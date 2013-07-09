@@ -1,0 +1,32 @@
+# Useful utilities: reptyr
+# Inspiration from: ArchWiki, kivikakk
+
+# Disable the startup message
+startup_message off
+
+# Disable the visual bell (a strong contender for most annoying setting)
+vbell off
+
+# Increase the default scrollback
+defscrollback 10000
+
+# Use a 256 colour terminal
+term screen-256color
+
+# Don't use the alternate screen (can use the mouse in more sophisticated terminals)
+termcapinfo xterm* ti@:te@
+
+# Use UTF-8 encoding as the default
+defutf8 on
+
+# Start window indexing from one
+bind c screen 1
+bind ^c screen 1
+bind 0 select 10
+screen 1
+
+# A much nicer statusbar (with much thanks to kivikakk for the dark arts hardstatus string)
+hardstatus off
+hardstatus alwayslastline
+hardstatus string '%{gk}[ %{G}%H %{g}][%= %{wk}%?%-Lw%?%{=b kR}(%{W}%n*%f %t%?(%u)%?%{=b kR})%{= kw}%?%+Lw%?%?%= %{g}][ %{Y}%l%{g} ]%{=b C}[ %d/%m %C %A ]%{W}'
+
