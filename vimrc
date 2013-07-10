@@ -19,7 +19,7 @@ Bundle 'Lokaltog/vim-easymotion'
 Bundle 'scrooloose/nerdtree'
 Bundle 'scrooloose/syntastic'
 Bundle 'tpope/vim-fugitive'
-Bundle 'L9.vim'
+Bundle 'L9'
 Bundle 'surround.vim'
 
 " Enable full file type detection (for Vundle)
