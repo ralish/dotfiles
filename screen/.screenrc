@@ -7,6 +7,9 @@ startup_message off
 # Disable the visual bell (a strong contender for most annoying setting)
 vbell off
 
+# Block the display if we detach uncleanly so certain programs don't hang on us
+defnonblock on
+
 # Increase the default scrollback
 defscrollback 10000
 
