@@ -6,6 +6,9 @@
 	name = Samuel D. Leslie
 	email = sdl@nexiom.net
 
+[github]
+	user = ralish
+
 [advice]
 	statusHints = false
 
@@ -20,6 +23,7 @@
 	ui = true
 
 [diff]
+	algorithm = patience
 	mnemonicprefix = true
 
 [help]
@@ -46,39 +50,39 @@
 	a	= add
 	aa	= add --all
 	ap	= add --patch
-	apa = add --patch --all
+	apa	= add --patch --all
 
 	bl	= blame
 
 	br	= branch
-	bra = branch --all
-	brd = branch --delete
-	brD = branch -D
+	bra	= branch --all
+	brd	= branch --delete
+	brD	= branch -D
 
-	bsb = bisect bad
-	bsg = bisect good
-	bsr = bisect reset
-	bss = bisect start
+	bsb	= bisect bad
+	bsg	= bisect good
+	bsr	= bisect reset
+	bss	= bisect start
 
 	cl	= clone
-	clr = clone --recursive
+	clr	= clone --recursive
 
 	cm	= commit
-	cmm = commit --message
-	cma = commit --all
-	cmv = commit --all --message
-	cmx = commit --amend
+	cmm	= commit --message
+	cma	= commit --all
+	cmv	= commit --all --message
+	cmx	= commit --amend
 
 	co	= checkout
-	cob = checkout -b
-	cof = checkout FETCH_HEAD
+	cob	= checkout -b
+	cof	= checkout FETCH_HEAD
 
 	cp	= cherry-pick
 
 	d	= diff -w
 	dw	= diff
 	dc	= diff --cached -w
-	dcw = diff --cached
+	dcw	= diff --cached
 
 	f	= fetch
 
@@ -87,7 +91,7 @@
 	h	= show -w
 	hw	= show
 	hs	= show --stat -w
-	hsw = show --stat
+	hsw	= show --stat
 	h1	= show -w HEAD~1
 	h2	= show -w HEAD~2
 	h3	= show -w HEAD~3
@@ -107,67 +111,67 @@
 	m	= merge
 	mf	= merge FETCH_HEAD
 	mm	= merge master
-	mnf = merge --no-ff
+	mnf	= merge --no-ff
 
 	n	= notes
 
 	p	= push
 	pf	= push --force
 	po	= push origin
-	pom = push origin master
+	pom	= push origin master
 	ps	= push --set-upstream
-	pso = push --set-upstream origin
+	pso	= push --set-upstream origin
 	pt	= push $(git symbolic-ref HEAD | sed s_^refs/heads/__)
-	ptf = push $(git symbolic-ref HEAD | sed s_^refs/heads/__) --force
+	ptf	= push $(git symbolic-ref HEAD | sed s_^refs/heads/__) --force
 	pn	= push refs/notes/*
 
 	q	= pull
 
 	rb	= rebase
-	rba = rebase --abort
-	rbc = rebase --continue
-	rbs = rebase --skip
-	rbf = rebase FETCH_HEAD
-	rbm = rebase master
-	rbi = rebase -i
-	rb1 = rebase -i HEAD~1
-	rb2 = rebase -i HEAD~2
-	rb3 = rebase -i HEAD~3
-	rb4 = rebase -i HEAD~4
-	rb5 = rebase -i HEAD~5
-	rb5 = rebase -i HEAD~5
-	rb6 = rebase -i HEAD~6
-	rb7 = rebase -i HEAD~7
-	rb8 = rebase -i HEAD~8
-	rb9 = rebase -i HEAD~9
-	rb0 = rebase -i HEAD~10
+	rba	= rebase --abort
+	rbc	= rebase --continue
+	rbs	= rebase --skip
+	rbf	= rebase FETCH_HEAD
+	rbm	= rebase master
+	rbi	= rebase -i
+	rb1	= rebase -i HEAD~1
+	rb2	= rebase -i HEAD~2
+	rb3	= rebase -i HEAD~3
+	rb4	= rebase -i HEAD~4
+	rb5	= rebase -i HEAD~5
+	rb5	= rebase -i HEAD~5
+	rb6	= rebase -i HEAD~6
+	rb7	= rebase -i HEAD~7
+	rb8	= rebase -i HEAD~8
+	rb9	= rebase -i HEAD~9
+	rb0	= rebase -i HEAD~10
 
-	rma = remote add
-	rmp = remote prune
-	rmr = remote rm
-	rmv = remote --verbose
+	rma	= remote add
+	rmp	= remote prune
+	rmr	= remote rm
+	rmv	= remote --verbose
 
 	rs	= reset
-	rsh = reset --hard
+	rsh	= reset --hard
 
 	rv	= revert --no-commit
-	rvn = revert
+	rvn	= revert
 
 	s	= status --short --branch
 	sl	= status --long
 
 	sm	= submodule
-	sma = submodule add
-	smi = submodule init
-	sms = submodule sync
-	smu = submodule update
+	sma	= submodule add
+	smi	= submodule init
+	sms	= submodule sync
+	smu	= submodule update
 
 	st	= stash save
-	sta = stash apply
-	std = stash drop
-	stl = stash list
-	stp = stash pop
-	sts = stash show --patch
+	sta	= stash apply
+	std	= stash drop
+	stl	= stash list
+	stp	= stash pop
+	sts	= stash show --patch
 
 	t	= tag
 	td	= tag --delete
