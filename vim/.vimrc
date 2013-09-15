@@ -1,6 +1,9 @@
 " Be more useful (ie. drop Vi compatibility)
 set nocompatible
 
+" Setting this first seems to fix non-zero exit status on OS X
+filetype on
+
 " Disable all file type detection (for Vundle)
 filetype off
 
