@@ -1,0 +1,41 @@
+With thanks to: Mathias Bynens
+
+# Permit 8-bit characters (will permit UTF-8)
+set input-meta on
+set output-meta on
+set convert-meta off
+
+# Completely disable the terminal bell (audible & visual)
+set bell-style none
+
+# Set automatic completion of filenames to be case insensitive
+set completion-ignore-case on
+
+# Prefer `vi` style key bindings versus the `emacs` defaults
+set editing-mode vi
+
+# Denote symlinks to directories with an appended slash
+set mark-symlinked-directories on
+
+# Do not autocomplete hidden files unless the pattern begins with a dot
+set match-hidden-files off
+
+# Show all autocomplete results at once instead of via the internal pager
+set page-completions off
+
+# List all matches in case multiple possible completions are possible
+set show-all-if-ambiguous on
+
+# Factor any text after the curser position into completion matching
+set skip-completed-text on
+
+# Show extra file information when completing similar to `ls -F`
+set visible-stats on
+
+# Use any entered text as the prefix for searching command history
+"\e[B": history-search-forward
+"\e[A": history-search-backward
+
+# Use Alt/Meta + Delete to delete the preceding word
+"\e[3;3~": kill-word
+
