@@ -1,0 +1,12 @@
+# OS X detritus
+.Trashes/
+._*
+.DS_Store
+.Spotlight-V100
+
+# Windows detritus
+$RECYCLE.BIN/
+Desktop.ini
+ehthumbs.db
+Thumbs.db
+
