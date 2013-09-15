@@ -1,4 +1,4 @@
-With thanks to: Mathias Bynens
+# With thanks to: Mathias Bynens
 
 # Permit 8-bit characters (will permit UTF-8)
 set input-meta on
