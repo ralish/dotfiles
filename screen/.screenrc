@@ -16,7 +16,7 @@ defscrollback 10000
 # Use a 256 colour terminal
 term screen-256color
 
-# Don't use the alternate screen (can use the mouse in more sophisticated terminals)
+# Don't use the alternate screen in xterm
 termcapinfo xterm* ti@:te@
 
 # Use UTF-8 encoding as the default
