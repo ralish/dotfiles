@@ -34,6 +34,12 @@ plugins=(debian git rand-quote)
 # Actually load oh-my-zsh with our settings
 source $ZSH/oh-my-zsh.sh
 
+# Load virtualenvwrapper if it is present
+if [ -f /etc/bash_completion.d/virtualenvwrapper ]; then
+	export WORKON_HOME=$HOME/.virtualenvs
+	source /etc/bash_completion.d/virtualenvwrapper
+fi
+
 # Customise our path
 export PATH=PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
 
