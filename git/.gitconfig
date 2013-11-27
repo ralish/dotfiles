@@ -27,7 +27,7 @@
 	mnemonicprefix = true
 
 [help]
-	autocorrect = 10
+	autocorrect = 0
 
 [log]
 	abbrevCommit = true
@@ -37,7 +37,7 @@
 	conflictstyle = diff3
 
 [push]
-	default = simple
+	default = matching
 
 [rebase]
 	autosquash = true
