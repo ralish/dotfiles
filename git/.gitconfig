@@ -36,6 +36,9 @@
 	log = true
 	conflictstyle = diff3
 
+[oh-my-zsh]
+	hide-status = 0
+
 [push]
 	default = matching
 
