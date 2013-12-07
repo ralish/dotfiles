@@ -1,6 +1,9 @@
 # If we're not running interactively then bail out
 [ -z "$PS1" ] && return
 
+# Path to our common shell configuration
+SHCFG=$HOME/dotfiles/sh/common.sh
+
 # Don't insert lines with a space or duplicates into history
 HISTCONTROL=ignoreboth
 
@@ -79,6 +82,9 @@ if [ -x /usr/bin/dircolors ]; then
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
 fi
+
+# Load our common shell configuration
+. $SHCFG
 
 # If we defined a custom aliases file then include it
 if [ -f ~/.bash_aliases ]; then

@@ -1,6 +1,9 @@
 # Path to oh-my-zsh configuration
 ZSH=$HOME/.oh-my-zsh
 
+# Path to our common shell configuration
+SHCFG=$HOME/dotfiles/sh/common.sh
+
 # Name of the oh-my-zsh theme to load
 ZSH_THEME="gianu"
 
@@ -33,6 +36,9 @@ plugins=(debian git rand-quote)
 
 # Actually load oh-my-zsh with our settings
 source $ZSH/oh-my-zsh.sh
+
+# Load our common shell configuration
+source $SHCFG
 
 # Load virtualenvwrapper if it is present
 if [ -f /etc/bash_completion.d/virtualenvwrapper ]; then
