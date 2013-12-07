@@ -1,2 +1,5 @@
+# Ignore arm cache
+arm/.arm/cache
+
 # Ignore our bundle folder as it will populate with cloned git repos
 vim/.vim/bundle
