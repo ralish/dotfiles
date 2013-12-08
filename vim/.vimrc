@@ -29,7 +29,11 @@ Bundle 'surround.vim'
 filetype plugin indent on
 
 " Use the Solarized colour scheme
-colorscheme solarized
+try
+    colorscheme solarized
+catch
+    colorscheme default
+endtry
 
 " Optimise for dark backgrounds
 set background=dark
