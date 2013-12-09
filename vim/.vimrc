@@ -1,3 +1,6 @@
+" Consult the Vim Options Documentation as a reference
+" http://vimdoc.sourceforge.net/htmldoc/options.html
+
 " Be more useful (ie. drop Vi compatibility)
 set nocompatible
 
@@ -6,6 +9,9 @@ filetype on
 
 " Disable all file type detection (for Vundle)
 filetype off
+
+" Enable mouse usage everywhere (all modes)
+set mouse=a
 
 " Load up Vundle
 set rtp+=~/.vim/bundle/vundle/
