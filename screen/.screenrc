@@ -1,11 +1,11 @@
 # Useful utilities: reptyr
 # Inspiration from: ArchWiki, kivikakk
 
-# Disable the startup message
-startup_message off
+# Enable usage of the alternate screen (clean exit from vim and other full-screen apps)
+altscreen on
 
-# Disable the visual bell (a strong contender for most annoying setting)
-vbell off
+# Use the current background colour when erasing characters instead of the default
+defbce on
 
 # Block the display if we detach uncleanly so certain programs don't hang on us
 defnonblock on
@@ -13,14 +13,23 @@ defnonblock on
 # Increase the default scrollback
 defscrollback 10000
 
-# Use a 256 colour terminal
-term screen-256color
+# Use UTF-8 encoding as the default
+defutf8 on
+
+# Shorten the time we display messages
+msgwait 2
+
+# Disable the startup message
+startup_message off
+
+# Use a 256 colour terminal with BCE (background-colour-erase) support
+term screen-256color-bce
 
 # Don't use the alternate screen in xterm
 termcapinfo xterm* ti@:te@
 
-# Use UTF-8 encoding as the default
-defutf8 on
+# Disable the visual bell (a strong contender for most annoying setting)
+vbell off
 
 # Start window indexing from one
 bind c screen 1
