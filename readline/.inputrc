@@ -11,6 +11,9 @@ set bell-style none
 # Set automatic completion of filenames to be case insensitive
 set completion-ignore-case on
 
+# Treat hypens and underscores as the same if completion-ignore-case is on
+set completion-map-case on
+
 # Confirm we want to show all possible matches if more than this limit
 set completion-query-items 200
 
