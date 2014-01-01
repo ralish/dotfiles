@@ -47,5 +47,5 @@ if [ -f /etc/bash_completion.d/virtualenvwrapper ]; then
 fi
 
 # Customise our path
-export PATH=PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+export PATH=$PATH
 
