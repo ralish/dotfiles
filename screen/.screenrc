@@ -22,7 +22,7 @@ msgwait 2
 # Disable the startup message
 startup_message off
 
-# Use a 256 colour terminal with BCE (background-colour-erase) support
+# Use a 256 colour terminal
 term screen-256color-bce
 
 # Don't use the alternate screen in xterm
