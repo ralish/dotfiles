@@ -1,5 +1,8 @@
 # Ignore tor-arm cache
 arm/.arm/cache
 
-# Ignore our Vim bundle folder as it will populate with cloned git repos
+# Never include our irssi config
+irssi
+
+# Ignore Vim bundle folder (git repos clone here)
 vim/.vim/bundle
