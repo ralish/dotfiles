@@ -1,6 +1,9 @@
 # Some general cnfiguration common to all shells
 # Should be compatible with: sh, bash, ksh, zsh
 
+# Customise our path
+export PATH=~/bin:$PATH
+
 # Our preferred text editors ordered by priority
 EDITOR_PRIORITY="vim vi nano pico"
 

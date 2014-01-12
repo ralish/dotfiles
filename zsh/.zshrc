@@ -46,6 +46,3 @@ if [ -f /etc/bash_completion.d/virtualenvwrapper ]; then
 	source /etc/bash_completion.d/virtualenvwrapper
 fi
 
-# Customise our path
-export PATH=$PATH
-
