@@ -13,7 +13,7 @@
 ###   kwallet              (Unix-like systems)
 ###   keychain             (Mac OS X)
 ###   windows-cryptoapi    (Windows)
-# password-stores = gnome-keyring,kwallet
+password-stores =
 ###
 ### Set KWallet wallet used by Subversion. If empty or unset,
 ### then the default network wallet will be used.

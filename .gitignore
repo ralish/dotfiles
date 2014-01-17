@@ -4,5 +4,8 @@ arm/.arm/cache
 # Never include our irssi config
 irssi
 
+# Make sure we exclude Subversion auth data
+subversion/.subversion/auth
+
 # Ignore Vim bundle folder (git repos clone here)
 vim/.vim/bundle
