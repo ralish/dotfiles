@@ -2,6 +2,9 @@
 	excludesfile = ~/.gitignore
 	attributesfile = ~/.gitattributes
 
+[include]
+	path = .gitconfig-win
+
 [user]
 	name = Samuel D. Leslie
 	email = sdl@nexiom.net

@@ -1,0 +1,6 @@
+[core]
+	quotepath = off
+
+[svn]
+	pathnameencoding = off
+
