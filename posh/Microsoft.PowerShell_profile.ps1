@@ -28,7 +28,7 @@ if (Test-Path $SublRegPath) {
 # Add SSH keys to ssh-agent
 $SshKeysPath = 'Y:\Secured\SSH Keys\*.opk'
 if (Get-Command ssh-add.exe) {
-    Get-ChildItem $SshKeysPath | % { ssh-add $_ } | Out-Null
+    Get-ChildItem $SshKeysPath | % { ssh-add $_ 2>&1 } | Out-Null
 } else {
     Write-Verbose "Couldn't locate ssh-add.exe binary; not adding SSH keys to ssh-agent."
 }
