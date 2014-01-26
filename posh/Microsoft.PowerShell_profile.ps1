@@ -8,6 +8,9 @@ if ($PSVersionTable.PSVersion.Major -ge 2) {
     }
 }
 
+# Source our custom functions
+. (Join-Path $PSScriptRoot 'Functions.ps1')
+
 # Some useful aliases
 New-Alias which Get-Command
 
