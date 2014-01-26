@@ -12,10 +12,12 @@ if ($PSVersionTable.PSVersion.Major -ge 2) {
 . (Join-Path $PSScriptRoot 'Functions.ps1')
 
 # Some useful aliases
-New-Alias which Get-Command
+Set-Alias which Get-Command
 
 # PowerShell paging sucks so hard but this helps a little
-Remove-Item Function:\more
+if (Test-Path Function:\more) {
+    Remove-Item Function:\more
+}
 Set-Alias more 'Out-Host -paging'
 
 # Add alias for Sublime Text
@@ -23,7 +25,7 @@ $SublRegPath = 'HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime
 $SublBinName = 'sublime_text.exe'
 if (Test-Path $SublRegPath) {
     $SublInfo = Get-ItemProperty $SublRegPath
-    New-Alias subl (Join-Path $SublInfo.InstallLocation $SublBinName)
+    Set-Alias subl (Join-Path $SublInfo.InstallLocation $SublBinName)
 } else {
     Write-Verbose "Couldn't locate Sublime Text install; not adding 'subl' alias."
 }
