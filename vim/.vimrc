@@ -11,7 +11,9 @@ filetype on
 filetype off
 
 " Enable mouse usage everywhere (all modes)
-set mouse=a
+if has('mouse')
+    set mouse=a
+endif
 
 " Load up Vundle
 set rtp+=~/.vim/bundle/vundle/
@@ -44,11 +46,23 @@ endtry
 " Optimise for dark backgrounds
 set background=dark
 
+" Allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+" Don't litter the filesystem with backup files
+set nobackup
+
 " Don't expand tabs into spaces
 set noexpandtab
 
+" Increase the command line history
+set history=50
+
 " Ignore case in search patterns
 set ignorecase
+
+" Search incrementally (ie. start matching immediately)
+set incsearch
 
 " Always draw a status line
 set laststatus=2
@@ -58,6 +72,9 @@ set modeline
 
 " Print the line number in front of each line
 set number
+
+" Always show the cursor position (line and column number)
+set ruler
 
 " Show partial command in the last line of the screen
 set showcmd
@@ -70,4 +87,13 @@ set smartindent
 
 " Insert appropriate number of blanks for tab in front of a line
 set smarttab
+
+" If the terminal has colour support then add some extras
+if &t_Co > 2 || has('gui_running')
+    " Enable syntax highlighting
+    syntax on
+
+    " Highlight matches when searching
+    set hlsearch
+endif
 
