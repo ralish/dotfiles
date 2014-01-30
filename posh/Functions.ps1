@@ -28,3 +28,9 @@ Function Get-EventLogTail {
         $idx1 = $idx2
     } while ($true)
 }
+
+# The MKLINK command is actually part of the Command Processor (cmd.exe)
+# So we have a quick and dirty function below to invoke it via PowerShell
+Function mklink {
+    cmd /c mklink $args
+}
