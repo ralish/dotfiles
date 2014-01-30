@@ -15,9 +15,7 @@ if ($PSVersionTable.PSVersion.Major -ge 2) {
 Set-Alias which Get-Command
 
 # PowerShell paging sucks so hard but this helps a little
-if (Test-Path Function:\more) {
-    Remove-Item Function:\more
-}
+if (Test-Path Function:\more) { Remove-Item Function:\more }
 Set-Alias more 'Out-Host -paging'
 
 # Add alias for Sublime Text
