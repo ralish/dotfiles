@@ -4,6 +4,9 @@ arm/.arm/cache
 # Never include our irssi config
 irssi
 
+# Ignore PoSh modules folder
+posh/Modules
+
 # Make sure we exclude Subversion auth data
 subversion/.subversion/auth
 
