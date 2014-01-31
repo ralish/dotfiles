@@ -12,11 +12,8 @@ if ($PSVersionTable.PSVersion.Major -ge 2) {
 . (Join-Path $PSScriptRoot 'Functions.ps1')
 
 # Some useful aliases
+Set-Alias gh Get-Help
 Set-Alias which Get-Command
-
-# PowerShell paging sucks so hard but this helps a little
-if (Test-Path Function:\more) { Remove-Item Function:\more }
-Set-Alias more 'Out-Host -paging'
 
 # Add alias for Sublime Text
 $SublRegPath = 'HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1'
