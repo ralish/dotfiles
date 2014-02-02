@@ -2,6 +2,13 @@
 if ($PSVersionTable.PSVersion.Major -ge 3) {
     if ((Get-Module PSReadLine -ListAvailable) -and ($Host.Name -eq 'ConsoleHost')) {
         Import-Module PSReadLine
+
+        # Search command history based on any already entered text
+        Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward
+        Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
+
+        # Bash style completion
+        Set-PSReadlineKeyHandler -Key Tab -Function Complete
     } else {
         Write-Verbose "Couldn't locate PSReadLine module; not importing to environment."
     }
