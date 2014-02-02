@@ -8,10 +8,11 @@ if ($PSVersionTable.PSVersion.Major -ge 3) {
 }
 
 # Load posh-git if we're running PoSh >= 2.0
-$PoshGitPath = (Join-Path (Split-Path $PROFILE) 'Modules\posh-git\profile.ps1')
 if ($PSVersionTable.PSVersion.Major -ge 2) {
-    if (Test-Path $PoshGitPath -PathType Leaf) {
-        . $PoshGitPath
+    if (Get-Module posh-git -ListAvailable) {
+        Import-Module posh-git
+        Enable-GitColors
+        Start-SshAgent -Quiet
     } else {
         Write-Verbose "Couldn't locate posh-git module; not importing to environment."
     }
