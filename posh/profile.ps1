@@ -1,6 +1,6 @@
 # Load PSReadLine if we're running PoSh >= 3.0
 if ($PSVersionTable.PSVersion.Major -ge 3) {
-    if (Get-Module PSReadLine -ListAvailable) {
+    if ((Get-Module PSReadLine -ListAvailable) -and ($Host.Name -eq 'ConsoleHost')) {
         Import-Module PSReadLine
     } else {
         Write-Verbose "Couldn't locate PSReadLine module; not importing to environment."
