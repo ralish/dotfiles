@@ -1,6 +1,10 @@
 # Ignore tor-arm cache
 arm/.arm/cache
 
+# Clink system specific data
+clink/.history
+clink/clink.log
+
 # Never include our irssi config
 irssi
 
