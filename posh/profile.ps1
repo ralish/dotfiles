@@ -1,3 +1,12 @@
+# Load PSReadLine if we're running PoSh >= 3.0
+if ($PSVersionTable.PSVersion.Major -ge 3) {
+    if (Get-Module PSReadLine -ListAvailable) {
+        Import-Module PSReadLine
+    } else {
+        Write-Verbose "Couldn't locate PSReadLine module; not importing to environment."
+    }
+}
+
 # Load posh-git if we're running PoSh >= 2.0
 $PoshGitPath = (Join-Path (Split-Path $PROFILE) 'Modules\posh-git\profile.ps1')
 if ($PSVersionTable.PSVersion.Major -ge 2) {
