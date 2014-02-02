@@ -18,23 +18,6 @@ if ($PSVersionTable.PSVersion.Major -ge 2) {
     }
 }
 
-# Source our custom functions
-. (Join-Path $PSScriptRoot 'Functions.ps1')
-
-# Some useful aliases
-Set-Alias gh Get-Help
-Set-Alias which Get-Command
-
-# Add alias for Sublime Text
-$SublRegPath = 'HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1'
-$SublBinName = 'sublime_text.exe'
-if (Test-Path $SublRegPath) {
-    $SublInfo = Get-ItemProperty $SublRegPath
-    Set-Alias subl (Join-Path $SublInfo.InstallLocation $SublBinName)
-} else {
-    Write-Verbose "Couldn't locate Sublime Text install; not adding 'subl' alias."
-}
-
 # Add SSH keys to ssh-agent
 $SshKeysPath = 'Y:\Secured\SSH Keys\*.opk'
 if (Get-Command ssh-add.exe) {
@@ -42,3 +25,7 @@ if (Get-Command ssh-add.exe) {
 } else {
     Write-Verbose "Couldn't locate ssh-add.exe binary; not adding SSH keys to ssh-agent."
 }
+
+# Source our custom aliases & functions
+. (Join-Path $PSScriptRoot 'Aliases.ps1')
+. (Join-Path $PSScriptRoot 'Functions.ps1')
