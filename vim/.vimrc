@@ -24,6 +24,7 @@ Bundle 'gmarik/vundle'
 
 " ******************** Bundles ********************
 Bundle 'altercation/vim-colors-solarized'
+Bundle 'bling/vim-airline'
 Bundle 'ervandew/supertab'
 Bundle 'kien/ctrlp.vim'
 Bundle 'Lokaltog/vim-easymotion'
