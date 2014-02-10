@@ -44,7 +44,7 @@ force_color_prompt=yes
 
 # If we elected to force a color prompt check we can support it 
 if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >& /dev/null; then
         color_prompt=yes
     else
         color_prompt=

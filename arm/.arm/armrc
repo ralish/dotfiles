@@ -174,7 +174,7 @@ features.config.descriptions.persist true
 # showIntermediateBounds
 #   shows y-axis increments between the top/bottom bounds
 
-features.graph.height 30 
+features.graph.height 30
 features.graph.maxWidth 150
 features.graph.interval 0
 features.graph.bound 1
