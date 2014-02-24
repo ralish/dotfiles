@@ -5,6 +5,9 @@ arm/.arm/cache
 clink/.history
 clink/clink.log
 
+# Only ever include the KiTTY config
+kitty/**
+
 # Never include our irssi config
 irssi
 
