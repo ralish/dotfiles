@@ -53,5 +53,5 @@ Thanks To
 
 The numerous people whose dotfiles I copied. Special mentions to:
 
-* [Amelia Cuss](https://github.com/kivikakk)
+* [Yuki Izumi](https://github.com/kivikakk)
 * [Mathias Bynens](https://github.com/mathiasbynens)
