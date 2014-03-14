@@ -6,6 +6,7 @@ if ($PSVersionTable.PSVersion.Major -ge 3) {
         # Search command history based on any already entered text
         Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward
         Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
+        Set-PSReadlineOption -HistorySearchCursorMovesToEnd
 
         # Bash style completion
         Set-PSReadlineKeyHandler -Key Tab -Function Complete
