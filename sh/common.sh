@@ -25,3 +25,6 @@ for editor in $EDITOR_PRIORITY; do
 	fi
 done
 
+# Nuke toggling flow control (ixany to re-enable)
+stty -ixon
+
