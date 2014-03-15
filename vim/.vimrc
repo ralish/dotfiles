@@ -53,6 +53,9 @@ set backspace=indent,eol,start
 " Don't litter the filesystem with backup files
 set nobackup
 
+" Highlight the current line
+set cursorline
+
 " Don't expand tabs into spaces
 set noexpandtab
 
