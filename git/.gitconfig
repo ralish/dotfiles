@@ -42,6 +42,9 @@
 [oh-my-zsh]
 	hide-status = 0
 
+[pull]
+	ff = only
+
 [push]
 	default = matching
 
@@ -183,4 +186,6 @@
 	td	= tag --delete
 	tl	= tag --list
 	tv	= tag --verify
+
+	up = "!git remote update -p; git merge --ff-only @{u}"
 
