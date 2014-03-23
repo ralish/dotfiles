@@ -43,6 +43,15 @@ source "$ZSH/oh-my-zsh.sh"
 # Load our common shell configuration
 source "$SHCFG"
 
+# Configure online help for zsh
+unalias run-help
+autoload run-help
+if [ -d "/usr/share/zsh/help" ]; then
+	HELPDIR="/usr/share/zsh/help"
+elif [ -d "/usr/local/share/zsh/help" ]; then
+	HELPDIR="/usr/local/share/zsh/help"
+fi
+
 # Load virtualenvwrapper if it is present
 if [ -f /etc/bash_completion.d/virtualenvwrapper ]; then
 	export WORKON_HOME="$HOME/.virtualenvs"
