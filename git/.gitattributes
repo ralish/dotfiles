@@ -1,4 +1,4 @@
-# Automatically normalize line endings for all text based files
+# Automatically normalise line endings for all text based files
 # 
 # Setting this globally seems to break other repositories in some cases
 # so we avoid using it for now, however, we can use it in our own repos

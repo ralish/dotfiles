@@ -172,6 +172,7 @@
 	sm	= submodule
 	sma	= submodule add
 	smi	= submodule init
+	smt	= submodule status
 	sms	= submodule sync
 	smu	= submodule update
 
@@ -187,5 +188,5 @@
 	tl	= tag --list
 	tv	= tag --verify
 
-	up = "!git remote update -p; git merge --ff-only @{u}"
+	up	= "!git remote update -p; git merge --ff-only @{u}"
 
