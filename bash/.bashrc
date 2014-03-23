@@ -88,4 +88,3 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 fi
 
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet
-
