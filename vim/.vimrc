@@ -1,6 +1,9 @@
 " Consult the Vim Options Documentation as a reference
 " http://vimdoc.sourceforge.net/htmldoc/options.html
 
+" Explicitly use sh
+set shell=sh
+
 " Be more useful (ie. drop Vi compatibility)
 set nocompatible
 
