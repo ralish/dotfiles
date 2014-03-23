@@ -1,11 +1,14 @@
 # Path to oh-my-zsh configuration
-ZSH=$HOME/.oh-my-zsh
+ZSH="$HOME/.oh-my-zsh"
 
 # Path to our common shell configuration
-SHCFG=$HOME/dotfiles/sh/common.sh
+SHCFG="$HOME/dotfiles/sh/common.sh"
 
 # Name of the oh-my-zsh theme to load
-ZSH_THEME="gianu"
+ZSH_THEME="agnoster"
+
+# Used by agnoster theme to hide default user
+DEFAULT_USER="sdl"
 
 # Enable case-sensitive completion
 CASE_SENSITIVE="true"
@@ -26,7 +29,7 @@ DISABLE_AUTO_UPDATE="true"
 DISABLE_CORRECTION="true"
 
 # Display red dots while waiting
-# COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Disable marking untracked files under VCS as dirty
 # DISABLE_UNTRACKED_FILES_DIRTY="true"
@@ -35,14 +38,15 @@ DISABLE_CORRECTION="true"
 plugins=(debian git rand-quote)
 
 # Actually load oh-my-zsh with our settings
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh"
 
 # Load our common shell configuration
-source $SHCFG
+source "$SHCFG"
 
 # Load virtualenvwrapper if it is present
 if [ -f /etc/bash_completion.d/virtualenvwrapper ]; then
-	export WORKON_HOME=$HOME/.virtualenvs
+	export WORKON_HOME="$HOME/.virtualenvs"
 	source /etc/bash_completion.d/virtualenvwrapper
 fi
 
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet
