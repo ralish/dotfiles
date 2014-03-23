@@ -21,7 +21,7 @@ match_colour = -1
 # the line. 0 = PATH only, 1 = PATH and CWD, 2 = PATH, CWD, and directories. In
 # all cases both executables and directories are matched when there is a path
 # separator present. A value of -1 will disable executable matching completely.
-exec_match_style = 2
+exec_match_style = 1
 
 # name: Whitespace prefix matches files
 # type: bool

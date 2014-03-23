@@ -1,5 +1,3 @@
-# With thanks to: Mathias Bynens
-
 # Permit 8-bit characters (will permit UTF-8)
 set input-meta on
 set output-meta on
@@ -17,7 +15,7 @@ set completion-map-case on
 # Confirm we want to show all possible matches if more than this limit
 set completion-query-items 200
 
-# Prefer `vi` style key bindings versus the `emacs` defaults
+# Prefer vi style key bindings versus the emacs defaults
 set editing-mode vi
 
 # Denote symlinks to directories with an appended slash
