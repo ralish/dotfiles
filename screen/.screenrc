@@ -1,6 +1,3 @@
-# Useful utilities: reptyr
-# Inspiration from: ArchWiki, kivikakk
-
 # Enable usage of the alternate screen (clean exit from vim and other full-screen apps)
 altscreen on
 
