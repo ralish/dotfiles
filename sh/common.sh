@@ -1,5 +1,5 @@
-# Some general cnfiguration common to all shells
-# Should be compatible with: sh, bash, ksh, zsh
+# Some general configuration common to most shells
+# Should be compatible with at least: sh, bash, ksh, zsh
 
 # Additional locations to prefix to our PATH
 EXTRA_PATHS="~/bin"
@@ -9,14 +9,14 @@ EDITOR_PRIORITY="vim vi nano pico"
 
 # OS X configuration
 if [ $(uname -s) = "Darwin" ]; then
-	. ~/dotfiles/sh/osx.sh
+	source "$HOME/dotfiles/sh/systems/osx.sh"
 fi
 
 # Customise our path
 export PATH="$EXTRA_PATHS:$PATH"
 
 # Figure out which editor to default to
-for editor in $EDITOR_PRIORITY; do
+for editor in $(echo $EDITOR_PRIORITY); do
 	editor_path=$(command -v $editor)
 	if [ -n "$editor_path" ]; then
 		export EDITOR="$editor_path"
@@ -25,6 +25,7 @@ for editor in $EDITOR_PRIORITY; do
 	fi
 done
 
-# Nuke toggling flow control (ixany to re-enable)
+# Disable toggling flow control (use ixany to re-enable)
 stty -ixon
 
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet
