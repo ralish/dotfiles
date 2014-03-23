@@ -1,4 +1,3 @@
 # KiTTY session profiles *must* have LF line endings
-# CRLF line endings causes the stupid thing to crash
+# CRLF line endings cause the stupid thing to crash
 kitty/** eol=lf
-

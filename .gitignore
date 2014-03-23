@@ -1,21 +1,22 @@
-# Ignore tor-arm cache
-arm/.arm/cache
+# Arm cache (for Tor)
+arm/.arm/cache/
 
 # Clink system specific data
 clink/.history
 clink/clink.log
 
-# Only ever include the KiTTY config
-kitty/**
+# Only include our KiTTY config
+kitty/
+!kitty/kitty.ini
 
 # Never include our irssi config
-irssi
+irssi/
 
-# Ignore PoSh modules folder
-posh/Modules
+# PoSh modules folder (PsGet populates this)
+posh/Modules/
 
-# Make sure we exclude Subversion auth data
+# Subversion authentication data
 subversion/.subversion/auth
 
-# Ignore Vim bundle folder (git repos clone here)
-vim/.vim/bundle
+# Vim bundle folder (Git repos clone here)
+vim/.vim/bundle/
