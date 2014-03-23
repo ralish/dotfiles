@@ -10,12 +10,12 @@ fish/.config/fish/fish_history
 fish/.config/fish/fishd.*
 fish/.config/fish/generated_completions/
 
+# Never include our Irssi config
+irssi/
+
 # Only include our KiTTY config
 kitty/
 !kitty/kitty.ini
-
-# Never include our Irssi config
-irssi/
 
 # PoSh modules folder (PsGet populates this)
 posh/Modules/
