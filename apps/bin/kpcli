@@ -22,9 +22,9 @@ use FileHandle;                               # core
 use Getopt::Long;                             # core
 use File::Basename;                           # core
 use Digest::file;                             # core
+use Digest::MD5;                              # core
 use Digest::SHA qw(sha256);                   # core
 use Data::Dumper qw(Dumper);                  # core
-use Term::ReadLine;                           # core
 use Term::ANSIColor;                          # core
 use Carp qw(longmess);                        # core
 use English qw(-no_match_vars);               # core
@@ -34,7 +34,6 @@ use Crypt::Rijndael;         # non-core, libcrypt-rijndael-perl on Ubuntu
 use Sort::Naturally;         # non-core, libsort-naturally-perl on Ubuntu
 use Term::ReadKey;           # non-core, libterm-readkey-perl on Ubuntu
 use Term::ShellUI;           # non-core, libterm-shellui-perl on Ubuntu
-                             #  - add Term::ReadLine::Gnu for cli history
 use File::KeePass 0.03;      # non-core, libfile-keepass-perl on Ubuntu
                              #  - >=v0.03 needed due critical bug fixes
 # Pull in optional perl modules with run-time loading
@@ -77,17 +76,30 @@ $|=1; # flush immediately after writes or prints to STDOUT
 
 my $DEBUG=0;
 $Data::Dumper::Useqq = 1;    # Have Dumper escape special chars (like \0)
+my $DEFAULT_PASSWD_LEN = 20; # Default length of generated passwords.
 my $DEFAULT_ENTRY_ICON = 0;  # In keepassx, icon 0 is a golden key
 my $DEfAULT_GROUP_ICON = 49; # In keepassx, icon 49 is an opened file folder
 my $FOUND_DIR = '_found';    # The find command's results go in /_found/
 
 # Application name and version
 my $APP_NAME = basename($0);  $APP_NAME =~ s/\.(pl|exe)$//;
-my $VERSION = "2.4";
+my $VERSION = "2.5";
 
 our $HISTORY_FILE = ""; # Gets set in the MyGetOpts() function
 my $opts=MyGetOpts();   # Will only return with options we think we can use
 
+my $doc_passwd_gen =
+	"Usage is straightforward. For password generation, the\n" .
+	"\"g\" method produces a string of random characters while\n" .
+	"the \"w\" method creates a 4-word string inspired by\n" .
+	"\"correct horse battery staple\" (http://xkcd.com/936/).\n" .
+	"\n" .
+	"By default, the \"g\" method generates a password that is\n" .
+	"$DEFAULT_PASSWD_LEN characters long. " .
+				"That can be controlled by providing an\n" .
+	"integer immediately after the \"g\" in the range of 1-50.\n" .
+	"For example, \"g17\" will generate a 17 character password.\n" .
+	"";
 # Setup our Term::ShellUI object
 my $term = new Term::ShellUI(
     app => $APP_NAME,
@@ -152,7 +164,7 @@ my $term = new Term::ShellUI(
 	     doc  => "\n" .
 		"Clear the screen, which is useful when guests arrive.\n",
 	     maxargs => 0,
-	     method => sub { print "\033[2J\033[0;0H"; },
+	     method => \&cli_cls,
 	     exclude_from_history => 1,
 	 },
          "clear" => { alias => "cls", exclude_from_history => 1, },
@@ -233,10 +245,7 @@ my $term = new Term::ShellUI(
              doc => "\n" .
 		"The new command is used to create a new entry.\n" .
 		"\n" .
-		"Usage is straightforward. For password generation, the\n" .
-		"\"g\" method produces a string of random characters while\n" .
-		"the \"w\" method creates a 4-word string inspired by\n" .
-		"\"correct horse battery staple\" (http://xkcd.com/936/)\n" .
+		$doc_passwd_gen .
 		"",
              minargs => 0, maxargs => 1,
              args => [\&complete_groups],
@@ -314,17 +323,14 @@ my $term = new Term::ShellUI(
              doc => "\n" .
 		"The edit command is used to modify an entry.\n" .
 		"\n" .
-		"Usage is straightforward. For password generation, the\n" .
-		"\"g\" method produces a string of random characters while\n" .
-		"the \"w\" method creates a 4-word string inspired by\n" .
-		"\"correct horse battery staple\" (http://xkcd.com/936/)\n" .
+		$doc_passwd_gen .
 		"",
              minargs => 1, maxargs => 1,
              args => \&complete_groups_and_entries,
              method => \&cli_edit,
          },
          "mv" => {
-             desc => "Move an entry: mv <path to entry> <path to group>",
+             desc => "Move an item: mv <path to group|entry> <path to group>",
              minargs => 2, maxargs => 2,
              args => [\&complete_groups_and_entries, \&complete_groups],
              method => \&cli_mv,
@@ -334,6 +340,25 @@ my $term = new Term::ShellUI(
              minargs => 1, maxargs => 1,
              args => \&complete_groups,
              method => \&cli_rename,
+         },
+         "copy" => {
+             desc => "Copy an entry: copy <path to entry> <path to new entry>",
+             minargs => 2, maxargs => 2,
+             args => [\&complete_groups_and_entries,
+					\&complete_groups_and_entries],
+             method => \&cli_copy,
+         },
+         "cp" => { alias => "copy", },
+         "clone" => {
+             desc =>"Clone an entry: clone <path to entry> <path to new entry>",
+             doc => "\n" .
+		"Clones an entry for you to edit. Similar to doing\n" .
+		"\"cp foo bar; edit bar\" if that were possible.\n" .
+		"\n",
+             minargs => 2, maxargs => 2,
+             args => [\&complete_groups_and_entries,
+					\&complete_groups_and_entries],
+             method => \&cli_clone,
          },
          "save" => {
              desc => "Save the database to disk",
@@ -399,7 +424,8 @@ print "\n" .
 	"Type 'help' for a description of available commands.\n" .
 	"Type 'help <command>' for details on individual commands.\n";
 if ($DEBUG) {print 'Using '.$term->{term}->ReadLine." for readline.\n"; }
-if (! $DEBUG && $term->{term}->ReadLine ne 'Term::ReadLine::Gnu') {
+if ( (! $DEBUG) && (lc($OSNAME) !~ m/^mswin/) &&
+		($term->{term}->ReadLine ne 'Term::ReadLine::Gnu')) {
   print color('yellow') . "\n" .
 	"* NOTE: You are using " . $term->{term}->ReadLine . ".\n" .
 	"  Term::ReadLine::Gnu will provide better functionality.\n" .
@@ -839,6 +865,16 @@ sub cli_stats {
 	"Entries with passwords of length:\n".stats_print(\%password_lengths) .
 	"\n" .
 	"";
+}
+
+sub cli_cls {
+  if (lc($OSNAME) =~ m/^mswin/ &&
+		(! $OPTIONAL_PM{'Win32::Console::ANSI'}->{loaded})) {
+    system("cls");
+  } else {
+    print "\033[2J\033[0;0H";
+    $|=1; # Needed for MS Windows (Win32::Console::ANSI works w/this flush)
+  }
 }
 
 sub cli_pwd {
@@ -1351,13 +1387,7 @@ sub cli_mv($$) {
     return;
   }
 
-  my $target_ent = $params->{args}->[0];
-  my $ent=find_target_entity_by_number_or_path($target_ent);
-  if (! defined($ent)) {
-    print "Unknown entry: $target_ent\n";
-    return -1;
-  }
-
+  # The target has to be a group. We start validation there (the target).
   my $target_dir = $params->{args}->[1];
   my $dir_normalized=normalize_path_string($target_dir);
   my $grp=undef;
@@ -1370,29 +1400,170 @@ sub cli_mv($$) {
     return -1;
   }
 
-  # Verify no entry title conflict at the new location
-  my $new_entry_path=normalize_path_string($target_dir . "/" . $ent->{title});
-  if (defined($state->{all_ent_paths_fwd}->{$new_entry_path})) {
-    my $path = dirname(humanize_path($new_entry_path));
-    print "There is already and entry named \"$ent->{title}\" at $path/.\n";
-    return undef;
+  # The source (thing we are moving) can be an entity or group, and
+  # here we figure out which one and prepare to exectute the move below.
+  my $src_path = normalize_path_string($params->{args}->[0]);
+  my $ent=undef;
+  my $mv_type = undef;
+  if ($ent=find_target_entity_by_number_or_path($src_path)) {
+    $mv_type = 'entry';
+  } elsif (defined($state->{all_grp_paths_fwd}->{$src_path})) {
+    $mv_type = 'group';
+  } else {
+    print "Unknown entity: $src_path\n";
+    return -1;
   }
 
-  # Unlock the kdb, clone the entry, remove its ID and set its new group,
-  # add it to the kdb, delete the old entry, then lock the kdb...
-  $state->{kdb}->unlock;
-  my %ent_copy = %{$ent};
-  delete $ent_copy{id};
-  $ent_copy{group} = $grp;
-  if ($state->{kdb}->add_entry(\%ent_copy)) {
-    $state->{kdb}->delete_entry({ id=>$ent->{id} });
+  # Execute the move of the entry or group.
+  if ($mv_type eq 'entry') {
+    # Verify no entry title conflict at the new location
+    my $new_entry_path=normalize_path_string($target_dir . "/" . $ent->{title});
+    if (defined($state->{all_ent_paths_fwd}->{$new_entry_path})) {
+      my $path = dirname(humanize_path($new_entry_path));
+      print "There is already and entry named \"$ent->{title}\" at $path/.\n";
+      return undef;
+    }
+
+    # Unlock the kdb, clone the entry, remove its ID and set its new group,
+    # add it to the kdb, delete the old entry, then lock the kdb...
+    $state->{kdb}->unlock;
+    my %ent_copy = %{$ent};
+    delete $ent_copy{id};
+    $ent_copy{group} = $grp;
+    if ($state->{kdb}->add_entry(\%ent_copy)) {
+      $state->{kdb}->delete_entry({ id=>$ent->{id} });
+    }
+    $state->{kdb}->lock;
+  } elsif ($mv_type eq 'group') {
+    # Find the group that the user is asking us to move
+    my $src_grp=$state->{kdb}->find_group(
+			{id => $state->{all_grp_paths_fwd}->{$src_path}});
+    # Clone the group that is to be moved
+    my %new_group = %{$src_grp};
+    # Delete the id and level from the cloned group
+    delete $new_group{id};
+    delete $new_group{level};
+    # Add the group ID of the parent we want to put our clone under
+    $new_group{group} = $grp->{id}; # Set the new parent group
+    # Add the clone as a new group
+    $state->{kdb}->add_group(\%new_group);
+    # Delete the original group that we just cloned into a new spot
+    $state->{kdb}->delete_group({ id => $src_grp->{id} });
+  } else {
+    print "Unknown error with move command.\n";
+    return -1;
   }
-  $state->{kdb}->lock;
 
   # Because we moved an entry we must refresh our $state paths
   refresh_state_all_paths();
   $state->{kdb_has_changed}=1;
   RequestSaveOnDBChange();
+}
+
+sub cli_copy {
+  my $self = shift @_;
+  my $params = shift @_;
+  my $skip_save = shift @_ || 0;
+  our $state;
+
+  if (recent_sigint() || deny_if_readonly() || warn_if_file_changed()) {
+    return;
+  }
+
+  my $source_ent = $params->{args}->[0];
+  my $src_ent=find_target_entity_by_number_or_path($source_ent);
+  if (! defined($src_ent)) {
+    print "Unknown entry: $source_ent\n";
+    return -1;
+  }
+
+  my $target_ent = $params->{args}->[1];
+  my $trg_ent=find_target_entity_by_number_or_path($target_ent);
+  if (defined($trg_ent)) {
+    print "Copy cannot overwrite an existing entry.\n";
+    return -1;
+  }
+
+  # Unlock the kdb, clone the entry, remove its ID and set its new group,
+  # add it to the kdb, delete the old entry, then lock the kdb...
+  $state->{kdb}->unlock;
+  my %ent_copy = %{$src_ent};
+  $state->{kdb}->lock;
+  delete $ent_copy{id}; # Remove the entry ID for the new copy
+  my ($grp_path,$name)=normalize_and_split_raw_path($target_ent);
+  $ent_copy{title} = humanize_path($name);
+  # group needs to be set to the ID of the group we may be moving the copy to
+  my $new_grp_id = $state->{all_grp_paths_fwd}->{$grp_path};
+  if (! defined($new_grp_id)) {
+    print "Copy failed due to missing target group ID.\n";
+    return -1;
+  } else {
+    $ent_copy{group} = $new_grp_id;
+  }
+  $state->{kdb}->unlock;
+  if (! $state->{kdb}->add_entry(\%ent_copy)) {
+    print "Copy failed on add_entry().\n";
+    $state->{kdb}->lock;
+    return -1;
+  }
+  $state->{kdb}->lock;
+
+  # Because we added an entry we must refresh our $state paths
+  if (! $skip_save) {
+    refresh_state_all_paths();
+    $state->{kdb_has_changed}=1;
+    RequestSaveOnDBChange();
+  }
+  return 0;
+}
+
+sub cli_clone($$) {
+  my $self = shift @_;
+  my $params = shift @_;
+  my $skip_save = shift @_ || 0;
+  our $state;
+
+  if (recent_sigint() || deny_if_readonly() || warn_if_file_changed()) {
+    return;
+  }
+
+  my $skip_save = 1;
+  my $retval_copy = cli_copy($self, $params, $skip_save);
+  if ($retval_copy) {
+    return -1;
+  }
+  refresh_state_all_paths();
+
+  my $target_ent = $params->{args}->[1];
+  my $ent=find_target_entity_by_number_or_path($target_ent);
+  if (! (defined($ent) && exists($ent->{id}))) {
+    print "Copy failed.\n";
+    return -1;
+  }
+
+  $state->{kdb_has_changed}=1;
+  my %changes = ();
+  my $retval_edit = _entry_edit_gui($ent, \%changes);
+
+  # Apply the user changes, update modify time and prompt to save
+  if ($retval_edit == 0) {
+    $state->{kdb}->unlock; # Required for the password field
+    foreach my $key (keys %changes) { $ent->{$key} = $changes{$key}; }
+    $state->{kdb}->lock;
+    $ent->{modified} = $state->{kdb}->now;
+    refresh_state_all_paths();
+    $state->{kdb_has_changed}=1;
+    RequestSaveOnDBChange();
+    return 0;
+  } else {
+    # If the edit failed (or if the user hit ^C while in edit_gui), then
+    # remove the target entity that cli_copy() made.
+    my $ent_id=$ent->{id};
+    $state->{kdb}->delete_entry({ id => $ent_id });
+    refresh_state_all_paths();
+    $state->{kdb_has_changed}=0; # Should be back to how we started
+    return $retval_edit;
+  }
 }
 
 sub cli_show($$) {
@@ -1449,7 +1620,7 @@ sub cli_show($$) {
   print &Dumper($ent) . "\n" if ($DEBUG > 2);
 }
 
-sub cli_edit($) {
+sub cli_edit {
   my $self = shift @_;
   my $params = shift @_;
   our $state;
@@ -1465,38 +1636,11 @@ sub cli_edit($) {
     return -1;
   }
 
-  # Loop through the fields taking edits the user wants to make
-  my @fields = get_entry_fields();
   my %changes = ();
-  foreach my $input (@fields) {
-    my $val = '';
-    if ($input->{multiline}) {
-      $val = new_edit_multiline_input($input, $ent->{$input->{key}});
-    } else {
-      $val = new_edit_single_line_input($input, $ent->{$input->{key}});
-    }
-    # If the user hit ^C (SIGINT) then we need to stop
-    if (recent_sigint()) { return undef; }
-    # Check a new title for same-name conflicts in its group
-    if ($input->{key} eq 'title' && length($val)) {
-      if ($val =~ m/\//) {
-        print "kpcli cannot support titles with slashes (/) in them.\n";
-        return undef;
-      }
-      my $path = $ent->{path}; # The group's path of the entry we are editing
-      my $new_entry = normalize_path_string("$path/$val");
-      if (defined($state->{all_ent_paths_fwd}->{$new_entry})) {
-        print "An entry titled \"$val\" is already in $path.\n";
-        return undef;
-      }
-    }
-
-    # If the field was not empty, we'll change it to the new $val
-    if (length($val)) { $changes{$input->{key}} = $val; }
-  }
+  my $retval = _entry_edit_gui($ent, \%changes);
 
   # If the user made changes, apply them, update modify time and prompt to save
-  if (scalar(keys(%changes)) > 0) {
+  if ($retval == 0 && scalar(keys(%changes)) > 0) {
     $state->{kdb}->unlock; # Required for the password field
     foreach my $key (keys %changes) { $ent->{$key} = $changes{$key}; }
     $state->{kdb}->lock;
@@ -1508,6 +1652,41 @@ sub cli_edit($) {
 
 return 0;
 }
+
+# Helper function for cli_edit() and cli_clone()
+sub _entry_edit_gui($) {
+  my $ent=shift @_;
+  my $rChanges = shift @_;
+  # Loop through the fields taking edits the user wants to make
+  my @fields = get_entry_fields();
+  foreach my $input (@fields) {
+    my $val = '';
+    if ($input->{multiline}) {
+      $val = new_edit_multiline_input($input, $ent->{$input->{key}});
+    } else {
+      $val = new_edit_single_line_input($input, $ent->{$input->{key}});
+    }
+    # If the user hit ^C (SIGINT) then we need to stop
+    if (recent_sigint()) { return -1; }
+    # Check a new title for same-name conflicts in its group
+    if ($input->{key} eq 'title' && length($val)) {
+      if ($val =~ m/\//) {
+        print "kpcli cannot support titles with slashes (/) in them.\n";
+        return -1;
+      }
+      my $path = $ent->{path}; # The group's path of the entry we are editing
+      my $new_entry = normalize_path_string("$path/$val");
+      if (defined($state->{all_ent_paths_fwd}->{$new_entry})) {
+        print "An entry titled \"$val\" is already in $path.\n";
+        return -1;
+      }
+    }
+    # If the field was not empty, we'll change it to the new $val
+    if (length($val)) { $rChanges->{$input->{key}} = $val; }
+  }
+  return 0;
+}
+
 
 # A code-consolidation function...
 sub get_prepped_readline_term() {
@@ -1558,9 +1737,14 @@ sub new_edit_single_line_input($$) {
     $val = $term->readline($prompt, $iv);
   }
   chomp $val;
-  if ($input->{genpasswd} && $val =~ m/^[wg]$/) {
-    if ($val eq 'g') {
-      $val = generatePasswordGobbledygook(20);
+  if ($input->{genpasswd} && $val =~ m/^([wg])(\d*)$/) {
+    my $cmd = $1;
+    my $len = $2;
+    if ($cmd eq 'g') {
+      if ($len !~ m/^\d+$/ || $len < 1 || $len > 50) {
+        $len = $DEFAULT_PASSWD_LEN;
+      }
+      $val = generatePasswordGobbledygook($len);
     } else {
       $val = generatePassword();
     }
@@ -2443,15 +2627,21 @@ sub cli_version($$) {
     }
     print " * Perl: $pv\n";
     my @modules = qw(File::KeePass Term::ShellUI Term::ReadKey Term::ReadLine);
+    my @missing_modules = ();
     foreach my $module (sort keys %OPTIONAL_PM) {
       if ($OPTIONAL_PM{$module}->{loaded}) {
         push @modules, $module;
+      } else {
+        push @missing_modules, $module;
       }
     }
     foreach my $module (@modules) {
       no strict 'refs';
       my $vstr=$module . "::VERSION";
       print " * $module: " . ${$vstr} . "\n";
+    }
+    foreach my $module (@missing_modules) {
+      print " * $module: not installed (optional)\n";
     }
     print "\n";
     print "ReadLine being used: " . $term->{term}->ReadLine . "\n";
@@ -2534,6 +2724,7 @@ sub GetPassword {
     if (ord($c) == 3) { # ^C
       print "\n";
       ReadMode('normal');
+      kill SIGINT, $$; # Due to raw mode, I must send the SIGINT to myself.
       return '';
     } elsif (ord($c) == 127 || ord($c) == 8) { # backspace (Linux/Windows)
       if (length($master_pass)) {
@@ -2553,7 +2744,11 @@ sub GetPassword {
   }
   ReadMode('normal');
   chomp $master_pass;
-  print "\n";
+  my $min_display_length = 25;
+  if (length($master_pass) < $min_display_length) {
+    print "$echo_char"x($min_display_length - length($master_pass));
+  }
+  print "\n"; $|=1;
   if (recent_sigint()) { return undef; } # Bail on SIGINT
   return $master_pass;
 }
@@ -3033,7 +3228,10 @@ sub setup_signal_handling {
       # a cli_XXXX function instead of at a readline prompt.
       my $mess = longmess();
       #print Dumper( $mess );
-      if ($mess =~ m/main::(cli_\w+)\(/) {
+      # At some point, Term::ShellUI started wrapping my cli_XXX() routines
+      # in eval{}, which hid the cli_\w+() from the longmess, and so I had
+      # to add a second condition here.
+      if ($mess =~ m/(main::(cli_\w+)\(|Term::ShellUI::call_cmd\()/) {
         #warn "It appears that SIGINT was called from $1\n";
         #warn "LHHD: $mess\n";
         # If the cli_NNN has an active_readline we need to work with it
@@ -3072,8 +3270,11 @@ sub setup_signal_handling {
 		our $state;
 		my $term = $state->{'term'}->{term};
 		my $mess = longmess();
-		if ($mess =~ m/main::(cli_\w+)\(/ &&
-				defined($state->{active_readline})) {
+                # At some point, Term::ShellUI started wrapping my cli_XXX()
+                # routines in eval{}, which hid the cli_\w+() from the longmess,
+                # and so I had to add a second condition here.
+                if ($mess =~ m/(main::(cli_\w+)\(|Term::ShellUI::call_cmd\()/ &&
+					defined($state->{active_readline})) {
 		  $term = $state->{active_readline};
 		}
 		$term->cleanup_after_signal();
@@ -3085,8 +3286,11 @@ sub setup_signal_handling {
 		our $state;
 		my $term = $state->{'term'}->{term};
 		my $mess = longmess();
-		if ($mess =~ m/main::(cli_\w+)\(/ &&
-				defined($state->{active_readline})) {
+                # At some point, Term::ShellUI started wrapping my cli_XXX()
+                # routines in eval{}, which hid the cli_\w+() from the longmess,
+                # and so I had to add a second condition here.
+                if ($mess =~ m/(main::(cli_\w+)\(|Term::ShellUI::call_cmd\()/ &&
+					defined($state->{active_readline})) {
 		  $term = $state->{active_readline};
 		}
 		$term->cleanup_after_signal();
@@ -3138,7 +3342,15 @@ sub get_readline_term($$) {
       $ENV{'TERM'} = 'vt102';
     }
     if (runtime_load_module($rOPTIONAL_PM,$module,undef) eq 1) {
+      # These SGI{'__WARN__'} shenanigans are to suppress:
+      # WARNING: Use of inherited AUTOLOAD for non-method
+      #          Term::ReadLine::Gnu::ornaments() is deprecated at
+      #          /usr/lib/perl5/Term/ReadLine/Gnu.pm line 250.
+      # Hopefully, newer versions of Term::ReadLine::Gnu will fix this.
+      $SIG{'__WARN__'} =
+		sub { warn $_[0] unless (caller eq "Term::ReadLine::Gnu"); };
       $rl_term = eval "$module->new('$app_name');";
+      delete $SIG{'__WARN__'};
       last MODULE;
     } else {
       #warn "Loading $module failed\n";
@@ -3153,7 +3365,23 @@ sub get_readline_term($$) {
   }
 
   # I don't like readline ornaments in kpcli
-  $rl_term->ornaments(0);
+  if (lc($OSNAME) =~ m/^mswin/ && $rOPTIONAL_PM->{'Capture::Tiny'}->{loaded}) {
+    # On MS Windows, the RLTERM->ornaments() call causes a warning about
+    # not having a termcap file. It seems hamless and so we suppress that
+    # message if we have Capture::Tiny available.
+    my ($out, $err, @result) = capture( sub { $rl_term->ornaments(0); } );
+    if (length($err) && $err !~ m/^cannot find termcap/i) { warn $err; }
+  } else {
+    # WARNING: Use of inherited AUTOLOAD for non-method
+    #          Term::ReadLine::Gnu::ornaments() is deprecated
+    #          at line <two lines below>.
+    # This "no warnings" is to stop that, but the same warning
+    # still comes from Term::ReadLine::Gnu at line 250 with perl
+    # v5.14.2 and Term::ReadLine::Gnu 1.20-2. That is suppressed
+    # in a different way, just above in this same function.
+    no warnings 'once';
+    $rl_term->ornaments(0);
+  }
 
   # I'm not sure that these are only needed on Windows, but I know they
   # are not needed on Linux so I'm trying to keep the scope narrow.
@@ -3455,6 +3683,18 @@ this program would not have been practical for me to author.
                     Added generatePasswordFromDict() and "w" generation.
                     Added the -v option to the version command.
                      - Added the versions command.
+ 2014-Mar-15 v2.5 - Added length control (gNN) to password generation.
+                    Added the copy command (and cp alias).
+                    Added the clone command.
+                    Added optional modules not installed to version -v.
+                    Groups can now also be moved with the mv command.
+                    Modified cli_cls() to also work on MS Windows.
+                    Suppressed Term::ReadLine::Gnu hint on MS Windows.
+                    Suppressed missing termcap warning on MS Windows.
+                    Print a min number of *s to not leak passwd length.
+                    Removed unneeded use of Term::ReadLine.
+                    Quieted "inherited AUTOLOAD for non-method" warns
+                     caused by Term::Readline::Gnu on perl 5.14.x.
 
 =head1 TODO ITEMS
 
@@ -3473,11 +3713,12 @@ this program would not have been practical for me to author.
 =pod OSNAMES
 
 Unix-like
- - Written and tested on Ubuntu Linux 10.04.1 LTS.
+ - Originally written and tested on Ubuntu Linux 10.04.1 LTS.
+ - As of version 2.5, development is done on Linux Mint 16.
  - Known to work on many other Linux and *BSD distributions.
 
 Microsoft Windows
- - As of v2.4, MS Windows is also supported.
+ - As of v2.4, Microsoft Windows is also supported.
  - Tested and compiled on Strawberry Perl 5.16.2 on Windows 7.
 
 =pod SCRIPT CATEGORIES
