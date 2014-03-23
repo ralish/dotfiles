@@ -1,15 +1,20 @@
 # Arm cache (for Tor)
 arm/.arm/cache/
 
-# Clink system specific data
+# Clink history and log files
 clink/.history
 clink/clink.log
+
+# Fish automatically generated files
+fish/.config/fish/fish_history
+fish/.config/fish/fishd.*
+fish/.config/fish/generated_completions/
 
 # Only include our KiTTY config
 kitty/
 !kitty/kitty.ini
 
-# Never include our irssi config
+# Never include our Irssi config
 irssi/
 
 # PoSh modules folder (PsGet populates this)
