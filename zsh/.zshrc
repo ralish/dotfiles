@@ -44,7 +44,7 @@ source "$ZSH/oh-my-zsh.sh"
 source "$SHCFG"
 
 # Configure online help for zsh
-unalias run-help
+alias run-help &> /dev/null
 autoload run-help
 if [ -d "/usr/share/zsh/help" ]; then
 	HELPDIR="/usr/share/zsh/help"
