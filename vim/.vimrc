@@ -59,9 +59,6 @@ set nobackup
 " Highlight the current line
 set cursorline
 
-" Don't expand tabs into spaces
-set noexpandtab
-
 " Increase the command line history
 set history=50
 
@@ -92,9 +89,6 @@ set smartcase
 " Do smart autoindenting when starting a new line
 set smartindent
 
-" Insert appropriate number of blanks for tab in front of a line
-set smarttab
-
 " If the terminal has colour support then add some extras
 if &t_Co > 2 || has('gui_running')
     " Enable syntax highlighting
@@ -103,4 +97,31 @@ if &t_Co > 2 || has('gui_running')
     " Highlight matches when searching
     set hlsearch
 endif
+
+
+" {{{ Editing Settings: Tabs }}}
+
+" Number of spaces that a <Tab> in the file counts for
+set tabstop=4
+
+" Number of spaces to use for each step of (auto)indent
+set shiftwidth=4
+
+" Number of spaces that a <Tab> counts for while editing
+set softtabstop=4
+
+" Don't expand <Tab> entries into defined number of spaces
+set noexpandtab
+
+" On <Tab> in front of a line insert 'shiftwidth' spaces
+set smarttab
+
+
+" {{{ Editing Settings: Whitespace }}}
+
+" Hide invisible characters (eol, tab, etc...)
+set nolist
+
+" Define formatting settings for 'list' mode
+set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
 
