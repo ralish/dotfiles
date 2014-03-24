@@ -120,6 +120,7 @@
 	m	= merge
 	mf	= merge FETCH_HEAD
 	mm	= merge master
+	mff	= merge --ff-only
 	mnf	= merge --no-ff
 
 	n	= notes
