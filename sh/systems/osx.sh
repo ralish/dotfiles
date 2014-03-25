@@ -13,6 +13,14 @@ export LSCOLORS='Exfxcxdxbxegedabagacad'
 # Tell grep to highlight matches
 export GREP_OPTIONS='--color=auto'
 
+# Assume x86_64 arch for all compiles
+export ARCHFLAGS="-arch x86_64"
+
+# Load bash completion if it's present
+if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
+	source "$(brew --prefix)/etc/bash_completion"
+fi
+
 # Load grc if it's present
 if [ -f "$(brew --prefix)/etc/grc.bashrc" ]; then
 	source "$(brew --prefix)/etc/grc.bashrc"
