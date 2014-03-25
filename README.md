@@ -55,3 +55,4 @@ The numerous people whose dotfiles I copied. Special mentions to:
 
 * [Yuki Izumi](https://github.com/kivikakk)
 * [Mathias Bynens](https://github.com/mathiasbynens)
+* [Sorin Ionescu](https://github.com/sorin-ionescu)
