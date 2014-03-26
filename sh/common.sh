@@ -7,8 +7,10 @@ EXTRA_PATHS="~/bin"
 # Our preferred text editors ordered by priority
 EDITOR_PRIORITY="vim vi nano pico"
 
-# OS X configuration
-if [ $(uname -s) = "Darwin" ]; then
+# Operating system and environment specific configurations
+if [[ $(uname -s) == CYGWIN_NT-* ]]; then
+	source "$HOME/dotfiles/sh/systems/cygwin.sh"
+elif [ $(uname -s) = "Darwin" ]; then
 	source "$HOME/dotfiles/sh/systems/osx.sh"
 fi
 
