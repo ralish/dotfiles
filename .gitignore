@@ -17,6 +17,9 @@ irssi/
 kitty/
 !kitty/kitty.ini
 
+# Never include our OpenSSH config
+openssh/
+
 # PoSh modules folder (PsGet populates this)
 posh/Modules/
 
