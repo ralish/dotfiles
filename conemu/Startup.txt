@@ -1,0 +1,3 @@
+cmd.exe "-new_console:d:%USERPROFILE%"
+>powershell.exe "-new_console:d:%USERPROFILE%"
+%SystemDrive%\Cygwin\bin\bash.exe --login -i "-new_console:C:%SystemDrive%\Cygwin\Cygwin-Terminal.ico"
