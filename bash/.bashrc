@@ -53,12 +53,12 @@ fi
 
 # Configure our prompt optionally with color and git support
 if [ "$color_prompt" = yes ]; then
-	if [[ -f /etc/bash_completion.d/git-prompt ]]; then
+	if [[ -f /etc/bash_completion.d/git-prompt || -f /etc/bash_completion.d/git ]]; then
 		PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w$(__git_ps1)\[\033[00m\]\$ '
 	else
 		PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 	fi
-elif [[ -f /etc/bash_completion.d/git-prompt ]]; then
+elif [[ -f /etc/bash_completion.d/git-prompt || -f /etc/bash_completion.d/git ]]; then
 	PS1='\u@\h:\w$(__git_ps1)\$ '
 else
 	PS1='\u@\h:\w\$ '
