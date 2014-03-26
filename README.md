@@ -48,6 +48,18 @@ I've settled on using [GNU Stow](http://www.gnu.org/software/stow/) to manage my
     Stow doesn't need to maintain any state between runs which helps to keep the system simple and consequently less likely to break in "interesting" ways.
 
 
+Tested Environments
+===================
+
+The following environments are known to work:
+
+ * Cygwin (1.7 or newer)
+ * FreeBSD (8.3 or newer)
+ * Linux (Ubuntu 12.04 or newer)
+ * OS X (10.9 or newer)
+ * Windows NT (Windows 7/Server 2008 R2 or newer)
+
+
 Thanks To
 =========
 
