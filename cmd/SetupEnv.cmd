@@ -1,7 +1,12 @@
 @ECHO OFF
+ECHO Making Command Prompt suck slightly less...
 
 REM Uncomment to enable verbose mode
 REM SET VERBOSE=YES
+
+REM So that we can safely run via AutoRun
+REM Use something like: IF NOT DEFINED SETUPENV Path\To\SetupEnv.Cmd
+SET SETUPENV=YES
 
 REM Because I'm tired of forgetting this
 DOSKEY ls=dir
