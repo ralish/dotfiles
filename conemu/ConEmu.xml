@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software">
 	<key name="ConEmu">
-		<key name=".Vanilla" modified="2014-03-27 03:09:32" build="140310">
+		<key name=".Vanilla" modified="2014-03-30 16:37:37" build="140310">
 			<value name="ColorTable00" type="dword" data="00423607"/>
 			<value name="ColorTable01" type="dword" data="002f32dc"/>
 			<value name="ColorTable02" type="dword" data="00009985"/>
@@ -518,41 +518,41 @@
 			<value name="DndLKey" type="hex" data="00"/>
 			<value name="DndRKey" type="hex" data="a2"/>
 			<value name="WndDragKey" type="dword" data="00121101"/>
-				<key name="Tasks" modified="2014-03-27 03:02:53" build="140310">
+				<key name="Tasks" modified="2014-03-30 16:37:29" build="140310">
 				<value name="Count" type="dword" data="00000005"/>
-						<key name="Task1" modified="2014-03-27 03:02:53" build="140310">
+						<key name="Task1" modified="2014-03-30 16:37:29" build="140310">
 					<value name="Name" type="string" data="{Command Prompt}"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data=""/>
-					<value name="Cmd1" type="string" data="cmd.exe -new_console:d:%USERPROFILE%"/>
+					<value name="Cmd1" type="string" data="%WinDir%\System32\cmd.exe -new_console:d:%HomeDrive%%HomePath%"/>
 					<value name="Active" type="dword" data="00000000"/>
 					<value name="Count" type="dword" data="00000001"/>
 				</key>
-						<key name="Task2" modified="2014-03-27 03:02:53" build="140310">
+						<key name="Task2" modified="2014-03-30 16:37:29" build="140310">
 					<value name="Name" type="string" data="{Windows PowerShell}"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data=""/>
-					<value name="Cmd1" type="string" data="powershell.exe -new_console:d:%USERPROFILE%"/>
+					<value name="Cmd1" type="string" data="%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -new_console:d:%HomeDrive%%HomePath%"/>
 					<value name="Active" type="dword" data="00000000"/>
 					<value name="Count" type="dword" data="00000001"/>
 				</key>
-						<key name="Task3" modified="2014-03-27 03:02:53" build="140310">
+						<key name="Task3" modified="2014-03-30 16:37:29" build="140310">
 					<value name="Name" type="string" data="{Cygwin}"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data="/icon &quot;%SystemDrive%\Cygwin\Cygwin-Terminal.ico&quot;"/>
-					<value name="Cmd1" type="string" data="%SystemDrive%\Cygwin\bin\bash.exe --login -i"/>
+					<value name="Cmd1" type="string" data="%SystemDrive%\Cygwin\bin\bash.exe --login -i -new_console:d:%SystemDrive%\Cygwin\bin"/>
 					<value name="Active" type="dword" data="00000000"/>
 					<value name="Count" type="dword" data="00000001"/>
 				</key>
-						<key name="Task4" modified="2014-03-27 03:02:53" build="140310">
+						<key name="Task4" modified="2014-03-30 16:37:29" build="140310">
 					<value name="Name" type="string" data="{MinGW}"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data="/icon &quot;%SystemDrive%\MinGW\msys\1.0\msys.ico&quot;"/>
-					<value name="Cmd1" type="string" data="%SystemDrive%\MinGW\msys\1.0\bin\bash.exe --login -i"/>
+					<value name="Cmd1" type="string" data="%SystemDrive%\MinGW\msys\1.0\bin\bash.exe -l -new_console:d:%SystemDrive%\MinGW\msys\1.0\bin"/>
 					<value name="Active" type="dword" data="00000000"/>
 					<value name="Count" type="dword" data="00000001"/>
 				</key>
-						<key name="Task5" modified="2014-03-27 03:02:53" build="140310">
+						<key name="Task5" modified="2014-03-30 16:37:29" build="140310">
 					<value name="Name" type="string" data="{PuTTY}"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data=""/>
@@ -620,10 +620,10 @@
 					<value name="Count" type="dword" data="00000001"/>
 				</key>
 			</key>
-				<key name="Apps" modified="2014-03-27 03:02:53" build="140310">
+				<key name="Apps" modified="2014-03-30 16:37:29" build="140310">
 				<value name="Count" type="dword" data="00000000"/>
 			</key>
-				<key name="Colors" modified="2014-03-27 03:02:53" build="140310">
+				<key name="Colors" modified="2014-03-30 16:37:29" build="140310">
 				<value name="Count" type="dword" data="00000000"/>
 			</key>
 			<value name="CmdLineHistory" type="multi"/>
