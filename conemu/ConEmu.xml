@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software">
 	<key name="ConEmu">
-		<key name=".Vanilla" modified="2014-03-30 23:48:26" build="140310">
+		<key name=".Vanilla" modified="2014-04-03 20:08:56" build="140310">
 			<value name="ColorTable00" type="dword" data="00423607"/>
 			<value name="ColorTable01" type="dword" data="002f32dc"/>
 			<value name="ColorTable02" type="dword" data="00009985"/>
@@ -128,10 +128,10 @@
 			<value name="ColorKeyValue" type="dword" data="00010101"/>
 			<value name="UseCurrentSizePos" type="hex" data="01"/>
 			<value name="WindowMode" type="dword" data="0000051f"/>
-			<value name="ConWnd Width" type="dword" data="000000b2"/>
-			<value name="ConWnd Height" type="dword" data="0000002c"/>
+			<value name="ConWnd Width" type="dword" data="000000c5"/>
+			<value name="ConWnd Height" type="dword" data="00000030"/>
 			<value name="Cascaded" type="hex" data="01"/>
-			<value name="ConWnd X" type="dword" data="fffffa60"/>
+			<value name="ConWnd X" type="dword" data="fffff9c8"/>
 			<value name="ConWnd Y" type="dword" data="00000000"/>
 			<value name="16bit Height" type="dword" data="00000000"/>
 			<value name="AutoSaveSizePos" type="hex" data="01"/>
@@ -195,7 +195,7 @@
 			<value name="SendAltPrintScrn" type="hex" data="00"/>
 			<value name="SendPrintScrn" type="hex" data="00"/>
 			<value name="SendCtrlEsc" type="hex" data="00"/>
-			<value name="Min2Tray" type="hex" data="01"/>
+			<value name="Min2Tray" type="hex" data="00"/>
 			<value name="AlwaysShowTrayIcon" type="hex" data="00"/>
 			<value name="SafeFarClose" type="hex" data="01"/>
 			<value name="SafeFarCloseMacro" type="string" data=""/>
@@ -518,9 +518,9 @@
 			<value name="DndLKey" type="hex" data="00"/>
 			<value name="DndRKey" type="hex" data="a2"/>
 			<value name="WndDragKey" type="dword" data="00121101"/>
-				<key name="Tasks" modified="2014-03-30 16:37:29" build="140310">
+				<key name="Tasks" modified="2014-04-03 20:08:57" build="140310">
 				<value name="Count" type="dword" data="00000005"/>
-						<key name="Task1" modified="2014-03-30 16:37:29" build="140310">
+						<key name="Task1" modified="2014-04-03 20:08:57" build="140310">
 					<value name="Name" type="string" data="{Command Prompt}"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data=""/>
@@ -528,7 +528,7 @@
 					<value name="Active" type="dword" data="00000000"/>
 					<value name="Count" type="dword" data="00000001"/>
 				</key>
-						<key name="Task2" modified="2014-03-30 16:37:29" build="140310">
+						<key name="Task2" modified="2014-04-03 20:08:57" build="140310">
 					<value name="Name" type="string" data="{Windows PowerShell}"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data=""/>
@@ -536,7 +536,7 @@
 					<value name="Active" type="dword" data="00000000"/>
 					<value name="Count" type="dword" data="00000001"/>
 				</key>
-						<key name="Task3" modified="2014-03-30 16:37:29" build="140310">
+						<key name="Task3" modified="2014-04-03 20:08:57" build="140310">
 					<value name="Name" type="string" data="{Cygwin}"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data="/icon &quot;%SystemDrive%\Cygwin\Cygwin-Terminal.ico&quot;"/>
@@ -544,7 +544,7 @@
 					<value name="Active" type="dword" data="00000000"/>
 					<value name="Count" type="dword" data="00000001"/>
 				</key>
-						<key name="Task4" modified="2014-03-30 16:37:29" build="140310">
+						<key name="Task4" modified="2014-04-03 20:08:57" build="140310">
 					<value name="Name" type="string" data="{MinGW}"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data="/icon &quot;%SystemDrive%\MinGW\msys\1.0\msys.ico&quot;"/>
@@ -552,7 +552,7 @@
 					<value name="Active" type="dword" data="00000000"/>
 					<value name="Count" type="dword" data="00000001"/>
 				</key>
-						<key name="Task5" modified="2014-03-30 16:37:29" build="140310">
+						<key name="Task5" modified="2014-04-03 20:08:57" build="140310">
 					<value name="Name" type="string" data="{PuTTY}"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
 					<value name="GuiArgs" type="string" data=""/>
@@ -620,10 +620,10 @@
 					<value name="Count" type="dword" data="00000001"/>
 				</key>
 			</key>
-				<key name="Apps" modified="2014-03-30 16:37:29" build="140310">
+				<key name="Apps" modified="2014-04-03 20:08:57" build="140310">
 				<value name="Count" type="dword" data="00000000"/>
 			</key>
-				<key name="Colors" modified="2014-03-30 16:37:29" build="140310">
+				<key name="Colors" modified="2014-04-03 20:08:57" build="140310">
 				<value name="Count" type="dword" data="00000000"/>
 			</key>
 			<value name="CmdLineHistory" type="multi"/>
