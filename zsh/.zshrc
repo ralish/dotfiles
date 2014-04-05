@@ -35,7 +35,7 @@ COMPLETION_WAITING_DOTS="true"
 # DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Which plugins would you like to load?
-plugins=(debian git rand-quote)
+plugins=(git rand-quote)
 
 # Actually load oh-my-zsh with our settings
 source "$ZSH/oh-my-zsh.sh"
