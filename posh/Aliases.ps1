@@ -11,3 +11,4 @@ if (Test-Path $SublRegPath) {
 } else {
     Write-Verbose "Couldn't locate Sublime Text install; not adding 'subl' alias."
 }
+Remove-Variable SublRegPath, SublBinName, SublInfo
