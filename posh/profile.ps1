@@ -35,5 +35,7 @@ if (Get-Command ssh-add.exe) {
 }
 
 # Source our custom aliases & functions
-. (Join-Path $PSScriptRoot 'Aliases.ps1')
-. (Join-Path $PSScriptRoot 'Functions.ps1')
+$ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
+. (Join-Path $ScriptPath 'Aliases.ps1')
+. (Join-Path $ScriptPath 'Functions.ps1')
+Remove-Variable ScriptPath
