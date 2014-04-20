@@ -27,6 +27,11 @@ for editor in $(echo $EDITOR_PRIORITY); do
 	fi
 done
 
+# If we defined a custom aliases file then include it
+if [ -f "$HOME/dotfiles/sh/aliases.sh" ]; then
+	source "$HOME/dotfiles/sh/aliases.sh"
+fi
+
 # Disable toggling flow control (use ixany to re-enable)
 stty -ixon
 

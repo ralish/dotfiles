@@ -77,11 +77,6 @@ esac
 # Load our common shell configuration
 source "$SHCFG"
 
-# If we defined a custom aliases file then include it
-if [ -f "$HOME/.bash_aliases" ]; then
-	source "$HOME/.bash_aliases"
-fi
-
 # Enable much more powerful bash completion if available
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 	source /etc/bash_completion
