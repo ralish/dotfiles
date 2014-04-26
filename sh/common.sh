@@ -32,6 +32,11 @@ if [ -f "$HOME/dotfiles/sh/aliases.sh" ]; then
 	source "$HOME/dotfiles/sh/aliases.sh"
 fi
 
+# If we defined a custom functions file then include it
+if [ -f "$HOME/dotfiles/sh/functions.sh" ]; then
+	source "$HOME/dotfiles/sh/functions.sh"
+fi
+
 # Disable toggling flow control (use ixany to re-enable)
 stty -ixon
 
