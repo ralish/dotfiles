@@ -1,4 +1,5 @@
 @ECHO OFF
+ECHO.
 ECHO Making Command Prompt suck slightly less...
 
 REM So that we can safely run via AutoRun without infinite recursion
@@ -8,6 +9,16 @@ SET SetupEnv=Yes
 
 REM Uncomment to enable verbose mode
 REM SET SetupEnvVerbose=Yes
+
+REM Inject Clink for a more pleasant experience
+SET ClinkPath=C:\Program Files (x86)\Nexiom\Software\Independent\clink\0.4.1\clink_x64.exe
+IF NOT EXIST "%ClinkPath%" (
+    IF DEFINED SetupEnvVerbose ECHO * Unable to find Clink at path specified by ClinkPath.
+) ELSE (
+    IF DEFINED SetupEnvVerbose ECHO * Injecting Clink into Command Processor...
+    "%ClinkPath%" inject -q --profile "~\clink"
+)
+SET ClinkPath=
 
 REM Inject ANSICON if we're not running inside ConEmu
 SET AnsiConPath=C:\Program Files (x86)\Nexiom\Software\Independent\ANSICON\ansicon.exe
