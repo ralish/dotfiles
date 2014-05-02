@@ -9,9 +9,13 @@ REM Uncomment to enable verbose mode
 REM SET SetupEnvVerbose=Yes
 
 REM Inject ANSICON if we're not running inside ConEmu
+SET AnsiConPath=C:\Program Files (x86)\Nexiom\Software\Independent\ANSICON\ansicon.exe
 IF NOT DEFINED ConEmuANSI (
-    IF !ANSICON_VER!==^!ANSICON_VER^! "C:\Program Files (x86)\Nexiom\Software\Independent\ANSICON\ansicon.exe" -p
+    IF EXIST "%AnsiConPath%" (
+        IF !ANSICON_VER!==^!ANSICON_VER^! "%AnsiConPath%" -p
+    )
 )
+SET AnsiConPath=
 
 REM Because I'm tired of forgetting Cmd is not a *nix shell
 DOSKEY clear=cls
