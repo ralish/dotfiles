@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software">
 	<key name="ConEmu">
-		<key name=".Vanilla" modified="2014-04-03 20:08:56" build="140310">
+		<key name=".Vanilla" modified="2014-05-02 20:48:18" build="140422">
 			<value name="ColorTable00" type="dword" data="00423607"/>
 			<value name="ColorTable01" type="dword" data="002f32dc"/>
 			<value name="ColorTable02" type="dword" data="00009985"/>
