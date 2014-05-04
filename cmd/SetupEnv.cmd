@@ -50,8 +50,8 @@ IF ERRORLEVEL 1 (
 ) ELSE (
     IF DEFINED SetupEnvVerbose ECHO * Setting Sublime Text 'subl' alias...
     FOR /F "tokens=2*" %%a IN ('REG QUERY "%SublRegPath%" /v InstallLocation ^| FINDSTR /R "[a-z]:\\.*\\$"') DO @SET SublDirPath=%%b
-    DOSKEY subl="!SublDirPath!%SublBinName%" $*
 )
+IF DEFINED SublDirPath DOSKEY subl="%SublDirPath%%SublBinName%" $*
 FOR /F "delims==" %%i IN ('SET Subl') DO @SET %%i=
 
 REM Remove the Verbose variable if it was ever set
