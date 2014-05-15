@@ -21,32 +21,32 @@
 # for already spawned shells outside of the one we're executing in.
 
 function ssh-fix-auth-sock {
-	if $(command -v id 1> /dev/null); then
-		uid=$(id -u)
-	else
-		echo "id command not found; exiting."
-		exit 1
-	fi
+    if $(command -v id 1> /dev/null); then
+        uid=$(id -u)
+    else
+        echo "id command not found; exiting."
+        exit 1
+    fi
 
-	ssh_agents=$(find /tmp -maxdepth 2 -type s -uid $uid -name 'agent.*' -printf '%T+ %p\n' 2> /dev/null)
-	if [ -z "$ssh_agents" ]; then
-		echo "Unable to locate any available SSH agents; exiting."
-		exit 1
-	else
-		best_agent=$(echo $ssh_agents | sort -r | head -n 1 | cut -d' ' -f2)
-		if [ $SSH_AUTH_SOCK != $best_agent ]; then
-			export SSH_AUTH_SOCK=$best_agent
-			if [ -n "$TMUX" ]; then
-				tmux setenv SSH_AUTH_SOCK $best_agent
-			fi
-			if [ -n "$STY" ]; then
-				screen setenv SSH_AUTH_SOCK $best_agent
-			fi
-			echo "Updated \$SSH_AUTH_SOCK to: $best_agent"
-		else
-			echo "\$SSH_AUTH_SOCK already set to best SSH agent."
-		fi
-	fi
+    ssh_agents=$(find /tmp -maxdepth 2 -type s -uid $uid -name 'agent.*' -printf '%T+ %p\n' 2> /dev/null)
+    if [ -z "$ssh_agents" ]; then
+        echo "Unable to locate any available SSH agents; exiting."
+        exit 1
+    else
+        best_agent=$(echo $ssh_agents | sort -r | head -n 1 | cut -d' ' -f2)
+        if [ $SSH_AUTH_SOCK != $best_agent ]; then
+            export SSH_AUTH_SOCK=$best_agent
+            if [ -n "$TMUX" ]; then
+                tmux setenv SSH_AUTH_SOCK $best_agent
+            fi
+            if [ -n "$STY" ]; then
+                screen setenv SSH_AUTH_SOCK $best_agent
+            fi
+            echo "Updated \$SSH_AUTH_SOCK to: $best_agent"
+        else
+            echo "\$SSH_AUTH_SOCK already set to best SSH agent."
+        fi
+    fi
 }
 
-# vim: syntax=sh ts=4 sw=4 sts=4 sr noet
+# vim: syntax=sh ts=4 sw=4 sts=4 et sr

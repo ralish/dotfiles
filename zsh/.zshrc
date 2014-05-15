@@ -47,15 +47,15 @@ source "$SHCFG"
 alias run-help &> /dev/null
 autoload run-help
 if [ -d "/usr/share/zsh/help" ]; then
-	HELPDIR="/usr/share/zsh/help"
+    HELPDIR="/usr/share/zsh/help"
 elif [ -d "/usr/local/share/zsh/help" ]; then
-	HELPDIR="/usr/local/share/zsh/help"
+    HELPDIR="/usr/local/share/zsh/help"
 fi
 
 # Load virtualenvwrapper if it is present
 if [ -f /etc/bash_completion.d/virtualenvwrapper ]; then
-	export WORKON_HOME="$HOME/.virtualenvs"
-	source /etc/bash_completion.d/virtualenvwrapper
+    export WORKON_HOME="$HOME/.virtualenvs"
+    source /etc/bash_completion.d/virtualenvwrapper
 fi
 
-# vim: syntax=sh ts=4 sw=4 sts=4 sr noet
+# vim: syntax=sh ts=4 sw=4 sts=4 et sr

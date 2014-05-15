@@ -1,193 +1,193 @@
 [core]
-	excludesfile = ~/.gitignore
-	attributesfile = ~/.gitattributes
+    excludesfile = ~/.gitignore
+    attributesfile = ~/.gitattributes
 
 [include]
-	path = .gitconfig-win
+    path = .gitconfig-win
 
 [user]
-	name = Samuel D. Leslie
-	email = sdl@nexiom.net
+    name = Samuel D. Leslie
+    email = sdl@nexiom.net
 
 [github]
-	user = ralish
+    user = ralish
 
 [advice]
-	statusHints = false
+    statusHints = false
 
 [apply]
-	whitespace = fix
+    whitespace = fix
 
 [branch]
-	autosetupmerge = true
-	autosetuprebase = always
+    autosetupmerge = true
+    autosetuprebase = always
 
 [color]
-	ui = true
+    ui = true
 
 [diff]
-	algorithm = patience
-	mnemonicprefix = true
+    algorithm = patience
+    mnemonicprefix = true
 
 [help]
-	autocorrect = 0
+    autocorrect = 0
 
 [log]
-	abbrevCommit = true
+    abbrevCommit = true
 
 [merge]
-	log = true
-	conflictstyle = diff3
+    log = true
+    conflictstyle = diff3
 
 [oh-my-zsh]
-	hide-status = 0
+    hide-status = 0
 
 [pull]
-	ff = only
+    ff = only
 
 [push]
-	default = matching
+    default = matching
 
 [rebase]
-	autosquash = true
+    autosquash = true
 
 [rerere]
-	enabled = true
-	autoupdate = true
+    enabled = true
+    autoupdate = true
 
 [alias]
-	a	= add
-	aa	= add --all
-	ap	= add --patch
-	apa	= add --patch --all
+    a   = add
+    aa  = add --all
+    ap  = add --patch
+    apa = add --patch --all
 
-	bl	= blame
+    bl  = blame
 
-	br	= branch
-	bra	= branch --all
-	brd	= branch --delete
-	brD	= branch -D
+    br  = branch
+    bra = branch --all
+    brd = branch --delete
+    brD = branch -D
 
-	bsb	= bisect bad
-	bsg	= bisect good
-	bsr	= bisect reset
-	bss	= bisect start
+    bsb = bisect bad
+    bsg = bisect good
+    bsr = bisect reset
+    bss = bisect start
 
-	cl	= clone
-	clr	= clone --recursive
+    cl  = clone
+    clr = clone --recursive
 
-	cm	= commit
-	cmm	= commit --message
-	cma	= commit --all
-	cmv	= commit --all --message
-	cmx	= commit --amend
+    cm  = commit
+    cmm = commit --message
+    cma = commit --all
+    cmv = commit --all --message
+    cmx = commit --amend
 
-	co	= checkout
-	cob	= checkout -b
-	cof	= checkout FETCH_HEAD
+    co  = checkout
+    cob = checkout -b
+    cof = checkout FETCH_HEAD
 
-	cp	= cherry-pick
+    cp  = cherry-pick
 
-	d	= diff -w
-	dw	= diff
-	dc	= diff --cached -w
-	dcw	= diff --cached
+    d   = diff -w
+    dw  = diff
+    dc  = diff --cached -w
+    dcw = diff --cached
 
-	f	= fetch
+    f   = fetch
 
-	g	= grep
+    g   = grep
 
-	h	= show -w
-	hw	= show
-	hs	= show --stat -w
-	hsw	= show --stat
-	h1	= show -w HEAD~1
-	h2	= show -w HEAD~2
-	h3	= show -w HEAD~3
-	h4	= show -w HEAD~4
-	h5	= show -w HEAD~5
-	h6	= show -w HEAD~6
-	h7	= show -w HEAD~7
-	h8	= show -w HEAD~8
-	h9	= show -w HEAD~9
-	h0	= show -w HEAD~10
+    h   = show -w
+    hw  = show
+    hs  = show --stat -w
+    hsw = show --stat
+    h1  = show -w HEAD~1
+    h2  = show -w HEAD~2
+    h3  = show -w HEAD~3
+    h4  = show -w HEAD~4
+    h5  = show -w HEAD~5
+    h6  = show -w HEAD~6
+    h7  = show -w HEAD~7
+    h8  = show -w HEAD~8
+    h9  = show -w HEAD~9
+    h0  = show -w HEAD~10
 
-	i	= init
+    i   = init
 
-	l	= log --show-notes="*" --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --all
-	lt	= log --show-notes="*" --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+    l   = log --show-notes="*" --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --all
+    lt  = log --show-notes="*" --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 
-	m	= merge
-	mf	= merge FETCH_HEAD
-	mm	= merge master
-	mff	= merge --ff-only
-	mnf	= merge --no-ff
+    m   = merge
+    mf  = merge FETCH_HEAD
+    mm  = merge master
+    mff = merge --ff-only
+    mnf = merge --no-ff
 
-	n	= notes
+    n   = notes
 
-	p	= push
-	pf	= push --force
-	po	= push origin
-	pom	= push origin master
-	ps	= push --set-upstream
-	pso	= push --set-upstream origin
-	pt	= push $(git symbolic-ref HEAD | sed s_^refs/heads/__)
-	ptf	= push $(git symbolic-ref HEAD | sed s_^refs/heads/__) --force
-	pn	= push refs/notes/*
+    p   = push
+    pf  = push --force
+    po  = push origin
+    pom = push origin master
+    ps  = push --set-upstream
+    pso = push --set-upstream origin
+    pt  = push $(git symbolic-ref HEAD | sed s_^refs/heads/__)
+    ptf = push $(git symbolic-ref HEAD | sed s_^refs/heads/__) --force
+    pn  = push refs/notes/*
 
-	q	= pull
+    q   = pull
 
-	rb	= rebase
-	rba	= rebase --abort
-	rbc	= rebase --continue
-	rbs	= rebase --skip
-	rbf	= rebase FETCH_HEAD
-	rbm	= rebase master
-	rbi	= rebase -i
-	rb1	= rebase -i HEAD~1
-	rb2	= rebase -i HEAD~2
-	rb3	= rebase -i HEAD~3
-	rb4	= rebase -i HEAD~4
-	rb5	= rebase -i HEAD~5
-	rb5	= rebase -i HEAD~5
-	rb6	= rebase -i HEAD~6
-	rb7	= rebase -i HEAD~7
-	rb8	= rebase -i HEAD~8
-	rb9	= rebase -i HEAD~9
-	rb0	= rebase -i HEAD~10
+    rb  = rebase
+    rba = rebase --abort
+    rbc = rebase --continue
+    rbs = rebase --skip
+    rbf = rebase FETCH_HEAD
+    rbm = rebase master
+    rbi = rebase -i
+    rb1 = rebase -i HEAD~1
+    rb2 = rebase -i HEAD~2
+    rb3 = rebase -i HEAD~3
+    rb4 = rebase -i HEAD~4
+    rb5 = rebase -i HEAD~5
+    rb5 = rebase -i HEAD~5
+    rb6 = rebase -i HEAD~6
+    rb7 = rebase -i HEAD~7
+    rb8 = rebase -i HEAD~8
+    rb9 = rebase -i HEAD~9
+    rb0 = rebase -i HEAD~10
 
-	rma	= remote add
-	rmp	= remote prune
-	rmr	= remote rm
-	rmv	= remote --verbose
+    rma = remote add
+    rmp = remote prune
+    rmr = remote rm
+    rmv = remote --verbose
 
-	rs	= reset
-	rsh	= reset --hard
+    rs  = reset
+    rsh = reset --hard
 
-	rv	= revert --no-commit
-	rvn	= revert
+    rv  = revert --no-commit
+    rvn = revert
 
-	s	= status --short --branch
-	sl	= status --long
+    s   = status --short --branch
+    sl  = status --long
 
-	sm	= submodule
-	sma	= submodule add
-	smi	= submodule init
-	smt	= submodule status
-	sms	= submodule sync
-	smu	= submodule update
+    sm  = submodule
+    sma = submodule add
+    smi = submodule init
+    smt = submodule status
+    sms = submodule sync
+    smu = submodule update
 
-	st	= stash save
-	sta	= stash apply
-	std	= stash drop
-	stl	= stash list
-	stp	= stash pop
-	sts	= stash show --patch
+    st  = stash save
+    sta = stash apply
+    std = stash drop
+    stl = stash list
+    stp = stash pop
+    sts = stash show --patch
 
-	t	= tag
-	td	= tag --delete
-	tl	= tag --list
-	tv	= tag --verify
+    t   = tag
+    td  = tag --delete
+    tl  = tag --list
+    tv  = tag --verify
 
-	up	= "!git remote update -p; git merge --ff-only @{u}"
+    up  = "!git remote update -p; git merge --ff-only @{u}"
 

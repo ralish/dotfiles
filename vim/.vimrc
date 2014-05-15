@@ -110,8 +110,8 @@ set shiftwidth=4
 " Number of spaces that a <Tab> counts for while editing
 set softtabstop=4
 
-" Don't expand <Tab> entries into defined number of spaces
-set noexpandtab
+" Expand <Tab> entries into the defined number of spaces
+set expandtab
 
 " On <Tab> in front of a line insert 'shiftwidth' spaces
 set smarttab
