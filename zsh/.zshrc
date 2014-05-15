@@ -43,6 +43,47 @@ source "$ZSH/oh-my-zsh.sh"
 # Load our common shell configuration
 source "$SHCFG"
 
+# Create a zkbd compatible hash populating it via the terminfo array
+typeset -g -A key
+key[Insert]=${terminfo[kich1]}
+key[Delete]=${terminfo[kdch1]}
+key[Home]=${terminfo[home]}
+key[End]=${terminfo[kend]}
+key[PageUp]=${terminfo[kpp]}
+key[PageDown]=${terminfo[knp]}
+key[Up]=${terminfo[kcuu1]}
+key[Down]=${terminfo[kcud1]}
+key[Left]=${terminfo[kcub1]}
+key[Right]=${terminfo[kcuf1]}
+
+# Set Insert/Delete keys to insert/delete chars on line
+[[ -n ${key[Insert]} ]] && bindkey "${key[Insert]}" overwrite-mode
+[[ -n ${key[Delete]} ]] && bindkey "${key[Delete]}" delete-char
+
+# Set Home/End keys to jump to beginning/end of line
+[[ -n ${key[Home]} ]] && bindkey "${key[Home]}" beginning-of-line
+[[ -n ${key[End]} ]] && bindkey "${key[End]}" end-of-line
+
+# Use any entered text as the prefix for searching command history
+[[ -n ${key[Up]} ]] && bindkey "${key[Up]}" history-search-backward
+[[ -n ${key[Down]} ]] && bindkey "${key[Down]}" history-search-forward
+
+# Set Ctrl+Left-arrow/Ctrl+Right-arrow to move to adjacent word
+bindkey "\e[1;5D" backward-word
+bindkey "\e[1;5C" forward-word
+
+# Make sure the terminal is in application mode when zle is active
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+    function zle-line-init () {
+        printf '%s' "${terminfo[smkx]}"
+    }
+    function zle-line-finish () {
+        printf '%s' "${terminfo[rmkx]}"
+    }
+    zle -N zle-line-init
+    zle -N zle-line-finish
+fi
+
 # Configure online help for zsh
 alias run-help &> /dev/null
 autoload run-help
