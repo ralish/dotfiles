@@ -62,4 +62,3 @@ set visible-stats on
 # Use Alt/Meta + Delete to delete the preceding word
 "\e[3;3~": kill-word
 
-# vim: ts=4 sw=4 sts=4 et sr

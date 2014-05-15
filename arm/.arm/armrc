@@ -322,3 +322,4 @@ log.fdUsageSixtyPercent NOTICE
 log.fdUsageNinetyPercent WARN
 log.unknownTorPid WARN
 
+# vim: ts=4 sw=4 sts=4 et sr

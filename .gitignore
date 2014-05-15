@@ -28,3 +28,5 @@ subversion/.subversion/auth
 
 # Vim bundle folder (Git repos clone here)
 vim/.vim/bundle/
+
+# vim: ts=4 sw=4 sts=4 et sr
