@@ -20,7 +20,7 @@ msgwait 2
 startup_message off
 
 # Use a 256 colour terminal
-term xterm-256color
+term screen-256color
 
 # Don't use the alternate screen in xterm
 termcapinfo xterm* ti@:te@
