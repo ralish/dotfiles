@@ -191,4 +191,4 @@
 
     up  = "!git remote update -p; git merge --ff-only @{u}"
 
-# vim: ts=4 sw=4 sts=4 et sr
+# vim: syntax=gitconfig ts=4 sw=4 sts=4 et sr

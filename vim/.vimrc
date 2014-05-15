@@ -125,4 +125,4 @@ set nolist
 " Define formatting settings for 'list' mode
 set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
 
-" vim: ts=4 sw=4 sts=4 et sr
+" vim: syntax=vim ts=4 sw=4 sts=4 et sr

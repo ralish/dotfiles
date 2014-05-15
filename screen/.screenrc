@@ -39,4 +39,4 @@ hardstatus off
 hardstatus alwayslastline
 hardstatus string '%{gk}[ %{G}%H %{g}][%= %{wk}%?%-Lw%?%{=b kR}(%{W}%n*%f %t%?(%u)%?%{=b kR})%{= kw}%?%+Lw%?%?%= %{g}][ %{Y}%l%{g} ]%{=b C}[ %d/%m %C %A ]%{W}'
 
-# vim: ts=4 sw=4 sts=4 et sr
+# vim: syntax=screen ts=4 sw=4 sts=4 et sr
