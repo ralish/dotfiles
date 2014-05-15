@@ -10,6 +10,11 @@ SET SetupEnv=Yes
 REM Uncomment to enable verbose mode
 REM SET SetupEnvVerbose=Yes
 
+REM Bail out before doing anything if we were invoked via Cygwin Setup!!
+REM Cygwin does some weird things to the environment while performing an
+REM autorebase that at a minimum causes DOSKEY to crash (yes, seriously).
+IF DEFINED CYGWINROOT EXIT /B
+
 REM Inject Clink for a more pleasant experience
 SET ClinkPath=C:\Program Files (x86)\Nexiom\Software\Independent\clink\0.4.1\clink_x64.exe
 IF NOT EXIST "%ClinkPath%" (
