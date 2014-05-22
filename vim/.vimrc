@@ -119,8 +119,8 @@ set smarttab
 
 " {{{ Editing Settings: Whitespace }}}
 
-" Hide invisible characters (eol, tab, etc...)
-set nolist
+" Show invisible characters (eol, tab, etc...)
+set list
 
 " Define formatting settings for 'list' mode
 set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
