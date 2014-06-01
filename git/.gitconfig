@@ -46,7 +46,7 @@
     ff = only
 
 [push]
-    default = matching
+    default = simple
 
 [rebase]
     autosquash = true
