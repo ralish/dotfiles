@@ -21,7 +21,7 @@
 # for already spawned shells outside of the one we're executing in.
 
 function ssh-fix-auth-sock {
-    if $(command -v id 1> /dev/null); then
+    if $(command -v id > /dev/null); then
         uid=$(id -u)
     else
         echo "id command not found; exiting."
