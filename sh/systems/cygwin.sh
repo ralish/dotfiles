@@ -1,5 +1,13 @@
 # Cygwin shell configuration
 
+# Cygwin package repository mirrors to use
+CYGWIN_PKGS_MAIN='http://mirror.internode.on.net/pub/cygwin/'  # Cygwin Core
+CYGWIN_PKGS_PORTS='ftp://ftp.cygwinports.org/pub/cygwinports/' # Cygwin Ports
+
+# Handy aliases to each package repository
+alias apt-cyg="apt-cyg -m $CYGWIN_PKGS_MAIN"
+alias apt-cyp="apt-cyg -m $CYGWIN_PKGS_PORTS"
+
 # Because I never remember the '-s' parameter
 alias ssh-agent-cyg='eval $(ssh-agent -s)'
 
