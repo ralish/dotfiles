@@ -7,6 +7,9 @@ EXTRA_PATHS="~/bin"
 # Our preferred text editors ordered by priority
 EDITOR_PRIORITY="vim vi nano pico"
 
+# Update our path immediately as some subsequent scripts may depend on it
+export PATH="$EXTRA_PATHS:$PATH"
+
 # Operating system and environment specific configurations
 if [[ $(uname -s) == CYGWIN_NT-* ]]; then
     source "$HOME/dotfiles/sh/systems/cygwin.sh"
@@ -14,7 +17,9 @@ elif [ $(uname -s) = "Darwin" ]; then
     source "$HOME/dotfiles/sh/systems/osx.sh"
 fi
 
-# Customise our path
+# Pedantic fix to ensure our earlier extra paths are first in the path
+extra_paths_escaped=$(echo $EXTRA_PATHS | sed 's/\//\\\//g')
+PATH=$(echo $PATH | sed "s/$extra_paths_escaped:*//g")
 export PATH="$EXTRA_PATHS:$PATH"
 
 # Figure out which editor to default to
