@@ -15,6 +15,11 @@ if command -v ssh-agent > /dev/null; then
     alias ssh-agent-cyg='eval $(ssh-agent -s)'
 fi
 
+# Sort out the Git prompt (__git_ps1 may not be available)
+if command -v git-prompt > /dev/null; then
+    source "$(command -v git-prompt)"
+fi
+
 # Add alias for Sublime Text
 SublRegPath='/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/Uninstall/Sublime Text 2_is1/InstallLocation'
 SublBinName='sublime_text.exe'
