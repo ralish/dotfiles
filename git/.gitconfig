@@ -3,6 +3,7 @@
     attributesfile = ~/.gitattributes
 
 [include]
+    path = .gitconfig-cyg
     path = .gitconfig-win
 
 [user]
