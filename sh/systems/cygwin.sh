@@ -5,11 +5,15 @@ CYGWIN_PKGS_MAIN='http://mirror.internode.on.net/pub/cygwin/'  # Cygwin Core
 CYGWIN_PKGS_PORTS='ftp://ftp.cygwinports.org/pub/cygwinports/' # Cygwin Ports
 
 # Handy aliases to each package repository
-alias apt-cyg="apt-cyg -m $CYGWIN_PKGS_MAIN"
-alias apt-cyp="apt-cyg -m $CYGWIN_PKGS_PORTS"
+if command -v apt-cyg 2>&1; then
+    alias apt-cyg="apt-cyg -m $CYGWIN_PKGS_MAIN"
+    alias apt-cyp="apt-cyg -m $CYGWIN_PKGS_PORTS"
+fi
 
 # Because I never remember the '-s' parameter
-alias ssh-agent-cyg='eval $(ssh-agent -s)'
+if command -v ssh-agent 2>&1; then
+    alias ssh-agent-cyg='eval $(ssh-agent -s)'
+fi
 
 # Add alias for Sublime Text
 SublRegPath='/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/Uninstall/Sublime Text 2_is1/InstallLocation'
