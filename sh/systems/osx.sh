@@ -23,8 +23,10 @@ if [ -n "$EXTRA_SYS_PATHS" ]; then
 fi
 
 # Load bash completion if it's present
-if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
-    source "$(brew --prefix)/etc/bash_completion"
+if [ -n "$BASH_VERSION" ]; then
+    if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
+        source "$(brew --prefix)/etc/bash_completion"
+    fi
 fi
 
 # Load grc if it's present
@@ -48,7 +50,7 @@ fi
 # Add Python site-packages to path if it's present
 python_sitepkgs='/usr/local/lib/python2.7/site-packages'
 if [ -d "$python_sitepkgs" ]; then
-    PYTHONPATH=$(path_add_prefix "$python_sitepkgs" $PYTHONPATH")
+    PYTHONPATH=$(path_add_prefix "$python_sitepkgs" "$PYTHONPATH")
 fi
 
 # vim: syntax=sh ts=4 sw=4 sts=4 et sr
