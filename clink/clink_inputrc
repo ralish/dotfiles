@@ -1,4 +1,4 @@
-# ---------------------------- Config Settings -----------------------------
+# ----------------------------- Config Settings ------------------------------
 
 # Permit 8-bit characters (will permit UTF-8)
 set input-meta on
@@ -41,7 +41,7 @@ set skip-completed-text on
 set visible-stats on
 
 
-# ------------------------------ Key Mappings ------------------------------
+# ------------------------------- Key Mappings -------------------------------
 
 # Set Home/End keys to jump to beginning/end of line
 "\e[1~": beginning-of-line
