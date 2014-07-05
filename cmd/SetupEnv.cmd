@@ -46,6 +46,10 @@ DOSKEY ls=dir $*
 DOSKEY man=help $*
 DOSKEY which=where $*
 
+REM Some other useful aliases to avoid having to append to our PATH
+DOSKEY depends32="C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe" $*
+DOSKEY depends64="C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe" $*
+
 REM Add alias for Sublime Text
 SET SublRegPath=HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1
 SET SublBinName=sublime_text.exe
