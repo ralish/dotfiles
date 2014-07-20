@@ -2,6 +2,13 @@
 ECHO.
 ECHO Making Command Prompt suck slightly less...
 
+REM Various variables that we may need to tweak
+SET AnsiConPath=C:\Program Files (x86)\Nexiom\Software\Independent\ANSICON\ansicon.exe
+SET ClinkPath=C:\Program Files (x86)\Nexiom\Software\Independent\clink\0.4.1\clink_x64.exe
+SET Dw32Path=C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe
+SET Dw64Path=C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe
+SET SublRegPath=HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1
+
 REM So that we can safely run via AutoRun without infinite recursion
 REM Key Path: HKEY_CURRENT_USER\Software\Microsoft\Command Processor
 REM Use something like: IF NOT DEFINED SetupEnv Path\To\SetupEnv.Cmd
@@ -16,7 +23,6 @@ REM autorebase that at a minimum causes DOSKEY to crash (yes, seriously).
 IF DEFINED CYGWINROOT EXIT /B
 
 REM Inject Clink for a more pleasant experience
-SET ClinkPath=C:\Program Files (x86)\Nexiom\Software\Independent\clink\0.4.1\clink_x64.exe
 IF NOT EXIST "%ClinkPath%" (
     IF DEFINED SetupEnvVerbose ECHO * Unable to find Clink at path specified by ClinkPath.
 ) ELSE (
@@ -26,7 +32,6 @@ IF NOT EXIST "%ClinkPath%" (
 SET ClinkPath=
 
 REM Inject ANSICON if we're not running inside ConEmu
-SET AnsiConPath=C:\Program Files (x86)\Nexiom\Software\Independent\ANSICON\ansicon.exe
 IF DEFINED ConEmuANSI (
     IF DEFINED SetupEnvVerbose ECHO * Detected we're running in ConEmu so not injecting ANSICON.
 ) ELSE (
@@ -47,7 +52,6 @@ DOSKEY man=help $*
 DOSKEY which=where $*
 
 REM Add alias for Dependency Walker x86
-SET Dw32Path=C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe
 IF NOT EXIST "%Dw32Path%" (
     IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Dependency Walker x86 at path specified by Dw32Path.
 ) ELSE (
@@ -57,7 +61,6 @@ IF NOT EXIST "%Dw32Path%" (
 SET Dw32Path=
 
 REM Add alias for Dependency Walker x64
-SET Dw64Path=C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe
 IF NOT EXIST "%Dw64Path%" (
     IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Dependency Walker x64 at path specified by Dw64Path.
 ) ELSE (
@@ -67,7 +70,6 @@ IF NOT EXIST "%Dw64Path%" (
 SET Dw64Path=
 
 REM Add alias for Sublime Text
-SET SublRegPath=HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1
 SET SublBinName=sublime_text.exe
 REG QUERY "%SublRegPath%" /v InstallLocation > NUL 2>&1
 IF ERRORLEVEL 1 (
