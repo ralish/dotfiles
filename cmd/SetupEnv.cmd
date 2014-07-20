@@ -46,9 +46,25 @@ DOSKEY ls=dir $*
 DOSKEY man=help $*
 DOSKEY which=where $*
 
-REM Some other useful aliases to avoid having to append to our PATH
-DOSKEY depends32="C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe" $*
-DOSKEY depends64="C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe" $*
+REM Add alias for Dependency Walker x86
+SET Dw32Path=C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe
+IF NOT EXIST "%Dw32Path%" (
+    IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Dependency Walker x86 at path specified by Dw32Path.
+) ELSE (
+    IF DEFINED SetupEnvVerbose ECHO * Setting Dependency Walker x86 'depends32' alias...
+    DOSKEY depends32="%Dw32Path%" $*
+)
+SET Dw32Path=
+
+REM Add alias for Dependency Walker x64
+SET Dw64Path=C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe
+IF NOT EXIST "%Dw64Path%" (
+    IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Dependency Walker x64 at path specified by Dw64Path.
+) ELSE (
+    IF DEFINED SetupEnvVerbose ECHO * Setting Dependency Walker x64 'depends64' alias...
+    DOSKEY depends64="%Dw64Path%" $*
+)
+SET Dw64Path=
 
 REM Add alias for Sublime Text
 SET SublRegPath=HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1
