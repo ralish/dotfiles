@@ -1,16 +1,16 @@
-# OS X detritus
+# OS X stuff
 .Trashes/
-._*
 .DS_Store
+._*
 .Spotlight-V100
 
-# Windows detritus
+# Windows stuff
 $RECYCLE.BIN/
 Desktop.ini
-ehthumbs.db
 Thumbs.db
+ehthumbs.db
 
-# Editor detritus
+# Vim files
 *~
 *.swp
 
