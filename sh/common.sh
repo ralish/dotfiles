@@ -41,6 +41,8 @@ if [[ $(uname -s) == CYGWIN_NT-* ]]; then
     source "$HOME/dotfiles/sh/systems/cygwin.sh"
 elif [ $(uname -s) = 'Darwin' ]; then
     source "$HOME/dotfiles/sh/systems/osx.sh"
+elif [ $(uname -s) = 'Linux' ]; then
+    source "$HOME/dotfiles/sh/systems/linux.sh"
 fi
 
 # Construct the final PATH with both the general and system changes
