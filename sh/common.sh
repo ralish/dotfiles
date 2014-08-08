@@ -37,7 +37,7 @@ if [ -n "$path_changes_general" ]; then
 fi
 
 # Operating system and environment specific configurations
-if [[ $(uname -s) == CYGWIN_NT-* ]]; then
+if [ $(uname -s) == CYGWIN_NT-* ]; then
     source "$HOME/dotfiles/sh/systems/cygwin.sh"
 elif [ $(uname -s) = 'Darwin' ]; then
     source "$HOME/dotfiles/sh/systems/osx.sh"
