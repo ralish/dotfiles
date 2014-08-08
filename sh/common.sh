@@ -37,11 +37,12 @@ if [ -n "$path_changes_general" ]; then
 fi
 
 # Operating system and environment specific configurations
-if [ $(uname -s) == CYGWIN_NT-* ]; then
+kernel_name=$(uname -s)
+if [ "${kernel_name#*CYGWIN_NT}" != "$kernel_name" ]; then
     source "$HOME/dotfiles/sh/systems/cygwin.sh"
-elif [ $(uname -s) = 'Darwin' ]; then
+elif [ "${kernel_name#*Darwin}" != "$kernel_name" ]; then
     source "$HOME/dotfiles/sh/systems/osx.sh"
-elif [ $(uname -s) = 'Linux' ]; then
+elif [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
     source "$HOME/dotfiles/sh/systems/linux.sh"
 fi
 
