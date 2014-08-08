@@ -17,9 +17,9 @@ function check-user-home-perms {
         user_gid=$(id -g $user)
         find_results=$(sudo find /home/$user -not -uid $user_uid -or -not -gid $user_gid 2>&1)
         find_status=$?
-        if [[ $find_status -eq 0 && -z $find_results ]]; then
+        if [ $find_status -eq 0 -a -z $find_results ]; then
             echo 'ok'
-        elif [[ $find_status -ne 0 ]]; then
+        elif [ $find_status -ne 0 ]; then
             echo 'find returned non-zero exit status!'
         else
             echo 'found potential issues:'
