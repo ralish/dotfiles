@@ -1,0 +1,45 @@
+-- ************** PostgreSQL Interactive Terminal Configuration **************
+
+-- Enable quiet mode while we process our .psqlrc
+\set QUIET 1
+
+
+-- ************************* Configuration Variables *************************
+
+-- Autocomplete keywords in uppercase even if we started typing in lowercase
+\set COMP_KEYWORD_CASE upper
+
+-- Where 'ignoreboth' is the combination of:
+-- * ignoredups:  Only store commands repeated in succession once
+-- * ignorespace: Don't store commands that start with a space
+\set HISTCONTROL ignoreboth
+
+-- Maintain a separate history file for each database we interact with
+\set HISTFILE ~/.psql_history- :DBNAME
+
+-- Make our prompt both useful and beautiful
+\set PROMPT1 '%[%033[1;32m%]%M %n@%/%R%[%033[0m%]%# '
+\set PROMPT2 '%[%033[1;36m%][more] %R > '
+
+-- Verbose error reports
+\set VERBOSITY verbose
+
+
+-- *************************** Query Result Output ***************************
+
+-- Use expanded mode if the output won't fit on the screen in normal mode
+\pset expanded auto
+
+-- Print null values as '[NULL]' instead of the default of an empty string
+\pset null '[NULL]'
+
+
+-- ****************************** Meta Commands ******************************
+
+-- Display how long each SQL statement took to execute in milliseconds
+\timing
+
+-- Disable quiet mode
+\unset QUIET
+
+-- vim: syntax=pgsql ts=4 sw=4 sts=4 et sr
