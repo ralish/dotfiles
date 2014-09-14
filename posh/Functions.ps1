@@ -1,3 +1,23 @@
+# Convert a string to the Base64 form suitable for usage with PowerShell's "-EncodedCommand" parameter
+Function ConvertTo-PoShBase64 {
+    Param(
+        [Parameter(Position=1,Mandatory=$true)]
+            [String]$String
+    )
+
+    [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$String"))
+}
+
+# Convert a string from the Base64 form suitable for usage with PowerShell's "-EncodedCommand" parameter
+Function ConvertFrom-PoShBase64 {
+    Param(
+        [Parameter(Position=1,Mandatory=$true)]
+            [String]$String
+    )
+
+    [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("$String"))
+}
+
 # Customise our prompt for useful Git status info (needs posh-git)
 if (Get-Module posh-git) {
     Function global:prompt {
