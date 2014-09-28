@@ -26,9 +26,8 @@ Remove-Variable Dw64Path
 # Add alias for Sublime Text
 $SublBinName = 'sublime_text.exe'
 if (Test-Path $SublRegPath -PathType Container) {
-    $SublInfo = Get-ItemProperty $SublRegPath
-    Set-Alias subl (Join-Path $SublInfo.InstallLocation $SublBinName)
+    Set-Alias subl (Join-Path (Get-ItemProperty $SublRegPath).InstallLocation $SublBinName)
 } else {
     Write-Verbose "Couldn't locate Sublime Text installation so not adding 'subl' alias."
 }
-Remove-Variable SublRegPath, SublBinName, SublInfo
+Remove-Variable SublRegPath, SublBinName
