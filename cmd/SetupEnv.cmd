@@ -5,6 +5,11 @@ REM Cygwin does some weird things to the environment while performing an
 REM autorebase that at a minimum causes DOSKEY to crash (yes, seriously).
 IF DEFINED CYGWINROOT EXIT /B
 
+REM Bail out before doing anything if we were invoked from within MinGW!!
+REM There are some weird cases I don't yet fully understand where a CMD
+REM spawned by MinGW will execute this script in truly bizarre ways...
+IF DEFINED MSYSTEM EXIT /B
+
 ECHO.
 ECHO Making Command Prompt suck slightly less...
 
