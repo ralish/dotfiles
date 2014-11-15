@@ -7,4 +7,9 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
+# Connect to the postgres database by default with psql
+if command -v psql > /dev/null; then
+    alias psql='psql postgres'
+fi
+
 # vim: syntax=sh ts=4 sw=4 sts=4 et sr
