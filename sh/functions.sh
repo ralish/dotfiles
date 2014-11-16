@@ -8,7 +8,7 @@
 function check-user-home-perms {
     if ! sudo -v 2> /dev/null; then
         echo 'This function requires sudo access.'
-        exit 1
+        return
     fi
 
     for user in $(ls /home); do
@@ -56,13 +56,13 @@ function ssh-fix-auth-sock {
         uid=$(id -u)
     else
         echo "id command not found; exiting."
-        exit 1
+        return
     fi
 
     ssh_agents=$(find /tmp -maxdepth 2 -type s -uid $uid -name 'agent.*' -printf '%T+ %p\n' 2> /dev/null)
     if [ -z "$ssh_agents" ]; then
         echo "Unable to locate any available SSH agents; exiting."
-        exit 1
+        return
     else
         best_agent=$(echo $ssh_agents | sort -r | head -n 1 | cut -d' ' -f2)
         if [ "$SSH_AUTH_SOCK" != "$best_agent" ]; then
