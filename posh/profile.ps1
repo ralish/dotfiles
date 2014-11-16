@@ -29,12 +29,24 @@ if ($PSVersionTable.PSVersion.Major -ge 2) {
     }
 }
 
-# Add SSH keys to ssh-agent
-$SshKeysPath = 'Y:\Secured\SSH Keys\*.opk'
-if (Get-Command ssh-add.exe -ErrorAction SilentlyContinue) {
-    Get-ChildItem $SshKeysPath | % { ssh-add $_ 2>&1 } | Out-Null
-} else {
-    Write-Verbose "Couldn't locate ssh-add.exe binary; not adding SSH keys to ssh-agent."
+# Load keys into ssh-agent (if we're not using Plink)
+$SshKeysPath = 'Y:\Secured\SSH Keys'
+$SshKeysExt = '.opsk'
+if ($env:GIT_SSH -inotmatch 'plink') {
+    if (Get-Command ssh-add.exe -ErrorAction SilentlyContinue) {
+        if (Test-Path -PathType Container $SshKeysPath) {
+            $SshKeys = Get-ChildItem $SshKeysPath | ? { $_.Extension -eq $SshKeysExt }
+            if ($SshKeys) {
+                $SshKeys | % { ssh-add $_ 2>&1 } | Out-Null
+            } else {
+                Write-Warning "Couldn't locate any SSH keys to add; looking for extension: $SshKeysExt"
+            }
+        } else {
+            Write-Warning "The provided SSH keys location doesn't exist: $SshKeysPath"
+        }
+    } else {
+        Write-Warning "Couldn't locate ssh-add.exe binary; not adding SSH keys to agent."
+    }
 }
 
 # Source any function files in our Functions directory
