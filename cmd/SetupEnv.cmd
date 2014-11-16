@@ -15,7 +15,7 @@ ECHO Making Command Prompt suck slightly less...
 
 REM Various variables that we may need to tweak
 SET AnsiConPath=C:\Program Files (x86)\Nexiom\Software\Independent\ANSICON\ansicon.exe
-SET ClinkPath=C:\Program Files (x86)\Nexiom\Software\Independent\clink\0.4.1\clink_x64.exe
+SET ClinkPath=C:\Program Files (x86)\Nexiom\Software\Independent\clink\0.4.2\clink_x64.exe
 SET Dw32Path=C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe
 SET Dw64Path=C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe
 SET SublRegPath=HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1
