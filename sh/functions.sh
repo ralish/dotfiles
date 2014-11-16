@@ -65,7 +65,7 @@ function ssh-fix-auth-sock {
         exit 1
     else
         best_agent=$(echo $ssh_agents | sort -r | head -n 1 | cut -d' ' -f2)
-        if [ $SSH_AUTH_SOCK != $best_agent ]; then
+        if [ "$SSH_AUTH_SOCK" != "$best_agent" ]; then
             export SSH_AUTH_SOCK=$best_agent
             if [ -n "$TMUX" ]; then
                 tmux setenv SSH_AUTH_SOCK $best_agent
