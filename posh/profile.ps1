@@ -1,3 +1,21 @@
+# **************************** Profile Configuration ***************************
+
+# Path where our SSH keys are stored
+$SshKeysPath = 'Y:\Secured\SSH Keys'
+# Extension of SSH private keys (so we don't import private keys stored in a different format)
+$SshKeysExt  = '.opk'
+
+# Path to Dependency Walker (32-bit)
+$Dw32Path = 'C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe'
+# Path to Dependency Walker (64-bit)
+$Dw64Path = 'C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe'
+
+# Path to Sublime Text installation registry key
+$SublRegPath = 'HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1'
+
+# ******************************************************************************
+
+
 # Determine the parent directory of our profile script for use later
 $ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
@@ -30,8 +48,6 @@ if ($PSVersionTable.PSVersion.Major -ge 2) {
 }
 
 # Load keys into ssh-agent (if we're not using Plink)
-$SshKeysPath = 'Y:\Secured\SSH Keys'
-$SshKeysExt = '.opsk'
 if ($env:GIT_SSH -inotmatch 'plink') {
     if (Get-Command ssh-add.exe -ErrorAction SilentlyContinue) {
         if (Test-Path -PathType Container $SshKeysPath) {

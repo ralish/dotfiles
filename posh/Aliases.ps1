@@ -1,9 +1,4 @@
-﻿# Various variables that we may need to tweak
-$Dw32Path = 'C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe'
-$Dw64Path = 'C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe'
-$SublRegPath = 'HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1'
-
-# Some useful aliases
+﻿# Some useful aliases
 Set-Alias gh Get-Help
 Set-Alias which Get-Command
 
