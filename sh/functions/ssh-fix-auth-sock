@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # When reattaching to a screen or tmux session the environment variables in
 # child and newly created shells will be set to those at the time the session
 # was initially created. There are some exceptions to this rule, for example,
@@ -22,37 +20,28 @@
 # Note that we do not (can not?) update the shell environment variable for
 # already spawned shells outside of the one we're executing in.
 
-# A better class of script...
-set -o errexit  # Exit on most errors (see the manual)
-set -o errtrace # Make sure any error trap is inherited
-set -o pipefail # Exit on failures earlier in a pipeline
-#set -o xtrace  # Trace the execution of the script (debug)
-
-if $(command -v id > /dev/null); then
+function ssh-fix-auth-sock {
     uid=$(id -u)
-else
-    echo "id command not found; exiting."
-    return
-fi
+    ssh_agents=$(find /tmp -maxdepth 2 -type s -uid $uid -name 'agent.*' -printf '%T+ %p\n' 2> /dev/null)
 
-ssh_agents=$(find /tmp -maxdepth 2 -type s -uid $uid -name 'agent.*' -printf '%T+ %p\n' 2> /dev/null)
-if [ -z "$ssh_agents" ]; then
-    echo "Unable to locate any available SSH agents; exiting."
-    return
-else
-    best_agent=$(echo $ssh_agents | sort -r | head -n 1 | cut -d' ' -f2)
-    if [ "$SSH_AUTH_SOCK" != "$best_agent" ]; then
-        export SSH_AUTH_SOCK=$best_agent
-        if [ -n "$TMUX" ]; then
-            tmux setenv SSH_AUTH_SOCK $best_agent
-        fi
-        if [ -n "$STY" ]; then
-            screen setenv SSH_AUTH_SOCK $best_agent
-        fi
-        echo "Updated \$SSH_AUTH_SOCK to: $best_agent"
+    if [[ -z $ssh_agents ]]; then
+        echo "Unable to locate any available SSH agents."
+        exit 1
     else
-        echo "\$SSH_AUTH_SOCK already set to best SSH agent."
+        best_agent=$(echo $ssh_agents | sort -r | head -n 1 | cut -d' ' -f2)
+        if [[ $SSH_AUTH_SOCK != $best_agent ]]; then
+            export SSH_AUTH_SOCK=$best_agent
+            if [[ -n TMUX ]]; then
+                tmux setenv SSH_AUTH_SOCK $best_agent
+            fi
+            if [[ -n $STY ]]; then
+                screen setenv SSH_AUTH_SOCK $best_agent
+            fi
+            echo "Updated \$SSH_AUTH_SOCK to: $best_agent"
+        else
+            echo "\$SSH_AUTH_SOCK already set to best SSH agent."
+        fi
     fi
-fi
+}
 
 # vim: syntax=sh ts=4 sw=4 sts=4 et sr cc=78 tw=78
