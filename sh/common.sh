@@ -46,6 +46,13 @@ elif [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
     source "$HOME/dotfiles/sh/systems/linux.sh"
 fi
 
+# Additional configurations for various applications
+if [ -d "$HOME/dotfiles/sh/apps" ]; then
+    for app in $(ls "$HOME/dotfiles/sh/apps"); do
+        source "$HOME/dotfiles/sh/apps/$app"
+    done
+fi
+
 # Construct the final PATH with both the general and system changes
 if [ -n "$path_changes_system" ]; then
     path_changes="$path_changes_system"
@@ -74,8 +81,8 @@ fi
 
 # If we defined a custom functions folder then include it
 if [ -d "$HOME/dotfiles/sh/functions" ]; then
-    for file in $(ls "$HOME/dotfiles/sh/functions"); do
-        source "$HOME/dotfiles/sh/functions/$file"
+    for function in $(ls "$HOME/dotfiles/sh/functions"); do
+        source "$HOME/dotfiles/sh/functions/$function"
     done
 fi
 

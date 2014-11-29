@@ -42,6 +42,9 @@ openssh/
 # PoSh modules folder (PsGet populates this)
 posh/Modules/
 
+# Additional application configurations
+sh/apps/
+
 # Subversion authentication data
 subversion/.subversion/auth
 
