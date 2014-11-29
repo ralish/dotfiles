@@ -13,10 +13,10 @@ if ! sudo -v 2> /dev/null; then
     exit 1
 fi
 
-echo '*** Updating packing index files...'
+echo '*** Updating package index files...'
 sudo apt-get update > /dev/null
 
-echo -e "\n*** Running APT dist-upgrade..."
+echo -e "\n*** Upgrading all installed packages..."
 sudo apt-get dist-upgrade
 
 echo -e "\n*** Cleaning the local repository..."
