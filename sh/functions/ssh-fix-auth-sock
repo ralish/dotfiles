@@ -1,34 +1,3 @@
-# Simple function to check for potentially incorrect file owners and
-# groups within each user's home directory. This can happen quite easily
-# when using sudo to perform configuration of a package which will be
-# running under a particular user account. Note that an account being
-# flagged by this function does not guarantee a permissions issue, just
-# that there *may* be one which should probably be verified.
-
-function check-user-home-perms {
-    if ! sudo -v 2> /dev/null; then
-        echo 'This function requires sudo access.'
-        return
-    fi
-
-    for user in $(ls /home); do
-        echo -n "Checking permissions for $user... "
-        user_uid=$(id -u $user)
-        user_gid=$(id -g $user)
-        find_results=$(sudo find /home/$user -not -uid $user_uid -or -not -gid $user_gid 2>&1)
-        find_status=$?
-        if [ $find_status -eq 0 -a -z $find_results ]; then
-            echo 'ok'
-        elif [ $find_status -ne 0 ]; then
-            echo 'find returned non-zero exit status!'
-        else
-            echo 'found potential issues:'
-            echo $find_results
-        fi
-    done
-}
-
-
 # When reattaching to a screen or tmux session the environment variables
 # in child and newly created shells will be set to those at the time the
 # session was initially created. There are some exceptions to this rule,
