@@ -75,8 +75,16 @@ set laststatus=2
 " Enable modeline support
 set modeline
 
-" Print the line number in front of each line
-set number
+" Setup the line numbering based on Vim version
+if v:version < 704
+    " Enable relative numbering with a few tweaks in the absence of hybrid mode
+    set relativenumber
+    Bundle "jeffkreeftmeijer/vim-numbertoggle"
+else
+    " Vim 7.4+ can enable both absolute/relative numbering at once (hybrid mode)
+    set relativenumber
+    set number
+endif
 
 " Always show the cursor position (line and column number)
 set ruler
