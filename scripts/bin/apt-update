@@ -19,13 +19,19 @@ fi
 echo '*** Updating package index files...'
 sudo apt-get update > /dev/null
 
-echo -e "\n*** Upgrading all installed packages..."
+echo -e "\n*** Upgrading installed packages..."
 sudo apt-get dist-upgrade
 
-echo -e "\n*** Cleaning the local repository..."
+echo -e "\n*** Removing redundant packages..."
 sudo apt-get autoremove
 
-echo -e "\n*** Removing redundant packages..."
+pkgs_rc=$(dpkg --get-selections | grep 'deinstall' | cut -f1)
+if [[ -n $pkgs_rc ]]; then
+    echo -e "\n*** Purging removed packages..."
+    sudo apt-get purge $pkgs_rc
+fi
+
+echo -e "\n*** Cleaning local repository..."
 sudo apt-get autoclean
 
 echo -e "\n*** Done!"
