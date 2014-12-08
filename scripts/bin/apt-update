@@ -34,6 +34,9 @@ fi
 echo -e "\n*** Cleaning local repository..."
 sudo apt-get autoclean
 
+pkgs_num=$(dpkg --get-selections | wc -l)
+echo -e "\n*** Total installed packages: $pkgs_num"
+
 echo -e "\n*** Done!"
 
 # vim: syntax=sh ts=4 sw=4 sts=4 et sr cc=78 tw=78
