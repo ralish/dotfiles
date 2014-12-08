@@ -7,10 +7,10 @@
 # guarantee an issue, just that there *may* be one which should be verified.
 
 # A better class of script...
-set -o errexit  # Exit on most errors (see the manual)
-set -o errtrace # Make sure any error trap is inherited
-set -o pipefail # Exit on failures earlier in a pipeline
-#set -o xtrace  # Trace the execution of the script (debug)
+set -o errexit          # Exit on most errors (see the manual)
+set -o errtrace         # Make sure any error trap is inherited
+set -o pipefail         # Exit on failures earlier in a pipeline
+#set -o xtrace          # Trace the execution of the script (debug)
 
 if ! sudo -v; then
     echo 'This script requires sudo access.'
