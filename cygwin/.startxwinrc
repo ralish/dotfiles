@@ -1,0 +1,3 @@
+# Lightweight NETWM compliant X11 desktop panel
+[ -x /usr/bin/fbpanel ] && exec /usr/bin/fbpanel -p multiwindow
+
