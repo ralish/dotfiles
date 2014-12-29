@@ -1,3 +1,6 @@
-# Lightweight NETWM compliant X11 desktop panel
-[ -x /usr/bin/fbpanel ] && exec /usr/bin/fbpanel -p multiwindow
+# We need to run something so just sleep forever
+[ -x /usr/bin/sleep ]  && sleep inf
+
+# A lightweight NETWM compliant X11 desktop panel
+#[ -x /usr/bin/fbpanel ] && exec /usr/bin/fbpanel -p multiwindow
 
