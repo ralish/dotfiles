@@ -94,6 +94,7 @@
     dcw = diff --cached
 
     f   = fetch
+    fa  = fetch --all
 
     g   = grep
 
