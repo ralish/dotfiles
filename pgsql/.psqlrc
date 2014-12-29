@@ -18,8 +18,8 @@
 \set HISTFILE ~/.psql_history- :DBNAME
 
 -- Make our prompt both useful and beautiful
-\set PROMPT1 '%[%033[1;32m%]%M %n@%/%R%[%033[0m%]%# '
-\set PROMPT2 '%[%033[1;36m%][more] %R > '
+\set PROMPT1 '%[%033[32m%]%M %n@%/%R%# %[%033[0m%]'
+\set PROMPT2 '%[%033[36m%][more] %R > %[%033[0m%]'
 
 -- Verbose error reports
 \set VERBOSITY verbose
