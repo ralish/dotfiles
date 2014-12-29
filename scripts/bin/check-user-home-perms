@@ -12,16 +12,13 @@ set -o errtrace         # Make sure any error trap is inherited
 set -o pipefail         # Exit on failures earlier in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
-if ! sudo -v; then
-    echo 'This script requires sudo access.'
-    exit 1
-fi
-
-for user in $(ls /home); do
-    echo -n "Checking permissions for $user... "
-    user_uid=$(id -u "$user")
-    user_gid=$(id -g "$user")
-    find_results=$(sudo find "/home/$user" -not -uid $user_uid -or -not -gid $user_gid 2>&1)
+function check_perms {
+    user_home="$1"
+    user_name="$(basename "$1")"
+    user_uid=$(id -u "$user_name")
+    user_gid=$(id -g "$user_name")
+    echo -n "Checking permissions for $user_name... "
+    find_results=$(sudo find "$user_home" -not -uid $user_uid -or -not -gid $user_gid 2>&1)
     find_status=$?
     if [[ $find_status -eq 0 && -z $find_results ]]; then
         echo 'ok'
@@ -30,6 +27,16 @@ for user in $(ls /home); do
     else
         echo -e "found potential issues:\n$find_results"
     fi
+}
+
+if ! sudo -v; then
+    echo 'This script requires sudo access.'
+    exit 1
+fi
+
+check_perms "$(echo ~root)"
+for user in $(find /home -maxdepth 1 -type d ! -name 'home'); do
+    check_perms "$user"
 done
 
 # vim: syntax=sh ts=4 sw=4 sts=4 et sr cc=78 tw=78
