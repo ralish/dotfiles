@@ -39,4 +39,4 @@ echo -e "\n*** Total installed packages: $pkgs_num"
 
 echo -e "\n*** Done!"
 
-# vim: syntax=sh ts=4 sw=4 sts=4 et sr cc=78 tw=78
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

@@ -4,3 +4,4 @@
 # A lightweight NETWM compliant X11 desktop panel
 #[ -x /usr/bin/fbpanel ] && exec /usr/bin/fbpanel -p multiwindow
 
+# vim: syntax=sh ts=4 sw=4 sts=4 et sr

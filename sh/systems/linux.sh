@@ -11,4 +11,4 @@ if [ -n "$USE_STDERRED" ]; then
     fi
 fi
 
-# vim: syntax=sh ts=4 sw=4 sts=4 et sr
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

@@ -53,4 +53,4 @@ if [ -d "$python_sitepkgs" ]; then
     PYTHONPATH=$(path_add_prefix "$python_sitepkgs" "$PYTHONPATH")
 fi
 
-# vim: syntax=sh ts=4 sw=4 sts=4 et sr
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

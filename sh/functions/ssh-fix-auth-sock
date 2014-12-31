@@ -5,24 +5,25 @@
 # handle updating environment variables that are likely connection specific
 # such as $SSH_AUTH_SOCK.
 #
-# While this usually works well, there are cases where it doesn't. For
-# example, if a user has a long running attached screen/tmux session on PC1,
-# attaches to the session on PC2 and subsequently disconnects, the
-# $SSH_AUTH_SOCK variable will be pointing to the now defunct SSH agent socket
-# that formerly belonged to the connection from PC2.
+# While this usually works well, there are cases where it doesn't. For example,
+# if a user has a long running attached screen/tmux session on PC1, attaches to
+# the session on PC2 and subsequently disconnects, the $SSH_AUTH_SOCK variable
+# will be pointing to the now defunct SSH agent socket that formerly belonged
+# to the connection from PC2.
 #
 # This simple function will update the $SSH_AUTH_SOCK variable to point to the
-# most recently created SSH agent socket for the effective user.  If it
-# detects we're running inside a screen/tmux session it will also update the
-# multiplexer environment so that future shells inherit the correct
-# environment variable.
+# most recently created SSH agent socket for the effective user.  If it detects
+# we're running inside a screen/tmux session it will also update the
+# multiplexer environment so that future shells inherit the correct environment
+# variable.
 #
 # Note that we do not (can not?) update the shell environment variable for
 # already spawned shells outside of the one we're executing in.
 
 function ssh-fix-auth-sock {
     uid=$(id -u)
-    ssh_agents=$(find /tmp -maxdepth 2 -type s -uid $uid -name 'agent.*' -printf '%T+ %p\n' 2> /dev/null)
+    ssh_agents=$(find /tmp -maxdepth 2 -type s -uid $uid -name 'agent.*' \
+                           -printf '%T+ %p\n' 2> /dev/null)
 
     if [ -z "$ssh_agents" ]; then
         echo "Unable to locate any available SSH agents."
@@ -44,4 +45,4 @@ function ssh-fix-auth-sock {
     fi
 }
 
-# vim: syntax=sh ts=4 sw=4 sts=4 et sr cc=78 tw=78
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

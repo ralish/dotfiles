@@ -18,4 +18,4 @@ if [ "$SHLVL" = 1 ]; then
     [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
 fi
 
-# vim: syntax=sh ts=4 sw=4 sts=4 et sr
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

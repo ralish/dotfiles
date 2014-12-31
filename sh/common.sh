@@ -89,4 +89,4 @@ fi
 # Disable toggling flow control (use ixany to re-enable)
 stty -ixon
 
-# vim: syntax=sh ts=4 sw=4 sts=4 et sr
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
