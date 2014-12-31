@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+
+# Quick script to handle installing/uninstalling relevant dotfiles components
+
+# A better class of script...
+set -o errexit          # Exit on most errors (see the manual)
+set -o errtrace         # Make sure any error trap is inherited
+set -o pipefail         # Exit on failures earlier in a pipeline
+#set -o xtrace          # Trace the execution of the script (debug)
+
+STOW_BIN=stow/bin/stow
+
+function script_init() {
+    orig_dir="$PWD"
+    script_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+    dotfiles_dir="$(cd "$script_dir"; git rev-parse --show-toplevel)"
+    dotfiles_name="$(basename "$dotfiles_dir")"
+}
+
+function parse_params() {
+    if [[ $# -eq 0 ]]; then
+        do_reinstall=true
+    else
+        while [[ $# -gt 0 ]]; do
+            param="$1"
+            shift
+            case $param in
+                -h|--help)
+                    echo 'Usage: [-h|--help] [-i|--install] [-r|--reinstall] [-u|--uninstall]'
+                    exit 0
+                    ;;
+                -i|--install)
+                    do_install=true
+                    ;;
+                -r|--reinstall)
+                    do_reinstall=true
+                    ;;
+                -u|--uninstall)
+                    do_uninstall=true
+                    ;;
+                *)
+                    echo "Invalid parameter was provided: $param"
+                    exit 1
+            esac
+        done
+    fi
+}
+
+function stow_components() {
+    cd "$dotfiles_dir"
+    comp_list=$(find "$dotfiles_dir" -maxdepth 1 -type d \
+                                     ! -name "$dotfiles_name" -and \
+                                     ! -name ".git")
+
+    for comp_path in $comp_list; do
+        comp_name="$(basename "$comp_path")"
+        if command -v "$comp_name" > /dev/null; then
+            if $STOW_BIN $1 "$comp_name" 2> /dev/null; then
+                comp_done="$comp_done $comp_name"
+            else
+                comp_fail="$comp_fail $comp_name"
+            fi
+        fi
+    done
+
+    if [[ -n $comp_fail ]]; then
+        comp_fail="$(echo "$comp_fail" | xargs -n1 | sort -u | xargs)"
+        echo -e "Failed components: \e[31m$comp_fail\e[39m"
+    fi
+    if [[ -n $comp_done ]]; then
+        comp_done="$(echo "$comp_done" | xargs -n1 | sort -u | xargs)"
+        echo -e "Successful components: \e[32m$comp_done\e[39m"
+    fi
+    cd "$orig_dir"
+}
+
+script_init
+parse_params $@
+
+if [[ -n $do_reinstall || (-n $do_install && $do_uninstall) ]]; then
+    echo '*** Reinstalling all dotfiles components...'
+    stow_components -R
+elif [[ -n $do_install ]]; then
+    echo '*** Installing all dotfiles components...'
+    stow_components -S
+elif [[ -n $do_uninstall ]]; then
+    echo '*** Uninstalling all dotfiles components...'
+    stow_components -D
+fi
+
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
