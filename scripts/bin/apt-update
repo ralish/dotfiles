@@ -11,8 +11,8 @@ set -o errtrace         # Make sure any error trap is inherited
 if ! sudo -v 2> /dev/null; then
     echo 'This script requires sudo access.'
     exit 1
-elif ! command -v apt-get > /dev/null; then
-    echo 'This script requires sudo access.'
+elif ! dpkg -S /usr/bin/dpkg > /dev/null 2>&1; then
+    echo 'This script is for Debian based systems.'
     exit 1
 fi
 
