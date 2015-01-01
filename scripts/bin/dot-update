@@ -22,6 +22,7 @@ function script_usage() {
     -h|--help                   Displays this help
 
     Update Options:
+    -a|--all                    Update all the things!!
     -g|--git                    Update Git sources & any submodules (default)
     -s|--stow                   Run dot-manage after updating Git (default)
     -v|--vim                    Update Vim bundles'
@@ -39,6 +40,11 @@ function parse_params() {
                 -h|--help)
                     script_usage
                     exit 0
+                    ;;
+                -a|--all)
+                    git_update=true
+                    stow_update=true
+                    vim_update=true
                     ;;
                 -g|--git)
                     git_update=true
