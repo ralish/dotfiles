@@ -43,7 +43,7 @@ Bundle 'tpope/vim-fugitive'
 " Enable full file type detection (for Vundle)
 filetype plugin indent on
 
-" Use the Solarized colour scheme
+" Set our preferred colour scheme
 try
     colorscheme jellybeans
 catch
