@@ -18,8 +18,8 @@ function check_perms {
     user_uid=$(id -u "$user_name")
     user_gid=$(id -g "$user_name")
     echo -n "Checking permissions for $user_name... "
-    find_results=$(sudo find "$user_home" -not -uid $user_uid -or \
-                                          -not -gid $user_gid 2>&1)
+    find_results="$(sudo find "$user_home" -not -uid $user_uid -or \
+                                           -not -gid $user_gid 2>&1)"
     find_status=$?
     if [[ $find_status -eq 0 && -z $find_results ]]; then
         echo 'ok'
@@ -30,7 +30,7 @@ function check_perms {
     fi
 }
 
-if ! sudo -v; then
+if ! sudo -v 2> /dev/null; then
     echo 'This script requires sudo access.'
     exit 1
 fi
