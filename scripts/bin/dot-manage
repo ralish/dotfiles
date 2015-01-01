@@ -12,10 +12,14 @@ META_DIR=metadata
 STOW_BIN=stow/bin/stow
 
 function script_init() {
+    # Determine some important paths
     orig_dir="$PWD"
     script_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
     dotfiles_dir="$(cd "$script_dir"; git rev-parse --show-toplevel)"
     dotfiles_name="$(basename "$dotfiles_dir")"
+
+    # Source in common metadata functions
+    source "$dotfiles_dir/$META_DIR/common.sh"
 }
 
 function parse_params() {
@@ -50,8 +54,12 @@ function parse_params() {
 function detect_components() {
     cd "$dotfiles_dir"
     stow_list=()
-    comp_nologic=()
-    comp_unknown=()
+    detect_success=()
+    detect_failure=()
+    detect_always_install=()
+    detect_never_install=()
+    detect_not_available=()
+    detect_no_logic=()
     comp_list="$(find "$dotfiles_dir" -maxdepth 1 -type d \
                                       ! -name "$dotfiles_name" -and \
                                       ! -name ".git")"
@@ -61,14 +69,25 @@ function detect_components() {
         if [[ -x $META_DIR/$comp_name/detect.sh ]]; then
             if $META_DIR/$comp_name/detect.sh; then
                 stow_list+=("$comp_name")
-            elif [[ $? -eq 2 ]]; then
-                comp_nologic+=("$comp_name ")
+                detect_success+=("$comp_name")
+            elif [[ $? -eq $DETECTION_ALWAYS_INSTALL ]]; then
+                stow_list+=("$comp_name")
+                detect_always_install+=("$comp_name")
+            elif [[ $? -eq $DETECTION_NEVER_INSTALL ]]; then
+                detect_never_install+=("$comp_name ")
+            elif [[ $? -eq $DETECTION_NOT_AVAILABLE ]]; then
+                detect_not_available+=("$comp_name ")
+            elif [[ $? -eq $DETECTION_NO_LOGIC ]]; then
+                detect_no_logic+=("$comp_name ")
             else
-                comp_unknown+=("$comp_name ")
+                detect_failure+=("$comp_name ")
             fi
         else
             if command -v "$comp_name" > /dev/null; then
                 stow_list+=("$comp_name")
+                detect_success+=("$comp_name")
+            else
+                detect_not_available+=("$comp_name ")
             fi
         fi
     done
@@ -87,14 +106,6 @@ function stow_components() {
         fi
     done
 
-    if [[ -n $comp_unknown ]]; then
-        comp_unknown="$(echo "$comp_unknown" | xargs -n1 | sort -u | xargs)"
-        echo -e "Detection failure: \t\e[35m$comp_unknown\e[39m"
-    fi
-    if [[ -n $comp_nologic ]]; then
-        comp_nologic="$(echo "$comp_nologic" | xargs -n1 | sort -u | xargs)"
-        echo -e "No detection logic: \t\e[33m$comp_nologic\e[39m"
-    fi
     if [[ -n $stow_failure ]]; then
         stow_failure="$(echo "$stow_failure" | xargs -n1 | sort -u | xargs)"
         echo -e "Stow Failed: \t\t\e[31m$stow_failure\e[39m"
