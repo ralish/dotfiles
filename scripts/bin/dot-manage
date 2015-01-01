@@ -99,60 +99,62 @@ function detect_components() {
     done
 
     if [[ -n $do_detection_report ]]; then
-        echo -ne "Detected:\t\t"
-        if [[ -n $detect_success ]]; then
-            detect_success="$(echo "${detect_success[@]}" | \
-                              xargs -n1 | sort | xargs)"
-            echo -e "\e[32m$detect_success\e[39m"
-        else
-            echo -e "\e[36mNone\e[39m"
-        fi
-
-        echo -ne "Always Install:\t\t"
-        if [[ -n $detect_always_install ]]; then
-            detect_always_install="$(echo "${detect_always_install[@]}" | \
-                                     xargs -n1 | sort | xargs)"
-            echo -e "\e[32m$detect_always_install\e[39m"
-        else
-            echo -e "\e[36mNone\e[39m"
-        fi
-
-        echo -ne "Never Install:\t\t"
-        if [[ -n $detect_never_install ]]; then
-            detect_never_install="$(echo "${detect_never_install[@]}" | \
-                                    xargs -n1 | sort | xargs)"
-            echo -e "\e[32m$detect_never_install\e[39m"
-        else
-            echo -e "\e[36mNone\e[39m"
-        fi
-
-        echo -ne "Not Available:\t\t"
-        if [[ -n $detect_not_available ]]; then
-            detect_not_available="$(echo "${detect_not_available[@]}" | \
-                                    xargs -n1 | sort | xargs)"
-            echo -e "\e[32m$detect_not_available\e[39m"
-        else
-            echo -e "\e[36mNone\e[39m"
-        fi
-
-        echo -ne "No Detection Logic:\t"
-        if [[ -n $detect_no_logic ]]; then
-            detect_no_logic="$(echo "${detect_no_logic[@]}" | \
-                               xargs -n1 | sort | xargs)"
-            echo -e "\e[33m$detect_no_logic\e[39m"
-        else
-            echo -e "\e[32mNone\e[39m"
-        fi
-
-        echo -ne "Detection Failure:\t"
-        if [[ -n $detect_failure ]]; then
-            detect_failure="$(echo "${detect_failure[@]}" | \
-                              xargs -n1 | sort | xargs)"
-            echo -e "\e[31m$detect_failure\e[39m"
-        else
-            echo -e "\e[32mNone\e[39m"
-        fi
+        detect_report
     fi
+}
+
+function detect_report() {
+    echo -ne "Detected:\t\t"
+    if [[ -n $detect_success ]]; then
+        detect_success="$(detect_report_format "${detect_success[@]}")"
+        echo -e "\e[32m$detect_success\e[39m"
+    else
+        echo -e "\e[36mNone\e[39m"
+    fi
+
+    echo -ne "Always Install:\t\t"
+    if [[ -n $detect_always_install ]]; then
+        detect_always_install="$(detect_report_format "${detect_always_install[@]}")"
+        echo -e "\e[32m$detect_always_install\e[39m"
+    else
+        echo -e "\e[36mNone\e[39m"
+    fi
+
+    echo -ne "Never Install:\t\t"
+    if [[ -n $detect_never_install ]]; then
+        detect_never_install="$(detect_report_format "${detect_never_install[@]}")"
+        echo -e "\e[32m$detect_never_install\e[39m"
+    else
+        echo -e "\e[36mNone\e[39m"
+    fi
+
+    echo -ne "Not Available:\t\t"
+    if [[ -n $detect_not_available ]]; then
+        detect_not_available="$(detect_report_format "${detect_not_available[@]}")"
+        echo -e "\e[32m$detect_not_available\e[39m"
+    else
+        echo -e "\e[36mNone\e[39m"
+    fi
+
+    echo -ne "No Detection Logic:\t"
+    if [[ -n $detect_no_logic ]]; then
+        detect_no_logic="$(detect_report_format "${detect_no_logic[@]}")"
+        echo -e "\e[33m$detect_no_logic\e[39m"
+    else
+        echo -e "\e[32mNone\e[39m"
+    fi
+
+    echo -ne "Detection Failure:\t"
+    if [[ -n $detect_failure ]]; then
+        detect_failure="$(detect_report_format "${detect_failure[@]}")"
+        echo -e "\e[31m$detect_failure\e[39m"
+    else
+        echo -e "\e[32mNone\e[39m"
+    fi
+}
+
+function detect_report_format() {
+    echo "$(echo "$@" | xargs -n1 | sort | xargs)"
 }
 
 function stow_components() {
