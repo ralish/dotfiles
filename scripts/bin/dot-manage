@@ -59,6 +59,7 @@ function detect_components() {
     stow_list=()
     detect_success=()
     detect_failure=()
+    detect_ignore=()
     detect_always_install=()
     detect_never_install=()
     detect_not_available=()
@@ -75,7 +76,9 @@ function detect_components() {
                 detect_success+=("$comp_name")
             else
                 detect_status=$?
-                if [[ $detect_status -eq $DETECTION_ALWAYS_INSTALL ]]; then
+                if [[ $detect_status -eq $DETECTION_IGNORE ]]; then
+                    detect_ignore+=("$comp_name")
+                elif [[ $detect_status -eq $DETECTION_ALWAYS_INSTALL ]]; then
                     stow_list+=("$comp_name")
                     detect_always_install+=("$comp_name")
                 elif [[ $detect_status -eq $DETECTION_NEVER_INSTALL ]]; then
@@ -132,6 +135,14 @@ function detect_report() {
     if [[ -n $detect_not_available ]]; then
         detect_not_available="$(detect_report_format "${detect_not_available[@]}")"
         echo -e "\e[32m$detect_not_available\e[39m"
+    else
+        echo -e "\e[36mNone\e[39m"
+    fi
+
+    echo -ne "Detection Ignored:\t"
+    if [[ -n $detect_ignore ]]; then
+        detect_ignore="$(detect_report_format "${detect_ignore[@]}")"
+        echo -e "\e[32m$detect_ignore\e[39m"
     else
         echo -e "\e[36mNone\e[39m"
     fi
