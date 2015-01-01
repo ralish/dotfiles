@@ -79,13 +79,13 @@ function detect_components() {
                     stow_list+=("$comp_name")
                     detect_always_install+=("$comp_name")
                 elif [[ $detect_status -eq $DETECTION_NEVER_INSTALL ]]; then
-                    detect_never_install+=("$comp_name ")
+                    detect_never_install+=("$comp_name")
                 elif [[ $detect_status -eq $DETECTION_NOT_AVAILABLE ]]; then
-                    detect_not_available+=("$comp_name ")
+                    detect_not_available+=("$comp_name")
                 elif [[ $detect_status -eq $DETECTION_NO_LOGIC ]]; then
-                    detect_no_logic+=("$comp_name ")
+                    detect_no_logic+=("$comp_name")
                 else
-                    detect_failure+=("$comp_name ")
+                    detect_failure+=("$comp_name")
                 fi
             fi
         else
@@ -93,7 +93,7 @@ function detect_components() {
                 stow_list+=("$comp_name")
                 detect_success+=("$comp_name")
             else
-                detect_not_available+=("$comp_name ")
+                detect_not_available+=("$comp_name")
             fi
         fi
     done
