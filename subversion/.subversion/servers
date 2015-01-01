@@ -10,15 +10,22 @@
 ###   http-proxy-exceptions      List of sites that do not use proxy
 ###   http-timeout               Timeout for HTTP requests in seconds
 ###   http-compression           Whether to compress HTTP requests
+###   http-max-connections       Maximum number of parallel server
+###                              connections to use for any given
+###                              HTTP operation.
+###   http-chunked-requests      Whether to use chunked transfer
+###                              encoding for HTTP requests body.
 ###   neon-debug-mask            Debug mask for Neon HTTP library
-###   http-auth-types            Auth types to use for HTTP library
 ###   ssl-authority-files        List of files, each of a trusted CA
 ###   ssl-trust-default-ca       Trust the system 'default' CAs
 ###   ssl-client-cert-file       PKCS#12 format client certificate file
 ###   ssl-client-cert-password   Client Key password, if needed.
 ###   ssl-pkcs11-provider        Name of PKCS#11 provider to use.
 ###   http-library               Which library to use for http/https
-###                              connections (neon or serf)
+###                              connections.
+###   http-bulk-updates          Whether to request bulk update
+###                              responses or to fetch each file
+###                              in an individual request.
 ###   store-passwords            Specifies whether passwords used
 ###                              to authenticate against a
 ###                              Subversion server may be cached
@@ -34,14 +41,14 @@
 ###                              passphrases may be cached on disk
 ###                              unencrypted (i.e., as plaintext).
 ###   store-auth-creds           Specifies whether any auth info
-###                              (passwords as well as server certs)
+###                              (passwords, server certs, etc.)
 ###                              may be cached to disk.
 ###   username                   Specifies the default username.
 ###
-### Set store-passwords to 'no' to avoid storing passwords in the
-### auth/ area of your config directory.  It defaults to 'yes',
-### but Subversion will never save your password to disk in
-### plaintext unless you tell it to.
+### Set store-passwords to 'no' to avoid storing passwords on disk
+### in any way, including in password stores.  It defaults to
+### 'yes', but Subversion will never save your password to disk in
+### plaintext unless explicitly configured to do so.
 ### Note that this option only prevents saving of *new* passwords;
 ### it doesn't invalidate existing passwords.  (To do that, remove
 ### the cache files by hand as described in the Subversion book.)
@@ -52,14 +59,14 @@
 ### unencrypted passwords in the auth/ area.  The default is
 ### 'ask', which means that Subversion will ask you before
 ### saving a password to disk in unencrypted form.  Note that
-### this option has no effect if either 'store-passwords' or 
+### this option has no effect if either 'store-passwords' or
 ### 'store-auth-creds' is set to 'no'.
 ###
 ### Set store-ssl-client-cert-pp to 'no' to avoid storing ssl
 ### client certificate passphrases in the auth/ area of your
 ### config directory.  It defaults to 'yes', but Subversion will
-### never save your passphrase to disk in plaintext unless you tell
-### it to via 'store-ssl-client-cert-pp-plaintext' (see below).
+### never save your passphrase to disk in plaintext unless
+### explicitly configured to do so.
 ###
 ### Note store-ssl-client-cert-pp only prevents the saving of *new*
 ### passphrases; it doesn't invalidate existing passphrases.  To do
@@ -74,7 +81,7 @@
 ### store unencrypted passphrases in the auth/ area.  The default
 ### is 'ask', which means that Subversion will prompt before
 ### saving a passphrase to disk in unencrypted form.  Note that
-### this option has no effect if either 'store-auth-creds' or 
+### this option has no effect if either 'store-auth-creds' or
 ### 'store-ssl-client-cert-pp' is set to 'no'.
 ###
 ### Set store-auth-creds to 'no' to avoid storing any Subversion
@@ -86,6 +93,13 @@
 ###
 ### HTTP timeouts, if given, are specified in seconds.  A timeout
 ### of 0, i.e. zero, causes a builtin default to be used.
+###
+### Most users will not need to explicitly set the http-library
+### option, but valid values for the option include:
+###    'serf': Serf-based module (Subversion 1.5 - present)
+###    'neon': Neon-based module (Subversion 1.0 - 1.7)
+### Availability of these modules may depend on your specific
+### Subversion distribution.
 ###
 ### The commented-out examples below are intended only to
 ### demonstrate how to use this file; any resemblance to actual
@@ -108,7 +122,6 @@
 # http-proxy-username = blah
 # http-proxy-password = doubleblah
 # http-timeout = 60
-# http-auth-types = basic;digest;negotiate
 # neon-debug-mask = 130
 # store-plaintext-passwords = no
 # username = harry
@@ -136,8 +149,8 @@
 ### overrides defaults, not explicitly matched server names.
 ###
 ### 'ssl-authority-files' is a semicolon-delimited list of files,
-### each pointing to a PEM-encoded Certificate Authority (CA) 
-### SSL certificate.  See details above for overriding security 
+### each pointing to a PEM-encoded Certificate Authority (CA)
+### SSL certificate.  See details above for overriding security
 ### due to SSL.
 [global]
 # http-proxy-exceptions = *.exception.com, www.internal-site.org
@@ -146,14 +159,14 @@
 # http-proxy-username = defaultusername
 # http-proxy-password = defaultpassword
 # http-compression = no
-# http-auth-types = basic;digest;negotiate
 # No http-timeout, so just use the builtin default.
 # No neon-debug-mask, so neon debugging is disabled.
 # ssl-authority-files = /path/to/CAcert.pem;/path/to/CAcert2.pem
 #
 # Password / passphrase caching parameters:
 store-passwords = no
-# store-plaintext-passwords = no
 # store-ssl-client-cert-pp = no
+# store-plaintext-passwords = no
 # store-ssl-client-cert-pp-plaintext = no
 
+# vim: tw=4 sw=4 sts=4 et sr

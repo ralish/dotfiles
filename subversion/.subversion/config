@@ -36,7 +36,7 @@ password-stores =
 ### The rest of the [auth] section in this file has been deprecated.
 ### Both 'store-passwords' and 'store-auth-creds' can now be
 ### specified in the 'servers' file in your config directory
-### and are documented there. Anything specified in this section 
+### and are documented there. Anything specified in this section
 ### is overridden by settings specified in the 'servers' file.
 # store-passwords = no
 # store-auth-creds = no
@@ -45,7 +45,7 @@ password-stores =
 [helpers]
 ### Set editor-cmd to the command used to invoke your text editor.
 ###   This will override the environment variables that Subversion
-###   examines by default to find this information ($EDITOR, 
+###   examines by default to find this information ($EDITOR,
 ###   et al).
 # editor-cmd = editor (vi, emacs, notepad, etc.)
 ### Set diff-cmd to the absolute path of your 'diff' program.
@@ -167,3 +167,5 @@ password-stores =
 ### cause some clients to fail to work properly. This does not have
 ### to be set for exclusive-locking-clients to work.
 # exclusive-locking = false
+
+# vim: tw=4 sw=4 sts=4 et sr
