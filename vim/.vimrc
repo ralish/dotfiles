@@ -26,25 +26,26 @@ call vundle#rc()
 Bundle 'gmarik/vundle'
 
 " ******************** Bundles ********************
+Bundle 'L9'
+Bundle 'surround.vim'
 Bundle 'altercation/vim-colors-solarized'
 Bundle 'bling/vim-airline'
 Bundle 'ervandew/supertab'
 Bundle 'exu/pgsql.vim'
 Bundle 'kien/ctrlp.vim'
 Bundle 'Lokaltog/vim-easymotion'
+Bundle 'mjio/jellybeans.vim'
 Bundle 'powerman/vim-plugin-AnsiEsc'
 Bundle 'scrooloose/nerdtree'
 Bundle 'scrooloose/syntastic'
 Bundle 'tpope/vim-fugitive'
-Bundle 'L9'
-Bundle 'surround.vim'
 
 " Enable full file type detection (for Vundle)
 filetype plugin indent on
 
 " Use the Solarized colour scheme
 try
-    colorscheme solarized
+    colorscheme jellybeans
 catch
     colorscheme default
 endtry
