@@ -72,6 +72,10 @@ function parse_params() {
                     exit 1
             esac
         done
+
+        if [[ -z $do_install && -z $do_uninstall ]]; then
+          do_reinstall=true
+        fi
     fi
 }
 
