@@ -15,40 +15,40 @@ ehthumbs.db
 *.swp
 
 # Arm cache (for Tor)
-arm/.arm/cache/
+/arm/.arm/cache/
 
 # Clink history and log files
-clink/.history
-clink/clink.log
+/clink/.history
+/clink/clink.log
 
 # ConEmu config tends to change on its own
-conemu/ConEmu.xml
+/conemu/ConEmu.xml
 
 # Fish automatically generated files
-fish/.config/fish/fish_history
-fish/.config/fish/fishd.*
-fish/.config/fish/generated_completions/
+/fish/.config/fish/fish_history
+/fish/.config/fish/fishd.*
+/fish/.config/fish/generated_completions/
 
 # Never include our Irssi config
-irssi/
+/irssi/
 
 # Only include our KiTTY config
-kitty/
-!kitty/kitty.ini
+/kitty/
+!/kitty/kitty.ini
 
 # Never include our OpenSSH config
-openssh/
+/openssh/
 
 # PoSh modules folder (PsGet populates this)
-posh/Modules/
+/posh/Modules/
 
 # Additional application configurations
-sh/apps/
+/sh/apps/
 
 # Subversion authentication data
-subversion/.subversion/auth
+/subversion/.subversion/auth
 
 # Vim bundle folder (Git repos clone here)
-vim/.vim/bundle/
+/vim/.vim/bundle/
 
 # vim: ts=4 sw=4 sts=4 et sr
