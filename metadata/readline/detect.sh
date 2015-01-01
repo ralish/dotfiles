@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+kernel_name=$(uname -s)
 if [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
     if ! dpkg --get-selections | egrep '^libreadline' > /dev/null; then
         exit 1
