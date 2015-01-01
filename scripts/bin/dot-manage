@@ -73,17 +73,20 @@ function detect_components() {
             if $META_DIR/$comp_name/detect.sh; then
                 stow_list+=("$comp_name")
                 detect_success+=("$comp_name")
-            elif [[ $? -eq $DETECTION_ALWAYS_INSTALL ]]; then
-                stow_list+=("$comp_name")
-                detect_always_install+=("$comp_name")
-            elif [[ $? -eq $DETECTION_NEVER_INSTALL ]]; then
-                detect_never_install+=("$comp_name ")
-            elif [[ $? -eq $DETECTION_NOT_AVAILABLE ]]; then
-                detect_not_available+=("$comp_name ")
-            elif [[ $? -eq $DETECTION_NO_LOGIC ]]; then
-                detect_no_logic+=("$comp_name ")
             else
-                detect_failure+=("$comp_name ")
+                detect_status=$?
+                if [[ $detect_status -eq $DETECTION_ALWAYS_INSTALL ]]; then
+                    stow_list+=("$comp_name")
+                    detect_always_install+=("$comp_name")
+                elif [[ $detect_status -eq $DETECTION_NEVER_INSTALL ]]; then
+                    detect_never_install+=("$comp_name ")
+                elif [[ $detect_status -eq $DETECTION_NOT_AVAILABLE ]]; then
+                    detect_not_available+=("$comp_name ")
+                elif [[ $detect_status -eq $DETECTION_NO_LOGIC ]]; then
+                    detect_no_logic+=("$comp_name ")
+                else
+                    detect_failure+=("$comp_name ")
+                fi
             fi
         else
             if command -v "$comp_name" > /dev/null; then
