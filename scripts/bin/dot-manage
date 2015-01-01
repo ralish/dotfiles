@@ -75,9 +75,9 @@ function stow_components() {
 
     for stow_comp in "${stow_list[@]}"; do
         if $STOW_BIN $1 "$stow_comp" 2> /dev/null; then
-            comp_done+="$comp_done $stow_comp"
+            comp_done+="$stow_comp "
         else
-            comp_fail+="$comp_fail $stow_comp"
+            comp_fail+="$stow_comp "
         fi
     done
 
