@@ -48,9 +48,9 @@ function parse_params() {
 
 function stow_components() {
     cd "$dotfiles_dir"
-    comp_list=$(find "$dotfiles_dir" -maxdepth 1 -type d \
-                                     ! -name "$dotfiles_name" -and \
-                                     ! -name ".git")
+    comp_list="$(find "$dotfiles_dir" -maxdepth 1 -type d \
+                                      ! -name "$dotfiles_name" -and \
+                                      ! -name ".git")"
 
     for comp_path in $comp_list; do
         comp_name="$(basename "$comp_path")"
