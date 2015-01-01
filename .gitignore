@@ -48,7 +48,8 @@ ehthumbs.db
 # Subversion authentication data
 /subversion/.subversion/auth
 
-# Vim bundle folder (Git repos clone here)
+# Vim bundle folder & dynamic data
+/vim/.vim/.netrwhist
 /vim/.vim/bundle/
 
 # vim: ts=4 sw=4 sts=4 et sr
