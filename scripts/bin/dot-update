@@ -8,7 +8,10 @@ set -o errtrace         # Make sure any error trap is inherited
 set -o pipefail         # Exit on failures earlier in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
+DOT_MANAGE=dot-manage
+
 function script_init() {
+    # Determine some important paths
     orig_dir="$PWD"
     script_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
     dotfiles_dir="$(cd "$script_dir"; git rev-parse --show-toplevel)"
@@ -17,17 +20,21 @@ function script_init() {
 function parse_params() {
     if [[ $# -eq 0 ]]; then
         git_update=true
+        stow_update=true
     else
         while [[ $# -gt 0 ]]; do
             param="$1"
             shift
             case $param in
                 -h|--help)
-                    echo 'Usage: [-h|--help] [-g|--git] [-v|--vim]'
+                    echo 'Usage: [-h|--help] [-g|--git] [-s|--stow] [-v|--vim]'
                     exit 0
                     ;;
                 -g|--git)
                     git_update=true
+                    ;;
+                -s|--stow)
+                    stow_update=true
                     ;;
                 -v|--vim)
                     vim_update=true
@@ -50,12 +57,18 @@ if [[ -n $git_update ]]; then
     git merge --ff-only
     git submodule init
     git submodule update
-    cd "$orig_dir"
+fi
+
+if [[ -n $stow_update ]]; then
+    cd "$dotfiles_dir"
+    ./$DOT_MANAGE
 fi
 
 if [[ -n $vim_update ]]; then
     echo '*** Updating Vim bundles...'
     vim +PluginUpdate +qall
 fi
+
+cd "$orig_dir"
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
