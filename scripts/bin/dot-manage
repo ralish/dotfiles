@@ -31,8 +31,11 @@ function parse_params() {
             shift
             case $param in
                 -h|--help)
-                    echo 'Usage: [-h|--help] [-i|--install] [-r|--reinstall] [-u|--uninstall]'
+                    echo 'Usage: [-h|--help] [-dr|--detection-report] [-i|--install] [-r|--reinstall] [-u|--uninstall]'
                     exit 0
+                    ;;
+                -dr|--detection-report)
+                    do_detection_report=true
                     ;;
                 -i|--install)
                     do_install=true
@@ -91,6 +94,62 @@ function detect_components() {
             fi
         fi
     done
+
+    if [[ -n $do_detection_report ]]; then
+        echo -n "Detected: "
+        if [[ -n $detect_success ]]; then
+            detect_success="$(echo "${detect_success[@]}" | \
+                              xargs -n1 | sort | xargs)"
+            echo -e "\t\t\e[32m$detect_success\e[39m"
+        else
+            echo -e "\t\t\e[36mNone\e[39m"
+        fi
+
+        echo -n "Always Install: "
+        if [[ -n $detect_always_install ]]; then
+            detect_always_install="$(echo "${detect_always_install[@]}" | \
+                                     xargs -n1 | sort | xargs)"
+            echo -e "\t\e[32m$detect_always_install\e[39m"
+        else
+            echo -e "\t\e[36mNone\e[39m"
+        fi
+
+        echo -n "Never Install: "
+        if [[ -n $detect_never_install ]]; then
+            detect_never_install="$(echo "${detect_never_install[@]}" | \
+                                    xargs -n1 | sort | xargs)"
+            echo -e "\t\t\e[32m$detect_never_install\e[39m"
+        else
+            echo -e "\t\t\e[36mNone\e[39m"
+        fi
+
+        echo -n "Not Available: "
+        if [[ -n $detect_not_available ]]; then
+            detect_not_available="$(echo "${detect_not_available[@]}" | \
+                                    xargs -n1 | sort | xargs)"
+            echo -e "\t\t\e[32m$detect_not_available\e[39m"
+        else
+            echo -e "\t\t\e[36mNone\e[39m"
+        fi
+
+        echo -n "No Detection Logic: "
+        if [[ -n $detect_no_logic ]]; then
+            detect_no_logic="$(echo "${detect_no_logic[@]}" | \
+                               xargs -n1 | sort | xargs)"
+            echo -e "\t\e[33m$detect_no_logic\e[39m"
+        else
+            echo -e "\t\e[32mNone\e[39m"
+        fi
+
+        echo -n "Detection Failure: "
+        if [[ -n $detect_failure ]]; then
+            detect_failure="$(echo "${detect_failure[@]}" | \
+                              xargs -n1 | sort | xargs)"
+            echo -e "\t\e[31m$detect_failure\e[39m"
+        else
+            echo -e "\t\e[32mNone\e[39m"
+        fi
+    fi
 }
 
 function stow_components() {
@@ -100,18 +159,18 @@ function stow_components() {
 
     for stow_comp in "${stow_list[@]}"; do
         if $STOW_BIN $1 "$stow_comp" 2> /dev/null; then
-            stow_success+="$stow_comp "
+            stow_success+=("$stow_comp")
         elif [[ $? -eq 1 ]]; then
-            stow_failure+="$stow_comp "
+            stow_failure+=("$stow_comp")
         fi
     done
 
     if [[ -n $stow_failure ]]; then
-        stow_failure="$(echo "$stow_failure" | xargs -n1 | sort -u | xargs)"
+        stow_failure="$(echo "${stow_failure[@]}" | xargs -n1 | sort | xargs)"
         echo -e "Stow Failed: \t\t\e[31m$stow_failure\e[39m"
     fi
     if [[ -n $stow_success ]]; then
-        stow_success="$(echo "$stow_success" | xargs -n1 | sort -u | xargs)"
+        stow_success="$(echo "${stow_success[@]}" | xargs -n1 | sort | xargs)"
         echo -e "Stow Succeeded: \t\e[32m$stow_success\e[39m"
     fi
 }
