@@ -50,6 +50,8 @@ function parse_params() {
 function detect_components() {
     cd "$dotfiles_dir"
     stow_list=()
+    comp_nologic=()
+    comp_unknown=()
     comp_list="$(find "$dotfiles_dir" -maxdepth 1 -type d \
                                       ! -name "$dotfiles_name" -and \
                                       ! -name ".git")"
@@ -59,6 +61,10 @@ function detect_components() {
         if [[ -x $META_DIR/$comp_name/detect.sh ]]; then
             if $META_DIR/$comp_name/detect.sh; then
                 stow_list+=("$comp_name")
+            elif [[ $? -eq 2 ]]; then
+                comp_nologic+=("$comp_name ")
+            else
+                comp_unknown+=("$comp_name ")
             fi
         else
             if command -v "$comp_name" > /dev/null; then
@@ -70,29 +76,39 @@ function detect_components() {
 
 function stow_components() {
     cd "$dotfiles_dir"
-    comp_done=()
-    comp_fail=()
+    stow_success=()
+    stow_failure=()
 
     for stow_comp in "${stow_list[@]}"; do
         if $STOW_BIN $1 "$stow_comp" 2> /dev/null; then
-            comp_done+="$stow_comp "
-        else
-            comp_fail+="$stow_comp "
+            stow_success+="$stow_comp "
+        elif [[ $? -eq 1 ]]; then
+            stow_failure+="$stow_comp "
         fi
     done
 
-    if [[ -n $comp_fail ]]; then
-        comp_fail="$(echo "$comp_fail" | xargs -n1 | sort -u | xargs)"
-        echo -e "Failed components: \e[31m$comp_fail\e[39m"
+    if [[ -n $comp_unknown ]]; then
+        comp_unknown="$(echo "$comp_unknown" | xargs -n1 | sort -u | xargs)"
+        echo -e "Detection failure: \t\e[35m$comp_unknown\e[39m"
     fi
-    if [[ -n $comp_done ]]; then
-        comp_done="$(echo "$comp_done" | xargs -n1 | sort -u | xargs)"
-        echo -e "Successful components: \e[32m$comp_done\e[39m"
+    if [[ -n $comp_nologic ]]; then
+        comp_nologic="$(echo "$comp_nologic" | xargs -n1 | sort -u | xargs)"
+        echo -e "No detection logic: \t\e[33m$comp_nologic\e[39m"
+    fi
+    if [[ -n $stow_failure ]]; then
+        stow_failure="$(echo "$stow_failure" | xargs -n1 | sort -u | xargs)"
+        echo -e "Stow Failed: \t\t\e[31m$stow_failure\e[39m"
+    fi
+    if [[ -n $stow_success ]]; then
+        stow_success="$(echo "$stow_success" | xargs -n1 | sort -u | xargs)"
+        echo -e "Stow Succeeded: \t\e[32m$stow_success\e[39m"
     fi
 }
 
 script_init
 parse_params $@
+
+echo '*** Detecting applicable dotfiles components...'
 detect_components
 
 if [[ -n $do_reinstall || (-n $do_install && $do_uninstall) ]]; then
