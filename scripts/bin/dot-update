@@ -17,6 +17,16 @@ function script_init() {
     dotfiles_dir="$(cd "$script_dir"; git rev-parse --show-toplevel)"
 }
 
+function script_usage() {
+    echo 'Usage:
+    -h|--help                   Displays this help
+
+    Update Options:
+    -g|--git                    Update Git sources & any submodules (default)
+    -s|--stow                   Run dot-manage after updating Git (default)
+    -v|--vim                    Update Vim bundles'
+}
+
 function parse_params() {
     if [[ $# -eq 0 ]]; then
         git_update=true
@@ -27,7 +37,7 @@ function parse_params() {
             shift
             case $param in
                 -h|--help)
-                    echo 'Usage: [-h|--help] [-g|--git] [-s|--stow] [-v|--vim]'
+                    script_usage
                     exit 0
                     ;;
                 -g|--git)

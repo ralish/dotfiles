@@ -24,7 +24,7 @@ function script_init() {
 
 function script_usage() {
     echo 'Usage:
-    -h|--help                   Displays this help.
+    -h|--help                   Displays this help
 
     Stow Options:
     -i|--install                Installs all detected applicable components
