@@ -8,6 +8,7 @@ set -o errtrace         # Make sure any error trap is inherited
 set -o pipefail         # Exit on failures earlier in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
+META_DIR=metadata
 STOW_BIN=stow/bin/stow
 
 function script_init() {
@@ -46,20 +47,37 @@ function parse_params() {
     fi
 }
 
-function stow_components() {
+function detect_components() {
     cd "$dotfiles_dir"
+    stow_list=()
     comp_list="$(find "$dotfiles_dir" -maxdepth 1 -type d \
                                       ! -name "$dotfiles_name" -and \
                                       ! -name ".git")"
 
     for comp_path in $comp_list; do
         comp_name="$(basename "$comp_path")"
-        if command -v "$comp_name" > /dev/null; then
-            if $STOW_BIN $1 "$comp_name" 2> /dev/null; then
-                comp_done="$comp_done $comp_name"
-            else
-                comp_fail="$comp_fail $comp_name"
+        if [[ -x $META_DIR/$comp_name/detect.sh ]]; then
+            if $META_DIR/$comp_name/detect.sh; then
+                stow_list+=("$comp_name")
             fi
+        else
+            if command -v "$comp_name" > /dev/null; then
+                stow_list+=("$comp_name")
+            fi
+        fi
+    done
+}
+
+function stow_components() {
+    cd "$dotfiles_dir"
+    comp_done=()
+    comp_fail=()
+
+    for stow_comp in "${stow_list[@]}"; do
+        if $STOW_BIN $1 "$stow_comp" 2> /dev/null; then
+            comp_done+="$comp_done $stow_comp"
+        else
+            comp_fail+="$comp_fail $stow_comp"
         fi
     done
 
@@ -71,11 +89,11 @@ function stow_components() {
         comp_done="$(echo "$comp_done" | xargs -n1 | sort -u | xargs)"
         echo -e "Successful components: \e[32m$comp_done\e[39m"
     fi
-    cd "$orig_dir"
 }
 
 script_init
 parse_params $@
+detect_components
 
 if [[ -n $do_reinstall || (-n $do_install && $do_uninstall) ]]; then
     echo '*** Reinstalling all dotfiles components...'
@@ -87,5 +105,7 @@ elif [[ -n $do_uninstall ]]; then
     echo '*** Uninstalling all dotfiles components...'
     stow_components -D
 fi
+
+cd "$orig_dir"
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
