@@ -34,7 +34,6 @@ Bundle 'ervandew/supertab'
 Bundle 'exu/pgsql.vim'
 Bundle 'kien/ctrlp.vim'
 Bundle 'Lokaltog/vim-easymotion'
-Bundle 'mjio/jellybeans.vim'
 Bundle 'powerman/vim-plugin-AnsiEsc'
 Bundle 'scrooloose/nerdtree'
 Bundle 'scrooloose/syntastic'
@@ -45,7 +44,7 @@ filetype plugin indent on
 
 " Set our preferred colour scheme
 try
-    colorscheme jellybeans
+    colorscheme solarized
 catch
     colorscheme default
 endtry
