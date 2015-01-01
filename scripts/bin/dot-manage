@@ -22,6 +22,21 @@ function script_init() {
     source "$dotfiles_dir/$META_DIR/common.sh"
 }
 
+function script_usage() {
+    echo 'Usage:
+    -h|--help                   Displays this help.
+
+    Stow Options:
+    -i|--install                Installs all detected applicable components
+    -u|--uninstall              Uninstalls all detected applicable components
+    -r|--reinstall              Equivalent to an uninstall and reinstall. This
+                                is the recommend option as it will prune any
+                                obsolete symlinks. See the Stow manual page.
+
+    Detection Options:
+    -dr|--detection-report      Displays a report of the detection results'
+}
+
 function parse_params() {
     if [[ $# -eq 0 ]]; then
         do_reinstall=true
@@ -31,7 +46,7 @@ function parse_params() {
             shift
             case $param in
                 -h|--help)
-                    echo 'Usage: [-h|--help] [-dr|--detection-report] [-i|--install] [-r|--reinstall] [-u|--uninstall]'
+                    script_usage
                     exit 0
                     ;;
                 -dr|--detection-report)
