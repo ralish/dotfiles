@@ -30,10 +30,13 @@ function script_usage() {
     -i|--install                Installs all detected applicable components
     -u|--uninstall              Uninstalls all detected applicable components
     -r|--reinstall              Equivalent to an uninstall and reinstall. This
-                                is the recommend option as it will prune any
-                                obsolete symlinks. See the Stow manual page.
+                                is the default option and is recommended as it
+                                will prune any obsolete symlinks.
 
     Detection Options:
+    -do|--detection-only        Only run component detection but make no
+                                changes. This is typically only useful in
+                                conjunction with the detection report function.
     -dr|--detection-report      Displays a report of the detection results'
 }
 
@@ -49,9 +52,6 @@ function parse_params() {
                     script_usage
                     exit 0
                     ;;
-                -dr|--detection-report)
-                    do_detection_report=true
-                    ;;
                 -i|--install)
                     do_install=true
                     ;;
@@ -60,6 +60,12 @@ function parse_params() {
                     ;;
                 -u|--uninstall)
                     do_uninstall=true
+                    ;;
+                -do|--detection-only)
+                    do_detection_only=true
+                    ;;
+                -dr|--detection-report)
+                    do_detection_report=true
                     ;;
                 *)
                     echo "Invalid parameter was provided: $param"
@@ -116,9 +122,6 @@ function detect_components() {
         fi
     done
 
-    if [[ -n $do_detection_report ]]; then
-        detect_report
-    fi
 }
 
 function detect_report() {
@@ -211,6 +214,12 @@ parse_params $@
 
 echo '*** Detecting applicable dotfiles components...'
 detect_components
+if [[ -n $do_detection_report ]]; then
+    detect_report
+fi
+if [[ -n $do_detection_only ]]; then
+    exit
+fi
 
 if [[ -n $do_reinstall || (-n $do_install && $do_uninstall) ]]; then
     echo '*** Reinstalling all dotfiles components...'
