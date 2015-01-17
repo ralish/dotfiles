@@ -21,9 +21,6 @@ ehthumbs.db
 /clink/.history
 /clink/clink.log
 
-# ConEmu config tends to change on its own
-/conemu/ConEmu.xml
-
 # Fish automatically generated files
 /fish/.config/fish/fish_history
 /fish/.config/fish/fishd.*
