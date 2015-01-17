@@ -10,8 +10,13 @@ REM There are some weird cases I don't yet fully understand where a CMD
 REM spawned by MinGW will execute this script in truly bizarre ways...
 IF DEFINED MSYSTEM EXIT /B
 
-ECHO.
-ECHO Making Command Prompt suck slightly less...
+REM We used to notify that the Command Prompt sucks slightly less on every
+REM execution. Unfortunately, there are some poorly written apps that spawn
+REM a cmd.exe instance and then directly parse the output as a string. Some
+REM of those will choke if we echo out any additional output like the below.
+REM I'm looking at you MySQL Workbench and your version check of mysqldump!!
+IF DEFINED SetupEnvVerbose ECHO.
+IF DEFINED SetupEnvVerbose ECHO Making Command Prompt suck slightly less...
 
 REM Various variables that we may need to tweak
 SET AnsiConPath=C:\Program Files (x86)\Nexiom\Software\Independent\ANSICON\ansicon.exe
