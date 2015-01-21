@@ -65,19 +65,6 @@ Function Get-EventLogTail {
     } while ($true)
 }
 
-# Quick and dirty method to get the list of installed software
-# Useful on Server Core installs where there's no simple cmdlet
-Function Get-InstalledPrograms {
-    $NativeRegPath = 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*'
-    $Wow6432RegPath = 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'
-
-    $InstProgs = Get-ItemProperty $NativeRegPath
-    if (Test-Path $Wow6432RegPath) {
-        $InstProgs += Get-ItemProperty $Wow6432RegPath
-    }
-    return $InstProgs
-}
-
 # The MKLINK command is actually part of the Command Processor (cmd.exe)
 # So we have a quick and dirty function below to invoke it via PowerShell
 Function mklink {
