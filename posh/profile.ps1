@@ -66,7 +66,9 @@ if ($env:GIT_SSH -inotmatch 'plink') {
 }
 
 # Source any function files in our Functions directory
-Get-ChildItem "$ScriptPath\Functions" | % { . $_.FullName }
+if (Test-Path "$ScriptPath\Functions" -PathType Container) {
+    Get-ChildItem "$ScriptPath\Functions" | % { . $_.FullName }
+}
 
 # Amend our Path to include our Scripts directory
 $env:Path += ";$ScriptPath\Scripts"
