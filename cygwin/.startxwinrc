@@ -1,3 +1,6 @@
+# Enable direct hardware-accelerated OpenGL rendering
+export LIBGL_USE_WGL=1
+
 # We need to run something so just sleep forever
 [ -x /usr/bin/sleep ] && sleep inf
 

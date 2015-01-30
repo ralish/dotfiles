@@ -20,6 +20,11 @@ if command -v git-prompt > /dev/null; then
     source "$(command -v git-prompt)"
 fi
 
+# Enable direct hardware-accelerated OpenGL rendering in Cygwin/X
+if command -v startxwin > /dev/null; then
+    export LIBGL_USE_WGL=1
+fi
+
 # Add alias for Sublime Text
 SublRegPath='/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/Uninstall/Sublime Text 2_is1/InstallLocation'
 SublBinName='sublime_text.exe'
