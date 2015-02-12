@@ -1,8 +1,5 @@
 # Enable color support of ls/*grep and make it the default
-if [ -x /usr/bin/dircolors ]; then
-    test -r "$HOME/.dircolors" \
-        && eval "$(dircolors -b "$HOME/.dircolors")" \
-        || eval "$(dircolors -b)"
+if [ -n "$LS_COLORS" -o -n "$LSCOLORS" ]; then
     alias ls='ls --color=auto'
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
