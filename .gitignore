@@ -47,6 +47,7 @@ ehthumbs.db
 
 # Vim bundle folder & dynamic data
 /vim/.vim/.netrwhist
+/vim/.vim/.viminfo
 /vim/.vim/bundle/
 
 # vim: ts=4 sw=4 sts=4 et sr

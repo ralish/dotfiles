@@ -18,6 +18,11 @@ if has('mouse')
     set mouse=a
 endif
 
+" Store the viminfo file somewhere sensible
+if has ('win32')
+    set viminfo='100,<50,s10,h,rA:,rB,n$HOME/Development/Personal/dotfiles/vim/.vim/.viminfo
+endif
+
 " Load up Vundle
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
