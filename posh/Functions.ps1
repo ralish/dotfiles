@@ -1,3 +1,22 @@
+# Connect to Exchange Online
+Function Connect-ExchangeOnline {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Position=1,Mandatory=$true)]
+            [System.Management.Automation.PSCredential]$Credential,
+            [switch]$NoMsol,
+            [switch]$NoImport
+    )
+
+    if (!$NoMsol) {
+        Connect-MsolService -Credential $Credential
+    }
+    $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
+    if (!$NoImport) {
+        Import-PSSession $ExchangeOnline
+    }
+}
+
 # Convert a string to the Base64 form suitable for usage with PowerShell's "-EncodedCommand" parameter
 Function ConvertTo-PoShBase64 {
     Param(
