@@ -21,6 +21,13 @@ ehthumbs.db
 /clink/.history
 /clink/clink.log
 
+# CPAN sources, builds & metadata
+/cpan/.cpan/FTPstats.yml
+/cpan/.cpan/histfile
+/cpan/.cpan/Metadata
+/cpan/.cpan/build/
+/cpan/.cpan/sources/
+
 # Fish automatically generated files
 /fish/.config/fish/fish_history
 /fish/.config/fish/fishd.*
