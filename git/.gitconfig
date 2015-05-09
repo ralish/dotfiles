@@ -38,6 +38,7 @@
 [merge]
     log = true
     conflictstyle = diff3
+    defaultToUpstream = true
 
 [oh-my-zsh]
     hide-status = 0
