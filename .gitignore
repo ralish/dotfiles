@@ -40,7 +40,7 @@ ehthumbs.db
 /kitty/
 !/kitty/kitty.ini
 
-# Never include our OpenSSH config
+# Never include OpenSSH configs (unless we force it)
 /openssh/
 
 # PoSh modules folder (PsGet populates this)
