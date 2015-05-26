@@ -21,7 +21,7 @@ if [[ $ssh_version =~ 'OpenSSH_5.9' ]]; then
     tail -n +4 "$TEMPLATE_DIR/ssh_config.59" >> "$OPENSSH_CFG"
 elif [[ $ssh_version =~ 'OpenSSH_6.6' ]]; then
     head -n -1 "$CUSTOM_CFG" > "$OPENSSH_CFG"
-    tail -n +4 "$TEMPLATE_DIR/ssh_config.59" >> "$OPENSSH_CFG"
+    tail -n +4 "$TEMPLATE_DIR/ssh_config.66" >> "$OPENSSH_CFG"
 else
     echo "Unsupported OpenSSH version detected: $ssh_version"
     exit $DETECTION_NO_LOGIC
