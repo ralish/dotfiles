@@ -69,6 +69,10 @@ parse_params $@
 if [[ -n $git_update ]]; then
     echo '*** Updating Git sources...'
     cd "$dotfiles_dir"
+
+    # Default to the upstream branches for an unqualified merge
+    git config merge.defaultToUpstream true
+
     git fetch
     git merge --ff-only
     git submodule init
