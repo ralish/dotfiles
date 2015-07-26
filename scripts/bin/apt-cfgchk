@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+
+# Search for new/old configuration file backups by dpkg or ucf
+
+# A better class of script...
+set -o errexit          # Exit on most errors (see the manual)
+set -o errtrace         # Make sure any error trap is inherited
+set -o pipefail         # Exit on failures earlier in a pipeline
+#set -o xtrace          # Trace the execution of the script (debug)
+
+function script_usage() {
+    echo 'Usage:
+    -h|--help                   Displays this help
+    -q|--quiet                  Suppress any warnings
+
+    Search Options:
+    -f|--fast                   Only search in /etc (default)
+    -a|--all                    Search in all directories'
+}
+
+function parse_params() {
+    if [[ $# -eq 0 ]]; then
+        fast_search=true
+    else
+        while [[ $# -gt 0 ]]; do
+            param="$1"
+            shift
+            case $param in
+                -h|--help)
+                    script_usage
+                    exit 0
+                    ;;
+                -q|--quiet)
+                    quiet=true
+                    ;;
+                -f|--fast)
+                    fast_search=true
+                    ;;
+                -a|--all)
+                    full_search=true
+                    ;;
+                *)
+                    echo "Invalid parameter was provided: $param"
+                    exit 1
+                esac
+        done
+    fi
+}
+
+parse_params $@
+
+if ! dpkg -S /usr/bin/dpkg > /dev/null 2>&1; then
+    echo 'This script is for Debian based systems.'
+    exit 1
+fi
+
+if [[ $UID -ne 0 && -z $quiet ]]; then
+    echo -e 'Warning: Running without root privileges may give incomplete results!\n'
+fi
+
+if [[ -n $full_search ]]; then
+    echo '*** Performing a full search...'
+    search_path='/'
+else
+    echo '*** Performing a fast search...'
+    search_path='/etc'
+fi
+
+if [[ -n $quiet ]]; then
+    exec 4>&2 2>/dev/null
+fi
+
+search_results=$(find $search_path -name '*.dpkg-dist*' -or \
+                                   -name '*.dpkg-new*' -or \
+                                   -name '*.dpkg-old*' -or \
+                                   -name '*.ucf-dist*' -or \
+                                   -name '*.ucf-new*' -or \
+                                   -name '*.ucf-old*' \
+                                   || true )
+
+if [[ -n $quiet ]]; then
+    exec 2>&4 4>/dev/null
+fi
+
+if [[ -n $search_results ]]; then
+    echo "$search_results" | sort
+else
+    echo 'No dpkg or ucf generated configuration files were found!'
+fi
+
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
