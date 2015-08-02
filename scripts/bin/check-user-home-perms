@@ -36,7 +36,9 @@ if ! sudo -v 2> /dev/null; then
 fi
 
 check_perms "$(echo ~root)"
-for user in $(find /home -maxdepth 1 -type d ! -name 'home'); do
+for user in $(find /home -maxdepth 1 \
+                         -not -path '*/\.*' \
+                         -type d ! -name 'home'); do
     check_perms "$user"
 done
 
