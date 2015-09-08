@@ -27,7 +27,6 @@ function ssh-fix-auth-sock {
 
     if [ -z "$ssh_agents" ]; then
         echo "Unable to locate any available SSH agents."
-        exit 1
     else
         best_agent=$(echo $ssh_agents | sort -r | head -n 1 | cut -d' ' -f2)
         if [ "$SSH_AUTH_SOCK" != "$best_agent" ]; then
