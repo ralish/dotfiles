@@ -68,6 +68,7 @@
     bra = branch --all
     brd = branch --delete
     brD = branch -D
+    brv = branch --verbose
 
     bsb = bisect bad
     bsg = bisect good
