@@ -52,6 +52,9 @@ ehthumbs.db
 # Subversion authentication data
 /subversion/.subversion/auth
 
+# Subversion annoyingly restores this
+/subversion/.subversion/README.txt
+
 # Vim bundle folder & dynamic data
 /vim/.vim/.netrwhist
 /vim/.vim/.viminfo
