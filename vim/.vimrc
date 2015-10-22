@@ -37,9 +37,11 @@ Bundle 'altercation/vim-colors-solarized'
 Bundle 'bling/vim-airline'
 Bundle 'ervandew/supertab'
 Bundle 'exu/pgsql.vim'
+Bundle "Glench/Vim-Jinja2-Syntax"
 Bundle 'kien/ctrlp.vim'
 Bundle 'Lokaltog/vim-easymotion'
 Bundle 'powerman/vim-plugin-AnsiEsc'
+Bundle "saltstack/salt-vim"
 Bundle 'scrooloose/nerdtree'
 Bundle 'scrooloose/syntastic'
 Bundle 'tpope/vim-fugitive'
