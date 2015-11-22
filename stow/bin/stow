@@ -29,7 +29,7 @@ stow [ options ] package ...
 
 =head1 DESCRIPTION
 
-This manual page describes GNU Stow 2.2.0, a program for managing
+This manual page describes GNU Stow 2.2.2, a program for managing
 the installation of software packages. This is not the definitive
 documentation for stow; for that, see the info manual.
 
@@ -409,14 +409,14 @@ translation approved by the Free Software Foundation.
 use strict;
 use warnings;
 
-require 5.6.1;
+require 5.006_001;
 
 use POSIX qw(getcwd);
 use Getopt::Long;
 
 use lib "$ENV{HOME}/dotfiles/stow/share/perl";
 use Stow;
-use Stow::Util qw(parent);
+use Stow::Util qw(parent error);
 
 my $ProgramName = $0;
 $ProgramName =~ s{.*/}{};

@@ -44,7 +44,7 @@ use Stow::Util qw(set_debug_level debug error set_test_mode
                   join_paths restore_cwd canon_path parent);
 
 our $ProgramName = 'stow';
-our $VERSION = '2.2.0';
+our $VERSION = '2.2.2';
 
 our $LOCAL_IGNORE_FILE  = '.stow-local-ignore';
 our $GLOBAL_IGNORE_FILE = '.stow-global-ignore';
@@ -185,11 +185,11 @@ sub set_stow_dir {
     }
 
     my $stow_dir = canon_path($self->{dir});
-
-    $self->{stow_path} = File::Spec->abs2rel($stow_dir, $self->{target});
+    my $target = canon_path($self->{target});
+    $self->{stow_path} = File::Spec->abs2rel($stow_dir, $target);
 
     debug(2, "stow dir is $stow_dir");
-    debug(2, "stow dir path relative to target $self->{target} is $self->{stow_path}");
+    debug(2, "stow dir path relative to target $target is $self->{stow_path}");
 }
 
 sub init_state {
@@ -323,7 +323,7 @@ sub within_target_do {
 
     my $cwd = getcwd();
     chdir($self->{target})
-        or error("Cannot chdir to target tree: $self->{target}");
+        or error("Cannot chdir to target tree: $self->{target} ($!)");
     debug(3, "cwd now $self->{target}");
 
     $self->$code();
@@ -367,7 +367,7 @@ sub stow_contents {
         unless $self->is_a_node($target);
 
     opendir my $DIR, $path
-        or error("cannot read directory: $path");
+        or error("cannot read directory: $path ($!)");
     my @listing = readdir $DIR;
     closedir $DIR;
 
@@ -406,7 +406,7 @@ sub stow_node {
 
     my $path = join_paths($stow_path, $package, $target);
 
-    debug(3, "Stowing $path");
+    debug(3, "Stowing $stow_path / $package / $target");
     debug(4, "  => $source");
 
     # Don't try to stow absolute symlinks (they can't be unstowed)
@@ -520,7 +520,7 @@ sub stow_node {
             }
         }
     }
-    elsif ($self->{'no-folding'} && -d $path) {
+    elsif ($self->{'no-folding'} && -d $path && ! -l $path) {
         $self->do_mkdir($target);
         $self->stow_contents(
             $self->{stow_path},
@@ -550,12 +550,12 @@ sub should_skip_target_which_is_stow_dir {
 
     # Don't try to remove anything under a stow directory
     if ($target eq $self->{stow_path}) {
-        debug(2, "Skipping target which was current stow directory $target");
+        warn "WARNING: skipping target which was current stow directory $target\n";
         return 1;
     }
 
     if ($self->marked_stow_dir($target)) {
-        debug(2, "Skipping protected directory $target");
+        warn "WARNING: skipping protected directory $target\n";
         return 1;
     }
 
@@ -607,7 +607,7 @@ sub unstow_contents_orig {
         unless -d $target;
 
     opendir my $DIR, $target
-        or error("cannot read directory: $target");
+        or error("cannot read directory: $target ($!)");
     my @listing = readdir $DIR;
     closedir $DIR;
 
@@ -734,7 +734,7 @@ sub unstow_contents {
         unless $self->is_a_node($target);
 
     opendir my $DIR, $path
-        or error("cannot read directory: $path");
+        or error("cannot read directory: $path ($!)");
     my @listing = readdir $DIR;
     closedir $DIR;
 
@@ -881,7 +881,9 @@ sub path_owned_by_package {
 #           :            might not exist yet due to two-phase approach,
 #           :            so we can't just call readlink())
 # Returns   : ($path, $stow_path, $package) where $path and $stow_path are
-#           : relative from the current (i.e. target) directory
+#           : relative from the current (i.e. target) directory.  $path
+#           : is the full relative path, $stow_path is the relative path
+#           : to the stow directory, and $package is the name of the package.
 #           : or ('', '', '') if link is not owned by stow
 # Throws    : n/a
 # Comments  : Needs 
@@ -958,7 +960,7 @@ sub cleanup_invalid_links {
     }
 
     opendir my $DIR, $dir
-        or error("cannot read directory: $dir");
+        or error("cannot read directory: $dir ($!)");
     my @listing = readdir $DIR;
     closedir $DIR;
 
@@ -1447,13 +1449,13 @@ sub process_task {
     if ($task->{action} eq 'create') {
         if ($task->{type} eq 'dir') {
             mkdir($task->{path}, 0777)
-                or error(qq(Could not create directory: $task->{path}));
+                or error("Could not create directory: $task->{path} ($!)");
             return;
         }
         elsif ($task->{type} eq 'link') {
             symlink $task->{source}, $task->{path}
                 or error(
-                    q(Could not create symlink: %s => %s),
+                    "Could not create symlink: %s => %s ($!)",
                     $task->{path},
                     $task->{source}
             );
@@ -1463,12 +1465,12 @@ sub process_task {
     elsif ($task->{action} eq 'remove') {
         if ($task->{type} eq 'dir') {
             rmdir $task->{path}
-                or error(qq(Could not remove directory: $task->{path}));
+                or error("Could not remove directory: $task->{path} ($!)");
             return;
         }
         elsif ($task->{type} eq 'link') {
             unlink $task->{path}
-                or error(qq(Could not remove link: $task->{path}));
+                or error("Could not remove link: $task->{path} ($!)");
             return;
         }
     }
@@ -1477,13 +1479,13 @@ sub process_task {
             # rename() not good enough, since the stow directory
             # might be on a different filesystem to the target.
             move $task->{path}, $task->{dest}
-                or error(qq(Could not move $task->{path} -> $task->{dest}));
+                or error("Could not move $task->{path} -> $task->{dest} ($!)");
             return;
         }
     }
 
     # Should never happen.
-    internal_error(qq(bad task action: $task->{action}));
+    internal_error("bad task action: $task->{action}");
 }
 
 #===== METHOD ===============================================================
@@ -1580,9 +1582,11 @@ sub is_a_link {
 
     if (my $action = $self->link_task_action($path)) {
         if ($action eq 'remove') {
+            debug(4, "  is_a_link($path): returning 0 (remove action found)");
             return 0;
         }
         elsif ($action eq 'create') {
+            debug(4, "  is_a_link($path): returning 1 (create action found)");
             return 1;
         }
     }
@@ -1594,7 +1598,7 @@ sub is_a_link {
         return $self->parent_link_scheduled_for_removal($path) ? 0 : 1;
     }
 
-    debug(4, "  is_a_link($path): returning false");
+    debug(4, "  is_a_link($path): returning 0");
     return 0;
 }
 
@@ -1732,8 +1736,8 @@ sub read_a_link {
     }
     elsif (-l $path) {
         debug(4, "  read_a_link($path): real link");
-        return readlink $path
-            or error("Could not read link: $path");
+        my $target = readlink $path or error("Could not read link: $path ($!)");
+        return $target;
     }
     internal_error("read_a_link() passed a non link path: $path\n");
 }
@@ -1857,7 +1861,7 @@ sub do_unlink {
     # Remove the link
     debug(1, "UNLINK: $file");
 
-    my $source = readlink $file or error("could not readlink $file");
+    my $source = readlink $file or error("could not readlink $file ($!)");
 
     my $task = {
         action  => 'remove',
@@ -2100,3 +2104,7 @@ _darcs
 
 .+~          # emacs backup files
 \#.*\#       # emacs autosave files
+
+^/README.*
+^/LICENSE.*
+^/COPYING
