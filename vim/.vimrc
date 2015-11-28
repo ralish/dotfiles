@@ -142,4 +142,7 @@ set list
 " Define formatting settings for 'list' mode
 set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
 
+" Filetype overrides
+autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+
 " vim: syntax=vim ts=4 sw=4 sts=4 et sr
