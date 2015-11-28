@@ -44,6 +44,7 @@ Bundle 'powerman/vim-plugin-AnsiEsc'
 Bundle "saltstack/salt-vim"
 Bundle 'scrooloose/nerdtree'
 Bundle 'scrooloose/syntastic'
+Bundle 'stephpy/vim-yaml'
 Bundle 'tpope/vim-fugitive'
 
 " Enable full file type detection (for Vundle)
