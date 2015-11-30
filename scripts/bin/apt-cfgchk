@@ -70,7 +70,8 @@ if [[ -n $quiet ]]; then
     exec 4>&2 2>/dev/null
 fi
 
-search_results=$(find $search_path -name '*.dpkg-dist*' -or \
+search_results=$(find $search_path -name '*.old*' -or \
+                                   -name '*.dpkg-dist*' -or \
                                    -name '*.dpkg-new*' -or \
                                    -name '*.dpkg-old*' -or \
                                    -name '*.ucf-dist*' -or \
