@@ -152,4 +152,7 @@ set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
 " Filetype overrides
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 
+" Syntax based folding is broken for shell scripts
+autocmd FileType sh set foldmethod=indent
+
 " vim: syntax=vim ts=4 sw=4 sts=4 et sr
