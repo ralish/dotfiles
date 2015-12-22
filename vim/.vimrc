@@ -69,6 +69,12 @@ set nobackup
 " Highlight the current line
 set cursorline
 
+" Folding should be determined by the file syntax
+set foldmethod=syntax
+
+" Initial folding level on opening a new buffer
+set foldlevelstart=32
+
 " Increase the command line history
 set history=50
 
