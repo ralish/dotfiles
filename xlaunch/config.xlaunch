@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XLaunch
+    WindowMode="MultiWindow"
+    ClientMode="NoClient"
+    LocalClient="True"
+    Display="0"
+    RemoteProtocol=""
+    LocalProgram="xterm"
+    RemoteProgram="xterm"
+    RemoteHost=""
+    RemoteUser=""
+    XDMCPHost=""
+    XDMCPBroadcast="False"
+    XDMCPIndirect="False"
+    Clipboard="True"
+    ExtraParams="-listen tcp"
+    Wgl="True"
+    DisableAC="True"
+    XDMCPTerminate="False"
+    SSHKeyChain="False"
+    SSHTerminal="True"
+    ExtraSSH="" />
