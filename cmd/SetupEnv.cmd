@@ -20,7 +20,6 @@ IF DEFINED SetupEnvVerbose ECHO Making Command Prompt suck slightly less...
 
 REM Various variables that we may need to tweak
 SET AnsiConPath=C:\Program Files (x86)\Nexiom\Software\Independent\ANSICON\ansicon.exe
-SET ClinkPath=C:\Program Files (x86)\Nexiom\Software\Independent\clink\0.4.5\clink_x64.exe
 SET Dw32Path=C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe
 SET Dw64Path=C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe
 SET SublRegPath=HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1
@@ -32,15 +31,16 @@ SET SetupEnv=Yes
 
 REM Uncomment to enable verbose mode
 REM SET SetupEnvVerbose=Yes
+IF DEFINED SetupEnvVerbose ECHO.
+IF DEFINED SetupEnvVerbose ECHO Configuring Command Processor environment:
 
 REM Inject Clink for a more pleasant experience
-IF NOT EXIST "%ClinkPath%" (
-    IF DEFINED SetupEnvVerbose ECHO * Unable to find Clink at path specified by ClinkPath.
+IF NOT EXIST "%CLINK_DIR%" (
+    IF DEFINED SetupEnvVerbose ECHO * Unable to find Clink at path specified by CLINK_DIR.
 ) ELSE (
     IF DEFINED SetupEnvVerbose ECHO * Injecting Clink into Command Processor...
-    "%ClinkPath%" inject -q --profile "~\clink"
+    "%CLINK_DIR%\clink_x64.exe" inject -q --profile "~\clink"
 )
-SET ClinkPath=
 
 REM Inject ANSICON if we're not running inside ConEmu
 IF DEFINED ConEmuANSI (
