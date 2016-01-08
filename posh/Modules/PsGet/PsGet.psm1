@@ -1319,6 +1319,13 @@ function Import-ModuleGlobally {
         Write-Verbose "Importing installed module '$ModuleName' from '$($installedModule.ModuleBase)'"
         Import-Module -Name $ModuleBase -Global -Force:$Force
 
+        # For psget no further checks are needed and their execution cause
+        # an error for the update process of 'psget'
+        # https://github.com/psget/psget/issues/186
+        if ($ModuleName -eq 'PsGet') {
+            return
+        }
+
         $IdentityExtension = [System.IO.Path]::GetExtension((Get-ModuleFile -Path $ModuleBase -ModuleName $ModuleName))
         if ($IdentityExtension -eq '.dll') {
             # import module twice for binary modules to workaround PowerShell bug:
@@ -1636,7 +1643,7 @@ function Install-ModuleToDestination {
 
         $isDestinationInPSModulePath = $env:PSModulePath.Contains($Destination)
         if ($isDestinationInPSModulePath) {
-            if (-not (Get-Module $ModuleName -ListAvailable)) {
+            if (-not (Get-Module $InstallWithModuleName -ListAvailable)) {
                 throw 'For some unexpected reasons module was not installed.'
             }
         }
@@ -1647,14 +1654,14 @@ function Install-ModuleToDestination {
         }
 
         if ($Update) {
-            Write-Host "Module $ModuleName was successfully updated." -Foreground Green
+            Write-Host "Module $InstallWithModuleName was successfully updated." -Foreground Green
         }
         else {
-            Write-Host "Module $ModuleName was successfully installed." -Foreground Green
+            Write-Host "Module $InstallWithModuleName was successfully installed." -Foreground Green
         }
 
         if (-not $DoNotImport) {
-            Import-ModuleGlobally -ModuleName:$ModuleName -ModuleBase:$targetFolderPath -Force:$Update
+            Import-ModuleGlobally -ModuleName:$InstallWithModuleName -ModuleBase:$targetFolderPath -Force:$Update
         }
 
         if ($isDestinationInPSModulePath -and $AddToProfile) {
@@ -1665,8 +1672,8 @@ function Install-ModuleToDestination {
                     New-Item $PROFILE -Type File -Force -ErrorAction Stop
                 }
 
-                if (Select-String $PROFILE -Pattern "Import-Module $ModuleName") {
-                    Write-Verbose "Import-Module $ModuleName command already in your profile"
+                if (Select-String $PROFILE -Pattern "Import-Module $InstallWithModuleName") {
+                    Write-Verbose "Import-Module $InstallWithModuleName command already in your profile"
                 }
                 else {
                     $signature = Get-AuthenticodeSignature -FilePath $PROFILE
@@ -1675,8 +1682,8 @@ function Install-ModuleToDestination {
                         Write-Error "PsGet cannot modify code-signed profile '$PROFILE'."
                     }
                     else {
-                        Write-Verbose "Add Import-Module $ModuleName command to the profile"
-                        "`nImport-Module $ModuleName" | Add-Content $PROFILE
+                        Write-Verbose "Add Import-Module $InstallWithModuleName command to the profile"
+                        "`nImport-Module $InstallWithModuleName" | Add-Content $PROFILE
                     }
                 }
             }
@@ -1744,7 +1751,7 @@ function Test-ModuleInstalledAndImport {
                     return $false
                 }
 
-                Write-Warning "The module '$ModuleName' was installed at more then one location. Installed paths:`n`t$($installedModule.ModuleBase | Format-List | Out-String)`n'$($firstInstalledModule.ModuleBase)' is the searched destination."
+                Write-Warning "The module '$ModuleName' was installed at more than one location. Installed paths:`n`t$($installedModule.ModuleBase | Format-List | Out-String)`n'$($firstInstalledModule.ModuleBase)' is the searched destination."
                 $installedModule = $targetModule
             }
             elseif ((Split-Path $installedModule.ModuleBase) -ne $Destination) {
