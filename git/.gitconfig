@@ -118,6 +118,7 @@
     i   = init
 
     l   = log --show-notes="*" --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --all
+    la  = "!git log --author=\"$(git config user.name)\" --name-only"
     lt  = log --show-notes="*" --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 
     m   = merge
