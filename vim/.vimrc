@@ -1,11 +1,22 @@
-" Consult the Vim Options Documentation as a reference
+" Consult the Vim Options Documentation as a reference:
 " http://vimdoc.sourceforge.net/htmldoc/options.html
 
-" Explicitly use sh
-set shell=sh
-
-" Be more useful (ie. drop Vi compatibility)
+" Be more useful (i.e. drop vi compatibility)
 set nocompatible
+
+" ****************************** File Locations *******************************
+
+" Directories to try for reading/writing backup files
+set backupdir^=~/.vim/backup//
+
+" Directories to try for reading/writing swap files
+set directory^=~/.vim/swap//
+
+" Directories to try for reading/writing undo files
+set undodir^=~/.vim/undo//
+
+" Shell to use for '!' and ':!' commands
+set shell=sh
 
 " Setting this first seems to fix non-zero exit status on OS X
 filetype on
@@ -155,4 +166,4 @@ autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 " Syntax based folding is broken for shell scripts
 autocmd FileType sh set foldmethod=indent
 
-" vim: syntax=vim ts=4 sw=4 sts=4 et sr
+" vim: syntax=vim cc=80 tw=79 ts=4 sw=4 sts=4 et sr
