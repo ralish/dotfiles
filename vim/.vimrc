@@ -162,6 +162,7 @@ set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
 
 " Filetype overrides
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+autocmd BufNewFile,BufWinEnter *.jinja set filetype=jinja
 
 " Syntax based folding is broken for shell scripts
 autocmd FileType sh set foldmethod=indent
