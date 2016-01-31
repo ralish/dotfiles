@@ -319,12 +319,6 @@ set viewdir=~/.vim/view
 
 
 " ****************************** Vundle Plugins *******************************
-" ################################# Libraries #################################
-
-" Assorted utility functions and commands
-Plugin 'L9'
-
-
 " ################################ Appearance #################################
 
 " vim-airline & themes
