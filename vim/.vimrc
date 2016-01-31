@@ -110,6 +110,12 @@ endif
 " Show the cursor position (note 'statusline' overrides this)
 set ruler
 
+" New windows from a horizontal split should be below the current one
+set splitbelow
+
+" New windows from a vertical split should be right of the current one
+set splitright
+
 
 " ********************************** Editing **********************************
 
