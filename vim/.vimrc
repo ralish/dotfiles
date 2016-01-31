@@ -131,6 +131,9 @@ set report=0
 " When inserting a bracket show the matching one
 set showmatch
 
+" Allow the cursor to be positioned where there's no character in Visual mode
+set virtualedit=block
+
 
 " ********************************** Saving ***********************************
 
@@ -207,7 +210,7 @@ set completeopt=longest,menuone,preview
 set scrolloff=2
 "
 " Number of columns to scroll horizontally (only with 'nowrap')
-set sidescroll=2
+set sidescroll=1
 
 " Number of columns to keep left and right of the cursor (only with 'nowrap')
 "set sidescrolloff=0
@@ -414,6 +417,16 @@ let g:airline_powerline_fonts=1
 let g:airline_theme='solarized'
 
 
+" ################################# NERDTree ##################################
+
+" Shortcut to toggle NERDTree
+noremap <C-n> :NERDTreeToggle<CR>
+
+" Open a NERDTree automatically on startup if no files were specified
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+
 " ***************************** Language Handling *****************************
 " ################################### Jinja ###################################
 
@@ -434,6 +447,31 @@ let g:markdown_fenced_languages = ['bash=sh', 'python']
 
 " Make PostgreSQL's SQL dialect the default for '.sql' files
 let g:sql_type_default = 'pgsql'
+
+
+" ******************************* Key Mappings ********************************
+
+" Move by rows instead of lines (much more intuitive with 'wrap')
+noremap j gj
+noremap k gk
+noremap gk k
+noremap gj j
+noremap <Up> gk
+noremap <Down> gj
+inoremap <Up> gk
+inoremap <Down> gj
+
+" Keep the cursor in place when joining lines with 'J'
+nnoremap J mzJ`z
+
+" Make 'U' perform a redo operation (a sensible inverse of 'u')
+nnoremap U <C-r>
+
+" Make behaviour of 'Y' consistent with 'D' and 'C' (i.e. yank from cursor)
+nnoremap Y y$
+
+" Write the file via sudo
+cnoremap w!! w !sudo tee % >/dev/null
 
 
 " vim: syntax=vim cc=80 tw=79 ts=4 sw=4 sts=4 et sr
