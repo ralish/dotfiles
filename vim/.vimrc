@@ -346,8 +346,6 @@ Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'easymotion/vim-easymotion'
 " Full filesystem explorer
 Plugin 'scrooloose/nerdtree'
-" Fast file/buffer navigation (needs Ruby)
-"Plugin 'wincent/command-t'
 
 
 " ############################### Functionality ###############################
