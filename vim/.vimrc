@@ -45,6 +45,9 @@ set laststatus=2
 " Show partial command in the last line of the screen
 set showcmd
 
+" Don't display the intro message on startup
+set shortmess+=I
+
 " Indicate we're on a fast terminal connection
 set ttyfast
 
@@ -195,10 +198,10 @@ set completeopt=longest,menuone,preview
 "set scrolljump=1
 
 " Number of lines to keep above and below the cursor
-set scrolloff=1
+set scrolloff=2
 "
 " Number of columns to scroll horizontally (only with 'nowrap')
-set sidescroll=1
+set sidescroll=2
 
 " Number of columns to keep left and right of the cursor (only with 'nowrap')
 "set sidescrolloff=0
@@ -307,23 +310,67 @@ set viewdir=~/.vim/view
 
 
 " ****************************** Vundle Plugins *******************************
+" ################################# Libraries #################################
 
+" Assorted utility functions and commands
 Plugin 'L9'
-Plugin 'surround.vim'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'ervandew/supertab'
-Plugin 'exu/pgsql.vim'
-Plugin 'Glench/Vim-Jinja2-Syntax'
-Plugin 'kien/ctrlp.vim'
-Plugin 'Lokaltog/vim-easymotion'
-Plugin 'powerman/vim-plugin-AnsiEsc'
-Plugin 'saltstack/salt-vim'
-Plugin 'scrooloose/nerdtree'
-Plugin 'scrooloose/syntastic'
-Plugin 'stephpy/vim-yaml'
-Plugin 'tpope/vim-fugitive'
+
+
+" ################################ Appearance #################################
+
+" vim-airline & themes
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
+" Support ANSI escape sequences
+Plugin 'powerman/vim-plugin-AnsiEsc'
+
+
+" ############################## Colour Schemes ###############################
+
+" Solarized
+Plugin 'altercation/vim-colors-solarized'
+" Tomorrow Theme
+"Plugin 'chriskempson/vim-tomorrow-theme'
+" Base16
+"Plugin 'chriskempson/base16-vim'
+
+
+" ################################ Navigation #################################
+
+" Full path fuzzy finder
+Plugin 'ctrlpvim/ctrlp.vim'
+" Improved motions handling
+Plugin 'easymotion/vim-easymotion'
+" Full filesystem explorer
+Plugin 'scrooloose/nerdtree'
+" Fast file/buffer navigation (needs Ruby)
+"Plugin 'wincent/command-t'
+
+
+" ############################### Functionality ###############################
+
+" Improved <Tab> completion
+Plugin 'ervandew/supertab'
+" Advanced syntax checking
+Plugin 'scrooloose/syntastic'
+" Powerful Git wrapper
+Plugin 'tpope/vim-fugitive'
+" Clever code quoting
+Plugin 'tpope/vim-surround'
+
+
+" ############################# Language Support ##############################
+
+" Markdown
+Plugin 'tpope/vim-markdown'
+" PgSQL
+Plugin 'exu/pgsql.vim'
+" Jinja2
+Plugin 'Glench/Vim-Jinja2-Syntax'
+" Salt
+Plugin 'saltstack/salt-vim'
+" YAML (built-in support is very slow)
+Plugin 'stephpy/vim-yaml'
 
 
 " ****************************** Vundle Finalise ******************************
@@ -349,6 +396,38 @@ try
 catch
     colorscheme default
 endtry
+
+
+" ****************************** Plugin Settings ******************************
+" ################################ vim-airline ################################
+
+" Enable Powerline symbols
+let g:airline_powerline_fonts=1
+
+" Use the Solarized theme
+let g:airline_theme='solarized'
+
+
+" ***************************** Language Handling *****************************
+" ################################### Jinja ###################################
+
+" Always treat '.jinja' files as Jinja (overrides any modeline)
+autocmd BufNewFile,BufWinEnter *.jinja set filetype=jinja
+
+
+" ################################# Markdown ##################################
+
+" Treat '.md' files as Markdown instead of Modula-2
+autocmd BufNewFile,BufReadPost *.md set filetype=markdown
+
+" Enable fenced code block syntax highlighting for these languages
+let g:markdown_fenced_languages = ['bash=sh', 'python']
+
+
+" #################################### SQL ####################################
+
+" Make PostgreSQL's SQL dialect the default for '.sql' files
+let g:sql_type_default = 'pgsql'
 
 
 " vim: syntax=vim cc=80 tw=79 ts=4 sw=4 sts=4 et sr
