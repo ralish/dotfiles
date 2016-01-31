@@ -321,11 +321,13 @@ set viewdir=~/.vim/view
 " ****************************** Vundle Plugins *******************************
 " ################################ Appearance #################################
 
+" tmux statusline generator
+Plugin 'edkolev/tmuxline.vim'
+" Support ANSI escape sequences
+Plugin 'powerman/vim-plugin-AnsiEsc'
 " vim-airline & themes
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
-" Support ANSI escape sequences
-Plugin 'powerman/vim-plugin-AnsiEsc'
 
 
 " ############################## Colour Schemes ###############################
@@ -362,12 +364,12 @@ Plugin 'tpope/vim-surround'
 
 " ############################# Language Support ##############################
 
+" Jinja2
+Plugin 'Glench/Vim-Jinja2-Syntax'
 " Markdown
 Plugin 'tpope/vim-markdown'
 " PgSQL
 Plugin 'exu/pgsql.vim'
-" Jinja2
-Plugin 'Glench/Vim-Jinja2-Syntax'
 " Salt
 Plugin 'saltstack/salt-vim'
 " YAML (built-in support is very slow)
@@ -450,8 +452,6 @@ noremap gk k
 noremap gj j
 noremap <Up> gk
 noremap <Down> gj
-inoremap <Up> gk
-inoremap <Down> gj
 
 " Keep the cursor in place when joining lines with 'J'
 nnoremap J mzJ`z
@@ -464,6 +464,5 @@ nnoremap Y y$
 
 " Write the file via sudo
 cnoremap w!! w !sudo tee % >/dev/null
-
 
 " vim: syntax=vim cc=80 tw=79 ts=4 sw=4 sts=4 et sr
