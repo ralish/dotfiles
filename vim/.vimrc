@@ -338,6 +338,8 @@ Plugin 'altercation/vim-colors-solarized'
 "Plugin 'chriskempson/vim-tomorrow-theme'
 " Base16
 "Plugin 'chriskempson/base16-vim'
+" Bad Wolf
+"Plugin 'sjl/badwolf'
 
 
 " ################################ Navigation #################################
