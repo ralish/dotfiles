@@ -436,7 +436,7 @@ autocmd BufNewFile,BufWinEnter *.jinja set filetype=jinja
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 
 " Enable fenced code block syntax highlighting for these languages
-let g:markdown_fenced_languages = ['bash=sh', 'python']
+let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
 
 
 " #################################### SQL ####################################
