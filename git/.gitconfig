@@ -90,10 +90,10 @@
 
     cp  = cherry-pick
 
-    d   = diff -w
-    dw  = diff
-    dc  = diff --cached -w
-    dcw = diff --cached
+    d   = diff
+    dw  = diff -w
+    dc  = diff --cached
+    dcw = diff --cached -w
 
     f   = fetch
     fa  = fetch --all
@@ -130,6 +130,7 @@
     n   = notes
 
     p   = push
+    pa  = push --all
     pf  = push --force
     po  = push origin
     pom = push origin master
