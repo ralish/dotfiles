@@ -9,11 +9,11 @@ Objectives
 
 My primary occupation is that of a sysadmin and so I often find myself working on many different systems. This introduces some key objectives I've tried to ensure my `dotfiles` meet:
 
-* Ease of access  
+* **Ease of access**  
   GitHub makes this easy by providing access to ZIP files of each branch in a repository. While a Git clone is strongly preferable, if this is too much effort or otherwise problematic, simply downloading and unpacking the ZIP archive is a helpful fallback.
-* Ease of setup  
+* **Ease of setup**  
   A long or manual installation or removal process is painful and time-consuming. An automated approach is essential so that after downloading or cloning the repository installation is quick and easy, with removal if necessary similarly straightforward.
-* Portability  
+* **Portability**  
   It's all too easy for platform assumptions to seek into configurations. I've tried my best to avoid such assumptions so that all configurations work on platforms where the underlying application or library is supported, or at least degrade gracefully.
 
 
@@ -22,19 +22,19 @@ Management
 
 I've settled on using [GNU Stow](https://www.gnu.org/software/stow/) to manage my `dotfiles` for the following attributes:
 
-* Compatible  
+* **Compatible**  
   Most Unix-like systems have [Perl](https://www.perl.org/) installed by default and Stow itself has no peculiar dependencies.
-* Portable  
+* **Portable**  
   Stow can be included in the repository and subsequently stow itself into a location in the user's `PATH` for a quick bootstrap!
-* Organised  
+* **Organised**  
   Stow makes keeping the repository organised simple, with each directory containing the configuration files for a specific program or library.
-* Granular  
+* **Granular**  
   Stow operates on chosen directories allowing for only a desired subset of application or library configurations to be installed.
-* Revertible  
+* **Revertible**  
   Stow can undo the changes it makes, ensuring that leaving the system in the same state as it was originally is trivial to do.
-* Stateless  
+* **Stateless**  
   Stow doesn't need to maintain any state between executions which helps to keep the system simple, and consequently less likely to break.
-* Lightweight  
+* **Lightweight**  
   Stow is fast, unintrusive, and at the time of writing the script comes in at a mere ~28KB.
 
 
