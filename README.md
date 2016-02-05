@@ -20,7 +20,7 @@ My primary occupation is that of a sysadmin and so I often find myself working o
 Management
 ----------
 
-I've settled on using [GNU Stow](https://www.gnu.org/software/stow/) to manage my `dotfiles` for the following attributes:
+I've settled on using [Stow](https://www.gnu.org/software/stow/) to manage my `dotfiles` for the following attributes:
 
 * **Compatible**  
   Most Unix-like systems have [Perl](https://www.perl.org/) installed by default and Stow itself has no peculiar dependencies.
@@ -35,7 +35,7 @@ I've settled on using [GNU Stow](https://www.gnu.org/software/stow/) to manage m
 * **Stateless**  
   Stow doesn't need to maintain any state between executions which helps to keep the system simple, and consequently less likely to break.
 * **Lightweight**  
-  Stow is fast, unintrusive, and at the time of writing the script comes in at a mere ~28KB.
+  Stow is fast, unintrusive, and at the time of writing the script comes in at a mere ~28KB!
 
 
 Tested Environments
@@ -47,7 +47,7 @@ The following environments are known to work:
  * [FreeBSD](https://www.freebsd.org/) *(8.3 or newer)*
  * [Linux](https://www.kernel.org/) *([Ubuntu](http://www.ubuntu.com/) 12.04 or newer)*
  * [OS X](https://www.apple.com/osx/) *(10.9 or newer)*
- * [Windows NT](https://www.microsoft.com/windows) *(Windows 7/Server 2008 R2 or newer)*
+ * [Windows](https://www.microsoft.com/windows) *(Windows 7/Server 2008 R2 or newer)*
 
 
 Thanks To
