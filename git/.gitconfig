@@ -100,20 +100,20 @@
 
     g   = grep
 
-    h   = show -w
-    hw  = show
-    hs  = show --stat -w
-    hsw = show --stat
-    h1  = show -w HEAD~1
-    h2  = show -w HEAD~2
-    h3  = show -w HEAD~3
-    h4  = show -w HEAD~4
-    h5  = show -w HEAD~5
-    h6  = show -w HEAD~6
-    h7  = show -w HEAD~7
-    h8  = show -w HEAD~8
-    h9  = show -w HEAD~9
-    h0  = show -w HEAD~10
+    h   = show
+    hw  = show -w
+    hs  = show --stat
+    hsw = show --stat -w
+    h1  = show HEAD~1
+    h2  = show HEAD~2
+    h3  = show HEAD~3
+    h4  = show HEAD~4
+    h5  = show HEAD~5
+    h6  = show HEAD~6
+    h7  = show HEAD~7
+    h8  = show HEAD~8
+    h9  = show HEAD~9
+    h0  = show HEAD~10
 
     i   = init
 
