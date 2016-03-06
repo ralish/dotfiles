@@ -37,22 +37,6 @@ Function ConvertFrom-PoShBase64 {
     [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String("$String"))
 }
 
-# Customise our prompt for useful Git status info (needs posh-git)
-if (Get-Module posh-git) {
-    Function global:prompt {
-        $REALLASTEXITCODE = $LASTEXITCODE
-
-        # Reset colour as it can be messed up by Enable-GitColors
-        $Host.UI.RawUI.ForegroundColor = $GitPromptSettings.DefaultForegroundColor
-
-        Write-Host ($pwd.ProviderPath) -NoNewline
-        Write-VcsStatus
-
-        $global:LASTEXITCODE = $REALLASTEXITCODE
-        return '> '
-    }
-}
-
 # Neatly print out all users with UIDs (uses RFC2307 schema extensions)
 Function Get-ADUserUID {
     Get-ADUser -Filter { uidNumber -ge 10000 } -Properties uidNumber, sAMAccountName, name, mail, loginShell, unixHomeDirectory, gidNumber `

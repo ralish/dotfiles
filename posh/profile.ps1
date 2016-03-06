@@ -16,36 +16,11 @@ $SublRegPath = 'HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime
 # ******************************************************************************
 
 
-# Determine the parent directory of our profile script for use later
-$ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
+# Determine the parent directory of our profile script
+$ScriptPath = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 
-# Load PSReadLine if we're running PoSh >= 3.0
-if ($PSVersionTable.PSVersion.Major -ge 3) {
-    if ((Get-Module PSReadLine -ListAvailable) -and ($Host.Name -eq 'ConsoleHost')) {
-        Import-Module PSReadLine
-
-        # Search command history based on any already entered text
-        Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward
-        Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
-        Set-PSReadlineOption -HistorySearchCursorMovesToEnd
-
-        # Bash style completion
-        Set-PSReadlineKeyHandler -Key Tab -Function Complete
-    } else {
-        Write-Verbose "Couldn't locate PSReadLine module; not importing to environment."
-    }
-}
-
-# Load posh-git if we're running PoSh >= 2.0
-if ($PSVersionTable.PSVersion.Major -ge 2) {
-    if (Get-Module posh-git -ListAvailable) {
-        Import-Module posh-git
-        Enable-GitColors
-        Start-SshAgent -Quiet
-    } else {
-        Write-Verbose "Couldn't locate posh-git module; not importing to environment."
-    }
-}
+# Import all available modules with our custom settings
+Get-ChildItem (Join-Path $ScriptPath 'Settings') -File | % { . $_.FullName }
 
 # Load keys into ssh-agent (if we're not using Plink)
 if ($env:GIT_SSH -inotmatch 'plink') {
