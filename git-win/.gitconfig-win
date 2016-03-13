@@ -1,5 +1,7 @@
 [core]
     # Don't print non-ASCII file names in quoted octal notation
     quotepath = off
+    # Treat a carriage-return as part of the line terminator
+    whitespace = cr-at-eol
 
 # vim: syntax=gitconfig ts=4 sw=4 sts=4 et sr
