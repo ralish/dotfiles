@@ -63,5 +63,6 @@ ehthumbs.db
 /vim/.vim/bundle/
 /vim/.vim/swap/
 /vim/.vim/undo/
+/vim/.vim/view/
 
 # vim: ts=4 sw=4 sts=4 et sr
