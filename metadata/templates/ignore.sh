@@ -2,7 +2,7 @@
 
 # Source in common metadata functions
 script_dir="$(dirname "${BASH_SOURCE[0]}")"
-source "$script_dir/../common.sh"
+source "$script_dir/templates/common.sh"
 
 exit $DETECTION_IGNORE
 

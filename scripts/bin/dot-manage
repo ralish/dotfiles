@@ -19,7 +19,7 @@ function script_init() {
     dotfiles_name="$(basename "$dotfiles_dir")"
 
     # Source in common metadata functions
-    source "$dotfiles_dir/$META_DIR/common.sh"
+    source "$dotfiles_dir/$META_DIR/templates/common.sh"
 }
 
 function script_usage() {
@@ -95,8 +95,8 @@ function detect_components() {
 
     for comp_path in $comp_list; do
         comp_name="$(basename "$comp_path")"
-        if [[ -x $META_DIR/$comp_name/detect.sh ]]; then
-            if $META_DIR/$comp_name/detect.sh; then
+        if [[ -x $META_DIR/$comp_name.sh ]]; then
+            if $META_DIR/$comp_name.sh; then
                 stow_list+=("$comp_name")
                 detect_success+=("$comp_name")
             else

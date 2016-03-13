@@ -2,14 +2,14 @@
 
 # Source in common metadata functions
 script_dir="$(dirname "${BASH_SOURCE[0]}")"
-source "$script_dir/../common.sh"
+source "$script_dir/templates/common.sh"
 
 if ! command -v ssh > /dev/null; then
     exit $DETECTION_NOT_AVAILABLE
 fi
 
 # Paths we need to know to build our configuration
-OPENSSH_DIR="$script_dir/../../openssh/.ssh"
+OPENSSH_DIR="$script_dir/../openssh/.ssh"
 OPENSSH_CFG="$OPENSSH_DIR/config"
 TEMPLATE_DIR="$OPENSSH_DIR/templates"
 CUSTOM_CFG="$TEMPLATE_DIR/ssh_config"

@@ -1,1 +1,0 @@
-../templates/always_install.sh

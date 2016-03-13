@@ -2,7 +2,7 @@
 
 # Source in common metadata functions
 script_dir="$(dirname "${BASH_SOURCE[0]}")"
-source "$script_dir/../common.sh"
+source "$script_dir/templates/common.sh"
 
 kernel_name=$(uname -s)
 if [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
