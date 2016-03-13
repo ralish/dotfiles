@@ -12,8 +12,8 @@
 # uses an encoding which Git doesn't natively support (e.g. UTF16-LE).
 #
 # PowerShell module manifest
-*.psd1 filter=file-encoding
+#*.psd1 filter=file-encoding
 # PowerShell script module
-*.psm1 filter=file-encoding
+#*.psm1 filter=file-encoding
 
 # vim: ts=4 sw=4 sts=4 et sr
