@@ -56,6 +56,11 @@
     enabled = true
     autoupdate = true
 
+[filter "file-encoding"]
+    clean = iconv -sc -f $(file --brief --mime-encoding %f) -t utf-8
+    smudge = iconv -sc -f utf-8 -t $(file --brief --mime-encoding %f)
+    required
+
 [alias]
     a   = add
     aa  = add --all

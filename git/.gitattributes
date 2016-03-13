@@ -1,8 +1,19 @@
-# Automatically normalise line endings for all text based files
+# Automatically normalise line endings for all text files
 #
 # Setting this globally seems to break other repositories in some cases
-# so we avoid using it for now, however, we can use it in our own repos
-#
+# so we avoid using it for now, however, we can use it in our own repos.
 # * text=auto
+
+# Apply the "file-encoding" filter to nominated file extensions
+#
+# This converts the listed extensions to UTF-8 on commit and back to
+# their original encoding on checkout. Doing so ensures Git operations
+# which work on the file's contents function correctly when the file
+# uses an encoding which Git doesn't natively support (e.g. UTF16-LE).
+#
+# PowerShell module manifest
+*.psd1 filter=file-encoding
+# PowerShell script module
+*.psm1 filter=file-encoding
 
 # vim: ts=4 sw=4 sts=4 et sr
