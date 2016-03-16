@@ -182,6 +182,9 @@
     s   = status --short --branch
     sl  = status --long
 
+    sh  = shortlog -s -e
+    shl = shortlog
+
     sm  = submodule
     sma = submodule add
     smi = submodule init
