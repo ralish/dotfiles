@@ -1,5 +1,10 @@
 @ECHO OFF
 
+REM Bail out before doing anything if we we appear to be running under
+REM an MSBuild process. All manner of weird stuff could be about to run
+REM as part of a build which might behave unexpectedly with our config.
+IF DEFINED VisualStudioVersion EXIT /B
+
 REM Bail out before doing anything if we were invoked via Cygwin Setup!!
 REM Cygwin does some weird things to the environment while performing an
 REM autorebase that at a minimum causes DOSKEY to crash (yes, seriously).
