@@ -35,7 +35,7 @@ COMPLETION_WAITING_DOTS="true"
 # DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Which plugins would you like to load?
-plugins=(git rand-quote)
+plugins=(colored-man-pages)
 
 # Actually load oh-my-zsh with our settings
 source "$ZSH/oh-my-zsh.sh"
