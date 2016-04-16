@@ -1,5 +1,5 @@
 " Consult the Vim Options Documentation as a reference:
-" http://vimdoc.sourceforge.net/htmldoc/options.html
+" http://vimhelp.appspot.com/options.txt.html
 
 " ****************************** Initialisation *******************************
 
@@ -386,9 +386,6 @@ call vundle#end()
 " Enable file type detection with plugin and indent support
 filetype plugin indent on
 
-" Enable syntax highlighting
-syntax on
-
 
 " ******************************* Colour Scheme *******************************
 
@@ -439,6 +436,18 @@ autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
 
 
+" ################################### Shell ###################################
+
+" Assume Bash syntax for shell files
+autocmd FileType sh let g:is_bash=1
+
+" Bitmask of folding features to enable:
+" - 1: Functions
+" - 2: Here documents
+" - 4: if/do/for statements
+autocmd FileType sh let g:sh_fold_enabled=1
+
+
 " #################################### SQL ####################################
 
 " Make PostgreSQL's SQL dialect the default for '.sql' files
@@ -466,5 +475,11 @@ nnoremap Y y$
 
 " Write the file via sudo
 cnoremap w!! w !sudo tee % >/dev/null
+
+
+" ********************************* Finalise **********************************
+
+" Enable syntax highlighting
+syntax on
 
 " vim: syntax=vim cc=80 tw=79 ts=4 sw=4 sts=4 et sr
