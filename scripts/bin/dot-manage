@@ -22,6 +22,7 @@ function script_init() {
     source "$dotfiles_dir/$META_DIR/templates/common.sh"
 }
 
+
 function script_usage() {
     echo 'Usage:
     -h|--help                   Displays this help
@@ -39,6 +40,7 @@ function script_usage() {
                                 conjunction with the detection report function.
     -dr|--detection-report      Displays a report of the detection results'
 }
+
 
 function parse_params() {
     if [[ $# -eq 0 ]]; then
@@ -79,6 +81,7 @@ function parse_params() {
     fi
 }
 
+
 function detect_components() {
     cd "$dotfiles_dir"
     stow_list=()
@@ -96,7 +99,7 @@ function detect_components() {
     for comp_path in $comp_list; do
         comp_name="$(basename "$comp_path")"
         if [[ -x $META_DIR/$comp_name.sh ]]; then
-            if $META_DIR/$comp_name.sh; then
+            if "$META_DIR/$comp_name.sh"; then
                 stow_list+=("$comp_name")
                 detect_success+=("$comp_name")
             else
@@ -128,9 +131,10 @@ function detect_components() {
 
 }
 
+
 function detect_report() {
     echo -ne "Detected:\t\t"
-    if [[ -n $detect_success ]]; then
+    if [[ -n ${detect_success[*]} ]]; then
         detect_success="$(detect_report_format "${detect_success[@]}")"
         echo -e "\e[32m$detect_success\e[39m"
     else
@@ -138,7 +142,7 @@ function detect_report() {
     fi
 
     echo -ne "Always Install:\t\t"
-    if [[ -n $detect_always_install ]]; then
+    if [[ -n ${detect_always_install[*]} ]]; then
         detect_always_install="$(detect_report_format "${detect_always_install[@]}")"
         echo -e "\e[32m$detect_always_install\e[39m"
     else
@@ -146,7 +150,7 @@ function detect_report() {
     fi
 
     echo -ne "Never Install:\t\t"
-    if [[ -n $detect_never_install ]]; then
+    if [[ -n ${detect_never_install[*]} ]]; then
         detect_never_install="$(detect_report_format "${detect_never_install[@]}")"
         echo -e "\e[32m$detect_never_install\e[39m"
     else
@@ -154,7 +158,7 @@ function detect_report() {
     fi
 
     echo -ne "Not Available:\t\t"
-    if [[ -n $detect_not_available ]]; then
+    if [[ -n ${detect_not_available[*]} ]]; then
         detect_not_available="$(detect_report_format "${detect_not_available[@]}")"
         echo -e "\e[32m$detect_not_available\e[39m"
     else
@@ -162,7 +166,7 @@ function detect_report() {
     fi
 
     echo -ne "Detection Ignored:\t"
-    if [[ -n $detect_ignore ]]; then
+    if [[ -n ${detect_ignore[*]} ]]; then
         detect_ignore="$(detect_report_format "${detect_ignore[@]}")"
         echo -e "\e[32m$detect_ignore\e[39m"
     else
@@ -170,7 +174,7 @@ function detect_report() {
     fi
 
     echo -ne "No Detection Logic:\t"
-    if [[ -n $detect_no_logic ]]; then
+    if [[ -n ${detect_no_logic[*]} ]]; then
         detect_no_logic="$(detect_report_format "${detect_no_logic[@]}")"
         echo -e "\e[33m$detect_no_logic\e[39m"
     else
@@ -178,7 +182,7 @@ function detect_report() {
     fi
 
     echo -ne "Detection Failure:\t"
-    if [[ -n $detect_failure ]]; then
+    if [[ -n ${detect_failure[*]} ]]; then
         detect_failure="$(detect_report_format "${detect_failure[@]}")"
         echo -e "\e[31m$detect_failure\e[39m"
     else
@@ -186,9 +190,11 @@ function detect_report() {
     fi
 }
 
+
 function detect_report_format() {
-    echo "$(echo "$@" | xargs -n1 | sort | xargs)"
+    echo "$@" | xargs -n1 | sort | xargs
 }
+
 
 function stow_components() {
     cd "$dotfiles_dir"
@@ -196,25 +202,26 @@ function stow_components() {
     stow_failure=()
 
     for stow_comp in "${stow_list[@]}"; do
-        if $STOW_BIN $1 "$stow_comp" 2> /dev/null; then
+        if "$STOW_BIN" "$1" "$stow_comp" 2> /dev/null; then
             stow_success+=("$stow_comp")
         elif [[ $? -eq 1 ]]; then
             stow_failure+=("$stow_comp")
         fi
     done
 
-    if [[ -n $stow_failure ]]; then
+    if [[ -n ${stow_failure[*]} ]]; then
         stow_failure="$(echo "${stow_failure[@]}" | xargs -n1 | sort | xargs)"
         echo -e "Stow Failed: \t\t\e[31m$stow_failure\e[39m"
     fi
-    if [[ -n $stow_success ]]; then
+    if [[ -n ${stow_success[*]} ]]; then
         stow_success="$(echo "${stow_success[@]}" | xargs -n1 | sort | xargs)"
         echo -e "Stow Succeeded: \t\e[32m$stow_success\e[39m"
     fi
 }
 
+
 script_init
-parse_params $@
+parse_params "$@"
 
 echo '*** Detecting applicable dotfiles components...'
 detect_components

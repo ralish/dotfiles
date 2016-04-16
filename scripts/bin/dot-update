@@ -17,6 +17,7 @@ function script_init() {
     dotfiles_dir="$(cd "$script_dir"; git rev-parse --show-toplevel)"
 }
 
+
 function script_usage() {
     echo 'Usage:
     -h|--help                   Displays this help
@@ -27,6 +28,7 @@ function script_usage() {
     -s|--stow                   Run dot-manage after updating Git (default)
     -v|--vim                    Update Vim bundles'
 }
+
 
 function parse_params() {
     if [[ $# -eq 0 ]]; then
@@ -63,8 +65,9 @@ function parse_params() {
     fi
 }
 
+
 script_init
-parse_params $@
+parse_params "$@"
 
 if [[ -n $git_update ]]; then
     echo '*** Updating Git sources...'
