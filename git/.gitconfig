@@ -123,9 +123,9 @@
     i   = init
 
     l   = log --show-notes="*" --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --all
-    la  = "!git log --author=\"$(git config user.name)\" --name-only"
-    ln  = log --name-only
-    ls  = ls-tree -r --name-only HEAD
+    la  = "!git log --author=\"$(git config user.name)\" --name-status"
+    ln  = log --name-status
+    ls  = ls-tree -r --name-status HEAD
     lt  = log --show-notes="*" --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 
     m   = merge
