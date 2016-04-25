@@ -16,20 +16,35 @@ HISTFILESIZE=2000
 # Autocorrect typos when changing path with "cd"
 shopt -s cdspell
 
+# Check if hashed commands exist before executing
+shopt -s checkhash
+
+# Check for stopped or running jobs before exiting
+shopt -s checkjobs
+
 # Update the window size after every command
 shopt -s checkwinsize
 
 # Try and save multi-line commands as a single entry
 shopt -s cmdhist
 
+# Replace directory names with results of word expansion
+shopt -s direxpand
+
 # Try to autocorrect typos during directory completion
 shopt -s dirspell
 
-# Append to the history file instead of overwriting
-shopt -s histappend
+# Include hidden files and directories in expansion
+#shopt -s dotglob
+
+# Enable extended pattern matching features
+shopt -s extglob
 
 # Enable support for wildcard globbing via "**"
 shopt -s globstar
+
+# Append to the history file instead of overwriting
+shopt -s histappend
 
 # Make use of lesspipe if present for handling non-text input
 [[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
