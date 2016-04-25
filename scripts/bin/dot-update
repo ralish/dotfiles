@@ -5,16 +5,24 @@
 # A better class of script...
 set -o errexit          # Exit on most errors (see the manual)
 set -o errtrace         # Make sure any error trap is inherited
-set -o pipefail         # Exit on failures earlier in a pipeline
+#set -o nounset         # Disallow expansion of unset variables
+set -o pipefail         # Use last non-zero exit code in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
 DOT_MANAGE=dot-manage
 
 function script_init() {
-    # Determine some important paths
+    # Original directory
     orig_dir="$PWD"
-    script_dir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-    dotfiles_dir="$(cd "$script_dir"; git rev-parse --show-toplevel)"
+
+    # Figure out the physical directory this script resides in. The approach
+    # taken is clumsy as the simple methods like "readlink -f" and "realpath"
+    # are not platform independent. We have to work on Linux, BSD, OS X, etc...
+    script_file="$(perl -MCwd -le 'print Cwd::abs_path(shift)' "${BASH_SOURCE[0]}")"
+    script_dir="$(dirname "$script_file")"
+
+    # Dotfiles directory path
+    dotfiles_dir="$(cd -P "$script_dir"; git rev-parse --show-toplevel)"
 }
 
 
