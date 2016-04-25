@@ -1,0 +1,9 @@
+<Component>
+    <FriendlyName>ConEmu</FriendlyName>
+    <InstallPath>
+        <SpecialFolder>ApplicationData</SpecialFolder>
+    </InstallPath>
+    <IgnorePaths>
+        <Path>Startup.txt</Path>
+    </IgnorePaths>
+</Component>

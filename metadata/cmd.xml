@@ -1,0 +1,10 @@
+<Component>
+    <FriendlyName>Command Prompt</FriendlyName>
+    <Detection>
+        <Method>Static</Method>
+        <Availability>AlwaysInstall</Availability>
+    </Detection>
+    <IgnorePaths>
+        <Path>SetupEnv.cmd</Path>
+    </IgnorePaths>
+</Component>
