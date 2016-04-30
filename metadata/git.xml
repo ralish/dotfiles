@@ -1,0 +1,5 @@
+<Component>
+    <InstallPath>
+        <HideSymlinks>True</HideSymlinks>
+    </InstallPath>
+</Component>
