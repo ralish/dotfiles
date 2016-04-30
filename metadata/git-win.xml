@@ -1,0 +1,12 @@
+<Component>
+    <FriendlyName>Git for Windows</FriendlyName>
+    <Detection>
+        <Method>Automatic</Method>
+        <MatchRegEx>True</MatchRegEx>
+        <MatchCase>True</MatchCase>
+        <MatchPattern>^Git </MatchPattern>
+    </Detection>
+    <InstallPath>
+        <HideSymlinks>True</HideSymlinks>
+    </InstallPath>
+</Component>
