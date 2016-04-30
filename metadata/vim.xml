@@ -1,0 +1,10 @@
+<Component>
+    <FriendlyName>Vim</FriendlyName>
+    <Detection>
+        <Method>Static</Method>
+        <Availability>AlwaysInstall</Availability>
+    </Detection>
+    <InstallPath>
+        <HideSymlinks>True</HideSymlinks>
+    </InstallPath>
+</Component>
