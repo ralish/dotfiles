@@ -265,8 +265,14 @@ set smarttab
 " Wrap long lines at a character in 'breakat'
 set linebreak
 
+" Characters to line break on when using 'linebreak'
+"let &breakat = ' 	!@*-+;:,./?'
+
 " String to insert at the start of wrapped lines
-"let &showbreak = ''
+"let &showbreak = '> '
+
+" Use the line number column to show the break character
+"set cpoptions+=n
 
 
 " ******************************* Backup Files ********************************
