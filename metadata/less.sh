@@ -14,6 +14,11 @@ LESSKEY="$script_dir/../less/.lesskey"
 # Generate the binary configuration file
 lesskey -- <(cat "$LESSKEY")
 
+# Remove any existing less history file
+if [[ -f $HOME/.lesshst ]]; then
+    rm "$HOME/.lesshst"
+fi
+
 exit $DETECTION_SUCCESS
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
