@@ -1,5 +1,9 @@
 # **************************** Profile Configuration ***************************
 
+# Path to our dotfiles directory
+# TODO: Determine this dynamically
+$DotFilesPath = "$HOME\dotfiles"
+
 # Path where our SSH keys are stored
 $SshKeysPath = 'Y:\Secured\SSH Keys'
 # Extension of SSH private keys (so we don't import private keys stored in a different format)
