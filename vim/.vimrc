@@ -51,6 +51,11 @@ set shortmess+=I
 " Indicate we're on a fast terminal connection
 set ttyfast
 
+" Set the path where the viminfo file is stored
+if has('viminfo')
+    set viminfo+=n~/dotfiles/vim/.vim/.viminfo
+endif
+
 " Configure mouse support if supported by the terminal
 if has('mouse')
     " Enable in all modes
