@@ -1,0 +1,11 @@
+<Component>
+    <FriendlyName>KiTTY</FriendlyName>
+    <Detection>
+        <Method>FindInPath</Method>
+        <FindInPath>putty</FindInPath>
+    </Detection>
+    <InstallPath>
+        <SpecialFolder>ApplicationData</SpecialFolder>
+        <Destination>KiTTY</Destination>
+    </InstallPath>
+</Component>
