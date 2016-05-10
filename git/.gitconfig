@@ -206,4 +206,7 @@
 
     up  = "!git remote update -p; git merge --ff-only @{u}"
 
+    wl  = "!watch -c -n 5 -t -x git l"
+    wlt = "!watch -c -n 5 -t -x git lt"
+
 # vim: syntax=gitconfig ts=4 sw=4 sts=4 et sr
