@@ -109,7 +109,7 @@ if v:version < 704
 else
     " Vim 7.4+ supports absolute and relative numbering at once (hybrid mode)
     set number
-    set relativenumber
+    "set relativenumber
 endif
 
 " Show the cursor position (note 'statusline' overrides this)
