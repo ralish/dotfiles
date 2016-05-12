@@ -134,7 +134,7 @@ set backspace=indent,eol,start
 set report=0
 
 " When inserting a bracket show the matching one
-set showmatch
+"set showmatch
 
 " Allow the cursor to be positioned where there's no character in Visual mode
 set virtualedit=block
