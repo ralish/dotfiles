@@ -375,6 +375,12 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
 
 
+" ################################ Integration ################################
+
+" Support focus events when running under tmux
+Plugin 'tmux-plugins/vim-tmux-focus-events'
+
+
 " ############################# Language Support ##############################
 
 " Jinja2
