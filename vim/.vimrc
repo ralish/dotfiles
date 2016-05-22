@@ -377,8 +377,8 @@ Plugin 'tpope/vim-surround'
 
 " ################################ Integration ################################
 
-" Support focus events when running under tmux
-Plugin 'tmux-plugins/vim-tmux-focus-events'
+" Support focus events when running under tmux (use our fork until PR#8 merged)
+Plugin 'ralish/vim-tmux-focus-events'
 
 
 " ############################# Language Support ##############################
