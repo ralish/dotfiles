@@ -389,6 +389,8 @@ Plugin 'Glench/Vim-Jinja2-Syntax'
 Plugin 'tpope/vim-markdown'
 " PgSQL
 Plugin 'exu/pgsql.vim'
+" Python
+Plugin 'klen/python-mode'
 " Salt
 Plugin 'saltstack/salt-vim'
 " YAML (built-in support is very slow)
