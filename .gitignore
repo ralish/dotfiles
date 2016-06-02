@@ -17,6 +17,9 @@ ehthumbs.db
 # Arm cache (for Tor)
 /arm/.arm/cache/
 
+# Bazaar lock files
+/bazaar/.bazaar/lock/
+
 # Clink history and log files
 /clink/.history
 /clink/clink.log
