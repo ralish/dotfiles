@@ -15,13 +15,10 @@ REM There are some weird cases I don't yet fully understand where a CMD
 REM spawned by MinGW will execute this script in truly bizarre ways...
 IF DEFINED MSYSTEM EXIT /B
 
-REM We used to notify that the Command Prompt sucks slightly less on every
-REM execution. Unfortunately, there are some poorly written apps that spawn
-REM a cmd.exe instance and then directly parse the output as a string. Some
-REM of those will choke if we echo out any additional output like the below.
-REM I'm looking at you MySQL Workbench and your version check of mysqldump!!
-IF DEFINED SetupEnvVerbose ECHO.
-IF DEFINED SetupEnvVerbose ECHO Making Command Prompt suck slightly less...
+REM So that we can safely run via AutoRun without infinite recursion
+REM Key Path: HKEY_CURRENT_USER\Software\Microsoft\Command Processor
+REM Use something like: IF NOT DEFINED SetupEnv Path\To\SetupEnv.Cmd
+SET SetupEnv=Yes
 
 REM Various variables that we may need to tweak
 SET AnsiConPath=C:\Program Files (x86)\Nexiom\Software\Independent\ANSICON\ansicon.exe
@@ -29,10 +26,13 @@ SET Dw32Path=C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walke
 SET Dw64Path=C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe
 SET SublRegPath=HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1
 
-REM So that we can safely run via AutoRun without infinite recursion
-REM Key Path: HKEY_CURRENT_USER\Software\Microsoft\Command Processor
-REM Use something like: IF NOT DEFINED SetupEnv Path\To\SetupEnv.Cmd
-SET SetupEnv=Yes
+REM We used to notify that the Command Prompt sucks slightly less on every
+REM execution. Unfortunately, there are some poorly written apps that spawn
+REM a cmd.exe instance and then directly parse the output as a string. Some
+REM of those will choke if we echo out any additional output like the below.
+REM I'm looking at you MySQL Workbench and your version check of mysqldump!!
+REM IF DEFINED SetupEnvVerbose ECHO.
+REM IF DEFINED SetupEnvVerbose ECHO Making Command Prompt suck slightly less...
 
 REM Uncomment to enable verbose mode
 REM SET SetupEnvVerbose=Yes
@@ -43,22 +43,30 @@ REM Inject Clink for a more pleasant experience
 IF NOT EXIST "%CLINK_DIR%" (
     IF DEFINED SetupEnvVerbose ECHO * Unable to find Clink at path specified by CLINK_DIR.
 ) ELSE (
-    IF DEFINED SetupEnvVerbose ECHO * Injecting Clink into Command Processor...
+    IF DEFINED SetupEnvVerbose ECHO * Injecting Clink...
     "%CLINK_DIR%\clink_x64.exe" inject -q --profile "~\clink"
 )
 
-REM Inject ANSICON if we're not running inside ConEmu
-IF DEFINED ConEmuANSI (
-    IF DEFINED SetupEnvVerbose ECHO * Detected we're running in ConEmu so not injecting ANSICON.
-) ELSE (
+REM Inject ANSICON if we're not running under ConEmu
+IF NOT DEFINED ConEmuANSI (
     IF NOT EXIST "%AnsiConPath%" (
         IF DEFINED SetupEnvVerbose ECHO * Unable to find ANSICON at path specified by AnsiConPath.
     ) ELSE (
-        IF DEFINED SetupEnvVerbose ECHO * Injecting ANSICON into Command Processor...
-        IF !ANSICON_VER!==^!ANSICON_VER^! "%AnsiConPath%" -p
+        IF DEFINED SetupEnvVerbose ECHO * Injecting ANSICON...
+        IF %ANSICON_VER%==^%ANSICON_VER^% "%AnsiConPath%" -p
     )
 )
 SET AnsiConPath=
+
+REM Configure a more informative prompt if we're running under ConEmu
+IF DEFINED ConEmuDir (
+    IF DEFINED SetupEnvVerbose ECHO * Configuring the prompt...
+    IF "%ConEmuIsAdmin%" == "ADMIN" (
+        PROMPT $E[m$E[32m$E]9;8;"USERNAME"$E\@$E]9;8;"COMPUTERNAME"$E\$S$E[91m$P$E[90m$G$E[m$S$E]9;12$E\
+    ) ELSE (
+        PROMPT $E[m$E[32m$E]9;8;"USERNAME"$E\@$E]9;8;"COMPUTERNAME"$E\$S$E[92m$P$E[90m$G$E[m$S$E]9;12$E\
+    )
+)
 
 REM Because I'm tired of forgetting Cmd is not a *nix shell
 IF DEFINED SetupEnvVerbose ECHO * Setting DOSKEY macros...
@@ -71,7 +79,7 @@ REM Add alias for Dependency Walker x86
 IF NOT EXIST "%Dw32Path%" (
     IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Dependency Walker x86 at path specified by Dw32Path.
 ) ELSE (
-    IF DEFINED SetupEnvVerbose ECHO * Setting Dependency Walker x86 'depends32' alias...
+    IF DEFINED SetupEnvVerbose ECHO * Adding Dependency Walker x86 alias: depends32
     DOSKEY depends32="%Dw32Path%" $*
 )
 SET Dw32Path=
@@ -80,7 +88,7 @@ REM Add alias for Dependency Walker x64
 IF NOT EXIST "%Dw64Path%" (
     IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Dependency Walker x64 at path specified by Dw64Path.
 ) ELSE (
-    IF DEFINED SetupEnvVerbose ECHO * Setting Dependency Walker x64 'depends64' alias...
+    IF DEFINED SetupEnvVerbose ECHO * Adding Dependency Walker x64 alias: depends64
     DOSKEY depends64="%Dw64Path%" $*
 )
 SET Dw64Path=
@@ -89,9 +97,9 @@ REM Add alias for Sublime Text
 SET SublBinName=sublime_text.exe
 REG QUERY "%SublRegPath%" /v InstallLocation > NUL 2>&1
 IF ERRORLEVEL 1 (
-    IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Sublime Text installation so not adding 'subl' alias.
+    IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Sublime Text via path specified by SublRegPath.
 ) ELSE (
-    IF DEFINED SetupEnvVerbose ECHO * Setting Sublime Text 'subl' alias...
+    IF DEFINED SetupEnvVerbose ECHO * Adding Sublime Text alias: subl
     FOR /F "tokens=2*" %%a IN ('REG QUERY "%SublRegPath%" /v InstallLocation ^| FINDSTR /R "[a-z]:\\.*\\$"') DO @SET SublDirPath=%%b
 )
 IF DEFINED SublDirPath DOSKEY subl="%SublDirPath%%SublBinName%" $*
