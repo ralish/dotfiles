@@ -134,7 +134,7 @@ set show-all-if-ambiguous on
 set show-all-if-unmodified on
 
 # Add a character to the begining of the prompt showing the editing mode
-set show-mode-in-prompt on
+set show-mode-in-prompt off
 
 # Factor any text after the cursor position in a word into completion matching
 set skip-completed-text on
