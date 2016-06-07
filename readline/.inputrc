@@ -104,7 +104,7 @@ set keyseq-timeout 500
 set mark-directories on
 
 # Mark modified history lines with a prepended asterisk
-set mark-modified-lines on
+set mark-modified-lines off
 
 # Mark completed directory symlinks with an appended slash
 #
