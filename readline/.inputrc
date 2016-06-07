@@ -1,53 +1,155 @@
-# ----------------------------- Config Settings ------------------------------
+# ------------------------------ Config Settings ------------------------------
 
-# Permit 8-bit characters (will permit UTF-8)
+# Convert characters with the eighth bit set (incompatible with UTF-8)
+set convert-meta off
+
+# Don't clear the eighth bit of input characters (required for UTF-8)
 set input-meta on
+
+# Display characters with the eighth bit set directly (required for UTF-8)
 set output-meta on
 
-# Treat characters with eighth bit set as an ASCII key sequence
-set convert-meta on
-
-# Completely disable the terminal bell (audible & visual)
+# Handling of the terminal bell
+#
+# Valid options are:
+# - none:               Never ring the bell
+# - visible:            Ring the visible bell
+# - audible:            Ring the audible bell
 set bell-style none
 
-# Set automatic completion of filenames to be case insensitive
+# Attempt to bind special control characters handled by the terminal driver
+set bind-tty-special-chars on
+
+# Display completion matches using different colours to indicate file types
+set colored-stats on
+
+# String to insert at the beginning of the line for the insert-comment command
+set comment-begin #
+
+# Number of screen columns used to display possible completion matches
+#
+# Note: Setting is ignored if <0 or greater than the terminal screen width.
+#
+# Valid options are:
+#  0:                    Display one match per line
+# >0:                    Number of columns to use per line of matches
+set completion-display-width -1
+
+# Perform filename completion matching case-insensitively
 set completion-ignore-case on
 
-# Treat hypens and underscores as the same if completion-ignore-case is on
+# Treat hypens and underscores as interchangeable during completion
+#
+# Note: Only applies if the completion-ignore-case setting is enabled.
 set completion-map-case on
 
-# Confirm we want to show all possible matches if more than this limit
+# Maximum length of the common prefix in a list of completion matches which is
+# displayed without modification. If >0, common prefixes longer than this value
+# will be replaced with an ellipsis when displaying the possible completions.
+set completion-prefix-display-length 0
+
+# Confirm to show completion matches if the total is greater than this limit
+#
+# Valid options are:
+# <0:                   Never prompt to display completion matches
+#  0:                   Always prompt to display completion matches
+# >0:                   Prompt if more than this number of matches
 set completion-query-items 200
 
-# Prefer vi style key bindings versus the emacs defaults
+# Disable word completion
+set disable-completion off
+
+# Default key bindings to use
+#
+# Valid options are:
+# emacs:                Emacs-style key bindings
+# vi:                   Vi-style key bindings
 set editing-mode vi
 
-# Denote symlinks to directories with an appended slash
+# Echo the corresponding control character for keyboard generated signals
+set echo-control-characters on
+
+# Enable the application keypad (needed to support arrow keys in some apps)
+set enable-keypad on
+
+# Attempt to enable any meta modifier key the terminal supports on input
+set enable-meta-key on
+
+# Perform tilde expansion when attempting word completion
+set expand-tilde off
+
+# Attempt to preserve the current cursor position when browsing history
+set history-preserve-point off
+
+# Maximum number of history entries to retain in the history list
+#
+# Valid options are:
+# <0:                   Do not limit the number of history entries
+#  0:                   Do not retain any history
+# >0:                   Number of history entries to retain
+set history-size -1
+
+# Don't wrap line being edited (scroll horizontally on a single line)
+set horizontal-scroll-mode off
+
+# Duration to wait for further input on an ambiguous key sequence. If no
+# further input is received, the shorter but complete key sequence is used.
+#
+# Valid options are:
+# <=0:                  Wait until the key sequence is unambiguous
+# >=1:                  Duration to wait for further input (milliseconds)
+set keyseq-timeout 500
+
+# Mark completed directory names with an appended slash
+set mark-directories on
+
+# Mark modified history lines with a prepended asterisk
+set mark-modified-lines on
+
+# Mark completed directory symlinks with an appended slash
+#
+# Note: Only applies if the mark-directories setting is enabled.
 set mark-symlinked-directories on
 
-# Do not autocomplete hidden files unless the pattern begins with a dot
+# Automatically include hidden files when performing filename completion
 set match-hidden-files off
 
-# Show all autocomplete results at once instead of via the internal pager
+# Display the common prefix of the possible completions (which may be empty)
+# before cycling through the completions list when performing menu completion.
+set menu-complete-display-prefix off
+
+# Show completion matches using an internal more-like pager when appropriate
 set page-completions off
 
-# List all matches in case multiple possible completions are possible
+# Display completion matches sorted horizontally in alphabetical order
+set print-completions-horizontally off
+
+# Undo all changes to history lines on returning from accept-line
+set revert-all-at-newline off
+
+# List completion matches immediately when multiple completions are possible
 set show-all-if-ambiguous on
 
-# Factor any text after the curser position into completion matching
+# List completion matches immediately when there's no common prefix
+set show-all-if-unmodified on
+
+# Add a character to the begining of the prompt showing the editing mode
+set show-mode-in-prompt on
+
+# Factor any text after the cursor position in a word into completion matching
 set skip-completed-text on
 
-# Show extra file information when completing similar to `ls -F`
+# Append a character denoting a file's type when listing completion matches
 set visible-stats on
 
 
-# ------------------------------- Key Mappings -------------------------------
+# ------------------------------- Key Mappings --------------------------------
 
-# Set Insert/Delete keys to insert/delete chars on line
+# Set Insert/Delete keys to insert/delete characters
 "\e[2~": overwrite-mode
 "\e[3~": delete-char
 
-# Set Home/End keys to jump to beginning/end of line
+# Set Home/End keys to jump to the beginning/end of line
 "\e[1~": beginning-of-line
 "\e[4~": end-of-line
 
@@ -59,4 +161,4 @@ set visible-stats on
 "\e[1;5D": backward-word
 "\e[1;5C": forward-word
 
-# vim: syntax=readline ts=4 sw=4 sts=4 et sr
+# vim: syntax=readline cc=80 tw=79 ts=4 sw=4 sts=4 et sr
