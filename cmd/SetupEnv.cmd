@@ -53,7 +53,7 @@ IF NOT DEFINED ConEmuANSI (
         IF DEFINED SetupEnvVerbose ECHO * Unable to find ANSICON at path specified by AnsiConPath.
     ) ELSE (
         IF DEFINED SetupEnvVerbose ECHO * Injecting ANSICON...
-        IF %ANSICON_VER%==^%ANSICON_VER^% "%AnsiConPath%" -p
+        IF !ANSICON_VER!==^!ANSICON_VER^! "%AnsiConPath%" -p
     )
 )
 SET AnsiConPath=
