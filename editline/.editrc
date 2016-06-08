@@ -1,0 +1,37 @@
+# ------------------------------ Config Settings ------------------------------
+
+# Enable editline functionality
+edit on
+
+# Use vi-style key bindings
+bind -v
+
+# Maximum number of history entries
+history size 1000
+
+# Only keep unique history entries
+history unique 1
+
+
+# ------------------------------- Key Mappings --------------------------------
+
+# Set Insert/Delete keys to insert/delete characters
+bind "\e[2~" ed-quoted-insert
+bind "\e[3~" ed-delete-next-char
+
+# Set Home/End keys to jump to the beginning/end of line
+bind "\e[1~" ed-move-to-beg
+bind "\e[4~" ed-move-to-end
+
+# Set Up/Down arrow keys to perform a command history prefix search
+bind "\e[A" ed-search-prev-history
+bind "\e[B" ed-search-next-history
+
+# Set Ctrl+Left/Right arrow keys to move to the adjacent word
+bind "\e[1;5D" ed-prev-word
+bind "\e[1;5C" em-next-word
+
+# Set Ctrl+R to perform an incremental backwards history search
+bind "^R" em-inc-search-prev
+
+# vim: cc=80 tw=79 ts=4 sw=4 sts=4 et sr
