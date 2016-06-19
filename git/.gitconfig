@@ -1,6 +1,6 @@
 [core]
-    excludesfile = ~/.gitignore
-    attributesfile = ~/.gitattributes
+    attributesFile = ~/.gitattributes
+    excludesFile = ~/.gitignore
 
 [include]
     path = .gitconfig-win
@@ -19,26 +19,26 @@
     whitespace = fix
 
 [branch]
-    autosetupmerge = true
-    autosetuprebase = always
+    autoSetupMerge = true
+    autoSetupRebase = always
 
 [color]
     ui = true
 
 [diff]
     algorithm = patience
-    mnemonicprefix = true
     compactionHeuristic = true
+    mnemonicPrefix = true
 
 [help]
-    autocorrect = 0
+    autoCorrect = 0
 
 [log]
     abbrevCommit = true
 
 [merge]
     log = true
-    conflictstyle = diff3
+    conflictStyle = diff3
     defaultToUpstream = true
 
 [oh-my-zsh]
@@ -51,11 +51,11 @@
     default = simple
 
 [rebase]
-    autosquash = true
+    autoSquash = true
 
 [rerere]
     enabled = true
-    autoupdate = true
+    autoUpdate = true
 
 [submodule]
     fetchJobs = 4
