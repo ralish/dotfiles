@@ -408,6 +408,8 @@ Plugin 'ervandew/supertab'
 Plugin 'scrooloose/syntastic'
 " Powerful Git wrapper
 Plugin 'tpope/vim-fugitive'
+" Heuristically set buffer options
+Plugin 'tpope/vim-sleuth'
 " Clever code quoting
 Plugin 'tpope/vim-surround'
 
