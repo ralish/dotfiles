@@ -13,13 +13,17 @@ set nocompatible
 "set shell=sh
 
 " Always use UTF-8 character encoding internally
-set encoding=utf-8
+if has('multi_byte')
+    set encoding=utf-8
+endif
 
 
 " ******************************** Vundle Init ********************************
 
 " Disable file type detection
-filetype off
+if has('autocmd')
+    filetype off
+endif
 
 " Add Vundle to the runtime path
 set runtimepath+=~/.vim/bundle/Vundle.vim
@@ -43,7 +47,9 @@ set history=50
 set laststatus=2
 
 " Show partial command in the last line of the screen
-set showcmd
+if has('cmdline_info')
+    set showcmd
+endif
 
 " Don't display the intro message on startup
 set shortmess+=I
@@ -86,11 +92,14 @@ set modeline
 " Automatically reread externally modified files if unchanged in Vim
 set autoread
 
-" Highlight the screen line of the cursor
-set cursorline
+" Configure highlighting of the cursor position
+if has('syntax')
+    " Highlight the screen line of the cursor
+    set cursorline
 
-" Highlight the screen column of the cursor
-"set cursorcolumn
+    " Highlight the screen column of the cursor
+    "set cursorcolumn
+endif
 
 " Don't equalise window sizes on spliting or closing
 "set noequalalways
@@ -113,13 +122,19 @@ else
 endif
 
 " Show the cursor position (note 'statusline' overrides this)
-set ruler
+if has('cmdline_info')
+    set ruler
+endif
 
 " New windows from a horizontal split should be below the current one
-set splitbelow
+if has('windows')
+    set splitbelow
+endif
 
 " New windows from a vertical split should be right of the current one
-set splitright
+if has('vertsplit')
+    set splitright
+endif
 
 
 " ********************************** Editing **********************************
@@ -137,7 +152,9 @@ set report=0
 "set showmatch
 
 " Allow the cursor to be positioned where there's no character in Visual mode
-set virtualedit=block
+if has('virtualedit')
+    set virtualedit=block
+endif
 
 
 " ********************************** Saving ***********************************
@@ -154,20 +171,22 @@ set nofsync
 
 " ********************************** Folding **********************************
 
-" Folding should be determined by the file syntax
-set foldmethod=syntax
+if has('folding')
+    " Folding should be determined by the file syntax
+    set foldmethod=syntax
 
-" Maximum nesting of folds for 'indent' and 'syntax' methods
-set foldnestmax=3
+    " Maximum nesting of folds for 'indent' and 'syntax' methods
+    set foldnestmax=3
 
-" Initial folding level on opening a new buffer
-set foldlevelstart=3
+    " Initial folding level on opening a new buffer
+    set foldlevelstart=3
 
-" Display a column with the specified width indicating open and closed folds
-"set foldcolumn=1
+    " Display a column with the specified width indicating open and closed folds
+    "set foldcolumn=1
 
-" Close folds with a level greater than 'foldlevel' when not under the cursor
-"set foldclose=all
+    " Close folds with a level greater than 'foldlevel' when not under the cursor
+    "set foldclose=all
+endif
 
 
 " ********************************* Indenting *********************************
@@ -188,7 +207,9 @@ set shiftround
 set shiftwidth=4
 
 " Do smart autoindenting when starting a new line
-set smartindent
+if has('smartindent')
+    set smartindent
+endif
 
 
 " **************************** Keyword Completion *****************************
@@ -196,14 +217,17 @@ set smartindent
 " Sources to scan for keyword completion
 set complete=.,t
 
-" Options to configure keyword completion
-set completeopt=longest,menuone,preview
-
 " Infer case for keyword completion (requires 'ignorecase')
 "set infercase
 
-" Maximum number of items to show in the keyword completion popup
-"set pumheight=0
+" Configure Insert mode completion
+if has('insert_expand')
+    " Options to configure keyword completion
+    set completeopt=longest,menuone,preview
+
+    " Maximum number of items to show in the keyword completion popup
+    "set pumheight=0
+endif
 
 
 " ********************************* Scrolling *********************************
@@ -223,23 +247,26 @@ set sidescroll=1
 
 " ***************************** Search & Replace ******************************
 
-" Highlight matches when searching
-set hlsearch
-
 " Ignore case in search patterns
 set ignorecase
-
-" Search incrementally (start matching immediately)
-set incsearch
-
-" Enable the 'g' flag in ':substitute" commands by default
-set gdefault
 
 " Case sensitive search with upper case characters (only with 'ignorecase')
 set smartcase
 
 " Don't wrap searches around the end of the file
 "set nowrapscan
+
+" Configure extra search capabilities
+if has('extra_search')
+    " Highlight matches when searching
+    set hlsearch
+
+    " Search incrementally (start matching immediately)
+    set incsearch
+endif
+
+" Enable the 'g' flag in ':substitute" commands by default
+set gdefault
 
 
 " ******************************** Tabulation *********************************
@@ -262,17 +289,20 @@ set smarttab
 " Don't display lines longer than the window width on the next line
 "set nowrap
 
-" Wrap long lines at a character in 'breakat'
-set linebreak
-
-" Characters to line break on when using 'linebreak'
-"let &breakat = ' 	!@*-+;:,./?'
-
-" String to insert at the start of wrapped lines
-"let &showbreak = '> '
-
-" Use the line number column to show the break character
+" Use the line number column to show wrapped text
 "set cpoptions+=n
+
+" Configure line breaking of long lines
+if has('linebreak')
+    " Wrap long lines at a character in 'breakat'
+    set linebreak
+
+    " Characters to line break on when using 'linebreak'
+    "let &breakat = ' 	!@*-+;:,./?'
+
+    " String to insert at the start of wrapped lines
+    "let &showbreak = '> '
+endif
 
 
 " ******************************* Backup Files ********************************
@@ -290,7 +320,9 @@ set backupdir^=~/.vim/backup//
 "set backupext=~
 
 " List of file patterns to match for excluding backup creation
-"set backupskip=/tmp/*
+if has('wildignore')
+    "set backupskip=/tmp/*
+endif
 
 
 " ******************************** Swap Files *********************************
@@ -307,11 +339,14 @@ set swapsync=
 
 " ******************************** Undo Files *********************************
 
-" Enable/disable saving of undo history to an undo file
-set undofile
+" Configure persistent undo
+if has('persistent_undo')
+    " Enable/disable saving of undo history to an undo file
+    set undofile
 
-" Directories to try for reading/writing undo files
-set undodir^=~/.vim/undo//
+    " Directories to try for reading/writing undo files
+    set undodir^=~/.vim/undo//
+endif
 
 " Maximum number of changes that can be undone
 "set undolevels=1000
@@ -322,11 +357,13 @@ set undodir^=~/.vim/undo//
 
 " ******************************** View Files *********************************
 
-" Directory for reading/writing view files
-set viewdir=~/.vim/view
+if has('mksession')
+    " Directory for reading/writing view files
+    set viewdir=~/.vim/view
 
-" List of items to save or restore to/from views
-"set viewoptions=folds,options,cursor
+    " List of items to save or restore to/from views
+    "set viewoptions=folds,options,cursor
+endif
 
 
 " ****************************** Vundle Plugins *******************************
@@ -403,7 +440,9 @@ Plugin 'stephpy/vim-yaml'
 call vundle#end()
 
 " Enable file type detection with plugin and indent support
-filetype plugin indent on
+if has('autocmd')
+    filetype plugin indent on
+endif
 
 
 " ******************************* Colour Scheme *******************************
@@ -499,6 +538,8 @@ cnoremap w!! w !sudo tee % >/dev/null
 " ********************************* Finalise **********************************
 
 " Enable syntax highlighting
-syntax on
+if has('syntax')
+    syntax on
+endif
 
 " vim: syntax=vim cc=80 tw=79 ts=4 sw=4 sts=4 et sr
