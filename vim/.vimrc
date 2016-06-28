@@ -10,7 +10,9 @@ set nocompatible
 "set cpoptions=aABceFs
 
 " Explicitly set the shell to use for '!' and ':!' commands
-"set shell=sh
+if &shell =~# 'fish$'
+    set shell=sh
+endif
 
 " Always use UTF-8 character encoding internally
 if has('multi_byte')
@@ -41,7 +43,7 @@ Plugin 'VundleVim/Vundle.vim'
 "set insertmode
 
 " Number of commands and search patterns to remember
-set history=50
+set history=1000
 
 " Always show a status line in the last window
 set laststatus=2
@@ -84,7 +86,7 @@ set cryptmethod=blowfish
 set modeline
 
 " Block unsafe commands in .vimrc and .exrc files in the current directory
-"set secure
+set secure
 
 
 " ********************************** Viewing **********************************
@@ -101,6 +103,9 @@ if has('syntax')
     "set cursorcolumn
 endif
 
+" Display as much as possible of the last line
+set display+=lastline
+
 " Don't equalise window sizes on spliting or closing
 "set noequalalways
 
@@ -108,7 +113,7 @@ endif
 set list
 
 " Characters to display for the 'list' mode and command
-set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
+set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<,nbsp:+
 
 " Configure line numbering based on Vim version
 if v:version < 704
@@ -118,7 +123,7 @@ if v:version < 704
 else
     " Vim 7.4+ supports absolute and relative numbering at once (hybrid mode)
     set number
-    "set relativenumber
+    set relativenumber
 endif
 
 " Show the cursor position (note 'statusline' overrides this)
@@ -139,11 +144,16 @@ endif
 
 " ********************************** Editing **********************************
 
-" Options to configure automatic formatting
-"set formatoptions=tcq
+" Remove comment character when joining lines
+if v:version > 703 || v:version == 703 && has('patch541')
+    set formatoptions+=j
+endif
 
 " Modify backspace behaviour to work over additional elements
 set backspace=indent,eol,start
+
+" Don't treat numbers starting with a zero as octal
+set nrformats-=octal
 
 " Always report the number of lines changed by commands
 set report=0
@@ -236,13 +246,13 @@ endif
 "set scrolljump=1
 
 " Number of lines to keep above and below the cursor
-set scrolloff=2
+set scrolloff=1
 "
 " Number of columns to scroll horizontally (only with 'nowrap')
-set sidescroll=1
+set sidescroll=3
 
 " Number of columns to keep left and right of the cursor (only with 'nowrap')
-"set sidescrolloff=0
+"set sidescrolloff=3
 
 
 " ***************************** Search & Replace ******************************
@@ -517,12 +527,12 @@ let g:sql_type_default = 'pgsql'
 " ******************************* Key Mappings ********************************
 
 " Move by rows instead of lines (much more intuitive with 'wrap')
-noremap j gj
-noremap k gk
-noremap gk k
+noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
+noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
+noremap <silent> <expr> <Up> (v:count == 0 ? 'gk' : 'k')
+noremap <silent> <expr> <Down> (v:count == 0 ? 'gj' : 'j')
 noremap gj j
-noremap <Up> gk
-noremap <Down> gj
+noremap gk k
 
 " Keep the cursor in place when joining lines with 'J'
 nnoremap J mzJ`z
@@ -541,7 +551,7 @@ cnoremap w!! w !sudo tee % >/dev/null
 
 " Enable syntax highlighting
 if has('syntax')
-    syntax on
+    syntax enable
 endif
 
 " vim: syntax=vim cc=80 tw=79 ts=4 sw=4 sts=4 et sr
