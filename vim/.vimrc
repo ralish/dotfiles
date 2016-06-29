@@ -471,6 +471,25 @@ endtry
 
 
 " ****************************** Plugin Settings ******************************
+" ################################# nerdtree ##################################
+
+" Shortcut to toggle NERDTree
+noremap <C-n> :NERDTreeToggle<CR>
+
+" Open a NERDTree automatically on startup if no files were specified
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+
+" ################################ python-mode ################################
+
+" Don't automatically run linter on saving changes
+let g:pymode_lint_on_write = 0
+
+" Don't automatically regenerate rope project cache on saving changes
+let g:pymode_rope_regenerate_on_write = 0
+
+
 " ################################ vim-airline ################################
 
 " Enable Powerline symbols
@@ -480,14 +499,10 @@ let g:airline_powerline_fonts=1
 let g:airline_theme='solarized'
 
 
-" ################################# NERDTree ##################################
+" ############################### vim-markdown ################################
 
-" Shortcut to toggle NERDTree
-noremap <C-n> :NERDTreeToggle<CR>
-
-" Open a NERDTree automatically on startup if no files were specified
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+" Enable fenced code block syntax highlighting for these languages
+let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
 
 
 " ***************************** Language Handling *****************************
@@ -501,9 +516,6 @@ autocmd BufNewFile,BufWinEnter *.jinja set filetype=jinja
 
 " Treat '.md' files as Markdown instead of Modula-2
 autocmd BufNewFile,BufReadPost *.md set filetype=markdown
-
-" Enable fenced code block syntax highlighting for these languages
-let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
 
 
 " ################################### Shell ###################################
