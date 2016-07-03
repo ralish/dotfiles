@@ -54,7 +54,7 @@ features.pathPrefix
 # If set, arm appends any log messages it reports while running to the given
 # log file. This does not take filters into account or include prepopulated
 # events.
-features.logFile 
+features.logFile
 
 # If true, the header panel always shows the file descriptor usage. Otherwise
 # this is only displayed when we're running out.
@@ -165,7 +165,7 @@ features.config.descriptions.persist true
 # maxWidth
 #   maximum number of graphed entries
 # interval
-#   0 -> each second,   1 -> 5 seconds,     2 -> 30 seconds,  3 -> minutely,      
+#   0 -> each second,   1 -> 5 seconds,     2 -> 30 seconds,  3 -> minutely,
 #   4 -> 15 minutes,    5 -> half hour,     6 -> hourly,      7 -> daily
 # bound
 #   0 -> global maxima, 1 -> local maxima,  2 -> tight

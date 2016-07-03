@@ -3,9 +3,9 @@ dotfiles themes
 
 ***None of these themes are my own!***
 
-I've added them directly into the repository as a proliferation of Git submodules makes for a frustratingly slow initial clone.
+I've added them directly as a proliferation of Git submodules makes for a frustratingly slow initial clone.
 
-You can find each theme's respective original repository below:
+You can find each theme's original repository below:
 
  - `conhost`: [neilpa/cmd-colors-solarized](https://github.com/neilpa/cmd-colors-solarized)
  - `psise`: [rakheshster/Solarize-PSISE](https://github.com/rakheshster/Solarize-PSISE)

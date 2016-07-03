@@ -1,5 +1,5 @@
-# KiTTY session profiles *must* have LF line endings
-# CRLF line endings cause the stupid thing to crash
+# KiTTY session profiles *must* have LF line endings. At the time of writing,
+# CRLF line endings cause the stupid thing to crash. Should investigate later!
 kitty/** eol=lf
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr

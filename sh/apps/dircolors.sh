@@ -1,10 +1,10 @@
 # dircolors configuration
 
 if command -v dircolors > /dev/null; then
-    # Use our custom dircolors configuration
+    # Use our custom configuration
     if [ -r "$HOME/.dircolors" ]; then
         eval "$(dircolors -b "$HOME/.dircolors")"
-    # Otherwise just use the default dircolors
+    # Otherwise just use the defaults
     else
         eval "$(dircolors -b)"
     fi

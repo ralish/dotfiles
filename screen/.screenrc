@@ -1,7 +1,7 @@
-# Enable usage of the alternate screen (clean exit from vim and other full-screen apps)
+# Enable usage of the alternate screen (clean exit from full-screen apps)
 altscreen on
 
-# Use the current background colour when erasing characters instead of the default
+# Use current background colour when erasing characters instead of the default
 defbce on
 
 # Block the display if we detach uncleanly so certain programs don't hang on us
@@ -34,7 +34,7 @@ bind ^c screen 1
 bind 0 select 10
 screen 1
 
-# A much nicer statusbar (with much thanks to kivikakk for the dark arts hardstatus string)
+# A much nicer statusbar
 hardstatus off
 hardstatus alwayslastline
 hardstatus string '%{gk}[ %{G}%H %{g}][%= %{wk}%?%-Lw%?%{=b kR}(%{W}%n*%f %t%?(%u)%?%{=b kR})%{= kw}%?%+Lw%?%?%= %{g}][ %{Y}%l%{g} ]%{=b C}[ %d/%m %C %A ]%{W}'

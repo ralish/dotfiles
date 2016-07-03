@@ -2,7 +2,7 @@
     # Allow paths longer than 260 characters (may have quirks!)
     longpaths = true
     # Don't print non-ASCII file names in quoted octal notation
-    quotepath = off
+    quotePath = off
     # Enable symlink support (requires SeCreateSymbolicLinkPrivilege)
     symlinks = true
     # Treat a carriage-return as part of the line terminator
