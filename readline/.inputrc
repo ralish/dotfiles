@@ -145,13 +145,16 @@ set visible-stats on
 
 # ------------------------------- Key Mappings --------------------------------
 
-# Set Insert/Delete keys to insert/delete characters
-"\e[2~": overwrite-mode
-"\e[3~": delete-char
+# Typing "!!<space>" will replace "!!" with the previous command
+space: magic-space
 
 # Set Home/End keys to jump to the beginning/end of line
 "\e[1~": beginning-of-line
 "\e[4~": end-of-line
+
+# Set Insert/Delete keys to insert/delete characters
+"\e[2~": overwrite-mode
+"\e[3~": delete-char
 
 # Set Up/Down arrow keys to perform a command history prefix search
 "\e[A": history-search-backward
