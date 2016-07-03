@@ -1,14 +1,37 @@
-# OS X stuff
+# OS X files
+.AppleDB/
+.AppleDesktop/
+.AppleDouble/
+.DocumentRevisions-V100/
+.fseventsd/
+.Spotlight-V100/
+.TemporaryItems/
 .Trashes/
-.DS_Store
+Network Trash Folder/
+Temporary Items/
 ._*
-.Spotlight-V100
+.apdisk
+.com.apple.timemachine.donotpresent
+.DS_Store
+.LSOverride
+.VolumeIcon.icns
+# Icon must end with two carriage returns (\r)
+Icon
 
-# Windows stuff
+# Windows files
 $RECYCLE.BIN/
 Desktop.ini
-Thumbs.db
 ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+log/
+logs/
+
+# Temporary files
+*.tmp
+tmp/
 
 # Vim files
 *~
