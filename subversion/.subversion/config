@@ -168,4 +168,4 @@ password-stores =
 ### to be set for exclusive-locking-clients to work.
 # exclusive-locking = false
 
-# vim: tw=4 sw=4 sts=4 et sr
+# vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr

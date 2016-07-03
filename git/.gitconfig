@@ -213,4 +213,4 @@
     wl  = "!watch -c -n 5 -t -x git l"
     wlt = "!watch -c -n 5 -t -x git lt"
 
-# vim: syntax=gitconfig ts=4 sw=4 sts=4 et sr
+# vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 et sr

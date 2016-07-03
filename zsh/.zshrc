@@ -99,4 +99,4 @@ if [ -f /etc/bash_completion.d/virtualenvwrapper ]; then
     source /etc/bash_completion.d/virtualenvwrapper
 fi
 
-# vim: syntax=zsh ts=4 sw=4 sts=4 et sr
+# vim: syntax=zsh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

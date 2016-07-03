@@ -34,4 +34,4 @@ bind "\e[1;5C" em-next-word
 # Set Ctrl+R to perform an incremental backwards history search
 bind "^R" em-inc-search-prev
 
-# vim: cc=80 tw=79 ts=4 sw=4 sts=4 et sr
+# vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr

@@ -169,4 +169,4 @@ store-passwords = no
 # store-plaintext-passwords = no
 # store-ssl-client-cert-pp-plaintext = no
 
-# vim: tw=4 sw=4 sts=4 et sr
+# vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr

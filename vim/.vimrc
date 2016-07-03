@@ -442,6 +442,8 @@ Plugin 'exu/pgsql.vim'
 Plugin 'klen/python-mode'
 " Salt
 Plugin 'saltstack/salt-vim'
+" tmux
+Plugin 'tmux-plugins/vim-tmux'
 " YAML (built-in support is very slow)
 Plugin 'stephpy/vim-yaml'
 

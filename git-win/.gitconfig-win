@@ -8,4 +8,4 @@
     # Treat a carriage-return as part of the line terminator
     whitespace = cr-at-eol
 
-# vim: syntax=gitconfig ts=4 sw=4 sts=4 et sr
+# vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 et sr

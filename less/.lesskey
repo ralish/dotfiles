@@ -4,4 +4,4 @@ LESS = --ignore-case --RAW-CONTROL-CHARS
 # Don't store a history of search and shell commands
 LESSHISTFILE = -
 
-# vim: cc=80 tw=79 ts=4 sw=4 sts=4 et sr
+# vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
