@@ -1,30 +1,40 @@
-# OS X stuff
-.Trashes/
-.DS_Store
-._*
-.Spotlight-V100
+# ********************************** Global ***********************************
 
-# Windows stuff
-$RECYCLE.BIN/
+# OS X files
+._*
+.DS_Store
+.LSOverride
+.VolumeIcon.icns
+# Icon must end with two carriage returns (\r)
+Icon
+
+# Windows files
 Desktop.ini
-Thumbs.db
 ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+tmp/
 
 # Vim files
 *~
 *.swp
 
-# Arm cache (for Tor)
+
+# ******************************** Components *********************************
+
+# Arm cache
 /arm/.arm/cache/
 
 # Bazaar lock files
 /bazaar/.bazaar/lock/
 
-# Clink history and log files
+# Clink history & log files
 /clink/.history
 /clink/clink.log
 
-# CPAN sources, builds & metadata
+# CPAN dynamic data
 /cpan/.cpan/.lock
 /cpan/.cpan/FTPstats.yml
 /cpan/.cpan/histfile
@@ -32,34 +42,32 @@ ehthumbs.db
 /cpan/.cpan/build/
 /cpan/.cpan/sources/
 
-# Fish automatically generated files
+# Fish dynamic data
 /fish/.config/fish/fish_history
 /fish/.config/fish/fishd.*
 /fish/.config/fish/generated_completions/
 
-# Never include our Irssi config
+# Irssi configuration
 /irssi/
 
-# Only include our KiTTY config
+# Only include our KiTTY configuration (excludes session profiles)
 /kitty/
 !/kitty/kitty.ini
 
-# Never include OpenSSH configs (unless we force it)
+# OpenSSH configuration (we can force add anything that can be public)
 /openssh/
 
-# PoSh modules folder (PsGet populates this)
+# PowerShell modules (they're usually retrieved by a module like OneGet)
 /posh/Modules/
 
-# Additional application configurations
+# Shell integrations for various applications
 /sh/apps/
 
-# Subversion authentication data
-/subversion/.subversion/auth
-
-# Subversion annoyingly restores this
+# Subversion readme & authentication data
 /subversion/.subversion/README.txt
+/subversion/.subversion/auth/
 
-# Vim bundle folder & dynamic data
+# Vim bundles & dynamic data
 /vim/.vim/.netrwhist
 /vim/.vim/.viminfo
 /vim/.vim/backup/
