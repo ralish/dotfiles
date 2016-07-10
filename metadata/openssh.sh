@@ -17,10 +17,10 @@ CUSTOM_CFG="$TEMPLATE_DIR/ssh_config"
 
 # Check for a supported version and build our config
 ssh_version=$(ssh -V 2>&1)
-if [[ $ssh_version =~ 'OpenSSH_5.9' ]]; then
+if [[ $ssh_version =~ OpenSSH_5\.9 ]]; then
     head -n -1 "$CUSTOM_CFG" > "$OPENSSH_CFG"
     tail -n +4 "$TEMPLATE_DIR/ssh_config.59" >> "$OPENSSH_CFG"
-elif [[ $ssh_version =~ 'OpenSSH_6.6' ]]; then
+elif [[ $ssh_version =~ OpenSSH_6\.6 ]]; then
     head -n -1 "$CUSTOM_CFG" > "$OPENSSH_CFG"
     tail -n +4 "$TEMPLATE_DIR/ssh_config.66" >> "$OPENSSH_CFG"
 else

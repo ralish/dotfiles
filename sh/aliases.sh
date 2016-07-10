@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Enable color support of ls/*grep and make it the default
-if [ -n "$LS_COLORS" -o -n "$LSCOLORS" ]; then
+if [ -n "$LS_COLORS" ] || [ -n "$LSCOLORS" ]; then
     alias ls='ls --color=auto'
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'

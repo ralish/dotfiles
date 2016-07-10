@@ -19,35 +19,30 @@ function script_usage() {
 }
 
 function parse_params() {
-    if [[ $# -eq 0 ]]; then
-        fast_search=true
-    else
-        while [[ $# -gt 0 ]]; do
-            param="$1"
-            shift
-            case $param in
-                -h|--help)
-                    script_usage
-                    exit 0
-                    ;;
-                -q|--quiet)
-                    quiet=true
-                    ;;
-                -f|--fast)
-                    fast_search=true
-                    ;;
-                -a|--all)
-                    full_search=true
-                    ;;
-                *)
-                    echo "Invalid parameter was provided: $param"
-                    exit 1
-                esac
-        done
-    fi
+    while [[ $# -gt 0 ]]; do
+        param="$1"
+        shift
+        case $param in
+            -h|--help)
+                script_usage
+                exit 0
+                ;;
+            -q|--quiet)
+                quiet=true
+                ;;
+            -f|--fast)
+                ;;
+            -a|--all)
+                full_search=true
+                ;;
+            *)
+                echo "Invalid parameter was provided: $param"
+                exit 1
+            esac
+    done
 }
 
-parse_params $@
+parse_params "$@"
 
 if ! dpkg -S /usr/bin/dpkg > /dev/null 2>&1; then
     echo 'This script is for Debian based systems.'
