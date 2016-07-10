@@ -492,6 +492,25 @@ let g:pymode_lint_on_write = 0
 let g:pymode_rope_regenerate_on_write = 0
 
 
+" ################################# syntastic #################################
+
+" Always populate the location-list with detected errors
+let g:syntastic_always_populate_loc_list = 1
+
+" Controls the behaviour of the error window (location-list):
+" - 0: Don't open or close automatically
+" - 1: Automatically open/close when errors are detected/not detected
+" - 2: Automatically close when no errors are detected
+" - 3: Automatically open when errors are detected
+let g:syntastic_auto_loc_list = 1
+
+" Run syntax checks when buffers are first loaded and on saving
+let g:syntastic_check_on_open = 1
+
+" Don't run syntax checks when buffers are written due to exiting
+let g:syntastic_check_on_wq = 0
+
+
 " ################################ vim-airline ################################
 
 " Enable Powerline symbols
