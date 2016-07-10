@@ -46,13 +46,6 @@ elif [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
     source "$HOME/dotfiles/sh/systems/linux.sh"
 fi
 
-# Additional configurations for various applications
-if [ -d "$HOME/dotfiles/sh/apps" ]; then
-    for app in $(ls "$HOME/dotfiles/sh/apps"); do
-        source "$HOME/dotfiles/sh/apps/$app"
-    done
-fi
-
 # Construct the final PATH with both the general and system changes
 if [ -n "$path_changes_system" ]; then
     path_changes="$path_changes_system"
@@ -62,6 +55,13 @@ if [ -n "$path_changes_general" ]; then
 fi
 if [ -n "$path_changes" ]; then
     export PATH="$path_changes:$original_path"
+fi
+
+# Additional configurations for various applications
+if [ -d "$HOME/dotfiles/sh/apps" ]; then
+    for app in $(ls "$HOME/dotfiles/sh/apps"); do
+        source "$HOME/dotfiles/sh/apps/$app"
+    done
 fi
 
 # Figure out which editor to default to
