@@ -60,3 +60,9 @@ Special mentions to:
 * [Yuki Izumi](https://github.com/kivikakk)
 * [Mathias Bynens](https://github.com/mathiasbynens)
 * [Sorin Ionescu](https://github.com/sorin-ionescu)
+
+## License
+
+All content is licensed under the terms of [The Unlicense License](LICENSE).
+
+You're free to do as you wish with my `dotfiles` though I'd love a **Star** to show your appreciation :)
