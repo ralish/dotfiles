@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Some general configuration common to most shells
 # Should be compatible with at least: sh, bash, ksh, zsh
 
@@ -39,10 +41,13 @@ fi
 # Operating system and environment specific configurations
 kernel_name=$(uname -s)
 if [ "${kernel_name#*CYGWIN_NT}" != "$kernel_name" ]; then
+    # shellcheck source=sh/systems/cygwin.sh
     source "$HOME/dotfiles/sh/systems/cygwin.sh"
 elif [ "${kernel_name#*Darwin}" != "$kernel_name" ]; then
+    # shellcheck source=sh/systems/osx.sh
     source "$HOME/dotfiles/sh/systems/osx.sh"
 elif [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
+    # shellcheck source=sh/systems/linux.sh
     source "$HOME/dotfiles/sh/systems/linux.sh"
 fi
 
@@ -60,6 +65,7 @@ fi
 # Additional configurations for various applications
 if [ -d "$HOME/dotfiles/sh/apps" ]; then
     for app in $(ls "$HOME/dotfiles/sh/apps"); do
+        # shellcheck source=/dev/null
         source "$HOME/dotfiles/sh/apps/$app"
     done
 fi
@@ -76,12 +82,14 @@ done
 
 # If we defined a custom aliases file then include it
 if [ -f "$HOME/dotfiles/sh/aliases.sh" ]; then
+    # shellcheck source=sh/aliases.sh
     source "$HOME/dotfiles/sh/aliases.sh"
 fi
 
 # If we defined a custom functions folder then include it
 if [ -d "$HOME/dotfiles/sh/functions" ]; then
     for function in $(ls "$HOME/dotfiles/sh/functions"); do
+        # shellcheck source=/dev/null
         source "$HOME/dotfiles/sh/functions/$function"
     done
 fi

@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # OS X shell configuration
 
 # Prefer GNU coreutils?
@@ -25,12 +27,14 @@ fi
 # Load bash completion if it's present
 if [ -n "$BASH_VERSION" ]; then
     if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
+        # shellcheck source=/dev/null
         source "$(brew --prefix)/etc/bash_completion"
     fi
 fi
 
 # Load grc if it's present
 if [ -f "$(brew --prefix)/etc/grc.bashrc" ]; then
+    # shellcheck source=/dev/null
     source "$(brew --prefix)/etc/grc.bashrc"
 fi
 

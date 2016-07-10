@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # PostgreSQL configuration
 
 if command -v psql > /dev/null; then

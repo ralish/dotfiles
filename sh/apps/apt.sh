@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # APT configuration
 
 if command -v apt-get > /dev/null; then

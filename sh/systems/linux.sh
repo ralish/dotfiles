@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Linux shell configuration
 
 # Use stderred if it's available

@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Consult the Bash Reference Manual for all the details:
 # https://www.gnu.org/software/bash/manual/bashref.html
 
@@ -127,6 +129,7 @@ esac
 
 # Enable more powerful command completion if available
 if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
+    # shellcheck source=/dev/null
     source /etc/bash_completion
 fi
 
@@ -136,6 +139,7 @@ fi
 ##########################
 
 # Load our common shell configuration
+# shellcheck source=sh/common.sh
 source "$HOME/dotfiles/sh/common.sh"
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

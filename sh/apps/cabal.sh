@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Cabal configuration
 
 if command -v cabal > /dev/null; then

@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # dircolors configuration
 
 if command -v dircolors > /dev/null; then

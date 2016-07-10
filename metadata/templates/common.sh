@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2034
+
 # Detection exit codes
 DETECTION_SUCCESS=0
 DETECTION_FAILURE=1

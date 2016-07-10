@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # If our homedir is encrypted with eCryptfs then don't unmount it on exit if
 # any tmux sessions are running. This is more difficult than it should be as
 # eCryptfs doesn't decrement the active sessions counter on the shared memory

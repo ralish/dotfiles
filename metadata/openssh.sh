@@ -2,6 +2,7 @@
 
 # Source in common metadata functions
 script_dir="$(dirname "${BASH_SOURCE[0]}")"
+# shellcheck source=metadata/templates/common.sh
 source "$script_dir/templates/common.sh"
 
 if ! command -v ssh > /dev/null; then

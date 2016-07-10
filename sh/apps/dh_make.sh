@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # dh_make configuration
 
 if command -v dh_make > /dev/null; then

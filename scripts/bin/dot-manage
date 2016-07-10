@@ -29,6 +29,7 @@ function script_init() {
     dotfiles_name="$(basename "$dotfiles_dir")"
 
     # Source in common metadata functions
+    # shellcheck source=metadata/templates/common.sh
     source "$dotfiles_dir/$META_DIR/templates/common.sh"
 }
 

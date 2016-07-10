@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # GCC configuration
 
 if command -v gcc > /dev/null; then

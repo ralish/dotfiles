@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # lesspipe configuration
 
 if command -v lesspipe > /dev/null; then

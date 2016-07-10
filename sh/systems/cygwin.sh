@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Cygwin shell configuration
 
 # Cygwin package repository mirrors to use
@@ -17,6 +19,7 @@ fi
 
 # Sort out the Git prompt (__git_ps1 may not be available)
 if command -v git-prompt > /dev/null; then
+    # shellcheck source=/dev/null
     source "$(command -v git-prompt)"
 fi
 
