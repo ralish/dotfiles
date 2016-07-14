@@ -133,6 +133,9 @@ if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
     source /etc/bash_completion
 fi
 
+# Typing "!!<space>" will replace "!!" with the previous command
+bind Space:magic-space
+
 
 ##########################
 ### Common Shell Setup ###

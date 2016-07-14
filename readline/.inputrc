@@ -145,9 +145,6 @@ set visible-stats on
 
 # ------------------------------- Key Mappings --------------------------------
 
-# Typing "!!<space>" will replace "!!" with the previous command
-space: magic-space
-
 # Set Home/End keys to jump to the beginning/end of line
 "\e[1~": beginning-of-line
 "\e[4~": end-of-line
