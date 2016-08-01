@@ -426,6 +426,8 @@ Plugin 'tpope/vim-surround'
 
 " ################################ Integration ################################
 
+" Synchronise with tmux's clipboard
+Plugin 'roxma/vim-tmux-clipboard'
 " Support focus events when running under tmux (use our fork until PR#8 merged)
 Plugin 'ralish/vim-tmux-focus-events'
 
