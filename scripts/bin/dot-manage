@@ -133,6 +133,7 @@ function detect_components() {
                                       ! -name "$dotfiles_name" -and \
                                       ! -name ".git")"
 
+    cd "$dotfiles_path"
     for comp_path in $comp_list; do
         comp_name="$(basename "$comp_path")"
         if [[ -x $META_DIR/$comp_name.sh ]]; then
@@ -235,6 +236,7 @@ function stow_components() {
     local stow_comp stow_result
     declare -g -a stow_success stow_failure
 
+    cd "$dotfiles_path"
     for stow_comp in "${stow_list[@]}"; do
         "$STOW_BIN" "$1" -d "$dotfiles_path" -t "$HOME" "$stow_comp"
 
