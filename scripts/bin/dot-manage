@@ -230,6 +230,15 @@ function detect_report() {
 }
 
 
+# DESC: Create some directories in advance to ensure stow doesn't symlink them
+# ARGS: None
+function create_dirs() {
+    if [[ ! -d $HOME/.config ]]; then
+        mkdir "$HOME/.config"
+    fi
+}
+
+
 # DESC: Invokes the stow executable on detected components
 # ARGS: $1 (required): The operation type (-S, -D or -R)
 function stow_components() {
@@ -288,6 +297,7 @@ function main() {
         return
     fi
 
+    create_dirs
     if [[ -n $do_reinstall ]]; then
         pretty_print "*** Reinstalling all dotfiles components..."
         stow_components -R
