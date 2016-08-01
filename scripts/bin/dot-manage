@@ -84,17 +84,8 @@ function parse_params() {
 
         if [[ -z $do_install && -z $do_uninstall ]]; then
             do_reinstall=true
-        elif [[ -n $do_install && -n $do_uninstall ]]; then
-            do_reinstall=true
         fi
     fi
-}
-
-
-# DESC: Quick, simple & dirty sorting of arguments
-# ARGS: $@ (required): Arguments to be sorted
-function sort_args() {
-    printf '%s ' "$@" | xargs -n 1 | sort | xargs
 }
 
 
@@ -116,6 +107,13 @@ function early_init() {
     # Source in common metadata functions
     # shellcheck source=metadata/templates/common.sh
     source "$dotfiles_path/$META_DIR/templates/common.sh"
+}
+
+
+# DESC: Quick, simple & dirty sorting of arguments
+# ARGS: $@ (required): Arguments to be sorted
+function sort_args() {
+    printf '%s ' "$@" | xargs -n 1 | sort | xargs
 }
 
 
