@@ -9,36 +9,32 @@ set -o errtrace         # Make sure any error trap is inherited
 set -o pipefail         # Use last non-zero exit code in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
+# Path to the dot-manage script relative to the dotfiles directory
 DOT_MANAGE=dot-manage
 
-function script_init() {
-    # Original directory
-    orig_dir="$PWD"
-
-    # Figure out the physical directory this script resides in. The approach
-    # taken is clumsy as the simple methods like "readlink -f" and "realpath"
-    # are not platform independent. We have to work on Linux, BSD, OS X, etc...
-    script_file="$(perl -MCwd -le 'print Cwd::abs_path(shift)' "${BASH_SOURCE[0]}")"
-    script_dir="$(dirname "$script_file")"
-
-    # Dotfiles directory path
-    dotfiles_dir="$(cd -P "$script_dir"; git rev-parse --show-toplevel)"
-}
-
-
+# DESC: Usage help
+# ARGS: None
 function script_usage() {
-    echo 'Usage:
-    -h|--help                   Displays this help
+    cat << EOF
+Usage:
+     -h|--help                  Displays this help
+     -v|--verbose               Displays verbose output
+    -nc|--no-colour             Disables colour output
 
     Update Options:
-    -a|--all                    Update all the things!!
-    -g|--git                    Update Git sources & any submodules (default)
-    -s|--stow                   Run dot-manage after updating Git (default)
-    -v|--vim                    Update Vim bundles'
+     -a|--all                   Update all the things!!
+     -g|--git                   Update Git sources & any submodules (default)
+     -s|--stow                  Run dot-manage after updating Git (default)
+     -v|--vim                   Update Vim bundles
+EOF
 }
 
 
+# DESC: Parameter parser
+# ARGS: $@ (optional): Arguments provided to the script
 function parse_params() {
+    local param
+
     if [[ $# -eq 0 ]]; then
         git_update=true
         stow_update=true
@@ -50,6 +46,12 @@ function parse_params() {
                 -h|--help)
                     script_usage
                     exit 0
+                    ;;
+                -v|--verbose)
+                    verbose="true"
+                    ;;
+                -nc|--no-colour)
+                    no_colour="true"
                     ;;
                 -a|--all)
                     git_update=true
@@ -74,32 +76,66 @@ function parse_params() {
 }
 
 
-script_init
-parse_params "$@"
+# DESC: Find some important paths we need before script_init() is called
+# ARGS: None
+function early_init() {
+    # Determine the physical directory this script resides in. This approach is
+    # necessarily clumsy as simple methods like "readlink -f" and "realpath"
+    # are not platform independent. We have to work on Linux, BSD, OS X, etc...
+    readonly script_real_path="$(perl -MCwd -le 'print Cwd::abs_path(shift)' \
+                                 "${BASH_SOURCE[0]}")"
+    readonly script_real_dir="$(dirname "$script_real_path")"
+    readonly script_real_name="$(basename "$script_real_path")"
 
-if [[ -n $git_update ]]; then
-    echo '*** Updating Git sources...'
-    cd "$dotfiles_dir"
+    # Dotfiles directory path & name
+    readonly dotfiles_path="$(cd -P "$script_real_dir/../../" && pwd)"
+    readonly dotfiles_name="$(basename "$dotfiles_path")"
+}
 
-    # Default to the upstream branches for an unqualified merge
-    git config merge.defaultToUpstream true
 
-    git fetch
-    git merge --ff-only
-    git submodule init
-    git submodule update
-fi
+# DESC: Main control flow
+# ARGS: $@ (optional): Arguments provided to the script
+function main() {
+    early_init
 
-if [[ -n $stow_update ]]; then
-    cd "$dotfiles_dir"
-    ./$DOT_MANAGE
-fi
+    # shellcheck source=scripts/bin/source.sh
+    source "$script_real_dir/source.sh"
 
-if [[ -n $vim_update ]]; then
-    echo '*** Updating Vim bundles...'
-    vim +PluginUpdate +qall
-fi
+    trap "script_trap_err" ERR
+    trap "script_trap_exit" EXIT
 
-cd "$orig_dir"
+    script_init
+    parse_params "$@"
+    if [[ -z $no_colour ]]; then
+        colour_init
+    fi
+
+    if [[ -n $git_update ]]; then
+        pretty_print "*** Updating Git sources..."
+        cd "$dotfiles_path"
+
+        # Default to the upstream branch for an unqualified merge
+        git config merge.defaultToUpstream true
+
+        git fetch
+        git merge --ff-only
+        git submodule init
+        git submodule update
+    fi
+
+    if [[ -n $stow_update ]]; then
+        cd "$dotfiles_path"
+        "./$DOT_MANAGE"
+    fi
+
+    if [[ -n $vim_update ]]; then
+        pretty_print "*** Updating Vim bundles..."
+        vim +PluginUpdate +qall
+    fi
+}
+
+
+# Update all the things!
+main "$@"
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
