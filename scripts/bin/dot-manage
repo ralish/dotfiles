@@ -247,9 +247,9 @@ function stow_components() {
 
     cd "$dotfiles_path"
     for stow_comp in "${stow_list[@]}"; do
-        "$STOW_BIN" "$1" -d "$dotfiles_path" -t "$HOME" "$stow_comp"
-
-        if [[ $? -eq 0 ]]; then
+        if "$STOW_BIN" "$1" \
+            -d "$dotfiles_path" -t "$HOME" \
+            "$stow_comp" 2> /dev/null; then
             stow_success+=("$stow_comp")
         else
             stow_failure+=("$stow_comp")
