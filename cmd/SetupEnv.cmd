@@ -94,16 +94,21 @@ IF NOT EXIST "%Dw64Path%" (
 SET Dw64Path=
 
 REM Add alias for Sublime Text
-SET SublBinName=sublime_text.exe
-REG QUERY "%SublRegPath%" /v InstallLocation > NUL 2>&1
-IF ERRORLEVEL 1 (
-    IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Sublime Text via path specified by SublRegPath.
+WHERE /Q subl.exe
+IF ERRORLEVEL 0 (
+    IF DEFINED SetupEnvVerbose ECHO * Found subl.exe in PATH so not adding an alias.
 ) ELSE (
-    IF DEFINED SetupEnvVerbose ECHO * Adding Sublime Text alias: subl
-    FOR /F "tokens=2*" %%a IN ('REG QUERY "%SublRegPath%" /v InstallLocation ^| FINDSTR /R "[a-z]:\\.*\\$"') DO @SET SublDirPath=%%b
+    SET SublBinName=sublime_text.exe
+    REG QUERY "%SublRegPath%" /v InstallLocation > NUL 2>&1
+    IF ERRORLEVEL 1 (
+        IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Sublime Text via path specified by SublRegPath.
+    ) ELSE (
+        IF DEFINED SetupEnvVerbose ECHO * Adding Sublime Text alias: subl
+        FOR /F "tokens=2*" %%a IN ('REG QUERY "%SublRegPath%" /v InstallLocation ^| FINDSTR /R "[a-z]:\\.*\\$"') DO @SET SublDirPath=%%b
+    )
+    IF DEFINED SublDirPath DOSKEY subl="%SublDirPath%%SublBinName%" $*
+    FOR /F "delims==" %%i IN ('SET Subl') DO @SET %%i=
 )
-IF DEFINED SublDirPath DOSKEY subl="%SublDirPath%%SublBinName%" $*
-FOR /F "delims==" %%i IN ('SET Subl') DO @SET %%i=
 
 REM Remove the Verbose variable if it was ever set
 SET SetupEnvVerbose=

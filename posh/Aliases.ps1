@@ -19,10 +19,14 @@ if (Test-Path $Dw64Path -PathType Leaf) {
 Remove-Variable Dw64Path
 
 # Add alias for Sublime Text
-$SublBinName = 'sublime_text.exe'
-if (Test-Path $SublRegPath -PathType Container) {
-    Set-Alias subl (Join-Path (Get-ItemProperty $SublRegPath).InstallLocation $SublBinName)
+if (Get-Command 'subl.exe' -ErrorAction SilentlyContinue) {
+    Write-Verbose "Found subl.exe in PATH so not adding an alias."
 } else {
-    Write-Verbose "Couldn't locate Sublime Text installation so not adding 'subl' alias."
+    $SublBinName = 'sublime_text.exe'
+    if (Test-Path $SublRegPath -PathType Container) {
+        Set-Alias subl (Join-Path (Get-ItemProperty $SublRegPath).InstallLocation $SublBinName)
+    } else {
+        Write-Verbose "Couldn't locate Sublime Text installation so not adding 'subl' alias."
+    }
+    Remove-Variable SublRegPath, SublBinName
 }
-Remove-Variable SublRegPath, SublBinName

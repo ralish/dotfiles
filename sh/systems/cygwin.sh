@@ -29,13 +29,15 @@ if command -v startxwin > /dev/null; then
 fi
 
 # Add alias for Sublime Text
-SublRegPath='/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/Uninstall/Sublime Text 2_is1/InstallLocation'
-SublBinName='sublime_text.exe'
-if [ -f "$SublRegPath" ]; then
-    SublDirPath=$(cat "$SublRegPath" \
-        | sed 's/^\([A-Z]\):/\/cygdrive\/\1/' \
-        | sed 's/\\/\//g')
-    alias subl="\"$SublDirPath$SublBinName\""
+if ! command -v subl.exe > /dev/null; then
+    SublRegPath='/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/Uninstall/Sublime Text 2_is1/InstallLocation'
+    SublBinName='sublime_text.exe'
+    if [ -f "$SublRegPath" ]; then
+        SublDirPath=$(cat "$SublRegPath" \
+            | sed 's/^\([A-Z]\):/\/cygdrive\/\1/' \
+            | sed 's/\\/\//g')
+        alias subl="\"$SublDirPath$SublBinName\""
+    fi
 fi
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
