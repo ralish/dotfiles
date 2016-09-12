@@ -64,7 +64,7 @@ function parse_params() {
                 -s|--stow)
                     stow_update=true
                     ;;
-                -v|--vim)
+                -vi|--vim)
                     vim_update=true
                     ;;
                 *)
