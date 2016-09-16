@@ -61,7 +61,8 @@ Special mentions to:
 * [Mathias Bynens](https://github.com/mathiasbynens)
 * [Sorin Ionescu](https://github.com/sorin-ionescu)
 
-## License
+License
+-------
 
 All content is licensed under the terms of [The Unlicense License](LICENSE).
 
