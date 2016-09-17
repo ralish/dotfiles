@@ -1,26 +1,24 @@
 dotfiles
 ========
 
-Here lies my own little collection of `dotfiles`. In contrast to many other `dotfiles` repositories, I've setup mine with slightly different objectives which reflect my occupation as a DevOps engineer versus a pure developer.
-
+Here lies my own collection of `dotfiles`. In contrast to many other `dotfiles` collections, I've setup mine with slightly different objectives which reflect my occupation as a SysAdmin & DevOps engineer versus a pure developer.
 
 Objectives
 ----------
 
-My primary occupation is that of a sysadmin and so I often find myself working on many different systems. This introduces some key objectives I've tried to ensure my `dotfiles` meet:
+My primary occupation is that of a SysAdmin and so I often find myself working on many different systems. This introduces some key objectives I've tried to ensure my `dotfiles` meet:
 
 * **Ease of access**  
   GitHub makes this easy by providing access to ZIP files of each branch in a repository. While a Git clone is strongly preferable, if this is too much effort or otherwise problematic, simply downloading and unpacking the ZIP archive is a helpful fallback.
 * **Ease of setup**  
-  A long or manual installation or removal process is painful and time-consuming. An automated approach is essential so that after downloading or cloning the repository installation is quick and easy, with removal if necessary similarly straightforward.
+  A long or manual installation or removal process is painful and time-consuming. An automated approach is essential so that installation is quick and easy, with removal similarly straightforward if this is desirable (e.g. on a shared access account).
 * **Portability**  
   It's all too easy for platform assumptions to seek into configurations. I've tried my best to avoid such assumptions so that all configurations work on platforms where the underlying application or library is supported, or at least degrade gracefully.
-
 
 Management
 ----------
 
-I've settled on using [Stow](https://www.gnu.org/software/stow/) to manage my `dotfiles` for the following attributes:
+I've settled on using [Stow](https://www.gnu.org/software/stow/) to manage my `dotfiles` due to the following attributes:
 
 * **Compatible**  
   Most Unix-like systems have [Perl](https://www.perl.org/) installed by default and Stow itself has no peculiar dependencies.
@@ -37,7 +35,6 @@ I've settled on using [Stow](https://www.gnu.org/software/stow/) to manage my `d
 * **Lightweight**  
   Stow is fast, unintrusive, and at the time of writing the script comes in at a mere ~28KB!
 
-
 Tested Environments
 -------------------
 
@@ -48,7 +45,6 @@ The following environments are known to work:
  * [Linux](https://www.kernel.org/) *([Ubuntu](http://www.ubuntu.com/) 12.04 or newer)*
  * [OS X](https://www.apple.com/osx/) *(10.9 or newer)*
  * [Windows](https://www.microsoft.com/windows) *(Windows 7/Server 2008 R2 or newer)*
-
 
 Thanks To
 ---------
@@ -66,4 +62,4 @@ License
 
 All content is licensed under the terms of [The Unlicense License](LICENSE).
 
-You're free to do as you wish with my `dotfiles` though I'd love a **Star** to show your appreciation :)
+You're free to do as you wish with my `dotfiles` (though I'd love a **Star** to show your appreciation!).
