@@ -3,11 +3,13 @@ Posterity
 
 A collection of resources I've found useful while cultivating my own `dotfiles`.
 
-## Bash
+Bash
+----
 
  - [bash-sensible](https://github.com/mrzool/bash-sensible)
 
-## Vim
+Vim
+---
 
  - [sensible.vim](https://github.com/tpope/vim-sensible)
  - [Vim After 11 Years](https://statico.github.io/vim.html)
