@@ -51,6 +51,8 @@ Thanks To
 
 The numerous people whose `dotfiles` served as inspiration or templates for my own!
 
+I keep a record of resources I've found particularly useful [here](POSTERITY.md).
+
 Special mentions to:
 
 * [Yuki Izumi](https://github.com/kivikakk)
