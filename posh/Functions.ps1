@@ -1,20 +1,95 @@
-# Connect to Exchange Online
+Function Connect-AllOffice365Services {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory=$true)]
+            [System.Management.Automation.PSCredential]$Credential,
+        [Parameter(Mandatory=$true)]
+            [String]$SharePointDomainName,
+            [String]$SccCmdletsPrefix='Scc'
+    )
+
+    Connect-Office365 -Credential $Credential
+    Connect-SharePointOnline -Credential $Credential -DomainName $SharePointDomainName
+    Connect-SkypeForBusinessOnline -Credential $Credential
+    Connect-ExchangeOnline -Credential $Credential
+    Connect-SecurityAndComplianceCenter -Credential $Credential -CmdletsPrefix $SccCmdletsPrefix
+}
+
 Function Connect-ExchangeOnline {
     [CmdletBinding()]
     Param(
-        [Parameter(Position=1,Mandatory=$true)]
-            [System.Management.Automation.PSCredential]$Credential,
-            [switch]$NoMsol,
-            [switch]$NoImport
+        [Parameter(Mandatory=$true)]
+            [System.Management.Automation.PSCredential]$Credential
     )
 
-    if (!$NoMsol) {
-        Connect-MsolService -Credential $Credential
+    Write-Verbose 'Connecting to Exchange Online ...'
+    $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication 'Basic' -AllowRedirection
+    Import-PSSession $ExchangeOnline -DisableNameChecking
+}
+
+Function Connect-Office365 {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory=$true)]
+            [System.Management.Automation.PSCredential]$Credential
+    )
+
+    if (!(Get-Module -Name MSOnline -ListAvailable)) {
+        throw 'Required module not available: MSOnline'
     }
-    $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
-    if (!$NoImport) {
-        Import-PSSession $ExchangeOnline
+
+    Write-Verbose 'Connecting to Office 365 ...'
+    Import-Module MSOnline
+    Connect-MsolService -Credential $Credential
+}
+
+Function Connect-SecurityAndComplianceCenter {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory=$true)]
+            [System.Management.Automation.PSCredential]$Credential,
+            [String]$CmdletsPrefix='Scc'
+    )
+
+    Write-Verbose 'Connecting to Security and Compliance Center ...'
+    $SCC = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://ps.compliance.protection.outlook.com/powershell-liveid/' -Credential $Credential -Authentication 'Basic' -AllowRedirection
+    Import-PSSession $SCC -Prefix $CmdletsPrefix
+}
+
+Function Connect-SharePointOnline {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory=$true)]
+            [System.Management.Automation.PSCredential]$Credential,
+        [Parameter(Mandatory=$true)]
+            [String]$DomainName
+    )
+
+    if (!(Get-Module -Name Microsoft.Online.SharePoint.PowerShell -ListAvailable)) {
+        throw 'Required module not available: Microsoft.Online.SharePoint.PowerShell'
     }
+
+    Write-Verbose 'Connecting to SharePoint Online ...'
+    Import-Module Microsoft.Online.SharePoint.PowerShell -DisableNameChecking
+    $SPOUrl = "https://$DomainName-admin.sharepoint.com"
+    Connect-SPOService -Url $SPOUrl -Credential $Credential
+}
+
+Function Connect-SkypeForBusinessOnline {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory=$true)]
+            [System.Management.Automation.PSCredential]$Credential
+    )
+
+    if (!(Get-Module -Name SkypeOnlineConnector -ListAvailable)) {
+        throw 'Required module not available: SkypeOnlineConnector'
+    }
+
+    Write-Verbose 'Connecting to Skype for Business Online ...'
+    Import-Module SkypeOnlineConnector
+    $SkypeForBusinessOnline = New-CsOnlineSession -Credential $Credential
+    Import-PSSession $SkypeForBusinessOnline
 }
 
 # Convert a string to the Base64 form suitable for usage with PowerShell's "-EncodedCommand" parameter
