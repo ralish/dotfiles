@@ -143,6 +143,27 @@ Function Get-EventLogTail {
     } while ($true)
 }
 
+# Find Office 365 users which have one or more disabled licenced services
+Function Get-Office365UsersWithDisabledServices {
+    $Users = Get-MsolUser | ? { $_.IsLicensed -eq $true}
+    foreach ($User in $Users) {
+        $DisabledServices = @()
+        $LicencedServices = $User.Licenses.ServiceStatus
+
+        foreach ($Service in $LicencedServices) {
+            if ($Service.ProvisioningStatus -eq 'Disabled') {
+                $DisabledServices += $Service
+            }
+        }
+
+        if ($DisabledServices.Count -gt 0) {
+            Write-Output ("{0} has the following disabled services:" -f $User.DisplayName)
+            $DisabledServices
+            Write-Output ""
+        }
+    }
+}
+
 # The MKLINK command is actually part of the Command Processor (cmd.exe)
 # So we have a quick and dirty function below to invoke it via PowerShell
 Function mklink {
