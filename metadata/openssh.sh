@@ -15,18 +15,28 @@ OPENSSH_CFG="$OPENSSH_DIR/config"
 TEMPLATE_DIR="$OPENSSH_DIR/templates"
 CUSTOM_CFG="$TEMPLATE_DIR/ssh_config"
 
+# Ensure the configuration has the correct permissions
+function set_config_perms() {
+    touch "$OPENSSH_CFG"
+    chmod 0600 "$OPENSSH_CFG"
+}
+
 # Check for a supported version and build our config
 ssh_version=$(ssh -V 2>&1)
 if [[ $ssh_version =~ OpenSSH_5\.9 ]]; then
+    set_config_perms
     head -n -1 "$CUSTOM_CFG" > "$OPENSSH_CFG"
     tail -n +4 "$TEMPLATE_DIR/ssh_config.59" >> "$OPENSSH_CFG"
 elif [[ $ssh_version =~ OpenSSH_6\.6 ]]; then
+    set_config_perms
     head -n -1 "$CUSTOM_CFG" > "$OPENSSH_CFG"
     tail -n +4 "$TEMPLATE_DIR/ssh_config.66" >> "$OPENSSH_CFG"
 elif [[ $ssh_version =~ OpenSSH_6\.9 ]]; then
+    set_config_perms
     head -n -1 "$CUSTOM_CFG" > "$OPENSSH_CFG"
     tail -n +4 "$TEMPLATE_DIR/ssh_config.69" >> "$OPENSSH_CFG"
 elif [[ $ssh_version =~ OpenSSH_7\.2 ]]; then
+    set_config_perms
     head -n -1 "$CUSTOM_CFG" > "$OPENSSH_CFG"
     tail -n +4 "$TEMPLATE_DIR/ssh_config.72" >> "$OPENSSH_CFG"
 else
