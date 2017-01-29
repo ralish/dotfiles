@@ -32,6 +32,8 @@ use English qw(-no_match_vars);               # core
 use Time::HiRes qw(gettimeofday tv_interval); # core
 use Time::Local qw(timegm);                   # core
 use Clone qw(clone);                          # core
+use Time::Piece;                              # core
+use Time::Seconds;                            # core
 use POSIX;                   # core, required for unsafe signal handling
 use Crypt::Rijndael;         # non-core, libcrypt-rijndael-perl on Ubuntu
 use Sort::Naturally;         # non-core, libsort-naturally-perl on Ubuntu
@@ -48,12 +50,6 @@ our $FORCED_READLINE = undef;	# Auto-select
 
 # Pull in optional perl modules with run-time loading
 my %OPTIONAL_PM=();
-# Data::Password is needed for the pwck command (check password quality).
-if (runtime_load_module(\%OPTIONAL_PM,'Data::Password',[qw(IsBadPassword)])) {
-  no warnings 'once';
-  $Data::Password::MINLEN = 8;
-  $Data::Password::MAXLEN = 0;
-}
 # Capture::Tiny is needed to safely optionally-load Clipboard.
 # Clipboard is needed by the clipboard copy commands (xw, xu, xp, and xx).
 if (runtime_load_module(\%OPTIONAL_PM,'Capture::Tiny',[qw(capture)])) {
@@ -82,6 +78,22 @@ if (lc($OSNAME) =~ m/^mswin/) {
   }
 }
 runtime_load_module(\%OPTIONAL_PM,'Sub::Install',undef);
+# Optionally use a more cryptographically secure RNG.
+our $RNG_EXT = undef;
+if (runtime_load_module(\%OPTIONAL_PM,'Math::Random::ISAAC',undef)) {
+  $RNG_EXT = Math::Random::ISAAC->new(
+	int(1000000000 * (Time::HiRes::time() - int(Time::HiRes::time()))));
+}
+use subs 'rand'; # Override built-in rand() with our own function
+sub rand {
+  my $ceiling = shift @_ || 1;
+  our $RNG_EXT;
+  if (defined($RNG_EXT) && ref($RNG_EXT) eq 'Math::Random::ISAAC') {
+    my $random = $RNG_EXT->rand() * $ceiling;
+    return $random;
+  }
+  return CORE::rand($ceiling);
+}
 
 $|=1; # flush immediately after writes or prints to STDOUT
 
@@ -98,7 +110,7 @@ my $MAX_ATTACH_SIZE = 2*1024**2; # Maximum size of entry file attachments
 
 # Application name and version
 my $APP_NAME = basename($0);  $APP_NAME =~ s/\.(pl|exe)$//;
-my $VERSION = "3.0";
+my $VERSION = "3.1";
 
 our $HISTORY_FILE = ""; # Gets set in the MyGetOpts() function
 my $opts=MyGetOpts();   # Will only return with options we think we can use
@@ -223,8 +235,8 @@ my $term = new Term::ShellUI(
              desc => "Save to a specific filename " .
 				"(saveas <file.kdb> [<file.key>])",
              minargs => 1, maxargs => 2,
-             args => [\&Term::ShellUI::complete_files,
-					\&Term::ShellUI::complete_files],
+             args => [\&Term::ShellUI::complete_onlyfiles,
+					\&Term::ShellUI::complete_onlyfiles],
              proc => sub { run_no_TSTP(\&cli_saveas, @_); },
          },
          "export" => {
@@ -239,8 +251,8 @@ my $term = new Term::ShellUI(
 		"password. Export from /, verify that the new file is\n" .
 		"good, and then remove your original file.\n",
              minargs => 1, maxargs => 2,
-             args => [\&Term::ShellUI::complete_files,
-					\&Term::ShellUI::complete_files],
+             args => [\&Term::ShellUI::complete_onlyfiles,
+					\&Term::ShellUI::complete_onlyfiles],
              proc => sub { run_no_TSTP(\&cli_export, @_); },
          },
          "import" => {
@@ -250,18 +262,18 @@ my $term = new Term::ShellUI(
 		"Use this command to import an entire password DB\n" .
 		"specified by <file> into a new group at <path>.\n" .
 		"Supported file types are KeePass v1 and v2, and\n" .
-		"Password Safe v3 (http://passwordsafe.sf.net).\n",
+		"Password Safe v3 (https://pwsafe.org/).\n",
              minargs => 2, maxargs => 3,
-             args => [\&Term::ShellUI::complete_files,\&complete_groups,
-					\&Term::ShellUI::complete_files],
+             args => [\&Term::ShellUI::complete_onlyfiles,\&complete_groups,
+					\&Term::ShellUI::complete_onlyfiles],
              proc => sub { run_no_TSTP(\&cli_import, @_); },
          },
          "open" => {
              desc => "Open a KeePass database file " .
 				"(open <file.kdb> [<file.key>])",
              minargs => 1, maxargs => 2,
-             args => [\&Term::ShellUI::complete_files,
-					\&Term::ShellUI::complete_files],
+             args => [\&Term::ShellUI::complete_onlyfiles,
+					\&Term::ShellUI::complete_onlyfiles],
              proc => sub { run_no_TSTP(\&cli_open, @_); },
          },
          "mkdir" => {
@@ -440,6 +452,20 @@ my $term = new Term::ShellUI(
              minargs => 1, maxargs => 2, args => "<search string>",
              method => \&cli_find,
          },
+         "purge" => {
+             desc => "Purges entries in a given group base on criteria.",
+             doc => "\n" .
+		"Purges entries within a given group based on the age of\n" .
+		"the created, accessed, modified, or expiration fields.\n" .
+		"\n" .
+		"Add -r to recurse subgroups.\n" .
+		"\n" .
+		"Add --no-recycle to not copy purged entries to the\n" .
+		"/Backup or \"/Recycle Bin\" groups.\n",
+             minargs => 1, maxargs => 3, args => \&complete_groups_and_entries,
+             method => \&cli_purge,
+         },
+
          "pwd" => {
              desc => "Print the current working directory",
              maxargs => 0, proc => \&cli_pwd,
@@ -475,10 +501,12 @@ if (length($opts->{kdb})) {
 }
 
 # Enter the interative kpcli shell session
-print "\n" .
+if (! defined($opts->{command})) {
+  print "\n" .
 	"KeePass CLI ($APP_NAME) v$VERSION is ready for operation.\n" .
 	"Type 'help' for a description of available commands.\n" .
 	"Type 'help <command>' for details on individual commands.\n";
+}
 if ($DEBUG) {print 'Using '.$term->{term}->ReadLine." for readline.\n"; }
 if ( (! $DEBUG) && (lc($OSNAME) !~ m/^mswin/) &&
 		($term->{term}->ReadLine ne 'Term::ReadLine::Gnu')) {
@@ -508,7 +536,12 @@ if (defined($opts->{timeout}) && int($opts->{timeout}) > 0) {
   setup_timeout_handling();
 }
 
-$term->run();
+if ( defined($opts->{command}) ) {
+    $term->process_a_cmd($opts->{command});
+    cli_quit($term,undef); # Needed else we leave a foo.lock file behind
+} else {
+    $term->run();
+}
 
 exit;
 
@@ -547,8 +580,17 @@ sub open_kdb {
     $state->{placed_lock_file} = $lock_file;
   }
 
-  # Ask the user for the master password and then open the kdb
-  my $master_pass=GetMasterPasswd();
+  my $master_pass;
+  if ( defined($opts->{pwfile}) ) {
+    # Read the master password from the given file
+    open(my $pwdfile, '<', $opts->{pwfile});
+    $master_pass=<$pwdfile>;
+    chomp $master_pass;
+    close($pwdfile);
+  } else {
+    # Ask the user for the master password and then open the kdb
+    $master_pass=GetMasterPasswd();
+  }
   if (recent_sigint()) { return undef; } # Bail on SIGINT
   $state->{kdb} = File::KeePass->new;
   if (! eval { $state->{kdb}->load_db($file,
@@ -824,11 +866,38 @@ sub cli_pwck {
 
   if (recent_sigint()) { return undef; } # Bail on SIGINT
 
-  # If Data::Password is not avaiable we can't do this for the user
-  if  (! $state->{OPTIONAL_PM}->{'Data::Password'}->{loaded}) {
-    print "Error: pwck requires the Data::Password module.\n";
+  # Try to load one of the optional modules needed by this feature.
+  # This list is in order of preference.
+  my @pwckModules = qw(Data::Password::passwdqc Data::Password);
+  my $pwckMethod = '';
+  pwckModules: foreach my $pwckmod (@pwckModules) {
+    # If it's already loaded then set $pwckMethod and bail out now
+    if ($state->{OPTIONAL_PM}->{$pwckmod}->{loaded}) {
+      $pwckMethod = $pwckmod;
+      last pwckModules;
+    }
+    # Try to load it. If we succeed, set $pwckMethod and bail out
+    if (runtime_load_module(\%OPTIONAL_PM,$pwckmod,undef)) {
+      if ($pwckmod eq 'Data::Password::passwdqc') {
+        $Data::Password::passwdqc::max=999; # Max password length allowed
+        $Data::Password::passwdqc::min=[INT_MAX, 20, 11, 8, 7]; # man pwqcheck
+      } elsif ($pwckmod eq 'Data::Password') {
+        #no warnings 'once';
+        $Data::Password::MINLEN = 8;
+        $Data::Password::MAXLEN = 0;
+      }
+      $pwckMethod = $pwckmod;
+      last pwckModules;
+    }
+  }
+  # If we could not get a module loaded, let the user know and bail out
+  if (! length($pwckMethod)) {
+    print "Error: pwck requires Data::Password or Data::Password::passwdqc.\n";
     return;
   }
+
+  # Tell the user which module we are using for password testing.
+  print "Using perl module $pwckMethod for password testing...\n\n";
 
   my @targets = ();
   my $target = $params->{args}->[0];
@@ -852,7 +921,23 @@ sub cli_pwck {
     # Loop over each target group adding each of its entries as targets
     foreach my $group (@groups) {
       if (defined($group->{entries})) {
-        push @targets, @{$group->{entries}};
+        ENTRY: foreach my $ent (@{$group->{entries}}) {
+          # skip Meta-Info/SYSTEM entries
+          if ($ent->{'title'} eq 'Meta-Info' &&
+					$ent->{'username'} eq 'SYSTEM') {
+            next ENTRY;
+          }
+          # If we don't have this entry recorded in all_ent_paths_rev then
+          # we can't report on it. The only case known of is when we have
+          # multiple entries at the same level (unsupported) and typically
+          # that's only seen in /Backup in v1 databases.
+          if (defined($state->{all_ent_paths_rev}->{$ent->{id}})) {
+            push @targets, $ent;
+          } elsif (! ($group->{title} eq 'Backup' && $group->{level} == 0)) {
+            warn "Warning: missing entry " . &Dumper($ent) . "\n";
+            next;
+          }
+        }
       }
     }
   }
@@ -869,12 +954,7 @@ sub cli_pwck {
       push @empties, $ent;
       $results{$ent->{id}} = '';
     } else {
-      $results{$ent->{id}} = IsBadPassword($pass);
-      if ($results{$ent->{id}} =~ m/dictionary word/i) {
-        # IsBadPassword() reports dictionary words that it finds. I don't
-        # like that from a security perspective so we change that here.
-        $results{$ent->{id}} = "contains a dictionary word";
-      }
+      $results{$ent->{id}} = my_IsBadPassword($pwckMethod, $pass);
     }
     # If the user hit ^C (SIGINT) then we need to stop
     if (recent_sigint()) {
@@ -906,14 +986,42 @@ sub cli_pwck {
     my $empty_count = scalar(@empties);
     print "$analyzed passwords analyzed, $empty_count blank, " .
 					"$problem_count concerns found";
-    if ($problem_count > 0) { print ":"; } else { print "."; }
+    if ($problem_count > 0) { print ":\n"; } else { print "."; }
     print "\n";
     foreach my $path (sort keys %problems) {
       print humanize_path($path) . ": $results{$problems{$path}}\n";
+      if (! length(humanize_path($path))) {
+        my $ent_id = $problems{$state->{all_ent_paths}->{$path}};
+        my $ent = $state->{kdb}->find_entry({id => $ent_id});
+        warn "LHHD: ".&Dumper($ent)."\n";
+      }
     }
   }
 
   return 0;
+}
+
+# This function handles abstraction to mutiple password
+# quality checking libraries.
+sub my_IsBadPassword($) {
+  my $pwckMethod = shift @_;
+  my $pass = shift @_;
+
+  my $result = undef;
+  if ($pwckMethod eq 'Data::Password') {
+    $result = Data::Password::IsBadPassword($pass);
+    if ($result =~ m/dictionary word/i) {
+      # IsBadPassword() reports dictionary words that it finds. I don't
+      # like that from a security perspective so we change that here.
+      $result = "contains a dictionary word";
+    }
+  } elsif ($pwckMethod eq 'Data::Password::passwdqc') {
+    my $pwdqc = Data::Password::passwdqc->new;
+    my $is_valid = $pwdqc->validate_password($pass);
+    $result = $pwdqc->reason if not $is_valid;
+  }
+
+  return $result;
 }
 
 # Prints some statistics about the open KeePass file
@@ -1132,6 +1240,168 @@ sub find_expired_entries {
   return @expired;
 }
 
+sub cli_purge($$) {
+  my $self = shift @_;
+  my $params = shift @_;
+  our $state;
+
+  if (recent_sigint()) { return undef; } # Bail on SIGINT
+
+  # Users can provide a --no-recycle option and -r for recurse.
+  my $target = undef;
+  my $purge_group='';
+  my %opts=();
+  {
+    local @ARGV = @{$params->{args}};
+    my $result = &GetOptions(\%opts, 'r', 'no-recycle');
+    if (scalar(@ARGV) != 1 || length($ARGV[0]) < 1) {
+      print "Purge only supports exactly one group at a time.\n";
+      return;
+    }
+    $target = normalize_path_string($ARGV[0]);
+    if (defined($state->{all_grp_paths_fwd}->{$target})) {
+      my $group_id = $state->{all_grp_paths_fwd}->{$target};
+      $purge_group = $state->{kdb}->find_group( { id => $group_id } );
+    } else {
+      print "Invalid group.\n";
+      return;
+    }
+  }
+
+  # Collect the date/time field that the user wants to purge by
+  print "Purge by (c)reated, (e)xpires, or last (a)ccessed/(m)odified time? ";
+  my $purge_by=get_single_key();
+  print "\n";
+  if ($purge_by !~ m/^[ecam]$/i) {
+    print "Operation canceled.\n";
+    return;
+  }
+
+  # Ask the user for the $purge_qty and $purge_uom
+  print "Purge entries order than... (90d, 13w, 6m, 2y, etc)? ";
+  my $purge_age = get_single_line();
+  print "\n";
+  my ($purge_qty, $purge_uom) = (undef, undef);
+  if ($purge_age !~ m/^(\d+)([dwmy])$/i) {
+    print "Invalid age specified.\n" .
+	"\n" .
+	"Examples:\n" .
+	" - 90d = 90 days\n" .
+	" - 13w = 13 weeks\n" .
+	" -  6m =  6 months\n" .
+	" -  2y =  2 years\n" .
+	"\n" .
+	"Operation canceled.\n";
+    return;
+  } else {
+    ($purge_qty, $purge_uom) = ($1, $2);
+  }
+  # Make a $purge_time Time::Piece object for the user's chosen purge time
+  my $time_now = Time::Piece->new;
+  my $purge_time = undef;
+  if ($purge_uom eq 'd') {
+    $purge_time = $time_now - ONE_DAY * $purge_qty;
+  } elsif ($purge_uom eq 'w') {
+    $purge_time = $time_now - 7 * ONE_DAY * $purge_qty;
+  } elsif ($purge_uom eq 'm') {
+    $purge_time = $time_now->add_months(-1*$purge_qty);
+  } elsif ($purge_uom eq 'y') {
+    $purge_time = $time_now->add_years(-1*$purge_qty);
+  }
+
+  # Gather the @groups and @ents that are purge candidates
+  my @groups = ($target);
+  if ($opts{'r'}) {
+    my @child_grps = grep(/^\Q$target\E\0/,
+		sort(keys(%{$state->{all_grp_paths_fwd}})));
+    foreach my $grp (@child_grps) {
+      push @groups, $grp;
+    }
+  }
+  my @ents = ();
+  foreach my $grp (@groups) {
+    my @ent_paths = grep(/^\Q$grp\E\0[^\0]+$/,
+			sort(keys(%{$state->{all_ent_paths_fwd}})));
+    foreach my $ent_path (@ent_paths) {
+      my $entry_id = $state->{all_ent_paths_fwd}->{$ent_path};
+      my $ent = $state->{kdb}->find_entry( {id=>$entry_id} );
+      push @ents, $ent;
+    }
+  }
+  # Place the "entries to purge" into @purge_ents
+  my %byK = (
+        'e' => 'expires', 'c' => 'created',
+        'a' => 'accessed', 'm' => 'modified',
+        );
+  my @purge_ents = ();
+  foreach my $ent (@ents) {
+    my $ent_time = $ent->{$byK{$purge_by}}; # %Y-%m-%d %H:%M:%S
+    $ent_time =~ s/[^0-9]//g;
+    my $prg_time = $purge_time->strftime("%Y%m%d%H%M%S");
+    if ($ent_time =~ m/^\d{14}$/ && $ent_time < $prg_time) {
+      push @purge_ents, $ent;
+    }
+  }
+
+  if (scalar(@purge_ents) < 1) {
+    print "No entries match your purge criteria. Nothing to purge.\n";
+    return;
+  }
+
+  # Show the user the imact this purge will have and request confirmation
+  my %byV = (
+	'e' => 'expired', 'c' => 'created',
+	'a' => 'last accessed', 'm' => 'last modified',
+	);
+  my %uomV = (
+	'd' => 'day(s)', 'w' => 'week(s)',
+	'm' => 'month(s)', 'y' => 'year(s)',
+	);
+  my $recursivelyV='';
+  if ($opts{'r'}) { $recursivelyV = "recursively " }
+  print "\n";
+  print "For group \"$purge_group->{title}\"\n" .
+	" - " . $recursivelyV . "purge entries with $byV{$purge_by} dates " .
+		"older than $purge_qty $uomV{$purge_uom}.\n" .
+	"   - $purge_qty $uomV{$purge_uom} ago is " .
+		$purge_time->strftime("%Y-%m-%d at %H:%M:%S") . "\n" .
+        " - this will purge " .scalar(@purge_ents). " of " .scalar(@ents) .
+		" entries in " .scalar(@groups). " groups.\n";
+  if ($opts{'no-recycle'}) {
+    print " - and with --no-recycle specified, no backups will be made!\n";
+  }
+  print "\n";
+  print "Confirm if you would you like to do this? [y/N] ";
+  my $key=get_single_key();
+  if (recent_sigint()) { return undef; } # Bail on SIGINT
+  print "\n";
+  if (lc($key) ne 'y') {
+    print "Operation canceled.\n";
+    return;
+  }
+
+  # Delete the entries that we need to purge
+  foreach my $ent (@purge_ents) {
+    # No recycling for "Backup"/"Recycle Bin" folders; other folders
+    # respect $opts{no-recycle}.
+    if (! ($opts{'no-recycle'} || ( $purge_group->{level} == 0 &&
+		($purge_group->{title} eq 'Backup' ||
+		$purge_group->{title} eq 'Recycle Bin') )) ) {
+      my $errmsg = recycle_entry($state, $ent);
+      if (defined($errmsg)) { print "WARNING: $errmsg\n"; }
+    }
+    if (recent_sigint()) { return undef; } # Bail on SIGINT
+    $state->{kdb}->delete_entry({ id => $ent->{id} });
+  }
+
+  # If we purged anything, set kdb_has_changed state, ask to save, etc.
+  if (scalar(@purge_ents) > 0) {
+    $state->{kdb_has_changed}=1;
+    refresh_state_all_paths();
+    RequestSaveOnDBChange();
+  }
+}
+
 sub cli_find($) {
   my $self = shift @_;
   my $params = shift @_;
@@ -1150,7 +1420,7 @@ sub cli_find($) {
     my $result = &GetOptions(\%opts, 'a', 'expired');
     if (defined($opts{'expired'})) {
       if (scalar(@ARGV) || scalar(keys(%opts)) > 1) {
-        print "-expired cannot have search criteria other qualifiers.\n";
+        print "-expired cannot have search criteria or other qualifiers.\n";
         return;
       }
     } else {
@@ -1370,7 +1640,23 @@ sub cli_save($) {
   $k->unlock;
   my $master_pass=
 	composite_master_pass($state->{get_master_passwd}(),$state->{key_file});
-  $k->save_db($state->{kdb_file},$master_pass);
+  # Note: adding the 3rd parameter (header) here was in response to a bug reported
+  # on 03/27/2016 via email to me from a person named marco. There is a bug in
+  # File::KeePass that will make this save_db() call revert a V2 database to v1 if
+  # the filename does not end in kdbx. Passing the header to this call here works
+  # around that bug (a failure to store the version in $self->{version}). I'm not
+  # changing this on cli_saveas(), else you could not change the DB versions by
+  # using that command with different file extensions. I opened a bug report,
+  # here: https://rt.cpan.org/Ticket/Display.html?id=113391
+  #
+  # I also decided to do this only in the case where a user has a V2 file opened
+  # and the filename does not end in kdbx, so that the impact of this change is
+  # minimized across the user base.
+  if ($state->{kdb_file} !~ m/\.kdbx$/i && $state->{kdb}->{header}->{version} == 2) {
+    $k->save_db($state->{kdb_file},$master_pass,$state->{kdb}->{header});
+  } else {
+    $k->save_db($state->{kdb_file},$master_pass);
+  }
   $state->{kdb_has_changed}=0; # set our state to no change since last save
   $master_pass="\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
   print "Saved to $state->{kdb_file}\n";
@@ -3502,9 +3788,8 @@ sub cli_attach {
         }
         if (defined($to_export) && defined($tmp_ent->{binary}->{$to_export})) {
           my $homedir=get_user_homedir();
-          my $filename = $to_export;
           my @path = File::Spec->splitdir($homedir);
-          my $iv = File::Spec->catfile(@path, $filename); # homedir/filename
+          my $iv = File::Spec->catfile(@path, $to_export); # homedir/filename
           print "\n";
           my $filename = prompt_filename_from_user($self,"Path to file: ",$iv);
           if (! length($filename)) { next ATTACH_INTERFACE; }
@@ -3901,8 +4186,8 @@ sub GetPassword {
 
 sub MyGetOpts {
   my %opts=();
-  my $result = &GetOptions(\%opts, "kdb=s", "key=s", "histfile=s",
-		"help", "h", "readonly", "no-recycle", "timeout=i");
+  my $result = &GetOptions(\%opts, "kdb=s", "key=s", "pwfile=s", "histfile=s",
+	"help", "h", "readonly", "no-recycle", "timeout=i", "command=s");
 
   # If the user asked for help or GetOptions complained, give help and exit
   if ($opts{help} || $opts{h} || (! int($result))) {
@@ -3943,9 +4228,11 @@ sub GetUsageMessage {
   my @params = (
     [ kdb => 'Optional KeePass database file to open (must exist).' ],
     [ key => 'Optional KeePass key file (must exist).' ],
+    [ pwfiles => 'Read master password from file instead of console.' ],
     [ histfile => 'Specify your history file (or perhaps /dev/null).' ],
     [ readonly => 'Run in read-only mode; no changes will be allowed.' ],
     [ "timeout=i" => 'Lock interface after i seconds of inactivity.' ],
+    [ command => 'Run single command and exit (no interactive session).' ],
     [ 'no-recycle' =>
 		'Don\'t store entry changes in /Backup or "/Recycle Bin".' ],
     [ help => 'This message.' ],
@@ -4143,7 +4430,7 @@ sub complete_groups_and_entries {
 # In Term::ReadLine::Gnu, suppress_completion_append_character() works,
 # but in Term::ReadLine::Perl and Term::ReadLine::Perl5 it does not, and
 # so we get to the outcome via $readline::rl_completer_terminator_character.
-sub __my_suppress_completion_append_character($self) {
+sub __my_suppress_completion_append_character($) {
   my $self = shift;
   if ($self->{term}->ReadLine eq 'Term::ReadLine::Gnu') {
     $self->suppress_completion_append_character();
@@ -4648,10 +4935,11 @@ sub setup_timeout_handling {
 }
 
 # Code consolidation function to runtime-load optional perl modules
-sub runtime_load_module($$$) {
+sub runtime_load_module {
   my $rOPTIONAL_PM = shift @_;
   my $module = shift @_;
   my $rImportList = shift @_ || undef;
+
   my $iltxt = '';
   if (defined($rImportList) && ref($rImportList) ne 'ARRAY') {
     die "The rImportList param to runtime_load_module() must be an ARRAY ref\n";
@@ -4671,9 +4959,10 @@ sub runtime_load_module($$$) {
 
 # This routine runs down the list of our preferred Term::ReadLine::*
 # modules and returns a new object from the first one that we find.
-sub get_readline_term($$) {
+sub get_readline_term {
   my $rOPTIONAL_PM = shift @_;
   my $app_name = shift @_;
+
   my @rl_modules = ();
   if (defined($FORCED_READLINE) && length($FORCED_READLINE)) {
     push @rl_modules, $FORCED_READLINE;
@@ -4714,7 +5003,9 @@ sub get_readline_term($$) {
   #if (! defined($rl_term)) { return undef; }
   if (! defined($rl_term)) {
     die "No usable Term::ReadLine::* modules found.\n" .
-	"This list tried: " . join(', ', @rl_modules) . "\n";
+	"This list was tried:\n * " . join("\n * ", @rl_modules) . "\n" .
+	"For more information, read the documentation: " .
+					"perldoc " . basename($0) . "\n";
   }
 
   # I don't like readline ornaments in kpcli
@@ -4837,7 +5128,7 @@ kpcli - A command line interface to KeePass database files.
 =head1 DESCRIPTION
 
 A command line interface (interactive shell) to work with KeePass
-database files (http://http://en.wikipedia.org/wiki/KeePass).  This
+database files (http://en.wikipedia.org/wiki/KeePass).  This
 program was inspired by my use of "kedpm -c" combined with my need
 to migrate to KeePass. The curious can read about the Ked Password
 Manager at http://kedpm.sourceforge.net/.
@@ -4845,6 +5136,8 @@ Manager at http://kedpm.sourceforge.net/.
 =head1 USAGE
 
 Please run the program and type "help" to learn how to use it.
+Run the program with --help as a command line option to learn about
+its command line options.
 
 =head1 PREREQUISITES
 
@@ -4865,17 +5158,34 @@ provide more fluid signal handling on Unix-like systems, making kpcli
 robust to suspend, resume, and interrupt - SIGSTP, SIGCONT and SIGINT.
 That module is in the libterm-readline-gnu-perl package on Ubuntu.
 
+You can optionally install C<Term::ReadLine::Perl5>, which is often
+preferred on platforms without GNU readline (MacOS, Windows, etc.)
+
 You can optionally install C<Clipboard> and C<Tiny::Capture> to use the
 clipboard features; http://search.cpan.org/~king/Clipboard/ and
 libcapture-tiny-perl on Ubuntu 10.04.
 
+You can optionally install C<Sub::Install> to use the --timeout feature.
+
 You can optionally install C<Data::Password> to use the pwck feature
 (Password Quality Check); libdata-password-perl on Ubuntu 10.04.
 
+You can optionally install C<Data::Password::passwdqc>, which is preferred
+by the pwck feature if it is available. That module is not commonly
+packaged and its list of dependencies is quite long, but cpanminus installs
+it nicely on Linux Mint. It appeared that all of its upstream dependencies
+were packaged in Linux Mint and so I apt-get install'ed them first, and
+then cpanminus only installed C<Data::Password::passwdqc>. Because it is a
+binding to a C library, C<Data::Password::passwdqc> is much faster than
+C<Data::Password> and also seems to have a bit more stict password rules.
+
 You can optionally install C<Crypt::PWSafe3> in order to import
-Password Safe v3 files (http://passwordsafe.sf.net). The dependency
-list of this module is hefty and it is not packaged in many distros,
-but cpanminus installs it nicely on Linux Mint (https://cpanmin.us/).
+Password Safe v3 files (https://pwsafe.org/). The dependency list
+of this module is hefty and it is not packaged in many distros, but
+cpanminus installs it nicely on Linux Mint (https://cpanmin.us/).
+
+You can optionally install C<Math::Random::ISAAC> in order to use a
+more secure rand() function. Package libmath-random-isaac-perl on Debian.
 
 On MS Windows, you can optionally install C<Win32::Console::ANSI> to get
 ANSI colors in Windows cmd terminals. Strawberry Perl 5.16.2 was used
@@ -4895,14 +5205,12 @@ versions, is asked to validate them with both v1 and v2 files.
 
 =head2 Some versions of Term::ReadLine::Perl5 are incompatible
 
-Some versions of C<Term::ReadLine::Perl5> are incompatible with the
-C<Term::ShellUI> module, which is core to kpcli. There is information
-about this in kpcli SF bug #18 (http://sourceforge.net/p/kpcli/bugs/18/).
-The C<Term::ReadLine::Perl5> author submitted a C<Term::ShellUI> patch
-to resolve the issue (https://rt.cpan.org/Ticket/Display.html?id=105375).
-As of this writing that patch is not integrated and so I am making a note
-of it here for users that it may bite. Those users are most often on
-MacOS X or Windows. Linux users most often use C<Term::ReadLine::Gnu>.
+C<Term::ReadLine::Perl5> versions 1.39-1.42 are incompatible with the
+C<Term::ShellUI> module, which is core to kpcli. There is information about
+this in kpcli SF bug #18 (http://sourceforge.net/p/kpcli/bugs/18/). The
+C<Term::ReadLine::Perl5> author submitted a C<Term::ShellUI> patch to
+resolve the issue (https://rt.cpan.org/Ticket/Display.html?id=105375) and
+he also released C<Term::ReadLine::Perl5> version 1.43 which resolves it.
 
 =head2 No history tracking for KeePass 2 (*.kdbx) files
 
@@ -5126,12 +5434,24 @@ this program would not have been practical for me to author.
                     Added $FORCED_READLINE global variable.
                     Attachments sanity check; SourceForge bug #17.
                     Endianness fix in magic_file_type(); SF bug #19.
+ 2016-Jul-30 v3.1 - Added the purge command.
+                    Added Data::Password::passwdqc support to the
+                     pwck command and prefer it over Data::Password.
+                    Minor improvements in cli_pwck().
+                    Applied SF patch #6 from Chris van Marle.
+                    Addressed items pointed out in SF patch #7.
+                    In cli_save(), worked around a File::KeePass bug.
+                     - rt.cpan.org tik# 113391; https://goo.gl/v65HKE
+                    Applied SF patch #8 from Maciej Grela.
+                    Optional better RNG; SF bug #30 from Aaron Toponce.
 
 =head1 TODO ITEMS
 
-  Consider broadening shell_expansion support beyond just mv and ls.
+  Consider adding /shadow_copies/<entries> feature, where kpcli
+  will write "shadow copies" of the database, one for each entry,
+  using the path/password in the url/password fields.
 
-  Consider adding a purge command for "Backup"/"Recycle Bin" folders.
+  Consider broadening shell_expansion support beyond just mv and ls.
 
   Consider adding a tags command for use with v2 files.
    - To navigate by entry tags
@@ -5141,9 +5461,6 @@ this program would not have been practical for me to author.
    - Related, consider adding a purge command for that history.
 
   Consider adding KeePass 2.x style multi-user synchronization.
-
-  Consider http://search.cpan.org/~sherwin/Data-Password-passwdqc/
-  for password quality checking.
 
   Consider adding searches for created, modified, and accessed times
   older than a user supplied time.
