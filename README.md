@@ -33,7 +33,7 @@ I've settled on using [Stow](https://www.gnu.org/software/stow/) to manage my `d
 * **Stateless**  
   Stow doesn't need to maintain any state between executions which helps to keep the system simple, and consequently less likely to break.
 * **Lightweight**  
-  Stow is fast, unintrusive, and at the time of writing the script comes in at a mere ~28KB!
+  Stow is fast, unintrusive, and at the time of writing the script comes in at a mere ~132KB!
 
 Tested Environments
 -------------------
