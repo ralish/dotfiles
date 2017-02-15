@@ -27,7 +27,7 @@
 
 [diff]
     algorithm = patience
-    compactionHeuristic = true
+    indentHeuristic = true
     mnemonicPrefix = true
 
 [help]
