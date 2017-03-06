@@ -18,15 +18,34 @@ Function Connect-AllOffice365Services {
 }
 
 Function Connect-ExchangeOnline {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
-        [Parameter(Mandatory=$true)]
-        [System.Management.Automation.Credential()][pscredential]$Credential
+        [Parameter(ParameterSetName='Standard',Mandatory=$true)]
+        [System.Management.Automation.Credential()][pscredential]$Credential,
+
+        [Parameter(ParameterSetName='MFA')]
+        [String]$UserPrincipalName=''
     )
 
+    if ($PSCmdlet.ParameterSetName -eq 'MFA') {
+        $ExoPowerShellModule = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0\TD1HV8YN.61O\1EP3V7G6.KPP\micr..tion_c3bce3770c238a49_0010.0000_90fa60bba125a33a\CreateExoPSSession.ps1'
+
+        if (!(Get-Command -Name Connect-EXOPSSession -ErrorAction SilentlyContinue)) {
+            if (Test-Path -Path $ExoPowerShellModule -PathType Leaf) {
+                . $ExoPowerShellModule
+            } else {
+                throw 'Required module not available: Microsoft.Exchange.Management.ExoPowershellModule'
+            }
+        }
+    }
+
     Write-Verbose -Message 'Connecting to Exchange Online ...'
-    $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication 'Basic' -AllowRedirection
-    Import-PSSession -Session $ExchangeOnline -DisableNameChecking
+    if ($PSCmdlet.ParameterSetName -eq 'Standard') {
+        $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
+        Import-PSSession -Session $ExchangeOnline -DisableNameChecking
+    } else {
+        Connect-EXOPSSession -UserPrincipalName $UserPrincipalName
+    }
 }
 
 Function Connect-Office365 {
