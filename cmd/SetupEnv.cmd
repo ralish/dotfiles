@@ -22,8 +22,8 @@ SET SetupEnv=Yes
 
 REM Various variables that we may need to tweak
 SET AnsiConPath=C:\Program Files (x86)\Nexiom\Software\Independent\ANSICON\ansicon.exe
-SET Dw32Path=C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe
-SET Dw64Path=C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe
+SET DepWalk32Path=C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe
+SET DepWalk64Path=C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe
 SET SublRegPath=HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1
 
 REM We used to notify that the Command Prompt sucks slightly less on every
@@ -76,22 +76,22 @@ DOSKEY man=help $*
 DOSKEY which=where $*
 
 REM Add alias for Dependency Walker x86
-IF NOT EXIST "%Dw32Path%" (
-    IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Dependency Walker x86 at path specified by Dw32Path.
+IF NOT EXIST "%DepWalk32Path%" (
+    IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Dependency Walker x86 at path specified by DepWalk32Path.
 ) ELSE (
     IF DEFINED SetupEnvVerbose ECHO * Adding Dependency Walker x86 alias: depends32
-    DOSKEY depends32="%Dw32Path%" $*
+    DOSKEY depends32="%DepWalk32Path%" $*
 )
-SET Dw32Path=
+SET DepWalk32Path=
 
 REM Add alias for Dependency Walker x64
-IF NOT EXIST "%Dw64Path%" (
-    IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Dependency Walker x64 at path specified by Dw64Path.
+IF NOT EXIST "%DepWalk64Path%" (
+    IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Dependency Walker x64 at path specified by DepWalk64Path.
 ) ELSE (
     IF DEFINED SetupEnvVerbose ECHO * Adding Dependency Walker x64 alias: depends64
-    DOSKEY depends64="%Dw64Path%" $*
+    DOSKEY depends64="%DepWalk64Path%" $*
 )
-SET Dw64Path=
+SET DepWalk64Path=
 
 REM Add alias for Sublime Text
 WHERE /Q subl.exe
