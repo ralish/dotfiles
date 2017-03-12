@@ -4,7 +4,9 @@
 " ****************************** Initialisation *******************************
 
 " No vi compatibility (i.e. use Vim defaults)
-set nocompatible
+if &compatible
+    set nocompatible
+endif
 
 " Compatibility flags for vi-compatible behaviour
 "set cpoptions=aABceFs
@@ -20,21 +22,10 @@ if has('multi_byte')
 endif
 
 
-" ******************************** Vundle Init ********************************
+" ******************************* vim-plug Init *******************************
 
-" Disable file type detection
-if has('autocmd')
-    filetype off
-endif
-
-" Add Vundle to the runtime path
-set runtimepath+=~/.vim/bundle/Vundle.vim
-
-" Initialise Vundle
-call vundle#begin()
-
-" Let Vundle manage Vundle
-Plugin 'VundleVim/Vundle.vim'
+" Directory where vim-plug will store plugins
+call plug#begin('~/.vim/plugins')
 
 
 " ********************************** General **********************************
@@ -119,7 +110,7 @@ set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<,nbsp:+
 if v:version < 704
     " Enable relative numbering with an easy toggle to absolute numbering
     set relativenumber
-    Plugin 'jeffkreeftmeijer/vim-numbertoggle'
+    Plug 'jeffkreeftmeijer/vim-numbertoggle'
 else
     " Vim 7.4+ supports absolute and relative numbering at once (hybrid mode)
     set number
@@ -376,89 +367,84 @@ if has('mksession')
 endif
 
 
-" ****************************** Vundle Plugins *******************************
+" ********************************** Plugins **********************************
 " ################################ Appearance #################################
 
 " tmux statusline generator
-Plugin 'edkolev/tmuxline.vim'
+Plug 'edkolev/tmuxline.vim'
 " Support ANSI escape sequences
-Plugin 'powerman/vim-plugin-AnsiEsc'
+Plug 'powerman/vim-plugin-AnsiEsc'
 " vim-airline & themes
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 
 
 " ############################## Colour Schemes ###############################
 
 " Solarized
-Plugin 'altercation/vim-colors-solarized'
+Plug 'altercation/vim-colors-solarized'
 " Tomorrow Theme
-"Plugin 'chriskempson/vim-tomorrow-theme'
+"Plug 'chriskempson/vim-tomorrow-theme'
 " Base16
-"Plugin 'chriskempson/base16-vim'
+"Plug 'chriskempson/base16-vim'
 " Bad Wolf
-"Plugin 'sjl/badwolf'
+"Plug 'sjl/badwolf'
 
 
 " ################################ Navigation #################################
 
 " Full path fuzzy finder
-Plugin 'ctrlpvim/ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim'
 " Improved motions handling
-Plugin 'easymotion/vim-easymotion'
+Plug 'easymotion/vim-easymotion'
 " Full filesystem explorer
-Plugin 'scrooloose/nerdtree'
+Plug 'scrooloose/nerdtree'
 
 
 " ############################### Functionality ###############################
 
 " Improved <Tab> completion
-Plugin 'ervandew/supertab'
+Plug 'ervandew/supertab'
 " Advanced syntax checking
-Plugin 'scrooloose/syntastic'
+Plug 'scrooloose/syntastic'
 " Powerful Git wrapper
-Plugin 'tpope/vim-fugitive'
+Plug 'tpope/vim-fugitive'
 " Heuristically set buffer options
-Plugin 'tpope/vim-sleuth'
+Plug 'tpope/vim-sleuth'
 " Clever code quoting
-Plugin 'tpope/vim-surround'
+Plug 'tpope/vim-surround'
 
 
 " ################################ Integration ################################
 
 " Synchronise with tmux's clipboard
-Plugin 'roxma/vim-tmux-clipboard'
+Plug 'roxma/vim-tmux-clipboard'
 " Support focus events when running under tmux (use our fork until PR#8 merged)
-Plugin 'ralish/vim-tmux-focus-events'
+Plug 'ralish/vim-tmux-focus-events'
 
 
 " ############################# Language Support ##############################
 
 " Jinja2
-Plugin 'Glench/Vim-Jinja2-Syntax'
+Plug 'Glench/Vim-Jinja2-Syntax'
 " Markdown
-Plugin 'tpope/vim-markdown'
+Plug 'tpope/vim-markdown'
 " PgSQL
-Plugin 'exu/pgsql.vim'
+Plug 'exu/pgsql.vim'
 " Python
-Plugin 'klen/python-mode'
+Plug 'klen/python-mode'
 " Salt
-Plugin 'saltstack/salt-vim'
+Plug 'saltstack/salt-vim'
 " tmux
-Plugin 'tmux-plugins/vim-tmux'
+Plug 'tmux-plugins/vim-tmux'
 " YAML (built-in support is very slow)
-Plugin 'stephpy/vim-yaml'
+Plug 'stephpy/vim-yaml'
 
 
-" ****************************** Vundle Finalise ******************************
+" ***************************** vim-plug Finalise *****************************
 
-" Finalise Vundle
-call vundle#end()
-
-" Enable file type detection with plugin and indent support
-if has('autocmd')
-    filetype plugin indent on
-endif
+" Initialise the plugin system
+call plug#end()
 
 
 " ******************************* Colour Scheme *******************************
@@ -583,13 +569,5 @@ nnoremap Y y$
 
 " Write the file via sudo
 cnoremap w!! w !sudo tee % >/dev/null
-
-
-" ********************************* Finalise **********************************
-
-" Enable syntax highlighting
-if has('syntax')
-    syntax enable
-endif
 
 " vim: syntax=vim cc=80 tw=79 ts=4 sw=4 sts=4 et sr

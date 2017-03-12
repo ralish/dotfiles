@@ -71,7 +71,7 @@ tmp/
 /vim/.vim/.netrwhist
 /vim/.vim/.viminfo
 /vim/.vim/backup/
-/vim/.vim/bundle/
+/vim/.vim/plugins/
 /vim/.vim/swap/
 /vim/.vim/undo/
 /vim/.vim/view/

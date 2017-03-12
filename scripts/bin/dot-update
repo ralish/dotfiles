@@ -130,7 +130,7 @@ function main() {
 
     if [[ -n $vim_update ]]; then
         pretty_print "*** Updating Vim bundles..."
-        vim +PluginUpdate +qall
+        vim +PlugUpdate +qall
     fi
 }
 
