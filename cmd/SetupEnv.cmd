@@ -24,7 +24,7 @@ REM Various variables that we may need to tweak
 SET AnsiConPath=C:\Program Files (x86)\Nexiom\Software\Independent\ANSICON\ansicon.exe
 SET DepWalk32Path=C:\Program Files (x86)\Nexiom\Software\Independent\Dependency Walker\depends.exe
 SET DepWalk64Path=C:\Program Files\Nexiom\Software\Independent\Dependency Walker\depends.exe
-SET SublRegPath=HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1
+SET SubText2RegPath=HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1
 
 REM We used to notify that the Command Prompt sucks slightly less on every
 REM execution. Unfortunately, there are some poorly written apps that spawn
@@ -93,21 +93,21 @@ IF NOT EXIST "%DepWalk64Path%" (
 )
 SET DepWalk64Path=
 
-REM Add alias for Sublime Text
+REM Add alias for Sublime Text 2
 WHERE /Q subl.exe
 IF ERRORLEVEL 0 (
-    IF DEFINED SetupEnvVerbose ECHO * Found subl.exe in PATH so not adding an alias.
+    IF DEFINED SetupEnvVerbose ECHO * Found Sublime Text 3 so not adding an alias.
 ) ELSE (
-    SET SublBinName=sublime_text.exe
-    REG QUERY "%SublRegPath%" /v InstallLocation > NUL 2>&1
+    SET SubText2BinName=sublime_text.exe
+    REG QUERY "%SubText2RegPath%" /v InstallLocation > NUL 2>&1
     IF ERRORLEVEL 1 (
-        IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Sublime Text via path specified by SublRegPath.
+        IF DEFINED SetupEnvVerbose ECHO * Couldn't locate Sublime Text 2 via path specified by SubText2RegPath.
     ) ELSE (
-        IF DEFINED SetupEnvVerbose ECHO * Adding Sublime Text alias: subl
-        FOR /F "tokens=2*" %%a IN ('REG QUERY "%SublRegPath%" /v InstallLocation ^| FINDSTR /R "[a-z]:\\.*\\$"') DO @SET SublDirPath=%%b
+        IF DEFINED SetupEnvVerbose ECHO * Adding Sublime Text 2 alias: subl
+        FOR /F "tokens=2*" %%a IN ('REG QUERY "%SubText2RegPath%" /v InstallLocation ^| FINDSTR /R "[a-z]:\\.*\\$"') DO @SET SubText2DirPath=%%b
     )
-    IF DEFINED SublDirPath DOSKEY subl="%SublDirPath%%SublBinName%" $*
-    FOR /F "delims==" %%i IN ('SET Subl') DO @SET %%i=
+    IF DEFINED SubText2DirPath DOSKEY subl="%SubText2DirPath%%SubText2BinName%" $*
+    FOR /F "delims==" %%i IN ('SET SubText2') DO @SET %%i=
 )
 
 REM Remove the Verbose variable if it was ever set
