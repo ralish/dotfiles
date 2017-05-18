@@ -1,4 +1,4 @@
-Function Connect-AllOffice365Services {
+Function Connect-Office365Services {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory=$true)]
@@ -10,11 +10,27 @@ Function Connect-AllOffice365Services {
         [String]$SccCmdletsPrefix='Scc'
     )
 
-    Connect-Office365 -Credential $Credential
     Connect-SharePointOnline -Credential $Credential -DomainName $SharePointDomainName
     Connect-SkypeForBusinessOnline -Credential $Credential
     Connect-ExchangeOnline -Credential $Credential
     Connect-SecurityAndComplianceCenter -Credential $Credential -CmdletsPrefix $SccCmdletsPrefix
+}
+
+Function Connect-AzureAD {
+    [CmdletBinding()]
+    Param(
+        [System.Management.Automation.Credential()][pscredential]$Credential
+    )
+
+    if (!(Get-Module -Name AzureAD -ListAvailable)) {
+        throw 'Required module not available: AzureAD'
+    }
+
+    Write-Verbose -Message 'Connecting to Azure AD (v2) ...'
+    Import-Module -Name AzureAD
+    if ($PSBoundParameters.ContainsKey('Credential')) {
+        Connect-AzureAD -Credential $Credential
+    }
 }
 
 Function Connect-ExchangeOnline {
@@ -48,10 +64,9 @@ Function Connect-ExchangeOnline {
     }
 }
 
-Function Connect-Office365 {
+Function Connect-MSOnline {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory=$true)]
         [System.Management.Automation.Credential()][pscredential]$Credential
     )
 
@@ -59,9 +74,11 @@ Function Connect-Office365 {
         throw 'Required module not available: MSOnline'
     }
 
-    Write-Verbose -Message 'Connecting to Office 365 ...'
+    Write-Verbose -Message 'Connecting to Azure AD (v1) ...'
     Import-Module -Name MSOnline
-    Connect-MsolService -Credential $Credential
+    if ($PSBoundParameters.ContainsKey('Credential')) {
+        Connect-MsolService -Credential $Credential
+    }
 }
 
 Function Connect-SecurityAndComplianceCenter {
