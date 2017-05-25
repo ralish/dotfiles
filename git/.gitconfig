@@ -76,7 +76,6 @@
     br  = branch
     bra = branch --all
     brd = branch --delete
-    brD = branch -D
     brv = branch -vv
 
     bsb = bisect bad
