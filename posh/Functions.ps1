@@ -5,15 +5,40 @@ Function Connect-Office365Services {
         [System.Management.Automation.Credential()][pscredential]$Credential,
 
         [Parameter(Mandatory=$true)]
-        [String]$SharePointDomainName,
+        [String]$SharePointTenantName,
 
         [String]$SccCmdletsPrefix='Scc'
     )
 
-    Connect-SharePointOnline -Credential $Credential -DomainName $SharePointDomainName
-    Connect-SkypeForBusinessOnline -Credential $Credential
+    Write-Host -Object 'Connecting to Exchange Online ...' -ForegroundColor Green
     Connect-ExchangeOnline -Credential $Credential
-    Connect-SecurityAndComplianceCenter -Credential $Credential -CmdletsPrefix $SccCmdletsPrefix
+
+    Write-Host -Object 'Connecting to SharePoint Online ...' -ForegroundColor Green
+    Connect-SharePointOnline -Credential $Credential -TenantName $SharePointTenantName
+
+    Write-Host -Object 'Connecting to Skype for Business Online ...' -ForegroundColor Green
+    Connect-SkypeForBusinessOnline -Credential $Credential
+
+    Write-Host -Object 'Connecting to Security & Compliance Center ...' -ForegroundColor Green
+    Connect-Office365SecurityAndComplianceCenter -Credential $Credential -CmdletsPrefix $SccCmdletsPrefix
+
+    Write-Host -Object 'Connecting to Centralized Deployment ...' -ForegroundColor Green
+    Connect-Office365CentralizedDeployment -Credential $Credential
+}
+
+Function Connect-MSOnline {
+    [CmdletBinding()]
+    Param(
+        [System.Management.Automation.Credential()][pscredential]$Credential
+    )
+
+    if (!(Get-Module -Name MSOnline -ListAvailable)) {
+        throw 'Required module not available: MSOnline'
+    }
+
+    Write-Verbose -Message 'Connecting to Azure AD (v1) ...'
+    Import-Module -Name MSOnline
+    Connect-MsolService @PSBoundParameters
 }
 
 Function Connect-AzureAD {
@@ -28,9 +53,7 @@ Function Connect-AzureAD {
 
     Write-Verbose -Message 'Connecting to Azure AD (v2) ...'
     Import-Module -Name AzureAD
-    if ($PSBoundParameters.ContainsKey('Credential')) {
-        Connect-AzureAD -Credential $Credential
-    }
+    Azure-AD\Connect-AzureAD @PSBoundParameters
 }
 
 Function Connect-ExchangeOnline {
@@ -40,7 +63,7 @@ Function Connect-ExchangeOnline {
         [System.Management.Automation.Credential()][pscredential]$Credential,
 
         [Parameter(ParameterSetName='MFA')]
-        [String]$UserPrincipalName=''
+        [String]$UserPrincipalName
     )
 
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
@@ -60,39 +83,8 @@ Function Connect-ExchangeOnline {
         $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
         Import-PSSession -Session $ExchangeOnline -DisableNameChecking
     } else {
-        Connect-EXOPSSession -UserPrincipalName $UserPrincipalName
+        Connect-EXOPSSession @PSBoundParameters
     }
-}
-
-Function Connect-MSOnline {
-    [CmdletBinding()]
-    Param(
-        [System.Management.Automation.Credential()][pscredential]$Credential
-    )
-
-    if (!(Get-Module -Name MSOnline -ListAvailable)) {
-        throw 'Required module not available: MSOnline'
-    }
-
-    Write-Verbose -Message 'Connecting to Azure AD (v1) ...'
-    Import-Module -Name MSOnline
-    if ($PSBoundParameters.ContainsKey('Credential')) {
-        Connect-MsolService -Credential $Credential
-    }
-}
-
-Function Connect-SecurityAndComplianceCenter {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory=$true)]
-        [System.Management.Automation.Credential()][pscredential]$Credential,
-
-        [String]$CmdletsPrefix='Scc'
-    )
-
-    Write-Verbose -Message 'Connecting to Security and Compliance Center ...'
-    $SCC = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://ps.compliance.protection.outlook.com/powershell-liveid/' -Credential $Credential -Authentication 'Basic' -AllowRedirection
-    Import-PSSession -Session $SCC -Prefix $CmdletsPrefix
 }
 
 Function Connect-SharePointOnline {
@@ -102,7 +94,7 @@ Function Connect-SharePointOnline {
         [System.Management.Automation.Credential()][pscredential]$Credential,
 
         [Parameter(Mandatory=$true)]
-        [String]$DomainName
+        [String]$TenantName
     )
 
     if (!(Get-Module -Name Microsoft.Online.SharePoint.PowerShell -ListAvailable)) {
@@ -111,7 +103,7 @@ Function Connect-SharePointOnline {
 
     Write-Verbose -Message 'Connecting to SharePoint Online ...'
     Import-Module -Name Microsoft.Online.SharePoint.PowerShell -DisableNameChecking
-    $SPOUrl = ('https://{0}-admin.sharepoint.com' -f $DomainName)
+    $SPOUrl = 'https://{0}-admin.sharepoint.com' -f $TenantName
     Connect-SPOService -Url $SPOUrl -Credential $Credential
 }
 
@@ -128,8 +120,38 @@ Function Connect-SkypeForBusinessOnline {
 
     Write-Verbose -Message 'Connecting to Skype for Business Online ...'
     Import-Module -Name SkypeOnlineConnector
-    $SkypeForBusinessOnline = New-CsOnlineSession -Credential $Credential
+    $SkypeForBusinessOnline = New-CsOnlineSession @PSBoundParameters
     Import-PSSession -Session $SkypeForBusinessOnline
+}
+
+Function Connect-Office365SecurityAndComplianceCenter {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory=$true)]
+        [System.Management.Automation.Credential()][pscredential]$Credential,
+
+        [String]$CmdletsPrefix='Scc'
+    )
+
+    Write-Verbose -Message 'Connecting to Office 365 Security and Compliance Center ...'
+    $Office365SCC = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://ps.compliance.protection.outlook.com/powershell-liveid/' -Credential $Credential -Authentication 'Basic' -AllowRedirection
+    Import-PSSession -Session $Office365SCC -Prefix $CmdletsPrefix
+}
+
+Function Connect-Office365CentralizedDeployment {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory=$true)]
+        [System.Management.Automation.Credential()][pscredential]$Credential
+    )
+
+    if (!(Get-Module -Name OrganizationAddInService -ListAvailable)) {
+        throw 'Required module not available: OrganizationAddInService'
+    }
+
+    Write-Verbose -Message 'Connecting to Office 365 Centralized Deployment ...'
+    Import-Module -Name OrganizationAddInService
+    Connect-OrganizationAddInService @PSBoundParameters
 }
 
 # Convert a string to the Base64 form suitable for usage with PowerShell's "-EncodedCommand" parameter
