@@ -522,6 +522,9 @@ let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
 " ***************************** Language Handling *****************************
 " ################################### Jinja ###################################
 
+" Disable HTML highlighting as usually we're not editing HTML templates
+let g:jinja_syntax_html=0
+
 " Always treat '.jinja' files as Jinja (overrides any modeline)
 autocmd BufNewFile,BufWinEnter *.jinja set filetype=jinja
 
