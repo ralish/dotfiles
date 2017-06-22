@@ -68,70 +68,90 @@ function script_init() {
     readonly script_dir="$(dirname "$script_path")"
     readonly script_name="$(basename "$script_path")"
 
-    # Text attributes
+    # Important to always set as we use it in the exit handler
     readonly ta_none="$(tput sgr0 || true)"
-    declare -g ta_bold ta_uscore ta_blink ta_reverse ta_conceal
-
-    # Foreground codes
-    declare -g fg_black fg_blue fg_cyan fg_green \
-               fg_magenta fg_red fg_white fg_yellow
-
-    # Background codes
-    declare -g bg_black bg_blue bg_cyan bg_green \
-               bg_magenta bg_red bg_white bg_yellow
 }
 
 
 # DESC: Initialise colour variables
 # ARGS: None
 function colour_init() {
-    # Text attributes
-    readonly ta_bold="$(tput bold || true)"
-    printf '%b' "$ta_none"
-    readonly ta_uscore="$(tput smul || true)"
-    printf '%b' "$ta_none"
-    readonly ta_blink="$(tput blink || true)"
-    printf '%b' "$ta_none"
-    readonly ta_reverse="$(tput rev || true)"
-    printf '%b' "$ta_none"
-    readonly ta_conceal="$(tput invis || true)"
-    printf '%b' "$ta_none"
+    if [[ -z ${no_colour-} ]]; then
+        # Text attributes
+        readonly ta_bold="$(tput bold || true)"
+        printf '%b' "$ta_none"
+        readonly ta_uscore="$(tput smul || true)"
+        printf '%b' "$ta_none"
+        readonly ta_blink="$(tput blink || true)"
+        printf '%b' "$ta_none"
+        readonly ta_reverse="$(tput rev || true)"
+        printf '%b' "$ta_none"
+        readonly ta_conceal="$(tput invis || true)"
+        printf '%b' "$ta_none"
 
-    # Foreground codes
-    readonly fg_black="$(tput setaf 0 || true)"
-    printf '%b' "$ta_none"
-    readonly fg_blue="$(tput setaf 4 || true)"
-    printf '%b' "$ta_none"
-    readonly fg_cyan="$(tput setaf 6 || true)"
-    printf '%b' "$ta_none"
-    readonly fg_green="$(tput setaf 2 || true)"
-    printf '%b' "$ta_none"
-    readonly fg_magenta="$(tput setaf 5 || true)"
-    printf '%b' "$ta_none"
-    readonly fg_red="$(tput setaf 1 || true)"
-    printf '%b' "$ta_none"
-    readonly fg_white="$(tput setaf 7 || true)"
-    printf '%b' "$ta_none"
-    readonly fg_yellow="$(tput setaf 3 || true)"
-    printf '%b' "$ta_none"
+        # Foreground codes
+        readonly fg_black="$(tput setaf 0 || true)"
+        printf '%b' "$ta_none"
+        readonly fg_blue="$(tput setaf 4 || true)"
+        printf '%b' "$ta_none"
+        readonly fg_cyan="$(tput setaf 6 || true)"
+        printf '%b' "$ta_none"
+        readonly fg_green="$(tput setaf 2 || true)"
+        printf '%b' "$ta_none"
+        readonly fg_magenta="$(tput setaf 5 || true)"
+        printf '%b' "$ta_none"
+        readonly fg_red="$(tput setaf 1 || true)"
+        printf '%b' "$ta_none"
+        readonly fg_white="$(tput setaf 7 || true)"
+        printf '%b' "$ta_none"
+        readonly fg_yellow="$(tput setaf 3 || true)"
+        printf '%b' "$ta_none"
 
-    # Background codes
-    readonly bg_black="$(tput setab 0 || true)"
-    printf '%b' "$ta_none"
-    readonly bg_blue="$(tput setab 4 || true)"
-    printf '%b' "$ta_none"
-    readonly bg_cyan="$(tput setab 6 || true)"
-    printf '%b' "$ta_none"
-    readonly bg_green="$(tput setab 2 || true)"
-    printf '%b' "$ta_none"
-    readonly bg_magenta="$(tput setab 5 || true)"
-    printf '%b' "$ta_none"
-    readonly bg_red="$(tput setab 1 || true)"
-    printf '%b' "$ta_none"
-    readonly bg_white="$(tput setab 7 || true)"
-    printf '%b' "$ta_none"
-    readonly bg_yellow="$(tput setab 3 || true)"
-    printf '%b' "$ta_none"
+        # Background codes
+        readonly bg_black="$(tput setab 0 || true)"
+        printf '%b' "$ta_none"
+        readonly bg_blue="$(tput setab 4 || true)"
+        printf '%b' "$ta_none"
+        readonly bg_cyan="$(tput setab 6 || true)"
+        printf '%b' "$ta_none"
+        readonly bg_green="$(tput setab 2 || true)"
+        printf '%b' "$ta_none"
+        readonly bg_magenta="$(tput setab 5 || true)"
+        printf '%b' "$ta_none"
+        readonly bg_red="$(tput setab 1 || true)"
+        printf '%b' "$ta_none"
+        readonly bg_white="$(tput setab 7 || true)"
+        printf '%b' "$ta_none"
+        readonly bg_yellow="$(tput setab 3 || true)"
+        printf '%b' "$ta_none"
+    else
+        # Text attributes
+        readonly ta_bold=''
+        readonly ta_uscore=''
+        readonly ta_blink=''
+        readonly ta_reverse=''
+        readonly ta_conceal=''
+
+        # Foreground codes
+        readonly fg_black=''
+        readonly fg_blue=''
+        readonly fg_cyan=''
+        readonly fg_green=''
+        readonly fg_magenta=''
+        readonly fg_red=''
+        readonly fg_white=''
+        readonly fg_yellow=''
+
+        # Background codes
+        readonly bg_black=''
+        readonly bg_blue=''
+        readonly bg_cyan=''
+        readonly bg_green=''
+        readonly bg_magenta=''
+        readonly bg_red=''
+        readonly bg_white=''
+        readonly bg_yellow=''
+    fi
 }
 
 
@@ -166,6 +186,39 @@ function verbose_print() {
 }
 
 
+# DESC: Combines two path variables and removes any duplicates
+# ARGS: $1 (required): Path(s) to join with the second argument
+#       $2 (optional): Path(s) to join with the first argument
+# OUTS: $build_path: The constructed path
+# NOTE: Heavily inspired by: https://unix.stackexchange.com/a/40973
+function build_path() {
+    if [[ -z ${1-} || $# -gt 2 ]]; then
+        script_exit "Invalid arguments passed to build_path()!" 2
+    fi
+
+    local new_path path_entry temp_path
+
+    temp_path="$1:"
+    if [[ -n ${2-} ]]; then
+        temp_path="$temp_path$2:"
+    fi
+
+    new_path=
+    while [[ -n $temp_path ]]; do
+        path_entry="${temp_path%%:*}"
+        case "$new_path:" in
+            *:"$path_entry":*) ;;
+                            *) new_path="$new_path:$path_entry"
+                               ;;
+        esac
+        temp_path="${temp_path#*:}"
+    done
+
+    # shellcheck disable=SC2034
+    build_path="${new_path#:}"
+}
+
+
 # DESC: Check a binary exists in the search path
 # ARGS: $1 (required): Name of the binary to test for existence
 #       $2 (optional): Set to any value to treat failure as a fatal error
@@ -178,7 +231,7 @@ function check_binary() {
         if [[ -n ${2-} ]]; then
             script_exit "Missing dependency: Couldn't locate $1." 1
         else
-            verbose_print "Missing dependency: $1" "$fg_red"
+            verbose_print "Missing dependency: $1" "${fg_red-}"
             return 1
         fi
     fi
@@ -190,7 +243,6 @@ function check_binary() {
 
 # DESC: Validate we have superuser access as root (via sudo if requested)
 # ARGS: $1 (optional): Set to any value to not attempt root access via sudo
-# shellcheck disable=SC2120
 function check_superuser() {
     if [[ $# -gt 1 ]]; then
         script_exit "Invalid arguments passed to check_superuser()!" 2
@@ -203,9 +255,9 @@ function check_superuser() {
         if check_binary sudo; then
             pretty_print "Sudo: Updating cached credentials for future use..."
             if ! sudo -v; then
-                verbose_print "Sudo: Couldn't acquire credentials..." "$fg_red"
+                verbose_print "Sudo: Couldn't acquire credentials..." \
+                              "${fg_red-}"
             else
-                # shellcheck disable=SC2016
                 test_euid="$(sudo -H -- "$BASH" -c 'printf "%s" "$EUID"')"
                 if [[ $test_euid -eq 0 ]]; then
                     superuser="true"
@@ -215,7 +267,7 @@ function check_superuser() {
     fi
 
     if [[ -z $superuser ]]; then
-        verbose_print "Unable to acquire superuser credentials." "$fg_red"
+        verbose_print "Unable to acquire superuser credentials." "${fg_red-}"
         return 1
     fi
 
