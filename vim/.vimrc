@@ -372,8 +372,10 @@ endif
 
 " tmux statusline generator
 Plug 'edkolev/tmuxline.vim'
+
 " Support ANSI escape sequences
 Plug 'powerman/vim-plugin-AnsiEsc'
+
 " vim-airline & themes
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -383,10 +385,13 @@ Plug 'vim-airline/vim-airline-themes'
 
 " Solarized
 Plug 'altercation/vim-colors-solarized'
+
 " Tomorrow Theme
 "Plug 'chriskempson/vim-tomorrow-theme'
+
 " Base16
 "Plug 'chriskempson/base16-vim'
+
 " Bad Wolf
 "Plug 'sjl/badwolf'
 
@@ -395,8 +400,10 @@ Plug 'altercation/vim-colors-solarized'
 
 " Full path fuzzy finder
 Plug 'ctrlpvim/ctrlp.vim'
+
 " Improved motions handling
 Plug 'easymotion/vim-easymotion'
+
 " Full filesystem explorer
 Plug 'scrooloose/nerdtree'
 
@@ -405,12 +412,16 @@ Plug 'scrooloose/nerdtree'
 
 " Improved <Tab> completion
 Plug 'ervandew/supertab'
+
 " Advanced syntax checking
 Plug 'scrooloose/syntastic'
+
 " Powerful Git wrapper
 Plug 'tpope/vim-fugitive'
+
 " Heuristically set buffer options
 Plug 'tpope/vim-sleuth'
+
 " Clever code quoting
 Plug 'tpope/vim-surround'
 
@@ -419,6 +430,7 @@ Plug 'tpope/vim-surround'
 
 " Synchronise with tmux's clipboard
 Plug 'roxma/vim-tmux-clipboard'
+
 " Support focus events when running under tmux (use our fork until PR#8 merged)
 Plug 'ralish/vim-tmux-focus-events'
 
@@ -427,16 +439,22 @@ Plug 'ralish/vim-tmux-focus-events'
 
 " Jinja2
 Plug 'Glench/Vim-Jinja2-Syntax'
+
 " Markdown
 Plug 'tpope/vim-markdown'
+
 " PgSQL
 Plug 'exu/pgsql.vim'
+
 " Python
 Plug 'klen/python-mode'
+
 " Salt
 Plug 'saltstack/salt-vim'
+
 " tmux
 Plug 'tmux-plugins/vim-tmux'
+
 " YAML (built-in support is very slow)
 Plug 'stephpy/vim-yaml'
 
