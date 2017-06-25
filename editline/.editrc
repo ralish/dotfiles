@@ -15,13 +15,13 @@ history unique 1
 
 # ------------------------------- Key Mappings --------------------------------
 
-# Set Insert/Delete keys to insert/delete characters
-bind "\e[2~" ed-quoted-insert
-bind "\e[3~" ed-delete-next-char
-
 # Set Home/End keys to jump to the beginning/end of line
 bind "\e[1~" ed-move-to-beg
 bind "\e[4~" ed-move-to-end
+
+# Set Insert/Delete keys to insert/delete characters
+bind "\e[2~" ed-quoted-insert
+bind "\e[3~" ed-delete-next-char
 
 # Set Up/Down arrow keys to perform a command history prefix search
 bind "\e[A" ed-search-prev-history
