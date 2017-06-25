@@ -1,16 +1,16 @@
 # Location of patch files
-QUILT_PATCHES=debian/patches
+QUILT_PATCHES='debian/patches'
 
-# Don't prepend an Index: line to patches
+# Don't prepend an "Index:" line to patches
 QUILT_NO_DIFF_INDEX=1
 
 # Don't include a timestamp in patch headers
 QUILT_NO_DIFF_TIMESTAMPS=1
 
-# Additional arguments for the refresh command
-QUILT_REFRESH_ARGS="-p ab"
-
 # Additional arguments for the diff command
-QUILT_DIFF_ARGS="-p ab --color=auto"
+QUILT_DIFF_ARGS='-p ab --color=auto'
+
+# Additional arguments for the refresh command
+QUILT_REFRESH_ARGS='-p ab'
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
