@@ -337,6 +337,9 @@ set directory^=~/.vim/swap//
 " Don't call [f]sync() after writing to a swap file (more power efficient)
 set swapsync=
 
+" Time after which nothing is typed to write the swap file (msec)
+set updatetime=250
+
 
 " ******************************** Undo Files *********************************
 
@@ -409,6 +412,11 @@ Plug 'scrooloose/nerdtree'
 
 
 " ############################### Functionality ###############################
+
+" Show a Git diff in the gutter
+if has('signs')
+    Plug 'airblade/vim-gitgutter'
+endif
 
 " Improved <Tab> completion
 Plug 'ervandew/supertab'
