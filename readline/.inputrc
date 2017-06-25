@@ -63,7 +63,7 @@ set disable-completion off
 #
 # Valid options are:
 # emacs:                Emacs-style key bindings
-# vi:                   Vi-style key bindings
+# vi:                   vi-style key bindings
 set editing-mode vi
 
 # Echo the corresponding control character for keyboard generated signals
