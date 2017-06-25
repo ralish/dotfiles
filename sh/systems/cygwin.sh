@@ -1,10 +1,12 @@
-#!/bin/sh
+# shellcheck shell=sh
 
 # Cygwin shell configuration
 
 # Cygwin package repository mirrors to use
 CYGWIN_PKGS_MAIN='http://mirror.internode.on.net/pub/cygwin/'  # Cygwin Core
 CYGWIN_PKGS_PORTS='ftp://ftp.cygwinports.org/pub/cygwinports/' # Cygwin Ports
+
+# -----------------------------------------------------------------------------
 
 # Handy aliases to each package repository
 if command -v apt-cyg > /dev/null; then
@@ -26,18 +28,6 @@ fi
 # Enable direct hardware-accelerated OpenGL rendering in Cygwin/X
 if command -v startxwin > /dev/null; then
     export LIBGL_USE_WGL=1
-fi
-
-# Add alias for Sublime Text
-if ! command -v subl.exe > /dev/null; then
-    SublRegPath='/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/Uninstall/Sublime Text 2_is1/InstallLocation'
-    SublBinName='sublime_text.exe'
-    if [ -f "$SublRegPath" ]; then
-        SublDirPath=$(cat "$SublRegPath" \
-            | sed 's/^\([A-Z]\):/\/cygdrive\/\1/' \
-            | sed 's/\\/\//g')
-        alias subl="\"$SublDirPath$SublBinName\""
-    fi
 fi
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

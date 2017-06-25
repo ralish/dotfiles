@@ -1,13 +1,12 @@
-#!/bin/sh
+# shellcheck shell=sh
 
 # dircolors configuration
-
 if command -v dircolors > /dev/null; then
-    # Use our custom configuration
     if [ -r "$HOME/.dircolors" ]; then
+        # Use our custom configuration
         eval "$(dircolors -b "$HOME/.dircolors")"
-    # Otherwise just use the defaults
     else
+        # Otherwise use the defaults
         eval "$(dircolors -b)"
     fi
 fi

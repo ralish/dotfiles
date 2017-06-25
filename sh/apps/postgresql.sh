@@ -1,7 +1,6 @@
-#!/bin/sh
+# shellcheck shell=sh
 
 # PostgreSQL configuration
-
 if command -v psql > /dev/null; then
     # Connect to the postgres database by default
     export PGDATABASE='postgres'

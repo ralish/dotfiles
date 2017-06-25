@@ -1,100 +1,108 @@
-#!/bin/sh
+# shellcheck shell=sh
 
-# Some general configuration common to most shells
-# Should be compatible with at least: sh, bash, ksh, zsh
+# General configuration common to all shells we use
+# Should be compatible with at least: sh, bash & zsh
 
-# Additional locations to prefix to our PATH
-EXTRA_PATHS=''
-
-# Our preferred text editors ordered by priority
+# Preferred text editors ordered by priority (space-separated)
 EDITOR_PRIORITY='vim vi nano pico'
 
-# Preserve our original PATH for use in some later munging
-original_path="$PATH"
+# Locations to prefix to PATH (colon-separated)
+EXTRA_PATHS=''
 
-# Quick and dirty function to help manage adding to the PATH
-function path_add_prefix() {
-    if [ $# -eq 2 ]; then
-        if [ -n "$1" -a -n "$2" ]; then
-            echo "$1:$2"
-        else
-            echo "$1$2"
-        fi
+# -----------------------------------------------------------------------------
+
+# Guess the dotfiles directory if $dotfiles wasn't set
+if [ -z "${dotfiles-}" ]; then
+    if [ -d "$HOME/dotfiles" ]; then
+        dotfiles="$HOME/dotfiles"
     else
-        echo 'Called path_add_prefix with an invalid number of parameters!'
+        # shellcheck disable=SC2016
+        echo 'Error: $dotfiles unset and unable to guess dotfiles directory!'
+        return
     fi
-}
-
-# Add any extra paths before we run the system specific stuff
-path_changes_general=$(path_add_prefix "$EXTRA_PATHS" "$path_changes_general")
-
-# If a bin directory exists in our home directory then add it
-if [ -d "$HOME/bin" ]; then
-    path_changes_general=$(path_add_prefix "$HOME/bin" "$path_changes_general")
 fi
 
-# Update the PATH with any changes we've recorded
-if [ -n "$path_changes_general" ]; then
-    export PATH="$path_changes_general:$PATH"
-fi
+# Helper functions
+sh_dir="$dotfiles/sh"
+# shellcheck source=sh/source.sh
+. "$sh_dir/source.sh"
 
-# Operating system and environment specific configurations
-kernel_name=$(uname -s)
+# Operating system and environment specific configuration
+kernel_name="$(uname -s)"
+sh_systems_dir="$sh_dir/systems"
 if [ "${kernel_name#*CYGWIN_NT}" != "$kernel_name" ]; then
     # shellcheck source=sh/systems/cygwin.sh
-    source "$HOME/dotfiles/sh/systems/cygwin.sh"
+    . "$sh_systems_dir/cygwin.sh"
 elif [ "${kernel_name#*Darwin}" != "$kernel_name" ]; then
-    # shellcheck source=sh/systems/osx.sh
-    source "$HOME/dotfiles/sh/systems/osx.sh"
+    # shellcheck source=sh/systems/macos.sh
+    . "$sh_systems_dir/macos.sh"
 elif [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
     # shellcheck source=sh/systems/linux.sh
-    source "$HOME/dotfiles/sh/systems/linux.sh"
+    . "$sh_systems_dir/linux.sh"
 fi
+unset kernel_name sh_systems_dir
 
-# Construct the final PATH with both the general and system changes
-if [ -n "$path_changes_system" ]; then
-    path_changes="$path_changes_system"
-fi
-if [ -n "$path_changes_general" ]; then
-    path_changes=$(path_add_prefix "$path_changes_general" "$path_changes")
-fi
-if [ -n "$path_changes" ]; then
-    export PATH="$path_changes:$original_path"
-fi
-
-# Additional configurations for various applications
-if [ -d "$HOME/dotfiles/sh/apps" ]; then
-    for app in $(ls "$HOME/dotfiles/sh/apps"); do
+# Additional configuration for various applications
+sh_apps_dir="$sh_dir/apps"
+if [ -d "$sh_apps_dir" ]; then
+    for sh_app in $sh_apps_dir/*.sh; do
+        [ -e "$sh_app" ] || break
         # shellcheck source=/dev/null
-        source "$HOME/dotfiles/sh/apps/$app"
+        . "$sh_app"
     done
 fi
+unset sh_app sh_apps_dir
 
-# Figure out which editor to default to
-for editor in $(echo $EDITOR_PRIORITY); do
-    editor_path=$(command -v $editor)
-    if [ -n "$editor_path" ]; then
-        export EDITOR="$editor_path"
-        export VISUAL="$editor_path"
-        break
-    fi
-done
+# Add any local bin directory to our PATH
+if [ -d "$HOME/bin" ]; then
+    build_path "$HOME/bin" "$PATH"
+    export PATH="$build_path"
+fi
 
-# If we defined a custom aliases file then include it
-if [ -f "$HOME/dotfiles/sh/aliases.sh" ]; then
+# Add any explicit extra paths to our PATH
+if [ -n "$EXTRA_PATHS" ]; then
+    build_path "$EXTRA_PATHS" "$PATH"
+    export PATH="$build_path"
+fi
+unset EXTRA_PATHS
+
+# Set our preferred editor
+if [ -n "$EDITOR_PRIORITY" ]; then
+    for editor in $EDITOR_PRIORITY; do
+        [ -e "$editor" ] || break
+        editor_path="$(command -v "$editor" > /dev/null)"
+        if [ -n "$editor_path" ]; then
+            export EDITOR="$editor_path"
+            export VISUAL="$editor_path"
+            break
+        fi
+    done
+fi
+unset EDITOR_PRIORITY editor editor_path
+
+# Include any custom aliases
+sh_aliases_file="$sh_dir/aliases.sh"
+if [ -f "$sh_aliases_file" ]; then
     # shellcheck source=sh/aliases.sh
-    source "$HOME/dotfiles/sh/aliases.sh"
+    . "$sh_aliases_file"
 fi
+unset sh_aliases_file
 
-# If we defined a custom functions folder then include it
-if [ -d "$HOME/dotfiles/sh/functions" ]; then
-    for function in $(ls "$HOME/dotfiles/sh/functions"); do
+# Include any custom functions
+sh_functions_dir="$sh_dir/functions"
+if [ -d "$sh_functions_dir" ]; then
+    for sh_function in $sh_functions_dir/*.sh; do
+        [ -e "$sh_function" ] || break
         # shellcheck source=/dev/null
-        source "$HOME/dotfiles/sh/functions/$function"
+        . "$sh_function"
     done
 fi
+unset sh_function sh_functions_dir
 
 # Disable toggling flow control (use ixany to re-enable)
 stty -ixon
+
+# Clean-up
+unset build_path sh_dir
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

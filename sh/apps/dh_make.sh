@@ -1,9 +1,8 @@
-#!/bin/sh
+# shellcheck shell=sh
 
 # dh_make configuration
-
 if command -v dh_make > /dev/null; then
-    # Full name & email for Debian package tools
+    # Name & email for Debian packaging tools
     export DEBFULLNAME='Samuel D. Leslie'
     export DEBEMAIL='sdl@nexiom.net'
 fi

@@ -1,12 +1,14 @@
-#!/bin/sh
+# shellcheck shell=sh
 
-# OS X shell configuration
+# macOS shell configuration
 
 # Prefer GNU coreutils?
 USE_GNU_COREUTILS='true'
 
 # Some extra paths to include
 EXTRA_SYS_PATHS='/usr/local/bin'
+
+# -----------------------------------------------------------------------------
 
 # Tell ls to be colourful
 export CLICOLOR='1'
