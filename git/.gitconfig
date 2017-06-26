@@ -35,6 +35,7 @@
 
 [log]
     abbrevCommit = true
+    mailmap = true
 
 [merge]
     log = true
