@@ -47,21 +47,20 @@ tmp/
 /fish/.config/fish/fishd.*
 /fish/.config/fish/generated_completions/
 
-# Irssi configuration
+# irssi configuration
 /irssi/
 
-# Only include our KiTTY configuration (excludes session profiles)
+# KiTTY configuration
 /kitty/
-!/kitty/kitty.ini
 
-# OpenSSH configuration (we can force add anything that can be public)
+# OpenSSH configuration
 /openssh/
 
-# PowerShell modules (they're usually retrieved by a module like OneGet)
+# PowerShell modules
 /posh/Modules/
 
-# Shell integrations for various applications
-/sh/apps/
+# Shell app configurations
+/sh/apps/homebrew.sh
 
 # Subversion readme & authentication data
 /subversion/.subversion/README.txt
