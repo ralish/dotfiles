@@ -65,6 +65,21 @@
     smudge = iconv -sc -f utf-8 -t $(file --brief --mime-encoding %f)
     required
 
+[url "git@bitbucket.org:"]
+    insteadof = bb:
+
+[url "git@github.com:"]
+    insteadof = gh:
+
+[url "git@gitlab.com:"]
+    insteadof = gl:
+
+[url "sdl@git.launchpad.net/"]
+    insteadof = lp:
+
+[url "sdl@git.launchpad.net/~sdl/+git/"]
+    insteadof = lpme:
+
 [alias]
     a   = add
     aa  = add --all
