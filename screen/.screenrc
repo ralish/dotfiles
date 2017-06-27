@@ -1,10 +1,10 @@
-# Enable usage of the alternate screen (clean exit from full-screen apps)
+# Enable usage of the alternate screen
 altscreen on
 
-# Use current background colour when erasing characters instead of the default
+# Use the current background colour when erasing characters
 defbce on
 
-# Block the display if we detach uncleanly so certain programs don't hang on us
+# Block the display if we detach uncleanly to avoid programs hanging
 defnonblock on
 
 # Increase the default scrollback
@@ -25,7 +25,7 @@ term screen-256color
 # Don't use the alternate screen in xterm
 termcapinfo xterm* ti@:te@
 
-# Disable the visual bell (a strong contender for most annoying setting)
+# Disable the visual bell
 vbell off
 
 # Start window indexing from one
