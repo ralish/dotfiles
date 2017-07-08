@@ -1,7 +1,8 @@
 Function Connect-Office365Services {
     Param(
         [Parameter(Mandatory)]
-        [System.Management.Automation.Credential()][pscredential]$Credential,
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential,
 
         [Parameter(Mandatory)]
         [String]$SharePointTenantName,
@@ -30,7 +31,8 @@ Function Connect-ExchangeOnline {
     [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
         [Parameter(ParameterSetName='Standard',Mandatory)]
-        [System.Management.Automation.Credential()][pscredential]$Credential,
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential,
 
         [Parameter(ParameterSetName='MFA')]
         [String]$UserPrincipalName
@@ -60,7 +62,8 @@ Function Connect-ExchangeOnline {
 Function Connect-SharePointOnline {
     Param(
         [Parameter(Mandatory)]
-        [System.Management.Automation.Credential()][pscredential]$Credential,
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential,
 
         [Parameter(Mandatory)]
         [String]$TenantName
@@ -80,7 +83,8 @@ Function Connect-SharePointOnline {
 Function Connect-SkypeForBusinessOnline {
     Param(
         [Parameter(Mandatory)]
-        [System.Management.Automation.Credential()][pscredential]$Credential
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
     )
 
     if (!(Get-Module -Name SkypeOnlineConnector -ListAvailable)) {
@@ -97,7 +101,8 @@ Function Connect-SkypeForBusinessOnline {
 Function Connect-Office365SecurityAndComplianceCenter {
     Param(
         [Parameter(Mandatory)]
-        [System.Management.Automation.Credential()][pscredential]$Credential,
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential,
 
         [String]$CmdletsPrefix='Scc'
     )
@@ -111,7 +116,8 @@ Function Connect-Office365SecurityAndComplianceCenter {
 Function Connect-Office365CentralizedDeployment {
     Param(
         [Parameter(Mandatory)]
-        [System.Management.Automation.Credential()][pscredential]$Credential
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
     )
 
     if (!(Get-Module -Name OrganizationAddInService -ListAvailable)) {

@@ -1,7 +1,8 @@
 Function Connect-AzureAD {
     [CmdletBinding()]
     Param(
-        [System.Management.Automation.Credential()][pscredential]$Credential
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
     )
 
     if (!(Get-Module -Name AzureAD -ListAvailable)) {
@@ -17,7 +18,8 @@ Function Connect-AzureAD {
 Function Connect-AzureRM {
     [CmdletBinding()]
     Param(
-        [System.Management.Automation.Credential()][pscredential]$Credential
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
     )
 
     if (!(Get-Module -Name AzureRM -ListAvailable)) {
@@ -33,7 +35,8 @@ Function Connect-AzureRM {
 Function Connect-MSOnline {
     [CmdletBinding()]
     Param(
-        [System.Management.Automation.Credential()][pscredential]$Credential
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
     )
 
     if (!(Get-Module -Name MSOnline -ListAvailable)) {
