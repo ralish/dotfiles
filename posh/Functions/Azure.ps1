@@ -106,21 +106,25 @@ Function Get-AzureAuthToken {
 
 
 Function Get-AzureUsersWithDisabledServices {
-    $Users = Get-MsolUser | Where-Object { $_.IsLicensed -eq $true}
+    [CmdletBinding()]
+    Param(
+        [Switch]$ReturnAllUsers
+    )
+
+    $Results = @()
+    $Users = Get-MsolUser | Where-Object { $_.IsLicensed -eq $true} | Sort-Object -Property DisplayName
+
     foreach ($User in $Users) {
         $DisabledServices = @()
-        $LicencedServices = $User.Licenses.ServiceStatus
+        $DisabledServices += $User.Licenses.ServiceStatus | Where-Object { $_.ProvisioningStatus -eq 'Disabled' }
 
-        foreach ($Service in $LicencedServices) {
-            if ($Service.ProvisioningStatus -eq 'Disabled') {
-                $DisabledServices += $Service
+        if ($DisabledServices -or $ReturnAllUsers) {
+            $Results += [PSCustomObject]@{
+                'User'=$User.DisplayName
+                'Service'=[Object[]]$DisabledServices.ServicePlan
             }
         }
-
-        if ($DisabledServices.Count -gt 0) {
-            Write-Host -Object ('{0} has the following disabled services:' -f $User.DisplayName)
-            Write-Host -Object $DisabledServices
-            Write-Host -Object ''
-        }
     }
+
+    Write-Output -InputObject $Results
 }
