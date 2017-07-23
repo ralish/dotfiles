@@ -19,9 +19,10 @@ silent! endwhile
 " Compatibility flags for vi-compatible behaviour
 "set cpoptions=aABceFs
 
-" Use the Bourne shell if we're launched under fish
-if &shell =~# 'fish$'
-    set shell=/bin/sh
+" Use the Bash shell instead of fish on older Vim releases
+if &shell =~# 'fish$' && (v:version < 704 ||
+                         \v:version == 704 && !has('patch276'))
+    set shell=/bin/bash
 endif
 
 if has('multi_byte')
@@ -30,6 +31,9 @@ if has('multi_byte')
 endif
 
 if has('viminfo')
+    " Save and restore uppercase global variables
+    set viminfo^=!
+
     " Set the path where the viminfo file is stored
     set viminfo+=n~/dotfiles/vim/.vim/.viminfo
 endif
@@ -56,13 +60,19 @@ set laststatus=2
 set list
 
 " Characters to display when 'list' mode is enabled
-set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<,nbsp:+
+set listchars=tab:>-,trail:~,extends:>,precedes:<,nbsp:+
 
 " Don't display the intro message on startup
 set shortmess+=I
 
 " Maximum line length to perform syntax highlighting on
 set synmaxcol=250
+
+" Enable time outs on key codes
+set ttimeout
+
+" Time out for key codes (msec)
+set ttimeoutlen=100
 
 " Indicate we're on a fast terminal connection
 set ttyfast
@@ -318,6 +328,9 @@ endif
 if has('windows')
     " New windows from a horizontal split should be below the current one
     set splitbelow
+
+    " Increase the number of tab pages which can be opened
+    set tabpagemax=50
 endif
 
 
@@ -361,6 +374,14 @@ set backupdir^=~/.vim/backup//
 if has('wildignore')
     " List of file patterns to match for excluding backup creation
     "set backupskip=/tmp/*
+endif
+
+
+" ******************************* Session Files *******************************
+
+if has('mksession')
+    " Don't save or restore options and mappings
+    set sessionoptions-=options
 endif
 
 
@@ -428,6 +449,10 @@ nnoremap U <C-r>
 
 " Make behaviour of 'Y' consistent with 'D' and 'C' (i.e. yank from cursor)
 nnoremap Y y$
+
+" Break undo before running CTRL-[UW] so they can be undone
+inoremap <C-U> <C-G>u<C-U>
+inoremap <C-W> <C-G>u<C-W>
 
 " Write the file via sudo
 cnoremap w!! w !sudo tee % >/dev/null
@@ -516,6 +541,11 @@ Plug 'ctrlpvim/ctrlp.vim'
 " Improved motions handling
 Plug 'easymotion/vim-easymotion'
 
+" Support EditorConfig files
+if has('python') || has('python3')
+    Plug 'editorconfig/editorconfig-vim'
+endif
+
 " Improved <Tab> completion
 Plug 'ervandew/supertab'
 
@@ -594,6 +624,12 @@ try
 catch
     colorscheme default
 endtry
+
+
+" ############################# editorconfig-vim ##############################
+
+" File path patterns to exclude
+let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 
 
 " ################################# nerdtree ##################################
