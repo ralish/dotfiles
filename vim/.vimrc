@@ -8,30 +8,43 @@ if &compatible
     set nocompatible
 endif
 
+" The above set command will be skipped if the +eval feature is missing, which
+" is the case in some minimal versions of Vim (e.g. vim.tiny). The trick below
+" will thus reset compatible *only* if the +eval feature is missing. Borrowed
+" from the defaults.vim introduced in Vim 8.
+silent! while 0
+    set nocompatible
+silent! endwhile
+
 " Compatibility flags for vi-compatible behaviour
 "set cpoptions=aABceFs
 
-" Explicitly set the shell to use for '!' and ':!' commands
+" Use the Bourne shell if we're launched under fish
 if &shell =~# 'fish$'
-    set shell=sh
+    set shell=/bin/sh
 endif
 
-" Always use UTF-8 character encoding internally
 if has('multi_byte')
+    " Always use UTF-8 character encoding internally
     set encoding=utf-8
 endif
 
-
-" ******************************* vim-plug Init *******************************
-
-" Directory where vim-plug will store plugins
-call plug#begin('~/.vim/plugins')
+if has('viminfo')
+    " Set the path where the viminfo file is stored
+    set viminfo+=n~/dotfiles/vim/.vim/.viminfo
+endif
 
 
 " ********************************** General **********************************
 
-" Make Insert mode the default (use Vim like a modeless editor)
-"set insertmode
+" Optimise colours for dark backgrounds
+set background=dark
+
+" Modify backspace behaviour to work over additional elements
+set backspace=indent,eol,start
+
+" Display as much as possible of the last line and terminate with '@@@'
+set display+=lastline
 
 " Number of commands and search patterns to remember
 set history=1000
@@ -39,53 +52,34 @@ set history=1000
 " Always show a status line in the last window
 set laststatus=2
 
-" Show partial command in the last line of the screen
-if has('cmdline_info')
-    set showcmd
-endif
+" Show invisible characters as defined in 'listchars'
+set list
+
+" Characters to display when 'list' mode is enabled
+set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<,nbsp:+
 
 " Don't display the intro message on startup
 set shortmess+=I
 
+" Maximum line length to perform syntax highlighting on
+set synmaxcol=250
+
 " Indicate we're on a fast terminal connection
 set ttyfast
 
-" Set the path where the viminfo file is stored
-if has('viminfo')
-    set viminfo+=n~/dotfiles/vim/.vim/.viminfo
+if has('cmdline_info')
+    " Show the cursor position (only if 'statusline' is not defined)
+    set ruler
+
+    " Show partial command in the last line of the screen
+    set showcmd
 endif
 
-" Configure mouse support if supported by the terminal
-if has('mouse')
-    " Enable in all modes
-    set mouse=a
-    " Configure the model to use (button/action behaviours)
-    set mousemodel=popup_setpos
-    " Time in which two clicks must occur to be a double-click (msec)
-    "set mousetime=500
-    " Terminal type for which mouse codes are to be recognised
-    set ttymouse=xterm2
+if has('langmap') && exists('+langremap')
+    " Don't apply 'langmap' to characters resulting from a mapping
+    set nolangremap
 endif
 
-
-" ********************************* Security **********************************
-
-" Use the Blowfish cipher for file encryption
-set cryptmethod=blowfish
-
-" Enable parsing of modelines (has security ramifications!)
-set modeline
-
-" Block unsafe commands in .vimrc and .exrc files in the current directory
-set secure
-
-
-" ********************************** Viewing **********************************
-
-" Automatically reread externally modified files if unchanged in Vim
-set autoread
-
-" Configure highlighting of the cursor position
 if has('syntax')
     " Highlight the screen line of the cursor
     set cursorline
@@ -94,17 +88,13 @@ if has('syntax')
     "set cursorcolumn
 endif
 
-" Display as much as possible of the last line
-set display+=lastline
+if has('wildmenu')
+    " Enable menu to resolve ambiguous command completions
+    set wildmenu
 
-" Don't equalise window sizes on spliting or closing
-"set noequalalways
-
-" Show invisible characters as defined in 'listchars'
-set list
-
-" Characters to display for the 'list' mode and command
-set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<,nbsp:+
+    " Ignore case when completing file names and directories
+    set wildignorecase
+endif
 
 " Configure line numbering based on Vim version
 if v:version < 704
@@ -117,31 +107,34 @@ else
     set relativenumber
 endif
 
-" Show the cursor position (note 'statusline' overrides this)
-if has('cmdline_info')
-    set ruler
-endif
 
-" New windows from a horizontal split should be below the current one
-if has('windows')
-    set splitbelow
-endif
+" ********************************* Security **********************************
 
-" New windows from a vertical split should be right of the current one
-if has('vertsplit')
-    set splitright
+" Use the Blowfish cipher for file encryption
+set cryptmethod=blowfish
+
+" Enable parsing of modelines (has security implications!)
+set modeline
+
+" Block unsafe commands in .vimrc and .exrc files in the current directory
+set secure
+
+
+" ********************************** Viewing **********************************
+
+" Automatically reread externally modified files if unchanged in Vim
+set autoread
+
+if has('virtualedit')
+    " Allow virtual editing in Visual block mode
+    set virtualedit=block
 endif
 
 
 " ********************************** Editing **********************************
 
-" Remove comment character when joining lines
-if v:version > 703 || v:version == 703 && has('patch541')
-    set formatoptions+=j
-endif
-
-" Modify backspace behaviour to work over additional elements
-set backspace=indent,eol,start
+" Make Insert mode the default (use Vim more like a modeless editor)
+"set insertmode
 
 " Don't treat numbers starting with a zero as octal
 set nrformats-=octal
@@ -152,9 +145,9 @@ set report=0
 " When inserting a bracket show the matching one
 "set showmatch
 
-" Allow the cursor to be positioned where there's no character in Visual mode
-if has('virtualedit')
-    set virtualedit=block
+" Remove any comment character when joining lines
+if v:version > 703 || v:version == 703 && has('patch541')
+    set formatoptions+=j
 endif
 
 
@@ -163,7 +156,7 @@ endif
 " Automatically write changes to a file on certain commands
 set autowrite
 
-" Raise a dialog on operations that would otherwise fail
+" Raise a dialogue on operations that would otherwise fail
 set confirm
 
 " Don't call fsync() after writing to a file (more power efficient)
@@ -173,20 +166,20 @@ set nofsync
 " ********************************** Folding **********************************
 
 if has('folding')
+    " Initial folding level on opening a new buffer
+    set foldlevelstart=3
+
     " Folding should be determined by the file syntax
     set foldmethod=syntax
 
     " Maximum nesting of folds for 'indent' and 'syntax' methods
     set foldnestmax=3
 
-    " Initial folding level on opening a new buffer
-    set foldlevelstart=3
-
-    " Display a column with the specified width indicating open and closed folds
-    "set foldcolumn=1
-
-    " Close folds with a level greater than 'foldlevel' when not under the cursor
+    " Close fold levels greater than 'foldlevel' when not under the cursor
     "set foldclose=all
+
+    " Display a column with the given width indicating open and closed folds
+    "set foldcolumn=1
 endif
 
 
@@ -207,8 +200,8 @@ set shiftround
 " Number of spaces corresponding to each indent operation
 set shiftwidth=4
 
-" Do smart autoindenting when starting a new line
 if has('smartindent')
+    " Do smart autoindenting when starting a new line
     set smartindent
 endif
 
@@ -218,16 +211,32 @@ endif
 " Sources to scan for keyword completion
 set complete=.,t
 
-" Infer case for keyword completion (requires 'ignorecase')
-"set infercase
+" Infer case for keyword completion (only with 'ignorecase')
+set infercase
 
-" Configure Insert mode completion
 if has('insert_expand')
     " Options to configure keyword completion
     set completeopt=longest,menuone,preview
 
-    " Maximum number of items to show in the keyword completion popup
+    " Maximum number of items to show in the keyword completion pop-up
     "set pumheight=0
+endif
+
+
+" ******************************* Mouse Support *******************************
+
+if has('mouse')
+    " Enable in all modes
+    set mouse=a
+
+    " Configure the model to use (button/action behaviours)
+    set mousemodel=popup_setpos
+
+    " Time in which two clicks must occur to be a double-click (msec)
+    "set mousetime=500
+
+    " Terminal type for which mouse codes are to be recognised
+    set ttymouse=xterm2
 endif
 
 
@@ -248,6 +257,9 @@ set sidescroll=3
 
 " ***************************** Search & Replace ******************************
 
+" Enable the 'g' flag in ':substitute" commands by default
+set gdefault
+
 " Ignore case in search patterns
 set ignorecase
 
@@ -257,17 +269,25 @@ set smartcase
 " Don't wrap searches around the end of the file
 "set nowrapscan
 
-" Configure extra search capabilities
 if has('extra_search')
     " Highlight matches when searching
     set hlsearch
 
-    " Search incrementally (start matching immediately)
+    " Search incrementally (i.e. start matching immediately)
     set incsearch
 endif
 
-" Enable the 'g' flag in ':substitute" commands by default
-set gdefault
+
+" ****************************** Spell Checking *******************************
+
+if has('syntax')
+    " Toggle spell checking in the local window
+    nnoremap <F7> :setlocal spell!<CR>
+    inoremap <F7> <C-\><C-O>:setlocal spell!<CR>
+
+    " Word list names to use for spell checking
+    set spelllang=en_au,en_gb
+endif
 
 
 " ******************************** Tabulation *********************************
@@ -285,6 +305,22 @@ set expandtab
 set smarttab
 
 
+" ***************************** Window Splitting ******************************
+
+" Don't equalise window sizes on splitting or closing
+"set noequalalways
+
+if has('vertsplit')
+    " New windows from a vertical split should be right of the current one
+    set splitright
+endif
+
+if has('windows')
+    " New windows from a horizontal split should be below the current one
+    set splitbelow
+endif
+
+
 " ********************************* Wrapping **********************************
 
 " Don't display lines longer than the window width on the next line
@@ -293,7 +329,6 @@ set smarttab
 " Use the line number column to show wrapped text
 "set cpoptions+=n
 
-" Configure line breaking of long lines
 if has('linebreak')
     " Wrap long lines at a character in 'breakat'
     set linebreak
@@ -302,13 +337,16 @@ if has('linebreak')
     "let &breakat = ' 	!@*-+;:,./?'
 
     " String to insert at the start of wrapped lines
-    "let &showbreak = '> '
+    let &showbreak = '> '
+
+    " Preserve indentation when wrapping lines
+    set breakindent
 endif
 
 
 " ******************************* Backup Files ********************************
 
-" Enable/disable saving a backup before overwriting a file
+" Disable saving a backup before overwriting a file
 set nobackup
 
 " Directories to try for reading/writing backup files
@@ -320,15 +358,15 @@ set backupdir^=~/.vim/backup//
 " String to append to the original file name for backups
 "set backupext=~
 
-" List of file patterns to match for excluding backup creation
 if has('wildignore')
+    " List of file patterns to match for excluding backup creation
     "set backupskip=/tmp/*
 endif
 
 
 " ******************************** Swap Files *********************************
 
-" Enable/disable using a swapfile for the buffer
+" Enable using a swap file for the buffer
 set swapfile
 
 " Directories to try for reading/writing swap files
@@ -343,20 +381,19 @@ set updatetime=250
 
 " ******************************** Undo Files *********************************
 
-" Configure persistent undo
-if has('persistent_undo')
-    " Enable/disable saving of undo history to an undo file
-    set undofile
-
-    " Directories to try for reading/writing undo files
-    set undodir^=~/.vim/undo//
-endif
-
 " Maximum number of changes that can be undone
 "set undolevels=1000
 
 " Save the whole buffer for undo when reloading if less than this many lines
 "set undoreload=10000
+
+if has('persistent_undo')
+    " Enable saving of undo history to an undo file
+    set undofile
+
+    " Directories to try for reading/writing undo files
+    set undodir^=~/.vim/undo//
+endif
 
 
 " ******************************** View Files *********************************
@@ -365,26 +402,104 @@ if has('mksession')
     " Directory for reading/writing view files
     set viewdir=~/.vim/view
 
-    " List of items to save or restore to/from views
+    " List of items to save and restore for views
     "set viewoptions=folds,options,cursor
 endif
 
 
+" ******************************* Key Mappings ********************************
+
+" Move by rows instead of lines (much more intuitive with 'wrap')
+noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
+noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
+noremap <silent> <expr> <Up> (v:count == 0 ? 'gk' : 'k')
+noremap <silent> <expr> <Down> (v:count == 0 ? 'gj' : 'j')
+noremap gj j
+noremap gk k
+
+" We never use Ex mode so use its mapping for reformatting
+noremap Q gq
+
+" Keep the cursor in place when joining lines
+nnoremap J mzJ`z
+
+" Make 'U' perform a redo operation (a sensible inverse of 'u')
+nnoremap U <C-r>
+
+" Make behaviour of 'Y' consistent with 'D' and 'C' (i.e. yank from cursor)
+nnoremap Y y$
+
+" Write the file via sudo
+cnoremap w!! w !sudo tee % >/dev/null
+
+
+" *****************************************************************************
+" * We'll now configure language handling and plugin settings. On minimal Vim *
+" * releases (e.g. vim.tiny) effectively none of this will work. Vim versions *
+" * without the +eval feature will skip processing of if statements and their *
+" * contents, so we wrap all subsequent configuration in an if block so that  *
+" * we preserve compatibility with these minimal Vim releases.                *
+" *****************************************************************************
+if 1
+
+" ***************************** Language Handling *****************************
+" ##################################### C #####################################
+
+" Highlight strings inside of comments
+let g:c_comment_strings = 1
+
+
+" ################################### Jinja ###################################
+
+" Always treat '.jinja' files as Jinja (overrides any modeline)
+autocmd BufNewFile,BufWinEnter *.jinja set filetype=jinja
+
+
+" ################################### Shell ###################################
+
+" Assume Bash syntax for shell files
+let g:is_bash = 1
+
+" Bitmask of folding features to enable:
+" - 1: Functions
+" - 2: Here documents
+" - 4: if/do/for statements
+let g:sh_fold_enabled = 1
+
+
 " ********************************** Plugins **********************************
+" ############################# vim-plug Startup ##############################
+
+" Directory where vim-plug will store plugins
+call plug#begin('~/.vim/plugins')
+
+
 " ################################ Appearance #################################
-
-" tmux statusline generator
-Plug 'edkolev/tmuxline.vim'
-
-" Support ANSI escape sequences
-Plug 'powerman/vim-plugin-AnsiEsc'
 
 " vim-airline & themes
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
+" Display vertical indent lines
+Plug 'Yggdroot/indentLine'
+
+" Support ANSI escape sequences
+Plug 'powerman/vim-plugin-AnsiEsc'
+
 
 " ############################## Colour Schemes ###############################
+
+" Bad Wolf
+"Plug 'sjl/badwolf'
+
+" Base16
+"Plug 'chriskempson/base16-vim'
+
+" Jellybeans
+"Plug 'nanotech/jellybeans.vim'
+
+" Molokai
+"Plug 'tomasr/molokai'
 
 " Solarized
 Plug 'altercation/vim-colors-solarized'
@@ -392,14 +507,8 @@ Plug 'altercation/vim-colors-solarized'
 " Tomorrow Theme
 "Plug 'chriskempson/vim-tomorrow-theme'
 
-" Base16
-"Plug 'chriskempson/base16-vim'
 
-" Bad Wolf
-"Plug 'sjl/badwolf'
-
-
-" ################################ Navigation #################################
+" ############################### Functionality ###############################
 
 " Full path fuzzy finder
 Plug 'ctrlpvim/ctrlp.vim'
@@ -407,25 +516,11 @@ Plug 'ctrlpvim/ctrlp.vim'
 " Improved motions handling
 Plug 'easymotion/vim-easymotion'
 
-" Full filesystem explorer
-Plug 'scrooloose/nerdtree'
-
-
-" ############################### Functionality ###############################
-
-" Show a Git diff in the gutter
-if has('signs')
-    Plug 'airblade/vim-gitgutter'
-endif
-
 " Improved <Tab> completion
 Plug 'ervandew/supertab'
 
-" Advanced syntax checking
-Plug 'scrooloose/syntastic'
-
-" Powerful Git wrapper
-Plug 'tpope/vim-fugitive'
+" Full filesystem explorer
+Plug 'scrooloose/nerdtree'
 
 " Heuristically set buffer options
 Plug 'tpope/vim-sleuth'
@@ -433,29 +528,46 @@ Plug 'tpope/vim-sleuth'
 " Clever code quoting
 Plug 'tpope/vim-surround'
 
+" Advanced syntax checking
+Plug 'vim-syntastic/syntastic'
 
-" ################################ Integration ################################
 
-" Synchronise with tmux's clipboard
+" ############################### Integrations ################################
+
+" Git: Powerful Git wrapper
+Plug 'tpope/vim-fugitive'
+
+" Git: Show a diff in the gutter
+if has('signs')
+    Plug 'airblade/vim-gitgutter'
+endif
+
+" tmux: Clipboard synchronisation
 Plug 'roxma/vim-tmux-clipboard'
 
-" Support focus events when running under tmux (use our fork until PR#8 merged)
+" tmux: Focus event handling (use our fork until PR #8 is merged)
 Plug 'ralish/vim-tmux-focus-events'
 
+" tmux: Status line generator
+Plug 'edkolev/tmuxline.vim'
 
-" ############################# Language Support ##############################
+
+" ################################# Languages #################################
 
 " Jinja2
 Plug 'Glench/Vim-Jinja2-Syntax'
 
 " Markdown
-Plug 'tpope/vim-markdown'
+Plug 'plasticboy/vim-markdown'
+
+" PowerShell
+Plug 'PProvost/vim-ps1'
 
 " PgSQL
 Plug 'exu/pgsql.vim'
 
 " Python
-Plug 'klen/python-mode'
+Plug 'python-mode/python-mode'
 
 " Salt
 Plug 'saltstack/salt-vim'
@@ -467,16 +579,14 @@ Plug 'tmux-plugins/vim-tmux'
 Plug 'stephpy/vim-yaml'
 
 
-" ***************************** vim-plug Finalise *****************************
+" ########################## vim-plug Initialisation ##########################
 
 " Initialise the plugin system
 call plug#end()
 
 
-" ******************************* Colour Scheme *******************************
-
-" Optimise for dark backgrounds
-set background=dark
+" ****************************** Plugin Settings ******************************
+" ############################### Colour Scheme ###############################
 
 " Set our preferred colour scheme
 try
@@ -486,17 +596,22 @@ catch
 endtry
 
 
-" ****************************** Plugin Settings ******************************
 " ################################# nerdtree ##################################
 
-" Shortcut to toggle NERDTree
+" Key mapping to toggle NERDTree
 noremap <C-n> :NERDTreeToggle<CR>
 
-" Open a NERDTree automatically on startup if no files were specified
-autocmd StdinReadPre * let s:std_in=1
+" Open NERDTree automatically on startup if no files were specified
+autocmd StdinReadPre * let s:std_in = 1
 if exists(':NERDTree')
-    autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+    autocmd VimEnter * if argc() == 0 && !exists('s:std_in') | NERDTree | endif
 endif
+
+
+" ################################### pgsql ###################################
+
+" Make PostgreSQL's SQL dialect the default for '.sql' files
+let g:sql_type_default = 'pgsql'
 
 
 " ################################ python-mode ################################
@@ -533,72 +648,28 @@ let g:syntastic_sh_shellcheck_args = '-x'
 " ################################ vim-airline ################################
 
 " Enable Powerline symbols
-let g:airline_powerline_fonts=1
+let g:airline_powerline_fonts = 1
 
 " Use the Solarized theme
-let g:airline_theme='solarized'
+let g:airline_theme = 'solarized'
+
+
+" ############################# Vim-Jinja2-Syntax #############################
+
+" Disable HTML highlighting as usually we're not editing HTML templates
+let g:jinja_syntax_html = 0
 
 
 " ############################### vim-markdown ################################
 
 " Enable fenced code block syntax highlighting for these languages
-let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
+let g:vim_markdown_fenced_languages =
+    \['bash=sh', 'c++=cpp', 'ini=dosini', 'shell=sh', 'viml=vim']
 
 
-" ***************************** Language Handling *****************************
-" ################################### Jinja ###################################
-
-" Disable HTML highlighting as usually we're not editing HTML templates
-let g:jinja_syntax_html=0
-
-" Always treat '.jinja' files as Jinja (overrides any modeline)
-autocmd BufNewFile,BufWinEnter *.jinja set filetype=jinja
-
-
-" ################################# Markdown ##################################
-
-" Treat '.md' files as Markdown instead of Modula-2
-autocmd BufNewFile,BufReadPost *.md set filetype=markdown
-
-
-" ################################### Shell ###################################
-
-" Assume Bash syntax for shell files
-autocmd FileType sh let g:is_bash=1
-
-" Bitmask of folding features to enable:
-" - 1: Functions
-" - 2: Here documents
-" - 4: if/do/for statements
-autocmd FileType sh let g:sh_fold_enabled=1
-
-
-" #################################### SQL ####################################
-
-" Make PostgreSQL's SQL dialect the default for '.sql' files
-let g:sql_type_default = 'pgsql'
-
-
-" ******************************* Key Mappings ********************************
-
-" Move by rows instead of lines (much more intuitive with 'wrap')
-noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
-noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
-noremap <silent> <expr> <Up> (v:count == 0 ? 'gk' : 'k')
-noremap <silent> <expr> <Down> (v:count == 0 ? 'gj' : 'j')
-noremap gj j
-noremap gk k
-
-" Keep the cursor in place when joining lines with 'J'
-nnoremap J mzJ`z
-
-" Make 'U' perform a redo operation (a sensible inverse of 'u')
-nnoremap U <C-r>
-
-" Make behaviour of 'Y' consistent with 'D' and 'C' (i.e. yank from cursor)
-nnoremap Y y$
-
-" Write the file via sudo
-cnoremap w!! w !sudo tee % >/dev/null
+endif
+" *****************************************************************************
+" * End of configuration of language handling and plugin settings.            *
+" *****************************************************************************
 
 " vim: syntax=vim cc=80 tw=79 ts=4 sw=4 sts=4 et sr
