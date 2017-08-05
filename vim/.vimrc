@@ -143,6 +143,12 @@ endif
 
 " ********************************** Editing **********************************
 
+" Insert a comment on <Enter> in Insert mode if in a comment
+"set formatoptions+=r
+
+" Insert a comment on 'o' or 'O' in Normal mode if in a comment
+"set formatoptions+=o
+
 " Make Insert mode the default (use Vim more like a modeless editor)
 "set insertmode
 
@@ -232,6 +238,11 @@ if has('insert_expand')
     "set pumheight=0
 endif
 
+if has('spell')
+    " Use spell checking dictionaries in keyword completion
+    set complete+=kspell
+endif
+
 
 " ******************************* Mouse Support *******************************
 
@@ -291,10 +302,6 @@ endif
 " ****************************** Spell Checking *******************************
 
 if has('syntax')
-    " Toggle spell checking in the local window
-    nnoremap <F7> :setlocal spell!<CR>
-    inoremap <F7> <C-\><C-O>:setlocal spell!<CR>
-
     " Word list names to use for spell checking
     set spelllang=en_au,en_gb
 endif
@@ -430,19 +437,20 @@ endif
 
 " ******************************* Key Mappings ********************************
 
-" Move by rows instead of lines (much more intuitive with 'wrap')
-noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
-noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
-noremap <silent> <expr> <Up> (v:count == 0 ? 'gk' : 'k')
-noremap <silent> <expr> <Down> (v:count == 0 ? 'gj' : 'j')
-noremap gj j
-noremap gk k
+" Key to use for <Leader>
+let mapleader = '\'
 
-" We never use Ex mode so use its mapping for reformatting
-noremap Q gq
+" Move by rows instead of lines (much more intuitive with 'wrap')
+nnoremap <expr> j v:count ? 'j' : 'gj'
+nnoremap <expr> <Down> v:count ? 'j' : 'gj'
+nnoremap <expr> k v:count ? 'k' : 'gk'
+nnoremap <expr> <Up> v:count ? 'k' : 'gk'
 
 " Keep the cursor in place when joining lines
 nnoremap J mzJ`z
+
+" We never use Ex mode so use its mapping for reformatting
+nnoremap Q gq
 
 " Make 'U' perform a redo operation (a sensible inverse of 'u')
 nnoremap U <C-r>
@@ -450,12 +458,37 @@ nnoremap U <C-r>
 " Make behaviour of 'Y' consistent with 'D' and 'C' (i.e. yank from cursor)
 nnoremap Y y$
 
-" Break undo before running CTRL-[UW] so they can be undone
-inoremap <C-U> <C-G>u<C-U>
-inoremap <C-W> <C-G>u<C-W>
+" Shortcuts for managing our vimrc
+nnoremap <Leader>ev :vsplit $MYVIMRC<CR>
+nnoremap <Leader>sv :source $MYVIMRC<CR>
 
-" Write the file via sudo
-cnoremap w!! w !sudo tee % >/dev/null
+" Disable highlighting of current search results
+nnoremap <Leader><Space> :nohlsearch<CR>
+
+" Toggle list mode
+nnoremap <Leader>l :set list!<CR>
+
+" Toggle paste mode
+nnoremap <Leader>p :set paste!<CR>
+
+" Close current window
+nnoremap <Leader>q :quit<CR>
+
+" Toggle spell checking
+if has('spell')
+    nnoremap <Leader>s :setlocal spell!<CR>
+    inoremap <Leader>s <C-\><C-o>:setlocal spell!<CR>
+endif
+
+" Open/close current fold
+nnoremap <Leader>z za
+
+" Break undo before running CTRL-U or CTRL-W so they can be undone
+inoremap <C-u> <C-g>u<C-u>
+inoremap <C-w> <C-g>u<C-w>
+
+" Write the current buffer via sudo
+cnoremap w!! w !sudo tee % > /dev/null
 
 
 " *****************************************************************************
@@ -584,11 +617,17 @@ Plug 'edkolev/tmuxline.vim'
 
 " ################################# Languages #################################
 
+" CoffeeScript
+Plug 'kchmck/vim-coffee-script'
+
 " Jinja2
 Plug 'Glench/Vim-Jinja2-Syntax'
 
-" Markdown
-Plug 'plasticboy/vim-markdown'
+" Markdown (simple)
+Plug 'tpope/vim-markdown'
+
+" Markdown (advanced)
+"Plug 'plasticboy/vim-markdown'
 
 " PowerShell
 Plug 'PProvost/vim-ps1'
@@ -635,7 +674,7 @@ let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 " ################################# nerdtree ##################################
 
 " Key mapping to toggle NERDTree
-noremap <C-n> :NERDTreeToggle<CR>
+nnoremap <C-n> :NERDTreeToggle<CR>
 
 " Open NERDTree automatically on startup if no files were specified
 autocmd StdinReadPre * let s:std_in = 1
@@ -680,6 +719,12 @@ let g:syntastic_check_on_wq = 0
 " Allow shellcheck to source files not specified on the command line
 let g:syntastic_sh_shellcheck_args = '-x'
 
+" Nicer symbols for the various issue types
+let g:syntastic_warning_symbol = '▲'
+let g:syntastic_style_warning_symbol = '≈'
+let g:syntastic_error_symbol = '✘'
+let g:syntastic_style_error_symbol = '≃'
+
 
 " ################################ vim-airline ################################
 
@@ -696,7 +741,13 @@ let g:airline_theme = 'solarized'
 let g:jinja_syntax_html = 0
 
 
-" ############################### vim-markdown ################################
+" ########################### vim-markdown (tpope) ############################
+
+" Enable fenced code block syntax highlighting for these languages
+let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
+
+
+" ######################### vim-markdown (plasticboy) #########################
 
 " Enable fenced code block syntax highlighting for these languages
 let g:vim_markdown_fenced_languages =
