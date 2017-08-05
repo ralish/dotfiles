@@ -58,6 +58,10 @@ Function Connect-ExchangeOnline {
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         Connect-EXOPSSession @PSBoundParameters
     } else {
+        # Workaround for a weird bug
+        # See: https://stackoverflow.com/questions/41596482/import-pssession-error-when-called-in-a-function
+        Remove-Variable -Name UserPrincipalName
+
         $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication 'Basic' -AllowRedirection
         Import-PSSession -Session $ExchangeOnline -DisableNameChecking
     }
