@@ -1,6 +1,7 @@
 Function Connect-AzureAD {
     [CmdletBinding()]
     Param(
+        [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
     )
@@ -10,14 +11,14 @@ Function Connect-AzureAD {
     }
 
     Write-Verbose -Message 'Connecting to Azure AD (v2) ...'
-    Import-Module -Name AzureAD
-    Azure-AD\Connect-AzureAD @PSBoundParameters
+    AzureAD\Connect-AzureAD @PSBoundParameters
 }
 
 
 Function Connect-AzureRM {
     [CmdletBinding()]
     Param(
+        [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
     )
@@ -27,7 +28,6 @@ Function Connect-AzureRM {
     }
 
     Write-Verbose -Message 'Connecting to Azure RM ...'
-    Import-Module -Name AzureRM
     Login-AzureRmAccount @PSBoundParameters
 }
 
@@ -35,6 +35,7 @@ Function Connect-AzureRM {
 Function Connect-MSOnline {
     [CmdletBinding()]
     Param(
+        [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
     )
@@ -44,7 +45,6 @@ Function Connect-MSOnline {
     }
 
     Write-Verbose -Message 'Connecting to Azure AD (v1) ...'
-    Import-Module -Name MSOnline
     Connect-MsolService @PSBoundParameters
 }
 

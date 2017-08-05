@@ -1,12 +1,15 @@
 Function Connect-Office365Services {
     Param(
         [Parameter(Mandatory)]
+        [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential,
 
         [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [String]$SharePointTenantName,
 
+        [ValidateNotNullOrEmpty()]
         [String]$SccCmdletsPrefix='Scc'
     )
 
@@ -14,7 +17,7 @@ Function Connect-Office365Services {
     Connect-ExchangeOnline -Credential $Credential
 
     Write-Host -ForegroundColor Green -Object 'Connecting to SharePoint Online ...'
-    Connect-SharePointOnline -Credential $Credential -TenantName $SharePointTenantName
+    Connect-SharePointOnline -TenantName $SharePointTenantName -Credential $Credential
 
     Write-Host -ForegroundColor Green -Object 'Connecting to Skype for Business Online ...'
     Connect-SkypeForBusinessOnline -Credential $Credential
@@ -30,16 +33,18 @@ Function Connect-Office365Services {
 Function Connect-ExchangeOnline {
     [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
-        [Parameter(ParameterSetName='Standard',Mandatory)]
-        [System.Management.Automation.Credential()]
-        [PSCredential]$Credential,
-
         [Parameter(ParameterSetName='MFA')]
-        [String]$UserPrincipalName
+        [ValidateNotNullOrEmpty()]
+        [String]$UserPrincipalName,
+
+        [Parameter(ParameterSetName='Standard',Mandatory)]
+        [ValidateNotNull()]
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
     )
 
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        if (!(Get-Command -Name Connect-EXOPSSession -ErrorAction SilentlyContinue)) {
+        if (!(Get-Command -Name Connect-EXOPSSession -ErrorAction Ignore)) {
             $ExoPowerShellModule = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0\TD1HV8YN.61O\1EP3V7G6.KPP\micr..tion_c3bce3770c238a49_0010.0000_90fa60bba125a33a\CreateExoPSSession.ps1'
             if (Test-Path -Path $ExoPowerShellModule -PathType Leaf) {
                 . $ExoPowerShellModule
@@ -50,11 +55,11 @@ Function Connect-ExchangeOnline {
     }
 
     Write-Verbose -Message 'Connecting to Exchange Online ...'
-    if ($PSCmdlet.ParameterSetName -eq 'Standard') {
+    if ($PSCmdlet.ParameterSetName -eq 'MFA') {
+        Connect-EXOPSSession @PSBoundParameters
+    } else {
         $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication 'Basic' -AllowRedirection
         Import-PSSession -Session $ExchangeOnline -DisableNameChecking
-    } else {
-        Connect-EXOPSSession @PSBoundParameters
     }
 }
 
@@ -62,11 +67,12 @@ Function Connect-ExchangeOnline {
 Function Connect-SharePointOnline {
     Param(
         [Parameter(Mandatory)]
-        [System.Management.Automation.Credential()]
-        [PSCredential]$Credential,
+        [ValidateNotNullOrEmpty()]
+        [String]$TenantName,
 
-        [Parameter(Mandatory)]
-        [String]$TenantName
+        [ValidateNotNull()]
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
     )
 
     if (!(Get-Module -Name Microsoft.Online.SharePoint.PowerShell -ListAvailable)) {
@@ -74,15 +80,19 @@ Function Connect-SharePointOnline {
     }
 
     Write-Verbose -Message 'Connecting to SharePoint Online ...'
-    Import-Module -Name Microsoft.Online.SharePoint.PowerShell -DisableNameChecking
     $SPOUrl = 'https://{0}-admin.sharepoint.com' -f $TenantName
-    Connect-SPOService -Url $SPOUrl -Credential $Credential
+    if ($Credential) {
+        Connect-SPOService -Url $SPOUrl -Credential $Credential
+    } else {
+        Connect-SPOService -Url $SPOUrl
+    }
 }
 
 
 Function Connect-SkypeForBusinessOnline {
+    [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
+        [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
     )
@@ -92,7 +102,6 @@ Function Connect-SkypeForBusinessOnline {
     }
 
     Write-Verbose -Message 'Connecting to Skype for Business Online ...'
-    Import-Module -Name SkypeOnlineConnector
     $SkypeForBusinessOnline = New-CsOnlineSession @PSBoundParameters
     Import-PSSession -Session $SkypeForBusinessOnline
 }
@@ -101,9 +110,11 @@ Function Connect-SkypeForBusinessOnline {
 Function Connect-Office365SecurityAndComplianceCenter {
     Param(
         [Parameter(Mandatory)]
+        [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential,
 
+        [ValidateNotNullOrEmpty()]
         [String]$CmdletsPrefix='Scc'
     )
 
@@ -116,6 +127,7 @@ Function Connect-Office365SecurityAndComplianceCenter {
 Function Connect-Office365CentralizedDeployment {
     Param(
         [Parameter(Mandatory)]
+        [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
     )
@@ -125,6 +137,5 @@ Function Connect-Office365CentralizedDeployment {
     }
 
     Write-Verbose -Message 'Connecting to Office 365 Centralized Deployment ...'
-    Import-Module -Name OrganizationAddInService
     Connect-OrganizationAddInService @PSBoundParameters
 }
