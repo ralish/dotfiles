@@ -107,14 +107,14 @@ if has('wildmenu')
 endif
 
 " Configure line numbering based on Vim version
-if v:version < 704
-    " Enable relative numbering with an easy toggle to absolute numbering
-    set relativenumber
-    Plug 'jeffkreeftmeijer/vim-numbertoggle'
-else
+if v:version > 703 || v:version == 703 && has('patch1115')
     " Vim 7.4+ supports absolute and relative numbering at once (hybrid mode)
     set number
     set relativenumber
+else
+    " Enable relative numbering with an easy toggle to absolute numbering
+    set relativenumber
+    Plug 'jeffkreeftmeijer/vim-numbertoggle'
 endif
 
 
@@ -360,7 +360,9 @@ if has('linebreak')
     let &showbreak = '> '
 
     " Preserve indentation when wrapping lines
-    set breakindent
+    if v:version > 704 || v:version == 704 && has('patch338')
+        set breakindent
+    endif
 endif
 
 
