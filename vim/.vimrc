@@ -627,6 +627,9 @@ Plug 'edkolev/tmuxline.vim'
 " CoffeeScript
 Plug 'kchmck/vim-coffee-script'
 
+" Git
+Plug 'tpope/vim-git'
+
 " Jinja2
 Plug 'Glench/Vim-Jinja2-Syntax'
 
