@@ -589,6 +589,8 @@ Plug 'ervandew/supertab'
 
 " Full filesystem explorer
 Plug 'scrooloose/nerdtree'
+" Git support for NERDTree
+Plug 'Xuyuanp/nerdtree-git-plugin'
 
 " Heuristically set buffer options
 Plug 'tpope/vim-sleuth'
