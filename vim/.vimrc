@@ -737,6 +737,16 @@ let g:airline_powerline_fonts = 1
 let g:airline_theme = 'solarized'
 
 
+" ############################### vim-gitgutter ###############################
+
+" Always display the sign column
+if exists('&signcolumn')
+    set signcolumn=yes
+else
+    let g:gitgutter_sign_column_always = 1
+endif
+
+
 " ############################# Vim-Jinja2-Syntax #############################
 
 " Disable HTML highlighting as usually we're not editing HTML templates
