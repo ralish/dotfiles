@@ -458,17 +458,17 @@ nnoremap J mzJ`z
 nnoremap Q gq
 
 " Make 'U' perform a redo operation (a sensible inverse of 'u')
-nnoremap U <C-r>
+nnoremap U <C-R>
 
 " Make behaviour of 'Y' consistent with 'D' and 'C' (i.e. yank from cursor)
 nnoremap Y y$
 
 " Shortcuts for managing our vimrc
 nnoremap <Leader>ev :vsplit $MYVIMRC<CR>
-nnoremap <Leader>sv :source $MYVIMRC<CR>
+nnoremap <Leader>sv :source $MYVIMRC<CR><C-L>:echo "Reloaded .vimrc"<CR>
 
 " Disable highlighting of current search results
-nnoremap <Leader><Space> :nohlsearch<CR>
+nnoremap <Leader><Space> :nohlsearch<C-R>=has('diff')?'<Bar>diffupdate':''<CR><CR><C-L>
 
 " Toggle list mode
 nnoremap <Leader>l :set list!<CR>
@@ -479,18 +479,21 @@ nnoremap <Leader>p :set paste!<CR>
 " Close current window
 nnoremap <Leader>q :quit<CR>
 
+" Toggle line wrapping
+nnoremap <Leader>w :set wrap!<CR>
+
 " Toggle spell checking
 if has('spell')
     nnoremap <Leader>s :setlocal spell!<CR>
-    inoremap <Leader>s <C-\><C-o>:setlocal spell!<CR>
+    inoremap <Leader>s <C-\><C-O>:setlocal spell!<CR>
 endif
 
 " Open/close current fold
 nnoremap <Leader>z za
 
 " Break undo before running CTRL-U or CTRL-W so they can be undone
-inoremap <C-u> <C-g>u<C-u>
-inoremap <C-w> <C-g>u<C-w>
+inoremap <C-U> <C-G>u<C-U>
+inoremap <C-W> <C-G>u<C-W>
 
 " Write the current buffer via sudo
 cnoremap w!! w !sudo tee % > /dev/null
@@ -684,7 +687,7 @@ let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 " ################################# nerdtree ##################################
 
 " Key mapping to toggle NERDTree
-nnoremap <C-n> :NERDTreeToggle<CR>
+nnoremap <C-N> :NERDTreeToggle<CR>
 
 " Open NERDTree automatically on startup if no files were specified
 autocmd StdinReadPre * let s:std_in = 1
