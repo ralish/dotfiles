@@ -344,7 +344,7 @@ endif
 " ********************************* Wrapping **********************************
 
 " Don't display lines longer than the window width on the next line
-"set nowrap
+set nowrap
 
 " Use the line number column to show wrapped text
 "set cpoptions+=n
@@ -359,9 +359,12 @@ if has('linebreak')
     " String to insert at the start of wrapped lines
     let &showbreak = '> '
 
-    " Preserve indentation when wrapping lines
-    if v:version > 704 || v:version == 704 && has('patch338')
+    if exists('+breakindent')
+        " Preserve indentation when wrapping lines
         set breakindent
+
+        " With 'breakindent' wrapping is reasonable
+        set wrap
     endif
 endif
 
