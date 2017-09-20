@@ -515,6 +515,12 @@ if 1
 let g:c_comment_strings = 1
 
 
+" ################################### Git #####################################
+
+" Nice to know where our lines will wrap
+autocmd FileType gitcommit set colorcolumn=73
+
+
 " ################################### Jinja ###################################
 
 " Always treat '.jinja' files as Jinja (overrides any modeline)
