@@ -624,8 +624,8 @@ endif
 " tmux: Clipboard synchronisation
 Plug 'roxma/vim-tmux-clipboard'
 
-" tmux: Focus event handling (use our fork until PR #8 is merged)
-Plug 'ralish/vim-tmux-focus-events'
+" tmux: Focus event handling
+Plug 'tmux-plugins/vim-tmux-focus-events'
 
 " tmux: Status line generator
 Plug 'edkolev/tmuxline.vim'
