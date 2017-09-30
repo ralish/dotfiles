@@ -775,6 +775,9 @@ let g:jinja_syntax_html = 0
 " Enable fenced code block syntax highlighting for these languages
 let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
 
+" Don't conceal markdown syntax characters
+let g:markdown_syntax_conceal = 0
+
 
 " ######################### vim-markdown (plasticboy) #########################
 
