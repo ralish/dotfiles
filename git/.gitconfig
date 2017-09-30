@@ -19,16 +19,19 @@
     whitespace = fix
 
 [branch]
-    autoSetupMerge = true
+    autoSetupMerge = always
     autoSetupRebase = always
 
 [color]
-    ui = true
+    interactive = auto
+    ui = auto
 
 [diff]
-    algorithm = patience
+    algorithm = histogram
+    compactionHeuristic = true
     indentHeuristic = true
     mnemonicPrefix = true
+    renames = copies
 
 [help]
     autoCorrect = 0
@@ -58,6 +61,9 @@
 [rerere]
     enabled = true
     autoUpdate = true
+
+[status]
+    submoduleSummary = true
 
 [submodule]
     fetchJobs = 4
