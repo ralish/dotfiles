@@ -114,6 +114,7 @@
     cma = commit --all
     cmv = commit --all --message
     cmx = commit --amend
+    cmz = commit --amend --all
 
     co  = checkout
     cob = checkout -b
@@ -122,9 +123,9 @@
     cp  = cherry-pick
 
     d   = diff
-    dw  = diff -w
+    dw  = diff --ignore-all-space
     dc  = diff --cached
-    dcw = diff --cached -w
+    dcw = diff --cached --ignore-all-space
 
     f   = fetch
     fa  = fetch --all
@@ -132,9 +133,9 @@
     g   = grep
 
     h   = show
-    hw  = show -w
+    hw  = show --ignore-all-space
     hs  = show --stat
-    hsw = show --stat -w
+    hsw = show --stat --ignore-all-space
     h1  = show HEAD~1
     h2  = show HEAD~2
     h3  = show HEAD~3
@@ -148,12 +149,12 @@
 
     i   = init
 
-    l   = log --show-notes="*" --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --all
+    l   = log --show-notes='*' --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --all
+    lt  = log --show-notes='*' --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
     la  = "!git log --author=\"$(git config user.name)\" --name-status"
     ldb = log --first-parent --no-merges
     ln  = log --name-status
     ls  = ls-tree -r --name-status HEAD
-    lt  = log --show-notes="*" --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 
     m   = merge
     mf  = merge FETCH_HEAD
@@ -170,8 +171,8 @@
     pom = push origin master
     ps  = push --set-upstream
     pso = push --set-upstream origin
-    pt  = push $(git symbolic-ref HEAD | sed s_^refs/heads/__)
-    ptf = push $(git symbolic-ref HEAD | sed s_^refs/heads/__) --force
+    pt  = push "$(git symbolic-ref HEAD | sed s_^refs/heads/__)"
+    ptf = push "$(git symbolic-ref HEAD | sed s_^refs/heads/__)" --force
     pn  = push refs/notes/*
 
     q   = pull
@@ -198,7 +199,7 @@
     rma = remote add
     rmp = remote prune
     rmr = remote rm
-    rmv = remote --verbose
+    rmv = remote -v
 
     rs  = reset
     rsh = reset --hard
@@ -209,7 +210,7 @@
     s   = status --short --branch
     sl  = status --long
 
-    sh  = shortlog -s -e
+    sh  = shortlog --summary --email
     shl = shortlog
 
     sm  = submodule
@@ -231,9 +232,9 @@
     tl  = tag --list
     tv  = tag --verify
 
-    up  = "!git remote update -p; git merge --ff-only @{u}"
+    up  = "!git remote update --prune; git merge --ff-only @{u}"
 
-    wl  = "!watch -c -n 5 -t -x git l"
-    wlt = "!watch -c -n 5 -t -x git lt"
+    wl  = "!watch --color --interval 5 --no-title --exec git l"
+    wlt = "!watch --color --interval 5 --no-title --exec git lt"
 
 # vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 et sr
