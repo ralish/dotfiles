@@ -126,6 +126,7 @@
     dw  = diff --ignore-all-space
     dc  = diff --cached
     dcw = diff --cached --ignore-all-space
+    dns = diff --name-status
 
     f   = fetch
     fa  = fetch --all
