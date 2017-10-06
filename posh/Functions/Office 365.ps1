@@ -45,9 +45,14 @@ Function Connect-ExchangeOnline {
 
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         if (!(Get-Command -Name Connect-EXOPSSession -ErrorAction Ignore)) {
-            $ExoPowerShellModule = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0\TD1HV8YN.61O\1EP3V7G6.KPP\micr..tion_c3bce3770c238a49_0010.0000_90fa60bba125a33a\CreateExoPSSession.ps1'
-            if (Test-Path -Path $ExoPowerShellModule -PathType Leaf) {
-                . $ExoPowerShellModule
+            $ClickOnceAppsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0'
+            $ExoPowerShellModule = Get-ChildItem -Path $ClickOnceAppsPath -Recurse -Include 'Microsoft.Exchange.Management.ExoPowershellModule.manifest'
+            $ExoPowerShellModuleDll = Join-Path -Path $ExoPowerShellModule.Directory.FullName -ChildPath 'Microsoft.Exchange.Management.ExoPowerShellModule.dll'
+            $ExoPowerShellModulePs1 = Join-Path -Path $ExoPowerShellModule.Directory.FullName -ChildPath 'CreateExoPSSession.ps1'
+
+            if ($ExoPowerShellModule) {
+                Import-Module -FullyQualifiedName $ExoPowerShellModuleDll
+                . $ExoPowerShellModulePs1
             } else {
                 throw 'Required module not available: Microsoft.Exchange.Management.ExoPowershellModule'
             }
