@@ -5,6 +5,6 @@
         <FindInPath>git</FindInPath>
     </Detection>
     <InstallPath>
-        <HideSymlinks>True</HideSymlinks>
+        <HideSymlinks>true</HideSymlinks>
     </InstallPath>
 </Component>
