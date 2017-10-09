@@ -1,0 +1,6 @@
+<Component>
+    <IgnorePaths>
+        <Path>.history</Path>
+        <Path>clink.log</Path>
+    </IgnorePaths>
+</Component>
