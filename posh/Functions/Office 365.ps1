@@ -72,6 +72,23 @@ Function Connect-ExchangeOnline {
     }
 }
 
+Function Connect-Office365CentralizedDeployment {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [ValidateNotNull()]
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
+    )
+
+    if (!(Get-Module -Name OrganizationAddInService -ListAvailable)) {
+        throw 'Required module not available: OrganizationAddInService'
+    }
+
+    Write-Host -ForegroundColor Green -Object 'Connecting to Office 365 Centralized Deployment ...'
+    Connect-OrganizationAddInService @PSBoundParameters
+}
+
 Function Connect-SecurityAndComplianceCenter {
     [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
@@ -149,31 +166,15 @@ Function Connect-SkypeForBusinessOnline {
     Import-PSSession -Session $CsOnlineSession
 }
 
-Function Connect-Office365CentralizedDeployment {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [ValidateNotNull()]
-        [System.Management.Automation.Credential()]
-        [PSCredential]$Credential
-    )
-
-    if (!(Get-Module -Name OrganizationAddInService -ListAvailable)) {
-        throw 'Required module not available: OrganizationAddInService'
-    }
-
-    Write-Host -ForegroundColor Green -Object 'Connecting to Office 365 Centralized Deployment ...'
-    Connect-OrganizationAddInService @PSBoundParameters
-}
-
 Function Import-ExoPowershellModule {
     [CmdletBinding()]
     Param()
 
     if (!(Get-Command -Name Connect-EXOPSSession -ErrorAction Ignore)) {
+        Write-Verbose -Message 'Importing Microsoft.Exchange.Management.ExoPowershellModule ...'
+
         $ClickOnceAppsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0'
         $ExoPowerShellModule = Get-ChildItem -Path $ClickOnceAppsPath -Recurse -Include 'Microsoft.Exchange.Management.ExoPowershellModule.manifest'
-        $ExoPowerShellModuleDll = Join-Path -Path $ExoPowerShellModule.Directory -ChildPath 'Microsoft.Exchange.Management.ExoPowerShellModule.dll'
         $ExoPowerShellModulePs1 = Join-Path -Path $ExoPowerShellModule.Directory -ChildPath 'CreateExoPSSession.ps1'
 
         if ($ExoPowerShellModule) {
