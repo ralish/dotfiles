@@ -10,10 +10,9 @@ Function Connect-AzureAD {
         throw 'Required module not available: AzureAD'
     }
 
-    Write-Verbose -Message 'Connecting to Azure AD (v2) ...'
+    Write-Host -ForegroundColour Green -Object 'Connecting to Azure AD (v2) ...'
     AzureAD\Connect-AzureAD @PSBoundParameters
 }
-
 
 Function Connect-AzureRM {
     [CmdletBinding()]
@@ -27,10 +26,9 @@ Function Connect-AzureRM {
         throw 'Required module not available: AzureRM'
     }
 
-    Write-Verbose -Message 'Connecting to Azure RM ...'
+    Write-Host -ForegroundColor Green -Object 'Connecting to Azure RM ...'
     Login-AzureRmAccount @PSBoundParameters
 }
-
 
 Function Connect-MSOnline {
     [CmdletBinding()]
@@ -44,12 +42,12 @@ Function Connect-MSOnline {
         throw 'Required module not available: MSOnline'
     }
 
-    Write-Verbose -Message 'Connecting to Azure AD (v1) ...'
+    Write-Host -ForegroundColor Green -Object 'Connecting to Azure AD (v1) ...'
     Connect-MsolService @PSBoundParameters
 }
 
-
 Function Get-AzureAuthHeader {
+    [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
         [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult]$AuthToken
@@ -63,9 +61,11 @@ Function Get-AzureAuthHeader {
     return $AuthHeader
 }
 
-
-# https://blogs.technet.microsoft.com/paulomarques/2016/04/05/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script/
 Function Get-AzureAuthToken {
+    # Working with Azure REST APIs from Powershell - Getting page and block blob information from ARM based storage account sample script
+    # https://blogs.technet.microsoft.com/paulomarques/2016/04/05/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script/
+
+    [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
         [String]$TenantId
@@ -83,7 +83,7 @@ Function Get-AzureAuthToken {
     if (Test-Path -Path $AdalAsmPath) {
         $null = [Reflection.Assembly]::LoadFrom($AdalAsmPath)
     } else {
-        throw ('Unable to locate required DLL: {0}' -f $AdalAsmName)
+        throw 'Unable to locate required DLL: {0}' -f $AdalAsmName
     }
 
     $AdalFormsAsmName = 'Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll'
@@ -91,7 +91,7 @@ Function Get-AzureAuthToken {
     if (Test-Path -Path $AdalFormsAsmPath) {
         $null = [Reflection.Assembly]::LoadFrom($AdalFormsAsmPath)
     } else {
-        throw ('Unable to locate required DLL: {0}' -f $AdalFormsAsmName)
+        throw 'Unable to locate required DLL: {0}' -f $AdalFormsAsmName
     }
 
     $AuthorityUri = 'https://login.windows.net/{0}' -f $TenantId
@@ -101,9 +101,9 @@ Function Get-AzureAuthToken {
 
     $AuthContext = New-Object -TypeName 'Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext' -ArgumentList $AuthorityUri
     $AuthResult = $AuthContext.AcquireToken($ApiEndpointUri, $ClientId, $RedirectUri, 'Auto')
+
     return $AuthResult
 }
-
 
 Function Get-AzureUsersWithDisabledServices {
     [CmdletBinding()]
@@ -112,7 +112,7 @@ Function Get-AzureUsersWithDisabledServices {
     )
 
     $Results = @()
-    $Users = Get-MsolUser | Where-Object { $_.IsLicensed -eq $true} | Sort-Object -Property DisplayName
+    $Users = Get-MsolUser | Where-Object { $_.IsLicensed -eq $true }
 
     foreach ($User in $Users) {
         $DisabledServices = @()
@@ -126,5 +126,5 @@ Function Get-AzureUsersWithDisabledServices {
         }
     }
 
-    Write-Output -InputObject $Results
+    return $Results
 }
