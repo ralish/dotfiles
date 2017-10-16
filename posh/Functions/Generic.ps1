@@ -1,5 +1,6 @@
 # Convert a string to Base64 form
 Function ConvertTo-Base64 {
+    [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
         [String]$String
@@ -8,9 +9,9 @@ Function ConvertTo-Base64 {
     [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($String))
 }
 
-
 # Convert a string from Base64 form
 Function ConvertFrom-Base64 {
+    [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
         [String]$String
@@ -19,10 +20,10 @@ Function ConvertFrom-Base64 {
     [Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($String))
 }
 
-
-# Watch a Windows Event Log (in a similar fashion to "tail")
+# Watch an Event Log (similar to Unix "tail")
 # Slightly improved from: http://stackoverflow.com/questions/15262196/powershell-tail-windows-event-log-is-it-possible
 Function Get-EventLogTail {
+    [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
         [String]$EventLog
@@ -32,14 +33,14 @@ Function Get-EventLogTail {
     do {
         Start-Sleep -Seconds 1
         $IndexNew = (Get-EventLog -LogName $EventLog -Newest 1).Index
-        Get-EventLog -LogName $EventLog -Newest ($IndexNew - $IndexOld) | Sort-Object -Property Index
-        $IndexOld = $IndexNew
+        if ($IndexNew -ne $IndexOld) {
+            Get-EventLog -LogName $EventLog -Newest ($IndexNew - $IndexOld) | Sort-Object -Property Index
+            $IndexOld = $IndexNew
+        }
     } while ($true)
 }
 
-
-# The MKLINK command is actually part of the Command Processor (cmd.exe)
-# So we have a quick and dirty function below to invoke it via PowerShell
+# Helper function to call MKLINK via cmd.exe
 Function mklink {
-    & "$env:ComSpec" /c mklink $args
+    & $env:ComSpec /c mklink $args
 }
