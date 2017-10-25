@@ -655,7 +655,7 @@ Plug 'PProvost/vim-ps1'
 Plug 'exu/pgsql.vim'
 
 " Python
-Plug 'python-mode/python-mode'
+Plug 'python-mode/python-mode', { 'branch': 'develop' }
 
 " Salt
 Plug 'saltstack/salt-vim'
