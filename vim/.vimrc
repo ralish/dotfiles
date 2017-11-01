@@ -625,7 +625,9 @@ endif
 Plug 'roxma/vim-tmux-clipboard'
 
 " tmux: Focus event handling
-Plug 'tmux-plugins/vim-tmux-focus-events'
+if v:version > 704 || v:version == 704 && has('patch392')
+    Plug 'tmux-plugins/vim-tmux-focus-events'
+endif
 
 " tmux: Status line generator
 Plug 'edkolev/tmuxline.vim'
