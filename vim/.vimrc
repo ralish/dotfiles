@@ -644,6 +644,9 @@ Plug 'tpope/vim-git'
 " Jinja2
 Plug 'Glench/Vim-Jinja2-Syntax'
 
+" JSON
+Plug 'elzr/vim-json'
+
 " Markdown (simple)
 Plug 'tpope/vim-markdown'
 
@@ -690,6 +693,12 @@ endtry
 
 " File path patterns to exclude
 let g:EditorConfig_exclude_patterns = ['fugitive://.*']
+
+
+" ################################### json ####################################
+
+" Don't conceal double quotes
+let g:vim_json_syntax_conceal = 0
 
 
 " ################################# nerdtree ##################################
