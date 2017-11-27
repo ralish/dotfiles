@@ -106,15 +106,10 @@ if has('wildmenu')
     set wildignorecase
 endif
 
-" Configure line numbering based on Vim version
+" Enable absolute and relative numbering at once (hybrid mode)
 if v:version > 703 || v:version == 703 && has('patch1115')
-    " Vim 7.4+ supports absolute and relative numbering at once (hybrid mode)
     set number
     set relativenumber
-else
-    " Enable relative numbering with an easy toggle to absolute numbering
-    set relativenumber
-    Plug 'jeffkreeftmeijer/vim-numbertoggle'
 endif
 
 
@@ -557,6 +552,12 @@ Plug 'Yggdroot/indentLine'
 
 " Support ANSI escape sequences
 Plug 'powerman/vim-plugin-AnsiEsc'
+
+" Relative numbering with a toggle for absolute numbering
+if v:version < 703 || v:version == 703 && !has('patch1115')
+    set relativenumber
+    Plug 'jeffkreeftmeijer/vim-numbertoggle'
+endif
 
 
 " ############################## Colour Schemes ###############################
