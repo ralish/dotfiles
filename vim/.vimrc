@@ -654,6 +654,9 @@ Plug 'tpope/vim-markdown'
 " Markdown (advanced)
 "Plug 'plasticboy/vim-markdown'
 
+" Nagios
+Plug 'bigbrozer/vim-nagios'
+
 " PowerShell
 Plug 'PProvost/vim-ps1'
 
