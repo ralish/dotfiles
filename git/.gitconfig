@@ -71,7 +71,13 @@
 [filter "file-encoding"]
     clean = iconv -sc -f $(file --brief --mime-encoding %f) -t utf-8
     smudge = iconv -sc -f utf-8 -t $(file --brief --mime-encoding %f)
-    required
+    required = true
+
+[filter "lfs"]
+    process = git-lfs filter-process
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    required = true
 
 [url "git@bitbucket.org:"]
     insteadof = bb:
