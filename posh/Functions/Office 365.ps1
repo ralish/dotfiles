@@ -157,6 +157,14 @@ Function Connect-SkypeForBusinessOnline {
         throw 'Required module not available: SkypeOnlineConnector'
     }
 
+    # Fix a scope issue due to variable reuse by SkypeOnlineConnector?
+    if (-not $PSBoundParameters.ContainsKey('MfaUsername')) {
+        Remove-Variable -Name MfaUsername
+    }
+    if (-not $PSBoundParameters.ContainsKey('Credential')) {
+        Remove-Variable -Name Credential
+    }
+
     Write-Host -ForegroundColor Green -Object 'Connecting to Skype for Business Online ...'
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         $CsOnlineSession = New-CsOnlineSession -UserName $MfaUsername
