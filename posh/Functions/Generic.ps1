@@ -1,12 +1,33 @@
-# Convert a string to Base64 form
-Function ConvertTo-Base64 {
+# Compare the properties of two objects
+# Via: https://blogs.technet.microsoft.com/janesays/2017/04/25/compare-all-properties-of-two-objects-in-windows-powershell/
+Function Compare-ObjectProperties {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
-        [String]$String
+        [PSObject]$ReferenceObject,
+        [PSObject]$DifferenceObject
     )
 
-    [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($String))
+    $ObjProps = @()
+    $ObjProps += $ReferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty Name
+    $ObjProps += $DifferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty Name
+    $ObjProps = $ObjProps | Sort-Object | Select-Object -Unique
+
+    $ObjDiffs = @()
+    foreach ($Property in $ObjProps) {
+        $Diff = Compare-Object -ReferenceObject $ReferenceObject -DifferenceObject $DifferenceObject -Property $Property
+        if ($Diff) {
+            $DiffProps = @{
+                PropertyName=$Property
+                RefValue=($Diff | Where-Object { $_.SideIndicator -eq '<=' } | Select-Object -ExpandProperty $($Property))
+                DiffValue=($Diff | Where-Object { $_.SideIndicator -eq '=>' } | Select-Object -ExpandProperty $($Property))
+            }
+            $ObjDiffs += New-Object -TypeName PSObject -Property $DiffProps
+        }
+    }
+
+    if ($ObjDiffs) {
+        return ($ObjDiffs | Select-Object -Property PropertyName, RefValue, DiffValue)
+    }
 }
 
 # Convert a string from Base64 form
@@ -18,6 +39,17 @@ Function ConvertFrom-Base64 {
     )
 
     [Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($String))
+}
+
+# Convert a string to Base64 form
+Function ConvertTo-Base64 {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$String
+    )
+
+    [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($String))
 }
 
 # Watch an Event Log (similar to Unix "tail")
