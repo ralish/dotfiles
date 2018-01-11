@@ -3,7 +3,10 @@
 Function Compare-ObjectProperties {
     [CmdletBinding()]
     Param(
+        [Parameter(Mandatory)]
         [PSObject]$ReferenceObject,
+
+        [Parameter(Mandatory)]
         [PSObject]$DifferenceObject
     )
 
