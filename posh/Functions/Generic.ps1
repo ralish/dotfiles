@@ -34,7 +34,7 @@ Function Compare-ObjectProperties {
 Function ConvertFrom-Base64 {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory,ValueFromPipeline)]
         [String]$String
     )
 
@@ -45,7 +45,7 @@ Function ConvertFrom-Base64 {
 Function ConvertFrom-URLEncoded {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory,ValueFromPipeline)]
         [String]$String
     )
 
@@ -56,7 +56,8 @@ Function ConvertFrom-URLEncoded {
 Function ConvertTo-Base64 {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory,ValueFromPipeline)]
+        [ValidateNotNull()]
         [String]$String
     )
 
@@ -67,7 +68,7 @@ Function ConvertTo-Base64 {
 Function ConvertTo-URLEncoded {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory,ValueFromPipeline)]
         [String]$String
     )
 
