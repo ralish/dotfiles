@@ -174,6 +174,39 @@ Function Connect-SkypeForBusinessOnline {
     Import-PSSession -Session $CsOnlineSession
 }
 
+Function Get-UnifiedGroupSummary {
+    [CmdletBinding()]
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [PSObject[]]$Groups
+    )
+
+    if (!$Groups) {
+        Write-Host -ForegroundColor Green -Object 'Retrieving Office 365 groups ...'
+        $Groups = Get-UnifiedGroup
+    }
+
+    foreach ($Group in $Groups) {
+        Write-Host -ForegroundColor Green -Object ('Now processing: {0}' -f $Group.Identity)
+
+        Write-Verbose -Message ('[{0}] Retrieving owners ...' -f $Group.Identity)
+        $Owners = Get-UnifiedGroupLinks -Identity $Group.Identity -LinkType Owners
+        if ($Owners) {
+            $AllOwners = [String]::Join(', ', ($Owners | Sort-Object))
+            Add-Member -InputObject $Group -MemberType NoteProperty -Name Owners -Value $AllOwners -Force
+        }
+
+        Write-Verbose -Message ('[{0}] Retrieving members ...' -f $Group.Identity)
+        $Members = Get-UnifiedGroupLinks -Identity $Group.Identity -LinkType Members
+        if ($Members) {
+            $AllMembers = [String]::Join(', ', ($Members | Sort-Object))
+            Add-Member -InputObject $Group -MemberType NoteProperty -Name Members -Value $AllMembers -Force
+        }
+    }
+
+    return $Groups
+}
+
 Function Import-ExoPowershellModule {
     [CmdletBinding()]
     Param()
