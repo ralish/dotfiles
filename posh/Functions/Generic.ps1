@@ -41,6 +41,17 @@ Function ConvertFrom-Base64 {
     [Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($String))
 }
 
+# Convert a string from URL encoded form
+Function ConvertFrom-URLEncoded {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$String
+    )
+
+    [Net.WebUtility]::UrlDecode($String)
+}
+
 # Convert a string to Base64 form
 Function ConvertTo-Base64 {
     [CmdletBinding()]
@@ -50,6 +61,17 @@ Function ConvertTo-Base64 {
     )
 
     [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($String))
+}
+
+# Convert a string to URL encoded form
+Function ConvertTo-URLEncoded {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$String
+    )
+
+    [Net.WebUtility]::UrlEncode($String)
 }
 
 # Watch an Event Log (similar to Unix "tail")
