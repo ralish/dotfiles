@@ -61,13 +61,13 @@ Function Get-AzureAuthHeader {
     return $AuthHeader
 }
 
+# Working with Azure REST APIs from Powershell - Getting page and block blob information from ARM based storage account sample script
+# https://blogs.technet.microsoft.com/paulomarques/2016/04/05/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script/
 Function Get-AzureAuthToken {
-    # Working with Azure REST APIs from Powershell - Getting page and block blob information from ARM based storage account sample script
-    # https://blogs.technet.microsoft.com/paulomarques/2016/04/05/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script/
-
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [String]$TenantId
     )
 
