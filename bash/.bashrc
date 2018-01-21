@@ -49,6 +49,9 @@ shopt -s globstar
 # Append to the history file instead of overwriting
 shopt -s histappend
 
+# Allow filename patterns matching no files to expand to a null string
+#shopt -s nullglob
+
 
 #########################
 ### Control Variables ###

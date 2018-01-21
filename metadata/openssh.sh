@@ -32,6 +32,7 @@ else
 fi
 
 # Build our configuration
+shopt -s nullglob
 echo -n > "$OPENSSH_CFG"
 chmod 0600 "$OPENSSH_CFG"
 head -n -1 "$OPENSSH_BANNER" >> "$OPENSSH_CFG"
