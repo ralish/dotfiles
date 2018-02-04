@@ -1,3 +1,24 @@
+Function Get-MultipleHardlinks {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [IO.DirectoryInfo]$Path,
+
+        [Switch]$Recurse,
+
+        [ValidateScript({$_ -gt 1})]
+        [Int]$MinimumHardlinks=2
+    )
+
+    $Files = Get-ChildItem -Path $Path -File -Recurse:$Recurse | Where-Object {
+        $_.LinkType -eq 'HardLink' -and $_.Target.Count -ge ($MinimumHardLinks - 1)
+    }
+
+    $Files | Add-Member -MemberType ScriptProperty -Name LinkCount -Value {$this.Target.Count + 1} -Force
+
+    return $Files
+}
+
 Function Get-NonInheritedACLs {
     [CmdletBinding()]
     Param(
