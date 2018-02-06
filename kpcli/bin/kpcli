@@ -106,11 +106,12 @@ my $DEFAULT_ENTRY_ICON = 0;  # In keepassx, icon 0 is a golden key
 my $DEfAULT_GROUP_ICON = 49; # In keepassx, icon 49 is an opened file folder
 my $DEfAULT_BAKUP_ICON = 2;  # In keepassx, icon 2 is a warning sign
 my $FOUND_DIR = '_found';    # The find command's results go in /_found/
-my $MAX_ATTACH_SIZE = 2*1024**2; # Maximum size of entry file attachments
+my $AUTOSAVES_DIR = '_autosaves'; # The place where auto-saves are kept
+my $MAX_ATTACH_SIZE = 2*1024**2;  # Maximum size of entry file attachments
 
 # Application name and version
 my $APP_NAME = basename($0);  $APP_NAME =~ s/\.(pl|exe)$//;
-my $VERSION = "3.1";
+my $VERSION = "3.2";
 
 our $HISTORY_FILE = ""; # Gets set in the MyGetOpts() function
 my $opts=MyGetOpts();   # Will only return with options we think we can use
@@ -136,6 +137,14 @@ my $term = new Term::ShellUI(
     history_file => $HISTORY_FILE,
     keep_quotes => 0,
     commands => {
+         "autosave" => {
+             desc => "Describes the autosave functionality",
+             doc => "\n" . cli_autosave(undef,undef,1),
+             method => \&cli_autosave,
+             minargs => 0, maxargs => 1,
+	     exclude_from_history => 1,
+             timeout_exempt => 1,
+         },
          "ver" => {
              desc => "Print the version of this program",
              doc => "\n" .
@@ -332,6 +341,12 @@ my $term = new Term::ShellUI(
              minargs => 1, maxargs => 1,
              args => \&complete_groups_and_entries,
              method => sub { cli_xN('xp', @_); }
+         },
+         "xpx" => {
+             desc => "Copy password to clipboard, with auto-clear: xpx <entry path|number>",
+             minargs => 1, maxargs => 1,
+             args => \&complete_groups_and_entries,
+             method => sub { cli_xN('xpx', @_); }
          },
          "xx" => {
              desc => "Clear the clipboard: xx",
@@ -728,7 +743,7 @@ sub destroy_found {
   my $k=$state->{kdb};
   my $found_group=$k->find_group({level=>0,title=>$FOUND_DIR});
   if (defined($found_group)) {
-    my @oldents = $k->find_entries({group=>$found_group->{id}});
+    my @oldents = $k->find_entries({group_id=>$found_group->{id}});
     foreach my $ent (@oldents) {
       $k->delete_entry({id => $ent->{id}});
     }
@@ -1673,6 +1688,45 @@ sub cli_save($) {
 
   # Update the md5sum of the file after we just saved it
   $state->{kdb_file_md5} = Digest::file::digest_file_hex($file, "MD5");
+
+  # Now handle any autosave entries that this database may have
+  handle_autosaves();
+}
+
+sub handle_autosaves() {
+  our $state;
+  # Look for an exising /_found and kill it if it exists
+  my $k=$state->{kdb};
+  my $autosaves_group=$k->find_group({level=>0,title=>$AUTOSAVES_DIR});
+  if (defined($autosaves_group)) {
+    print "Defined autosaves:\n";
+    my @ents = $k->find_entries({group_id=>$autosaves_group->{id}});
+    print join("\n", @{get_human_entry_list(\@ents, 1)}) . "\n";
+    print color('red')."Process these autosaves? [y/N]: ".color('clear');
+    my $key=get_single_key();
+    print "\n";
+    if (lc($key) ne 'y') {
+      return;
+    }
+    foreach my $ent (@ents) {
+      my $as_file = $ent->{url};
+      $as_file = dirname($state->{kdb_file}) . "/" . $as_file;
+      my $as_file_lock = $as_file . ".lock";
+      if (-e $as_file_lock) {
+        print color('yellow') .
+		"Skipped \"$ent->{title}\" due lock file." .color('clear')."\n";
+      }
+      $state->{kdb}->unlock;
+      if ($state->{kdb_file} !~ m/\.kdbx$/i &&
+				$state->{kdb}->{header}->{version} == 2) {
+        $k->save_db($as_file,$ent->{password},$state->{kdb}->{header});
+      } else {
+        $k->save_db($as_file,$ent->{password});
+      }
+      $state->{kdb}->lock;
+    }
+    print color('red')."done.".color('clear')."\n";
+  }
 }
 
 # This subroutine handles the clipboard commands (xw, xu, xp, and xx)
@@ -1717,7 +1771,7 @@ sub cli_xN($$) {
   SWITCH: {
     $xNcmd eq 'xu' && do { $to_copy = $ent->{username}; last SWITCH; };
     $xNcmd eq 'xw' && do { $to_copy = $ent->{url}; last SWITCH; };
-    $xNcmd eq 'xp' && do {
+    $xNcmd =~ m/^xpx?$/ && do {
 			$to_copy = $state->{kdb}->locked_entry_password($ent);
 			last SWITCH; };
     warn "Error: cli_xN() does not know how to handle the $xNcmd command.";
@@ -1729,10 +1783,28 @@ sub cli_xN($$) {
 	'xu' => 'username',
 	'xw' => 'url',
 	'xp' => 'password',
+	'xpx' => 'password',
 	};
   if (defined($to_copy)) {
     Clipboard->copy($to_copy);
     print "Copied $cp_map->{$xNcmd} for \"$ent->{title}\" to the clipboard.\n";
+  }
+
+  # The user has asked us to auto-clear the clipboard
+  if ($xNcmd eq 'xpx') {
+    for my $n (reverse (0..9)) {
+      for my $i (reverse (0..9)) {
+        if (($i > 0 || $n == 0) && !($i % 3)) {
+          print "\rClipboard will be cleared in $n.$i seconds...";
+        }
+        if (recent_sigint()) { print "\n"; return undef; } # Bail on SIGINT
+        Time::HiRes::sleep(0.1);
+      }
+    }
+    print "\n";
+    Clipboard->copy('');
+    print "Clipboard cleared.\n";
+    return;
   }
 
   return;
@@ -2606,8 +2678,8 @@ sub new_edit_multiline_input($$) {
     if ($line =~ m/^\.[\r\n]*$/) { # a lone "." ends our input
       $unfinished = 0;
     } else {
+      $line .= "\n" if ($line !~ m/\n$/); # ReadLine() vs. $term->readline().
       $val .= $line;
-      $val .= "\n" if ($val !~ m/\n$/); # ReadLine() vs. $term->readline().
       if ($val =~ m/^[\r\n]*$/) { $val = ''; $unfinished = 0; }
     }
     # If the user hit ^C (SIGINT) then we need to stop
@@ -4002,6 +4074,26 @@ sub cli_quit($$) {
   return 0; # It's OK to quit
 }
 
+sub cli_autosave {
+  my $self = shift @_;
+  my $params = shift @_;
+  my $no_print = shift @_ || 0;
+  my $t="You can add entries to /$AUTOSAVES_DIR/ and, for each one, the save\n" .
+	"command will write the open kdb to the filename in the url field\n" .
+	"and with the entry's password. This can be used to keep copies\n" .
+	"of your kdb files with alternative passwords that might only\n" .
+	"be shared with the recipients during an emergency or at death.\n".
+	"\n" .
+	"The url field should only hold simple filenames (no paths) and\n" .
+	"the files will be written to the same directory as the opened\n" .
+	"Keepass file. There is no support for keyfile, only passwords.\n" .
+	"\n" .
+	"When /$AUTOSAVES_DIR/ entries exist, the save command shows\n" .
+	"them and prompts the user for confirmation before execution.\n" .
+	"";
+  if ($no_print) { return $t; } else { print $t; }
+}
+
 sub cli_version($$) {
   my $self = shift @_;
   my $params = shift @_;
@@ -4228,7 +4320,7 @@ sub GetUsageMessage {
   my @params = (
     [ kdb => 'Optional KeePass database file to open (must exist).' ],
     [ key => 'Optional KeePass key file (must exist).' ],
-    [ pwfiles => 'Read master password from file instead of console.' ],
+    [ pwfile => 'Read master password from file instead of console.' ],
     [ histfile => 'Specify your history file (or perhaps /dev/null).' ],
     [ readonly => 'Run in read-only mode; no changes will be allowed.' ],
     [ "timeout=i" => 'Lock interface after i seconds of inactivity.' ],
@@ -5444,12 +5536,14 @@ this program would not have been practical for me to author.
                      - rt.cpan.org tik# 113391; https://goo.gl/v65HKE
                     Applied SF patch #8 from Maciej Grela.
                     Optional better RNG; SF bug #30 from Aaron Toponce.
+ 2017-Dec-22 v3.2 - Added xpx command per the request in SF ticket #32.
+                    Added autosave functionality (shadow copies).
+                    Fixed a bug in new_edit_multiline_input() that was
+                     preventing blank lines between paragraphs.
+                    Fixed a typo in the --help info for --pwfile.
+                    Fixed a small bug in subroutine destroy_found().
 
 =head1 TODO ITEMS
-
-  Consider adding /shadow_copies/<entries> feature, where kpcli
-  will write "shadow copies" of the database, one for each entry,
-  using the path/password in the url/password fields.
 
   Consider broadening shell_expansion support beyond just mv and ls.
 
@@ -5477,7 +5571,7 @@ Unix-like
 
 Microsoft Windows
  - As of v2.4, Microsoft Windows is also supported.
- - Tested and compiled on Strawberry Perl 5.16.2 on Windows 7.
+ - Tested and compiled on Strawberry Perl 5.16.2 on Windows 10.
 
 =pod SCRIPT CATEGORIES
 
