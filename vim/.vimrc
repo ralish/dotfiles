@@ -458,6 +458,9 @@ nnoremap U <C-R>
 " Make behaviour of 'Y' consistent with 'D' and 'C' (i.e. yank from cursor)
 nnoremap Y y$
 
+" Open/close current fold
+nnoremap zz za
+
 " Shortcuts for managing our vimrc
 nnoremap <Leader>ev :vsplit $MYVIMRC<CR>
 nnoremap <Leader>sv :source $MYVIMRC<CR><C-L>:echo "Reloaded .vimrc"<CR>
@@ -482,9 +485,6 @@ if has('spell')
     nnoremap <Leader>s :setlocal spell!<CR>
     inoremap <Leader>s <C-\><C-O>:setlocal spell!<CR>
 endif
-
-" Open/close current fold
-nnoremap <Leader>z za
 
 " Break undo before running CTRL-U or CTRL-W so they can be undone
 inoremap <C-U> <C-G>u<C-U>
