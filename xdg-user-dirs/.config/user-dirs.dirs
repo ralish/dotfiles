@@ -1,0 +1,15 @@
+# XDG user directories configuration
+
+# This file is read by xdg-user-dir to inform XDG aware applications of our
+# preferred directories for storing various files. Consult xdg-user-dir(1).
+
+XDG_DESKTOP_DIR="$HOME/"
+XDG_DOCUMENTS_DIR="$HOME/"
+XDG_DOWNLOAD_DIR="$HOME/"
+XDG_MUSIC_DIR="$HOME/"
+XDG_PICTURES_DIR="$HOME/"
+XDG_PUBLICSHARE_DIR="$HOME/"
+XDG_TEMPLATES_DIR="$HOME/"
+XDG_VIDEOS_DIR="$HOME/"
+
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
