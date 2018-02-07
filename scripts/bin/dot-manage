@@ -9,10 +9,10 @@ set -o errtrace         # Make sure any error trap is inherited
 set -o pipefail         # Use last non-zero exit code in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
-# Path to the metadata directory relative to the dotfiles directory
-META_DIR=metadata
-# Path to the stow executable relative to the dotfiles directory
-STOW_BIN=stow/bin/stow
+# Path to the metadata directory
+META_DIR="metadata"
+# Path to the stow executable
+STOW_BIN="stow/bin/stow"
 
 # DESC: Usage help
 # ARGS: None
@@ -24,16 +24,13 @@ Usage:
     -nc|--no-colour             Disables colour output
 
     Stow Options:
+     -r|--reinstall             Equivalent to an uninstall and subsequent
+                                reinstall. This is the default and recommended
+                                option as it will prune any obsolete symlinks.
      -i|--install               Installs all detected applicable components
      -u|--uninstall             Uninstalls all detected applicable components
-     -r|--reinstall             Equivalent to an uninstall and reinstall. This
-                                is the default option and is recommended as it
-                                will prune any obsolete symlinks.
 
     Detection Options:
-    -do|--detection-only        Only run component detection but make no
-                                changes. This is typically only useful in
-                                conjunction with the detection report function.
     -dr|--detection-report      Displays a report of the detection results
 EOF
 }
@@ -44,48 +41,40 @@ EOF
 function parse_params() {
     local param
 
-    if [[ $# -eq 0 ]]; then
-        do_reinstall=true
-    else
-        while [[ $# -gt 0 ]]; do
-            param="$1"
-            shift
-            case $param in
-                -h|--help)
-                    script_usage
-                    exit 0
-                    ;;
-                -v|--verbose)
-                    verbose="true"
-                    ;;
-                -nc|--no-colour)
-                    no_colour="true"
-                    ;;
-                -i|--install)
-                    do_install="true"
-                    ;;
-                -r|--reinstall)
-                    do_reinstall="true"
-                    ;;
-                -u|--uninstall)
-                    do_uninstall="true"
-                    ;;
-                -do|--detection-only)
-                    do_detection_only="true"
-                    ;;
-                -dr|--detection-report)
-                    do_detection_report="true"
-                    ;;
-                *)
-                    script_exit "Invalid parameter was provided: $param" 2
-                    ;;
-            esac
-        done
+    # Default stow method
+    stow_method="reinstall"
 
-        if [[ -z $do_install && -z $do_uninstall ]]; then
-            do_reinstall=true
-        fi
-    fi
+    while [[ $# -gt 0 ]]; do
+        param="$1"
+        shift
+        case $param in
+            -h|--help)
+                script_usage
+                exit 0
+                ;;
+            -v|--verbose)
+                verbose="true"
+                ;;
+            -nc|--no-colour)
+                no_colour="true"
+                ;;
+            -i|--install)
+                stow_method="install"
+                ;;
+            -r|--reinstall)
+                stow_method="reinstall"
+                ;;
+            -u|--uninstall)
+                stow_method="uninstall"
+                ;;
+            -dr|--detection-report)
+                detection_report="true"
+                ;;
+            *)
+                script_exit "Invalid parameter was provided: $param" 2
+                ;;
+        esac
+    done
 }
 
 
@@ -110,6 +99,18 @@ function early_init() {
 }
 
 
+# DESC: Create some directories in advance so stow doesn't symlink them
+# ARGS: $@ (required): Directories to be created
+function create_dirs() {
+    while [[ $# -gt 0 ]]; do
+        if [[ ! -d $1 ]]; then
+            mkdir -p "$1"
+        fi
+        shift
+    done
+}
+
+
 # DESC: Quick, simple & dirty sorting of arguments
 # ARGS: $@ (required): Arguments to be sorted
 function sort_args() {
@@ -120,22 +121,23 @@ function sort_args() {
 # DESC: Detect the status of each component
 # ARGS: None
 function detect_components() {
-    pretty_print "*** Detecting applicable dotfiles components..."
+    pretty_print "*** Detecting applicable dotfiles components ..."
 
-    # TODO: comp_list should probably also be an array
     local comp_list comp_name comp_path detect_status
-    declare -g -a stow_list
-    declare -g -a detect_success detect_failure detect_ignore
-    declare -g -a detect_always_install detect_never_install
-    declare -g -a detect_not_available detect_no_logic
+    declare -g -a stow_list detect_success detect_failure detect_ignore \
+                  detect_always_install detect_never_install \
+                  detect_not_available detect_no_logic
 
-    comp_list="$(find "$dotfiles_path" -maxdepth 1 -type d \
-                                      ! -name "$dotfiles_name" -and \
-                                      ! -name ".git")"
+    comp_list="$(find "$dotfiles_path" \
+                    -maxdepth 1 \
+                    -type d \
+                    -not -path '*/\.*' -and \
+                    -not -name "$dotfiles_name")"
 
-    cd "$dotfiles_path"
     for comp_path in $comp_list; do
+        cd "$dotfiles_path"
         comp_name="$(basename "$comp_path")"
+
         if [[ -x $META_DIR/$comp_name.sh ]]; then
             if "$META_DIR/$comp_name.sh"; then
                 stow_list+=("$comp_name")
@@ -230,19 +232,6 @@ function detect_report() {
 }
 
 
-# DESC: Create some directories in advance to ensure stow doesn't symlink them
-# ARGS: $@ (required): Directories to be created
-function create_dirs() {
-    while [[ $# -gt 0 ]]; do
-        dir="$1"
-        if [[ ! -d $dir ]]; then
-            mkdir -p "$dir"
-        fi
-        shift
-    done
-}
-
-
 # DESC: Invokes the stow executable on detected components
 # ARGS: $1 (required): The operation type (-S, -D or -R)
 function stow_components() {
@@ -252,8 +241,9 @@ function stow_components() {
     cd "$dotfiles_path"
     for stow_comp in "${stow_list[@]}"; do
         if "$STOW_BIN" "$1" \
-            -d "$dotfiles_path" -t "$HOME" \
-            "$stow_comp" 2> /dev/null; then
+                -d "$dotfiles_path" \
+                -t "$HOME" \
+                "$stow_comp" 2> /dev/null; then
             stow_success+=("$stow_comp")
         else
             stow_failure+=("$stow_comp")
@@ -291,25 +281,26 @@ function main() {
 
     detect_components
 
-    if [[ -n $do_detection_report ]]; then
+    if [[ -n $detection_report ]]; then
         detect_report
-    fi
-
-    if [[ -n $do_detection_only ]]; then
         return
     fi
 
     create_dirs "$HOME/.config"
-    if [[ -n $do_reinstall ]]; then
-        pretty_print "*** Reinstalling all dotfiles components..."
-        stow_components -R
-    elif [[ -n $do_install ]]; then
-        pretty_print "*** Installing all dotfiles components..."
-        stow_components -S
-    elif [[ -n $do_uninstall ]]; then
-        pretty_print "*** Uninstalling all dotfiles components..."
-        stow_components -D
-    fi
+    case $stow_method in
+        install)
+            pretty_print "*** Installing all dotfiles components ..."
+            stow_components -S
+            ;;
+        reinstall)
+            pretty_print "*** Reinstalling all dotfiles components ..."
+            stow_components -R
+            ;;
+        uninstall)
+            pretty_print "*** Uninstalling all dotfiles components ..."
+            stow_components -D
+            ;;
+    esac
 }
 
 
