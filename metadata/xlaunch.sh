@@ -1,1 +1,1 @@
-templates/never_install.sh
+templates/ignore.sh

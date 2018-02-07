@@ -8,7 +8,7 @@ source "$script_dir/templates/common.sh"
 kernel_name=$(uname -s)
 if [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
     if command -v dpkg > /dev/null; then
-        if ! dpkg --get-selections | egrep '^libreadline' > /dev/null; then
+        if ! dpkg --get-selections | grep -E '^libreadline' > /dev/null; then
             exit $DETECTION_NOT_AVAILABLE
         fi
     elif command -v rpm > /dev/null; then
@@ -19,7 +19,7 @@ if [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
         exit $DETECTION_NO_LOGIC
     fi
 elif [ "${kernel_name#*CYGWIN_NT}" != "$kernel_name" ]; then
-    if ! cygcheck -c -d | egrep '^libreadline' > /dev/null; then
+    if ! cygcheck -c -d | grep -E '^libreadline' > /dev/null; then
         exit $DETECTION_NOT_AVAILABLE
     fi
 else
