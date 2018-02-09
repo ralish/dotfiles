@@ -5,7 +5,7 @@
 # A better class of script...
 set -o errexit          # Exit on most errors (see the manual)
 set -o errtrace         # Make sure any error trap is inherited
-#set -o nounset         # Disallow expansion of unset variables
+set -o nounset          # Disallow expansion of unset variables
 set -o pipefail         # Use last non-zero exit code in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
@@ -171,7 +171,7 @@ function detect_report() {
     local detection_result
 
     printf '%s\t\t' "Detected:"
-    if [[ -n ${detect_success[*]} ]]; then
+    if [[ -n ${detect_success[*]-} ]]; then
         detection_result="$(sort_args "${detect_success[@]}")"
         printf '%b%s%b\n' "$fg_green" "$detection_result" "$ta_none"
     else
@@ -179,7 +179,7 @@ function detect_report() {
     fi
 
     printf '%s\t\t' "Always Install:"
-    if [[ -n ${detect_always_install[*]} ]]; then
+    if [[ -n ${detect_always_install[*]-} ]]; then
         detection_result="$(sort_args "${detect_always_install[@]}")"
         printf '%b%s%b\n' "$fg_green" "$detection_result" "$ta_none"
     else
@@ -187,7 +187,7 @@ function detect_report() {
     fi
 
     printf '%s\t\t' "Never Install:"
-    if [[ -n ${detect_never_install[*]} ]]; then
+    if [[ -n ${detect_never_install[*]-} ]]; then
         detection_result="$(sort_args "${detect_never_install[@]}")"
         printf '%b%s%b\n' "$fg_green" "$detection_result" "$ta_none"
     else
@@ -195,7 +195,7 @@ function detect_report() {
     fi
 
     printf '%s\t\t' "Not Available:"
-    if [[ -n ${detect_not_available[*]} ]]; then
+    if [[ -n ${detect_not_available[*]-} ]]; then
         detection_result="$(sort_args "${detect_not_available[@]}")"
         printf '%b%s%b\n' "$fg_green" "$detection_result" "$ta_none"
     else
@@ -203,7 +203,7 @@ function detect_report() {
     fi
 
     printf '%s\t' "Detection Ignored:"
-    if [[ -n ${detect_ignore[*]} ]]; then
+    if [[ -n ${detect_ignore[*]-} ]]; then
         detection_result="$(sort_args "${detect_ignore[@]}")"
         printf '%b%s%b\n' "$fg_green" "$detection_result" "$ta_none"
     else
@@ -211,7 +211,7 @@ function detect_report() {
     fi
 
     printf '%s\t' "No Detection Logic:"
-    if [[ -n ${detect_no_logic[*]} ]]; then
+    if [[ -n ${detect_no_logic[*]-} ]]; then
         detection_result="$(sort_args "${detect_no_logic[@]}")"
         printf '%b%s%b\n' "$fg_yellow" "$detection_result" "$ta_none"
     else
@@ -219,7 +219,7 @@ function detect_report() {
     fi
 
     printf '%s\t' "Detection Failure:"
-    if [[ -n ${detect_failure[*]} ]]; then
+    if [[ -n ${detect_failure[*]-} ]]; then
         detection_result="$(sort_args "${detect_failure[@]}")"
         printf '%b%s%b\n' "$fg_red" "$detection_result" "$ta_none"
     else
@@ -246,13 +246,13 @@ function stow_components() {
         fi
     done
 
-    if [[ -n ${stow_failure[*]} ]]; then
+    if [[ -n ${stow_failure[*]-} ]]; then
         printf '%s\t\t' "Stow Failed:"
         stow_result="$(sort_args "${stow_failure[@]}")"
         printf '%b%s%b\n' "$fg_red" "$stow_result" "$ta_none"
     fi
 
-    if [[ -n ${stow_success[*]} ]]; then
+    if [[ -n ${stow_success[*]-} ]]; then
         printf '%s\t\t' "Stow Succeeded:"
         stow_result="$(sort_args "${stow_success[@]}")"
         printf '%b%s%b\n' "$fg_green" "$stow_result" "$ta_none"
@@ -277,7 +277,7 @@ function main() {
 
     detect_components
 
-    if [[ -n $detection_report ]]; then
+    if [[ -n ${detection_report-} ]]; then
         detect_report
         return
     fi
