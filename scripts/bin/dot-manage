@@ -265,8 +265,8 @@ function stow_components() {
 function main() {
     early_init
 
-    # shellcheck source=scripts/bin/source.sh
-    source "$script_real_dir/source.sh"
+    # shellcheck source=scripts/bin/bash-template.sh
+    source "$script_real_dir/bash-template.sh"
 
     trap "script_trap_err" ERR
     trap "script_trap_exit" EXIT
