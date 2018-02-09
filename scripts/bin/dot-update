@@ -10,7 +10,7 @@ set -o pipefail         # Use last non-zero exit code in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
 # Path to the dot-manage script
-DOT_MANAGE="dot-manage"
+DOT_MANAGE='dot-manage'
 
 # DESC: Usage help
 # ARGS: None
@@ -43,21 +43,21 @@ function parse_params() {
                 exit 0
                 ;;
             -nc|--no-colour)
-                no_colour="true"
+                no_colour='true'
                 ;;
             -a|--all)
-                git_update="true"
-                stow_update="true"
-                vim_update="true"
+                git_update='true'
+                stow_update='true'
+                vim_update='true'
                 ;;
             -g|--git)
-                git_update="true"
+                git_update='true'
                 ;;
             -s|--stow)
-                stow_update="true"
+                stow_update='true'
                 ;;
             -vi|--vim)
-                vim_update="true"
+                vim_update='true'
                 ;;
             *)
                 echo "Invalid parameter was provided: $param"
@@ -68,7 +68,7 @@ function parse_params() {
     if [[ -z ${git_update-} &&
           -z ${stow_update-} &&
           -z ${vim_update-} ]]; then
-        default_update="true"
+        default_update='true'
     fi
 }
 
@@ -106,8 +106,9 @@ function main() {
     colour_init
 
     if [[ -n ${default_update-} || -n ${git_update-} ]]; then
-        pretty_print "*** Updating Git sources ..."
+        pretty_print '*** Updating Git sources ...'
         cd "$dotfiles_path"
+        check_binary 'git' 'fatal'
 
         # Default to the upstream branch for an unqualified merge
         git config merge.defaultToUpstream true
@@ -124,7 +125,8 @@ function main() {
     fi
 
     if [[ -n ${default_update-} || -n ${vim_update-} ]]; then
-        pretty_print "*** Updating Vim plug-ins ..."
+        pretty_print '*** Updating Vim plug-ins ...'
+        check_binary 'vim' 'fatal'
         vim +PlugUpdate +qall
     fi
 }

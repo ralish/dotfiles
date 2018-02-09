@@ -10,9 +10,9 @@ set -o pipefail         # Use last non-zero exit code in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
 # Path to the metadata directory
-META_DIR="metadata"
+META_DIR='metadata'
 # Path to the stow executable
-STOW_BIN="stow/bin/stow"
+STOW_BIN='stow/bin/stow'
 
 # DESC: Usage help
 # ARGS: None
@@ -41,7 +41,7 @@ function parse_params() {
     local param
 
     # Default stow method
-    stow_method="reinstall"
+    stow_method='reinstall'
 
     while [[ $# -gt 0 ]]; do
         param="$1"
@@ -52,19 +52,19 @@ function parse_params() {
                 exit 0
                 ;;
             -nc|--no-colour)
-                no_colour="true"
+                no_colour='true'
                 ;;
             -i|--install)
-                stow_method="install"
+                stow_method='install'
                 ;;
             -r|--reinstall)
-                stow_method="reinstall"
+                stow_method='reinstall'
                 ;;
             -u|--uninstall)
-                stow_method="uninstall"
+                stow_method='uninstall'
                 ;;
             -dr|--detection-report)
-                detection_report="true"
+                detection_report='true'
                 ;;
             *)
                 script_exit "Invalid parameter was provided: $param" 2
@@ -117,7 +117,7 @@ function sort_args() {
 # DESC: Detect the status of each component
 # ARGS: None
 function detect_components() {
-    pretty_print "*** Detecting applicable dotfiles components ..."
+    pretty_print '*** Detecting applicable dotfiles components ...'
 
     local comp_list comp_name comp_path detect_status
     declare -g -a stow_list detect_success detect_failure detect_ignore \
@@ -170,60 +170,60 @@ function detect_components() {
 function detect_report() {
     local detection_result
 
-    printf '%s\t\t' "Detected:"
+    printf '%s\t\t' 'Detected:'
     if [[ -n ${detect_success[*]-} ]]; then
         detection_result="$(sort_args "${detect_success[@]}")"
         printf '%b%s%b\n' "$fg_green" "$detection_result" "$ta_none"
     else
-        printf '%b%s%b\n' "$fg_cyan" "None" "$ta_none"
+        printf '%b%s%b\n' "$fg_cyan" 'None' "$ta_none"
     fi
 
-    printf '%s\t\t' "Always Install:"
+    printf '%s\t\t' 'Always Install:'
     if [[ -n ${detect_always_install[*]-} ]]; then
         detection_result="$(sort_args "${detect_always_install[@]}")"
         printf '%b%s%b\n' "$fg_green" "$detection_result" "$ta_none"
     else
-        printf '%b%s%b\n' "$fg_cyan" "None" "$ta_none"
+        printf '%b%s%b\n' "$fg_cyan" 'None' "$ta_none"
     fi
 
-    printf '%s\t\t' "Never Install:"
+    printf '%s\t\t' 'Never Install:'
     if [[ -n ${detect_never_install[*]-} ]]; then
         detection_result="$(sort_args "${detect_never_install[@]}")"
         printf '%b%s%b\n' "$fg_green" "$detection_result" "$ta_none"
     else
-        printf '%b%s%b\n' "$fg_cyan" "None" "$ta_none"
+        printf '%b%s%b\n' "$fg_cyan" 'None' "$ta_none"
     fi
 
-    printf '%s\t\t' "Not Available:"
+    printf '%s\t\t' 'Not Available:'
     if [[ -n ${detect_not_available[*]-} ]]; then
         detection_result="$(sort_args "${detect_not_available[@]}")"
         printf '%b%s%b\n' "$fg_green" "$detection_result" "$ta_none"
     else
-        printf '%b%s%b\n' "$fg_cyan" "None" "$ta_none"
+        printf '%b%s%b\n' "$fg_cyan" 'None' "$ta_none"
     fi
 
-    printf '%s\t' "Detection Ignored:"
+    printf '%s\t' 'Detection Ignored:'
     if [[ -n ${detect_ignore[*]-} ]]; then
         detection_result="$(sort_args "${detect_ignore[@]}")"
         printf '%b%s%b\n' "$fg_green" "$detection_result" "$ta_none"
     else
-        printf '%b%s%b\n' "$fg_cyan" "None" "$ta_none"
+        printf '%b%s%b\n' "$fg_cyan" 'None' "$ta_none"
     fi
 
-    printf '%s\t' "No Detection Logic:"
+    printf '%s\t' 'No Detection Logic:'
     if [[ -n ${detect_no_logic[*]-} ]]; then
         detection_result="$(sort_args "${detect_no_logic[@]}")"
         printf '%b%s%b\n' "$fg_yellow" "$detection_result" "$ta_none"
     else
-        printf '%b%s%b\n' "$fg_green" "None" "$ta_none"
+        printf '%b%s%b\n' "$fg_green" 'None' "$ta_none"
     fi
 
-    printf '%s\t' "Detection Failure:"
+    printf '%s\t' 'Detection Failure:'
     if [[ -n ${detect_failure[*]-} ]]; then
         detection_result="$(sort_args "${detect_failure[@]}")"
         printf '%b%s%b\n' "$fg_red" "$detection_result" "$ta_none"
     else
-        printf '%b%s%b\n' "$fg_green" "None" "$ta_none"
+        printf '%b%s%b\n' "$fg_green" 'None' "$ta_none"
     fi
 }
 
@@ -247,13 +247,13 @@ function stow_components() {
     done
 
     if [[ -n ${stow_failure[*]-} ]]; then
-        printf '%s\t\t' "Stow Failed:"
+        printf '%s\t\t' 'Stow Failed:'
         stow_result="$(sort_args "${stow_failure[@]}")"
         printf '%b%s%b\n' "$fg_red" "$stow_result" "$ta_none"
     fi
 
     if [[ -n ${stow_success[*]-} ]]; then
-        printf '%s\t\t' "Stow Succeeded:"
+        printf '%s\t\t' 'Stow Succeeded:'
         stow_result="$(sort_args "${stow_success[@]}")"
         printf '%b%s%b\n' "$fg_green" "$stow_result" "$ta_none"
     fi
@@ -285,15 +285,15 @@ function main() {
     create_dirs "$HOME/.config"
     case $stow_method in
         install)
-            pretty_print "*** Installing all dotfiles components ..."
+            pretty_print '*** Installing all dotfiles components ...'
             stow_components -S
             ;;
         reinstall)
-            pretty_print "*** Reinstalling all dotfiles components ..."
+            pretty_print '*** Reinstalling all dotfiles components ...'
             stow_components -R
             ;;
         uninstall)
-            pretty_print "*** Uninstalling all dotfiles components ..."
+            pretty_print '*** Uninstalling all dotfiles components ...'
             stow_components -D
             ;;
     esac
