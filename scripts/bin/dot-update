@@ -5,12 +5,12 @@
 # A better class of script...
 set -o errexit          # Exit on most errors (see the manual)
 set -o errtrace         # Make sure any error trap is inherited
-#set -o nounset         # Disallow expansion of unset variables
+set -o nounset          # Disallow expansion of unset variables
 set -o pipefail         # Use last non-zero exit code in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
-# Path to the dot-manage script relative to the dotfiles directory
-DOT_MANAGE=dot-manage
+# Path to the dot-manage script
+DOT_MANAGE="dot-manage"
 
 # DESC: Usage help
 # ARGS: None
@@ -18,14 +18,13 @@ function script_usage() {
     cat << EOF
 Usage:
      -h|--help                  Displays this help
-     -v|--verbose               Displays verbose output
     -nc|--no-colour             Disables colour output
 
     Update Options:
-     -a|--all                   Update all the things!!
-     -g|--git                   Update Git sources & any submodules (default)
-     -s|--stow                  Run dot-manage after updating Git (default)
-     -v|--vim                   Update Vim bundles
+     -a|--all                   Update all the things
+     -g|--git                   Update Git sources (default)
+     -s|--stow                  Run dot-manage (default)
+     -v|--vim                   Update Vim plug-ins
 EOF
 }
 
@@ -35,43 +34,41 @@ EOF
 function parse_params() {
     local param
 
-    if [[ $# -eq 0 ]]; then
-        git_update=true
-        stow_update=true
-    else
-        while [[ $# -gt 0 ]]; do
-            param="$1"
-            shift
-            case $param in
-                -h|--help)
-                    script_usage
-                    exit 0
-                    ;;
-                -v|--verbose)
-                    verbose="true"
-                    ;;
-                -nc|--no-colour)
-                    no_colour="true"
-                    ;;
-                -a|--all)
-                    git_update=true
-                    stow_update=true
-                    vim_update=true
-                    ;;
-                -g|--git)
-                    git_update=true
-                    ;;
-                -s|--stow)
-                    stow_update=true
-                    ;;
-                -vi|--vim)
-                    vim_update=true
-                    ;;
-                *)
-                    echo "Invalid parameter was provided: $param"
-                    exit 1
-            esac
-        done
+    while [[ $# -gt 0 ]]; do
+        param="$1"
+        shift
+        case $param in
+            -h|--help)
+                script_usage
+                exit 0
+                ;;
+            -nc|--no-colour)
+                no_colour="true"
+                ;;
+            -a|--all)
+                git_update="true"
+                stow_update="true"
+                vim_update="true"
+                ;;
+            -g|--git)
+                git_update="true"
+                ;;
+            -s|--stow)
+                stow_update="true"
+                ;;
+            -vi|--vim)
+                vim_update="true"
+                ;;
+            *)
+                echo "Invalid parameter was provided: $param"
+                exit 1
+        esac
+    done
+
+    if [[ -z ${git_update-} &&
+          -z ${stow_update-} &&
+          -z ${vim_update-} ]]; then
+        default_update="true"
     fi
 }
 
@@ -108,8 +105,8 @@ function main() {
     parse_params "$@"
     colour_init
 
-    if [[ -n $git_update ]]; then
-        pretty_print "*** Updating Git sources..."
+    if [[ -n ${default_update-} || -n ${git_update-} ]]; then
+        pretty_print "*** Updating Git sources ..."
         cd "$dotfiles_path"
 
         # Default to the upstream branch for an unqualified merge
@@ -121,13 +118,13 @@ function main() {
         git submodule update
     fi
 
-    if [[ -n $stow_update ]]; then
+    if [[ -n ${default_update-} || -n ${stow_update-} ]]; then
         cd "$dotfiles_path"
         "./$DOT_MANAGE"
     fi
 
-    if [[ -n $vim_update ]]; then
-        pretty_print "*** Updating Vim bundles..."
+    if [[ -n ${default_update-} || -n ${vim_update-} ]]; then
+        pretty_print "*** Updating Vim plug-ins ..."
         vim +PlugUpdate +qall
     fi
 }
