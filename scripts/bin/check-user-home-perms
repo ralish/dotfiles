@@ -9,37 +9,76 @@
 # A better class of script...
 set -o errexit          # Exit on most errors (see the manual)
 set -o errtrace         # Make sure any error trap is inherited
-set -o pipefail         # Exit on failures earlier in a pipeline
+set -o nounset          # Disallow expansion of unset variables
+set -o pipefail         # Use last non-zero exit code in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
-function check_perms {
-    user_home="$1"
-    user_name="$(basename "$1")"
-    user_uid=$(id -u "$user_name")
-    user_gid=$(id -g "$user_name")
-    echo -n "Checking permissions for $user_name... "
-    find_results="$(sudo find "$user_home" -not -uid $user_uid -or \
-                                           -not -gid $user_gid 2>&1)"
+# DESC: Check permissions on a user's home directory
+# ARGS: $1 (required): User name to check
+function check_user_home_perms() {
+    if [[ $# -ne 1 ]]; then
+        script_exit 'Invalid arguments passed to check_user_home_perms()!' 2
+    fi
+
+    local user_name user_entry
+    user_name="$1"
+    user_entry="$(getent passwd "$user_name" || true)"
+    if [[ -z $user_entry ]]; then
+        script_exit "Unable to find details for user: $user_name"
+    fi
+
+    local user_uid user_gid user_home
+    user_uid="$(id -u "$user_name")"
+    user_gid="$(id -g "$user_name")"
+    user_home="$(echo "$user_entry" | cut -d: -f6)"
+
+    pretty_print "Checking permissions for $user_name ... " "$fg_green" 'true'
+    local find_results find_status
+    find_results="$(run_as_root find "$user_home" \
+                        -not -uid "$user_uid" -or \
+                        -not -gid "$user_gid" 2>&1)"
     find_status=$?
+
     if [[ $find_status -eq 0 && -z $find_results ]]; then
-        echo 'ok'
+        pretty_print 'OK'
     elif [[ $find_status -ne 0 ]]; then
-        echo 'find returned non-zero exit status!'
+        pretty_print 'find returned non-zero exit status!' "$fg_yellow"
     else
-        echo -e "found potential issues:\n$find_results"
+        pretty_print 'found potential issues:' "$fg_red"
+        pretty_print "$find_results"
     fi
 }
 
-if ! sudo -v 2> /dev/null; then
-    echo 'This script requires sudo access.'
-    exit 1
-fi
 
-check_perms "$(echo ~root)"
-for user in $(find /home -maxdepth 1 \
-                         -not -path '*/\.*' \
-                         -type d ! -name 'home'); do
-    check_perms "$user"
-done
+# DESC: Main control flow
+# ARGS: $@ (optional): Arguments provided to the script
+function main() {
+    # shellcheck source=scripts/bin/bash-template.sh
+    source "$(dirname "${BASH_SOURCE[0]}")/bash-template.sh"
+
+    trap "script_trap_err" ERR
+    trap "script_trap_exit" EXIT
+
+    script_init
+    colour_init
+
+    # shellcheck disable=SC2119
+    if ! check_superuser; then
+        script_exit 'Superuser access (via root or sudo) is required.' 1
+    fi
+
+    # shellcheck disable=SC2034
+    getent passwd | while IFS=: read -r login pw uid gid gecos home shell; do
+        if [[ $home =~ ^(/root|/home/[A-Za-z]) ]]; then
+            if [[ -d $home ]]; then
+                check_user_home_perms "$login"
+            fi
+        fi
+    done
+}
+
+
+# Check user home directory permissions
+main "$@"
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
