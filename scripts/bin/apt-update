@@ -5,38 +5,62 @@
 # A better class of script...
 set -o errexit          # Exit on most errors (see the manual)
 set -o errtrace         # Make sure any error trap is inherited
-#set -o pipefail        # Exit on failures earlier in a pipeline
+set -o nounset          # Disallow expansion of unset variables
+set -o pipefail         # Use last non-zero exit code in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
-if ! sudo -v 2> /dev/null; then
-    echo 'This script requires sudo access.'
-    exit 1
-elif ! dpkg -S /usr/bin/dpkg > /dev/null 2>&1; then
-    echo 'This script is for Debian based systems.'
-    exit 1
-fi
+# DESC: Main control flow
+# ARGS: $@ (optional): Arguments provided to the script
+function main() {
+    # shellcheck source=scripts/bin/bash-template.sh
+    source "$(dirname "${BASH_SOURCE[0]}")/bash-template.sh"
 
-echo '*** Updating package index files...'
-sudo apt-get update > /dev/null
+    trap "script_trap_err" ERR
+    trap "script_trap_exit" EXIT
 
-echo -e "\n*** Upgrading installed packages..."
-sudo apt-get dist-upgrade
+    script_init
+    colour_init
 
-echo -e "\n*** Removing redundant packages..."
-sudo apt-get autoremove
+    # shellcheck disable=SC2119
+    if ! check_superuser; then
+        script_exit 'Superuser access (via root or sudo) is required.' 1
+    fi
 
-pkgs_rc=$(dpkg --get-selections | grep 'deinstall' | cut -f1)
-if [[ -n $pkgs_rc ]]; then
-    echo -e "\n*** Purging removed packages..."
-    sudo apt-get purge $pkgs_rc
-fi
+    check_binary 'dpkg' 'fatal'
 
-echo -e "\n*** Cleaning local repository..."
-sudo apt-get autoclean
+    pretty_print '*** Updating package index files ...'
+    run_as_root apt-get update > /dev/null
+    echo
 
-pkgs_num=$(dpkg --get-selections | wc -l)
-echo -e "\n*** Total installed packages: $pkgs_num"
+    pretty_print '*** Upgrading installed packages ...'
+    run_as_root apt-get dist-upgrade
+    echo
 
-echo -e "\n*** Done!"
+    pretty_print '*** Removing redundant packages ...'
+    run_as_root apt-get autoremove
+    echo
+
+    pkgs_rc="$(dpkg --get-selections | grep 'deinstall' | cut -f1)"
+    if [[ -n $pkgs_rc ]]; then
+        pretty_print '*** Purging removed packages ...'
+        # shellcheck disable=SC2086
+        run_as_root apt-get purge $pkgs_rc
+        echo
+    fi
+
+    pretty_print '*** Cleaning local repository ...'
+    sudo apt-get autoclean
+    echo
+
+    pkgs_num="$(dpkg --get-selections | wc -l)"
+    pretty_print "*** Total installed packages: $pkgs_num"
+    echo
+
+    pretty_print '*** Done!'
+}
+
+
+# Perform system update
+main "$@"
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
