@@ -56,7 +56,7 @@ function parse_params() {
             -s|--stow)
                 stow_update='true'
                 ;;
-            -vi|--vim)
+            -v|--vim)
                 vim_update='true'
                 ;;
             *)
@@ -124,7 +124,7 @@ function main() {
         "./$DOT_MANAGE"
     fi
 
-    if [[ -n ${default_update-} || -n ${vim_update-} ]]; then
+    if [[ -n ${vim_update-} ]]; then
         pretty_print '*** Updating Vim plug-ins ...'
         check_binary 'vim' 'fatal'
         vim +PlugUpdate +qall
