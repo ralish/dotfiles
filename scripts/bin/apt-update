@@ -40,7 +40,7 @@ function main() {
     run_as_root apt-get autoremove
     echo
 
-    pkgs_rc="$(dpkg --get-selections | grep 'deinstall' | cut -f1)"
+    pkgs_rc="$(dpkg --get-selections | grep 'deinstall' | cut -f1 || true)"
     if [[ -n $pkgs_rc ]]; then
         pretty_print '*** Purging removed packages ...'
         # shellcheck disable=SC2086
