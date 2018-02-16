@@ -23,7 +23,7 @@ update-ssh-auth-sock() {
     ssh_current_agent="$SSH_AUTH_SOCK"
 
     if [ -n "$TMUX" ]; then
-        eval "$(tmux show-environment -s | grep -E '^SSH_AUTH_SOCK=')"
+        eval "$(tmux show-env -s | grep -E '^(unset )?SSH_AUTH_SOCK[=;]')"
     elif [ -n "$STY" ]; then
         uid="$(id -u)"
         ssh_agents="$(find /tmp -maxdepth 2 \
