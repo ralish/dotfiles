@@ -174,6 +174,52 @@ Function Connect-SkypeForBusinessOnline {
     Import-PSSession -Session $CsOnlineSession
 }
 
+Function Get-InboxRulesByFolders {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [String]$Mailbox,
+
+        [String]$TimeZone='AUS Eastern Standard Time',
+        [String]$TimeFormat='yyyy/mm/dd'
+    )
+
+    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox folders ...'
+    $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object { $_.DefaultFolderType -ne 'Inbox' }
+
+    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
+    $Rules = Get-InboxRule -Mailbox $Mailbox -DescriptionTimeZone $TimeZone -DescriptionTimeFormat $TimeFormat
+
+    Write-Host -ForegroundColor Green -Object 'Generating report ...'
+    $Results = @()
+    foreach ($Folder in $Folders) {
+        Add-Member -InputObject $Folder -MemberType NoteProperty -Name Rules -Value @()
+        Add-Member -InputObject $Folder -MemberType ScriptProperty -Name RuleCount -Value { $this.Rules.Count }
+
+        $FolderDashName = ($Folder.FolderPath -join ' - ').Substring(8)
+        foreach ($Rule in $Rules) {
+            if ($Rule.LinkedToFolder) {
+                continue
+            }
+
+            if ($Rule.Name -match ('^{0}' -f $FolderDashName) -and $Rule.MoveToFolder -eq $Folder.Name) {
+                Add-Member -InputObject $Rule -MemberType NoteProperty -Name LinkedToFolder -Value $true
+                $Folder.Rules += $Rule
+            }
+        }
+
+        $Results += $Folder
+    }
+
+    $UnlinkedRules = $Rules | Where-Object { $_.LinkedToFolder -eq $false }
+    if ($UnlinkedRules) {
+        Write-Host -ForegroundColor Yellow -Object ('Number of unlinked rules: {0}' -f $UnlinkedRules.Count)
+    }
+
+    return $Folders
+}
+
 Function Get-UnifiedGroupSummary {
     [CmdletBinding()]
     Param(
