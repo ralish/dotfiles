@@ -190,6 +190,9 @@ Function Get-InboxRulesByFolders {
 
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
     $Rules = Get-InboxRule -Mailbox $Mailbox -DescriptionTimeZone $TimeZone -DescriptionTimeFormat $TimeFormat
+    foreach ($Rule in $Rules) {
+        Add-Member -InputObject $Rule -MemberType NoteProperty -Name LinkedToFolder -Value $false
+    }
 
     Write-Host -ForegroundColor Green -Object 'Generating report ...'
     $Results = @()
@@ -204,7 +207,7 @@ Function Get-InboxRulesByFolders {
             }
 
             if ($Rule.Name -match ('^{0}' -f $FolderDashName) -and $Rule.MoveToFolder -eq $Folder.Name) {
-                Add-Member -InputObject $Rule -MemberType NoteProperty -Name LinkedToFolder -Value $true
+                $Rule.LinkedToFolder = $true
                 $Folder.Rules += $Rule
             }
         }
@@ -214,7 +217,7 @@ Function Get-InboxRulesByFolders {
 
     $UnlinkedRules = $Rules | Where-Object { $_.LinkedToFolder -eq $false }
     if ($UnlinkedRules) {
-        Write-Host -ForegroundColor Yellow -Object ('Number of unlinked rules: {0}' -f $UnlinkedRules.Count)
+        Write-Host -ForegroundColor Yellow -Object ('Number of unlinked rules: {0}' -f ($UnlinkedRules | Measure-Object).Count)
     }
 
     return $Folders
