@@ -25,9 +25,4 @@ if command -v git-prompt > /dev/null; then
     source "$(command -v git-prompt)"
 fi
 
-# Enable direct hardware-accelerated OpenGL rendering in Cygwin/X
-if command -v startxwin > /dev/null; then
-    export LIBGL_USE_WGL=1
-fi
-
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
