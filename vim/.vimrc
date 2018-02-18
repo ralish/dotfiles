@@ -273,7 +273,7 @@ set sidescroll=3
 
 " ***************************** Search & Replace ******************************
 
-" Enable the 'g' flag in ':substitute" commands by default
+" Enable the 'g' flag in ':substitute' commands by default
 set gdefault
 
 " Ignore case in search patterns
@@ -435,6 +435,33 @@ if has('mksession')
 endif
 
 
+" ******************************** Functions **********************************
+
+" Centre and pad the current line up to text width (defaults to 79)
+" Inspired by: https://stackoverflow.com/a/3400528
+function! AsciiTextBanner(...)
+    let l:fill_char = a:0 >= 1 ? a:1 : '#'
+    let l:text_width = a:0 >= 2 ? a:2 : &textwidth
+
+    if len(l:fill_char) != 1
+        let l:fill_char = '#'
+    endif
+
+    if l:text_width <= 0 || l:text_width > 1000
+        let l:text_width = 79
+    endif
+
+    silent s/[[:space:]]*$//
+    execute "center" . l:text_width
+    execute "normal! hhv0r" . l:fill_char . "A\<Esc>"
+
+    let l:eol_chars = l:text_width - col('$')
+    if l:eol_chars > 0
+        silent substitute/$/\=(' '.repeat(l:fill_char, l:eol_chars))/
+    endif
+endfunction
+
+
 " ******************************* Key Mappings ********************************
 
 " Key to use for <Leader>
@@ -463,10 +490,13 @@ nnoremap zz za
 
 " Shortcuts for managing our vimrc
 nnoremap <Leader>ev :vsplit $MYVIMRC<CR>
-nnoremap <Leader>sv :source $MYVIMRC<CR><C-L>:echo "Reloaded .vimrc"<CR>
+nnoremap <Leader>sv :source $MYVIMRC<CR><C-L>:echo 'Reloaded .vimrc'<CR>
 
 " Disable highlighting of current search results
 nnoremap <Leader><Space> :nohlsearch<C-R>=has('diff')?'<Bar>diffupdate':''<CR><CR><C-L>
+
+" Centre and pad the current line
+nnoremap <leader>ac :call AsciiTextBanner()<CR>
 
 " Toggle list mode
 nnoremap <Leader>l :set list!<CR>
