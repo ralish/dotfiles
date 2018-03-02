@@ -127,6 +127,7 @@
     cof = checkout FETCH_HEAD
 
     cp  = cherry-pick
+    cpa = cherry-pick --abort
 
     d   = diff
     dw  = diff --ignore-all-space
