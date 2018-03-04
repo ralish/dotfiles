@@ -780,14 +780,17 @@ let g:syntastic_check_on_open = 1
 " Don't run syntax checks when buffers are written due to exiting
 let g:syntastic_check_on_wq = 0
 
-" Allow shellcheck to source files not specified on the command line
-let g:syntastic_sh_shellcheck_args = '-x'
-
 " Nicer symbols for the various issue types
 let g:syntastic_warning_symbol = '▲'
 let g:syntastic_style_warning_symbol = '≈'
 let g:syntastic_error_symbol = '✘'
 let g:syntastic_style_error_symbol = '≃'
+
+" Configure which syntax checkers to use for various languages
+let g:syntastic_javascript_checkers = ['eslint']
+
+" Allow shellcheck to source files not specified on the command line
+let g:syntastic_sh_shellcheck_args = '-x'
 
 
 " ################################ vim-airline ################################
