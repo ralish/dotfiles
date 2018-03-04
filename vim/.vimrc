@@ -793,6 +793,10 @@ let g:syntastic_style_error_symbol = '≃'
 " Configure which syntax checkers to use for various languages
 let g:syntastic_javascript_checkers = ['eslint']
 
+" Use markdownlint-cli instead of mdl for Markdown lint
+let g:syntastic_markdown_mdl_exec = 'markdownlint'
+let g:syntastic_markdown_mdl_args = ''
+
 " Allow shellcheck to source files not specified on the command line
 let g:syntastic_sh_shellcheck_args = '-x'
 
