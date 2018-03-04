@@ -764,6 +764,10 @@ let g:pymode_rope_regenerate_on_write = 0
 
 " ################################# syntastic #################################
 
+" Some useful shortcuts to common commands
+nnoremap <Leader>sc :SyntasticCheck<CR>
+nnoremap <Leader>si :SyntasticInfo<CR>
+
 " Always populate the location-list with detected errors
 let g:syntastic_always_populate_loc_list = 1
 
