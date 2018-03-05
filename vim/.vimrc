@@ -672,6 +672,9 @@ Plug 'kchmck/vim-coffee-script'
 " Git
 Plug 'tpope/vim-git'
 
+" JavaScript
+Plug 'pangloss/vim-javascript'
+
 " Jinja2
 Plug 'Glench/Vim-Jinja2-Syntax'
 
