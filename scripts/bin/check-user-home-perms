@@ -34,9 +34,11 @@ function check_user_home_perms() {
 
     pretty_print "Checking permissions for $user_name ... " "$fg_green" 'true'
     local find_results find_status
+    # TODO: The Vim undo files exclusion is a massive hack ...
     find_results="$(run_as_root find "$user_home" \
-                        -not -uid "$user_uid" -or \
-                        -not -gid "$user_gid" 2>&1)"
+                        -not -path '*/.vim/undo/*' \
+                     \( -not -uid "$user_uid" -or \
+                        -not -gid "$user_gid" \) 2>&1)"
     find_status=$?
 
     if [[ $find_status -eq 0 && -z $find_results ]]; then
