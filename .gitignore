@@ -59,6 +59,9 @@ tmp/
 # PowerShell modules
 /posh/Modules/
 
+# PuTTY configuration
+/putty/
+
 # Shell app configurations
 /sh/apps/homebrew.sh
 
