@@ -1,248 +1,248 @@
 [core]
-    attributesFile = ~/.gitattributes
-    excludesFile = ~/.gitignore
+	attributesFile = ~/.gitattributes
+	excludesFile = ~/.gitignore
 
 [include]
-    path = .gitconfig-win
+	path = .gitconfig-win
 
 [user]
-    name = Samuel D. Leslie
-    email = sdl@nexiom.net
+	name = Samuel D. Leslie
+	email = sdl@nexiom.net
 
 [github]
-    user = ralish
+	user = ralish
 
 [advice]
-    statusHints = false
+	statusHints = false
 
 [apply]
-    whitespace = fix
+	whitespace = fix
 
 [branch]
-    autoSetupMerge = always
-    autoSetupRebase = always
+	autoSetupMerge = always
+	autoSetupRebase = always
 
 [color]
-    interactive = auto
-    ui = auto
+	interactive = auto
+	ui = auto
 
 [diff]
-    algorithm = histogram
-    compactionHeuristic = true
-    indentHeuristic = true
-    mnemonicPrefix = true
-    renames = copies
+	algorithm = histogram
+	compactionHeuristic = true
+	indentHeuristic = true
+	mnemonicPrefix = true
+	renames = copies
 
 [help]
-    autoCorrect = 0
+	autoCorrect = 0
 
 [log]
-    abbrevCommit = true
-    follow = true
-    mailmap = true
+	abbrevCommit = true
+	follow = true
+	mailmap = true
 
 [merge]
-    log = true
-    conflictStyle = diff3
-    defaultToUpstream = true
+	log = true
+	conflictStyle = diff3
+	defaultToUpstream = true
 
 [oh-my-zsh]
-    hide-status = 0
+	hide-status = 0
 
 [pull]
-    ff = only
+	ff = only
 
 [push]
-    default = simple
+	default = simple
 
 [rebase]
-    autoSquash = true
+	autoSquash = true
 
 [rerere]
-    enabled = true
-    autoUpdate = true
+	enabled = true
+	autoUpdate = true
 
 [status]
-    submoduleSummary = true
+	submoduleSummary = true
 
 [submodule]
-    fetchJobs = 4
+	fetchJobs = 4
 
 [filter "file-encoding"]
-    clean = "GIT_TMP=$(mktemp); GIT_FILE_TYPE=$(tee $GIT_TMP | file --brief --mime-encoding -); cat $GIT_TMP | iconv -sc -f $GIT_FILE_TYPE -t utf-8; rm -f $GIT_TMP"
-    smudge = "GIT_TMP=$(mktemp); GIT_FILE_TYPE=$(tee $GIT_TMP | file --brief --mime-encoding -); cat $GIT_TMP | iconv -sc -f utf-8 -t $GIT_FILE_TYPE; rm -f $GIT_TMP"
-    required = true
+	clean = "GIT_TMP=$(mktemp); GIT_FILE_TYPE=$(tee $GIT_TMP | file --brief --mime-encoding -); cat $GIT_TMP | iconv -sc -f $GIT_FILE_TYPE -t utf-8; rm -f $GIT_TMP"
+	smudge = "GIT_TMP=$(mktemp); GIT_FILE_TYPE=$(tee $GIT_TMP | file --brief --mime-encoding -); cat $GIT_TMP | iconv -sc -f utf-8 -t $GIT_FILE_TYPE; rm -f $GIT_TMP"
+	required = true
 
 [filter "lfs"]
-    process = git-lfs filter-process
-    clean = git-lfs clean -- %f
-    smudge = git-lfs smudge -- %f
-    required = true
+	process = git-lfs filter-process
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	required = true
 
 [url "git@bitbucket.org:"]
-    insteadof = bb:
+	insteadof = bb:
 
 [url "git@github.com:"]
-    insteadof = gh:
+	insteadof = gh:
 
 [url "git@gitlab.com:"]
-    insteadof = gl:
+	insteadof = gl:
 
 [url "sdl@git.launchpad.net/"]
-    insteadof = lp:
+	insteadof = lp:
 
 [url "sdl@git.launchpad.net/~sdl/+git/"]
-    insteadof = lpme:
+	insteadof = lpme:
 
 [alias]
-    a   = add
-    aa  = add --all
-    ap  = add --patch
-    apa = add --patch --all
+	a   = add
+	aa  = add --all
+	ap  = add --patch
+	apa = add --patch --all
 
-    bl  = blame
+	bl  = blame
 
-    br  = branch
-    bra = branch --all
-    brd = branch --delete
-    brv = branch -vv
+	br  = branch
+	bra = branch --all
+	brd = branch --delete
+	brv = branch -vv
 
-    bsb = bisect bad
-    bsg = bisect good
-    bsr = bisect reset
-    bss = bisect start
+	bsb = bisect bad
+	bsg = bisect good
+	bsr = bisect reset
+	bss = bisect start
 
-    cl  = clone
-    clr = clone --recursive
+	cl  = clone
+	clr = clone --recursive
 
-    cm  = commit
-    cmm = commit --message
-    cma = commit --all
-    cmv = commit --all --message
-    cmx = commit --amend
-    cmz = commit --amend --all
+	cm  = commit
+	cmm = commit --message
+	cma = commit --all
+	cmv = commit --all --message
+	cmx = commit --amend
+	cmz = commit --amend --all
 
-    co  = checkout
-    cob = checkout -b
-    cof = checkout FETCH_HEAD
+	co  = checkout
+	cob = checkout -b
+	cof = checkout FETCH_HEAD
 
-    cp  = cherry-pick
-    cpa = cherry-pick --abort
+	cp  = cherry-pick
+	cpa = cherry-pick --abort
 
-    d   = diff
-    dw  = diff --ignore-all-space
-    dc  = diff --cached
-    dcw = diff --cached --ignore-all-space
-    dns = diff --name-status
+	d   = diff
+	dw  = diff --ignore-all-space
+	dc  = diff --cached
+	dcw = diff --cached --ignore-all-space
+	dns = diff --name-status
 
-    f   = fetch
-    fa  = fetch --all
+	f   = fetch
+	fa  = fetch --all
 
-    g   = grep
+	g   = grep
 
-    h   = show
-    hw  = show --ignore-all-space
-    hs  = show --stat
-    hsw = show --stat --ignore-all-space
-    h1  = show HEAD~1
-    h2  = show HEAD~2
-    h3  = show HEAD~3
-    h4  = show HEAD~4
-    h5  = show HEAD~5
-    h6  = show HEAD~6
-    h7  = show HEAD~7
-    h8  = show HEAD~8
-    h9  = show HEAD~9
-    h0  = show HEAD~10
+	h   = show
+	hw  = show --ignore-all-space
+	hs  = show --stat
+	hsw = show --stat --ignore-all-space
+	h1  = show HEAD~1
+	h2  = show HEAD~2
+	h3  = show HEAD~3
+	h4  = show HEAD~4
+	h5  = show HEAD~5
+	h6  = show HEAD~6
+	h7  = show HEAD~7
+	h8  = show HEAD~8
+	h9  = show HEAD~9
+	h0  = show HEAD~10
 
-    i   = init
+	i   = init
 
-    l   = log --show-notes='*' --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --all
-    lt  = log --show-notes='*' --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
-    la  = "!git log --author=\"$(git config user.name)\" --name-status"
-    ldb = log --first-parent --no-merges
-    ln  = log --name-status
-    ls  = ls-tree -r --name-status HEAD
+	l   = log --show-notes='*' --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --all
+	lt  = log --show-notes='*' --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+	la  = "!git log --author=\"$(git config user.name)\" --name-status"
+	ldb = log --first-parent --no-merges
+	ln  = log --name-status
+	ls  = ls-tree -r --name-status HEAD
 
-    m   = merge
-    mf  = merge FETCH_HEAD
-    mm  = merge master
-    mff = merge --ff-only
-    mnf = merge --no-ff
+	m   = merge
+	mf  = merge FETCH_HEAD
+	mm  = merge master
+	mff = merge --ff-only
+	mnf = merge --no-ff
 
-    n   = notes
+	n   = notes
 
-    p   = push
-    pa  = push --all
-    pf  = push --force
-    po  = push origin
-    pom = push origin master
-    ps  = push --set-upstream
-    pso = push --set-upstream origin
-    pt  = push "$(git symbolic-ref HEAD | sed s_^refs/heads/__)"
-    ptf = push "$(git symbolic-ref HEAD | sed s_^refs/heads/__)" --force
-    pn  = push refs/notes/*
+	p   = push
+	pa  = push --all
+	pf  = push --force
+	po  = push origin
+	pom = push origin master
+	ps  = push --set-upstream
+	pso = push --set-upstream origin
+	pt  = push "$(git symbolic-ref HEAD | sed s_^refs/heads/__)"
+	ptf = push "$(git symbolic-ref HEAD | sed s_^refs/heads/__)" --force
+	pn  = push refs/notes/*
 
-    q   = pull
+	q   = pull
 
-    rb  = rebase
-    rba = rebase --abort
-    rbc = rebase --continue
-    rbs = rebase --skip
-    rbf = rebase FETCH_HEAD
-    rbm = rebase master
-    rbi = rebase -i
-    rb1 = rebase -i HEAD~1
-    rb2 = rebase -i HEAD~2
-    rb3 = rebase -i HEAD~3
-    rb4 = rebase -i HEAD~4
-    rb5 = rebase -i HEAD~5
-    rb5 = rebase -i HEAD~5
-    rb6 = rebase -i HEAD~6
-    rb7 = rebase -i HEAD~7
-    rb8 = rebase -i HEAD~8
-    rb9 = rebase -i HEAD~9
-    rb0 = rebase -i HEAD~10
+	rb  = rebase
+	rba = rebase --abort
+	rbc = rebase --continue
+	rbs = rebase --skip
+	rbf = rebase FETCH_HEAD
+	rbm = rebase master
+	rbi = rebase -i
+	rb1 = rebase -i HEAD~1
+	rb2 = rebase -i HEAD~2
+	rb3 = rebase -i HEAD~3
+	rb4 = rebase -i HEAD~4
+	rb5 = rebase -i HEAD~5
+	rb5 = rebase -i HEAD~5
+	rb6 = rebase -i HEAD~6
+	rb7 = rebase -i HEAD~7
+	rb8 = rebase -i HEAD~8
+	rb9 = rebase -i HEAD~9
+	rb0 = rebase -i HEAD~10
 
-    rma = remote add
-    rmp = remote prune
-    rmr = remote rm
-    rmv = remote -v
+	rma = remote add
+	rmp = remote prune
+	rmr = remote rm
+	rmv = remote -v
 
-    rs  = reset
-    rsh = reset --hard
+	rs  = reset
+	rsh = reset --hard
 
-    rv  = revert --no-commit
-    rvn = revert
+	rv  = revert --no-commit
+	rvn = revert
 
-    s   = status --short --branch
-    sl  = status --long
+	s   = status --short --branch
+	sl  = status --long
 
-    sh  = shortlog --summary --email
-    shl = shortlog
+	sh  = shortlog --summary --email
+	shl = shortlog
 
-    sm  = submodule
-    sma = submodule add
-    smi = submodule init
-    smt = submodule status
-    sms = submodule sync
-    smu = submodule update
+	sm  = submodule
+	sma = submodule add
+	smi = submodule init
+	smt = submodule status
+	sms = submodule sync
+	smu = submodule update
 
-    st  = stash save
-    sta = stash apply
-    std = stash drop
-    stl = stash list
-    stp = stash pop
-    sts = stash show --patch
+	st  = stash save
+	sta = stash apply
+	std = stash drop
+	stl = stash list
+	stp = stash pop
+	sts = stash show --patch
 
-    t   = tag
-    td  = tag --delete
-    tl  = tag --list
-    tv  = tag --verify
+	t   = tag
+	td  = tag --delete
+	tl  = tag --list
+	tv  = tag --verify
 
-    up  = "!git remote update --prune; git merge --ff-only @{u}"
+	up  = "!git remote update --prune; git merge --ff-only @{u}"
 
-    wl  = "!watch --color --interval 5 --no-title --exec git l"
-    wlt = "!watch --color --interval 5 --no-title --exec git lt"
+	wl  = "!watch --color --interval 5 --no-title --exec git l"
+	wlt = "!watch --color --interval 5 --no-title --exec git lt"
 
-# vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 et sr
+# vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 noet sr
