@@ -1,6 +1,6 @@
 # ********************************* Global ************************************
 
-# OS X files
+# OS X
 ._*
 .DS_Store
 .LSOverride
@@ -8,33 +8,40 @@
 # Icon must end with two carriage returns (\r)
 Icon
 
-# Windows files
+# Windows
 Desktop.ini
 ehthumbs.db
 Thumbs.db
 
-# Temporary files
-*.tmp
-tmp/
-
-# Vim files
+# Temporary
 *~
-*.swp
+*.bak
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
+.netrwhist
 
 
 # ******************************* Components **********************************
 
-# Arm cache
+# arm (Tor)
 /arm/.arm/cache/
 
-# Bazaar lock files
+# Bazaar
 /bazaar/.bazaar/lock/
 
-# Clink history & log files
+# Clink
 /clink/.history
 /clink/clink.log
 
-# CPAN dynamic data
+# CPAN
 /cpan/.cpan/.lock
 /cpan/.cpan/FTPstats.yml
 /cpan/.cpan/histfile
@@ -42,34 +49,34 @@ tmp/
 /cpan/.cpan/build/
 /cpan/.cpan/sources/
 
-# Fish dynamic data
+# fish
 /fish/.config/fish/fish_history
 /fish/.config/fish/fishd.*
 /fish/.config/fish/generated_completions/
 
-# irssi configuration
+# Irssi
 /irssi/
 
-# KiTTY configuration
+# KiTTY
 /kitty/
 
-# OpenSSH configuration
+# OpenSSH
 /openssh/
 
-# PowerShell modules
+# PowerShell
 /posh/Modules/
 
-# PuTTY configuration
+# PuTTY
 /putty/
 
 # Shell app configurations
 /sh/apps/homebrew.sh
 
-# Subversion readme & authentication data
+# Subversion
 /subversion/.subversion/README.txt
 /subversion/.subversion/auth/
 
-# Vim bundles & dynamic data
+# Vim
 /vim/.vim/.netrwhist
 /vim/.vim/.viminfo
 /vim/.vim/backup/
