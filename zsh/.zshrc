@@ -71,6 +71,10 @@ key[Right]=${terminfo[kcuf1]}
 [[ -n ${key[Down]} ]] && bindkey "${key[Down]}" history-search-forward
 
 # Set Ctrl+Left-arrow/Ctrl+Right-arrow to move to adjacent word
+bindkey "\e[D" backward-word
+bindkey "\e[C" forward-word
+bindkey "\e[1;2D" backward-word
+bindkey "\e[1;2C" forward-word
 bindkey "\e[1;5D" backward-word
 bindkey "\e[1;5C" forward-word
 
