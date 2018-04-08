@@ -104,6 +104,36 @@ Function ConvertTo-URLEncoded {
     [Net.WebUtility]::UrlEncode($String)
 }
 
+# Beautify XML strings
+# Via: https://blogs.msdn.microsoft.com/sergey_babkins_blog/2016/12/31/how-to-pretty-print-xml-in-powershell-and-text-pipelines/
+Function Format-Xml {
+    [CmdletBinding()]
+    Param(
+        [Parameter(ValueFromPipeline)]
+        [String[]]$Xml
+    )
+
+    Begin {
+        $Data = New-Object -TypeName Collections.ArrayList
+    }
+
+    Process {
+        $null = $Data.Add($Xml -join [Environment]::NewLine)
+    }
+
+    End {
+        $XmlDoc = New-Object -TypeName Xml.XmlDataDocument
+        $XmlDoc.LoadXml($Data)
+
+        $Sw = New-Object -TypeName IO.StringWriter
+        $XmlWriter = New-Object -TypeName Xml.XmlTextWriter($Sw)
+        $XmlWriter.Formatting = [Xml.Formatting]::Indented
+
+        $XmlDoc.WriteContentTo($XmlWriter)
+        $Sw.ToString()
+    }
+}
+
 # Watch an Event Log (similar to Unix "tail")
 # Slightly improved from: http://stackoverflow.com/questions/15262196/powershell-tail-windows-event-log-is-it-possible
 Function Get-EventLogTail {
