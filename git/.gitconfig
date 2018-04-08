@@ -211,6 +211,7 @@
 
 	rs  = reset
 	rsh = reset --hard
+	rsm = reset --hard master
 
 	rv  = revert --no-commit
 	rvn = revert
