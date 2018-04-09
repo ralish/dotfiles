@@ -10,6 +10,8 @@
 # DESC: Handler for unexpected errors
 # ARGS: $1 (optional): Exit code (defaults to 1)
 function script_trap_err() {
+    local exit_code=1
+
     # Disable the error trap handler to prevent potential recursion
     trap - ERR
 
@@ -17,12 +19,37 @@ function script_trap_err() {
     set +o errexit
     set +o pipefail
 
-    # Exit with failure status
+    # Validate any provided exit code
     if [[ $# -eq 1 && $1 =~ ^[0-9]+$ ]]; then
-        exit "$1"
-    else
-        exit 1
+        exit_code="$1"
     fi
+
+    # Output debug data if in Cron mode
+    if [[ -n ${cron-} ]]; then
+        # Restore original file output descriptors
+        if [[ -n ${script_output-} ]]; then
+            exec 1>&3 2>&4
+        fi
+
+        # Print basic debugging information
+        printf '%b\n' "$ta_none"
+        printf '***** Abnormal termination of script *****\n'
+        printf 'Script Path:            %s\n' "$script_path"
+        printf 'Script Parameters:      %s\n' "$script_params"
+        printf 'Script Exit Code:       %s\n' "$exit_code"
+
+        # Print the script log if we have it. It's possible we may not if we
+        # failed before we even called cron_init(). This can happen if bad
+        # parameters were passed to the script so we bailed out very early.
+        if [[ -n ${script_output-} ]]; then
+            printf 'Script Output:\n\n%s' "$(cat "$script_output")"
+        else
+            printf 'Script Output:          None (failed before log init)\n'
+        fi
+    fi
+
+    # Exit with failure status
+    exit "$exit_code"
 }
 
 
@@ -30,6 +57,11 @@ function script_trap_err() {
 # ARGS: None
 function script_trap_exit() {
     cd "$orig_cwd"
+
+    # Remove Cron mode script log
+    if [[ -n ${cron-} && -f ${script_output-} ]]; then
+        rm "$script_output"
+    fi
 
     # Restore terminal colours
     printf '%b' "$ta_none"
@@ -55,21 +87,22 @@ function script_exit() {
         fi
     fi
 
-    script_exit "Invalid arguments passed to script_exit()!" 2
+    script_exit 'Invalid arguments passed to script_exit()!' 2
 }
 
 
 # DESC: Generic script initialisation
-# ARGS: None
+# ARGS: $@ (optional): Arguments provided to the script
 function script_init() {
     # Useful paths
     readonly orig_cwd="$PWD"
-    readonly script_path="${BASH_SOURCE[0]}"
+    readonly script_path="${BASH_SOURCE[1]}"
     readonly script_dir="$(dirname "$script_path")"
     readonly script_name="$(basename "$script_path")"
+    readonly script_params="$*"
 
     # Important to always set as we use it in the exit handler
-    readonly ta_none="$(tput sgr0 || true)"
+    readonly ta_none="$(tput sgr0 2> /dev/null || true)"
 }
 
 
@@ -78,51 +111,51 @@ function script_init() {
 function colour_init() {
     if [[ -z ${no_colour-} ]]; then
         # Text attributes
-        readonly ta_bold="$(tput bold || true)"
+        readonly ta_bold="$(tput bold 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly ta_uscore="$(tput smul || true)"
+        readonly ta_uscore="$(tput smul 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly ta_blink="$(tput blink || true)"
+        readonly ta_blink="$(tput blink 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly ta_reverse="$(tput rev || true)"
+        readonly ta_reverse="$(tput rev 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly ta_conceal="$(tput invis || true)"
+        readonly ta_conceal="$(tput invis 2> /dev/null || true)"
         printf '%b' "$ta_none"
 
         # Foreground codes
-        readonly fg_black="$(tput setaf 0 || true)"
+        readonly fg_black="$(tput setaf 0 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly fg_blue="$(tput setaf 4 || true)"
+        readonly fg_blue="$(tput setaf 4 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly fg_cyan="$(tput setaf 6 || true)"
+        readonly fg_cyan="$(tput setaf 6 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly fg_green="$(tput setaf 2 || true)"
+        readonly fg_green="$(tput setaf 2 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly fg_magenta="$(tput setaf 5 || true)"
+        readonly fg_magenta="$(tput setaf 5 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly fg_red="$(tput setaf 1 || true)"
+        readonly fg_red="$(tput setaf 1 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly fg_white="$(tput setaf 7 || true)"
+        readonly fg_white="$(tput setaf 7 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly fg_yellow="$(tput setaf 3 || true)"
+        readonly fg_yellow="$(tput setaf 3 2> /dev/null || true)"
         printf '%b' "$ta_none"
 
         # Background codes
-        readonly bg_black="$(tput setab 0 || true)"
+        readonly bg_black="$(tput setab 0 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly bg_blue="$(tput setab 4 || true)"
+        readonly bg_blue="$(tput setab 4 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly bg_cyan="$(tput setab 6 || true)"
+        readonly bg_cyan="$(tput setab 6 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly bg_green="$(tput setab 2 || true)"
+        readonly bg_green="$(tput setab 2 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly bg_magenta="$(tput setab 5 || true)"
+        readonly bg_magenta="$(tput setab 5 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly bg_red="$(tput setab 1 || true)"
+        readonly bg_red="$(tput setab 1 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly bg_white="$(tput setab 7 || true)"
+        readonly bg_white="$(tput setab 7 2> /dev/null || true)"
         printf '%b' "$ta_none"
-        readonly bg_yellow="$(tput setab 3 || true)"
+        readonly bg_yellow="$(tput setab 3 2> /dev/null || true)"
         printf '%b' "$ta_none"
     else
         # Text attributes
@@ -155,6 +188,17 @@ function colour_init() {
 }
 
 
+# DESC: Initialise Cron mode
+# ARGS: None
+function cron_init() {
+    if [[ -n ${cron-} ]]; then
+        # Redirect all output to a temporary file
+        readonly script_output="$(mktemp --tmpdir "$script_name".XXXXX)"
+        exec 3>&1 4>&2 1>"$script_output" 2>&1
+    fi
+}
+
+
 # DESC: Pretty print the provided string
 # ARGS: $1 (required): Message to print (defaults to a green foreground)
 #       $2 (optional): Colour to print the message with. This can be an ANSI
@@ -162,7 +206,7 @@ function colour_init() {
 #       $3 (optional): Set to any value to not append a new line to the message
 function pretty_print() {
     if [[ $# -eq 0 || $# -gt 3 ]]; then
-        script_exit "Invalid arguments passed to pretty_print()!" 2
+        script_exit 'Invalid arguments passed to pretty_print()!' 2
     fi
 
     if [[ -z ${no_colour-} ]]; then
@@ -198,7 +242,7 @@ function verbose_print() {
 # NOTE: Heavily inspired by: https://unix.stackexchange.com/a/40973
 function build_path() {
     if [[ -z ${1-} || $# -gt 2 ]]; then
-        script_exit "Invalid arguments passed to build_path()!" 2
+        script_exit 'Invalid arguments passed to build_path()!' 2
     fi
 
     local new_path path_entry temp_path
@@ -229,7 +273,7 @@ function build_path() {
 #       $2 (optional): Set to any value to treat failure as a fatal error
 function check_binary() {
     if [[ $# -ne 1 && $# -ne 2 ]]; then
-        script_exit "Invalid arguments passed to check_binary()!" 2
+        script_exit 'Invalid arguments passed to check_binary()!' 2
     fi
 
     if ! command -v "$1" > /dev/null 2>&1; then
@@ -250,33 +294,33 @@ function check_binary() {
 # ARGS: $1 (optional): Set to any value to not attempt root access via sudo
 function check_superuser() {
     if [[ $# -gt 1 ]]; then
-        script_exit "Invalid arguments passed to check_superuser()!" 2
+        script_exit 'Invalid arguments passed to check_superuser()!' 2
     fi
 
     local superuser test_euid
     if [[ $EUID -eq 0 ]]; then
-        superuser="true"
+        superuser=true
     elif [[ -z ${1-} ]]; then
         if check_binary sudo; then
-            pretty_print "Sudo: Updating cached credentials ..."
+            pretty_print 'Sudo: Updating cached credentials ...'
             if ! sudo -v; then
                 verbose_print "Sudo: Couldn't acquire credentials ..." \
                               "${fg_red-}"
             else
                 test_euid="$(sudo -H -- "$BASH" -c 'printf "%s" "$EUID"')"
                 if [[ $test_euid -eq 0 ]]; then
-                    superuser="true"
+                    superuser=true
                 fi
             fi
         fi
     fi
 
-    if [[ -z $superuser ]]; then
-        verbose_print "Unable to acquire superuser credentials." "${fg_red-}"
+    if [[ -z ${superuser-} ]]; then
+        verbose_print 'Unable to acquire superuser credentials.' "${fg_red-}"
         return 1
     fi
 
-    verbose_print "Successfully acquired superuser credentials."
+    verbose_print 'Successfully acquired superuser credentials.'
     return 0
 }
 
@@ -287,12 +331,12 @@ function check_superuser() {
 function run_as_root() {
     local try_sudo
     if [[ ${1-} =~ ^0$ ]]; then
-        try_sudo="true"
+        try_sudo=true
         shift
     fi
 
     if [[ $# -eq 0 ]]; then
-        script_exit "Invalid arguments passed to run_as_root()!" 2
+        script_exit 'Invalid arguments passed to run_as_root()!' 2
     fi
 
     if [[ $EUID -eq 0 ]]; then
