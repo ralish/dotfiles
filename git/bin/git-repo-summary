@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+
+# TODO
+
+# A better class of script...
+set -o errexit          # Exit on most errors (see the manual)
+set -o errtrace         # Make sure any error trap is inherited
+set -o nounset          # Disallow expansion of unset variables
+set -o pipefail         # Use last non-zero exit code in a pipeline
+#set -o xtrace          # Trace the execution of the script (debug)
+
+# DESC: Usage help
+# ARGS: None
+function script_usage() {
+    cat << EOF
+Usage:
+     -h|--help                  Displays this help
+     -v|--verbose               Displays verbose output
+    -nc|--no-colour             Disables colour output
+EOF
+}
+
+
+# DESC: Parameter parser
+# ARGS: $@ (optional): Arguments provided to the script
+function parse_params() {
+    local param
+    while [[ $# -gt 0 ]]; do
+        param="$1"
+        shift
+        case $param in
+            -h|--help)
+                script_usage
+                exit 0
+                ;;
+            -v|--verbose)
+                verbose=true
+                ;;
+            -nc|--no-colour)
+                no_colour=true
+                ;;
+            *)
+                script_exit "Invalid parameter was provided: $param" 2
+                ;;
+        esac
+    done
+}
+
+
+# DESC: Find some important paths we need before script_init() is called
+# ARGS: None
+function early_init() {
+    # Determine the physical directory this script resides in. This approach is
+    # necessarily clumsy as simple methods like "readlink -f" and "realpath"
+    # are not platform independent. We have to work on Linux, BSD, OS X, etc...
+    readonly script_real_path="$(perl -MCwd -le 'print Cwd::abs_path(shift)' \
+                                 "${BASH_SOURCE[0]}")"
+    readonly script_real_dir="$(dirname "$script_real_path")"
+    readonly script_real_name="$(basename "$script_real_path")"
+
+    # Dotfiles directory path & name
+    readonly dotfiles_path="$(cd -P "$script_real_dir/../../" && pwd)"
+    readonly dotfiles_name="$(basename "$dotfiles_path")"
+}
+
+
+# DESC: Main control flow
+# ARGS: $@ (optional): Arguments provided to the script
+function show_git_summary() {
+    local repo_name
+    repo_name="$(basename "$PWD")"
+
+    pretty_print "*** $repo_name ***"
+    pretty_print 'Branches:'
+    git --no-pager branch -vv
+
+    echo ''
+}
+
+
+# DESC: Main control flow
+# ARGS: $@ (optional): Arguments provided to the script
+function main() {
+    early_init
+
+    # shellcheck source=scripts/bin/bash-template.sh
+    source "$dotfiles_path/scripts/bin/bash-template.sh"
+
+    trap script_trap_err ERR
+    trap script_trap_exit EXIT
+
+    script_init "$@"
+    parse_params "$@"
+    colour_init
+
+    check_binary git fatal
+
+    if git rev-parse --git-dir > /dev/null 2>&1; then
+        show_git_summary
+    else
+        for dir in */; do
+            (
+            cd "$dir"
+            if git rev-parse --git-dir > /dev/null 2>&1; then
+                show_git_summary
+            fi
+            )
+        done
+    fi
+}
+
+
+# Make it rain
+main "$@"
+
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
