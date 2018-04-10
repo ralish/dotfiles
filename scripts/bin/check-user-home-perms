@@ -32,6 +32,11 @@ function check_user_home_perms() {
     user_gid="$(id -g "$user_name")"
     user_home="$(echo "$user_entry" | cut -d: -f6)"
 
+    if [[ $user_home = '/' ]]; then
+        pretty_print "Skipping user with root home dir: $user_name" "$fg_yellow"
+        return
+    fi
+
     pretty_print "Checking permissions for $user_name ... " "$fg_green" 'true'
     local find_results find_status
     # TODO: The Vim undo files exclusion is a massive hack ...
