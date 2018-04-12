@@ -13,10 +13,14 @@ set -o pipefail         # Use last non-zero exit code in a pipeline
 # ARGS: None
 function script_usage() {
     cat << EOF
-Usage:
+Usage: [OPTIONS] [PATHS]
      -h|--help                  Displays this help
      -v|--verbose               Displays verbose output
     -nc|--no-colour             Disables colour output
+
+     -b|--branches              Show Git branches
+     -r|--remotes               Show Git remotes
+     -s|--status                Show Git status
 EOF
 }
 
@@ -25,6 +29,7 @@ EOF
 # ARGS: $@ (optional): Arguments provided to the script
 function parse_params() {
     local param
+    declare -g -a git_repos
     while [[ $# -gt 0 ]]; do
         param="$1"
         shift
@@ -39,11 +44,28 @@ function parse_params() {
             -nc|--no-colour)
                 no_colour=true
                 ;;
+            -b|--branches)
+                git_branches=true
+                ;;
+            -r|--remotes)
+                git_remotes=true
+                ;;
+            -s|--status)
+                git_status=true
+                ;;
             *)
-                script_exit "Invalid parameter was provided: $param" 2
+                git_repos+=("$param")
                 ;;
         esac
     done
+
+    if [[ -z ${git_branches-} &&
+          -z ${git_remotes-} &&
+          -z ${git_status-} ]]; then
+        git_branches=true
+        git_remotes=true
+        git_status=true
+    fi
 }
 
 
@@ -64,15 +86,28 @@ function early_init() {
 }
 
 
-# DESC: Main control flow
-# ARGS: $@ (optional): Arguments provided to the script
+# DESC: Show selected summary information for a Git repository
+# ARGS: None
 function show_git_summary() {
     local repo_name
     repo_name="$(basename "$PWD")"
 
     pretty_print "*** $repo_name ***"
-    pretty_print 'Branches:'
-    git --no-pager branch -vv
+
+    if [[ -n ${git_status-} ]]; then
+        pretty_print 'Status:'
+        git status --short --branch
+    fi
+
+    if [[ -n ${git_remotes-} ]]; then
+        pretty_print 'Remotes:'
+        git remote -v
+    fi
+
+    if [[ -n ${git_branches-} ]]; then
+        pretty_print 'Branches:'
+        git --no-pager branch -vv
+    fi
 
     echo ''
 }
@@ -95,7 +130,18 @@ function main() {
 
     check_binary git fatal
 
-    if git rev-parse --git-dir > /dev/null 2>&1; then
+    if [[ -n ${git_repos-} ]]; then
+        for repo in "${git_repos[@]}"; do
+            if ! [[ -d "$repo" ]]; then
+                script_exit "Provided path is invalid: $repo"
+            fi
+
+            (
+            cd -- "$repo"
+            show_git_summary
+            )
+        done
+    elif git rev-parse --git-dir > /dev/null 2>&1; then
         show_git_summary
     else
         for dir in */; do
