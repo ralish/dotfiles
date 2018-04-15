@@ -5,28 +5,31 @@ Function ConvertTo-TextEncoding {
         [Parameter(ValueFromPipeline)]
         [IO.FileInfo[]]$File,
 
-        [ValidateSet('ASCII', 'UTF7', 'UTF8', 'UTF16', 'UTF16BE', 'UTF32')]
-        [String]$Encoding='UTF8'
+        [ValidateSet('ASCII', 'UTF7', 'UTF8', 'UTF16', 'UTF16BE', 'UTF32', 'UTF32BE')]
+        [String]$Encoding='UTF8',
+
+        [Switch]$ByteOrderMark
     )
 
     Begin {
         switch ($Encoding) {
-            ASCII       { $Encoder = [Text.Encoding]::ASCII }
-            UTF7        { $Encoder = [Text.Encoding]::UTF7 }
-            UTF8        { $Encoder = [Text.Encoding]::UTF8 }
-            UTF16       { $Encoder = [Text.Encoding]::Unicode }
-            UTF16BE     { $Encoder = [Text.Encoding]::BigEndianUnicode }
-            UTF32       { $Encoder = [Text.Encoding]::UTF32 }
+            ASCII       { $Encoder = New-Object -TypeName Text.ASCIIEncoding }
+            UTF7        { $Encoder = New-Object -TypeName Text.UTF7Encoding }
+            UTF8        { $Encoder = New-Object -TypeName Text.UTF8Encoding -ArgumentList ($ByteOrderMark) }
+            UTF16       { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList ($false, $ByteOrderMark) }
+            UTF16BE     { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList ($true, $ByteOrderMark) }
+            UTF32       { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList ($false, $ByteOrderMark) }
+            UTF32BE     { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList ($true, $ByteOrderMark) }
         }
     }
 
     Process {
-        Write-Verbose -Message ('Converting to {0}: {1}' -f $Encoding, $File.Name)
-        $Content = Get-Content -Path $File
-        [IO.File]::WriteAllLines($File.FullName, $Content, $Encoder)
-    }
+        $Item = Get-Item -Path $File
+        $Content = Get-Content -Path $Item
 
-    End {}
+        Write-Verbose -Message ('Converting: {0}' -f $Item.FullName)
+        [IO.File]::WriteAllLines($Item.FullName, $Content, $Encoder)
+    }
 }
 
 # Compare the properties of two objects
