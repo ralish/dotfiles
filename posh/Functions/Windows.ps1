@@ -18,28 +18,37 @@ Function Get-MultipleHardLinks {
     return $Files
 }
 
+# Retrieve directories with non-inherited ACLs
 Function Get-NonInheritedACLs {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [String]$Path,
+        [IO.DirectoryInfo]$Path,
 
-        [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [String]$User
+        [String]$User,
+
+        [Switch]$Recurse
     )
 
-    $ACLMatches = @()
-    $Directories = Get-ChildItem -Path $Path -Directory -Recurse
+    $Directories = Get-ChildItem -Path $Path -Directory -Recurse:$Recurse
 
+    $ACLMatches = @()
     foreach ($Directory in $Directories) {
         $ACL = Get-ACL -Path $Directory.FullName
         $ACLNonInherited = $ACL.Access | Where-Object { $_.IsInherited -eq $false }
 
-        if ($ACLNonInherited.IdentityReference -contains $User) {
-            $ACLMatches += $Directory
+        if (!$ACLNonInherited) {
+            continue
         }
+
+        if ($PSBoundParameters.ContainsKey('User')) {
+            if ($ACLNonInherited.IdentityReference -notcontains $User) {
+                continue
+            }
+        }
+
+        $ACLMatches += $Directory
     }
 
     return $ACLMatches
