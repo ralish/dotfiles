@@ -31,9 +31,6 @@ temp/
 
 # ******************************* Components **********************************
 
-# arm (Tor)
-/arm/.arm/cache/
-
 # Bazaar
 /bazaar/.bazaar/lock/
 
