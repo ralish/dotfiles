@@ -149,12 +149,14 @@ Function Test-CommandAvailable {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [String]$Name
+        [String[]]$Name
     )
 
-    Write-Verbose -Message ('Checking command is available: {0}' -f $Name)
-    if (!(Get-Command -Name $Name -ErrorAction Ignore)) {
-        throw ('Required command not available: {0}' -f $Name)
+    foreach ($Command in $Name) {
+        Write-Verbose -Message ('Checking command is available: {0}' -f $Command)
+        if (!(Get-Command -Name $Command -ErrorAction Ignore)) {
+            throw ('Required command not available: {0}' -f $Command)
+        }
     }
 }
 
@@ -163,11 +165,13 @@ Function Test-ModuleAvailable {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [String]$Name
+        [String[]]$Name
     )
 
-    Write-Verbose -Message ('Checking module is available: {0}' -f $Name)
-    if (!(Get-Module -Name $Name -ListAvailable)) {
-        throw ('Required module not available: {0}' -f $Name)
+    foreach ($Module in $Name) {
+        Write-Verbose -Message ('Checking module is available: {0}' -f $Module)
+        if (!(Get-Module -Name $Module -ListAvailable)) {
+            throw ('Required module not available: {0}' -f $Module)
+        }
     }
 }
