@@ -1,3 +1,4 @@
+# Helper function to connect to Azure Active Directory (AzureAD module)
 Function Connect-AzureAD {
     [CmdletBinding()]
     Param(
@@ -14,6 +15,7 @@ Function Connect-AzureAD {
     AzureAD\Connect-AzureAD @PSBoundParameters
 }
 
+# Helper function to connect to Azure Resource Manager
 Function Connect-AzureRM {
     [CmdletBinding()]
     Param(
@@ -30,6 +32,7 @@ Function Connect-AzureRM {
     Login-AzureRmAccount @PSBoundParameters
 }
 
+# Helper function to connect to Azure Active Directory (MSOnline module)
 Function Connect-MSOnline {
     [CmdletBinding()]
     Param(
@@ -46,6 +49,7 @@ Function Connect-MSOnline {
     Connect-MsolService @PSBoundParameters
 }
 
+# Creates an authorization header from an Azure AD authentication
 Function Get-AzureAuthHeader {
     [CmdletBinding()]
     Param(
@@ -61,13 +65,12 @@ Function Get-AzureAuthHeader {
     return $AuthHeader
 }
 
-# Working with Azure REST APIs from Powershell - Getting page and block blob information from ARM based storage account sample script
-# https://blogs.technet.microsoft.com/paulomarques/2016/04/05/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script/
+# Retrieve an Azure AD authentication token
+# Via: https://blogs.technet.microsoft.com/paulomarques/2016/04/05/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script/
 Function Get-AzureAuthToken {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [String]$TenantId
     )
 
@@ -86,12 +89,12 @@ Function Get-AzureAuthToken {
         throw 'Unable to locate required DLL: {0}' -f $AdalAsmName
     }
 
-    $AdalFormsAsmName = 'Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll'
-    $AdalFormsAsmPath = Join-Path -Path $ArmProfileModulePath -ChildPath $AdalFormsAsmName
-    if (Test-Path -Path $AdalFormsAsmPath) {
-        $null = [Reflection.Assembly]::LoadFrom($AdalFormsAsmPath)
+    $AdalWinFormsAsmName = 'Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll'
+    $AdalWinFormsAsmPath = Join-Path -Path $ArmProfileModulePath -ChildPath $AdalWinFormsAsmName
+    if (Test-Path -Path $AdalWinFormsAsmPath) {
+        $null = [Reflection.Assembly]::LoadFrom($AdalWinFormsAsmPath)
     } else {
-        throw 'Unable to locate required DLL: {0}' -f $AdalFormsAsmName
+        throw 'Unable to locate required DLL: {0}' -f $AdalWinFormsAsmName
     }
 
     $AuthorityUri = 'https://login.windows.net/{0}' -f $TenantId
@@ -105,15 +108,16 @@ Function Get-AzureAuthToken {
     return $AuthResult
 }
 
+# Get Azure AD users with disabled services
 Function Get-AzureUsersWithDisabledServices {
     [CmdletBinding()]
     Param(
         [Switch]$ReturnAllUsers
     )
 
-    $Results = @()
     $Users = Get-MsolUser | Where-Object { $_.IsLicensed -eq $true }
 
+    $Results = @()
     foreach ($User in $Users) {
         $DisabledServices = @()
         $DisabledServices += $User.Licenses.ServiceStatus | Where-Object { $_.ProvisioningStatus -eq 'Disabled' }
