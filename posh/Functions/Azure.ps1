@@ -7,11 +7,9 @@ Function Connect-AzureAD {
         [PSCredential]$Credential
     )
 
-    if (!(Get-Module -Name AzureAD -ListAvailable)) {
-        throw 'Required module not available: AzureAD'
-    }
+    Test-ModuleAvailable -Name AzureAD
 
-    Write-Host -ForegroundColour Green -Object 'Connecting to Azure AD (v2) ...'
+    Write-Host -ForegroundColor Green -Object 'Connecting to Azure AD (v2) ...'
     AzureAD\Connect-AzureAD @PSBoundParameters
 }
 
@@ -24,9 +22,7 @@ Function Connect-AzureRM {
         [PSCredential]$Credential
     )
 
-    if (!(Get-Module -Name AzureRM -ListAvailable)) {
-        throw 'Required module not available: AzureRM'
-    }
+    Test-ModuleAvailable -Name AzureRM
 
     Write-Host -ForegroundColor Green -Object 'Connecting to Azure RM ...'
     Login-AzureRmAccount @PSBoundParameters
@@ -41,9 +37,7 @@ Function Connect-MSOnline {
         [PSCredential]$Credential
     )
 
-    if (!(Get-Module -Name MSOnline -ListAvailable)) {
-        throw 'Required module not available: MSOnline'
-    }
+    Test-ModuleAvailable -Name MSOnline
 
     Write-Host -ForegroundColor Green -Object 'Connecting to Azure AD (v1) ...'
     Connect-MsolService @PSBoundParameters
@@ -114,6 +108,8 @@ Function Get-AzureUsersWithDisabledServices {
     Param(
         [Switch]$ReturnAllUsers
     )
+
+    Test-ModuleAvailable -Name MSOnline
 
     $Users = Get-MsolUser | Where-Object { $_.IsLicensed -eq $true }
 

@@ -168,3 +168,17 @@ Function Get-EventLogTail {
 Function mklink {
     & $env:ComSpec /c mklink $args
 }
+
+# Confirm a PowerShell module is available
+Function Test-ModuleAvailable {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Name
+    )
+
+    Write-Verbose -Message ('Checking module is available: {0}' -f $Name)
+    if (!(Get-Module -Name $Name -ListAvailable)) {
+        throw ('Required module not available: {0}' -f $Name)
+    }
+}
