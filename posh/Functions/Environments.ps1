@@ -3,7 +3,6 @@ Function Enable-Nodejs {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [String]$Path
     )
 
@@ -16,7 +15,6 @@ Function Enable-Perl {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [String]$Path
     )
 
@@ -31,7 +29,6 @@ Function Enable-Python {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [String]$Path
     )
 
