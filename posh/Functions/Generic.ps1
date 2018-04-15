@@ -144,29 +144,6 @@ Function Format-Xml {
     }
 }
 
-# Reload selected PowerShell profiles
-Function Reload-Profile {
-    [CmdletBinding()]
-    Param(
-        [Switch]$AllUsersAllHosts,
-        [Switch]$AllUsersCurrentHost,
-        [Switch]$CurrentUserAllHosts,
-        [Switch]$CurrentUserCurrentHost=$true
-    )
-
-    $ProfileTypes = @('AllUsersAllHosts', 'AllUsersCurrentHost', 'CurrentUserAllHosts', 'CurrentUserCurrentHost')
-    foreach ($ProfileType in $ProfileTypes) {
-        if (Get-Variable -Name $ProfileType -ValueOnly) {
-            if (Test-Path -Path $profile.$ProfileType -PathType Leaf) {
-                Write-Verbose -Message ('Sourcing {0} from: {1}' -f $ProfileType, $profile.$ProfileType)
-                . $profile.$ProfileType
-            } else {
-                Write-Warning -Message ("Skipping {0} as it doesn't exist: {1}" -f $ProfileType, $profile.$ProfileType)
-            }
-        }
-    }
-}
-
 # Confirm a PowerShell command is available
 Function Test-CommandAvailable {
     [CmdletBinding()]
@@ -195,6 +172,29 @@ Function Test-ModuleAvailable {
         Write-Verbose -Message ('Checking module is available: {0}' -f $Module)
         if (!(Get-Module -Name $Module -ListAvailable)) {
             throw ('Required module not available: {0}' -f $Module)
+        }
+    }
+}
+
+# Reload selected PowerShell profiles
+Function Update-Profile {
+    [CmdletBinding()]
+    Param(
+        [Switch]$AllUsersAllHosts,
+        [Switch]$AllUsersCurrentHost,
+        [Switch]$CurrentUserAllHosts,
+        [Switch]$CurrentUserCurrentHost=$true
+    )
+
+    $ProfileTypes = @('AllUsersAllHosts', 'AllUsersCurrentHost', 'CurrentUserAllHosts', 'CurrentUserCurrentHost')
+    foreach ($ProfileType in $ProfileTypes) {
+        if (Get-Variable -Name $ProfileType -ValueOnly) {
+            if (Test-Path -Path $profile.$ProfileType -PathType Leaf) {
+                Write-Verbose -Message ('Sourcing {0} from: {1}' -f $ProfileType, $profile.$ProfileType)
+                . $profile.$ProfileType
+            } else {
+                Write-Warning -Message ("Skipping {0} as it doesn't exist: {1}" -f $ProfileType, $profile.$ProfileType)
+            }
         }
     }
 }
