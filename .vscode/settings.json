@@ -1,5 +1,5 @@
 {
-    // File paths & extensions to language mappings
+    // File paths to language mappings
     "files.associations": {
         "**/openssh/**": "ssh_config"
     }
