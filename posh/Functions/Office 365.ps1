@@ -1,3 +1,4 @@
+# Helper function to connect to all Office 365 services
 Function Connect-Office365Services {
     [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
@@ -11,7 +12,6 @@ Function Connect-Office365Services {
         [PSCredential]$Credential,
 
         [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [String]$SharePointTenantName
     )
 
@@ -40,12 +40,13 @@ Function Connect-Office365Services {
     }
 
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        Write-Warning -Message "Unable to connect to Office 365 Centralized Deployment as it doesn't yet support MFA."
+        Write-Warning -Message "Unable to connect to Office 365 Centralized Deployment as it doesn't support MFA."
     } else {
         Connect-Office365CentralizedDeployment -Credential $Credential
     }
 }
 
+# Helper function to connect to Exchange Online
 Function Connect-ExchangeOnline {
     [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
@@ -72,6 +73,7 @@ Function Connect-ExchangeOnline {
     }
 }
 
+# Helper function to connect to Centralized Deployment
 Function Connect-Office365CentralizedDeployment {
     [CmdletBinding()]
     Param(
@@ -81,14 +83,13 @@ Function Connect-Office365CentralizedDeployment {
         [PSCredential]$Credential
     )
 
-    if (!(Get-Module -Name OrganizationAddInService -ListAvailable)) {
-        throw 'Required module not available: OrganizationAddInService'
-    }
+    Test-ModuleAvailable -Name OrganizationAddInService
 
     Write-Host -ForegroundColor Green -Object 'Connecting to Office 365 Centralized Deployment ...'
     Connect-OrganizationAddInService @PSBoundParameters
 }
 
+# Helper function to connect to Security & Compliance Center
 Function Connect-SecurityAndComplianceCenter {
     [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
@@ -115,11 +116,11 @@ Function Connect-SecurityAndComplianceCenter {
     }
 }
 
+# Helper function to connect to SharePoint Online
 Function Connect-SharePointOnline {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [String]$TenantName,
 
         [ValidateNotNull()]
@@ -127,9 +128,7 @@ Function Connect-SharePointOnline {
         [PSCredential]$Credential
     )
 
-    if (!(Get-Module -Name Microsoft.Online.SharePoint.PowerShell -ListAvailable)) {
-        throw 'Required module not available: Microsoft.Online.SharePoint.PowerShell'
-    }
+    Test-ModuleAvailable -Name Microsoft.Online.SharePoint.PowerShell
 
     Write-Host -ForegroundColor Green -Object 'Connecting to SharePoint Online ...'
     $SPOUrl = 'https://{0}-admin.sharepoint.com' -f $TenantName
@@ -140,6 +139,7 @@ Function Connect-SharePointOnline {
     }
 }
 
+# Helper function to connect to Skype for Business Online
 Function Connect-SkypeForBusinessOnline {
     [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
@@ -153,9 +153,7 @@ Function Connect-SkypeForBusinessOnline {
         [PSCredential]$Credential
     )
 
-    if (!(Get-Module -Name SkypeOnlineConnector -ListAvailable)) {
-        throw 'Required module not available: SkypeOnlineConnector'
-    }
+    Test-ModuleAvailable -Name SkypeOnlineConnector
 
     # Fix a scope issue due to variable reuse by SkypeOnlineConnector?
     if (-not $PSBoundParameters.ContainsKey('MfaUsername')) {
@@ -174,38 +172,35 @@ Function Connect-SkypeForBusinessOnline {
     Import-PSSession -Session $CsOnlineSession
 }
 
+# Retrieve a summary of mailbox folders with associated rules
 Function Get-InboxRulesByFolders {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [String]$Mailbox,
 
+        [ValidateNotNullOrEmpty()]
         [String]$TimeZone='AUS Eastern Standard Time',
+
+        [ValidateNotNullOrEmpty()]
         [String]$TimeFormat='yyyy/mm/dd'
     )
 
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox folders ...'
     $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object { $_.DefaultFolderType -ne 'Inbox' }
+    $Folders | Add-Member -MemberType NoteProperty -Name Rules -Value @()
+    $Folders | Add-Member -MemberType ScriptProperty -Name RuleCount -Value { $this.Rules.Count }
 
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
     $Rules = Get-InboxRule -Mailbox $Mailbox -DescriptionTimeZone $TimeZone -DescriptionTimeFormat $TimeFormat
-    foreach ($Rule in $Rules) {
-        Add-Member -InputObject $Rule -MemberType NoteProperty -Name LinkedToFolder -Value $false
-    }
+    $Rules | Add-Member -MemberType NoteProperty -Name LinkedToFolder -Value $false
 
     Write-Host -ForegroundColor Green -Object 'Generating report ...'
     $Results = @()
     foreach ($Folder in $Folders) {
-        Add-Member -InputObject $Folder -MemberType NoteProperty -Name Rules -Value @()
-        Add-Member -InputObject $Folder -MemberType ScriptProperty -Name RuleCount -Value { $this.Rules.Count }
-
         $FolderDashName = ($Folder.FolderPath -join ' - ').Substring(8)
-        foreach ($Rule in $Rules) {
-            if ($Rule.LinkedToFolder) {
-                continue
-            }
 
+        foreach ($Rule in ($Rules | Where-Object { $_.LinkedToFolder -eq $false })) {
             if ($Rule.Name -match ('^{0}' -f $FolderDashName) -and $Rule.MoveToFolder -eq $Folder.Name) {
                 $Rule.LinkedToFolder = $true
                 $Folder.Rules += $Rule
@@ -223,6 +218,7 @@ Function Get-InboxRulesByFolders {
     return $Folders
 }
 
+# Retrieve a summary of unified groups with owner & member details
 Function Get-UnifiedGroupSummary {
     [CmdletBinding()]
     Param(
@@ -256,6 +252,7 @@ Function Get-UnifiedGroupSummary {
     return $Groups
 }
 
+# Helper function to import the weird Exchange Online PowerShell module
 Function Import-ExoPowershellModule {
     [CmdletBinding()]
     Param()
