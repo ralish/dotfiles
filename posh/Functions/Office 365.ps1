@@ -186,6 +186,8 @@ Function Get-InboxRulesByFolders {
         [String]$TimeFormat='yyyy/mm/dd'
     )
 
+    Test-CommandAvailable -Name Get-MailboxFolder
+
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox folders ...'
     $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object { $_.DefaultFolderType -ne 'Inbox' }
     $Folders | Add-Member -MemberType NoteProperty -Name Rules -Value @()
@@ -225,6 +227,8 @@ Function Get-UnifiedGroupSummary {
         [ValidateNotNullOrEmpty()]
         [PSObject[]]$Groups
     )
+
+    Test-CommandAvailable -Name Get-UnifiedGroup
 
     if (!$Groups) {
         Write-Host -ForegroundColor Green -Object 'Retrieving Office 365 groups ...'

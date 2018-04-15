@@ -144,6 +144,20 @@ Function Format-Xml {
     }
 }
 
+# Confirm a PowerShell command is available
+Function Test-CommandAvailable {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Name
+    )
+
+    Write-Verbose -Message ('Checking command is available: {0}' -f $Name)
+    if (!(Get-Command -Name $Name -ErrorAction Ignore)) {
+        throw ('Required command not available: {0}' -f $Name)
+    }
+}
+
 # Confirm a PowerShell module is available
 Function Test-ModuleAvailable {
     [CmdletBinding()]
