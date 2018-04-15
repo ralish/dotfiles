@@ -1,20 +1,19 @@
-Function Get-MultipleHardlinks {
+# Retrieve files with a minimum number of hard links
+Function Get-MultipleHardLinks {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
         [IO.DirectoryInfo]$Path,
 
-        [Switch]$Recurse,
-
         [ValidateScript({$_ -gt 1})]
-        [Int]$MinimumHardlinks=2
+        [Int]$MinimumHardLinks=2,
+
+        [Switch]$Recurse
     )
 
     $Files = Get-ChildItem -Path $Path -File -Recurse:$Recurse | Where-Object {
         $_.LinkType -eq 'HardLink' -and $_.Target.Count -ge ($MinimumHardLinks - 1)
-    }
-
-    $Files | Add-Member -MemberType ScriptProperty -Name LinkCount -Value {$this.Target.Count + 1} -Force
+    } | Add-Member -MemberType ScriptProperty -Name LinkCount -Value { $this.Target.Count + 1 } -Force
 
     return $Files
 }
