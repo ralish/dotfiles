@@ -2,18 +2,18 @@ if (Get-Module -Name PSReadLine -ListAvailable) {
     if ($Host.Name -eq 'ConsoleHost') {
         Import-Module -Name PSReadLine
 
-        # Move the cursor to the end of the line while cycling through history
-        Set-PSReadlineOption -HistorySearchCursorMovesToEnd
+        # Move the cursor to end of line while cycling through history
+        Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
         # Search the command history based on any already entered text
-        Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward
-        Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
+        Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
+        Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 
         # Bash style command completion
-        #Set-PSReadlineKeyHandler -Key Tab -Function Complete
+        #Set-PSReadLineKeyHandler -Key Tab -Function Complete
     } else {
-        Write-Verbose -Message 'Skipping PSReadLine configuration as host is not ConsoleHost.'
+        Write-Verbose -Message '[dotfiles] Skipping PSReadLine settings as host is not ConsoleHost.'
     }
 } else {
-    Write-Verbose -Message 'Unable to locate PSReadLine module.'
+    Write-Verbose -Message '[dotfiles] Skipping PSReadLine settings as module not found.'
 }
