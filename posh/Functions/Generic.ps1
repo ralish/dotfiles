@@ -1,37 +1,3 @@
-# Convert a text file to the given encoding
-Function ConvertTo-TextEncoding {
-    [CmdletBinding()]
-    Param(
-        [Parameter(ValueFromPipeline)]
-        [IO.FileInfo[]]$File,
-
-        [ValidateSet('ASCII', 'UTF7', 'UTF8', 'UTF16', 'UTF16BE', 'UTF32', 'UTF32BE')]
-        [String]$Encoding='UTF8',
-
-        [Switch]$ByteOrderMark
-    )
-
-    Begin {
-        switch ($Encoding) {
-            ASCII       { $Encoder = New-Object -TypeName Text.ASCIIEncoding }
-            UTF7        { $Encoder = New-Object -TypeName Text.UTF7Encoding }
-            UTF8        { $Encoder = New-Object -TypeName Text.UTF8Encoding -ArgumentList ($ByteOrderMark) }
-            UTF16       { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList ($false, $ByteOrderMark) }
-            UTF16BE     { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList ($true, $ByteOrderMark) }
-            UTF32       { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList ($false, $ByteOrderMark) }
-            UTF32BE     { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList ($true, $ByteOrderMark) }
-        }
-    }
-
-    Process {
-        $Item = Get-Item -Path $File
-        $Content = Get-Content -Path $Item
-
-        Write-Verbose -Message ('Converting: {0}' -f $Item.FullName)
-        [IO.File]::WriteAllLines($Item.FullName, $Content, $Encoder)
-    }
-}
-
 # Compare the properties of two objects
 # Via: https://blogs.technet.microsoft.com/janesays/2017/04/25/compare-all-properties-of-two-objects-in-windows-powershell/
 Function Compare-ObjectProperties {
@@ -52,12 +18,14 @@ Function Compare-ObjectProperties {
     $ObjDiffs = @()
     foreach ($Property in $ObjProps) {
         $Diff = Compare-Object -ReferenceObject $ReferenceObject -DifferenceObject $DifferenceObject -Property $Property
+
         if ($Diff) {
             $DiffProps = @{
                 PropertyName=$Property
                 RefValue=($Diff | Where-Object { $_.SideIndicator -eq '<=' } | Select-Object -ExpandProperty $($Property))
                 DiffValue=($Diff | Where-Object { $_.SideIndicator -eq '=>' } | Select-Object -ExpandProperty $($Property))
             }
+
             $ObjDiffs += New-Object -TypeName PSObject -Property $DiffProps
         }
     }
@@ -101,6 +69,40 @@ Function ConvertTo-Base64 {
     [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($String))
 }
 
+# Convert a text file to the given encoding
+Function ConvertTo-TextEncoding {
+    [CmdletBinding()]
+    Param(
+        [Parameter(ValueFromPipeline)]
+        [IO.FileInfo[]]$File,
+
+        [ValidateSet('ASCII', 'UTF7', 'UTF8', 'UTF16', 'UTF16BE', 'UTF32', 'UTF32BE')]
+        [String]$Encoding='UTF8',
+
+        [Switch]$ByteOrderMark
+    )
+
+    Begin {
+        switch ($Encoding) {
+            ASCII       { $Encoder = New-Object -TypeName Text.ASCIIEncoding }
+            UTF7        { $Encoder = New-Object -TypeName Text.UTF7Encoding }
+            UTF8        { $Encoder = New-Object -TypeName Text.UTF8Encoding -ArgumentList ($ByteOrderMark) }
+            UTF16       { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList ($false, $ByteOrderMark) }
+            UTF16BE     { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList ($true, $ByteOrderMark) }
+            UTF32       { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList ($false, $ByteOrderMark) }
+            UTF32BE     { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList ($true, $ByteOrderMark) }
+        }
+    }
+
+    Process {
+        $Item = Get-Item -Path $File
+        $Content = Get-Content -Path $Item
+
+        Write-Verbose -Message ('Converting: {0}' -f $Item.FullName)
+        [IO.File]::WriteAllLines($Item.FullName, $Content, $Encoder)
+    }
+}
+
 # Convert a string to URL encoded form
 Function ConvertTo-URLEncoded {
     [CmdletBinding()]
@@ -133,12 +135,12 @@ Function Format-Xml {
         $XmlDoc = New-Object -TypeName Xml.XmlDataDocument
         $XmlDoc.LoadXml($Data)
 
-        $Sw = New-Object -TypeName IO.StringWriter
-        $XmlWriter = New-Object -TypeName Xml.XmlTextWriter($Sw)
-        $XmlWriter.Formatting = [Xml.Formatting]::Indented
+        $StringWriter = New-Object -TypeName IO.StringWriter
+        $XmlTextWriter = New-Object -TypeName Xml.XmlTextWriter($StringWriter)
+        $XmlTextWriter.Formatting = [Xml.Formatting]::Indented
 
-        $XmlDoc.WriteContentTo($XmlWriter)
-        $Sw.ToString()
+        $XmlDoc.WriteContentTo($XmlTextWriter)
+        $StringWriter.ToString()
     }
 }
 
@@ -162,7 +164,7 @@ Function Get-EventLogTail {
     } while ($true)
 }
 
-# Helper function to call MKLINK via cmd.exe
+# Helper function to call MKLINK in cmd
 Function mklink {
     & $env:ComSpec /c mklink $args
 }
