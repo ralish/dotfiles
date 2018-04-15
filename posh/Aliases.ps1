@@ -1,46 +1,35 @@
-# **************************** Aliases Configuration ***************************
-#
-# Path to Dependency Walker (32-bit)
-$Dw32Path = "${env:ProgramFiles(x86)}\Nexiom\Software\Independent\Dependency Walker\depends.exe"
-# Path to Dependency Walker (64-bit)
-$Dw64Path = "$env:ProgramW6432\Nexiom\Software\Independent\Dependency Walker\depends.exe"
-#
-# Path to Sublime Text 2 installation registry key
-$SublRegPath = 'HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1'
-#
-# ******************************************************************************
-
-# Some useful aliases
+# Some basic useful aliases
 Set-Alias -Name cop -Value Compare-ObjectProperties
 Set-Alias -Name gh -Value Get-Help
 Set-Alias -Name which -Value Get-Command
 
-# Add alias for Dependency Walker x86
-if (Test-Path -Path $Dw32Path -PathType Leaf) {
-    Set-Alias -Name depends32 -Value $Dw32Path
+# Dependency Walker (x86)
+$DepWalker32Path = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Nexiom\Software\Independent\Dependency Walker\depends.exe'
+if (Test-Path -Path $DepWalker32Path -PathType Leaf) {
+    Set-Alias -Name depends32 -Value $DepWalker32Path
 } else {
-    Write-Verbose -Message 'Unable to locate Dependency Walker x86 at path specified by $Dw32Path.'
+    Write-Verbose -Message '[dotfiles] Unable to locate Dependency Walker (x86) for alias.'
 }
-Remove-Variable -Name Dw32Path
+Remove-Variable -Name DepWalker32Path
 
-# Add alias for Dependency Walker x64
-if (Test-Path -Path $Dw64Path -PathType Leaf) {
-    Set-Alias -Name depends64 -Value $Dw64Path
+# Dependency Walker (x64)
+$DepWalker64Path = Join-Path -Path $env:ProgramW6432 -ChildPath 'Nexiom\Software\Independent\Dependency Walker\depends.exe'
+if (Test-Path -Path $DepWalker64Path -PathType Leaf) {
+    Set-Alias -Name depends64 -Value $DepWalker64Path
 } else {
-    Write-Verbose -Message 'Unable to locate Dependency Walker x64 at path specified by $Dw64Path.'
+    Write-Verbose -Message '[dotfiles] Unable to locate Dependency Walker (x64) for alias.'
 }
-Remove-Variable -Name Dw64Path
+Remove-Variable -Name DepWalker64Path
 
-# Add alias for Sublime Text 2
-if (!(Get-Command -Name 'subl.exe' -ErrorAction SilentlyContinue)) {
-    $SublBinName = 'sublime_text.exe'
-    if (Test-Path -Path $SublRegPath -PathType Container) {
-        Set-Alias -Name subl -Value (Join-Path -Path (Get-ItemProperty -Path $SublRegPath).InstallLocation -ChildPath $SublBinName)
+# Sublime Text 2
+$Sublime2RegPath = 'HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1'
+if (!(Get-Command -Name subl.exe -ErrorAction SilentlyContinue)) {
+    if (Test-Path -Path $Sublime2RegPath -PathType Container) {
+        Set-Alias -Name subl -Value (Join-Path -Path (Get-ItemProperty -Path $Sublime2RegPath).InstallLocation -ChildPath 'sublime_text.exe')
     } else {
-        Write-Verbose -Message 'Unable to locate Sublime Text installation so not adding alias.'
+        Write-Verbose -Message '[dotfiles] Unable to locate Sublime Text 2 for alias.'
     }
-    Remove-Variable -Name SublBinName
 } else {
-    Write-Verbose -Message 'Found subl.exe in search path so not adding an alias.'
+    Write-Verbose -Message '[dotfiles] Skipping Sublime Text 2 alias as found subl.exe in PATH.'
 }
-Remove-Variable -Name SublRegPath
+Remove-Variable -Name Sublime2RegPath
