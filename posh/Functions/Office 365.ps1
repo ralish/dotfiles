@@ -180,10 +180,10 @@ Function Get-InboxRulesByFolders {
         [String]$Mailbox,
 
         [ValidateNotNullOrEmpty()]
-        [String]$TimeZone='AUS Eastern Standard Time',
+        [String]$DescriptionTimeZone='AUS Eastern Standard Time',
 
         [ValidateNotNullOrEmpty()]
-        [String]$TimeFormat='yyyy/mm/dd'
+        [String]$DescriptionTimeFormat='yyyy/mm/dd'
     )
 
     Test-CommandAvailable -Name Get-MailboxFolder
@@ -194,10 +194,10 @@ Function Get-InboxRulesByFolders {
     $Folders | Add-Member -MemberType ScriptProperty -Name RuleCount -Value { $this.Rules.Count }
 
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
-    $Rules = Get-InboxRule -Mailbox $Mailbox -DescriptionTimeZone $TimeZone -DescriptionTimeFormat $TimeFormat
+    $Rules = Get-InboxRule @PSBoundParameters
     $Rules | Add-Member -MemberType NoteProperty -Name LinkedToFolder -Value $false
 
-    Write-Host -ForegroundColor Green -Object 'Generating report ...'
+    Write-Host -ForegroundColor Green -Object 'Associating mailbox rules to folders ...'
     $Results = @()
     foreach ($Folder in $Folders) {
         $FolderDashName = ($Folder.FolderPath -join ' - ').Substring(8)
