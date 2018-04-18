@@ -220,6 +220,51 @@ Function Get-InboxRulesByFolders {
     return $Folders
 }
 
+# Retrieve a summary of sent & received totals for a mailbox
+Function Get-MailboxActivitySummary {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Mailbox,
+
+        [DateTime]$StartDate,
+        [DateTime]$EndDate
+    )
+
+    Test-CommandAvailable -Name Get-Mailbox
+
+    if (-not $PSBoundParameters.ContainsKey('EndDate')) {
+        $EndDate = Get-Date
+    }
+
+    if (-not $PSBoundParameters.ContainsKey('StartDate')) {
+        $StartDate = $EndDate.AddDays(-2)
+    }
+
+    $TraceParams = $PSBoundParameters
+    $null = $TraceParams.Remove('Mailbox')
+
+    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox details ...'
+    $ExoMailbox = Get-Mailbox -Identity $Mailbox
+    $Addresses = $ExoMailbox.EmailAddresses | Where-Object { $_ -match '^smtp:' } | ForEach-Object { $_.Substring(5) }
+
+    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox send logs ...'
+    $Sent = Get-MessageTrace @TraceParams -SenderAddress $Addresses
+
+    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox receive logs ...'
+    $Received = Get-MessageTrace @TraceParams -RecipientAddress $Addresses
+
+    $Summary = [PSCustomObject]@{
+        Mailbox = $ExoMailbox.PrimarySmtpAddress
+        StartDate = $StartDate.ToString()
+        EndDate = $EndDate.ToString()
+        Sent = ($Sent | Measure-Object).Count
+        Received = ($Received | Measure-Object).Count
+    }
+
+    return $Summary
+}
+
 # Retrieve a summary of unified groups with owner & member details
 Function Get-UnifiedGroupSummary {
     [CmdletBinding()]
