@@ -172,6 +172,68 @@ Function Connect-SkypeForBusinessOnline {
     Import-PSSession -Session $CsOnlineSession
 }
 
+# Export mailbox data for our email management spreadsheet
+Function Export-MailboxSpreadsheetData {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Mailbox,
+
+        [IO.DirectoryInfo]$Path,
+        [DateTime]$StartDate,
+        [DateTime]$EndDate,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$DescriptionTimeZone,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$DescriptionTimeFormat
+    )
+
+    Test-CommandAvailable -Name Get-Mailbox
+
+    if (-not $PSBoundParameters.ContainsKey('Path')) {
+        if ((Get-Item -Path $PWD) -is [IO.DirectoryInfo]) {
+            $Path = Get-Item -Path $PWD
+        } else {
+            Write-Warning -Message 'Defaulting to $HOME as $PWD is not a directory.'
+            $Path = $HOME
+        }
+    }
+
+    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox details ...'
+    $ExoMailbox = Get-Mailbox -Identity $Mailbox
+    $MailboxAddress = $ExoMailbox.PrimarySmtpAddress
+
+    $Params = @{ Mailbox=$Mailbox }
+    foreach ($Parameter in @('StartDate', 'EndDate')) {
+        if ($PSBoundParameters.ContainsKey($Parameter)) {
+            $Params.Add($Parameter, $PSBoundParameters.Item($Parameter))
+        }
+    }
+    $Activity = Get-MailboxActivitySummary -Mailbox $Mailbox
+
+    $Params = @{ Mailbox=$Mailbox }
+    foreach ($Parameter in @('DescriptionTimeZone', 'DescriptionTimeFormat')) {
+        if ($PSBoundParameters.ContainsKey($Parameter)) {
+            $Params.Add($Parameter, $PSBoundParameters.Item($Parameter))
+        }
+    }
+    $Folders = Get-InboxRulesByFolders @Params
+
+    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
+    $Rules = Get-InboxRule @Params
+
+    Write-Host -ForegroundColor Green -Object 'Exporting mailbox data ...'
+    $Params = @{
+        Encoding='UTF8'
+        NoTypeInformation=$true
+    }
+    $Activity | Export-Csv @Params -Path (Join-Path -Path $Path -ChildPath 'Activity Summary.csv') -Append
+    $Folders | Export-Csv @Params -Path (Join-Path -Path $Path -ChildPath ('{0} - Folders.csv' -f $MailboxAddress))
+    $Rules | Export-Csv @Params -Path (Join-Path -Path $Path -ChildPath ('{0} - Rules.csv' -f $MailboxAddress))
+}
+
 # Retrieve a summary of mailbox folders with associated rules
 Function Get-InboxRulesByFolders {
     [CmdletBinding()]
