@@ -9,8 +9,8 @@ if (Get-Module -Name PSReadLine -ListAvailable) {
         Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
         Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
 
-        # Bash style command completion
-        #Set-PSReadLineKeyHandler -Key Tab -Function Complete
+        # Menu style command completion
+        Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
     } else {
         Write-Verbose -Message '[dotfiles] Skipping PSReadLine settings as host is not ConsoleHost.'
     }

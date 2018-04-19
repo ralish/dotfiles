@@ -1,4 +1,4 @@
-# Some basic useful aliases
+# Some useful aliases
 Set-Alias -Name cop -Value Compare-ObjectProperties
 Set-Alias -Name gh -Value Get-Help
 Set-Alias -Name which -Value Get-Command
