@@ -5,7 +5,7 @@ if ($env:GIT_SSH -notmatch '\\plink\.exe$') {
     # SSH keys file extension
     $SshKeysExt  = '.opk'
 
-    if (Get-Command -Name ssh-add.exe -ErrorAction SilentlyContinue) {
+    if (Get-Command -Name ssh-add -ErrorAction SilentlyContinue) {
         if (Test-Path -Path $SshKeysPath -PathType Container) {
             $SshKeys = Get-ChildItem -Path $SshKeysPath -File | Where-Object { $_.Extension -eq $SshKeysExt }
             if ($SshKeys) {
