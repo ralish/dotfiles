@@ -694,7 +694,7 @@ Plug 'bigbrozer/vim-nagios'
 Plug 'PProvost/vim-ps1'
 
 " PgSQL
-Plug 'exu/pgsql.vim'
+Plug 'lifepillar/pgsql.vim'
 
 " Python
 Plug 'python-mode/python-mode', { 'branch': 'develop' }
