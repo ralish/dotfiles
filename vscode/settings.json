@@ -1,0 +1,38 @@
+{
+    // Editor
+    "editor.renderWhitespace": "boundary",
+
+    // Explorer
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+
+    // Telemetry
+    "telemetry.enableTelemetry": false,
+    "telemetry.enableCrashReporter": false,
+
+    // Extension: C/C++
+    "C_Cpp.autoAddFileAssociations": false,
+    "C_Cpp.loggingLevel": "Warning",
+
+    // Extension: DevSkim
+    "devskim.enableBestPracticeRules": true,
+    "devskim.enableManualReviewRules": true,
+
+    // Extension: GitLens
+    "gitlens.advanced.messages": {
+        "suppressShowKeyBindingsNotice": true
+    },
+
+    // Extension: markdownlint
+    "markdownlint.run": "onType",
+    "markdownlint.config": {
+        // Header style
+        "MD003": { "style": "setext_with_atx" },
+        // Trailing spaces
+        "MD009": { "br_spaces": 2 },
+        // Line length
+        "MD013": false,
+        // Trailing punctuation in header
+        "MD026": { "punctuation": ".,;:!" }
+    }
+}
