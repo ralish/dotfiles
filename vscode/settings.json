@@ -10,6 +10,9 @@
     "telemetry.enableTelemetry": false,
     "telemetry.enableCrashReporter": false,
 
+    // Language: PHP
+    "php.suggest.basic": false,
+
     // Extension: C/C++
     "C_Cpp.autoAddFileAssociations": false,
     "C_Cpp.loggingLevel": "Warning",
@@ -34,5 +37,8 @@
         "MD013": false,
         // Trailing punctuation in header
         "MD026": { "punctuation": ".,;:!" }
-    }
+    },
+
+    // Extension: PHP IntelliSense
+    "php.executablePath": "C:\\PHP\\php.exe"
 }
