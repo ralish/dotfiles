@@ -11,4 +11,8 @@
         <SpecialFolder>ApplicationData</SpecialFolder>
         <Destination>KiTTY</Destination>
     </InstallPath>
+
+    <IgnorePaths>
+        <Path>Helpers</Path>
+    </IgnorePaths>
 </Component>
