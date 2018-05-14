@@ -27,7 +27,7 @@ elif [[ $ssh_version =~ OpenSSH_6\.9 ]]; then
 elif [[ $ssh_version =~ OpenSSH_7\.2 ]]; then
     ssh_template="$OPENSSH_TEMPLATES/ssh_config.72"
 else
-    printf 'Unsupported OpenSSH version: %s' "$ssh_version"
+    printf 'Unsupported OpenSSH version: %s\n' "$ssh_version"
     exit "$DETECTION_NO_LOGIC"
 fi
 
