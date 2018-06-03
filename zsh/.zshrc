@@ -105,4 +105,14 @@ if [ -f /etc/bash_completion.d/virtualenvwrapper ]; then
     source /etc/bash_completion.d/virtualenvwrapper
 fi
 
+# Include any custom functions
+zsh_functions_dir="$dotfiles/sh/functions"
+if [ -d "$zsh_functions_dir" ]; then
+    for zsh_function in $zsh_functions_dir/*.zsh; do
+        [ -e "$zsh_function" ] || break
+        . "$zsh_function"
+    done
+fi
+unset zsh_function zsh_functions_dir
+
 # vim: syntax=zsh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
