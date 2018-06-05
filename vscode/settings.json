@@ -22,6 +22,7 @@
     "devskim.enableManualReviewRules": true,
 
     // Extension: GitLens
+    "gitlens.historyExplorer.enabled": true,
     "gitlens.advanced.messages": {
         "suppressShowKeyBindingsNotice": true
     },
