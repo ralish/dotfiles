@@ -69,8 +69,7 @@ unset EXTRA_PATHS
 # Set our preferred editor
 if [ -n "$EDITOR_PRIORITY" ]; then
     for editor in $EDITOR_PRIORITY; do
-        [ -e "$editor" ] || break
-        editor_path="$(command -v "$editor" > /dev/null)"
+        editor_path="$(command -v "$editor")"
         if [ -n "$editor_path" ]; then
             export EDITOR="$editor_path"
             export VISUAL="$editor_path"
