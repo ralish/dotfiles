@@ -43,7 +43,13 @@ plugins=(colored-man-pages)
 source "$ZSH/oh-my-zsh.sh"
 
 # Load our common shell configuration
+#
+# By default zsh does *not* perform field splitting on unquoted parameter
+# expansions. We temporarily enable this option for compatibility with our
+# common shell configuration as most shells default to this behaviour.
+setopt shwordsplit
 source "$SHCFG"
+unsetopt shwordsplit
 
 # Create a zkbd compatible hash populating it via the terminfo array
 typeset -g -A key
