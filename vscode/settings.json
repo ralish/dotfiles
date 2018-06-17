@@ -6,6 +6,10 @@
     "explorer.confirmDelete": false,
     "explorer.confirmDragAndDrop": false,
 
+    // Files
+    "files.autoSave": "onFocusChange",
+    "files.trimTrailingWhitespace": true,
+
     // Telemetry
     "telemetry.enableTelemetry": false,
     "telemetry.enableCrashReporter": false,
@@ -20,6 +24,7 @@
     // Extension: DevSkim
     "devskim.enableBestPracticeRules": true,
     "devskim.enableManualReviewRules": true,
+    "devskim.removeFindingsOnClose": true,
 
     // Extension: GitLens
     "gitlens.historyExplorer.enabled": true,
@@ -28,7 +33,6 @@
     },
 
     // Extension: markdownlint
-    "markdownlint.run": "onType",
     "markdownlint.config": {
         // Header style
         "MD003": { "style": "setext_with_atx" },
@@ -41,5 +45,11 @@
     },
 
     // Extension: PHP IntelliSense
-    "php.executablePath": "C:\\PHP\\php.exe"
+    "php.executablePath": "C:\\PHP\\php.exe",
+
+    // Extension: Python
+    "python.linting.flake8Enabled": true,
+
+    // Extension: XML Tools
+    "xmlTools.splitXmlnsOnFormat": false
 }
