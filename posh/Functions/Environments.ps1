@@ -1,3 +1,20 @@
+# Configure environment for Cygwin usage
+Function Enable-Cygwin {
+    [CmdletBinding()]
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [String]$Path='C:\Cygwin'
+    )
+
+    if (-not (Test-Path -Path $Path -PathType Container)) {
+        throw 'Provided Cygwin path is not a directory: {0}' -f $Path
+    }
+
+    $BinPath = Join-Path -Path $Path -ChildPath 'bin'
+    $LocalBinPath = Join-Path -Path $Path -ChildPath 'usr\local\bin'
+    Set-Item -Path Env:\Path -Value ('{0};{1};{2}' -f $LocalBinPath, $BinPath, $Env:PATH)
+}
+
 # Configure environment for Node.js development
 Function Enable-Nodejs {
     [CmdletBinding()]
