@@ -300,7 +300,7 @@ Function Get-MailboxActivitySummary {
     }
 
     if (-not $PSBoundParameters.ContainsKey('StartDate')) {
-        $StartDate = $EndDate.AddDays(-2)
+        $StartDate = $EndDate.AddDays(-7)
     }
 
     $TraceParams = $PSBoundParameters
