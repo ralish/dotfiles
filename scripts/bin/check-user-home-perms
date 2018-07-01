@@ -75,13 +75,14 @@ function main() {
     fi
 
     # shellcheck disable=SC2034
-    getent passwd | while IFS=: read -r login pw uid gid gecos home shell; do
+    getent passwd | while IFS=: read -r login pw uid gid gecos home shell
+    do {
         if [[ $home =~ ^(/root|/home/[A-Za-z]) ]]; then
             if [[ -d $home ]]; then
                 check_user_home_perms "$login"
             fi
         fi
-    done
+    } < /dev/null; done
 }
 
 
