@@ -11,8 +11,8 @@
     "files.trimTrailingWhitespace": true,
 
     // Telemetry
-    "telemetry.enableTelemetry": false,
     "telemetry.enableCrashReporter": false,
+    "telemetry.enableTelemetry": false,
 
     // Language: PHP
     "php.suggest.basic": false,
@@ -27,7 +27,8 @@
     "devskim.removeFindingsOnClose": true,
 
     // Extension: GitLens
-    "gitlens.historyExplorer.enabled": true,
+    "gitlens.defaultDateStyle": "absolute",
+    "gitlens.advanced.telemetry.enabled": false,
     "gitlens.advanced.messages": {
         "suppressShowKeyBindingsNotice": true
     },
