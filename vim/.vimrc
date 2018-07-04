@@ -793,6 +793,9 @@ let g:syntastic_style_warning_symbol = '≈'
 let g:syntastic_error_symbol = '✘'
 let g:syntastic_style_error_symbol = '≃'
 
+" Indicate to the C++ compiler which standard we're using
+"let g:syntastic_cpp_compiler_options = '-std=c++11'
+
 " Configure which syntax checkers to use for various languages
 let g:syntastic_javascript_checkers = ['eslint']
 
