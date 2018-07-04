@@ -23,7 +23,7 @@ Remove-Variable -Name DepWalker64Path
 
 # Sublime Text 2
 $Sublime2RegPath = 'HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1'
-if (!(Get-Command -Name subl.exe -ErrorAction SilentlyContinue)) {
+if (!(Get-Command -Name subl.exe -ErrorAction Ignore)) {
     if (Test-Path -Path $Sublime2RegPath -PathType Container) {
         Set-Alias -Name subl -Value (Join-Path -Path (Get-ItemProperty -Path $Sublime2RegPath).InstallLocation -ChildPath 'sublime_text.exe')
     } else {
