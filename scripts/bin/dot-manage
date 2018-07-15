@@ -16,10 +16,12 @@ STOW_BIN='stow/bin/stow'
 
 # DESC: Usage help
 # ARGS: None
+# OUTS: None
 function script_usage() {
     cat << EOF
 Usage:
      -h|--help                  Displays this help
+     -v|--verbose               Displays verbose output
     -nc|--no-colour             Disables colour output
 
     Stow Options:
@@ -37,11 +39,12 @@ EOF
 
 # DESC: Parameter parser
 # ARGS: $@ (optional): Arguments provided to the script
+# OUTS: Variables indicating command-line parameters and options
 function parse_params() {
     local param
 
     # Default stow method
-    stow_method='reinstall'
+    stow_method=reinstall
 
     while [[ $# -gt 0 ]]; do
         param="$1"
@@ -51,20 +54,23 @@ function parse_params() {
                 script_usage
                 exit 0
                 ;;
+            -v|--verbose)
+                verbose=true
+                ;;
             -nc|--no-colour)
-                no_colour='true'
+                no_colour=true
                 ;;
             -i|--install)
-                stow_method='install'
+                stow_method=install
                 ;;
             -r|--reinstall)
-                stow_method='reinstall'
+                stow_method=reinstall
                 ;;
             -u|--uninstall)
-                stow_method='uninstall'
+                stow_method=uninstall
                 ;;
             -dr|--detection-report)
-                detection_report='true'
+                detection_report=true
                 ;;
             *)
                 script_exit "Invalid parameter was provided: $param" 2
@@ -76,6 +82,11 @@ function parse_params() {
 
 # DESC: Find some important paths we need before script_init() is called
 # ARGS: None
+# OUTS: $script_real_path: The full canonicalized path to the script
+#       $script_real_dir: The canonicalized directory path of the script
+#       $script_real_name: The canonicalized file name of the script
+#       $dotfiles_path: The dotfiles directory path
+#       $dotfiles_name: The dotfiles directory name
 function early_init() {
     # Determine the physical directory this script resides in. This approach is
     # necessarily clumsy as simple methods like "readlink -f" and "realpath"
@@ -97,6 +108,7 @@ function early_init() {
 
 # DESC: Create some directories in advance so stow doesn't symlink them
 # ARGS: $@ (required): Directories to be created
+# OUTS: None
 function create_dirs() {
     while [[ $# -gt 0 ]]; do
         if [[ ! -d $1 ]]; then
@@ -109,6 +121,7 @@ function create_dirs() {
 
 # DESC: Quick, simple & dirty sorting of arguments
 # ARGS: $@ (required): Arguments to be sorted
+# OUTS: None
 function sort_args() {
     printf '%s ' "$@" | xargs -n 1 | sort | xargs
 }
@@ -116,6 +129,14 @@ function sort_args() {
 
 # DESC: Detect the status of each component
 # ARGS: None
+# OUTS: $stow_list: Array of components to be passed to GNU Stow
+#       $detect_success: Array of successfully detected components
+#       $detect_always_install: Array of components to always install
+#       $detect_never_install: Array of components to never install
+#       $detect_not_available: Array of components which are unavailable
+#       $detect_no_logic: Array of components missing detection logic
+#       $detect_ignore: Array of components to explicitly ignore
+#       $detect_failure: Array of components with a detection failure
 function detect_components() {
     pretty_print '*** Detecting applicable dotfiles components ...'
 
@@ -167,6 +188,7 @@ function detect_components() {
 
 # DESC: Output a report with the results of component detection
 # ARGS: None
+# OUTS: None
 function detect_report() {
     local detection_result
 
@@ -230,6 +252,8 @@ function detect_report() {
 
 # DESC: Invokes the stow executable on detected components
 # ARGS: $1 (required): The operation type (-S, -D or -R)
+# OUTS: $stow_success: Array of components Stow successfully installed
+#       $stow_failure: Array of components Stow failed to install
 function stow_components() {
     local stow_comp stow_result
     declare -g -a stow_success stow_failure
@@ -262,16 +286,17 @@ function stow_components() {
 
 # DESC: Main control flow
 # ARGS: $@ (optional): Arguments provided to the script
+# OUTS: None
 function main() {
     early_init
 
     # shellcheck source=scripts/bin/bash-template.sh
     source "$script_real_dir/bash-template.sh"
 
-    trap "script_trap_err" ERR
-    trap "script_trap_exit" EXIT
+    trap script_trap_err ERR
+    trap script_trap_exit EXIT
 
-    script_init
+    script_init "$@"
     parse_params "$@"
     colour_init
 

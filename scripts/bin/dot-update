@@ -14,23 +14,26 @@ DOT_MANAGE='dot-manage'
 
 # DESC: Usage help
 # ARGS: None
+# OUTS: None
 function script_usage() {
     cat << EOF
 Usage:
      -h|--help                  Displays this help
+     -v|--verbose               Displays verbose output
     -nc|--no-colour             Disables colour output
 
     Update Options:
      -a|--all                   Update all the things
      -g|--git                   Update Git sources (default)
      -s|--stow                  Run dot-manage (default)
-     -v|--vim                   Update Vim plug-ins
+    -vi|--vim                   Update Vim plug-ins
 EOF
 }
 
 
 # DESC: Parameter parser
 # ARGS: $@ (optional): Arguments provided to the script
+# OUTS: Variables indicating command-line parameters and options
 function parse_params() {
     local param
 
@@ -42,22 +45,25 @@ function parse_params() {
                 script_usage
                 exit 0
                 ;;
+            -v|--verbose)
+                verbose=true
+                ;;
             -nc|--no-colour)
-                no_colour='true'
+                no_colour=true
                 ;;
             -a|--all)
-                git_update='true'
-                stow_update='true'
-                vim_update='true'
+                git_update=true
+                stow_update=true
+                vim_update=true
                 ;;
             -g|--git)
-                git_update='true'
+                git_update=true
                 ;;
             -s|--stow)
-                stow_update='true'
+                stow_update=true
                 ;;
-            -v|--vim)
-                vim_update='true'
+            -vi|--vim)
+                vim_update=true
                 ;;
             *)
                 echo "Invalid parameter was provided: $param"
@@ -68,13 +74,18 @@ function parse_params() {
     if [[ -z ${git_update-} &&
           -z ${stow_update-} &&
           -z ${vim_update-} ]]; then
-        default_update='true'
+        default_update=true
     fi
 }
 
 
 # DESC: Find some important paths we need before script_init() is called
 # ARGS: None
+# OUTS: $script_real_path: The full canonicalized path to the script
+#       $script_real_dir: The canonicalized directory path of the script
+#       $script_real_name: The canonicalized file name of the script
+#       $dotfiles_path: The dotfiles directory path
+#       $dotfiles_name: The dotfiles directory name
 function early_init() {
     # Determine the physical directory this script resides in. This approach is
     # necessarily clumsy as simple methods like "readlink -f" and "realpath"
@@ -92,22 +103,24 @@ function early_init() {
 
 # DESC: Main control flow
 # ARGS: $@ (optional): Arguments provided to the script
+# OUTS: None
 function main() {
     early_init
 
     # shellcheck source=scripts/bin/bash-template.sh
     source "$script_real_dir/bash-template.sh"
 
-    trap "script_trap_err" ERR
-    trap "script_trap_exit" EXIT
+    trap script_trap_err ERR
+    trap script_trap_exit EXIT
 
-    script_init
+    script_init "$@"
     parse_params "$@"
     colour_init
 
+    cd "$dotfiles_path"
+
     if [[ -n ${default_update-} || -n ${git_update-} ]]; then
         pretty_print '*** Updating Git sources ...'
-        cd "$dotfiles_path"
         check_binary 'git' 'fatal'
 
         # Default to the upstream branch for an unqualified merge
@@ -120,7 +133,6 @@ function main() {
     fi
 
     if [[ -n ${default_update-} || -n ${stow_update-} ]]; then
-        cd "$dotfiles_path"
         "./$DOT_MANAGE"
     fi
 
