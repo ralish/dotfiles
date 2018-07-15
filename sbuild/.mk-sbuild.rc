@@ -1,0 +1,13 @@
+# Lines to append to schroot entries
+SCHROOT_CONF_SUFFIX='source-root-users=root,sbuild,admin source-root-groups=root,sbuild,admin preserve-environment=true'
+
+# Do not include the "-updates" release pocket
+#SKIP_UPDATES=1
+
+# Do not include the "-proposed" release pocket
+SKIP_PROPOSED=1
+
+# Proxy for debootstrap (useful with apt-cacher-ng)
+#DEBOOTSTRAP_PROXY='http://127.0.0.1:3142/'
+
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
