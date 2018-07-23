@@ -10,7 +10,7 @@ My primary occupation is that of a SysAdmin and so I often find myself working o
 
 - **Ease of access**  
   GitHub makes this easy by providing access to ZIP files of each branch in a repository. While a Git clone is strongly preferable, if this is too much effort or otherwise problematic, simply downloading and unpacking the ZIP archive is a helpful fallback.
--**Ease of setup**  
+- **Ease of setup**  
   A long or manual installation or removal process is painful and time-consuming. An automated approach is essential so that installation is quick and easy, with removal similarly straightforward if this is desirable (e.g. on a shared access account).
 - **Portability**  
   It's all too easy for platform assumptions to seep into configurations. I've tried my best to avoid such assumptions so that all configurations work on platforms where the underlying application or library is supported, or at least degrade gracefully.
