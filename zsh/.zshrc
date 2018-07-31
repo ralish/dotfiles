@@ -37,7 +37,7 @@ COMPLETION_WAITING_DOTS="true"
 # DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Which plugins would you like to load?
-plugins=(colored-man-pages)
+plugins=(colored-man-pages shrink-path)
 
 # Actually load oh-my-zsh with our settings
 source "$ZSH/oh-my-zsh.sh"
@@ -120,5 +120,10 @@ if [ -d "$zsh_functions_dir" ]; then
     done
 fi
 unset zsh_function zsh_functions_dir
+
+# Agnoster theme prompt customisations for current dir
+prompt_dir() {
+    prompt_segment blue black "$(shrink_path -l -t)"
+}
 
 # vim: syntax=zsh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
