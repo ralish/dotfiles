@@ -1,20 +1,23 @@
 [core]
-    # Use Visual Studio Code as our editor
-    editor = code --wait
-    # Allow paths longer than 260 characters (may have quirks!)
-    longpaths = true
-    # Don't print non-ASCII file names in quoted octal notation
-    quotePath = off
-    # Enable symlink support (requires SeCreateSymbolicLinkPrivilege)
-    symlinks = true
-    # Treat a carriage-return as part of the line terminator
-    whitespace = cr-at-eol
+	# Use Visual Studio Code as our editor
+	editor = code --wait
+	# Allow paths longer than 260 characters (may have quirks!)
+	longpaths = true
+	# Don't print non-ASCII file names in quoted octal notation
+	quotePath = off
+	# Enable symlink support (requires SeCreateSymbolicLinkPrivilege)
+	symlinks = true
+	# Treat a carriage-return as part of the line terminator
+	whitespace = cr-at-eol
 
 [diff]
-    # Use Visual Studio Code for diffs
-    tool = vscode
+	# Use Visual Studio Code for diffs
+	tool = vscode
 
 [difftool "vscode"]
-    cmd = code --wait --diff $LOCAL $REMOTE
+	cmd = code --wait --diff $LOCAL $REMOTE
+
+[gpg]
+	program = C:\\Program Files (x86)\\Nexiom\\Software\\Independent\\Gpg4win\\pub\\gpg.exe
 
 # vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 et sr
