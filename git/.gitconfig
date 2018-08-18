@@ -8,6 +8,7 @@
 [user]
 	name = Samuel D. Leslie
 	email = sdl@nexiom.net
+	signingkey = 48CB9B43C8BA347C
 
 [github]
 	user = ralish
