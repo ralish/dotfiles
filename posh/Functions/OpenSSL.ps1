@@ -47,7 +47,7 @@ Function Convert-OpenSSLPemToPkcs12 {
 }
 
 Function Convert-OpenSSLPkcs12ToPem {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='Both')]
     Param(
         [Parameter(Mandatory)]
         [String]$Pkcs12File,
