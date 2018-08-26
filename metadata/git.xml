@@ -3,4 +3,8 @@
     <InstallPath>
         <HideSymlinks>true</HideSymlinks>
     </InstallPath>
+
+    <IgnorePaths>
+        <Path>bin</Path>
+    </IgnorePaths>
 </Component>

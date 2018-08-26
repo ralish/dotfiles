@@ -3,10 +3,7 @@
     <FriendlyName>Command Prompt</FriendlyName>
 
     <Detection>
-        <Method>FindInPath</Method>
+        <Method>Static</Method>
+        <Availability>NeverInstall</Availability>
     </Detection>
-
-    <IgnorePaths>
-        <Path>SetupEnv.cmd</Path>
-    </IgnorePaths>
 </Component>
