@@ -7,7 +7,7 @@
     "explorer.confirmDragAndDrop": false,
 
     // Files
-    "files.autoSave": "onFocusChange",
+    "files.autoSave": "onWindowChange",
     "files.trimTrailingWhitespace": true,
 
     // Telemetry
