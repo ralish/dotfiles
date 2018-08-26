@@ -52,5 +52,11 @@
     "python.linting.flake8Enabled": true,
 
     // Extension: XML Tools
-    "xmlTools.splitXmlnsOnFormat": false
+    "xmlTools.splitXmlnsOnFormat": false,
+
+    "[powershell]": {
+        // CodeLens causes significant slowdown with the PowerShell extension
+        // See GitHub Issues: #647, #861, #1174, #1326, #1464
+        "editor.codeLens": false
+    }
 }
