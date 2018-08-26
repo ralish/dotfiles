@@ -54,6 +54,11 @@
     // Extension: XML Tools
     "xmlTools.splitXmlnsOnFormat": false,
 
+    "[markdown]": {
+        // Trailing whitespace has special meaning in Markdown syntax
+        "files.trimTrailingWhitespace": false,
+    },
+
     "[powershell]": {
         // CodeLens causes significant slowdown with the PowerShell extension
         // See GitHub Issues: #647, #861, #1174, #1326, #1464
