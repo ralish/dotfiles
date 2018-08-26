@@ -48,6 +48,9 @@
     // Extension: PHP IntelliSense
     "php.executablePath": "C:\\PHP\\php.exe",
 
+    // Extension: PowerShell
+    "powershell.scriptAnalysis.settingsPath": "C:\\Users\\SDL\\dotfiles\\posh\\PSScriptAnalyzerSettings.psd1",
+
     // Extension: Python
     "python.linting.flake8Enabled": true,
 
