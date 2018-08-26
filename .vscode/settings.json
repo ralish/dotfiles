@@ -2,5 +2,7 @@
     // File paths to language mappings
     "files.associations": {
         "**/openssh/**": "ssh_config"
-    }
+    },
+
+    "powershell.scriptAnalysis.settingsPath": ".vscode\\PSScriptAnalyzerSettings.psd1"
 }
