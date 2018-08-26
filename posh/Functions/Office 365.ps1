@@ -1,12 +1,13 @@
 # Helper function to connect to all Office 365 services
 Function Connect-Office365Services {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
         [Parameter(ParameterSetName='MFA')]
         [ValidateNotNullOrEmpty()]
         [String]$MfaUsername,
 
-        [Parameter(ParameterSetName='Standard',Mandatory)]
+        [Parameter(ParameterSetName='Standard', Mandatory)]
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential,
@@ -54,7 +55,7 @@ Function Connect-ExchangeOnline {
         [ValidateNotNullOrEmpty()]
         [String]$MfaUsername,
 
-        [Parameter(ParameterSetName='Standard',Mandatory)]
+        [Parameter(ParameterSetName='Standard', Mandatory)]
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
@@ -97,7 +98,7 @@ Function Connect-SecurityAndComplianceCenter {
         [ValidateNotNullOrEmpty()]
         [String]$MfaUsername,
 
-        [Parameter(ParameterSetName='Standard',Mandatory)]
+        [Parameter(ParameterSetName='Standard', Mandatory)]
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
@@ -147,7 +148,7 @@ Function Connect-SkypeForBusinessOnline {
         [ValidateNotNullOrEmpty()]
         [String]$MfaUsername,
 
-        [Parameter(ParameterSetName='Standard',Mandatory)]
+        [Parameter(ParameterSetName='Standard', Mandatory)]
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
@@ -236,6 +237,7 @@ Function Export-MailboxSpreadsheetData {
 
 # Retrieve a summary of mailbox folders with associated rules
 Function Get-InboxRulesByFolders {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]

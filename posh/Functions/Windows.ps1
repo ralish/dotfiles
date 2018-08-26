@@ -1,5 +1,7 @@
 # Retrieve files with a minimum number of hard links
 Function Get-MultipleHardLinks {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
@@ -19,7 +21,7 @@ Function Get-MultipleHardLinks {
 }
 
 # Retrieve directories with non-inherited ACLs
-Function Get-NonInheritedACLs {
+Function Get-NonInheritedACL {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]

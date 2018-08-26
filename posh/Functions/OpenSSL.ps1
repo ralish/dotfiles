@@ -112,6 +112,7 @@ Function Get-OpenSSLPrivateKey {
 }
 
 Function New-OpenSSLPrivateKeyAndCsr {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
@@ -128,6 +129,7 @@ Function New-OpenSSLPrivateKeyAndCsr {
 }
 
 Function New-OpenSSLSelfSignedCertificate {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]

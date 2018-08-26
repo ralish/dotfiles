@@ -1,6 +1,7 @@
 # Compare the properties of two objects
 # Via: https://blogs.technet.microsoft.com/janesays/2017/04/25/compare-all-properties-of-two-objects-in-windows-powershell/
 Function Compare-ObjectProperties {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
@@ -39,7 +40,7 @@ Function Compare-ObjectProperties {
 Function ConvertFrom-Base64 {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory,ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [String]$String
     )
 
@@ -50,7 +51,7 @@ Function ConvertFrom-Base64 {
 Function ConvertFrom-URLEncoded {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory,ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [String]$String
     )
 
@@ -61,7 +62,7 @@ Function ConvertFrom-URLEncoded {
 Function ConvertTo-Base64 {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory,ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [ValidateNotNull()]
         [String]$String
     )
@@ -71,6 +72,7 @@ Function ConvertTo-Base64 {
 
 # Convert a text file to the given encoding
 Function ConvertTo-TextEncoding {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]
     Param(
         [Parameter(ValueFromPipeline)]
@@ -107,7 +109,7 @@ Function ConvertTo-TextEncoding {
 Function ConvertTo-URLEncoded {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory,ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [String]$String
     )
 
@@ -178,6 +180,7 @@ Function Test-ModuleAvailable {
 
 # Reload selected PowerShell profiles
 Function Update-Profile {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidDefaultValueSwitchParameter', '')]
     [CmdletBinding()]
     Param(
         [Switch]$AllUsersAllHosts,

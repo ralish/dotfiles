@@ -17,6 +17,7 @@ Function Enable-Cygwin {
 
 # Configure environment for Node.js development
 Function Enable-Nodejs {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
