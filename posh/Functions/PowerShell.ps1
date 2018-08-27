@@ -1,3 +1,33 @@
+Function ghd {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Name
+    )
+
+    Get-Help -Detailed @PSBoundParameters
+}
+
+Function ghe {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Name
+    )
+
+    Get-Help -Examples @PSBoundParameters
+}
+
+Function ghf {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Name
+    )
+
+    Get-Help -Full @PSBoundParameters
+}
+
 Function Uninstall-ObsoleteModule {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
