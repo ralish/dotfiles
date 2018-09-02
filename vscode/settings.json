@@ -1,5 +1,6 @@
 {
     // Editor
+    "editor.find.seedSearchStringFromSelection": false,
     "editor.renderWhitespace": "boundary",
 
     // Explorer
