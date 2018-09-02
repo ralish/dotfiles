@@ -55,10 +55,17 @@
     // Extension: Python
     "python.linting.flake8Enabled": true,
 
+    // Extension: Rewrap
+    "rewrap.autoWrap.enabled": true,
+
     // Extension: XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
     "xmlTools.removeCommentsOnMinify": true,
     "xmlTools.splitXmlnsOnFormat": false,
+
+    "[git-commit]": {
+        "rewrap.wrappingColumn": 72,
+    },
 
     "[markdown]": {
         // Trailing whitespace has special meaning in Markdown syntax
