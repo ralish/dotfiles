@@ -58,6 +58,12 @@
     // Extension: Rewrap
     "rewrap.autoWrap.enabled": true,
 
+    // Extension: shellcheck
+    "shellcheck.customArgs": [
+        // Permit following source directives
+        "-x"
+    ],
+
     // Extension: XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
     "xmlTools.removeCommentsOnMinify": true,
@@ -75,6 +81,6 @@
     "[powershell]": {
         // CodeLens causes significant slowdown with the PowerShell extension
         // See GitHub Issues: #647, #861, #1174, #1326, #1464
-        "editor.codeLens": false
+        "editor.codeLens": false,
     }
 }
