@@ -43,7 +43,7 @@ Function Connect-MSOnline {
     Connect-MsolService @PSBoundParameters
 }
 
-# Creates an authorization header from an Azure AD authentication
+# Retrieve an Azure AD authorization header
 Function Get-AzureAuthHeader {
     [CmdletBinding()]
     Param(
@@ -102,7 +102,7 @@ Function Get-AzureAuthToken {
     return $AuthResult
 }
 
-# Get Azure AD users with disabled services
+# Retrieve Azure AD users with disabled services
 Function Get-AzureUsersWithDisabledServices {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]

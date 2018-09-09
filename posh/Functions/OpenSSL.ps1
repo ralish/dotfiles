@@ -1,3 +1,9 @@
+# Certificate encoding formats
+# - DER:        Distinguished Encoding Rules
+# - PEM:        Privacy-Enhanced Mail
+# - PKCS #12:   Public-Key Cryptography Standards #12
+
+# Convert a certificate in DER format to PEM format
 Function Convert-OpenSSLDerToPem {
     [CmdletBinding()]
     Param(
@@ -11,6 +17,7 @@ Function Convert-OpenSSLDerToPem {
     & openssl x509 -inform der -in `"$DerFile`" -out `"$PemFile`"
 }
 
+# Convert a certificate in PEM format to DER format
 Function Convert-OpenSSLPemToDer {
     [CmdletBinding()]
     Param(
@@ -24,6 +31,7 @@ Function Convert-OpenSSLPemToDer {
     & openssl x509 -outform der -in `"$PemFile`" -out `"$DerFile`"
 }
 
+# Convert a certificate in PEM format to PKCS #12 format
 Function Convert-OpenSSLPemToPkcs12 {
     [CmdletBinding()]
     Param(
@@ -46,6 +54,7 @@ Function Convert-OpenSSLPemToPkcs12 {
     }
 }
 
+# Convert a certificate in PKCS #12 format to PEM format
 Function Convert-OpenSSLPkcs12ToPem {
     [CmdletBinding(DefaultParameterSetName='Both')]
     Param(
@@ -71,6 +80,7 @@ Function Convert-OpenSSLPkcs12ToPem {
     }
 }
 
+# Retrieve the details of a certificate
 Function Get-OpenSSLCertificate {
     [CmdletBinding()]
     Param(
@@ -81,6 +91,7 @@ Function Get-OpenSSLCertificate {
     & openssl x509 -in `"$Certificate`" -noout -text
 }
 
+# Retrieve the details of a certificate signing request
 Function Get-OpenSSLCsr {
     [CmdletBinding()]
     Param(
@@ -91,6 +102,7 @@ Function Get-OpenSSLCsr {
     & openssl req -in `"$Csr`" -noout -text -verify
 }
 
+# Retrieve the details of a PKCS #12 certificate
 Function Get-OpenSSLPkcs12 {
     [CmdletBinding()]
     Param(
@@ -101,6 +113,7 @@ Function Get-OpenSSLPkcs12 {
     & openssl rsa -in `"$Pkcs12`" -info
 }
 
+# Retrieve the details of a private key
 Function Get-OpenSSLPrivateKey {
     [CmdletBinding()]
     Param(
@@ -111,6 +124,7 @@ Function Get-OpenSSLPrivateKey {
     & openssl rsa -in `"$PrivateKey`" -check
 }
 
+# Create a private key and certificate signing request
 Function New-OpenSSLPrivateKeyAndCsr {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]
@@ -128,6 +142,7 @@ Function New-OpenSSLPrivateKeyAndCsr {
     & openssl req -out `"$Csr`" -new -newkey rsa:$KeySize -nodes -keyout `"$PrivateKey`"
 }
 
+# Create a private key and self-signed certificate
 Function New-OpenSSLSelfSignedCertificate {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]

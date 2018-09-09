@@ -1,3 +1,4 @@
+# Invoke Get-Help with -Detailed
 Function ghd {
     [CmdletBinding()]
     Param(
@@ -8,6 +9,7 @@ Function ghd {
     Get-Help -Detailed @PSBoundParameters
 }
 
+# Invoke Get-Help with -Examples
 Function ghe {
     [CmdletBinding()]
     Param(
@@ -18,6 +20,7 @@ Function ghe {
     Get-Help -Examples @PSBoundParameters
 }
 
+# Invoke Get-Help with -Full
 Function ghf {
     [CmdletBinding()]
     Param(
@@ -28,6 +31,7 @@ Function ghf {
     Get-Help -Full @PSBoundParameters
 }
 
+# Uninstall obsolete versions of installed modules
 Function Uninstall-ObsoleteModule {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
