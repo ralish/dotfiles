@@ -1,5 +1,7 @@
 # Load SSH keys into ssh-agent if we're not using Plink
 if ($env:GIT_SSH -notmatch '\\plink\.exe$') {
+    Write-Verbose -Message '[dotfiles] Loading SSH keys into ssh-agent ...'
+
     # Path to our SSH keys
     $SshKeysPath = 'Y:\Secured\SSH Keys'
     # SSH keys file extension

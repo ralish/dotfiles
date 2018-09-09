@@ -1,4 +1,6 @@
 if (Get-Module -Name PSDotFiles -ListAvailable) {
+    Write-Verbose -Message '[dotfiles] Loading PSDotFiles settings ...'
+
     # Path to our dotfiles directory
     $DotFilesPath = Join-Path -Path $HOME -ChildPath 'dotfiles'
 

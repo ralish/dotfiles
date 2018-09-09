@@ -1,4 +1,6 @@
 if ($env:ConEmuANSI -eq 'ON') {
+    Write-Verbose -Message '[dotfiles] Loading ConEmu settings ...'
+
     # Special prompt handling for PowerShell under ConEmu
     # See: https://conemu.github.io/en/PowershellPrompt.html
     $ConEmuPrompt = {
@@ -12,4 +14,6 @@ if ($env:ConEmuANSI -eq 'ON') {
 
         return $prompt
     }
+} else {
+    Write-Verbose -Message '[dotfiles] Skipping ConEmu settings as not running under ConEmu.'
 }

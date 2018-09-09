@@ -1,5 +1,6 @@
 if (Get-Module -Name PSReadLine -ListAvailable) {
     if ($Host.Name -eq 'ConsoleHost') {
+        Write-Verbose -Message '[dotfiles] Loading PSReadLine settings ...'
         Import-Module -Name PSReadLine
 
         # Move the cursor to end of line while cycling through history

@@ -1,4 +1,5 @@
 if (Get-Module -Name posh-git -ListAvailable) {
+    Write-Verbose -Message '[dotfiles] Loading posh-git settings ...'
     Import-Module -Name posh-git
 
     # Abbreviate home directory path with tilde
