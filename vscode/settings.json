@@ -29,10 +29,10 @@
 
     // Extension: GitLens
     "gitlens.defaultDateStyle": "absolute",
-    "gitlens.advanced.telemetry.enabled": false,
     "gitlens.advanced.messages": {
         "suppressShowKeyBindingsNotice": true
     },
+    "gitlens.advanced.telemetry.enabled": false,
 
     // Extension: markdownlint
     "markdownlint.config": {
@@ -55,9 +55,6 @@
     // Extension: Python
     "python.linting.flake8Enabled": true,
 
-    // Extension: Rewrap
-    "rewrap.autoWrap.enabled": true,
-
     // Extension: shellcheck
     "shellcheck.customArgs": [
         // Permit following source directives
@@ -70,6 +67,8 @@
     "xmlTools.splitXmlnsOnFormat": false,
 
     "[git-commit]": {
+        // Enable Rewrap extension to automatically wrap commit messages
+        "rewrap.autoWrap.enabled": false,
         "rewrap.wrappingColumn": 72,
     },
 
