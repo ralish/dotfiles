@@ -1,9 +1,9 @@
 # Below files have encodings which Git doesn't natively understand (typically
 # UTF-16). Use a filter to send them through iconv so they can be processed.
-#*.reg filter=file-encoding
+#*.reg                          filter=file-encoding
 
 # KiTTY session profiles *must* have LF line endings. At the time of writing,
 # CRLF line endings cause the stupid thing to crash. Should investigate later!
-kitty/** eol=lf
+kitty/**                        text        eol=lf
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
