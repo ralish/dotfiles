@@ -55,6 +55,9 @@
     // Extension: Python
     "python.linting.flake8Enabled": true,
 
+    // Extension: Select Line Status Bar
+    "selectline.alignment": "right",
+
     // Extension: shellcheck
     "shellcheck.customArgs": [
         // Permit following source directives
