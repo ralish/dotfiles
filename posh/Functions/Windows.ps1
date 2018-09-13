@@ -1,3 +1,17 @@
+# Retrieve a persisted environment variable
+Function Get-EnvironmentVariable {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Name,
+
+        [ValidateSet('Machine', 'User')]
+        [String]$Scope='User'
+    )
+
+    [Environment]::GetEnvironmentVariable($Name, [EnvironmentVariableTarget]::$Scope)
+}
+
 # Retrieve files with a minimum number of hard links
 Function Get-MultipleHardLinks {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
@@ -59,6 +73,37 @@ Function Get-NonInheritedACL {
 # Helper function to call MKLINK in cmd
 Function mklink {
     & $env:ComSpec /c mklink $args
+}
+
+# Set a persisted environment variable
+Function Set-EnvironmentVariable {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Name,
+
+        [AllowEmptyString()]
+        [String]$Value,
+
+        [ValidateSet('Machine', 'User')]
+        [String]$Scope='User',
+
+        [ValidateSet('Overwrite', 'Append', 'Prepend')]
+        [String]$Action='Overwrite'
+    )
+
+    if ($Action -in @('Append', 'Prepend')) {
+        $CurrentValue = Get-EnvironmentVariable -Name $Name -Scope $Scope
+    }
+
+    switch ($Action) {
+        'Overwrite' { $NewValue = $Value }
+        'Append'    { $NewValue = '{0}{1}' -f $CurrentValue, $Value }
+        'Prepend'   { $NewValue = '{0}{1}' -f $Value, $CurrentValue }
+    }
+
+    [Environment]::SetEnvironmentVariable($Name, $NewValue, [EnvironmentVariableTarget]::$Scope)
 }
 
 # Watch an Event Log (similar to Unix "tail")
