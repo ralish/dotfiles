@@ -204,6 +204,42 @@ Function Format-Xml {
     }
 }
 
+# Remove an element from a Path type string
+Function Remove-PathStringElement {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$Path,
+
+        [Parameter(Mandatory)]
+        [String]$Element,
+
+        [ValidateLength(1, 1)]
+        [String]$Separator=';',
+
+        [Switch]$NoRepair
+    )
+
+    $RegExElement = [Regex]::Escape($Element)
+    $RegExSeparator = [Regex]::Escape($Separator)
+
+    if (!$NoRepair) {
+        $Path = Repair-PathString -String $Path -Separator $Separator
+    }
+
+    $OnlyElement = '^{0}$' -f $RegExElement
+    if ($Path -match $OnlyElement) {
+        return ''
+    }
+
+    $FirstElement   = '^{0}{1}' -f $RegExElement, $RegExSeparator
+    $LastElement    = '{0}{1}$' -f $RegExSeparator, $RegExElement
+    $MiddleElement  = '{0}{1}{2}' -f $RegExSeparator, $RegExElement, $RegExSeparator
+
+    return $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $Separator
+}
+
 # Remove excess separators from a Path type string
 Function Repair-PathString {
     [CmdletBinding()]
