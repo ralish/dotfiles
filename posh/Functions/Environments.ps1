@@ -14,12 +14,16 @@ Function Enable-Cygwin {
 
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
     $LocalBinPath = Join-Path -Path $Path -ChildPath 'usr\local\bin'
-    $PathAddition = '{0};{1}' -f $LocalBinPath, $BinPath
 
-    Set-Item -Path Env:\Path -Value ('{0};{1}' -f $env:Path, $PathAddition)
+    $env:Path = $env:Path |
+        Add-PathStringElement -Element $LocalBinPath |
+        Add-PathStringElement -Element $BinPath
 
     if ($Persist) {
-        Add-EnvironmentPathElement -Name Path -Value $PathAddition
+        Get-EnvironmentVariable -Name Path |
+            Add-PathStringElement -Element $LocalBinPath |
+            Add-PathStringElement -Element $BinPath |
+            Set-EnvironmentVariable -Name Path
     }
 }
 
@@ -39,12 +43,16 @@ Function Enable-Nodejs {
     }
 
     $LocalNpmPath = Join-Path -Path $env:APPDATA -ChildPath 'npm'
-    $PathAddition = '{0};{1}' -f $LocalNpmPath, $Path
 
-    Set-Item -Path Env:\Path -Value ('{0};{1}' -f $env:Path, $PathAddition)
+    $env:Path = $env:Path |
+        Add-PathStringElement -Element $LocalNpmPath |
+        Add-PathStringElement -Element $Path
 
     if ($Persist) {
-        Add-EnvironmentPathElement -Name Path -Value $PathAddition
+        Get-EnvironmentVariable -Name Path |
+            Add-PathStringElement -Element $LocalNpmPath |
+            Add-PathStringElement -Element $Path |
+            Set-EnvironmentVariable -Name Path
     }
 }
 
@@ -65,12 +73,18 @@ Function Enable-Perl {
     $RootBinPath = Join-Path -Path $Path -ChildPath 'c\bin'
     $SiteBinPath = Join-Path -Path $Path -ChildPath 'perl\site\bin'
     $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
-    $PathAddition = '{0};{1};{2}' -f $RootBinPath, $SiteBinPath, $PerlBinPath
 
-    Set-Item -Path Env:\Path -Value ('{0};{1}' -f $env:Path, $PathAddition)
+    $env:Path = $env:Path |
+        Add-PathStringElement -Element $RootBinPath |
+        Add-PathStringElement -Element $SiteBinPath |
+        Add-PathStringElement -Element $PerlBinPath
 
     if ($Persist) {
-        Add-EnvironmentPathElement -Name Path -Value $PathAddition
+        Get-EnvironmentVariable -Name Path |
+            Add-PathStringElement -Element $RootBinPath |
+            Add-PathStringElement -Element $SiteBinPath |
+            Add-PathStringElement -Element $PerlBinPath |
+            Set-EnvironmentVariable -Name Path
     }
 }
 
@@ -88,10 +102,13 @@ Function Enable-PHP {
         throw 'Provided PHP path is not a directory: {0}' -f $Path
     }
 
-    Set-Item -Path Env:\Path -Value ('{0};{1}' -f $env:Path, $Path)
+    $env:Path = $env:Path |
+        Add-PathStringElement -Element $Path
 
     if ($Persist) {
-        Add-EnvironmentPathElement -Name Path -Value $Path
+        Get-EnvironmentVariable -Name Path |
+            Add-PathStringElement -Element $Path |
+            Set-EnvironmentVariable -Name Path
     }
 }
 
@@ -110,12 +127,16 @@ Function Enable-Python {
     }
 
     $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
-    $PathAddition = '{0};{1}' -f $ScriptsPath, $Path
 
-    Set-Item -Path Env:\Path -Value ('{0};{1}' -f $env:Path, $PathAddition)
+    $env:Path = $env:Path |
+        Add-PathStringElement -Element $ScriptsPath |
+        Add-PathStringElement -Element $Path
 
     if ($Persist) {
-        Add-EnvironmentPathElement -Name Path -Value $PathAddition
+        Get-EnvironmentVariable -Name Path |
+            Add-PathStringElement -Element $ScriptsPath |
+            Add-PathStringElement -Element $Path |
+            Set-EnvironmentVariable -Name Path
     }
 }
 
@@ -137,13 +158,18 @@ Function Enable-Ruby {
 
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
-    Set-Item -Path Env:\Path -Value ('{0};{1}' -f $env:Path, $BinPath)
+    $env:Path = $env:Path |
+        Add-PathStringElement -Element $BinPath
+
     if ($Options) {
-        Set-Item -Path Env:\RUBYOPT -Value $Options
+        $env:RUBYOPT = $Options
     }
 
     if ($Persist) {
-        Add-EnvironmentPathElement -Name Path -Value $BinPath
+        Get-EnvironmentVariable -Name Path |
+            Add-PathStringElement -Element $BinPath |
+            Set-EnvironmentVariable -Name Path
+
         Set-EnvironmentVariable -Name RUBYOPT -Value $Options
     }
 }

@@ -1,31 +1,3 @@
-# Add a value to a Path type environment variable
-Function Add-PathEnvironmentElement {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [String]$Name,
-
-        [Parameter(Mandatory)]
-        [String]$Value,
-
-        [ValidateSet('Machine', 'User')]
-        [String]$Scope='User',
-
-        [ValidateSet('Append', 'Prepend')]
-        [String]$Action='Append'
-    )
-
-    $CurrentValue = Get-EnvironmentVariable -Name $Name -Scope $Scope
-
-    switch ($Action) {
-        'Append'    { $Value = '{0};{1}' -f $CurrentValue, $Value }
-        'Prepend'   { $Value = '{0};{1}' -f $Value, $CurrentValue }
-    }
-
-    Set-EnvironmentVariable @PSBoundParameters
-}
-
 # Retrieve a persisted environment variable
 Function Get-EnvironmentVariable {
     [CmdletBinding()]
@@ -111,6 +83,7 @@ Function Set-EnvironmentVariable {
         [Parameter(Mandatory)]
         [String]$Name,
 
+        [Parameter(ValueFromPipeline)]
         [AllowEmptyString()]
         [String]$Value,
 

@@ -1,3 +1,61 @@
+# Add an element to a Path type string
+Function Add-PathStringElement {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$Path,
+
+        [Parameter(Mandatory)]
+        [String]$Element,
+
+        [ValidateLength(1, 1)]
+        [String]$Separator=';',
+
+        [ValidateSet('Append', 'Prepend')]
+        [String]$Action='Append',
+
+        [Switch]$NoRepair
+    )
+
+    $RegExElement = [Regex]::Escape($Element)
+    $RegExSeparator = [Regex]::Escape($Separator)
+
+    if (!$NoRepair) {
+        $Path = Repair-PathString -String $Path -Separator $Separator
+    }
+
+    $OnlyElement = '^{0}$' -f $RegExElement
+    if ($Path -notmatch $OnlyElement) {
+        $FirstElement   = '^{0}{1}' -f $RegExElement, $RegExSeparator
+        $LastElement    = '{0}{1}$' -f $RegExSeparator, $RegExElement
+        $MiddleElement  = '{0}{1}{2}' -f $RegExSeparator, $RegExElement, $RegExSeparator
+
+        $Path = $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $Separator
+
+        $NewSeparator = $Separator
+        switch ($Action) {
+            'Append' {
+                if ($Path.EndsWith($Separator)) {
+                    $NewSeparator = ''
+                }
+
+                $Path = '{0}{1}{2}' -f $Path, $NewSeparator, $Element
+            }
+
+            'Prepend' {
+                if ($Path.StartsWith($Separator)) {
+                    $NewSeparator = ''
+                }
+
+                $Path = '{0}{1}{2}' -f $Element, $NewSeparator, $Path
+            }
+        }
+    }
+
+    return $Path
+}
+
 # Compare the properties of two objects
 # Via: https://blogs.technet.microsoft.com/janesays/2017/04/25/compare-all-properties-of-two-objects-in-windows-powershell/
 Function Compare-ObjectProperties {
