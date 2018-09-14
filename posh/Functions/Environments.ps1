@@ -1,73 +1,94 @@
 # Configure environment for Cygwin usage
-Function Enable-Cygwin {
+Function Switch-Cygwin {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path='C:\Cygwin',
 
-        [Switch]$Persist
+        [Switch]$Persist,
+        [Switch]$Disable
     )
 
     if (-not (Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Cygwin path is not a directory: {0}' -f $Path
     }
 
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+    } else {
+        $Operation = 'Add-PathStringElement'
+    }
+
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
     $LocalBinPath = Join-Path -Path $Path -ChildPath 'usr\local\bin'
 
     $env:Path = $env:Path |
-        Add-PathStringElement -Element $LocalBinPath |
-        Add-PathStringElement -Element $BinPath
+        & $Operation -Element $LocalBinPath |
+        & $Operation -Element $BinPath
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            Add-PathStringElement -Element $LocalBinPath |
-            Add-PathStringElement -Element $BinPath |
+            & $Operation -Element $LocalBinPath |
+            & $Operation -Element $BinPath |
             Set-EnvironmentVariable -Name Path
     }
 }
 
 # Configure environment for Node.js development
-Function Enable-Nodejs {
+Function Switch-Nodejs {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path='C:\Nodejs',
 
-        [Switch]$Persist
+        [Switch]$Persist,
+        [Switch]$Disable
     )
 
     if (-not (Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Nodejs path is not a directory: {0}' -f $Path
     }
 
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+    } else {
+        $Operation = 'Add-PathStringElement'
+    }
+
     $LocalNpmPath = Join-Path -Path $env:APPDATA -ChildPath 'npm'
 
     $env:Path = $env:Path |
-        Add-PathStringElement -Element $LocalNpmPath |
-        Add-PathStringElement -Element $Path
+        & $Operation -Element $LocalNpmPath |
+        & $Operation -Element $Path
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            Add-PathStringElement -Element $LocalNpmPath |
-            Add-PathStringElement -Element $Path |
+            & $Operation -Element $LocalNpmPath |
+            & $Operation -Element $Path |
             Set-EnvironmentVariable -Name Path
     }
 }
 
 # Configure environment for Perl development
-Function Enable-Perl {
+Function Switch-Perl {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path='C:\Perl',
 
-        [Switch]$Persist
+        [Switch]$Persist,
+        [Switch]$Disable
     )
 
     if (-not (Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Perl path is not a directory: {0}' -f $Path
+    }
+
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+    } else {
+        $Operation = 'Add-PathStringElement'
     }
 
     $RootBinPath = Join-Path -Path $Path -ChildPath 'c\bin'
@@ -75,73 +96,87 @@ Function Enable-Perl {
     $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
 
     $env:Path = $env:Path |
-        Add-PathStringElement -Element $RootBinPath |
-        Add-PathStringElement -Element $SiteBinPath |
-        Add-PathStringElement -Element $PerlBinPath
+        & $Operation -Element $RootBinPath |
+        & $Operation -Element $SiteBinPath |
+        & $Operation -Element $PerlBinPath
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            Add-PathStringElement -Element $RootBinPath |
-            Add-PathStringElement -Element $SiteBinPath |
-            Add-PathStringElement -Element $PerlBinPath |
+            & $Operation -Element $RootBinPath |
+            & $Operation -Element $SiteBinPath |
+            & $Operation -Element $PerlBinPath |
             Set-EnvironmentVariable -Name Path
     }
 }
 
 # Configure environment for PHP development
-Function Enable-PHP {
+Function Switch-PHP {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path='C:\PHP',
 
-        [Switch]$Persist
+        [Switch]$Persist,
+        [Switch]$Disable
     )
 
     if (-not (Test-Path -Path $Path -PathType Container)) {
         throw 'Provided PHP path is not a directory: {0}' -f $Path
     }
 
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+    } else {
+        $Operation = 'Add-PathStringElement'
+    }
+
     $env:Path = $env:Path |
-        Add-PathStringElement -Element $Path
+        & $Operation -Element $Path
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            Add-PathStringElement -Element $Path |
+            & $Operation -Element $Path |
             Set-EnvironmentVariable -Name Path
     }
 }
 
 # Configure environment for Python development
-Function Enable-Python {
+Function Switch-Python {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path='C:\Python',
 
-        [Switch]$Persist
+        [Switch]$Persist,
+        [Switch]$Disable
     )
 
     if (-not (Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Python path is not a directory: {0}' -f $Path
     }
 
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+    } else {
+        $Operation = 'Add-PathStringElement'
+    }
+
     $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
 
     $env:Path = $env:Path |
-        Add-PathStringElement -Element $ScriptsPath |
-        Add-PathStringElement -Element $Path
+        & $Operation -Element $ScriptsPath |
+        & $Operation -Element $Path
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            Add-PathStringElement -Element $ScriptsPath |
-            Add-PathStringElement -Element $Path |
+            & $Operation -Element $ScriptsPath |
+            & $Operation -Element $Path |
             Set-EnvironmentVariable -Name Path
     }
 }
 
 # Configure environment for Ruby development
-Function Enable-Ruby {
+Function Switch-Ruby {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
@@ -149,17 +184,24 @@ Function Enable-Ruby {
 
         [String]$Options='-Eutf-8',
 
-        [Switch]$Persist
+        [Switch]$Persist,
+        [Switch]$Disable
     )
 
     if (-not (Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Ruby path is not a directory: {0}' -f $Path
     }
 
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+    } else {
+        $Operation = 'Add-PathStringElement'
+    }
+
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
     $env:Path = $env:Path |
-        Add-PathStringElement -Element $BinPath
+        & $Operation -Element $BinPath
 
     if ($Options) {
         $env:RUBYOPT = $Options
@@ -167,7 +209,7 @@ Function Enable-Ruby {
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            Add-PathStringElement -Element $BinPath |
+            & $Operation -Element $BinPath |
             Set-EnvironmentVariable -Name Path
 
         Set-EnvironmentVariable -Name RUBYOPT -Value $Options
