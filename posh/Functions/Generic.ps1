@@ -146,6 +146,21 @@ Function Format-Xml {
     }
 }
 
+# Remove excess separators from a Path type string
+Function Repair-PathString {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$String,
+
+        [ValidateLength(1, 1)]
+        [String]$Separator=';'
+    )
+
+    $RegExSeparator = [Regex]::Escape($Separator)
+    $String -replace "^$RegExSeparator+" -replace "$RegExSeparator+$" -replace "$RegExSeparator{2,}", $Separator
+}
+
 # Confirm a PowerShell command is available
 Function Test-CommandAvailable {
     [CmdletBinding()]
