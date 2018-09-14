@@ -222,6 +222,8 @@ Function Switch-Ruby {
             & $Operation -Element $BinPath |
             Set-EnvironmentVariable -Name Path
 
-        Set-EnvironmentVariable -Name RUBYOPT -Value $Options
+        if ($Options) {
+            Set-EnvironmentVariable -Name RUBYOPT -Value $Options
+        }
     }
 }
