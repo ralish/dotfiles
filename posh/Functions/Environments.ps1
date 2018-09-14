@@ -158,7 +158,9 @@ Function Switch-Python {
     $StrippedVersion = $Version -replace '\.'
     $VersionedPath = '{0}{1}' -f $Path, $StrippedVersion
 
-    if (-not ((Test-Path -Path $VersionedPath -PathType Container) -or (Test-Path -Path $Path -PathType Container))) {
+    if (Test-Path -Path $VersionedPath -PathType Container) {
+        $Path = $VersionedPath
+    } elseif (-not (Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Python path is not a directory: {0}' -f $Path
     }
 
