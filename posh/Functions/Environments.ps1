@@ -144,6 +144,10 @@ Function Switch-PHP {
 Function Switch-Python {
     [CmdletBinding()]
     Param(
+        [Parameter(Mandatory)]
+        [ValidatePattern('[0-9]+\.[0-9]+')]
+        [String]$Version,
+
         [ValidateNotNullOrEmpty()]
         [String]$Path='C:\Python',
 
@@ -151,7 +155,10 @@ Function Switch-Python {
         [Switch]$Disable
     )
 
-    if (-not (Test-Path -Path $Path -PathType Container)) {
+    $StrippedVersion = $Version -replace '\.'
+    $VersionedPath = '{0}{1}' -f $Path, $StrippedVersion
+
+    if (-not ((Test-Path -Path $VersionedPath -PathType Container) -or (Test-Path -Path $Path -PathType Container))) {
         throw 'Provided Python path is not a directory: {0}' -f $Path
     }
 
@@ -162,13 +169,16 @@ Function Switch-Python {
     }
 
     $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
+    $LocalScriptsPath = Join-Path -Path $env:APPDATA -ChildPath ('Python\Python{0}\Scripts' -f $StrippedVersion)
 
     $env:Path = $env:Path |
+        & $Operation -Element $LocalScriptsPath |
         & $Operation -Element $ScriptsPath |
         & $Operation -Element $Path
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
+            & $Operation -Element $LocalScriptsPath |
             & $Operation -Element $ScriptsPath |
             & $Operation -Element $Path |
             Set-EnvironmentVariable -Name Path
