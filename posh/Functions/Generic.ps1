@@ -121,7 +121,6 @@ Function ConvertTo-Base64 {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [ValidateNotNull()]
         [String]$String
     )
 
