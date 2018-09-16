@@ -84,5 +84,12 @@
         // CodeLens causes significant slowdown with the PowerShell extension
         // See GitHub Issues: #647, #861, #1174, #1326, #1464
         "editor.codeLens": false,
+    },
+
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            // Organise imports with isort
+            "source.organizeImports": true
+        }
     }
 }
