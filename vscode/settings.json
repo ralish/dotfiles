@@ -72,19 +72,19 @@
 
     "[git-commit]": {
         // Enable Rewrap extension to automatically wrap commit messages
-        "rewrap.autoWrap.enabled": false,
-        "rewrap.wrappingColumn": 72,
+        "rewrap.autoWrap.enabled": true,
+        "rewrap.wrappingColumn": 72
     },
 
     "[markdown]": {
         // Trailing whitespace has special meaning in Markdown syntax
-        "files.trimTrailingWhitespace": false,
+        "files.trimTrailingWhitespace": false
     },
 
     "[powershell]": {
         // CodeLens causes significant slowdown with the PowerShell extension
         // See GitHub Issues: #647, #861, #1174, #1326, #1464
-        "editor.codeLens": false,
+        "editor.codeLens": false
     },
 
     "[python]": {
