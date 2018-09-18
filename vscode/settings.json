@@ -63,6 +63,7 @@
         // Permit following source directives
         "-x"
     ],
+    "shellcheck.useWorkspaceRootAsCwd": true,
 
     // Extension: XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
