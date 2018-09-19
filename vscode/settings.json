@@ -32,7 +32,6 @@
     "gitlens.advanced.messages": {
         "suppressShowKeyBindingsNotice": true
     },
-    "gitlens.advanced.telemetry.enabled": false,
 
     // Extension: markdownlint
     "markdownlint.config": {
