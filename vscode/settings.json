@@ -64,6 +64,15 @@
     ],
     "shellcheck.useWorkspaceRootAsCwd": true,
 
+    // Extension: SSH FS
+    "sshfs.configs": [
+        {
+            "name": "eventide",
+            "putty": "Nexiom - VMs - Eventide",
+            "root": "/home/sdl"
+        }
+    ],
+
     // Extension: XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
     "xmlTools.removeCommentsOnMinify": true,
