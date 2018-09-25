@@ -2,13 +2,13 @@
 
 # Cabal configuration
 if command -v cabal > /dev/null; then
-    # Add any local bin directory to our PATH
     cabal_bin="$HOME/.cabal/bin"
-    if [ -d "$cabal_bin" ]; then
-        build_path "$cabal_bin" "$PATH"
-        # shellcheck disable=SC2154
-        export PATH="$build_path"
-    fi
+
+    # Add local bin directory to PATH
+    build_path "$cabal_bin" "$PATH"
+    # shellcheck disable=SC2154
+    export PATH="$build_path"
+
     unset cabal_bin
 fi
 
