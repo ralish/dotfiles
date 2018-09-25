@@ -2,8 +2,9 @@
 
 # Perl configuration
 if command -v perl > /dev/null; then
-    # Setup any local Perl environment
     perl5_dir="$HOME/perl5"
+
+    # Setup any local Perl environment
     if [ -d "$perl5_dir" ]; then
         build_path "$perl5_dir/bin" "$PATH"
         # shellcheck disable=SC2154
@@ -18,6 +19,7 @@ if command -v perl > /dev/null; then
         export PERL_MB_OPT="--install_base \"$perl5_dir\""
         export PERL_MM_OPT="INSTALL_BASE=$perl5_dir"
     fi
+
     unset perl5_dir
 fi
 
