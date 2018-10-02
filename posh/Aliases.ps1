@@ -1,7 +1,8 @@
 # Some useful aliases
-Set-Alias -Name cop -Value Compare-ObjectProperties
-Set-Alias -Name gh -Value Get-Help
-Set-Alias -Name which -Value Get-Command
+Set-Alias -Name cop     -Value Compare-ObjectProperties
+Set-Alias -Name gh      -Value Get-Help
+Set-Alias -Name gita    -Value Invoke-GitChildDir
+Set-Alias -Name which   -Value Get-Command
 
 # Dependency Walker (x86)
 $DepWalker32Path = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Nexiom\Software\Independent\Dependency Walker\depends.exe'
