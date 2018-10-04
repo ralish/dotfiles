@@ -10,14 +10,14 @@ Function Prompt {
         $prompt += & $GitPromptScriptBlock
     }
 
-    # ConEmu
-    if ($ConEmuPrompt) {
-        $prompt += & $ConEmuPrompt
-    }
-
     # Default
     if (-not $prompt) {
         $prompt = 'PS {0}{1} ' -f $ExecutionContext.SessionState.Path.CurrentLocation, '>' * ($NestedPromptLevel + 1)
+    }
+
+    # ConEmu
+    if ($ConEmuPrompt) {
+        $prompt += & $ConEmuPrompt
     }
 
     return $prompt
