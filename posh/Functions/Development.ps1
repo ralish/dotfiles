@@ -1,3 +1,4 @@
+# Invoke a Git command in all Git repositories
 Function Invoke-GitChildDir {
     [CmdletBinding()]
     Param(
