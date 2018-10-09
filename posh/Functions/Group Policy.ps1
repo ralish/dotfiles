@@ -22,11 +22,11 @@ Function Get-ControlledGpoStatus {
         if ($DomainGPO) {
             $Result.Domain = $DomainGPO
 
-            if ($AgpmGPO.ComputerVersion -eq $DomainGPO.Computer.DSVersion -and $AgpmGPO.UserVersion -eq $DomainGPO.User.DSVersion) {
+            if ([Int32]$AgpmGPO.ComputerVersion -eq $DomainGPO.Computer.DSVersion -and [Int32]$AgpmGPO.UserVersion -eq $DomainGPO.User.DSVersion) {
                 $Result.Status = 'Current'
-            } elseif ($AgpmGPO.ComputerVersion -le $DomainGPO.Computer.DSVersion -and $AgpmGPO.UserVersion -le $DomainGPO.User.DSVersion) {
+            } elseif ([Int32]$AgpmGPO.ComputerVersion -le $DomainGPO.Computer.DSVersion -and [Int32]$AgpmGPO.UserVersion -le $DomainGPO.User.DSVersion) {
                 $Result.Status = 'Out-of-date (Import)'
-            } elseif ($AgpmGPO.ComputerVersion -ge $DomainGPO.Computer.DSVersion -and $AgpmGPO.UserVersion -ge $DomainGPO.User.DSVersion) {
+            } elseif ([Int32]$AgpmGPO.ComputerVersion -ge $DomainGPO.Computer.DSVersion -and [Int32]$AgpmGPO.UserVersion -ge $DomainGPO.User.DSVersion) {
                 $Result.Status = 'Newer (Deploy)'
             } else {
                 $Result.Status = 'Inconsistent'
