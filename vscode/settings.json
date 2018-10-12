@@ -73,6 +73,9 @@
         }
     ],
 
+    // Extension: vscode-icons
+    "workbench.iconTheme": "vscode-icons",
+
     // Extension: XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
     "xmlTools.removeCommentsOnMinify": true,
