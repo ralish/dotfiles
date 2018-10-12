@@ -20,4 +20,7 @@
 [gpg]
 	program = C:\\Program Files (x86)\\Nexiom\\Software\\Independent\\Gpg4win\\pub\\gpg.exe
 
+[http]
+	sslBackend = schannel
+
 # vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 et sr
