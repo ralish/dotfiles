@@ -60,6 +60,9 @@ temp/
 # KiTTY
 /kitty/
 
+# less
+/less/.less
+
 # OpenSSH
 /openssh/
 
