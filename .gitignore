@@ -31,6 +31,9 @@ temp/
 
 # ******************************* Components **********************************
 
+# bash
+/bash/.bash_history
+
 # Bazaar
 /bazaar/.bazaar/lock/
 
