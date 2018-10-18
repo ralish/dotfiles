@@ -4,6 +4,7 @@
 
 # Script files should always be LF terminated
 *.sh                            text        eol=lf
+scripts/**                      text        eol=lf
 
 # KiTTY session profiles *must* have LF line endings. At the time of writing,
 # CRLF line endings cause the stupid thing to crash. Should investigate later!
