@@ -16,6 +16,9 @@
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
 
+    // Workbench
+    "workbench.enableExperiments": false,
+
     // Language: PHP
     "php.suggest.basic": false,
 
