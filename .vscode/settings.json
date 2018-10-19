@@ -4,5 +4,13 @@
         "**/openssh/**": "ssh_config"
     },
 
-    "powershell.scriptAnalysis.settingsPath": ".vscode\\PSScriptAnalyzerSettings.psd1"
+    "powershell.scriptAnalysis.settingsPath": ".vscode\\PSScriptAnalyzerSettings.psd1",
+
+    "[bat]": {
+        "editor.rulers": [79],
+    },
+
+    "[shellscript]": {
+        "editor.rulers": [79],
+    }
 }
