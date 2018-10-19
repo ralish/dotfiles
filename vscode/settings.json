@@ -1,6 +1,7 @@
 {
     // Editor
     "editor.find.seedSearchStringFromSelection": false,
+    "editor.minimap.showSlider": "always",
     "editor.renderWhitespace": "boundary",
 
     // Explorer
