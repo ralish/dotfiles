@@ -4,9 +4,12 @@
 
 # Script files should always be LF terminated
 *.sh                            text        eol=lf
+.bashrc                         text        eol=lf
 .mk-sbuild.rc                   text        eol=lf
 .quiltrc                        text        eol=lf
+.zshrc                          text        eol=lf
 user-dirs.dirs                  text        eol=lf
+git/bin/*                       text        eol=lf
 scripts/**                      text        eol=lf
 
 # KiTTY session profiles *must* have LF line endings. At the time of writing,

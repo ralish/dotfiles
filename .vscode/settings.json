@@ -1,8 +1,17 @@
 {
     // File paths to language mappings
     "files.associations": {
+        // bazaar
+        "**/bazaar/*.conf": "ini",
+
         // curl
         ".curlrc": "properties",
+
+        // editline
+        ".editrc": "properties",
+
+        // git
+        ".gitconfig*": "gitconfig",
 
         // less
         ".lesskey": "properties",
@@ -19,11 +28,17 @@
         // openssh
         "**/openssh/**": "ssh_config",
 
+        // pgsql
+        ".psqlrc": "postgres",
+
         // pip
         "pip.conf": "ini",
 
         // quilt
         ".quiltrc": "shellscript",
+
+        // readline
+        ".inputrc": "properties",
 
         // sbuild
         ".mk-sbuild.rc": "shellscript",
