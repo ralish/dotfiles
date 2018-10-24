@@ -45,7 +45,7 @@ unset kernel_name sh_systems_dir
 # Additional configuration for various applications
 sh_apps_dir="$sh_dir/apps"
 if [ -d "$sh_apps_dir" ]; then
-    for sh_app in $sh_apps_dir/*.sh; do
+    for sh_app in "$sh_apps_dir"/*.sh; do
         [ -e "$sh_app" ] || break
         # shellcheck source=/dev/null
         . "$sh_app"
@@ -90,7 +90,7 @@ unset sh_aliases_file
 # Include any custom functions
 sh_functions_dir="$sh_dir/functions"
 if [ -d "$sh_functions_dir" ]; then
-    for sh_function in $sh_functions_dir/*.sh; do
+    for sh_function in "$sh_functions_dir"/*.sh; do
         [ -e "$sh_function" ] || break
         # shellcheck source=/dev/null
         . "$sh_function"

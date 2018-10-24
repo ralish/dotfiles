@@ -16,7 +16,7 @@ fi
 # Fix Git prompt (__git_ps1 may not be available)
 if command -v git-prompt > /dev/null; then
     # shellcheck source=/dev/null
-    source "$(command -v git-prompt)"
+    . "$(command -v git-prompt)"
 fi
 
 # Because I never remember the "-s" parameter
