@@ -3,46 +3,32 @@
     "files.associations": {
         // bazaar
         "**/bazaar/*.conf": "ini",
-
         // curl
         ".curlrc": "properties",
-
         // editline
         ".editrc": "properties",
-
         // git
         ".gitconfig*": "gitconfig",
-
         // less
         ".lesskey": "properties",
-
         // markdownlint
         ".markdownlintrc": "jsonc",
-
         // mysql
         ".my.cnf": "ini",
-
         // npm
         ".npmrc": "ini",
-
         // openssh
         "**/openssh/**": "ssh_config",
-
         // pgsql
         ".psqlrc": "postgres",
-
         // pip
         "pip.conf": "ini",
-
         // quilt
         ".quiltrc": "shellscript",
-
         // readline
         ".inputrc": "properties",
-
         // sbuild
         ".mk-sbuild.rc": "shellscript",
-
         // xdg-user-dir
         "user-dirs.dirs": "shellscript"
     },
