@@ -1,3 +1,14 @@
+# Invoke Format-List selecting all properties
+Function fla {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [PSObject]$InputObject
+    )
+
+    Format-List -Property * @PSBoundParameters
+}
+
 # Invoke Get-Help with -Detailed
 Function ghd {
     [CmdletBinding()]
