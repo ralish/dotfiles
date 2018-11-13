@@ -85,10 +85,13 @@ Function Get-OpenSSLCertificate {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [String]$Certificate
+        [String]$Certificate,
+
+        [String[]]$NameOptions='oneline'
     )
 
-    & openssl x509 -in `"$Certificate`" -noout -text
+    $NameOpt = [String]::Join(',', $NameOptions)
+    & openssl x509 -in `"$Certificate`" -noout -text -nameopt `"$NameOpt`"
 }
 
 # Retrieve the details of a certificate signing request
@@ -96,10 +99,13 @@ Function Get-OpenSSLCsr {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [String]$Csr
+        [String]$Csr,
+
+        [String[]]$NameOptions='oneline'
     )
 
-    & openssl req -in `"$Csr`" -noout -text -verify
+    $NameOpt = [String]::Join(',', $NameOptions)
+    & openssl req -in `"$Csr`" -noout -text -verify -nameopt `"$NameOpt`"
 }
 
 # Retrieve the details of a PKCS #12 certificate
