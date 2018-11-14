@@ -1,0 +1,46 @@
+[ req ]
+default_bits                        = 2048
+default_md                          = sha256
+
+encrypt_key                         = no
+prompt                              = no
+utf8                                = yes
+string_mask                         = utf8only
+
+distinguished_name                  = req_dn
+req_extensions                      = req_ext
+
+
+[ req_dn ]
+# CN=
+#commonName                          =
+# E=
+#emailAddress                        =
+# OU=
+#organizationalUnitName              =
+# O=
+#organizationName                    =
+# L=
+#localityName                        =
+# ST=
+#stateOrProvinceName                 =
+# C=
+#countryName                         =
+
+
+[ req_ext ]
+# Subject Alternative Name
+#
+# Specify as a comma separated list of additional names.
+#
+# Valid options are:
+# - dirName
+# - DNS
+# - email
+# - IP
+# - otherName
+# - RID
+# - URI
+#subjectAltName                      =
+
+# vim: syntax=dosini cc=80 tw=79 ts=4 sw=4 sts=4 et sr

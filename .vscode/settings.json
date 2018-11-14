@@ -19,6 +19,8 @@
         ".npmrc": "ini",
         // openssh
         "**/openssh/**": "ssh_config",
+        // openssl
+        "**/openssl/*.cnf": "ini",
         // pgsql
         ".psqlrc": "postgres",
         // pip
