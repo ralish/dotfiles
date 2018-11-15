@@ -142,10 +142,43 @@ Function New-OpenSSLPrivateKeyAndCsr {
         [String]$Csr,
 
         [ValidateScript({$_ -gt 0})]
-        [Int]$KeySize=2048
+        [Int]$KeySize,
+
+        [Switch]$EncryptKey,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$Config
     )
 
-    & openssl req -out `"$Csr`" -new -newkey rsa:$KeySize -nodes -keyout `"$PrivateKey`"
+    if ($KeySize) {
+        $NewKeyArgs = 'rsa:{0}' -f $KeySize
+    } else {
+        $NewKeyArgs = 'rsa'
+    }
+
+    $Params = @(
+        'req',
+        '-new',
+        '-out',
+        ('"{0}"' -f $Csr),
+        '-keyout',
+        ('"{0}"' -f $PrivateKey),
+        '-newkey',
+        $NewKeyArgs
+    )
+
+    if (!$EncryptKey) {
+        $Params += '-nodes'
+    }
+
+    if ($Config) {
+        $Params += @(
+            '-config',
+            ('"{0}"' -f $Config)
+        )
+    }
+
+    Start-Process -FilePath 'openssl' -ArgumentList $Params -NoNewWindow -Wait
 }
 
 # Create a private key and self-signed certificate
