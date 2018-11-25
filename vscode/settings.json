@@ -79,6 +79,13 @@
 
     // Extension: vscode-icons
     "workbench.iconTheme": "vscode-icons",
+    "vsicons.associations.files": [
+        {
+            "icon": "xml",
+            "extensions": [".ps1xml"],
+            "format": "svg"
+        }
+    ],
 
     // Extension: XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
