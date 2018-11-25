@@ -329,6 +329,48 @@ Function Get-MailboxActivitySummary {
     return $Summary
 }
 
+# Retrieve a summary of users with delegates or forwarding rules
+# Improved version of: https://github.com/OfficeDev/O365-InvestigationTooling/blob/master/DumpDelegatesandForwardingRules.ps1
+Function Get-MailboxDelegatesAndForwardingRules {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
+    [CmdletBinding()]
+    Param()
+
+    Test-CommandAvailable -Name @('Get-InboxRule', 'Get-MsolUser')
+
+    $Delegates = @()
+    $ForwardingRules = @()
+    $MailboxForwarding = @()
+
+    $Users = Get-MsolUser -All -EnabledFilter EnabledOnly |
+        Select-Object -Property UserPrincipalName, FirstName, LastName, StrongPasswordRequired, LastPasswordChangeTimestamp, StrongAuthenticationRequirements, StsRefreshTokensValidFrom |
+        Where-Object {($_.UserPrincipalName -notlike '*#EXT#*')}
+
+    $Mailboxes = Get-Mailbox -ResultSize Unlimited
+
+    $MailboxForwarding += $Mailboxes |
+        Select-Object -Property UserPrincipalName, DisplayName, ForwardingAddress, ForwardingSmtpAddress, DeliverToMailboxandForward |
+        Where-Object {$null -ne $_.ForwardingSmtpAddress}
+
+    foreach ($Mailbox in $Mailboxes) {
+        Write-Verbose -Message ('Checking delegates and forwarding rules for user: {0}' -f $Mailbox.UserPrincipalName)
+        $Delegates += Get-MailboxPermission -Identity $Mailbox.UserPrincipalName |
+            Where-Object {($_.IsInherited -ne 'True') -and ($_.User -notlike '*SELF*')}
+        $ForwardingRules += Get-InboxRule -Mailbox $Mailbox.UserPrincipalname |
+            Select-Object -Property Name, Description, Enabled, Priority, ForwardTo, ForwardAsAttachmentTo, RedirectTo, DeleteMessage |
+            Where-Object {($null -ne $_.ForwardTo) -or ($null -ne $_.ForwardAsAttachmentTo) -or ($null -ne $_.RedirectTo)}
+    }
+
+    $Results = [PSCustomObject]@{
+        'Users'=$Users
+        'Delegates'=$Delegates
+        'ForwardingRules'=$ForwardingRules
+        'MailboxForwarding'=$MailboxForwarding
+    }
+
+    return $Results
+}
+
 # Retrieve a summary of unified groups with owner & member details
 Function Get-UnifiedGroupSummary {
     [CmdletBinding()]
