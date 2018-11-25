@@ -112,7 +112,7 @@ Function Get-AzureUsersWithDisabledServices {
 
     Test-ModuleAvailable -Name MSOnline
 
-    $Users = Get-MsolUser | Where-Object { $_.IsLicensed -eq $true }
+    $Users = Get-MsolUser -ErrorAction Stop | Where-Object { $_.IsLicensed -eq $true }
 
     $Results = @()
     foreach ($User in $Users) {

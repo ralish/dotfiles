@@ -342,7 +342,7 @@ Function Get-MailboxDelegatesAndForwardingRules {
     $ForwardingRules = @()
     $MailboxForwarding = @()
 
-    $Users = Get-MsolUser -All -EnabledFilter EnabledOnly |
+    $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop |
         Select-Object -Property UserPrincipalName, FirstName, LastName, StrongPasswordRequired, LastPasswordChangeTimestamp, StrongAuthenticationRequirements, StsRefreshTokensValidFrom |
         Where-Object {($_.UserPrincipalName -notlike '*#EXT#*')}
 
