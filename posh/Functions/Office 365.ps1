@@ -357,7 +357,7 @@ Function Get-MailboxDelegatesAndForwardingRules {
         $Delegates += Get-MailboxPermission -Identity $Mailbox.UserPrincipalName |
             Where-Object {($_.IsInherited -ne 'True') -and ($_.User -notlike '*SELF*')}
         $ForwardingRules += Get-InboxRule -Mailbox $Mailbox.UserPrincipalname |
-            Select-Object -Property Name, Description, Enabled, Priority, ForwardTo, ForwardAsAttachmentTo, RedirectTo, DeleteMessage |
+            Select-Object -Property MailboxOwnerId, Name, Description, Enabled, Priority, ForwardTo, ForwardAsAttachmentTo, RedirectTo, DeleteMessage |
             Where-Object {($null -ne $_.ForwardTo) -or ($null -ne $_.ForwardAsAttachmentTo) -or ($null -ne $_.RedirectTo)}
     }
 
