@@ -1,3 +1,6 @@
+# Load our custom formatting data
+Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml')
+
 # Helper function to connect to all Office 365 services
 Function Connect-Office365Services {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
@@ -343,22 +346,39 @@ Function Get-MailboxDelegatesAndForwardingRules {
     $MailboxForwarding = @()
 
     $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop |
-        Select-Object -Property UserPrincipalName, FirstName, LastName, StrongPasswordRequired, LastPasswordChangeTimestamp, StrongAuthenticationRequirements, StsRefreshTokensValidFrom |
-        Where-Object {($_.UserPrincipalName -notlike '*#EXT#*')}
+        Where-Object { $_.UserPrincipalName -notlike '*#EXT#*' }
+
+    $Users | ForEach-Object {
+        Add-Member -InputObject $_ -MemberType ScriptProperty -Name IsFederated -Value { if ($null -ne $this.ImmutableId) { $true } else { $false } }
+        Add-Member -InputObject $_ -MemberType ScriptProperty -Name StrongAuthenticationState -Value { $this.StrongAuthenticationRequirements.State }
+        $_.PSObject.TypeNames.Insert(0, 'Microsoft.Online.Administration.User.Security')
+    }
 
     $Mailboxes = Get-Mailbox -ResultSize Unlimited
 
     $MailboxForwarding += $Mailboxes |
-        Select-Object -Property UserPrincipalName, DisplayName, ForwardingAddress, ForwardingSmtpAddress, DeliverToMailboxandForward |
-        Where-Object {$null -ne $_.ForwardingSmtpAddress}
+        Where-Object { $null -ne $_.ForwardingSmtpAddress }
+
+    $MailboxForwarding | ForEach-Object {
+        $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Security')
+    }
 
     foreach ($Mailbox in $Mailboxes) {
         Write-Verbose -Message ('Checking delegates and forwarding rules for user: {0}' -f $Mailbox.UserPrincipalName)
+
         $Delegates += Get-MailboxPermission -Identity $Mailbox.UserPrincipalName |
-            Where-Object {($_.IsInherited -ne 'True') -and ($_.User -notlike '*SELF*')}
+            Where-Object { ($_.IsInherited -ne 'True') -and ($_.User -notlike '*SELF*') }
+
+        $Delegates | ForEach-Object {
+            $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Security')
+        }
+
         $ForwardingRules += Get-InboxRule -Mailbox $Mailbox.UserPrincipalname |
-            Select-Object -Property MailboxOwnerId, Name, Description, Enabled, Priority, ForwardTo, ForwardAsAttachmentTo, RedirectTo, DeleteMessage |
-            Where-Object {($null -ne $_.ForwardTo) -or ($null -ne $_.ForwardAsAttachmentTo) -or ($null -ne $_.RedirectTo)}
+            Where-Object { ($null -ne $_.ForwardTo) -or ($null -ne $_.ForwardAsAttachmentTo) -or ($null -ne $_.RedirectTo) }
+
+        $ForwardingRules | ForEach-Object {
+            $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Security')
+        }
     }
 
     $Results = [PSCustomObject]@{
