@@ -1,3 +1,6 @@
+# Load our custom formatting data
+Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1xml')
+
 # Helper function to connect to Azure Active Directory (AzureAD module)
 Function Connect-AzureAD {
     [CmdletBinding()]
@@ -100,6 +103,29 @@ Function Get-AzureAuthToken {
     $AuthResult = $AuthContext.AcquireToken($ApiEndpointUri, $ClientId, $RedirectUri, 'Auto')
 
     return $AuthResult
+}
+
+# Retrieve licensing summary for Azure AD users
+Function Get-AzureUsersLicensingSummary {
+    [CmdletBinding()]
+    Param()
+
+    Test-ModuleAvailable -Name MSOnline
+
+    $Users = Get-MsolUser -ErrorAction Stop | Where-Object { $_.UserType -ne 'Guest' }
+
+    foreach ($User in $Users) {
+        if ($User.Licenses) {
+            $LicensingSummary = [String]::Join(', ', ($User.Licenses.AccountSku.SkuPartNumber | Sort-Object))
+        } else {
+            $LicensingSummary = [String]::Empty
+        }
+        Add-Member -InputObject $User -MemberType NoteProperty -Name LicensingSummary -Value $LicensingSummary
+
+        $User.PSObject.TypeNames.Insert(0, 'Microsoft.Online.Administration.User.Licenses')
+    }
+
+    return $Users
 }
 
 # Retrieve Azure AD users with disabled services
