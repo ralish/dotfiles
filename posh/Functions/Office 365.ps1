@@ -345,8 +345,7 @@ Function Get-MailboxDelegatesAndForwardingRules {
     $ForwardingRules = @()
     $MailboxForwarding = @()
 
-    $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop |
-        Where-Object { $_.UserPrincipalName -notlike '*#EXT#*' }
+    $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop | Where-Object { $_.UserType -ne 'Guest' }
 
     $Users | ForEach-Object {
         Add-Member -InputObject $_ -MemberType ScriptProperty -Name IsFederated -Value { if ($null -ne $this.ImmutableId) { $true } else { $false } }
