@@ -63,44 +63,67 @@ Function Get-AzureAuthHeader {
 }
 
 # Retrieve an Azure AD authentication token
-# Via: https://blogs.technet.microsoft.com/paulomarques/2016/04/05/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script/
+# Based on: https://blogs.technet.microsoft.com/paulomarques/2016/04/05/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script/
+# Useful links:
+# - https://blogs.technet.microsoft.com/cloudlojik/2017/09/05/using-powershell-to-connect-to-microsoft-graph-api/
+# - https://blogs.technet.microsoft.com/cloudlojik/2018/06/29/connecting-to-microsoft-graph-with-a-native-app-using-powershell/
 Function Get-AzureAuthToken {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [String]$TenantId
+        [ValidateSet('AzureAdGraph', 'AzureClassic', 'AzureGallery', 'AzureRm', 'MsGraph')]
+        [String]$Api,
+
+        [Parameter(Mandatory)]
+        [String]$TenantName,
+
+        # Default is the well-known identifier for PowerShell clients
+        [Guid]$ClientId='1950a258-227b-4e31-a9cf-717495945fc2',
+
+        [ValidateNotNullOrEmpty()]
+        [String]$RedirectUri='urn:ietf:wg:oauth:2.0:oob',
+
+        [ValidateSet('Auto', 'Always', 'Never', 'RefreshSession', 'SelectAccount')]
+        [String]$PromptBehaviour='Auto'
     )
 
-    $ArmProfileModule = Get-Module -Name AzureRM.Profile -ListAvailable
-    if ($ArmProfileModule) {
-        $ArmProfileModulePath = $ArmProfileModule.ModuleBase
+    $AdalModule = Get-Module -Name AzureAD -ListAvailable
+    if ($AdalModule) {
+        $AdalModulePath = $AdalModule.ModuleBase
     } else {
-        throw 'Required module not available: AzureRM.Profile'
+        throw 'Required module not available: AzureAD'
     }
 
     $AdalAsmName = 'Microsoft.IdentityModel.Clients.ActiveDirectory.dll'
-    $AdalAsmPath = Join-Path -Path $ArmProfileModulePath -ChildPath $AdalAsmName
+    $AdalAsmPath = Join-Path -Path $AdalModulePath -ChildPath $AdalAsmName
     if (Test-Path -Path $AdalAsmPath) {
         $null = [Reflection.Assembly]::LoadFrom($AdalAsmPath)
     } else {
         throw 'Unable to locate required DLL: {0}' -f $AdalAsmName
     }
 
-    $AdalWinFormsAsmName = 'Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll'
-    $AdalWinFormsAsmPath = Join-Path -Path $ArmProfileModulePath -ChildPath $AdalWinFormsAsmName
-    if (Test-Path -Path $AdalWinFormsAsmPath) {
-        $null = [Reflection.Assembly]::LoadFrom($AdalWinFormsAsmPath)
+    $AdalPlatformAsmName = 'Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll'
+    $AdalPlatformAsmPath = Join-Path -Path $AdalModulePath -ChildPath $AdalPlatformAsmName
+    if (Test-Path -Path $AdalPlatformAsmPath) {
+        $null = [Reflection.Assembly]::LoadFrom($AdalPlatformAsmPath)
     } else {
-        throw 'Unable to locate required DLL: {0}' -f $AdalWinFormsAsmName
+        throw 'Unable to locate required DLL: {0}' -f $AdalPlatformAsmName
     }
 
-    $AuthorityUri = 'https://login.windows.net/{0}' -f $TenantId
-    $ApiEndpointUri = 'https://management.core.windows.net/'
-    $ClientId = '1950a258-227b-4e31-a9cf-717495945fc2'
-    $RedirectUri = 'urn:ietf:wg:oauth:2.0:oob'
+    switch ($Api) {
+        'MsGraph'           { $ApiEndpointUri = 'https://graph.microsoft.com/' }
+        'AzureRm'           { $ApiEndpointUri = 'https://management.azure.com/' }
+        'AzureGallery'      { $ApiEndpointUri = 'https://gallery.azure.com/' }
+        # Deprecated APIs
+        'AzureAdGraph'      { $ApiEndpointUri = 'https://graph.windows.net/' }
+        'AzureClassic'      { $ApiEndpointUri = 'https://management.core.windows.net/' }
+    }
 
+    $AuthorityUri = 'https://login.microsoftonline.com/{0}.onmicrosoft.com' -f $TenantName
     $AuthContext = New-Object -TypeName 'Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext' -ArgumentList $AuthorityUri
-    $AuthResult = $AuthContext.AcquireToken($ApiEndpointUri, $ClientId, $RedirectUri, 'Auto')
+    $PlatformParams = New-Object -TypeName 'Microsoft.IdentityModel.Clients.ActiveDirectory.PlatformParameters' -ArgumentList $PromptBehaviour
+    $AuthResult = $AuthContext.AcquireTokenAsync($ApiEndpointUri, $ClientId, $RedirectUri, $PlatformParams)
 
     return $AuthResult
 }
