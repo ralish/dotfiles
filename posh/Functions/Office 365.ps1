@@ -390,8 +390,8 @@ Function Get-MailboxDelegatesAndForwardingRules {
     return $Results
 }
 
-# Retrieve a summary of unified groups with owner & member details
-Function Get-UnifiedGroupSummary {
+# Retrieve a report on unified groups with owner & member details
+Function Get-UnifiedGroupReport {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
