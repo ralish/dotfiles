@@ -1,3 +1,26 @@
+# Retrieve the constructors for a given type
+Function Get-TypeConstructor {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [Type]$Type
+    )
+
+    $Constructors = $Type.GetConstructors()
+    foreach ($Constructor in $Constructors) {
+        $ConstructorParams = $Constructor.GetParameters()
+        if ($ConstructorParams.Count -gt 0) {
+            $FormattedParams = '{0}({1})' -f $Type.FullName, [String]::Join(', ', ($ConstructorParams | ForEach-Object { $_.ToString() }))
+        } else {
+            $FormattedParams = '{0}()' -f $Type.FullName
+        }
+
+        [PSCustomObject]@{
+            Constructor = $FormattedParams
+        }
+    }
+}
+
 # Invoke a Git command in all Git repositories
 Function Invoke-GitChildDir {
     [CmdletBinding()]
