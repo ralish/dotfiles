@@ -322,11 +322,11 @@ Function Get-MailboxActivitySummary {
     $Received = Get-MessageTrace @TraceParams -RecipientAddress $Addresses
 
     $Summary = [PSCustomObject]@{
-        Mailbox = $ExoMailbox.PrimarySmtpAddress
-        StartDate = $StartDate.ToString()
-        EndDate = $EndDate.ToString()
-        Sent = ($Sent | Measure-Object).Count
-        Received = ($Received | Measure-Object).Count
+        Mailbox     = $ExoMailbox.PrimarySmtpAddress
+        StartDate   = $StartDate.ToString()
+        EndDate     = $EndDate.ToString()
+        Sent        = ($Sent | Measure-Object).Count
+        Received    = ($Received | Measure-Object).Count
     }
 
     return $Summary
@@ -381,10 +381,10 @@ Function Get-MailboxDelegatesAndForwardingRules {
     }
 
     $Results = [PSCustomObject]@{
-        'Users'=$Users
-        'Delegates'=$Delegates
-        'ForwardingRules'=$ForwardingRules
-        'MailboxForwarding'=$MailboxForwarding
+        Users               = $Users
+        Delegates           = $Delegates
+        ForwardingRules     = $ForwardingRules
+        MailboxForwarding   = $MailboxForwarding
     }
 
     return $Results
