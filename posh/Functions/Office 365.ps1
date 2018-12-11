@@ -426,6 +426,85 @@ Function Get-UnifiedGroupReport {
     return $Groups
 }
 
+# Retrieve a usage summary for a unified group
+Function Get-UnifiedGroupUsageSummary {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Identity,
+
+        [Parameter(Mandatory)]
+        [String]$TenantName,
+
+        [Parameter(Mandatory)]
+        [Guid]$ClientId,
+
+        [Parameter(Mandatory)]
+        [String]$RedirectUri
+    )
+
+    # Group
+    Write-Verbose -Message 'Retrieving group data ...'
+    $UnifiedGroup = Get-UnifiedGroup -Identity $Identity -IncludeAllProperties
+
+    # Mailbox
+    Write-Verbose -Message 'Retrieving mailbox data ...'
+    $Mailbox = Get-Mailbox -Identity $UnifiedGroup.PrimarySmtpAddress -GroupMailbox
+    $MailboxStatistics = Get-MailboxStatistics -Identity $UnifiedGroup.PrimarySmtpAddress
+
+    # Calendar
+    Write-Verbose -Message 'Retrieving calendar data ...'
+    $Calendar = Get-MailboxFolderStatistics -Identity $UnifiedGroup.PrimarySmtpAddress -FolderScope Calendar
+
+    # Site
+    Write-Verbose -Message 'Retrieving site data ...'
+    $SPOSite = Get-SPOSite -Identity $UnifiedGroup.SharePointSiteUrl -Detailed
+
+    # Notebook
+    Write-Verbose -Message 'Retrieving OneNote data ...'
+    Write-Warning -Message 'Not yet implemented!'
+
+    # Graph API setup
+    Write-Verbose -Message 'Connecting to Microsoft Graph API ...'
+    $GraphApiAuthToken = Get-AzureAuthToken -Api MsGraph -TenantName $TenantName -ClientId $ClientId -RedirectUri $RedirectUri
+    $GraphApiAuthHeader = Get-AzureAuthHeader -AuthToken $GraphApiAuthToken.Result
+
+    # Planner
+    # https://docs.microsoft.com/en-us/graph/api/resources/planner-overview?view=graph-rest-1.0
+    Write-Verbose -Message 'Retrieving Planner data ...'
+    $GraphApiPlannerPlans = 'https://graph.microsoft.com/v1.0/groups/{0}/planner/plans' -f $UnifiedGroup.ExternalDirectoryObjectId
+    $Planner = Invoke-RestMethod -Uri $GraphApiPlannerPlans -Headers $GraphApiAuthHeader -Method Get
+
+    # Teams
+    # https://docs.microsoft.com/en-us/graph/api/resources/teams-api-overview?view=graph-rest-1.0
+    Write-Verbose -Message 'Retrieving Teams data ...'
+    Write-Warning -Message 'Not yet implemented!'
+
+    $Summary = [PSCustomObject]@{
+        Group               = $UnifiedGroup
+
+        Mailbox             = $Mailbox
+        MailboxStatistics   = $MailboxStatistics
+        MailboxItems        = $MailboxStatistics.ItemCount
+        MailboxSize         = $MailboxStatistics.TotalItemSize
+
+        Calendar            = $Calendar
+        CalendarItems       = $Calendar.VisibleItemsInFolder
+
+        SPOSite             = $SPOSite
+        SPOSiteSize         = $SPOSite.StorageUsageCurrent
+
+        Notebook            = $null
+
+        Planner             = $Planner
+
+        Teams               = $null
+    }
+
+    return $Summary
+}
+
 # Helper function to import the weird Exchange Online PowerShell module
 Function Import-ExoPowershellModule {
     [CmdletBinding()]
