@@ -21,6 +21,30 @@ Function Get-TypeConstructor {
     }
 }
 
+# Retrieve the methods for a given type
+Function Get-TypeMethod {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [Type]$Type
+    )
+
+    $Methods = $Type.GetMethods() | Sort-Object -Property Name
+    foreach ($Method in $Methods) {
+        $MethodParams = $Method.GetParameters()
+        if ($MethodParams.Count -gt 0) {
+            $FormattedParams = '{0}({1})' -f $Type.FullName, [String]::Join(', ', ($MethodParams | ForEach-Object { $_.ToString() }))
+        } else {
+            $FormattedParams = '{0}()' -f $Type.FullName
+        }
+
+        [PSCustomObject]@{
+            Method      = $Method.Name
+            Parameters  = $FormattedParams
+        }
+    }
+}
+
 # Invoke a Git command in all Git repositories
 Function Invoke-GitChildDir {
     [CmdletBinding()]
