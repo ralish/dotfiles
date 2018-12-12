@@ -1,3 +1,11 @@
+# Retrieve available type accelerators
+Function Get-TypeAccelerator {
+    [CmdletBinding()]
+    Param()
+
+    [PSObject].Assembly.GetType('System.Management.Automation.TypeAccelerators')::get_Get()
+}
+
 # Retrieve the constructors for a given type
 Function Get-TypeConstructor {
     [CmdletBinding()]
