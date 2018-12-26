@@ -3,6 +3,9 @@ if (Get-Module -Name PSReadLine -ListAvailable) {
         Write-Verbose -Message '[dotfiles] Loading PSReadLine settings ...'
         Import-Module -Name PSReadLine
 
+        # Don't store duplicate history entries
+        Set-PSReadLineOption -HistoryNoDuplicates
+
         # Move the cursor to end of line while cycling through history
         Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
