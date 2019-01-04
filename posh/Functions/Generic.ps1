@@ -9,46 +9,44 @@ Function Add-PathStringElement {
         [Parameter(Mandatory)]
         [String]$Element,
 
-        [ValidateLength(1, 1)]
-        [String]$Separator=';',
-
         [ValidateSet('Append', 'Prepend')]
         [String]$Action='Append',
+
+        [Char]$PathSeparator=[IO.Path]::PathSeparator,
 
         [Switch]$NoRepair
     )
 
     $RegExElement = [Regex]::Escape($Element)
-    $RegExSeparator = [Regex]::Escape($Separator)
+    $RegExPathSeparator = [Regex]::Escape($PathSeparator)
 
     if (!$NoRepair) {
-        $Path = Repair-PathString -String $Path -Separator $Separator
+        $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
     }
 
     $OnlyElement = '^{0}$' -f $RegExElement
     if ($Path -notmatch $OnlyElement) {
-        $FirstElement   = '^{0}{1}' -f $RegExElement, $RegExSeparator
-        $LastElement    = '{0}{1}$' -f $RegExSeparator, $RegExElement
-        $MiddleElement  = '{0}{1}{2}' -f $RegExSeparator, $RegExElement, $RegExSeparator
+        $FirstElement   = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
+        $LastElement    = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
+        $MiddleElement  = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
 
-        $Path = $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $Separator
+        $Path = $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
 
-        $NewSeparator = $Separator
         switch ($Action) {
             'Append' {
-                if ($Path.EndsWith($Separator)) {
-                    $NewSeparator = ''
+                if ($Path.EndsWith($PathSeparator)) {
+                    $Path = '{0}{1}' -f $Path, $Element
+                } else {
+                    $Path = '{0}{1}{2}' -f $Path, $PathSeparator, $Element
                 }
-
-                $Path = '{0}{1}{2}' -f $Path, $NewSeparator, $Element
             }
 
             'Prepend' {
-                if ($Path.StartsWith($Separator)) {
-                    $NewSeparator = ''
+                if ($Path.StartsWith($PathSeparator)) {
+                    $Path = '{0}{1}' -f $Element, $Path
+                } else {
+                    $Path = '{0}{1}{2}' -f $Element, $PathSeparator, $Path
                 }
-
-                $Path = '{0}{1}{2}' -f $Element, $NewSeparator, $Path
             }
         }
     }
@@ -214,29 +212,28 @@ Function Remove-PathStringElement {
         [Parameter(Mandatory)]
         [String]$Element,
 
-        [ValidateLength(1, 1)]
-        [String]$Separator=';',
+        [Char]$PathSeparator=[IO.Path]::PathSeparator,
 
         [Switch]$NoRepair
     )
 
     $RegExElement = [Regex]::Escape($Element)
-    $RegExSeparator = [Regex]::Escape($Separator)
+    $RegExPathSeparator = [Regex]::Escape($PathSeparator)
 
     if (!$NoRepair) {
-        $Path = Repair-PathString -String $Path -Separator $Separator
+        $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
     }
 
     $OnlyElement = '^{0}$' -f $RegExElement
     if ($Path -match $OnlyElement) {
-        return ''
+        return [String]::Empty
     }
 
-    $FirstElement   = '^{0}{1}' -f $RegExElement, $RegExSeparator
-    $LastElement    = '{0}{1}$' -f $RegExSeparator, $RegExElement
-    $MiddleElement  = '{0}{1}{2}' -f $RegExSeparator, $RegExElement, $RegExSeparator
+    $FirstElement   = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
+    $LastElement    = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
+    $MiddleElement  = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
 
-    return $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $Separator
+    return $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
 }
 
 # Remove excess separators from a Path type string
@@ -246,12 +243,11 @@ Function Repair-PathString {
         [Parameter(Mandatory, ValueFromPipeline)]
         [String]$String,
 
-        [ValidateLength(1, 1)]
-        [String]$Separator=';'
+        [Char]$PathSeparator=[IO.Path]::PathSeparator
     )
 
-    $RegExSeparator = [Regex]::Escape($Separator)
-    $String -replace "^$RegExSeparator+" -replace "$RegExSeparator+$" -replace "$RegExSeparator{2,}", $Separator
+    $RegExPathSeparator = [Regex]::Escape($PathSeparator)
+    $String -replace "^$RegExPathSeparator+" -replace "$RegExPathSeparator+$" -replace "$RegExPathSeparator{2,}", $PathSeparator
 }
 
 # Confirm a PowerShell command is available
