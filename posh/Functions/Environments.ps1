@@ -171,16 +171,19 @@ Function Switch-Python {
     }
 
     $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
-    $LocalScriptsPath = Join-Path -Path $env:APPDATA -ChildPath ('Python\Python{0}\Scripts' -f $StrippedVersion)
+    $LocalScriptsSharedPath = Join-Path -Path $env:APPDATA -ChildPath 'Python\Scripts'
+    $LocalScriptsVersionedPath = Join-Path -Path $env:APPDATA -ChildPath ('Python\Python{0}\Scripts' -f $StrippedVersion)
 
     $env:Path = $env:Path |
-        & $Operation -Element $LocalScriptsPath |
+        & $Operation -Element $LocalScriptsVersionedPath |
+        & $Operation -Element $LocalScriptsSharedPath |
         & $Operation -Element $ScriptsPath |
         & $Operation -Element $Path
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            & $Operation -Element $LocalScriptsPath |
+            & $Operation -Element $LocalScriptsVersionedPath |
+            & $Operation -Element $LocalScriptsSharedPath |
             & $Operation -Element $ScriptsPath |
             & $Operation -Element $Path |
             Set-EnvironmentVariable -Name Path
