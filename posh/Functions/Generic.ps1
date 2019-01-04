@@ -13,24 +13,41 @@ Function Add-PathStringElement {
         [String]$Action='Append',
 
         [Char]$PathSeparator=[IO.Path]::PathSeparator,
+        [Char]$DirectorySeparator=[IO.Path]::DirectorySeparatorChar,
 
-        [Switch]$NoRepair
+        [Switch]$NoRepair,
+        [Switch]$SimpleAlgo
     )
-
-    $RegExElement = [Regex]::Escape($Element)
-    $RegExPathSeparator = [Regex]::Escape($PathSeparator)
 
     if (!$NoRepair) {
         $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
     }
 
-    $OnlyElement = '^{0}$' -f $RegExElement
-    if ($Path -notmatch $OnlyElement) {
-        $FirstElement   = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
-        $LastElement    = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
-        $MiddleElement  = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
+    if (!$SimpleAlgo) {
+        if ($Element.EndsWith($DirectorySeparator)) {
+            $Element = $Element.TrimEnd($DirectorySeparator)
+        }
+        $Element += $DirectorySeparator
+    }
+
+    $RegExElement = [Regex]::Escape($Element)
+
+    if (!$SimpleAlgo) {
+        $RegExElement += '*'
+    }
+
+    $SingleElement = '^{0}$' -f $RegExElement
+    if ($Path -notmatch $SingleElement) {
+        $RegExPathSeparator = [Regex]::Escape($PathSeparator)
+        $FirstElement       = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
+        $LastElement        = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
+        $MiddleElement      = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
 
         $Path = $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
+
+        if (!$SimpleAlgo) {
+            $Element = $PSBoundParameters.Item('Element')
+        }
 
         switch ($Action) {
             'Append' {
@@ -213,25 +230,38 @@ Function Remove-PathStringElement {
         [String]$Element,
 
         [Char]$PathSeparator=[IO.Path]::PathSeparator,
+        [Char]$DirectorySeparator=[IO.Path]::DirectorySeparatorChar,
 
-        [Switch]$NoRepair
+        [Switch]$NoRepair,
+        [Switch]$SimpleAlgo
     )
-
-    $RegExElement = [Regex]::Escape($Element)
-    $RegExPathSeparator = [Regex]::Escape($PathSeparator)
 
     if (!$NoRepair) {
         $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
     }
 
-    $OnlyElement = '^{0}$' -f $RegExElement
-    if ($Path -match $OnlyElement) {
+    if (!$SimpleAlgo) {
+        if ($Element.EndsWith($DirectorySeparator)) {
+            $Element = $Element.TrimEnd($DirectorySeparator)
+        }
+        $Element += $DirectorySeparator
+    }
+
+    $RegExElement = [Regex]::Escape($Element)
+
+    if (!$SimpleAlgo) {
+        $RegExElement += '*'
+    }
+
+    $SingleElement = '^{0}$' -f $RegExElement
+    if ($Path -match $SingleElement) {
         return [String]::Empty
     }
 
-    $FirstElement   = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
-    $LastElement    = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
-    $MiddleElement  = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
+    $RegExPathSeparator = [Regex]::Escape($PathSeparator)
+    $FirstElement       = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
+    $LastElement        = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
+    $MiddleElement      = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
 
     return $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
 }
