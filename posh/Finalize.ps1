@@ -1,6 +1,9 @@
 # Default to UTF-8 encoding with Out-File
 $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
 
+# Number of elements to enumerate when displaying arrays
+$FormatEnumerationLimit = 5
+
 # Our custom prompt with various integrations
 Function Prompt {
     $prompt = ''
