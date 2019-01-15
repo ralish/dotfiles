@@ -16,9 +16,7 @@ LESSKEY="$script_dir/../less/.lesskey"
 lesskey -- <(cat "$LESSKEY")
 
 # Remove any existing less history file
-if [[ -f $HOME/.lesshst ]]; then
-    rm "$HOME/.lesshst"
-fi
+rm -f "$HOME/.lesshst"
 
 exit $DETECTION_SUCCESS
 
