@@ -21,6 +21,7 @@ ms-vscode.cpptools
 ms-vscode.csharp
 ms-vscode.PowerShell
 msjsdiag.debugger-for-chrome
+redhat.vscode-xml
 redhat.vscode-yaml
 robertohuertasm.vscode-icons
 sidneys1.gitconfig
