@@ -5,8 +5,4 @@
     <Detection>
         <Method>FindInPath</Method>
     </Detection>
-
-    <InstallPath>
-        <HideSymlinks>true</HideSymlinks>
-    </InstallPath>
 </Component>
