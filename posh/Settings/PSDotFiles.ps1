@@ -6,6 +6,9 @@ if (Get-Module -Name PSDotFiles -ListAvailable) {
 
     # Enable automatic component detection
     $DotFilesAutodetect = $true
+
+    # Allow evaluation of nested symlinks
+    $DotFilesAllowNestedSymlinks = $true
 } else {
     Write-Verbose -Message '[dotfiles] Skipping PSDotFiles settings as module not found.'
 }
