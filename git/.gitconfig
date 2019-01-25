@@ -180,8 +180,7 @@
 	pom = push origin master
 	ps  = push --set-upstream
 	pso = push --set-upstream origin
-	pt  = push "$(git symbolic-ref HEAD | sed s_^refs/heads/__)"
-	ptf = push "$(git symbolic-ref HEAD | sed s_^refs/heads/__)" --force
+	pt  = push --tags
 	pn  = push refs/notes/*
 
 	q   = pull
