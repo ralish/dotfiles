@@ -26,6 +26,9 @@
     "C_Cpp.autoAddFileAssociations": false,
     "C_Cpp.loggingLevel": "Warning",
 
+    // Extension: C#
+    "csharp.suppressHiddenDiagnostics": false,
+
     // Extension: DevSkim
     "devskim.enableBestPracticeRules": true,
     "devskim.enableManualReviewRules": true,
