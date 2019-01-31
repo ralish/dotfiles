@@ -18,7 +18,7 @@
 	cmd = code --wait --diff $LOCAL $REMOTE
 
 [gpg]
-	program = C:\\Program Files (x86)\\Nexiom\\Software\\Independent\\Gpg4win\\pub\\gpg.exe
+	program = C:\\Program Files (x86)\\Gpg4win\\pub\\gpg.exe
 
 [http]
 	sslBackend = schannel
