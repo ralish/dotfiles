@@ -1,3 +1,5 @@
+# shellcheck shell=sh disable=SC2034
+
 # Lines to append to schroot entries
 SCHROOT_CONF_SUFFIX='source-root-users=root,sbuild,admin source-root-groups=root,sbuild,admin preserve-environment=true'
 

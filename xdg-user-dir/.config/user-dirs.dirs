@@ -1,4 +1,4 @@
-# XDG user directories configuration
+# shellcheck shell=sh disable=SC2034
 
 # This file is read by xdg-user-dir to inform XDG aware applications of our
 # preferred directories for storing various files. Consult xdg-user-dir(1).

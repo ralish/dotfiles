@@ -1,3 +1,5 @@
+# shellcheck shell=sh disable=SC2034
+
 # Location of patch files
 QUILT_PATCHES='debian/patches'
 
