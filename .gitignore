@@ -61,7 +61,7 @@ temp/
 /kitty/
 
 # less
-/less/.less
+/less/[._]less
 
 # OpenSSH
 /openssh/
