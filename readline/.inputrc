@@ -31,8 +31,8 @@ set comment-begin #
 # Note: Setting is ignored if <0 or greater than the terminal screen width.
 #
 # Valid options are:
-#  0:                    Display one match per line
-# >0:                    Number of columns to use per line of matches
+#  0:                   Display one match per line
+# >0:                   Number of columns to use per line of matches
 set completion-display-width -1
 
 # Perform filename completion matching case-insensitively
@@ -62,8 +62,8 @@ set disable-completion off
 # Default key bindings to use
 #
 # Valid options are:
-# emacs:                Emacs-style key bindings
-# vi:                   vi-style key bindings
+# - emacs:              Emacs-style key bindings
+# - vi:                 vi-style key bindings
 set editing-mode vi
 
 # Echo the corresponding control character for keyboard generated signals
