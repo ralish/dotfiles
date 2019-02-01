@@ -111,6 +111,11 @@ $blue     = "#268bd2"
 $cyan     = "#2aa198"
 $green    = "#859900"
 
+$bgCol = if ($Dark) { $base03 } else { $base3 }
+$primaryCol = if ($Dark) { $base0 } else { $base00 }
+$emphasizeCol = if ($Dark) { $base1 } else { $base01 }
+$secondaryCol = if ($Dark) { $base01 } else { $base1 }
+
 ## Variables for the fonts
 ## These are the default PowerShell font and size; change if you want to.
 ## !!TODO!! allow users to specify this on the command line? Obviously check with the installed fonts to validate. 
@@ -118,8 +123,8 @@ $Font     = "Lucida Console"
 
 # The actual action starts here.
 # The Script pane is common to both PowerShell 2.0 and 3.0 ISE. Defining its colors & fonts here.
-$psISE.Options.ScriptPaneBackgroundColor = if ($Dark) { $base03 } else { $base3 }
-$psISE.Options.ScriptPaneForegroundColor = if ($Dark) { $base0 } else { $base00 }
+$psISE.Options.ScriptPaneBackgroundColor = $bgCol
+$psISE.Options.ScriptPaneForegroundColor = $primaryCol
 
 $psISE.Options.FontName = $Font
 $psISE.Options.FontSize = $FontSize
@@ -128,43 +133,43 @@ $psISE.Options.FontSize = $FontSize
 $psISE.Options.TokenColors.Item("Attribute") = $yellow
 
 # Cmdlets, their arguments & parameters.
-$psISE.Options.TokenColors.Item("Command") = if ($Dark) { $base1 } else { $base01 }
+$psISE.Options.TokenColors.Item("Command") = $emphasizeCol
 $psISE.Options.TokenColors.Item("CommandArgument") = $blue
 $psISE.Options.TokenColors.Item("CommandParameter") = $red
 
 # Comments.
-$psISE.Options.TokenColors.Item("Comment") = if ($Dark) { $base01 } else { $base1 }
+$psISE.Options.TokenColors.Item("Comment") = $secondaryCol
 
 # Brackets etc.
-$psISE.Options.TokenColors.Item("GroupEnd") = if ($Dark) { $base1 } else { $base01 }
-$psISE.Options.TokenColors.Item("GroupStart") = if ($Dark) { $base1 } else { $base01 }
+$psISE.Options.TokenColors.Item("GroupEnd") = $emphasizeCol
+$psISE.Options.TokenColors.Item("GroupStart") = $emphasizeCol
 
 # Keywords (if, while, etc).
 $psISE.Options.TokenColors.Item("Keyword") = $green
 
 # Not really sure what this is, so setting this to the default color.
-$psISE.Options.TokenColors.Item("LineContinuation") = if ($Dark) { $base0 } else { $base00 }
+$psISE.Options.TokenColors.Item("LineContinuation") = $primaryCol
 
 # Not really sure what this is, but since it's a label I'm setting it to the highlight color.
-$psISE.Options.TokenColors.Item("LoopLabel") = if ($Dark) { $base1 } else { $base01 }
+$psISE.Options.TokenColors.Item("LoopLabel") = $emphasizeCol
 
 # Members.
-$psISE.Options.TokenColors.Item("Member") = if ($Dark) { $base0 } else { $base00 }
+$psISE.Options.TokenColors.Item("Member") = $primaryCol
 
 # Not really sure what this is, so setting this to the default color.
-$psISE.Options.TokenColors.Item("NewLine") = if ($Dark) { $base0 } else { $base00 }
+$psISE.Options.TokenColors.Item("NewLine") = $primaryCol
 
 # Numbers (even as array indexes).
 $psISE.Options.TokenColors.Item("Number") = $cyan
 
 # Operators (+, += etc).
-$psISE.Options.TokenColors.Item("Operator") = if ($Dark) { $base0 } else { $base00 }
+$psISE.Options.TokenColors.Item("Operator") = $primaryCol
 
 # Not really sure what this is, so setting this to the default color.
-$psISE.Options.TokenColors.Item("Position") = if ($Dark) { $base0 } else { $base00 }
+$psISE.Options.TokenColors.Item("Position") = $primaryCol
 
 # Statement separators (semicolon etc).
-$psISE.Options.TokenColors.Item("StatementSeparator") = if ($Dark) { $base1 } else { $base01 }
+$psISE.Options.TokenColors.Item("StatementSeparator") = $emphasizeCol
 
 # String.
 $psISE.Options.TokenColors.Item("String") = $cyan
@@ -173,7 +178,7 @@ $psISE.Options.TokenColors.Item("String") = $cyan
 $psISE.Options.TokenColors.Item("Type") = $violet
 
 # Unknown items (I this is the color you will see while typing and before it's actually colored.
-$psISE.Options.TokenColors.Item("Unknown") = if ($Dark) { $base0 } else { $base00 }
+$psISE.Options.TokenColors.Item("Unknown") = $primaryCol
 
 # Variables.
 $psISE.Options.TokenColors.Item("Variable") = $orange
@@ -191,54 +196,48 @@ $psISE.Options.VerboseForegroundColor = $yellow
 $psISE.Options.DebugForegroundColor = $blue  
 
 # Now for the PowerShell ISE version specific stuff
-switch ($PSVersionTable.PSVersion.Major) {
-  2 
-  {
-    # PowerShell 2.0 ISE specific stuff go here. Command pane & Output pane colors.
-    # Command pane background colors.
-    # Can't set the foreground color as that's taken from the Script pane foreground color.
-    $psISE.Options.CommandPaneBackgroundColor = if ($Dark) { $base03 } else { $base3 }
-  
-    # Output pane colors.
-    $psISE.Options.OutputPaneBackgroundColor = $psISE.Options.OutputPaneTextBackgroundColor = $base03
-    $psISE.Options.OutputPaneForegroundColor = $base1
+if ($PSVersionTable.PSVersion.Major -eq 2) {
+  # PowerShell 2.0 ISE specific stuff go here. Command pane & Output pane colors.
+  # Command pane background colors.
+  # Can't set the foreground color as that's taken from the Script pane foreground color.
+  $psISE.Options.CommandPaneBackgroundColor = $bgCol
 
-  }
-  3 
-  {
-    # PowerShell 3.0 ISE specific stuff go here. No Command pane & Output pane. 
-    # Has a Console pane that is essentially the Command & Output panes combined and supports token colors! W00t!
+  # Output pane colors.
+  $psISE.Options.OutputPaneBackgroundColor = $psISE.Options.OutputPaneTextBackgroundColor = $base03
+  $psISE.Options.OutputPaneForegroundColor = $base1
+} else {
+  # PowerShell 3.0 ISE and later specific stuff go here. No Command pane & Output pane. 
+  # Has a Console pane that is essentially the Command & Output panes combined and supports token colors! W00t!
 
-    # Console pane colors.
-    $psISE.Options.ConsolePaneBackgroundColor = $psISE.Options.ConsolePaneTextBackgroundColor = $base03
-    $psISE.Options.ConsolePaneForegroundColor = $base1
+  # Console pane colors.
+  $psISE.Options.ConsolePaneBackgroundColor = $psISE.Options.ConsolePaneTextBackgroundColor = $bgCol
+  $psISE.Options.ConsolePaneForegroundColor = $primaryCol
 
-    # Token colors in the console pane. Skipping comments as these are same as the token definitions in the Script pane (defined above).
-    $psISE.Options.ConsoleTokenColors.Item("Attribute") = $yellow
-    $psISE.Options.ConsoleTokenColors.Item("Command") = if ($Dark) { $base1 } else { $base01 }
-    $psISE.Options.ConsoleTokenColors.Item("CommandArgument") = $blue
-    $psISE.Options.ConsoleTokenColors.Item("CommandParameter") = $red
-    $psISE.Options.ConsoleTokenColors.Item("Comment") = if ($Dark) { $base01 } else { $base1 }
-    $psISE.Options.ConsoleTokenColors.Item("GroupEnd") = if ($Dark) { $base1 } else { $base01 }
-    $psISE.Options.ConsoleTokenColors.Item("GroupStart") = if ($Dark) { $base1 } else { $base01 }
-    $psISE.Options.ConsoleTokenColors.Item("Keyword") = $green
-    $psISE.Options.ConsoleTokenColors.Item("LineContinuation") = if ($Dark) { $base0 } else { $base00 }
-    $psISE.Options.ConsoleTokenColors.Item("LoopLabel") = if ($Dark) { $base1 } else { $base01 }
-    $psISE.Options.ConsoleTokenColors.Item("Member") = if ($Dark) { $base0 } else { $base00 }
-    $psISE.Options.ConsoleTokenColors.Item("NewLine") = if ($Dark) { $base0 } else { $base00 }
-    $psISE.Options.ConsoleTokenColors.Item("Number") = $cyan
-    $psISE.Options.ConsoleTokenColors.Item("Operator") = if ($Dark) { $base0 } else { $base00 }
-    $psISE.Options.ConsoleTokenColors.Item("Position") = if ($Dark) { $base0 } else { $base00 }
-    $psISE.Options.ConsoleTokenColors.Item("StatementSeparator") = if ($Dark) { $base1 } else { $base01 }
-    $psISE.Options.ConsoleTokenColors.Item("String") = $cyan
-    $psISE.Options.ConsoleTokenColors.Item("Type") = $violet
-    $psISE.Options.ConsoleTokenColors.Item("Unknown") = if ($Dark) { $base0 } else { $base00 }
-    $psISE.Options.ConsoleTokenColors.Item("Variable") = $orange
+  # Token colors in the console pane. Skipping comments as these are same as the token definitions in the Script pane (defined above).
+  $psISE.Options.ConsoleTokenColors.Item("Attribute") = $yellow
+  $psISE.Options.ConsoleTokenColors.Item("Command") = $emphasizeCol
+  $psISE.Options.ConsoleTokenColors.Item("CommandArgument") = $blue
+  $psISE.Options.ConsoleTokenColors.Item("CommandParameter") = $red
+  $psISE.Options.ConsoleTokenColors.Item("Comment") = $secondaryCol
+  $psISE.Options.ConsoleTokenColors.Item("GroupEnd") = $emphasizeCol
+  $psISE.Options.ConsoleTokenColors.Item("GroupStart") = $emphasizeCol
+  $psISE.Options.ConsoleTokenColors.Item("Keyword") = $green
+  $psISE.Options.ConsoleTokenColors.Item("LineContinuation") = $primaryCol
+  $psISE.Options.ConsoleTokenColors.Item("LoopLabel") = $emphasizeCol
+  $psISE.Options.ConsoleTokenColors.Item("Member") = $primaryCol
+  $psISE.Options.ConsoleTokenColors.Item("NewLine") = $primaryCol
+  $psISE.Options.ConsoleTokenColors.Item("Number") = $cyan
+  $psISE.Options.ConsoleTokenColors.Item("Operator") = $primaryCol
+  $psISE.Options.ConsoleTokenColors.Item("Position") = $primaryCol
+  $psISE.Options.ConsoleTokenColors.Item("StatementSeparator") = $emphasizeCol
+  $psISE.Options.ConsoleTokenColors.Item("String") = $cyan
+  $psISE.Options.ConsoleTokenColors.Item("Type") = $violet
+  $psISE.Options.ConsoleTokenColors.Item("Unknown") = $primaryCol
+  $psISE.Options.ConsoleTokenColors.Item("Variable") = $orange
 
-    # When you hover over the outlining lines there's a brief flash of white background in the script pane
-    # I don't know any workaround so I disable Outlining altogether. 
-    $psISE.Options.ShowOutlining = $false
-  }
+  # When you hover over the outlining lines there's a brief flash of white background in the script pane
+  # I don't know any workaround so I disable Outlining altogether. 
+  $psISE.Options.ShowOutlining = $false
 }
 
 Write-Verbose "All done!"
