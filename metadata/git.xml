@@ -5,6 +5,6 @@
     </InstallPath>
 
     <IgnorePaths>
-        <Path>bin</Path>
+        <IgnorePath>bin</IgnorePath>
     </IgnorePaths>
 </Component>
