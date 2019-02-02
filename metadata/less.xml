@@ -10,4 +10,9 @@
     <InstallPath>
         <HideSymlinks>true</HideSymlinks>
     </InstallPath>
+
+    <RenamePaths>
+        <RenamePath source=".less" symlink="_less" />
+        <RenamePath source=".lesskey" symlink="_lesskey" />
+    </RenamePaths>
 </Component>

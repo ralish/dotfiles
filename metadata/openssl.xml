@@ -4,6 +4,6 @@
 
     <Detection>
         <Method>Static</Method>
-        <Availability>Ignored</Availability>
+        <Availability>NeverInstall</Availability>
     </Detection>
 </Component>

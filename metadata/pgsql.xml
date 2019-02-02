@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ralish/PSDotFiles/master/Metadata.xsd">
-    <FriendlyName>pip</FriendlyName>
-    <BasePath>.config\pip</BasePath>
-
-    <Detection>
-        <Method>FindInPath</Method>
-    </Detection>
+    <FriendlyName>PostgreSQL</FriendlyName>
 
     <InstallPath>
         <SpecialFolder>ApplicationData</SpecialFolder>
-        <Destination>pip</Destination>
+        <Destination>postgresql</Destination>
     </InstallPath>
 
     <RenamePaths>
-        <RenamePath source="pip.conf" symlink="pip.ini" />
+        <RenamePath source=".psqlrc" symlink="psqlrc.conf" />
     </RenamePaths>
 </Component>
