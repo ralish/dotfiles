@@ -6,7 +6,7 @@ script_dir="$(dirname "${BASH_SOURCE[0]}")"
 source "$script_dir/templates/common.sh"
 
 if ! command -v ssh > /dev/null; then
-    exit "$DETECTION_NOT_AVAILABLE"
+    exit $DETECTION_NOT_AVAILABLE
 fi
 
 # Important paths
@@ -28,7 +28,7 @@ elif [[ $ssh_version =~ OpenSSH_7\.2 ]]; then
     ssh_template="$OPENSSH_TEMPLATES/ssh_config.72"
 else
     printf 'Unsupported OpenSSH version: %s\n' "$ssh_version"
-    exit "$DETECTION_NO_LOGIC"
+    exit $DETECTION_NO_LOGIC
 fi
 
 # Build our configuration
@@ -36,12 +36,12 @@ shopt -s nullglob
 echo -n > "$OPENSSH_CFG"
 chmod 0600 "$OPENSSH_CFG"
 head -n -1 "$OPENSSH_BANNER" >> "$OPENSSH_CFG"
-for include in $OPENSSH_INCLUDES/*; do
+for include in "$OPENSSH_INCLUDES"/*; do
     head -n -1 "$include" >> "$OPENSSH_CFG"
     echo >> "$OPENSSH_CFG"
 done
 cat "$ssh_template" >> "$OPENSSH_CFG"
 
-exit "$DETECTION_SUCCESS"
+exit $DETECTION_SUCCESS
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
