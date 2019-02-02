@@ -31,6 +31,8 @@
         ".inputrc": "properties",
         // sbuild
         ".mk-sbuild.rc": "shellscript",
+        // wget
+        ".wgetrc": "properties",
         // xdg-user-dir
         "user-dirs.dirs": "shellscript"
     },
