@@ -101,6 +101,11 @@
         "rewrap.wrappingColumn": 72
     },
 
+    "[jinja]": {
+        // Workaround for bug in SaltStack extension
+        "editor.autoClosingBrackets": "never"
+    },
+
     "[markdown]": {
         // Trailing whitespace has special meaning in Markdown syntax
         "files.trimTrailingWhitespace": false
