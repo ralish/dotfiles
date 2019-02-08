@@ -14,6 +14,7 @@ jamiewoodio.cisco
 joaompinto.asciidoctor-vscode
 Kelvin.vscode-sshfs
 korekontrol.saltstack
+mechatroner.rainbow-csv
 mkaufman.HTMLHint
 MS-DevSkim.vscode-devskim
 ms-python.python
