@@ -89,4 +89,11 @@ temp/
 /vim/.vim/undo/
 /vim/.vim/view/
 
+# Web browsers
+/chrome/
+/edge/
+/firefox/
+/msie/
+/safari/
+
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
