@@ -89,6 +89,9 @@ temp/
 /vim/.vim/undo/
 /vim/.vim/view/
 
+# Visual Studio
+/vs/
+
 # Web browsers
 /chrome/
 /edge/
