@@ -1,17 +1,26 @@
 # ********************************* Global ************************************
 
-# OS X
+# macOS
 ._*
+.AppleDouble
 .DS_Store
 .LSOverride
-.VolumeIcon.icns
 # Icon must end with two carriage returns (\r)
 Icon
 
 # Windows
-Desktop.ini
+[Dd]esktop.ini
 ehthumbs.db
 Thumbs.db
+
+# Vim
+.netrwhist
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]*.un~
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
 
 # Temporary
 *~
@@ -20,13 +29,6 @@ Thumbs.db
 *.temp
 tmp/
 temp/
-
-# Vim
-[._]*.s[a-v][a-z]
-[._]*.sw[a-p]
-[._]s[a-v][a-z]
-[._]sw[a-p]
-.netrwhist
 
 
 # ******************************* Components **********************************
