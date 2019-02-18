@@ -89,6 +89,7 @@
             "format": "svg"
         }
     ],
+    "vsicons.dontShowNewVersionMessage": true,
 
     // Extension: XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
