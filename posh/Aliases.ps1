@@ -5,6 +5,16 @@ Set-Alias -Name gita    -Value Invoke-GitChildDir
 Set-Alias -Name up      -Value Update-Profile
 Set-Alias -Name which   -Value Get-Command
 
+# Remove the curl alias if the real deal is present
+if (Get-Command -Name curl.exe -ErrorAction Ignore) {
+    Remove-Item -Path Alias:\curl -ErrorAction Ignore
+}
+
+# Remove the sc alias in favour of the sc.exe utility
+if (Get-Command -Name sc.exe -ErrorAction Ignore) {
+    Remove-Item -Path Alias:\sc -ErrorAction Ignore
+}
+
 # Dependency Walker (x86)
 $DepWalker32Path = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Nexiom\Software\Independent\Dependency Walker\depends.exe'
 if (Test-Path -Path $DepWalker32Path -PathType Leaf) {
