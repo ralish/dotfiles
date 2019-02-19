@@ -226,7 +226,7 @@ Function Export-MailboxSpreadsheetData {
     $Folders = Get-InboxRulesByFolders @Params
 
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
-    $Rules = Get-InboxRule @Params
+    $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
 
     Write-Host -ForegroundColor Green -Object 'Exporting mailbox data ...'
     $Params = @{
@@ -261,7 +261,7 @@ Function Get-InboxRulesByFolders {
     $Folders | Add-Member -MemberType ScriptProperty -Name RuleCount -Value { $this.Rules.Count }
 
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
-    $Rules = Get-InboxRule @PSBoundParameters
+    $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
     $Rules | Add-Member -MemberType NoteProperty -Name LinkedToFolder -Value $false
 
     Write-Host -ForegroundColor Green -Object 'Associating mailbox rules to folders ...'
