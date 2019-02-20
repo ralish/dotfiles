@@ -184,8 +184,10 @@ Function Export-MailboxSpreadsheetData {
         [String]$Mailbox,
 
         [IO.DirectoryInfo]$Path,
+
         [DateTime]$StartDate,
         [DateTime]$EndDate,
+        [Switch]$SkipActivitySummary,
 
         [ValidateNotNullOrEmpty()]
         [String]$DescriptionTimeZone='AUS Eastern Standard Time',
@@ -212,13 +214,15 @@ Function Export-MailboxSpreadsheetData {
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
     $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
 
-    $Params = @{ Mailbox=$Mailbox }
-    foreach ($Parameter in @('StartDate', 'EndDate')) {
-        if ($PSBoundParameters.ContainsKey($Parameter)) {
-            $Params.Add($Parameter, $PSBoundParameters.Item($Parameter))
+    if (!$SkipActivitySummary) {
+        $Params = @{ Mailbox=$Mailbox }
+        foreach ($Parameter in @('StartDate', 'EndDate')) {
+            if ($PSBoundParameters.ContainsKey($Parameter)) {
+                $Params.Add($Parameter, $PSBoundParameters.Item($Parameter))
+            }
         }
+        $Activity = Get-MailboxActivitySummary -Mailbox $Mailbox
     }
-    $Activity = Get-MailboxActivitySummary -Mailbox $Mailbox
 
     $Folders = Get-InboxRulesByFolders -Mailbox $Mailbox -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
 
@@ -227,7 +231,11 @@ Function Export-MailboxSpreadsheetData {
         Encoding='UTF8'
         NoTypeInformation=$true
     }
-    $Activity | Export-Csv @Params -Path (Join-Path -Path $Path -ChildPath 'Activity Summary.csv') -Append
+
+    if (!$SkipActivitySummary) {
+        $Activity | Export-Csv @Params -Path (Join-Path -Path $Path -ChildPath 'Activity Summary.csv') -Append
+    }
+
     $Folders | Export-Csv @Params -Path (Join-Path -Path $Path -ChildPath ('{0} - Folders.csv' -f $MailboxAddress))
     $Rules | Export-Csv @Params -Path (Join-Path -Path $Path -ChildPath ('{0} - Rules.csv' -f $MailboxAddress))
 }
@@ -260,7 +268,7 @@ Function Get-InboxRulesByFolders {
     $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
     $Rules | Add-Member -MemberType NoteProperty -Name LinkedToFolder -Value $false
 
-    Write-Host -ForegroundColor Green -Object 'Associating mailbox rules to folders ...'
+    Write-Host -ForegroundColor Green -Object 'Associating rules to folders ...'
     $Results = @()
     foreach ($Folder in $Folders) {
         $FolderName = ($Folder.FolderPath -join ' - ').Substring(8)
