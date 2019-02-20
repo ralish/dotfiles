@@ -188,10 +188,10 @@ Function Export-MailboxSpreadsheetData {
         [DateTime]$EndDate,
 
         [ValidateNotNullOrEmpty()]
-        [String]$DescriptionTimeZone,
+        [String]$DescriptionTimeZone='AUS Eastern Standard Time',
 
         [ValidateNotNullOrEmpty()]
-        [String]$DescriptionTimeFormat
+        [String]$DescriptionTimeFormat='yyyy/mm/dd'
     )
 
     Test-CommandAvailable -Name @('Get-InboxRule', 'Get-Mailbox')
@@ -220,13 +220,7 @@ Function Export-MailboxSpreadsheetData {
     }
     $Activity = Get-MailboxActivitySummary -Mailbox $Mailbox
 
-    $Params = @{ Mailbox=$Mailbox }
-    foreach ($Parameter in @('DescriptionTimeZone', 'DescriptionTimeFormat')) {
-        if ($PSBoundParameters.ContainsKey($Parameter)) {
-            $Params.Add($Parameter, $PSBoundParameters.Item($Parameter))
-        }
-    }
-    $Folders = Get-InboxRulesByFolders @Params
+    $Folders = Get-InboxRulesByFolders -Mailbox $Mailbox -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
 
     Write-Host -ForegroundColor Green -Object 'Exporting mailbox data ...'
     $Params = @{
