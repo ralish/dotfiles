@@ -267,10 +267,11 @@ Function Get-InboxRulesByFolders {
     Write-Host -ForegroundColor Green -Object 'Associating mailbox rules to folders ...'
     $Results = @()
     foreach ($Folder in $Folders) {
-        $FolderDashName = ($Folder.FolderPath -join ' - ').Substring(8)
+        $FolderName = ($Folder.FolderPath -join ' - ').Substring(8)
+        $RegexMatch = '^{0}' -f [Regex]::Escape($FolderName)
 
         foreach ($Rule in ($Rules | Where-Object { $_.LinkedToFolder -eq $false })) {
-            if ($Rule.Name -match ('^{0}' -f $FolderDashName) -and $Rule.MoveToFolder -eq $Folder.Name) {
+            if ($Rule.Name -match $RegexMatch -and $Rule.MoveToFolder -eq $Folder.Name) {
                 $Rule.LinkedToFolder = $true
                 $Folder.Rules += $Rule
             }
