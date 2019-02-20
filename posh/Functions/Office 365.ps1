@@ -250,7 +250,9 @@ Function Get-InboxRulesByFolders {
         [String]$DescriptionTimeZone='AUS Eastern Standard Time',
 
         [ValidateNotNullOrEmpty()]
-        [String]$DescriptionTimeFormat='yyyy/mm/dd'
+        [String]$DescriptionTimeFormat='yyyy/mm/dd',
+
+        [Switch]$ReturnUnlinkedRules
     )
 
     Test-CommandAvailable -Name Get-MailboxFolder
@@ -282,10 +284,14 @@ Function Get-InboxRulesByFolders {
 
     $UnlinkedRules = $Rules | Where-Object { $_.LinkedToFolder -eq $false }
     if ($UnlinkedRules) {
-        Write-Host -ForegroundColor Yellow -Object ('Number of unlinked rules: {0}' -f ($UnlinkedRules | Measure-Object).Count)
+        Write-Warning -Message ('Number of unlinked rules: {0}' -f ($UnlinkedRules | Measure-Object).Count)
     }
 
-    return $Folders
+    if ($ReturnUnlinkedRules) {
+        return $UnlinkedRules
+    } else {
+        return $Folders
+    }
 }
 
 # Retrieve a summary of sent & received totals for a mailbox
