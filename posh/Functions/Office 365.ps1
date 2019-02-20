@@ -194,7 +194,7 @@ Function Export-MailboxSpreadsheetData {
         [String]$DescriptionTimeFormat
     )
 
-    Test-CommandAvailable -Name Get-Mailbox
+    Test-CommandAvailable -Name @('Get-InboxRule', 'Get-Mailbox')
 
     if (-not $PSBoundParameters.ContainsKey('Path')) {
         if ((Get-Item -Path $PWD) -is [IO.DirectoryInfo]) {
@@ -208,6 +208,9 @@ Function Export-MailboxSpreadsheetData {
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox details ...'
     $ExoMailbox = Get-Mailbox -Identity $Mailbox
     $MailboxAddress = $ExoMailbox.PrimarySmtpAddress
+
+    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
+    $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
 
     $Params = @{ Mailbox=$Mailbox }
     foreach ($Parameter in @('StartDate', 'EndDate')) {
@@ -224,9 +227,6 @@ Function Export-MailboxSpreadsheetData {
         }
     }
     $Folders = Get-InboxRulesByFolders @Params
-
-    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
-    $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
 
     Write-Host -ForegroundColor Green -Object 'Exporting mailbox data ...'
     $Params = @{
@@ -255,7 +255,7 @@ Function Get-InboxRulesByFolders {
         [Switch]$ReturnUnlinkedRules
     )
 
-    Test-CommandAvailable -Name Get-MailboxFolder
+    Test-CommandAvailable -Name @('Get-InboxRule', 'Get-MailboxFolder')
 
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox folders ...'
     $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object { $_.DefaultFolderType -ne 'Inbox' }
@@ -305,7 +305,7 @@ Function Get-MailboxActivitySummary {
         [DateTime]$EndDate
     )
 
-    Test-CommandAvailable -Name Get-Mailbox
+    Test-CommandAvailable -Name @('Get-Mailbox', 'Get-MessageTrace')
 
     if (-not $PSBoundParameters.ContainsKey('EndDate')) {
         $EndDate = Get-Date
@@ -346,7 +346,7 @@ Function Get-MailboxDelegatesAndForwardingRules {
     [CmdletBinding()]
     Param()
 
-    Test-CommandAvailable -Name @('Get-InboxRule', 'Get-MsolUser')
+    Test-CommandAvailable -Name @('Get-InboxRule', 'Get-Mailbox', 'Get-MailboxPermission', 'Get-MsolUser')
 
     $Delegates = @()
     $ForwardingRules = @()
@@ -405,7 +405,7 @@ Function Get-UnifiedGroupReport {
         [PSObject[]]$Groups
     )
 
-    Test-CommandAvailable -Name Get-UnifiedGroup
+    Test-CommandAvailable -Name @('Get-UnifiedGroup', 'Get-UnifiedGroupLinks')
 
     if (!$Groups) {
         Write-Host -ForegroundColor Green -Object 'Retrieving Office 365 groups ...'
