@@ -213,6 +213,9 @@ Function Export-MailboxSpreadsheetData {
 
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
     $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
+    foreach ($Rule in $Rules) {
+        $Rule.Description = $Rule.Description -replace '\r?\n\r?\Z$'
+    }
 
     if (!$SkipActivitySummary) {
         $Params = @{ Mailbox=$Mailbox }
