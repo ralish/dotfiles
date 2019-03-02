@@ -56,7 +56,7 @@
     "php.executablePath": "C:\\PHP\\php.exe",
 
     // Extension: PowerShell
-    "powershell.scriptAnalysis.settingsPath": "C:\\Users\\SDL\\dotfiles\\posh\\PSScriptAnalyzerSettings.psd1",
+    "powershell.scriptAnalysis.settingsPath": "C:\\Users\\SDL\\Code\\Personal\\dotfiles\\posh\\PSScriptAnalyzerSettings.psd1",
 
     // Extension: Python
     "python.linting.flake8Enabled": true,
@@ -65,11 +65,11 @@
     "selectline.alignment": "right",
 
     // Extension: shellcheck
+    "shellcheck.useWorkspaceRootAsCwd": true,
     "shellcheck.customArgs": [
         // Permit following source directives
         "-x"
     ],
-    "shellcheck.useWorkspaceRootAsCwd": true,
 
     // Extension: SSH FS
     "sshfs.configs": [
@@ -82,6 +82,7 @@
 
     // Extension: vscode-icons
     "workbench.iconTheme": "vscode-icons",
+    "vsicons.dontShowNewVersionMessage": true,
     "vsicons.associations.files": [
         {
             "icon": "xml",
@@ -89,7 +90,6 @@
             "format": "svg"
         }
     ],
-    "vsicons.dontShowNewVersionMessage": true,
 
     // Extension: XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
