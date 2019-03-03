@@ -87,7 +87,7 @@ Function Get-OpenSSLCertificate {
         [Parameter(Mandatory)]
         [String]$Certificate,
 
-        [String[]]$NameOptions='oneline'
+        [String[]]$NameOptions=@('oneline')
     )
 
     $NameOpt = [String]::Join(',', $NameOptions)
@@ -101,7 +101,7 @@ Function Get-OpenSSLCsr {
         [Parameter(Mandatory)]
         [String]$Csr,
 
-        [String[]]$NameOptions='oneline'
+        [String[]]$NameOptions=@('oneline')
     )
 
     $NameOpt = [String]::Join(',', $NameOptions)

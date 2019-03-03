@@ -160,11 +160,11 @@ Function ConvertTo-TextEncoding {
         switch ($Encoding) {
             ASCII       { $Encoder = New-Object -TypeName Text.ASCIIEncoding }
             UTF7        { $Encoder = New-Object -TypeName Text.UTF7Encoding }
-            UTF8        { $Encoder = New-Object -TypeName Text.UTF8Encoding -ArgumentList ($ByteOrderMark) }
-            UTF16       { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList ($false, $ByteOrderMark) }
-            UTF16BE     { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList ($true, $ByteOrderMark) }
-            UTF32       { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList ($false, $ByteOrderMark) }
-            UTF32BE     { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList ($true, $ByteOrderMark) }
+            UTF8        { $Encoder = New-Object -TypeName Text.UTF8Encoding -ArgumentList $ByteOrderMark }
+            UTF16       { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList @($false, $ByteOrderMark) }
+            UTF16BE     { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList @($true, $ByteOrderMark) }
+            UTF32       { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList @($false, $ByteOrderMark) }
+            UTF32BE     { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList @($true, $ByteOrderMark) }
         }
     }
 
@@ -210,7 +210,7 @@ Function Format-Xml {
         $XmlDoc.LoadXml($Data)
 
         $StringWriter = New-Object -TypeName IO.StringWriter
-        $XmlTextWriter = New-Object -TypeName Xml.XmlTextWriter($StringWriter)
+        $XmlTextWriter = New-Object -TypeName Xml.XmlTextWriter -ArgumentList $StringWriter
         $XmlTextWriter.Formatting = [Xml.Formatting]::Indented
 
         $XmlDoc.WriteContentTo($XmlTextWriter)

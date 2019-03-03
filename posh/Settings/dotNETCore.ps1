@@ -9,7 +9,7 @@ if (Get-Command -Name dotnet -ErrorAction Ignore) {
     Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
         Param($CommandName, $WordToComplete, $CursorPosition)
         dotnet complete --position $CursorPosition, "$WordToComplete" | ForEach-Object {
-            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+            [Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
         }
     }
 } else {

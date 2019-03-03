@@ -3,7 +3,7 @@ Function Switch-Cygwin {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path='C:\Cygwin',
+        [String]$Path="$env:HOMEDRIVE\Cygwin",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -40,7 +40,7 @@ Function Switch-Nodejs {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path='C:\Nodejs',
+        [String]$Path="$env:HOMEDRIVE\Nodejs",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -75,7 +75,7 @@ Function Switch-Perl {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path='C:\Perl',
+        [String]$Path="$env:HOMEDRIVE\Perl",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -114,7 +114,7 @@ Function Switch-PHP {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path='C:\PHP',
+        [String]$Path="$env:HOMEDRIVE\PHP",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -149,7 +149,7 @@ Function Switch-Python {
         [String]$Version,
 
         [ValidateNotNullOrEmpty()]
-        [String]$Path='C:\Python',
+        [String]$Path="$env:HOMEDRIVE\Python",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -195,7 +195,7 @@ Function Switch-Ruby {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path='C:\Ruby',
+        [String]$Path="$env:HOMEDRIVE\Ruby",
 
         [String]$Options='-Eutf-8',
 
