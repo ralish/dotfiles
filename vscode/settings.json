@@ -12,6 +12,9 @@
     "files.autoSave": "onWindowChange",
     "files.trimTrailingWhitespace": true,
 
+    // Search
+    "search.usePCRE2": true,
+
     // Telemetry
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
