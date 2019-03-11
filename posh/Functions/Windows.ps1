@@ -107,6 +107,19 @@ Function Set-EnvironmentVariable {
     [Environment]::SetEnvironmentVariable($Name, $NewValue, [EnvironmentVariableTarget]::$Scope)
 }
 
+# Test if the user has Administrator privileges
+Function Test-IsAdministrator {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    Param()
+
+    $User = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+    if ($User.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        return $true
+    }
+    return $false
+}
+
 # Watch an Event Log (similar to Unix "tail")
 # Slightly improved from: http://stackoverflow.com/questions/15262196/powershell-tail-windows-event-log-is-it-possible
 Function Watch-EventLog {
