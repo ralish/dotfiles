@@ -43,6 +43,9 @@
         "suppressShowKeyBindingsNotice": true
     },
 
+    // Extension: Language Support for Java(TM) by Red Hat
+    "java.configuration.checkProjectSettingsExclusions": false,
+
     // Extension: markdownlint
     "markdownlint.config": {
         // Header style
