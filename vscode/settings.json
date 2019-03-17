@@ -3,6 +3,7 @@
     "editor.find.seedSearchStringFromSelection": false,
     "editor.minimap.showSlider": "always",
     "editor.renderWhitespace": "boundary",
+    "editor.suggestSelection": "first",
 
     // Explorer
     "explorer.confirmDelete": false,
@@ -85,6 +86,9 @@
             "root": "/home/sdl"
         }
     ],
+
+    // Extension: Visual Studio IntelliCode
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
 
     // Extension: vscode-icons
     "workbench.iconTheme": "vscode-icons",
