@@ -101,6 +101,11 @@
         }
     ],
 
+    // Extension: XML
+    // Disable the LSP process watching for exit of the parent process
+    // Can be removed once GH #116 is merged and a new release is made
+    "xml.server.vmargs": "-noverify -Xmx64M -XX:+UseG1GC -XX:+UseStringDeduplication -DwatchParentProcess=false",
+
     // Extension: XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
     "xmlTools.removeCommentsOnMinify": true,
