@@ -61,7 +61,9 @@ Function Invoke-GitChildDir {
         [String]$Command,
 
         [ValidateNotNullOrEmpty()]
-        [String]$Path
+        [String]$Path,
+
+        [Switch]$Recurse
     )
 
     $GitArgs = $Command.Split()
@@ -77,7 +79,11 @@ Function Invoke-GitChildDir {
     foreach ($Dir in $Dirs) {
         $GitDir = Join-Path -Path $Dir -ChildPath '.git'
         if (-not (Test-Path -Path $GitDir -PathType Container)) {
-            Write-Verbose -Message ('Skipping directory: {0}' -f $Dir.Name)
+            if ($Recurse) {
+                Invoke-GitChildDir -Command $Command -Path $Dir.FullName -Recurse:$Recurse
+            } else {
+                Write-Verbose -Message ('Skipping directory: {0}' -f $Dir.Name)
+            }
             continue
         }
 
