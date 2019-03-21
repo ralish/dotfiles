@@ -66,6 +66,7 @@
     "powershell.scriptAnalysis.settingsPath": "C:\\Users\\SDL\\Code\\Personal\\dotfiles\\posh\\PSScriptAnalyzerSettings.psd1",
 
     // Extension: Python
+    "python.jediEnabled": false,
     "python.linting.flake8Enabled": true,
 
     // Extension: Select Line Status Bar
