@@ -1,35 +1,41 @@
-# Update assorted applications
+# Update everything!
 Function Update-AllTheThings {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding(DefaultParameterSetName='OptOut')]
     Param(
         [Parameter(ParameterSetName='OptOut')]
         [ValidateSet(
+            'Windows',
             'Office',
+            'VisualStudio',
             'PowerShell',
             'Scoop',
-            'VisualStudio',
-            'Windows'
+            'npm',
+            'pip'
         )]
         [String[]]$ExcludeTasks,
 
         [Parameter(ParameterSetName='OptIn', Mandatory)]
         [ValidateSet(
+            'Windows',
             'Office',
+            'VisualStudio',
             'PowerShell',
             'Scoop',
-            'VisualStudio',
-            'Windows'
+            'npm',
+            'pip'
         )]
         [String[]]$IncludeTasks
     )
 
     $Tasks = @{
+        Windows = $null
         Office = $null
+        VisualStudio = $null
         PowerShell = $null
         Scoop = $null
-        VisualStudio = $null
-        Windows = $null
+        npm = $null
+        pip = $null
     }
 
     foreach ($Task in @($Tasks.Keys)) {
@@ -55,11 +61,13 @@ Function Update-AllTheThings {
     }
 
     $Results = [PSCustomObject]@{
+        Windows = $null
         Office = $null
+        VisualStudio = $null
         PowerShell = $null
         Scoop = $null
-        VisualStudio = $null
-        Windows = $null
+        npm = $null
+        pip = $null
     }
 
     if ($Tasks['Windows']) {
@@ -113,8 +121,12 @@ Function Update-AllTheThings {
     }
 
     if ($Tasks['PowerShell']) {
-        Write-Host -ForegroundColor Green -Object 'Updating PowerShell modules ...'
-        Update-Module
+        if (Get-Module -Name PowerShellGet -ListAvailable) {
+            Write-Host -ForegroundColor Green -Object 'Updating PowerShell modules ...'
+            Update-Module
+        } else {
+            Write-Warning -Message 'Unable to update PowerShell modules as PowerShellGet module not available.'
+        }
 
         if (Get-Command -Name Uninstall-ObsoleteModule) {
             Write-Host -ForegroundColor Green -Object 'Uninstalling obsolete PowerShell modules ...'
@@ -141,6 +153,39 @@ Function Update-AllTheThings {
         } else {
             Write-Warning -Message 'Unable to install Scoop updates as scoop command not found.'
             $Results.Scoop = $false
+        }
+    }
+
+    if ($Tasks['npm']) {
+        if (Get-Command -Name npm) {
+            Write-Host -ForegroundColor Green -Object 'Updating npm ...'
+            & npm update -g npm
+
+            Write-Host -ForegroundColor Green -Object 'Updating npm modules ...'
+            & npm update -g
+
+            $Results.npm = $true
+        } else {
+            Write-Warning -Message 'Unable to install npm updates as npm command not found.'
+            $Results.npm = $false
+        }
+    }
+
+    if ($Tasks['pip']) {
+        if (Get-Command -Name pip) {
+            Write-Host -ForegroundColor Green -Object 'Updating pip ...'
+            & python -m pip install --upgrade pip
+
+            Write-Host -ForegroundColor Green -Object 'Updating pip modules ...'
+            $Regex = [Regex]::new('^\S+==')
+            $PipArgs = @('install', '-U')
+            & pip freeze | ForEach-Object { $PipArgs += $Regex.Match($_).Value.TrimEnd('=') }
+            Start-Process -FilePath pip -ArgumentList $PipArgs -NoNewWindow -Wait
+
+            $Results.pip = $true
+        } else {
+            Write-Warning -Message 'Unable to install pip updates as pip command not found.'
+            $Results.pip = $false
         }
     }
 
