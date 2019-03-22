@@ -185,7 +185,7 @@ Function ConvertTo-URLEncoded {
         [String]$String
     )
 
-    [Net.WebUtility]::UrlEncode($String)
+    [Uri]::EscapeDataString($String)
 }
 
 # Beautify XML strings
