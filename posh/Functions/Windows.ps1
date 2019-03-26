@@ -1,3 +1,54 @@
+# Convert security descriptors between different formats
+Function Convert-SecurityDescriptor {
+    [CmdletBinding()]
+    Param(
+        [Parameter(ParameterSetName='Binary', Mandatory, ValueFromPipeline)]
+        [Byte[]]$BinarySD,
+
+        [Parameter(ParameterSetName='SDDL', Mandatory, ValueFromPipeline)]
+        [String]$SddlSD,
+
+        [Parameter(ParameterSetName='WMI', Mandatory, ValueFromPipeline)]
+        [Management.ManagementBaseObject]$WmiSD,
+
+        [Parameter(Mandatory)]
+        [ValidateSet('Binary', 'SDDL', 'WMI')]
+        [String]$TargetType
+    )
+
+    switch ($PSCmdlet.ParameterSetName) {
+        'Binary' {
+            if ($TargetType -eq 'SDDL') {
+                return ([wmiclass]'Win32_SecurityDescriptorHelper').BinarySDToSDDL($BinarySD).SDDL
+            } elseif ($TargetType -eq 'WMI') {
+                return ([wmiclass]'Win32_SecurityDescriptorHelper').BinarySDToWin32SD($BinarySD).Descriptor
+            }
+        }
+
+        'SDDL' {
+            if ($TargetType -eq 'Binary') {
+                return ([wmiclass]'Win32_SecurityDescriptorHelper').SDDLToBinarySD($SddlSD).BinarySD
+            } elseif ($TargetType -eq 'WMI') {
+                return ([wmiclass]'Win32_SecurityDescriptorHelper').SDDLToWin32SD($SddlSD).Descriptor
+            }
+        }
+
+        'WMI' {
+            if ($WmiSD.__CLASS -ne 'Win32_SecurityDescriptor') {
+                throw ('Expected Win32_SecurityDescriptor instance but received: {0}' -f $WmiSD.__CLASS)
+            }
+
+            if ($TargetType -eq 'Binary') {
+                return ([wmiclass]'Win32_SecurityDescriptorHelper').Win32SDToBinarySD($WmiSD).BinarySD
+            } elseif ($TargetType -eq 'SDDL') {
+                return ([wmiclass]'Win32_SecurityDescriptorHelper').Win32SDToSDDL($WmiSD).SDDL
+            }
+        }
+    }
+
+    throw 'Unable to convert security descriptor to same type as input.'
+}
+
 # Retrieve a persisted environment variable
 Function Get-EnvironmentVariable {
     [CmdletBinding()]
