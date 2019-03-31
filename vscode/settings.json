@@ -1,27 +1,36 @@
 {
-    // Editor
-    "editor.find.seedSearchStringFromSelection": false,
-    "editor.minimap.showSlider": "always",
+    // Text Editor
     "editor.renderWhitespace": "boundary",
+
+    // Text Editor: Find
+    "editor.find.seedSearchStringFromSelection": false,
+
+    // Text Editor: Minimap
+    "editor.minimap.showSlider": "always",
+
+    // Text Editor: Suggestions
     "editor.suggestSelection": "first",
 
-    // Explorer
-    "explorer.confirmDelete": false,
-    "explorer.confirmDragAndDrop": false,
-
-    // Files
+    // Text Editor: Files
     "files.autoSave": "onWindowChange",
     "files.trimTrailingWhitespace": true,
 
-    // Search
-    "search.usePCRE2": true,
-
-    // Telemetry
-    "telemetry.enableCrashReporter": false,
-    "telemetry.enableTelemetry": false,
-
     // Workbench
     "workbench.enableExperiments": false,
+
+    // Workbench: Appearance
+    "workbench.iconTheme": "vscode-icons",
+
+    // Features: Explorer
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+
+    // Features: Search
+    "search.usePCRE2": true,
+
+    // Application: Telemetry
+    "telemetry.enableCrashReporter": false,
+    "telemetry.enableTelemetry": false,
 
     // Language: PHP
     "php.suggest.basic": false,
@@ -92,7 +101,6 @@
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
 
     // Extension: vscode-icons
-    "workbench.iconTheme": "vscode-icons",
     "vsicons.dontShowNewVersionMessage": true,
     "vsicons.associations.files": [
         {
