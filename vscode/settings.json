@@ -26,6 +26,7 @@
     "explorer.confirmDragAndDrop": false,
 
     // Features: Search
+    "search.smartCase": true,
     "search.usePCRE2": true,
 
     // Application: Telemetry
