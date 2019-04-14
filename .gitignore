@@ -22,6 +22,9 @@ Thumbs.db
 [._]ss[a-gi-z]
 [._]sw[a-p]
 
+# Visual Studio Code
+.vscode/ipch
+
 # Temporary
 *~
 *.bak
