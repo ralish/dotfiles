@@ -69,6 +69,9 @@
 [submodule]
 	fetchJobs = 4
 
+[diff "utf-16"]
+	textconv = "iconv -f utf-16 -t utf-8"
+
 [filter "file-encoding"]
 	clean = "GIT_TMP=$(mktemp); GIT_FILE_TYPE=$(tee $GIT_TMP | file --brief --mime-encoding -); cat $GIT_TMP | iconv -sc -f $GIT_FILE_TYPE -t utf-8; rm -f $GIT_TMP"
 	smudge = "GIT_TMP=$(mktemp); GIT_FILE_TYPE=$(tee $GIT_TMP | file --brief --mime-encoding -); cat $GIT_TMP | iconv -sc -f utf-8 -t $GIT_FILE_TYPE; rm -f $GIT_TMP"
