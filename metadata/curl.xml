@@ -7,7 +7,7 @@
     </Detection>
 
     <InstallPath>
-        <SpecialFolder>ApplicationData</SpecialFolder>
+        <HideSymlinks>true</HideSymlinks>
     </InstallPath>
 
     <RenamePaths>
