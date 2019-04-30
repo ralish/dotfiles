@@ -18,14 +18,10 @@ REM Use something like: IF NOT DEFINED SetupEnv Path\To\SetupEnv.Cmd
 SET SetupEnv=Yes
 
 REM Paths to applications we reference later for additional setup
-SET SubText2RegPath=HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\Sublime Text 2_is1
 IF DEFINED ProgramFiles(x86) (
     SET AnsiConPath="%ProgramFiles(x86)%\ANSICON\ansicon.exe"
-    SET DepWalk32Path="%ProgramFiles(x86)%\Dependency Walker\depends.exe"
-    SET DepWalk64Path="%ProgramFiles%\Dependency Walker\depends.exe"
 ) ELSE (
     SET AnsiConPath="%ProgramFiles%\ANSICON\ansicon.exe"
-    SET DepWalk32Path="%ProgramFiles%\Dependency Walker\depends.exe"
 )
 
 REM Output a message that our configuration is being applied
@@ -86,41 +82,6 @@ DOSKEY clear=cls $*
 DOSKEY ls=dir $*
 DOSKEY man=help $*
 DOSKEY which=where $*
-
-REM Add alias for Dependency Walker x86
-IF EXIST %DepWalk32Path% (
-    IF DEFINED SetupEnvVerbose ECHO * [Dependency Walker x86] Adding alias: depends32
-    DOSKEY depends32=%DepWalk32Path% $*
-) ELSE (
-    IF DEFINED SetupEnvVerbose ECHO * [Dependency Walker x86] Couldn't locate at path specified by DepWalk32Path.
-)
-SET DepWalk32Path=
-
-REM Add alias for Dependency Walker x64
-IF EXIST %DepWalk64Path% (
-    IF DEFINED SetupEnvVerbose ECHO * [Dependency Walker x64] Adding alias: depends64
-    DOSKEY depends64=%DepWalk64Path% $*
-) ELSE (
-    IF DEFINED SetupEnvVerbose ECHO * [Dependency Walker x64] Couldn't locate at path specified by DepWalk64Path.
-)
-SET DepWalk64Path=
-
-REM Add alias for Sublime Text 2
-WHERE /Q subl.exe
-IF ERRORLEVEL 0 (
-    IF DEFINED SetupEnvVerbose ECHO * [Sublime Text 2] Skipping as found a Sublime Text 3 installation.
-) ELSE (
-    SET SubText2BinName=sublime_text.exe
-    REG QUERY "%SubText2RegPath%" /v InstallLocation > NUL 2>&1
-    IF ERRORLEVEL 1 (
-        IF DEFINED SetupEnvVerbose ECHO * [Sublime Text 2] Couldn't locate via path specified by SubText2RegPath.
-    ) ELSE (
-        IF DEFINED SetupEnvVerbose ECHO * [Sublime Text 2] Adding alias: subl
-        FOR /F "tokens=2*" %%a IN ('REG QUERY "%SubText2RegPath%" /v InstallLocation ^| FINDSTR /R "[a-z]:\\.*\\$"') DO @SET SubText2DirPath=%%b
-    )
-    IF DEFINED SubText2DirPath DOSKEY subl="%SubText2DirPath%%SubText2BinName%" $*
-)
-FOR /F "delims==" %%i IN ('SET SubText2') DO @SET %%i=
 
 REM Final clean-up
 SET SetupEnvVerbose=
