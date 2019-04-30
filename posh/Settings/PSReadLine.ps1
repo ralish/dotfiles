@@ -50,3 +50,15 @@ Set-PSReadlineKeyHandler `
             [Microsoft.PowerShell.PSConsoleReadLine]::EndOfLine()
         }
     }
+
+if (Test-IsWindows) {
+    if (Get-Command -Name concfg -ErrorAction Ignore) {
+        Write-Verbose -Message '[dotfiles] Loading ConCfg settings ...'
+
+        # Set PSReadline colours based on theme
+        & concfg tokencolor -n enable
+    } else {
+        Write-Verbose -Message '[dotfiles] Skipping ConCfg settings as unable to locate concfg.'
+        continue
+    }
+}
