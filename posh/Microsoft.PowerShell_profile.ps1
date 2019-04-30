@@ -18,10 +18,3 @@ if (Test-Path -Path $PoshScriptsPath -PathType Container) {
     $env:Path = '{0};{1}' -f $PoshScriptsPath, $env:Path
 }
 Remove-Variable -Name PoshScriptsPath
-
-# Source profile configuration which must be run last
-$PoshFinalizePath = Join-Path -Path $PSScriptRoot -ChildPath 'Finalize.ps1'
-if (Test-Path -Path $PoshFinalizePath -PathType Leaf) {
-    . $PoshFinalizePath
-}
-Remove-Variable -Name PoshFinalizePath
