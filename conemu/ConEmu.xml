@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software">
 	<key name="ConEmu">
-		<key name=".Vanilla" modified="2019-04-30 11:06:40" build="190303">
+		<key name=".Vanilla" modified="2019-04-30 11:12:37" build="190303">
 			<value name="ColorTable00" type="dword" data="00362b00"/>
 			<value name="ColorTable01" type="dword" data="00423607"/>
-			<value name="ColorTable02" type="dword" data="0098a12a"/>
-			<value name="ColorTable03" type="dword" data="00756e58"/>
-			<value name="ColorTable04" type="dword" data="00164bcb"/>
-			<value name="ColorTable05" type="dword" data="00542388"/>
-			<value name="ColorTable06" type="dword" data="00005875"/>
+			<value name="ColorTable02" type="dword" data="00756e58"/>
+			<value name="ColorTable03" type="dword" data="00837b65"/>
+			<value name="ColorTable04" type="dword" data="002f32dc"/>
+			<value name="ColorTable05" type="dword" data="00c4716c"/>
+			<value name="ColorTable06" type="dword" data="00164bcb"/>
 			<value name="ColorTable07" type="dword" data="00d5e8ee"/>
 			<value name="ColorTable08" type="dword" data="00a1a193"/>
-			<value name="ColorTable09" type="dword" data="00c4716c"/>
+			<value name="ColorTable09" type="dword" data="00d28b26"/>
 			<value name="ColorTable10" type="dword" data="00009985"/>
-			<value name="ColorTable11" type="dword" data="00d28b26"/>
-			<value name="ColorTable12" type="dword" data="002f32dc"/>
+			<value name="ColorTable11" type="dword" data="0098a12a"/>
+			<value name="ColorTable12" type="dword" data="00969483"/>
 			<value name="ColorTable13" type="dword" data="008236d3"/>
 			<value name="ColorTable14" type="dword" data="000089b5"/>
 			<value name="ColorTable15" type="dword" data="00e3f6fd"/>
