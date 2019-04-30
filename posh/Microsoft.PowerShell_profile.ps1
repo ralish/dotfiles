@@ -12,13 +12,6 @@ if (Test-Path -Path $PoshSettingsPath -PathType Container) {
 }
 Remove-Variable -Name PoshSettingsPath
 
-# Source custom aliases
-$PoshAliasesPath = Join-Path -Path $PSScriptRoot -ChildPath 'Aliases.ps1'
-if (Test-Path -Path $PoshAliasesPath -PathType Leaf) {
-    . $PoshAliasesPath
-}
-Remove-Variable -Name PoshAliasesPath
-
 # Amend the search path to include our scripts directory
 $PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
 if (Test-Path -Path $PoshScriptsPath -PathType Container) {
