@@ -1,16 +1,16 @@
-# Source custom settings
-$PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
-if (Test-Path -Path $PoshSettingsPath -PathType Container) {
-    Get-ChildItem -Path $PoshSettingsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
-}
-Remove-Variable -Name PoshSettingsPath
-
 # Source custom functions
 $PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
 if (Test-Path -Path $PoshFunctionsPath -PathType Container) {
     Get-ChildItem -Path $PoshFunctionsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
 }
 Remove-Variable -Name PoshFunctionsPath
+
+# Source custom settings
+$PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
+if (Test-Path -Path $PoshSettingsPath -PathType Container) {
+    Get-ChildItem -Path $PoshSettingsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
+}
+Remove-Variable -Name PoshSettingsPath
 
 # Source custom aliases
 $PoshAliasesPath = Join-Path -Path $PSScriptRoot -ChildPath 'Aliases.ps1'
