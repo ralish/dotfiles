@@ -1,3 +1,7 @@
+if (!(Test-IsWindows)) {
+    return
+}
+
 # Load our custom formatting data
 Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml')
 

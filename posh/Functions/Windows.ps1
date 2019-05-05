@@ -1,3 +1,7 @@
+if (!(Test-IsWindows)) {
+    return
+}
+
 # Convert security descriptors between different formats
 Function Convert-SecurityDescriptor {
     [CmdletBinding()]

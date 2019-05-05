@@ -1,3 +1,7 @@
+if (!(Test-IsWindows)) {
+    return
+}
+
 # Load our custom formatting data
 Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1xml')
 
