@@ -29,6 +29,9 @@
     "search.smartCase": true,
     "search.usePCRE2": true,
 
+    // Features: Terminal
+    "terminal.integrated.fontFamily": "Hack",
+
     // Application: Telemetry
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
