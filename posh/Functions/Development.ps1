@@ -96,3 +96,42 @@ Function Invoke-GitChildDir {
 
     Set-Location -Path $OrigLocation
 }
+
+Function Invoke-GitMergeAllBranches {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
+    [CmdletBinding()]
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [String]$SourceBranch='master'
+    )
+
+    $Branches = @()
+    & git branch | ForEach-Object {
+        $Branches += $_.TrimStart('* ')
+        if ($_.StartsWith('* ')) {
+            $CurrentBranch = $_.TrimStart('* ')
+        }
+    }
+
+    if ($SourceBranch -notin $Branches) {
+        throw ('Source branch for merge does not exist locally: {0}' -f $SourceBranch)
+    }
+
+    if ($SourceBranch -ne $CurrentBranch) {
+        & git checkout $SourceBranch
+        Write-Host ''
+    }
+
+    foreach ($Branch in $Branches) {
+        if ($Branch -eq $SourceBranch) {
+            continue
+        }
+
+        Write-Host -ForegroundColor Green ('Updating branch: {0}' -f $Branch)
+        & git checkout $Branch
+        & git merge --ff-only $SourceBranch
+        Write-Host ''
+    }
+
+    & git checkout $SourceBranch
+}
