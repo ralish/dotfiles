@@ -127,11 +127,6 @@ Function Update-Office {
 
     # The new Update Now feature for Office 2013 Click-to-Run for Office365 and its associated command-line and switches
     # https://blogs.technet.microsoft.com/odsupport/2014/03/03/the-new-update-now-feature-for-office-2013-click-to-run-for-office365-and-its-associated-command-line-and-switches/
-    #
-    # The update runs asynchronously as there's no parameter to request waiting
-    # for update completion. This behaviour can be emulated by watching various
-    # registry keys but it's grotesque. The Wait-ForOfficeCTRUpdate function in
-    # the Update-Office365Anywhere.ps1 script would make a good starting point.
 
     if (!(Test-IsAdministrator)) {
         throw 'You must have administrator privileges to perform Office updates.'
@@ -145,6 +140,48 @@ Function Update-Office {
 
     Write-Host -ForegroundColor Green -Object 'Installing Office updates ...'
     Start-Process -FilePath $OfficeC2RClient -ArgumentList @('/update', 'user', 'updatepromptuser=True') -NoNewWindow -Wait
+    Start-Sleep -Seconds 3
+
+    do {
+        $OfficeRegPath = 'HKLM:\Software\Microsoft\Office\ClickToRun'
+        $OfficeRegKey = Get-Item -Path $OfficeRegPath
+
+        $ExecutingScenario = $OfficeRegKey.GetValue('ExecutingScenario')
+        if ($ExecutingScenario) {
+            if ($ExecutingScenario -ne $ExecutingScenarioPrevious) {
+                $ExecutingScenarioPrevious = $ExecutingScenario
+                Write-Verbose -Message ('Office update currently running scenario: {0}' -f $ExecutingScenario)
+            }
+        } else {
+            $LastScenario = $OfficeRegKey.GetValue('LastScenario')
+            $LastScenarioResult = $OfficeRegKey.GetValue('LastScenarioResult')
+            break
+        }
+
+        $TasksRegPath = Join-Path -Path $OfficeRegPath -ChildPath ('Scenario\{0}\TasksState' -f $ExecutingScenario)
+        $TasksRegKey = Get-Item -Path $TasksRegPath
+
+        foreach ($Task in $TasksRegKey.GetValueNames()) {
+            $TaskName = $Task.Split(':')[0]
+            $TaskStatus = $TasksRegKey.GetValue($Task)
+
+            if ($TaskStatus -eq 'TASKSTATE_FAILED') {
+                Write-Warning -Message ('Office update task failed in {0} scenario: {1}' -f $ExecutingScenario, $TaskName)
+            }
+
+            if ($TaskStatus -eq 'TASKSTATE_CANCELLED') {
+                Write-Warning -Message ('Office update task cancelled in {0} scenario: {1}' -f $ExecutingScenario, $TaskName)
+            }
+        }
+
+        Start-Sleep -Seconds 5
+    } while ($true)
+
+    Write-Verbose -Message ('Office update finished {0} scenario with result: {1}' -f $LastScenario, $LastScenarioResult)
+    if ($LastScenarioResult -ne 'Success') {
+        return $false
+    }
+
     return $true
 }
 
