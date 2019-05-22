@@ -74,6 +74,7 @@ Function Invoke-GitChildDir {
 
     $OrigLocation = Get-Location
     Set-Location -Path $Path
+    $BaseLocation = Get-Location
 
     $Dirs = Get-ChildItem -Directory
     foreach ($Dir in $Dirs) {
@@ -90,7 +91,7 @@ Function Invoke-GitChildDir {
         Write-Host -ForegroundColor Green -Object ('Running in: {0}' -f $Dir.Name)
         Set-Location -Path $Dir
         & git @GitArgs
-        Set-Location -Path $Path
+        Set-Location -Path $BaseLocation
         Write-Host
     }
 
