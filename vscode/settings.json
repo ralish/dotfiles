@@ -21,6 +21,9 @@
     // Workbench: Appearance
     "workbench.iconTheme": "vscode-icons",
 
+    // Workbench: Navigation
+    "breadcrumbs.enabled": true,
+
     // Features: Explorer
     "explorer.confirmDelete": false,
     "explorer.confirmDragAndDrop": false,
