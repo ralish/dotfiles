@@ -1,0 +1,10 @@
+; ----------------------------------------------------------------------
+; PARSING User POLICY
+
+User
+Software\Microsoft\Windows\CurrentVersion\Policies\Explorer
+HideSCAVolume
+DWORD:1
+
+; PARSING COMPLETED.
+; ----------------------------------------------------------------------
