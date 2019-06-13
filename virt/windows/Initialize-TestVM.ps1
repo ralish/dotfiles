@@ -10,6 +10,21 @@ Function Optimize-WindowsFeatures {
     Install-WindowsFeature -Name NET-Framework-Core -Source $NetFx35SourcePath
 }
 
+Function Optimize-WindowsPowerShell {
+    [CmdletBinding()]
+    Param()
+
+    if (!($PSVersionTable.PSVersion.Major -gt 5 -or ($PSVersionTable.PSVersion.Major -eq 5 -and $PSVersionTable.PSVersion.Minor -ge 1))) {
+        Write-Warning 'Skipping PowerShell settings as version is not 5.1 or newer.'
+        return
+    }
+
+    Write-Host -ForegroundColor Green 'Optimising Windows PowerShell ...'
+
+    Install-PackageProvider -Name NuGet -Force
+    Install-Module -Name @('PSWindowsUpdate', 'PSWinGlue', 'PSWinVitals', 'SpeculationControl') -Scope AllUsers -Force
+}
+
 Function Optimize-WindowsSettings {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
@@ -74,3 +89,4 @@ Function Set-RegistryValue {
 Optimize-WindowsSettings
 Optimize-WindowsUpdate
 Optimize-WindowsFeatures
+Optimize-WindowsPowerShell
