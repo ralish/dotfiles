@@ -38,8 +38,18 @@ Function Get-ADShadowPrincipalContainer {
     [CmdletBinding()]
     Param()
 
-    $Dc = Get-ADDomainController -Discover -NextClosestSite
-    $RootDse = Get-ADRootDSE -Server $Dc.HostName.Value
+    try {
+        $Dc = Get-ADDomainController -Discover -NextClosestSite -ErrorAction Stop
+    } catch {
+        throw $_
+    }
+
+    try {
+        $RootDse = Get-ADRootDSE -Server $Dc.HostName.Value -ErrorAction Stop
+    } catch {
+        throw $_
+    }
+
     $SpcDn = 'CN=Shadow Principal Configuration,CN=Services,{0}' -f $RootDse.configurationNamingContext
 
     return $SpcDn
@@ -57,8 +67,17 @@ Function Get-ADShadowPrincipalSid {
         [int]$Rid
     )
 
-    $Dc = Get-ADDomainController -DomainName $Domain -Discover -NextClosestSite
-    $RootDse = Get-ADRootDSE -Server $Dc.HostName.Value
+    try {
+        $Dc = Get-ADDomainController -DomainName $Domain -Discover -NextClosestSite -ErrorAction Stop
+    } catch {
+        throw $_
+    }
+
+    try {
+        $RootDse = Get-ADRootDSE -Server $Dc.HostName.Value -ErrorAction Stop
+    } catch {
+        throw $_
+    }
 
     $DomainIdentifier = Get-ADObject -Server $Dc.HostName.Value -Identity $RootDse.defaultNamingContext -Properties objectSid
     [System.Security.Principal.SecurityIdentifier]$Sid = '{0}-{1}' -f $DomainIdentifier.objectSid.Value, $Rid
