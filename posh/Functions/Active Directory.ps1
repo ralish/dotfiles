@@ -55,36 +55,6 @@ Function Get-ADShadowPrincipalContainer {
     return $SpcDn
 }
 
-# Retrieve the SID for a given RID in the specified domain
-Function Get-ADShadowPrincipalSid {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [String]$Domain,
-
-        [Parameter(Mandatory)]
-        [ValidateRange(0, 2147483647)]
-        [int]$Rid
-    )
-
-    try {
-        $Dc = Get-ADDomainController -DomainName $Domain -Discover -NextClosestSite -ErrorAction Stop
-    } catch {
-        throw $_
-    }
-
-    try {
-        $RootDse = Get-ADRootDSE -Server $Dc.HostName.Value -ErrorAction Stop
-    } catch {
-        throw $_
-    }
-
-    $DomainIdentifier = Get-ADObject -Server $Dc.HostName.Value -Identity $RootDse.defaultNamingContext -Properties objectSid
-    [System.Security.Principal.SecurityIdentifier]$Sid = '{0}-{1}' -f $DomainIdentifier.objectSid.Value, $Rid
-
-    return $Sid
-}
-
 # Create a shadow principal
 Function New-ADShadowPrincipal {
     [CmdletBinding()]
