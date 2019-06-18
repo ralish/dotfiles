@@ -73,7 +73,7 @@ Function Invoke-GitChildDir {
     }
 
     $OrigLocation = Get-Location
-    Set-Location -Path $Path
+    Set-Location -Path $Path -ErrorAction Stop
     $BaseLocation = Get-Location
 
     $Dirs = Get-ChildItem -Directory
