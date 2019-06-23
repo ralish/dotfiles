@@ -106,7 +106,7 @@ Function Get-NonInheritedACL {
 
     $ACLMatches = @()
     foreach ($Directory in $Directories) {
-        $ACL = Get-ACL -Path $Directory.FullName
+        $ACL = Get-ACL -LiteralPath $Directory.FullName
         $ACLNonInherited = $ACL.Access | Where-Object { $_.IsInherited -eq $false }
 
         if (!$ACLNonInherited) {
