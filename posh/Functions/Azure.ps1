@@ -14,10 +14,15 @@ Function Connect-AzureAD {
         [PSCredential]$Credential
     )
 
-    Test-ModuleAvailable -Name AzureAD
+    if (Test-ModuleAvailable -Name AzureADPreview -Return Boolean) {
+        $ModuleName = 'AzureADPreview'
+    } else {
+        Test-ModuleAvailable -Name AzureAD
+        $ModuleName = 'AzureAD'
+    }
 
     Write-Host -ForegroundColor Green -Object 'Connecting to Azure AD (v2) ...'
-    AzureAD\Connect-AzureAD @PSBoundParameters
+    & $ModuleName\Connect-AzureAD @PSBoundParameters
 }
 
 # Helper function to connect to Azure Resource Manager

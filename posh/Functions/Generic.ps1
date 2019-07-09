@@ -301,13 +301,24 @@ Function Test-ModuleAvailable {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [String[]]$Name
+        [String[]]$Name,
+
+        [ValidateSet('Boolean', 'Exception')]
+        [String]$Return='Exception'
     )
 
     foreach ($Module in $Name) {
         Write-Verbose -Message ('Checking module is available: {0}' -f $Module)
-        if (!(Get-Module -Name $Module -ListAvailable)) {
-            throw ('Required module not available: {0}' -f $Module)
+        if (Get-Module -Name $Module -ListAvailable) {
+            if ($Return -eq 'Boolean') {
+                return $true
+            }
+        } else {
+            if ($Return -eq 'Boolean') {
+                return $false
+            } else {
+                throw ('Required module not available: {0}' -f $Module)
+            }
         }
     }
 }
