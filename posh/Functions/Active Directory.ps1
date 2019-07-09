@@ -2,6 +2,92 @@ if (!(Test-IsWindows)) {
     return
 }
 
+# Load our custom formatting data
+Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml')
+
+#region Helper functions
+# Resolve various types of AD GUIDs
+Function Resolve-ADGuid {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [ValidateSet('ExtendedRight', 'SchemaObject')]
+        [String]$Type,
+
+        [Parameter(ValueFromPipeline)]
+        [Guid[]]$Guid,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$Server
+    )
+
+    Begin {
+        $ADObjects = @()
+
+        $CommonParams = @{
+            ErrorAction = 'Stop'
+        }
+
+        if ($Server) {
+            $CommonParams.Add('Server', $Server)
+        }
+
+        try {
+            $RootDse = Get-ADRootDSE @CommonParams
+        } catch {
+            throw $_
+        }
+    }
+
+    Process {
+        foreach ($ADGuid in $Guid) {
+            switch ($Type) {
+                'ExtendedRight' {
+                    $AdFilter = 'objectClass -eq "controlAccessRight"'
+                    if ($Guid) {
+                        # The single quoted variable is intentional! It's resolved
+                        # at runtime by the ActiveDirectory Get-ADObject cmdlet.
+                        $AdFilter = '{0} -and rightsGuid -eq $ADGuid' -f $AdFilter
+                    }
+
+                    $ADObjects += Get-ADObject @CommonParams -SearchBase $RootDse.configurationNamingContext -Filter $AdFilter -Properties *
+                }
+
+                'SchemaObject' {
+                    if ($Guid) {
+                        # The single quoted variable is intentional! It's resolved
+                        # at runtime by the ActiveDirectory Get-ADObject cmdlet.
+                        $AdFilter = 'schemaIDGUID -eq $ADGuid'
+                    } else {
+                        $AdFilter = '*'
+                    }
+
+                    $ADObjects += Get-ADObject @CommonParams -SearchBase $RootDse.schemaNamingContext -Filter $AdFilter -Properties *
+                }
+            }
+        }
+    }
+
+    End {
+        switch ($Type) {
+            'ExtendedRight' {
+                foreach ($ADObject in $ADObjects) {
+                    $ADObject.PSObject.TypeNames.Insert(0, 'Microsoft.ActiveDirectory.Management.ADObject.ControlAccessRight')
+                }
+            }
+
+            'SchemaObject' {
+                foreach ($ADObject in $ADObjects) {
+                    $ADObject.PSObject.TypeNames.Insert(0, 'Microsoft.ActiveDirectory.Management.ADObject.SchemaObject')
+                }
+            }
+        }
+
+        return $ADObjects
+    }
+}
+#endregion
+
 #region Shadow security principals
 # Add members to a shadow principal
 Function Add-ADShadowPrincipalMember {
