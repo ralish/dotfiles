@@ -21,7 +21,7 @@ Function Optimize-WindowsPowerShell {
 
     Write-Host -ForegroundColor Green 'Optimising Windows PowerShell ...'
 
-    Install-PackageProvider -Name NuGet -Force
+    $null = Install-PackageProvider -Name NuGet -Force
     Install-Module -Name @('PSWindowsUpdate', 'PSWinGlue', 'PSWinVitals', 'SpeculationControl') -Scope AllUsers -Force
 }
 
