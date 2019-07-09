@@ -10,6 +10,14 @@ Function Optimize-WindowsFeatures {
     Install-WindowsFeature -Name NET-Framework-Core -Source $NetFx35SourcePath
 }
 
+Function Optimize-WindowsImage {
+    [CmdletBinding()]
+    Param()
+
+    Write-Host -ForegroundColor Green 'Performing component store clean-up ...'
+    & dism.exe /Online /Cleanup-Image /StartComponentCleanup
+}
+
 Function Optimize-WindowsPowerShell {
     [CmdletBinding()]
     Param()
@@ -90,3 +98,4 @@ Optimize-WindowsSettings
 Optimize-WindowsUpdate
 Optimize-WindowsFeatures
 Optimize-WindowsPowerShell
+Optimize-WindowsImage
