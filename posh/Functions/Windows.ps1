@@ -6,7 +6,7 @@ if (!(Test-IsWindows)) {
 Function Convert-SecurityDescriptor {
     [CmdletBinding()]
     Param(
-        [Parameter(ParameterSetName='Binary', Mandatory, ValueFromPipeline)]
+        [Parameter(ParameterSetName='Binary', Mandatory)]
         [Byte[]]$BinarySD,
 
         [Parameter(ParameterSetName='SDDL', Mandatory, ValueFromPipeline)]
