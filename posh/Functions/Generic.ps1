@@ -169,11 +169,13 @@ Function ConvertTo-TextEncoding {
     }
 
     Process {
-        $Item = Get-Item -Path $File
-        $Content = Get-Content -Path $Item
+        foreach ($TextFile in $File) {
+            $Item = Get-Item -Path $TextFile
+            $Content = Get-Content -Path $Item
 
-        Write-Verbose -Message ('Converting: {0}' -f $Item.FullName)
-        [IO.File]::WriteAllLines($Item.FullName, $Content, $Encoder)
+            Write-Verbose -Message ('Converting: {0}' -f $Item.FullName)
+            [IO.File]::WriteAllLines($Item.FullName, $Content, $Encoder)
+        }
     }
 }
 
