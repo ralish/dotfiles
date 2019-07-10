@@ -22,8 +22,6 @@ Function Resolve-ADGuid {
     )
 
     Begin {
-        $ADObjects = @()
-
         $CommonParams = @{
             ErrorAction = 'Stop'
         }
@@ -50,7 +48,11 @@ Function Resolve-ADGuid {
                         $AdFilter = '{0} -and rightsGuid -eq $ADGuid' -f $AdFilter
                     }
 
-                    $ADObjects += Get-ADObject @CommonParams -SearchBase $RootDse.configurationNamingContext -Filter $AdFilter -Properties *
+                    $ADObject = Get-ADObject @CommonParams -SearchBase $RootDse.configurationNamingContext -Filter $AdFilter -Properties *
+                    if ($ADObject) {
+                        $ADObject.PSObject.TypeNames.Insert(0, 'Microsoft.ActiveDirectory.Management.ADObject.ControlAccessRight')
+                        $ADObject
+                    }
                 }
 
                 'SchemaObject' {
@@ -62,28 +64,14 @@ Function Resolve-ADGuid {
                         $AdFilter = '*'
                     }
 
-                    $ADObjects += Get-ADObject @CommonParams -SearchBase $RootDse.schemaNamingContext -Filter $AdFilter -Properties *
+                    $ADObject = Get-ADObject @CommonParams -SearchBase $RootDse.schemaNamingContext -Filter $AdFilter -Properties *
+                    if ($ADObject) {
+                        $ADObject.PSObject.TypeNames.Insert(0, 'Microsoft.ActiveDirectory.Management.ADObject.SchemaObject')
+                        $ADObject
+                    }
                 }
             }
         }
-    }
-
-    End {
-        switch ($Type) {
-            'ExtendedRight' {
-                foreach ($ADObject in $ADObjects) {
-                    $ADObject.PSObject.TypeNames.Insert(0, 'Microsoft.ActiveDirectory.Management.ADObject.ControlAccessRight')
-                }
-            }
-
-            'SchemaObject' {
-                foreach ($ADObject in $ADObjects) {
-                    $ADObject.PSObject.TypeNames.Insert(0, 'Microsoft.ActiveDirectory.Management.ADObject.SchemaObject')
-                }
-            }
-        }
-
-        return $ADObjects
     }
 }
 #endregion
