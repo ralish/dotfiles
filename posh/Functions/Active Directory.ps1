@@ -14,8 +14,11 @@ Function Resolve-ADGuid {
         [ValidateSet('ExtendedRight', 'SchemaObject')]
         [String]$Type,
 
-        [Parameter(ValueFromPipeline)]
+        [Parameter(ParameterSetName='Guid', ValueFromPipeline)]
         [Guid[]]$Guid,
+
+        [Parameter(ParameterSetName='All')]
+        [Switch]$All,
 
         [ValidateNotNullOrEmpty()]
         [String]$Server
@@ -35,43 +38,61 @@ Function Resolve-ADGuid {
         } catch {
             throw $_
         }
+
+        switch ($Type) {
+            'ExtendedRight' {
+                $SearchBase = $RootDse.configurationNamingContext
+                $TypeName = 'Microsoft.ActiveDirectory.Management.ADObject.ControlAccessRight'
+            }
+
+            'SchemaObject' {
+                $SearchBase = $RootDse.schemaNamingContext
+                $TypeName = 'Microsoft.ActiveDirectory.Management.ADObject.SchemaObject'
+            }
+        }
+
+        $SearchFilters = @()
     }
 
     Process {
-        foreach ($ADGuid in $Guid) {
-            switch ($Type) {
-                'ExtendedRight' {
-                    $AdFilter = 'objectClass -eq "controlAccessRight"'
-                    if ($Guid) {
-                        # The single quoted variable is intentional! It's resolved
-                        # at runtime by the ActiveDirectory Get-ADObject cmdlet.
-                        $AdFilter = '{0} -and rightsGuid -eq $ADGuid' -f $AdFilter
+        if ($PSCmdlet.ParameterSetName -eq 'Guid') {
+            foreach ($ADGuid in $Guid) {
+                switch ($Type) {
+                    'ExtendedRight' {
+                        $SearchFilters += '(&(objectClass=controlAccessRight)(rightsGuid={0}))' -f $ADGuid
                     }
 
-                    $ADObject = Get-ADObject @CommonParams -SearchBase $RootDse.configurationNamingContext -Filter $AdFilter -Properties *
-                    if ($ADObject) {
-                        $ADObject.PSObject.TypeNames.Insert(0, 'Microsoft.ActiveDirectory.Management.ADObject.ControlAccessRight')
-                        $ADObject
-                    }
-                }
-
-                'SchemaObject' {
-                    if ($Guid) {
-                        # The single quoted variable is intentional! It's resolved
-                        # at runtime by the ActiveDirectory Get-ADObject cmdlet.
-                        $AdFilter = 'schemaIDGUID -eq $ADGuid'
-                    } else {
-                        $AdFilter = '*'
-                    }
-
-                    $ADObject = Get-ADObject @CommonParams -SearchBase $RootDse.schemaNamingContext -Filter $AdFilter -Properties *
-                    if ($ADObject) {
-                        $ADObject.PSObject.TypeNames.Insert(0, 'Microsoft.ActiveDirectory.Management.ADObject.SchemaObject')
-                        $ADObject
+                    'SchemaObject' {
+                        $GuidOctetString = '\{0}' -f [System.String]::Join('\', ($ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') }))
+                        $SearchFilters += '(schemaIDGUID={0})' -f $GuidOctetString
                     }
                 }
             }
+        } else {
+            switch ($Type) {
+                'ExtendedRight' {
+                    $SearchFilters += '(objectClass=controlAccessRight)'
+                }
+
+                'SchemaObject' {
+                    $SearchFilters += '(objectClass=*)'
+                }
+            }
         }
+    }
+
+    End {
+        $ADObjects = @()
+
+        foreach ($SearchFilter in $SearchFilters) {
+            $ADObjects += Get-ADObject @CommonParams -SearchBase $SearchBase -LDAPFilter $SearchFilter -Properties *
+        }
+
+        foreach ($ADObject in $ADObjects) {
+            $ADObject.PSObject.TypeNames.Insert(0, $TypeName)
+        }
+
+        return $ADObjects
     }
 }
 #endregion

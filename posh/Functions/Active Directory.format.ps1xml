@@ -9,7 +9,7 @@
             <TableControl>
                 <TableHeaders>
                     <TableColumnHeader>
-                        <Label>RightsGUID</Label>
+                        <Label>RightsGuid</Label>
                     </TableColumnHeader>
                     <TableColumnHeader />
                     <TableColumnHeader />
@@ -38,7 +38,9 @@
             </ViewSelectedBy>
             <TableControl>
                 <TableHeaders>
-                    <TableColumnHeader />
+                    <TableColumnHeader>
+                        <Label>SchemaIdGuid</Label>
+                    </TableColumnHeader>
                     <TableColumnHeader />
                     <TableColumnHeader>
                         <Label>LdapDisplayName</Label>
@@ -48,7 +50,7 @@
                     <TableRowEntry>
                         <TableColumnItems>
                             <TableColumnItem>
-                                <PropertyName>ObjectGUID</PropertyName>
+                                <ScriptBlock>[Guid]::new($_.schemaIDGUID)</ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Name</PropertyName>
