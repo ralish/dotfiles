@@ -279,6 +279,7 @@ Function Update-VisualStudio {
 
 # Update Microsoft Windows
 Function Update-Windows {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param()
 
