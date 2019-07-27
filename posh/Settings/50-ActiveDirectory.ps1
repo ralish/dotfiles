@@ -16,6 +16,7 @@ $ADUserIgnoredProperties = @(
     'lastLogoff',
     'logonCount',
     'mS-DS-ConsistencyGuid',
+    'msDS-KeyCredentialLink',
     'uSNChanged',
     'uSNCreated',
 
@@ -52,5 +53,6 @@ $ADUserIgnoredProperties = @(
     'objectSid',
 
     # Interesting but duplicated properties
+    'mail'                  # EmailAddress
     'sn'                    # Surname
 )
