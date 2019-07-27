@@ -81,13 +81,19 @@ Function Compare-ObjectProperties {
         [PSObject]$ReferenceObject,
 
         [Parameter(Mandatory)]
-        [PSObject]$DifferenceObject
+        [PSObject]$DifferenceObject,
+
+        [String[]]$IgnoredProperties
     )
 
     $ObjProps = @()
     $ObjProps += $ReferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty Name
     $ObjProps += $DifferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty Name
     $ObjProps = $ObjProps | Sort-Object | Select-Object -Unique
+
+    if ($IgnoredProperties) {
+        $ObjProps = $ObjProps | Where-Object { $_ -notin $IgnoredProperties }
+    }
 
     $ObjDiffs = @()
     foreach ($Property in $ObjProps) {
