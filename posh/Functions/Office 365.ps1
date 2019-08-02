@@ -348,59 +348,97 @@ Function Get-MailboxActivitySummary {
     return $Summary
 }
 
-# Retrieve a summary of users with delegates or forwarding rules
+# Retrieve a security report for all users
 # Improved version of: https://github.com/OfficeDev/O365-InvestigationTooling/blob/master/DumpDelegatesandForwardingRules.ps1
-Function Get-MailboxDelegatesAndForwardingRules {
+Function Get-Office365UserSecurityReport {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param()
 
     Test-CommandAvailable -Name @('Get-InboxRule', 'Get-Mailbox', 'Get-MailboxPermission', 'Get-MsolUser')
 
-    $Delegates = @()
-    $ForwardingRules = @()
+    $MailboxCalendar = @()
+    $MailboxDelegates = @()
     $MailboxForwarding = @()
+    $MailboxForwardingRules = @()
+    $MailboxSendAs = @()
+    $MailboxSendOnBehalf = @()
 
-    $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop | Where-Object { $_.UserType -ne 'Guest' }
-
-    $Users | ForEach-Object {
-        Add-Member -InputObject $_ -MemberType ScriptProperty -Name IsFederated -Value { if ($null -ne $this.ImmutableId) { $true } else { $false } }
-        Add-Member -InputObject $_ -MemberType ScriptProperty -Name StrongAuthenticationState -Value { $this.StrongAuthenticationRequirements.State }
-        $_.PSObject.TypeNames.Insert(0, 'Microsoft.Online.Administration.User.Security')
-    }
+    $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop |
+        Where-Object {
+            $_.UserType -ne 'Guest'
+        } | ForEach-Object {
+            Add-Member -InputObject $_ -MemberType ScriptProperty -Name IsFederated -Value { if ($null -ne $this.ImmutableId) { $true } else { $false } }
+            Add-Member -InputObject $_ -MemberType ScriptProperty -Name StrongAuthenticationState -Value { $this.StrongAuthenticationRequirements.State }
+            $_.PSObject.TypeNames.Insert(0, 'Microsoft.Online.Administration.User.Security')
+            $_
+        }
 
     $Mailboxes = Get-Mailbox -ResultSize Unlimited
-
-    $MailboxForwarding += $Mailboxes |
-        Where-Object { $null -ne $_.ForwardingSmtpAddress }
-
-    $MailboxForwarding | ForEach-Object {
-        $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Security')
-    }
-
     foreach ($Mailbox in $Mailboxes) {
-        Write-Verbose -Message ('Checking delegates and forwarding rules for user: {0}' -f $Mailbox.UserPrincipalName)
+        Write-Verbose -Message ('Inspecting mailbox: {0}' -f $Mailbox.UserPrincipalName)
 
-        $Delegates += Get-MailboxPermission -Identity $Mailbox.UserPrincipalName |
-            Where-Object { ($_.IsInherited -ne 'True') -and ($_.User -notlike '*SELF*') }
+        $MailboxForwarding += $Mailboxes |
+            Where-Object {
+                $null -ne $_.ForwardingSmtpAddress
+            } | ForEach-Object {
+                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Security')
+                $_
+            }
 
-        $Delegates | ForEach-Object {
-            $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Security')
+        if ($Mailbox.GrantSendOnBehalfTo) {
+            $MailboxSendOnBehalf += [PSCustomObject]@{
+                Identity        = $Mailbox.UserPrincipalName
+                SendOnBehalf    = $Mailbox.GrantSendOnBehalfTo
+            }
         }
 
-        $ForwardingRules += Get-InboxRule -Mailbox $Mailbox.UserPrincipalname |
-            Where-Object { ($null -ne $_.ForwardTo) -or ($null -ne $_.ForwardAsAttachmentTo) -or ($null -ne $_.RedirectTo) }
+        $MailboxSendAs += Get-RecipientPermission -Identity $Mailbox.UserPrincipalName |
+            Where-Object {
+                $_.Trustee -ne 'NT AUTHORITY\SELF'
+            } | ForEach-Object {
+                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.Security')
+                $_
+            }
 
-        $ForwardingRules | ForEach-Object {
-            $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Security')
-        }
+        $MailboxDelegates += Get-MailboxPermission -Identity $Mailbox.UserPrincipalName |
+            Where-Object {
+                $_.IsInherited -ne 'True' -and
+                $_.User -ne 'NT AUTHORITY\SELF'
+            } | ForEach-Object {
+                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Security')
+                $_
+            }
+
+        $MailboxCalendarFolder = Get-MailboxFolderStatistics -Identity $Mailbox.UserPrincipalName -FolderScope Calendar | Where-Object FolderType -eq 'Calendar'
+        $MailboxCalendar += Get-MailboxFolderPermission -Identity ('{0}:\{1}' -f $Mailbox.UserPrincipalName, $MailboxCalendarFolder.Name) |
+            Where-Object {
+                !($_.User.UserType.Value -eq 'Default' -and $_.AccessRights -eq 'AvailabilityOnly') -and
+                !($_.User.UserType.Value -eq 'Anonymous' -and $_.AccessRights -eq 'None')
+            } | ForEach-Object {
+                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.StoreTasks.MailboxFolderPermission.Calendar')
+                $_
+            }
+
+        $MailboxForwardingRules += Get-InboxRule -Mailbox $Mailbox.UserPrincipalname |
+            Where-Object {
+                $null -ne $_.ForwardTo -or
+                $null -ne $_.ForwardAsAttachmentTo -or
+                $null -ne $_.RedirectTo
+            } | ForEach-Object {
+                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Security')
+                $_
+            }
     }
 
     $Results = [PSCustomObject]@{
-        Users               = $Users
-        Delegates           = $Delegates
-        ForwardingRules     = $ForwardingRules
-        MailboxForwarding   = $MailboxForwarding
+        Users                   = $Users
+        MailboxCalendar         = $MailboxCalendar
+        MailboxDelegates        = $MailboxDelegates
+        MailboxForwardingRules  = $MailboxForwardingRules
+        MailboxForwarding       = $MailboxForwarding
+        MailboxSendAs           = $MailboxSendAs
+        MailboxSendOnBehalf     = $MailboxSendOnBehalf
     }
 
     return $Results

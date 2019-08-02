@@ -28,6 +28,26 @@
             </TableControl>
         </View>
         <View>
+            <Name>Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.Security</Name>
+            <ViewSelectedBy>
+                <TypeName>Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.Security</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Identity</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Trustee</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+        <View>
             <Name>Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Security</Name>
             <ViewSelectedBy>
                 <TypeName>Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Security</TypeName>
@@ -82,6 +102,32 @@
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Deny</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+        <View>
+            <Name>Deserialized.Microsoft.Exchange.Management.StoreTasks.MailboxFolderPermission.Calendar</Name>
+            <ViewSelectedBy>
+                <TypeName>Deserialized.Microsoft.Exchange.Management.StoreTasks.MailboxFolderPermission.Calendar</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Identity</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>User</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>AccessRights</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>SharingPermissionFlags</PropertyName>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>
