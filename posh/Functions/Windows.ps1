@@ -82,9 +82,10 @@ Function Get-MultipleHardLinks {
         [Switch]$Recurse
     )
 
-    $Files = Get-ChildItem -Path $Path -File -Recurse:$Recurse | Where-Object {
-        $_.LinkType -eq 'HardLink' -and $_.Target.Count -ge ($MinimumHardLinks - 1)
-    } | Add-Member -MemberType ScriptProperty -Name LinkCount -Value { $this.Target.Count + 1 } -Force
+    $Files = Get-ChildItem -Path $Path -File -Recurse:$Recurse |
+        Where-Object {
+            $_.LinkType -eq 'HardLink' -and $_.Target.Count -ge ($MinimumHardLinks - 1)
+        } | Add-Member -MemberType ScriptProperty -Name LinkCount -Value { $this.Target.Count + 1 } -Force
 
     return $Files
 }

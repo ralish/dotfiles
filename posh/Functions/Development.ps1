@@ -107,12 +107,13 @@ Function Invoke-GitMergeAllBranches {
     )
 
     $Branches = @()
-    & git branch | ForEach-Object {
-        $Branches += $_.TrimStart('* ')
-        if ($_.StartsWith('* ')) {
-            $CurrentBranch = $_.TrimStart('* ')
+    & git branch |
+        ForEach-Object {
+            $Branches += $_.TrimStart('* ')
+            if ($_.StartsWith('* ')) {
+                $CurrentBranch = $_.TrimStart('* ')
+            }
         }
-    }
 
     if ($SourceBranch -notin $Branches) {
         throw ('Source branch for merge does not exist locally: {0}' -f $SourceBranch)
