@@ -5,6 +5,8 @@ if (!(Test-IsWindows)) {
 # Load our custom formatting data
 Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml')
 
+#region Service connection helpers
+
 # Helper function to connect to all Office 365 services
 Function Connect-Office365Services {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
@@ -180,6 +182,39 @@ Function Connect-SkypeForBusinessOnline {
     Import-PSSession -Session $CsOnlineSession
 }
 
+# Helper function to import the weird Exchange Online PowerShell module
+Function Import-ExoPowershellModule {
+    [CmdletBinding()]
+    Param()
+
+    if (!(Get-Command -Name Connect-EXOPSSession -ErrorAction Ignore)) {
+        Write-Verbose -Message 'Importing Microsoft.Exchange.Management.ExoPowershellModule ...'
+
+        $ClickOnceAppsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0'
+        $ExoPowerShellModule = Get-ChildItem -Path $ClickOnceAppsPath -Recurse -Include 'Microsoft.Exchange.Management.ExoPowershellModule.manifest' | Sort-Object -Property LastWriteTime | Select-Object -Last 1
+        $ExoPowerShellModulePs1 = Join-Path -Path $ExoPowerShellModule.Directory -ChildPath 'CreateExoPSSession.ps1'
+
+        if ($ExoPowerShellModule) {
+            # Sourcing the script rudely changes the current working directory
+            $CurrentPath = Get-Location
+            . $ExoPowerShellModulePs1
+            Set-Location -Path $CurrentPath
+
+            # Change the scope of imported functions to be global (better approach?)
+            $Functions = @('Connect-EXOPSSession', 'Connect-IPPSSession', 'Test-Uri')
+            foreach ($Function in $Functions) {
+                $null = New-Item -Path Function: -Name global:$Function -Value (Get-Content -Path Function:\$Function)
+            }
+        } else {
+            throw 'Required module not available: Microsoft.Exchange.Management.ExoPowershellModule'
+        }
+    }
+}
+
+#endregion
+
+#region Exchange Online
+
 # Export mailbox data for our email management spreadsheet
 Function Export-MailboxSpreadsheetData {
     [CmdletBinding()]
@@ -348,6 +383,10 @@ Function Get-MailboxActivitySummary {
     return $Summary
 }
 
+#endregion
+
+#region Security
+
 # Retrieve a security report for all users
 # Improved version of: https://github.com/OfficeDev/O365-InvestigationTooling/blob/master/DumpDelegatesandForwardingRules.ps1
 Function Get-Office365UserSecurityReport {
@@ -443,6 +482,10 @@ Function Get-Office365UserSecurityReport {
 
     return $Results
 }
+
+#endregion
+
+#region Office 365 Groups
 
 # Retrieve a report on unified groups with owner & member details
 Function Get-UnifiedGroupReport {
@@ -559,31 +602,4 @@ Function Get-UnifiedGroupUsageSummary {
     return $Summary
 }
 
-# Helper function to import the weird Exchange Online PowerShell module
-Function Import-ExoPowershellModule {
-    [CmdletBinding()]
-    Param()
-
-    if (!(Get-Command -Name Connect-EXOPSSession -ErrorAction Ignore)) {
-        Write-Verbose -Message 'Importing Microsoft.Exchange.Management.ExoPowershellModule ...'
-
-        $ClickOnceAppsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0'
-        $ExoPowerShellModule = Get-ChildItem -Path $ClickOnceAppsPath -Recurse -Include 'Microsoft.Exchange.Management.ExoPowershellModule.manifest' | Sort-Object -Property LastWriteTime | Select-Object -Last 1
-        $ExoPowerShellModulePs1 = Join-Path -Path $ExoPowerShellModule.Directory -ChildPath 'CreateExoPSSession.ps1'
-
-        if ($ExoPowerShellModule) {
-            # Sourcing the script rudely changes the current working directory
-            $CurrentPath = Get-Location
-            . $ExoPowerShellModulePs1
-            Set-Location -Path $CurrentPath
-
-            # Change the scope of imported functions to be global (better approach?)
-            $Functions = @('Connect-EXOPSSession', 'Connect-IPPSSession', 'Test-Uri')
-            foreach ($Function in $Functions) {
-                $null = New-Item -Path Function: -Name global:$Function -Value (Get-Content -Path Function:\$Function)
-            }
-        } else {
-            throw 'Required module not available: Microsoft.Exchange.Management.ExoPowershellModule'
-        }
-    }
-}
+#endregion
