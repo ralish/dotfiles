@@ -235,7 +235,7 @@ Function Export-MailboxSpreadsheetData {
         [String]$DescriptionTimeFormat='yyyy/mm/dd'
     )
 
-    Test-CommandAvailable -Name @('Get-InboxRule', 'Get-Mailbox')
+    Test-CommandAvailable -Name 'Get-Mailbox'
 
     if (-not $PSBoundParameters.ContainsKey('Path')) {
         if ((Get-Item -Path $PWD) -is [IO.DirectoryInfo]) {
@@ -299,7 +299,7 @@ Function Get-InboxRulesByFolders {
         [Switch]$ReturnUnlinkedRules
     )
 
-    Test-CommandAvailable -Name @('Get-InboxRule', 'Get-MailboxFolder')
+    Test-CommandAvailable -Name 'Get-Mailbox'
 
     Write-Host -ForegroundColor Green -Object 'Retrieving mailbox folders ...'
     $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object { $_.DefaultFolderType -ne 'Inbox' }
@@ -349,7 +349,7 @@ Function Get-MailboxActivitySummary {
         [DateTime]$EndDate
     )
 
-    Test-CommandAvailable -Name @('Get-Mailbox', 'Get-MessageTrace')
+    Test-CommandAvailable -Name 'Get-Mailbox'
 
     if (-not $PSBoundParameters.ContainsKey('EndDate')) {
         $EndDate = Get-Date
@@ -394,7 +394,7 @@ Function Get-Office365UserSecurityReport {
     [CmdletBinding()]
     Param()
 
-    Test-CommandAvailable -Name @('Get-InboxRule', 'Get-Mailbox', 'Get-MailboxPermission', 'Get-MsolUser')
+    Test-CommandAvailable -Name @('Get-Mailbox', 'Get-MsolUser')
 
     $MailboxCalendar = @()
     $MailboxDelegates = @()
@@ -495,7 +495,7 @@ Function Get-UnifiedGroupReport {
         [PSObject[]]$Groups
     )
 
-    Test-CommandAvailable -Name @('Get-UnifiedGroup', 'Get-UnifiedGroupLinks')
+    Test-CommandAvailable -Name 'Get-UnifiedGroup'
 
     if (!$Groups) {
         Write-Host -ForegroundColor Green -Object 'Retrieving Office 365 groups ...'
