@@ -97,12 +97,15 @@ Function Get-AzureAuthToken {
         [String]$PromptBehaviour='Auto'
     )
 
-    $AdalModule = Get-Module -Name AzureAD -ListAvailable
-    if ($AdalModule) {
-        $AdalModulePath = $AdalModule.ModuleBase
+    if (Test-ModuleAvailable -Name AzureADPreview -Return Boolean) {
+        $AzureADModule = 'AzureADPreview'
     } else {
-        throw 'Required module not available: AzureAD'
+        Test-ModuleAvailable -Name AzureAD
+        $AzureADModule = 'AzureAD'
     }
+
+    $AdalModule = Get-Module -Name $AzureADModule -ListAvailable
+    $AdalModulePath = $AdalModule.ModuleBase
 
     $AdalAsmName = 'Microsoft.IdentityModel.Clients.ActiveDirectory.dll'
     $AdalAsmPath = Join-Path -Path $AdalModulePath -ChildPath $AdalAsmName
