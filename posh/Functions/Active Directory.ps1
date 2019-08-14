@@ -97,6 +97,95 @@ Function Resolve-ADGuid {
 }
 #endregion
 
+#region Kerberos
+# Estimate the Kerberos token size for a user
+# Reference: https://support.microsoft.com/kb/327825
+# Inspired by: https://jacob.ludriks.com/2014/05/27/Getting-Kerberos-token-size-with-Powershell/
+Function Get-KerberosTokenSize {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Username,
+
+        [ValidateSet('Windows Server 2008 R2 (or earlier)', 'Windows Server 2012 (or later)')]
+        [String]$OperatingSystem='Windows Server 2012 (or later)',
+
+        [ValidateRange(0, 10000)]
+        [int]$TicketOverheadBytes=1200
+    )
+
+    Test-ModuleAvailable -Name ActiveDirectory
+
+    if ($Username.Split('\').Count -ne 1) {
+        if ($Username.Split('\').Count -gt 2) {
+            throw 'Only a single backslash may be present in username.'
+        }
+
+        $Domain = $Username.Split('\')[0]
+        $User = $Username.Split('\')[1]
+    } elseif ($Username.Split('@').count -ne 1) {
+        if ($Username.Split('@').Count -gt 2) {
+            throw 'Only a single "@" sign may be present in username.'
+        }
+
+        $User = $Username.Split('@')[0]
+        $Domain = $Username.Split('@')[1]
+    } else {
+        $User = $Username
+        $Domain = $env:USERDOMAIN
+    }
+
+    try {
+        $ADDomain = Get-ADDomain -Identity $Domain -ErrorAction Stop
+    } catch {
+        throw $_
+    }
+
+    try {
+        $ADUser = Get-ADUser -Server $ADDomain.PDCEmulator -Identity $User -Properties SIDHistory, TrustedForDelegation -ErrorAction Stop
+    } catch {
+        throw $_
+    }
+
+    try {
+        $ADGroups = Get-ADPrincipalGroupMembership -Server $ADDomain.PDCEmulator -Identity $User -ErrorAction Stop
+    } catch {
+        throw $_
+    }
+
+    $SIDHistory         = $ADUser.$SIDHistory.Count
+    $DomainLocal        = @($ADGroups | Where-Object { $_.GroupScope -eq 'DomainLocal' }).Count
+    $Global             = @($ADGroups | Where-Object { $_.GroupScope -eq 'Global' }).Count
+    $UniversalInside    = @($ADGroups | Where-Object { $_.GroupScope -eq 'Universal' -and $_.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
+    $UniversalOutside   = @($ADGroups | Where-Object { $_.GroupScope -eq 'Universal' -and !$_.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
+
+    if ($OperatingSystem -eq 'Windows Server 2012 (or later)') {
+        $TokenSizeBytes = (40 * ($SIDHistory + $UniversalOutside)) + (8 * ($DomainLocal + $Global + $UniversalInside))
+    } else {
+        $TokenSizeBytes = (40 * ($SIDHistory + $DomainLocal + $UniversalOutside)) + (8 * ($Global + $UniversalInside))
+    }
+
+    if ($ADUser.TrustedForDelegation) {
+        $TokenSizeBytes = $TokenSizeBytes * 2
+    }
+
+    $TokenSizeBytes += $TicketOverheadBytes
+
+    $TokenSize = [PSCustomObject]@{
+        SIDHistory              = $SIDHistory
+        DomainLocal             = $DomainLocal
+        Global                  = $Global
+        UniversalInside         = $UniversalInside
+        UniversalOutside        = $UniversalOutside
+        TrustedForDelegation    = $ADUser.TrustedForDelegation
+        TicketOverheadBytes     = $TicketOverheadBytes
+        TokenSizeBytes          = $TokenSizeBytes
+    }
+
+    return $TokenSize
+}
+#endregion
+
 #region Shadow security principals
 # Add members to a shadow principal
 Function Add-ADShadowPrincipalMember {
