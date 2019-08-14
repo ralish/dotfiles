@@ -535,68 +535,69 @@ Function Get-UnifiedGroupUsageSummary {
         [String]$TenantName,
 
         [Parameter(Mandatory)]
-        [Guid]$ClientId,
+        [Guid]$GraphApiClientId,
 
         [Parameter(Mandatory)]
-        [String]$RedirectUri
+        [String]$GraphApiRedirectUri
     )
 
-    # Group
+    Test-CommandAvailable -Name @('Get-Mailbox', 'Get-SPOSite', 'Get-Team')
+
+    # Group (Exchange)
     Write-Verbose -Message 'Retrieving group data ...'
-    $UnifiedGroup = Get-UnifiedGroup -Identity $Identity -IncludeAllProperties
+    $Group = Get-UnifiedGroup -Identity $Identity -IncludeAllProperties
 
-    # Mailbox
+    # Mailbox (Exchange)
     Write-Verbose -Message 'Retrieving mailbox data ...'
-    $Mailbox = Get-Mailbox -Identity $UnifiedGroup.PrimarySmtpAddress -GroupMailbox
-    $MailboxStatistics = Get-MailboxStatistics -Identity $UnifiedGroup.PrimarySmtpAddress
+    $Mailbox = Get-Mailbox -Identity $Group.PrimarySmtpAddress -GroupMailbox
+    # Output: PrimarySmtpAddress
+    $MailboxStatistics = Get-MailboxStatistics -Identity $Group.PrimarySmtpAddress
+    # Output: '{0} / {1}' -f $ItemCount, $TotalItemSize
 
-    # Calendar
+    # Calendar (Exchange)
     Write-Verbose -Message 'Retrieving calendar data ...'
-    $Calendar = Get-MailboxFolderStatistics -Identity $UnifiedGroup.PrimarySmtpAddress -FolderScope Calendar
+    $Calendar = Get-MailboxFolderStatistics -Identity $Group.PrimarySmtpAddress -FolderScope Calendar
+    # Output: VisibleItemsInFolder
 
-    # Site
-    Write-Verbose -Message 'Retrieving site data ...'
-    $SPOSite = Get-SPOSite -Identity $UnifiedGroup.SharePointSiteUrl -Detailed
+    # Site (SharePoint)
+    Write-Verbose -Message 'Retrieving SharePoint site ...'
+    $Site = Get-SPOSite -Identity $Group.SharePointSiteUrl -Detailed
+    # Output: StorageUsageCurrent
 
-    # Notebook
-    Write-Verbose -Message 'Retrieving OneNote data ...'
-    Write-Warning -Message 'Not yet implemented!'
+    # Teams
+    Write-Verbose -Message 'Retrieving Teams ...'
+    try {
+        $Teams = Get-Team -GroupId $Group.ExternalDirectoryObjectId
+    } catch {
+        $Teams = $null
+    }
 
     # Graph API setup
     Write-Verbose -Message 'Connecting to Microsoft Graph API ...'
-    $GraphApiAuthToken = Get-AzureAuthToken -Api MsGraph -TenantName $TenantName -ClientId $ClientId -RedirectUri $RedirectUri
+    $GraphApiAuthToken = Get-AzureAuthToken -Api MsGraph -TenantName $TenantName -ClientId $GraphApiClientId -RedirectUri $GraphApiRedirectUri
     $GraphApiAuthHeader = Get-AzureAuthHeader -AuthToken $GraphApiAuthToken.Result
+
+    # OneNote
+    # https://docs.microsoft.com/en-us/graph/api/resources/onenote-api-overview?view=graph-rest-1.0
+    Write-Verbose -Message 'Retrieving OneNote notebooks ...'
+    $GraphApiUri = 'https://graph.microsoft.com/v1.0/groups/{0}/onenote/notebooks' -f $Group.ExternalDirectoryObjectId
+    $Notebooks = Invoke-RestMethod -Uri $GraphApiUri -Headers $GraphApiAuthHeader -Method Get
 
     # Planner
     # https://docs.microsoft.com/en-us/graph/api/resources/planner-overview?view=graph-rest-1.0
-    Write-Verbose -Message 'Retrieving Planner data ...'
-    $GraphApiPlannerPlans = 'https://graph.microsoft.com/v1.0/groups/{0}/planner/plans' -f $UnifiedGroup.ExternalDirectoryObjectId
-    $Planner = Invoke-RestMethod -Uri $GraphApiPlannerPlans -Headers $GraphApiAuthHeader -Method Get
-
-    # Teams
-    # https://docs.microsoft.com/en-us/graph/api/resources/teams-api-overview?view=graph-rest-1.0
-    Write-Verbose -Message 'Retrieving Teams data ...'
-    Write-Warning -Message 'Not yet implemented!'
+    Write-Verbose -Message 'Retrieving Planner plans ...'
+    $GraphApiUri = 'https://graph.microsoft.com/v1.0/groups/{0}/planner/plans' -f $Group.ExternalDirectoryObjectId
+    $Plans = Invoke-RestMethod -Uri $GraphApiUri -Headers $GraphApiAuthHeader -Method Get
 
     $Summary = [PSCustomObject]@{
-        Group               = $UnifiedGroup
-
+        Group               = $Group
         Mailbox             = $Mailbox
         MailboxStatistics   = $MailboxStatistics
-        MailboxItems        = $MailboxStatistics.ItemCount
-        MailboxSize         = $MailboxStatistics.TotalItemSize
-
         Calendar            = $Calendar
-        CalendarItems       = $Calendar.VisibleItemsInFolder
-
-        SPOSite             = $SPOSite
-        SPOSiteSize         = $SPOSite.StorageUsageCurrent
-
-        Notebook            = $null
-
-        Planner             = $Planner
-
-        Teams               = $null
+        Site                = $Site
+        Notebooks           = $Notebooks
+        Plans               = $Plans
+        Teams               = $Teams
     }
 
     return $Summary
