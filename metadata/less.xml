@@ -11,8 +11,13 @@
         <HideSymlinks>true</HideSymlinks>
     </InstallPath>
 
-    <RenamePaths>
-        <RenamePath source=".less" symlink="_less" />
-        <RenamePath source=".lesskey" symlink="_lesskey" />
-    </RenamePaths>
+    <AdditionalPaths>
+        <AdditionalPath source=".less">
+            <TargetPath symlink="_less" />
+        </AdditionalPath>
+
+        <AdditionalPath source=".lesskey">
+            <TargetPath symlink="_lesskey" />
+        </AdditionalPath>
+    </AdditionalPaths>
 </Component>
