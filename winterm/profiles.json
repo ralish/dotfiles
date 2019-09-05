@@ -1,0 +1,412 @@
+{
+    "globals" :
+    {
+        "alwaysShowTabs" : true,
+        "copyOnSelect" : true,
+        "showTabsInTitlebar" : true,
+        "showTerminalTitleInTitlebar" : false,
+
+        "requestedTheme" : "dark",
+        "initialCols" : 120,
+        "initialRows" : 30,
+
+        "defaultProfile" : "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+
+        "keybindings" :
+        [
+            {
+                "command" : "closeTab",
+                "keys" :
+                [
+                    "ctrl+w"
+                ]
+            },
+            {
+                "command" : "newTab",
+                "keys" :
+                [
+                    "ctrl+t"
+                ]
+            },
+            {
+                "command" : "newTabProfile0",
+                "keys" :
+                [
+                    "ctrl+shift+1"
+                ]
+            },
+            {
+                "command" : "newTabProfile1",
+                "keys" :
+                [
+                    "ctrl+shift+2"
+                ]
+            },
+            {
+                "command" : "newTabProfile2",
+                "keys" :
+                [
+                    "ctrl+shift+3"
+                ]
+            },
+            {
+                "command" : "newTabProfile3",
+                "keys" :
+                [
+                    "ctrl+shift+4"
+                ]
+            },
+            {
+                "command" : "newTabProfile4",
+                "keys" :
+                [
+                    "ctrl+shift+5"
+                ]
+            },
+            {
+                "command" : "newTabProfile5",
+                "keys" :
+                [
+                    "ctrl+shift+6"
+                ]
+            },
+            {
+                "command" : "newTabProfile6",
+                "keys" :
+                [
+                    "ctrl+shift+7"
+                ]
+            },
+            {
+                "command" : "newTabProfile7",
+                "keys" :
+                [
+                    "ctrl+shift+8"
+                ]
+            },
+            {
+                "command" : "newTabProfile8",
+                "keys" :
+                [
+                    "ctrl+shift+9"
+                ]
+            },
+            {
+                "command" : "nextTab",
+                "keys" :
+                [
+                    "ctrl+tab"
+                ]
+            },
+            {
+                "command" : "openSettings",
+                "keys" :
+                [
+                    "ctrl+,"
+                ]
+            },
+            {
+                "command" : "prevTab",
+                "keys" :
+                [
+                    "ctrl+shift+tab"
+                ]
+            },
+            {
+                "command" : "scrollDown",
+                "keys" :
+                [
+                    "ctrl+shift+down"
+                ]
+            },
+            {
+                "command" : "scrollDownPage",
+                "keys" :
+                [
+                    "ctrl+shift+pgdn"
+                ]
+            },
+            {
+                "command" : "scrollUp",
+                "keys" :
+                [
+                    "ctrl+shift+up"
+                ]
+            },
+            {
+                "command" : "scrollUpPage",
+                "keys" :
+                [
+                    "ctrl+shift+pgup"
+                ]
+            },
+            {
+                "command" : "switchToTab0",
+                "keys" :
+                [
+                    "alt+1"
+                ]
+            },
+            {
+                "command" : "switchToTab1",
+                "keys" :
+                [
+                    "alt+2"
+                ]
+            },
+            {
+                "command" : "switchToTab2",
+                "keys" :
+                [
+                    "alt+3"
+                ]
+            },
+            {
+                "command" : "switchToTab3",
+                "keys" :
+                [
+                    "alt+4"
+                ]
+            },
+            {
+                "command" : "switchToTab4",
+                "keys" :
+                [
+                    "alt+5"
+                ]
+            },
+            {
+                "command" : "switchToTab5",
+                "keys" :
+                [
+                    "alt+6"
+                ]
+            },
+            {
+                "command" : "switchToTab6",
+                "keys" :
+                [
+                    "alt+7"
+                ]
+            },
+            {
+                "command" : "switchToTab7",
+                "keys" :
+                [
+                    "alt+8"
+                ]
+            },
+            {
+                "command" : "switchToTab8",
+                "keys" :
+                [
+                    "alt+9"
+                ]
+            }
+        ]
+    },
+    "profiles" :
+    [
+        {
+            "name" : "Windows PowerShell",
+            "guid" : "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+            "icon" : "ms-appx:///ProfileIcons/{61c54bbd-c2c6-5271-96e7-009a87ff44bf}.png",
+
+            "commandline" : "powershell.exe",
+            "startingDirectory" : "%USERPROFILE%",
+
+            "colorScheme" : "Solarized Dark",
+            "padding" : "0, 0, 0, 0",
+
+            "fontFace" : "Hack",
+            "fontSize" : 10,
+
+            "cursorShape" : "bar",
+            "cursorColor" : "#FFFFFF",
+
+            "useAcrylic" : false,
+            "acrylicOpacity" : 0.75,
+
+            "closeOnExit" : true,
+            "historySize" : 9001,
+            "snapOnInput" : true
+        },
+        {
+            "name" : "cmd",
+            "guid" : "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+            "icon" : "ms-appx:///ProfileIcons/{0caa0dad-35be-5f56-a8ff-afceeeaa6101}.png",
+
+            "commandline" : "cmd.exe",
+            "startingDirectory" : "%USERPROFILE%",
+
+            "colorScheme" : "Solarized Dark",
+            "padding" : "0, 0, 0, 0",
+
+            "fontFace" : "Hack",
+            "fontSize" : 10,
+
+            "cursorShape" : "bar",
+            "cursorColor" : "#FFFFFF",
+
+            "useAcrylic" : false,
+            "acrylicOpacity" : 0.75,
+
+            "closeOnExit" : true,
+            "historySize" : 9001,
+            "snapOnInput" : true
+        }
+    ],
+    "schemes" :
+    [
+        {
+            "name" : "Campbell",
+
+            "background" : "#0C0C0C",
+            "foreground" : "#CCCCCC",
+
+            "black" : "#0C0C0C",
+            "brightBlack" : "#767676",
+
+            "blue" : "#0037DA",
+            "brightBlue" : "#3B78FF",
+
+            "cyan" : "#3A96DD",
+            "brightCyan" : "#61D6D6",
+
+            "green" : "#13A10E",
+            "brightGreen" : "#16C60C",
+
+            "purple" : "#881798",
+            "brightPurple" : "#B4009E",
+
+            "red" : "#C50F1F",
+            "brightRed" : "#E74856",
+
+            "white" : "#CCCCCC",
+            "brightWhite" : "#F2F2F2",
+
+            "yellow" : "#C19C00",
+            "brightYellow" : "#F9F1A5"
+        },
+        {
+            "name" : "One Half Dark",
+
+            "background" : "#282C34",
+            "foreground" : "#DCDFE4",
+
+            "black" : "#282C34",
+            "brightBlack" : "#5A6374",
+
+            "blue" : "#61AFEF",
+            "brightBlue" : "#61AFEF",
+
+            "cyan" : "#56B6C2",
+            "brightCyan" : "#56B6C2",
+
+            "green" : "#98C379",
+            "brightGreen" : "#98C379",
+
+            "purple" : "#C678DD",
+            "brightPurple" : "#C678DD",
+
+            "red" : "#E06C75",
+            "brightRed" : "#E06C75",
+
+            "white" : "#DCDFE4",
+            "brightWhite" : "#DCDFE4",
+
+            "yellow" : "#E5C07B",
+            "brightYellow" : "#E5C07B"
+        },
+        {
+            "name" : "One Half Light",
+
+            "background" : "#FAFAFA",
+            "foreground" : "#383A42",
+
+            "black" : "#383A42",
+            "brightBlack" : "#4F525D",
+
+            "blue" : "#0184BC",
+            "brightBlue" : "#61AFEF",
+
+            "cyan" : "#0997B3",
+            "brightCyan" : "#56B5C1",
+
+            "green" : "#50A14F",
+            "brightGreen" : "#98C379",
+
+            "purple" : "#A626A4",
+            "brightPurple" : "#C577DD",
+
+            "red" : "#E45649",
+            "brightRed" : "#DF6C75",
+
+            "white" : "#FAFAFA",
+            "brightWhite" : "#FFFFFF",
+
+            "yellow" : "#C18301",
+            "brightYellow" : "#E4C07A"
+        },
+        {
+            "name" : "Solarized Dark",
+
+            "background" : "#002B36",
+            "foreground" : "#839496",
+
+            "black" : "#073642",
+            "brightBlack" : "#002B36",
+
+            "blue" : "#268BD2",
+            "brightBlue" : "#839496",
+
+            "cyan" : "#2AA198",
+            "brightCyan" : "#93A1A1",
+
+            "green" : "#859900",
+            "brightGreen" : "#586E75",
+
+            "purple" : "#D33682",
+            "brightPurple" : "#6C71C4",
+
+            "red" : "#DC322F",
+            "brightRed" : "#CB4B16",
+
+            "white" : "#EEE8D5",
+            "brightWhite" : "#FDF6E3",
+
+            "yellow" : "#B58900",
+            "brightYellow" : "#657B83"
+        },
+        {
+            "name" : "Solarized Light",
+
+            "background" : "#FDF6E3",
+            "foreground" : "#657B83",
+
+            "black" : "#073642",
+            "brightBlack" : "#002B36",
+
+            "blue" : "#268BD2",
+            "brightBlue" : "#839496",
+
+            "cyan" : "#2AA198",
+            "brightCyan" : "#93A1A1",
+
+            "green" : "#859900",
+            "brightGreen" : "#586E75",
+
+            "purple" : "#D33682",
+            "brightPurple" : "#6C71C4",
+
+            "red" : "#DC322F",
+            "brightRed" : "#CB4B16",
+
+            "white" : "#EEE8D5",
+            "brightWhite" : "#FDF6E3",
+
+            "yellow" : "#B58900",
+            "brightYellow" : "#657B83"
+        }
+    ]
+}
