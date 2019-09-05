@@ -69,14 +69,13 @@ Function Get-EnvironmentVariable {
 
 # Retrieve files with a minimum number of hard links
 Function Get-MultipleHardLinks {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
         [IO.DirectoryInfo]$Path,
 
-        [ValidateScript({$_ -gt 1})]
+        [ValidateScript( { $_ -gt 1 } )]
         [Int]$MinimumHardLinks=2,
 
         [Switch]$Recurse
@@ -128,6 +127,7 @@ Function Get-NonInheritedACL {
 
 # Retrieve well-known security identifiers
 Function Get-WellKnownSID {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
     [CmdletBinding()]
     Param(
         [Parameter(ParameterSetName='NTAuthority', Mandatory)]
@@ -422,7 +422,7 @@ Function mklink {
 
 # Set a persisted environment variable
 Function Set-EnvironmentVariable {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]

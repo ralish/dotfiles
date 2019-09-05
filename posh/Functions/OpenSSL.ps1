@@ -132,7 +132,6 @@ Function Get-OpenSSLPrivateKey {
 
 # Create a private key and certificate signing request
 Function New-OpenSSLPrivateKeyAndCsr {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
@@ -141,7 +140,7 @@ Function New-OpenSSLPrivateKeyAndCsr {
         [Parameter(Mandatory)]
         [String]$Csr,
 
-        [ValidateScript({$_ -gt 0})]
+        [ValidateScript( { $_ -gt 0 } )]
         [Int]$KeySize,
 
         [Switch]$EncryptKey,
@@ -183,7 +182,6 @@ Function New-OpenSSLPrivateKeyAndCsr {
 
 # Create a private key and self-signed certificate
 Function New-OpenSSLSelfSignedCertificate {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
@@ -192,10 +190,10 @@ Function New-OpenSSLSelfSignedCertificate {
         [Parameter(Mandatory)]
         [String]$Certificate,
 
-        [ValidateScript({$_ -gt 0})]
+        [ValidateScript( { $_ -gt 0 } )]
         [Int]$KeySize=2048,
 
-        [ValidateScript({$_ -gt 0})]
+        [ValidateScript( { $_ -gt 0 } )]
         [Int]$ValidDays=365
     )
 

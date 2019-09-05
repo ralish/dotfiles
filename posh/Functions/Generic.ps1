@@ -1,6 +1,5 @@
 # Add an element to a Path type string
 Function Add-PathStringElement {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
@@ -150,7 +149,7 @@ Function ConvertTo-Base64 {
 
 # Convert a text file to the given encoding
 Function ConvertTo-TextEncoding {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
     [CmdletBinding()]
     Param(
         [Parameter(ValueFromPipeline)]
@@ -228,7 +227,6 @@ Function Format-Xml {
 
 # Remove an element from a Path type string
 Function Remove-PathStringElement {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]

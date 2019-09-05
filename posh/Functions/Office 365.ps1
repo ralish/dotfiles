@@ -525,7 +525,6 @@ Function Get-UnifiedGroupReport {
 
 # Retrieve a usage summary for a unified group
 Function Get-UnifiedGroupUsageSummary {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
