@@ -1,3 +1,48 @@
+# Create a file in each empty directory under a path
+Function Add-FileToEmptyDirectories {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
+    [CmdletBinding(SupportsShouldProcess)]
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [String[]]$Path,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$FileName='.keepme',
+
+        [String[]]$Exclude=@('.git')
+    )
+
+    if (!$PSBoundParameters.ContainsKey('Path')) {
+        $Path += Get-Item -Path $PWD.Path
+    }
+
+    foreach ($Dir in $Path) {
+        $Dir = Get-Item -Path $Path -ErrorAction Ignore
+        if ($Dir -isnot [IO.DirectoryInfo]) {
+            Write-Error -Message ('Provided path is not a directory: {0}' -f $Path)
+        }
+
+        $FilesToCreate = @()
+        Get-ChildItem -Directory -Exclude $Exclude -Force | ForEach-Object {
+            if ((Get-ChildItem -Path $_.FullName -Force | Measure-Object).Count -ne 0) {
+                Get-ChildItem -Path $_.FullName -Directory -Recurse -Force | ForEach-Object {
+                    if ((Get-ChildItem -Path $_.FullName -Force | Measure-Object).Count -eq 0) {
+                        $FilesToCreate += Join-Path -Path $_.FullName -ChildPath $FileName
+                    }
+                }
+            } else {
+                $FilesToCreate += Join-Path -Path $_.FullName -ChildPath $FileName
+            }
+        }
+
+        foreach ($FilePath in $FilesToCreate) {
+            if ($PSCmdlet.ShouldProcess($FilePath, 'Create')) {
+                $null = New-Item -Path $FilePath -ItemType File -Verbose
+            }
+        }
+    }
+}
+
 # Retrieve available type accelerators
 Function Get-TypeAccelerator {
     [CmdletBinding()]
