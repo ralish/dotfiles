@@ -391,7 +391,156 @@ Function Get-MailboxActivitySummary {
 
 #endregion
 
-#region Security
+#region Reporting
+
+# Retrieve a usage summary for an entity
+Function Get-Office365EntityUsageSummary {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [ValidateSet('User', 'Group')]
+        [String]$Type,
+
+        [Parameter(Mandatory)]
+        [String]$Identity,
+
+        [Parameter(Mandatory)]
+        [String]$TenantName,
+
+        [Parameter(Mandatory)]
+        [Guid]$GraphApiClientId,
+
+        [Parameter(Mandatory)]
+        [String]$GraphApiRedirectUri
+    )
+
+    Test-CommandAvailable -Name @('Get-Mailbox', 'Get-SPOSite', 'Get-Team')
+
+    # Graph API setup
+    Write-Verbose -Message 'Connecting to Microsoft Graph API ...'
+    $GraphApiAuthToken = Get-AzureAuthToken -Api MsGraph -TenantName $TenantName -ClientId $GraphApiClientId -RedirectUri $GraphApiRedirectUri
+    $GraphApiAuthHeader = Get-AzureAuthHeader -AuthToken $GraphApiAuthToken.Result
+
+    # Base entity data
+    switch ($Type) {
+        'User' {
+            $ExoIdentity = $Identity
+            $GraphApiOneNoteUri = 'https://graph.microsoft.com/v1.0/users/{0}/onenote/notebooks' -f $Identity
+        }
+
+        'Group' {
+            Write-Verbose -Message 'Retrieving group data ...'
+            $Group = Get-UnifiedGroup -Identity $Identity -IncludeAllProperties -ErrorAction Stop
+
+            if ($Group -is [Array]) {
+                throw ('Expected a single group but {0} groups matched provided identity.' -f $Group.Count)
+            }
+
+            $ExoIdentity = $Group.PrimarySmtpAddress
+            $GraphApiOneNoteUri = 'https://graph.microsoft.com/v1.0/groups/{0}/onenote/notebooks' -f $Group.ExternalDirectoryObjectId
+            $GraphApiPlannerUri = 'https://graph.microsoft.com/v1.0/groups/{0}/planner/plans' -f $Group.ExternalDirectoryObjectId
+        }
+    }
+
+    # Mailbox
+    Write-Verbose -Message 'Retrieving mailbox data ...'
+    switch ($Type) {
+        'User' {
+            $Mailbox = Get-Mailbox -Identity $ExoIdentity -ErrorAction Stop
+        }
+
+        'Group' {
+            $Mailbox = Get-Mailbox -Identity $ExoIdentity -GroupMailbox
+        }
+    }
+    $Mailbox | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.PrimarySmtpAddress } -Force
+    $MailboxStatistics = Get-MailboxStatistics -Identity $ExoIdentity
+    $MailboxStatistics | Add-Member -MemberType ScriptMethod -Name ToString -Value { '{0} items / {1}' -f $this.ItemCount, $this.TotalItemSize } -Force
+
+    # Calendar
+    Write-Verbose -Message 'Retrieving calendar data ...'
+    $Calendar = Get-MailboxFolderStatistics -Identity $ExoIdentity -FolderScope Calendar
+    $Calendar | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.VisibleItemsInFolder } -Force
+
+    # Groups
+    if ($Type -eq 'User') {
+        Write-Verbose -Message 'Retrieving group ownership data ...'
+        $ExoRecipientFilter = 'ManagedBy -eq "{0}"' -f $Mailbox.DistinguishedName
+        $Groups = Get-Recipient -Filter $ExoRecipientFilter -RecipientTypeDetails GroupMailbox
+    }
+
+    # Site
+    Write-Verbose -Message 'Retrieving SharePoint site ...'
+    switch ($Type) {
+        'User' {
+            $SPOSiteFilter = 'Url -like "https://{0}-my.sharepoint.com/personal/*" -and Owner -eq "{1}"' -f $TenantName, $Identity
+            $PersonalSite = Get-SPOSite -IncludePersonalSite $true -Filter $SPOSiteFilter
+            $Site = Get-SPOSite -Identity $PersonalSite.Url -Detailed
+        }
+
+        'Group' {
+            $Site = Get-SPOSite -Identity $Group.SharePointSiteUrl -Detailed
+        }
+    }
+    $Site | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.StorageUsageCurrent } -Force
+
+    # Teams
+    Write-Verbose -Message 'Retrieving Teams ...'
+    switch ($Type) {
+        'User' {
+            $Teams = Get-Team -User $Identity
+        }
+
+        'Group' {
+            try {
+                $Teams = Get-Team -GroupId $Group.ExternalDirectoryObjectId
+            } catch {
+                $Teams = $null
+            }
+        }
+    }
+
+    # OneNote
+    # https://docs.microsoft.com/en-us/graph/api/resources/onenote-api-overview?view=graph-rest-1.0
+    Write-Verbose -Message 'Retrieving OneNote notebooks ...'
+    $Notebooks = Invoke-RestMethod -Uri $GraphApiOneNoteUri -Headers $GraphApiAuthHeader -Method Get
+
+    # Planner
+    # https://docs.microsoft.com/en-us/graph/api/resources/planner-overview?view=graph-rest-1.0
+    if ($Type -eq 'Group') {
+        Write-Verbose -Message 'Retrieving Planner plans ...'
+        $Plans = Invoke-RestMethod -Uri $GraphApiPlannerUri -Headers $GraphApiAuthHeader -Method Get
+    }
+
+    switch ($Type) {
+        'User' {
+            $Summary = [PSCustomObject]@{
+                Mailbox             = $Mailbox
+                MailboxStatistics   = $MailboxStatistics
+                Calendar            = $Calendar
+                Groups              = $Groups
+                Site                = $Site
+                Teams               = $Teams
+                Notebooks           = $Notebooks
+            }
+        }
+
+        'Group' {
+            $Summary = [PSCustomObject]@{
+                Group               = $Group
+                Mailbox             = $Mailbox
+                MailboxStatistics   = $MailboxStatistics
+                Calendar            = $Calendar
+                Site                = $Site
+                Teams               = $Teams
+                Notebooks           = $Notebooks
+                Plans               = $Plans
+            }
+        }
+    }
+
+    return $Summary
+}
 
 # Retrieve a security report for all users
 # Improved version of: https://github.com/OfficeDev/O365-InvestigationTooling/blob/master/DumpDelegatesandForwardingRules.ps1
@@ -489,10 +638,6 @@ Function Get-Office365UserSecurityReport {
     return $Results
 }
 
-#endregion
-
-#region Office 365 Groups
-
 # Retrieve a report on unified groups with owner & member details
 Function Get-UnifiedGroupReport {
     [CmdletBinding()]
@@ -527,85 +672,6 @@ Function Get-UnifiedGroupReport {
     }
 
     return $Groups
-}
-
-# Retrieve a usage summary for a unified group
-Function Get-UnifiedGroupUsageSummary {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [String]$Identity,
-
-        [Parameter(Mandatory)]
-        [String]$TenantName,
-
-        [Parameter(Mandatory)]
-        [Guid]$GraphApiClientId,
-
-        [Parameter(Mandatory)]
-        [String]$GraphApiRedirectUri
-    )
-
-    Test-CommandAvailable -Name @('Get-Mailbox', 'Get-SPOSite', 'Get-Team')
-
-    # Group (Exchange)
-    Write-Verbose -Message 'Retrieving group data ...'
-    $Group = Get-UnifiedGroup -Identity $Identity -IncludeAllProperties
-
-    # Mailbox (Exchange)
-    Write-Verbose -Message 'Retrieving mailbox data ...'
-    $Mailbox = Get-Mailbox -Identity $Group.PrimarySmtpAddress -GroupMailbox
-    # Output: PrimarySmtpAddress
-    $MailboxStatistics = Get-MailboxStatistics -Identity $Group.PrimarySmtpAddress
-    # Output: '{0} / {1}' -f $ItemCount, $TotalItemSize
-
-    # Calendar (Exchange)
-    Write-Verbose -Message 'Retrieving calendar data ...'
-    $Calendar = Get-MailboxFolderStatistics -Identity $Group.PrimarySmtpAddress -FolderScope Calendar
-    # Output: VisibleItemsInFolder
-
-    # Site (SharePoint)
-    Write-Verbose -Message 'Retrieving SharePoint site ...'
-    $Site = Get-SPOSite -Identity $Group.SharePointSiteUrl -Detailed
-    # Output: StorageUsageCurrent
-
-    # Teams
-    Write-Verbose -Message 'Retrieving Teams ...'
-    try {
-        $Teams = Get-Team -GroupId $Group.ExternalDirectoryObjectId
-    } catch {
-        $Teams = $null
-    }
-
-    # Graph API setup
-    Write-Verbose -Message 'Connecting to Microsoft Graph API ...'
-    $GraphApiAuthToken = Get-AzureAuthToken -Api MsGraph -TenantName $TenantName -ClientId $GraphApiClientId -RedirectUri $GraphApiRedirectUri
-    $GraphApiAuthHeader = Get-AzureAuthHeader -AuthToken $GraphApiAuthToken.Result
-
-    # OneNote
-    # https://docs.microsoft.com/en-us/graph/api/resources/onenote-api-overview?view=graph-rest-1.0
-    Write-Verbose -Message 'Retrieving OneNote notebooks ...'
-    $GraphApiUri = 'https://graph.microsoft.com/v1.0/groups/{0}/onenote/notebooks' -f $Group.ExternalDirectoryObjectId
-    $Notebooks = Invoke-RestMethod -Uri $GraphApiUri -Headers $GraphApiAuthHeader -Method Get
-
-    # Planner
-    # https://docs.microsoft.com/en-us/graph/api/resources/planner-overview?view=graph-rest-1.0
-    Write-Verbose -Message 'Retrieving Planner plans ...'
-    $GraphApiUri = 'https://graph.microsoft.com/v1.0/groups/{0}/planner/plans' -f $Group.ExternalDirectoryObjectId
-    $Plans = Invoke-RestMethod -Uri $GraphApiUri -Headers $GraphApiAuthHeader -Method Get
-
-    $Summary = [PSCustomObject]@{
-        Group               = $Group
-        Mailbox             = $Mailbox
-        MailboxStatistics   = $MailboxStatistics
-        Calendar            = $Calendar
-        Site                = $Site
-        Notebooks           = $Notebooks
-        Plans               = $Plans
-        Teams               = $Teams
-    }
-
-    return $Summary
 }
 
 #endregion
