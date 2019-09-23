@@ -50,6 +50,12 @@ Function Connect-Office365Services {
     }
 
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
+        Connect-MicrosoftTeams
+    } else {
+        Connect-MicrosoftTeams -Credential $Credential
+    }
+
+    if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         Write-Warning -Message "Unable to connect to Office 365 Centralized Deployment as it doesn't support MFA."
     } else {
         Connect-Office365CentralizedDeployment -Credential $Credential
