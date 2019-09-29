@@ -33,6 +33,8 @@
         ".mk-sbuild.rc": "shellscript",
         // wget
         ".wgetrc": "properties",
+        //winterm
+        "profiles.json": "jsonc",
         // xdg-user-dir
         "user-dirs.dirs": "shellscript"
     },
