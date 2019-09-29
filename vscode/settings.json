@@ -30,7 +30,6 @@
 
     // Features: Search
     "search.smartCase": true,
-    "search.usePCRE2": true,
 
     // Features: Terminal
     "terminal.integrated.fontFamily": "Hack",
