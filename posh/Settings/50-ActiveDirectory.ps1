@@ -54,5 +54,6 @@ $ADUserIgnoredProperties = @(
 
     # Interesting but duplicated properties
     'mail'                  # EmailAddress
+    'mobile'                # MobilePhone
     'sn'                    # Surname
 )
