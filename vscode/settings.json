@@ -153,10 +153,5 @@
             // Organise imports with isort
             "source.organizeImports": true
         }
-    },
-
-    "[sls]": {
-        // Workaround for bug in SaltStack extension
-        "editor.autoClosingBrackets": "never"
     }
 }
