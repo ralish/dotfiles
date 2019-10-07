@@ -6,6 +6,7 @@ if (!(Test-IsWindows)) {
 Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml')
 
 #region Helper functions
+
 # Resolve various types of AD GUIDs
 Function Resolve-ADGuid {
     [CmdletBinding()]
@@ -95,9 +96,11 @@ Function Resolve-ADGuid {
         return $ADObjects
     }
 }
+
 #endregion
 
 #region Kerberos
+
 # Estimate the Kerberos token size for a user
 # Reference: https://support.microsoft.com/kb/327825
 # Inspired by: https://jacob.ludriks.com/2014/05/27/Getting-Kerberos-token-size-with-Powershell/
@@ -184,9 +187,11 @@ Function Get-KerberosTokenSize {
 
     return $TokenSize
 }
+
 #endregion
 
 #region Shadow security principals
+
 # Add members to a shadow principal
 Function Add-ADShadowPrincipalMember {
     [CmdletBinding()]
@@ -257,4 +262,5 @@ Function New-ADShadowPrincipal {
 
     New-ADObject -Type 'msDS-ShadowPrincipal' -Path $ShadowPrincipalContainer -Name $Name -OtherAttributes @{ 'msDS-ShadowPrincipalSid' = $SidByteArray }
 }
+
 #endregion
