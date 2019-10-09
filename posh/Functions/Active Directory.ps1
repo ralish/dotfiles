@@ -83,14 +83,14 @@ Function Resolve-ADGuid {
     }
 
     End {
-        $ADObjects = @()
+        [Collections.ArrayList]$ADObjects = @()
 
         foreach ($SearchFilter in $SearchFilters) {
-            $ADObjects += Get-ADObject @CommonParams -SearchBase $SearchBase -LDAPFilter $SearchFilter -Properties *
-        }
-
-        foreach ($ADObject in $ADObjects) {
-            $ADObject.PSObject.TypeNames.Insert(0, $TypeName)
+            $Results = Get-ADObject @CommonParams -SearchBase $SearchBase -LDAPFilter $SearchFilter -Properties *
+            foreach ($ADObject in $Results) {
+                $ADObject.PSObject.TypeNames.Insert(0, $TypeName)
+                $null = $ADObjects.Add($ADObject)
+            }
         }
 
         return $ADObjects

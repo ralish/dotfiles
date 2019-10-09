@@ -175,16 +175,16 @@ Function Get-AzureUsersWithDisabledServices {
 
     $Users = Get-MsolUser -ErrorAction Stop | Where-Object { $_.IsLicensed -eq $true }
 
-    $Results = @()
+    [Collections.ArrayList]$Results = @()
     foreach ($User in $Users) {
-        $DisabledServices = @()
-        $DisabledServices += $User.Licenses.ServiceStatus | Where-Object { $_.ProvisioningStatus -eq 'Disabled' }
+        $DisabledServices = @($User.Licenses.ServiceStatus | Where-Object { $_.ProvisioningStatus -eq 'Disabled' })
 
         if ($DisabledServices -or $ReturnAllUsers) {
-            $Results += [PSCustomObject]@{
+            $Result = [PSCustomObject]@{
                 User        = $User.DisplayName
                 Service     = [Object[]]$DisabledServices.ServicePlan
             }
+            $null = $Results.Add($Result)
         }
     }
 

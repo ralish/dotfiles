@@ -205,7 +205,7 @@ Function Format-Xml {
     )
 
     Begin {
-        $Data = New-Object -TypeName Collections.ArrayList
+        [Collections.ArrayList]$Data = @()
     }
 
     Process {

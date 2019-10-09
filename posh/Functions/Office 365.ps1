@@ -317,7 +317,7 @@ Function Get-InboxRulesByFolders {
     $Rules | Add-Member -MemberType NoteProperty -Name LinkedToFolder -Value $false
 
     Write-Host -ForegroundColor Green -Object 'Associating rules to folders ...'
-    $Results = @()
+    [Collections.ArrayList]$Results = @()
     foreach ($Folder in $Folders) {
         $FolderName = ($Folder.FolderPath -join ' - ').Substring(8)
         $RegexMatch = '^{0}' -f [Regex]::Escape($FolderName)
@@ -329,7 +329,7 @@ Function Get-InboxRulesByFolders {
             }
         }
 
-        $Results += $Folder
+        $null = $Results.Add($Folder)
     }
 
     $UnlinkedRules = $Rules | Where-Object { $_.LinkedToFolder -eq $false }
@@ -552,7 +552,7 @@ Function Get-Office365UserLicensingMatrix {
     $Users = Get-MsolUser -All
     $Licenses = $Users.Licenses.AccountSkuId | Sort-Object -Unique | ForEach-Object { $_.Split(':')[1] }
 
-    $Matrix = @()
+    [Collections.ArrayList]$Matrix = @()
     $MatrixEntry = [PSCustomObject]@{ UserPrincipalName = '' }
     foreach ($License in $Licenses) {
         $MatrixEntry | Add-Member -MemberType NoteProperty -Name $License -Value $false
@@ -570,7 +570,7 @@ Function Get-Office365UserLicensingMatrix {
             $UserLicensing.$LicenseName = $true
         }
 
-        $Matrix += $UserLicensing
+        $null = Matrix.Add($UserLicensing)
     }
 
     return $Matrix

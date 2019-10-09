@@ -22,16 +22,16 @@ Function Add-FileToEmptyDirectories {
             Write-Error -Message ('Provided path is not a directory: {0}' -f $Path)
         }
 
-        $FilesToCreate = @()
+        [Collections.ArrayList]$FilesToCreate = @()
         Get-ChildItem -Directory -Exclude $Exclude -Force | ForEach-Object {
             if ((Get-ChildItem -Path $_.FullName -Force | Measure-Object).Count -ne 0) {
                 Get-ChildItem -Path $_.FullName -Directory -Recurse -Force | ForEach-Object {
                     if ((Get-ChildItem -Path $_.FullName -Force | Measure-Object).Count -eq 0) {
-                        $FilesToCreate += Join-Path -Path $_.FullName -ChildPath $FileName
+                        $null = $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
                     }
                 }
             } else {
-                $FilesToCreate += Join-Path -Path $_.FullName -ChildPath $FileName
+                $null = $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
             }
         }
 
