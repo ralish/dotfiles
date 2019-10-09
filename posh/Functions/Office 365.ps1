@@ -588,19 +588,19 @@ Function Get-Office365UserSecurityReport {
 
     Test-CommandAvailable -Name @('Get-Mailbox', 'Get-MsolUser')
 
-    $MailboxAuditing = @()
-    $MailboxCalendar = @()
-    $MailboxDelegates = @()
-    $MailboxForwarding = @()
-    $MailboxForwardingRules = @()
-    $MailboxSendAs = @()
-    $MailboxSendOnBehalf = @()
+    [Collections.ArrayList]$MailboxAuditing = @()
+    [Collections.ArrayList]$MailboxCalendar = @()
+    [Collections.ArrayList]$MailboxDelegates = @()
+    [Collections.ArrayList]$MailboxForwarding = @()
+    [Collections.ArrayList]$MailboxForwardingRules = @()
+    [Collections.ArrayList]$MailboxSendAs = @()
+    [Collections.ArrayList]$MailboxSendOnBehalf = @()
 
     Write-Verbose -Message 'Retrieving all enabled users ...'
     $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop |
         Where-Object {
             $_.UserType -ne 'Guest'
-        } | ForEach-Object {
+        } | Sort-Object -Property UserPrincipalName | ForEach-Object {
             Add-Member -InputObject $_ -MemberType NoteProperty -Name IsActive -Value $false
             Add-Member -InputObject $_ -MemberType ScriptProperty -Name IsFederated -Value { if ($null -ne $this.ImmutableId) { $true } else { $false } }
             Add-Member -InputObject $_ -MemberType ScriptProperty -Name StrongAuthenticationState -Value { $this.StrongAuthenticationRequirements.State }
@@ -630,61 +630,57 @@ Function Get-Office365UserSecurityReport {
     foreach ($Mailbox in $Mailboxes) {
         Write-Verbose -Message ('Inspecting mailbox: {0}' -f $Mailbox.UserPrincipalName)
 
-        $MailboxAuditing += $Mailbox | Select-Object -Property * | ForEach-Object {
-            $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Auditing')
-            $_
-        }
+        $Auditing = Get-Mailbox -Identity $Mailbox.UserPrincipalName
+        $Auditing.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Auditing')
+        $null = $MailboxAuditing.Add($Auditing)
 
-        $MailboxForwarding += $Mailboxes |
-            Where-Object {
-                $null -ne $_.ForwardingSmtpAddress
-            } | ForEach-Object {
-                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Security')
-                $_
-            }
+        if ($Mailbox.ForwardingSmtpAddress) {
+            $Forwarding = Get-Mailbox -Identity $Mailbox.UserPrincipalName
+            $Forwarding.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Forwarding')
+            $null = $MailboxForwarding.Add($Forwarding)
+        }
 
         if ($Mailbox.GrantSendOnBehalfTo) {
-            $MailboxSendOnBehalf += [PSCustomObject]@{
-                Identity        = $Mailbox.UserPrincipalName
-                SendOnBehalf    = $Mailbox.GrantSendOnBehalfTo
-            }
+            $SendOnBehalf = Get-Mailbox -Identity $Mailbox.UserPrincipalName
+            $SendOnBehalf.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.SendOnBehalf')
+            $null = $MailboxSendOnBehalf.Add($SendOnBehalf)
         }
 
-        $MailboxSendAs += Get-RecipientPermission -Identity $Mailbox.UserPrincipalName |
+        Get-RecipientPermission -Identity $Mailbox.UserPrincipalName |
             Where-Object {
                 $_.Trustee -ne 'NT AUTHORITY\SELF'
             } | ForEach-Object {
-                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.Security')
-                $_
+                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.SendAs')
+                $null = $MailboxSendAs.Add($_)
             }
 
-        $MailboxDelegates += Get-MailboxPermission -Identity $Mailbox.UserPrincipalName |
+        Get-MailboxPermission -Identity $Mailbox.UserPrincipalName |
             Where-Object {
                 $_.IsInherited -ne 'True' -and
                 $_.User -ne 'NT AUTHORITY\SELF'
             } | ForEach-Object {
-                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Security')
-                $_
+                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Delegates')
+                $null = $MailboxDelegates.Add($_)
             }
 
-        $MailboxCalendarFolder = Get-MailboxFolderStatistics -Identity $Mailbox.UserPrincipalName -FolderScope Calendar | Where-Object FolderType -eq 'Calendar'
-        $MailboxCalendar += Get-MailboxFolderPermission -Identity ('{0}:\{1}' -f $Mailbox.UserPrincipalName, $MailboxCalendarFolder.Name) |
+        $CalendarFolder = Get-MailboxFolderStatistics -Identity $Mailbox.UserPrincipalName -FolderScope Calendar | Where-Object FolderType -eq 'Calendar'
+        Get-MailboxFolderPermission -Identity ('{0}:\{1}' -f $Mailbox.UserPrincipalName, $CalendarFolder.Name) |
             Where-Object {
                 !($_.User.UserType.Value -eq 'Default' -and $_.AccessRights -eq 'AvailabilityOnly') -and
                 !($_.User.UserType.Value -eq 'Anonymous' -and $_.AccessRights -eq 'None')
             } | ForEach-Object {
                 $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.StoreTasks.MailboxFolderPermission.Calendar')
-                $_
+                $null = $MailboxCalendar.Add($_)
             }
 
-        $MailboxForwardingRules += Get-InboxRule -Mailbox $Mailbox.UserPrincipalname |
+        Get-InboxRule -Mailbox $Mailbox.UserPrincipalname |
             Where-Object {
                 $null -ne $_.ForwardTo -or
                 $null -ne $_.ForwardAsAttachmentTo -or
                 $null -ne $_.RedirectTo
             } | ForEach-Object {
-                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Security')
-                $_
+                $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Forwarding')
+                $null = $MailboxForwardingRules.Add($_)
             }
     }
 

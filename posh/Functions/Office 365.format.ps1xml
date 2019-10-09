@@ -34,9 +34,9 @@
             </TableControl>
         </View>
         <View>
-            <Name>Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Security</Name>
+            <Name>Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Forwarding</Name>
             <ViewSelectedBy>
-                <TypeName>Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Security</TypeName>
+                <TypeName>Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Forwarding</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableRowEntries>
@@ -60,9 +60,32 @@
             </TableControl>
         </View>
         <View>
-            <Name>Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.Security</Name>
+            <Name>Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.SendOnBehalf</Name>
             <ViewSelectedBy>
-                <TypeName>Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.Security</TypeName>
+                <TypeName>Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.SendOnBehalf</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>UserPrincipalName</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>GrantSendOnBehalfTo</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>MessageCopyForSendOnBehalfEnabled</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+        <View>
+            <Name>Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.SendAs</Name>
+            <ViewSelectedBy>
+                <TypeName>Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.SendAs</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableRowEntries>
@@ -80,9 +103,9 @@
             </TableControl>
         </View>
         <View>
-            <Name>Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Security</Name>
+            <Name>Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Forwarding</Name>
             <ViewSelectedBy>
-                <TypeName>Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Security</TypeName>
+                <TypeName>Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Forwarding</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableRowEntries>
@@ -115,9 +138,9 @@
             </TableControl>
         </View>
         <View>
-            <Name>Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Security</Name>
+            <Name>Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Delegates</Name>
             <ViewSelectedBy>
-                <TypeName>Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Security</TypeName>
+                <TypeName>Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Delegates</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableRowEntries>
