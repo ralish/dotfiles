@@ -1,118 +1,4 @@
-# Add an element to a Path type string
-Function Add-PathStringElement {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [String]$Path,
-
-        [Parameter(Mandatory)]
-        [String]$Element,
-
-        [ValidateSet('Append', 'Prepend')]
-        [String]$Action='Append',
-
-        [Char]$PathSeparator=[IO.Path]::PathSeparator,
-        [Char]$DirectorySeparator=[IO.Path]::DirectorySeparatorChar,
-
-        [Switch]$NoRepair,
-        [Switch]$SimpleAlgo
-    )
-
-    if (!$NoRepair) {
-        $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
-    }
-
-    if (!$SimpleAlgo) {
-        if ($Element.EndsWith($DirectorySeparator)) {
-            $Element = $Element.TrimEnd($DirectorySeparator)
-        }
-        $Element += $DirectorySeparator
-    }
-
-    $RegExElement = [Regex]::Escape($Element)
-
-    if (!$SimpleAlgo) {
-        $RegExElement += '*'
-    }
-
-    $SingleElement = '^{0}$' -f $RegExElement
-    if ($Path -notmatch $SingleElement) {
-        $RegExPathSeparator = [Regex]::Escape($PathSeparator)
-        $FirstElement       = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
-        $LastElement        = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
-        $MiddleElement      = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
-
-        $Path = $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
-
-        if (!$SimpleAlgo) {
-            $Element = $PSBoundParameters.Item('Element')
-        }
-
-        switch ($Action) {
-            'Append' {
-                if ($Path.EndsWith($PathSeparator)) {
-                    $Path = '{0}{1}' -f $Path, $Element
-                } else {
-                    $Path = '{0}{1}{2}' -f $Path, $PathSeparator, $Element
-                }
-            }
-
-            'Prepend' {
-                if ($Path.StartsWith($PathSeparator)) {
-                    $Path = '{0}{1}' -f $Element, $Path
-                } else {
-                    $Path = '{0}{1}{2}' -f $Element, $PathSeparator, $Path
-                }
-            }
-        }
-    }
-
-    return $Path
-}
-
-# Compare the properties of two objects
-# Via: https://blogs.technet.microsoft.com/janesays/2017/04/25/compare-all-properties-of-two-objects-in-windows-powershell/
-Function Compare-ObjectProperties {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [PSObject]$ReferenceObject,
-
-        [Parameter(Mandatory)]
-        [PSObject]$DifferenceObject,
-
-        [String[]]$IgnoredProperties
-    )
-
-    $ObjProps = @()
-    $ObjProps += $ReferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty Name
-    $ObjProps += $DifferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty Name
-    $ObjProps = $ObjProps | Sort-Object | Select-Object -Unique
-
-    if ($IgnoredProperties) {
-        $ObjProps = $ObjProps | Where-Object { $_ -notin $IgnoredProperties }
-    }
-
-    $ObjDiffs = @()
-    foreach ($Property in $ObjProps) {
-        $Diff = Compare-Object -ReferenceObject $ReferenceObject -DifferenceObject $DifferenceObject -Property $Property
-
-        if ($Diff) {
-            $DiffProps = @{
-                PropertyName=$Property
-                RefValue=($Diff | Where-Object { $_.SideIndicator -eq '<=' } | Select-Object -ExpandProperty $($Property))
-                DiffValue=($Diff | Where-Object { $_.SideIndicator -eq '=>' } | Select-Object -ExpandProperty $($Property))
-            }
-
-            $ObjDiffs += New-Object -TypeName PSObject -Property $DiffProps
-        }
-    }
-
-    if ($ObjDiffs) {
-        return ($ObjDiffs | Select-Object -Property PropertyName, RefValue, DiffValue)
-    }
-}
+#region Encoding
 
 # Convert a string from Base64 form
 Function ConvertFrom-Base64 {
@@ -195,6 +81,10 @@ Function ConvertTo-URLEncoded {
     [Uri]::EscapeDataString($String)
 }
 
+#endregion
+
+#region Formatting
+
 # Beautify XML strings
 # Via: https://blogs.msdn.microsoft.com/sergey_babkins_blog/2016/12/31/how-to-pretty-print-xml-in-powershell-and-text-pipelines/
 Function Format-Xml {
@@ -223,6 +113,82 @@ Function Format-Xml {
         $XmlDoc.WriteContentTo($XmlTextWriter)
         $StringWriter.ToString()
     }
+}
+
+#endregion
+
+#region Path management
+
+# Add an element to a Path type string
+Function Add-PathStringElement {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$Path,
+
+        [Parameter(Mandatory)]
+        [String]$Element,
+
+        [ValidateSet('Append', 'Prepend')]
+        [String]$Action='Append',
+
+        [Char]$PathSeparator=[IO.Path]::PathSeparator,
+        [Char]$DirectorySeparator=[IO.Path]::DirectorySeparatorChar,
+
+        [Switch]$NoRepair,
+        [Switch]$SimpleAlgo
+    )
+
+    if (!$NoRepair) {
+        $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
+    }
+
+    if (!$SimpleAlgo) {
+        if ($Element.EndsWith($DirectorySeparator)) {
+            $Element = $Element.TrimEnd($DirectorySeparator)
+        }
+        $Element += $DirectorySeparator
+    }
+
+    $RegExElement = [Regex]::Escape($Element)
+
+    if (!$SimpleAlgo) {
+        $RegExElement += '*'
+    }
+
+    $SingleElement = '^{0}$' -f $RegExElement
+    if ($Path -notmatch $SingleElement) {
+        $RegExPathSeparator = [Regex]::Escape($PathSeparator)
+        $FirstElement       = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
+        $LastElement        = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
+        $MiddleElement      = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
+
+        $Path = $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
+
+        if (!$SimpleAlgo) {
+            $Element = $PSBoundParameters.Item('Element')
+        }
+
+        switch ($Action) {
+            'Append' {
+                if ($Path.EndsWith($PathSeparator)) {
+                    $Path = '{0}{1}' -f $Path, $Element
+                } else {
+                    $Path = '{0}{1}{2}' -f $Path, $PathSeparator, $Element
+                }
+            }
+
+            'Prepend' {
+                if ($Path.StartsWith($PathSeparator)) {
+                    $Path = '{0}{1}' -f $Element, $Path
+                } else {
+                    $Path = '{0}{1}{2}' -f $Element, $PathSeparator, $Path
+                }
+            }
+        }
+    }
+
+    return $Path
 }
 
 # Remove an element from a Path type string
@@ -286,69 +252,4 @@ Function Repair-PathString {
     $String -replace "^$RegExPathSeparator+" -replace "$RegExPathSeparator+$" -replace "$RegExPathSeparator{2,}", $PathSeparator
 }
 
-# Confirm a PowerShell command is available
-Function Test-CommandAvailable {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [String[]]$Name
-    )
-
-    foreach ($Command in $Name) {
-        Write-Verbose -Message ('Checking command is available: {0}' -f $Command)
-        if (!(Get-Command -Name $Command -ErrorAction Ignore)) {
-            throw ('Required command not available: {0}' -f $Command)
-        }
-    }
-}
-
-# Confirm a PowerShell module is available
-Function Test-ModuleAvailable {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [String[]]$Name,
-
-        [ValidateSet('Boolean', 'Exception')]
-        [String]$Return='Exception'
-    )
-
-    foreach ($Module in $Name) {
-        Write-Verbose -Message ('Checking module is available: {0}' -f $Module)
-        if (Get-Module -Name $Module -ListAvailable) {
-            if ($Return -eq 'Boolean') {
-                return $true
-            }
-        } else {
-            if ($Return -eq 'Boolean') {
-                return $false
-            } else {
-                throw ('Required module not available: {0}' -f $Module)
-            }
-        }
-    }
-}
-
-# Reload selected PowerShell profiles
-Function Update-Profile {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidDefaultValueSwitchParameter', '')]
-    [CmdletBinding()]
-    Param(
-        [Switch]$AllUsersAllHosts,
-        [Switch]$AllUsersCurrentHost,
-        [Switch]$CurrentUserAllHosts,
-        [Switch]$CurrentUserCurrentHost=$true
-    )
-
-    $ProfileTypes = @('AllUsersAllHosts', 'AllUsersCurrentHost', 'CurrentUserAllHosts', 'CurrentUserCurrentHost')
-    foreach ($ProfileType in $ProfileTypes) {
-        if (Get-Variable -Name $ProfileType -ValueOnly) {
-            if (Test-Path -Path $profile.$ProfileType -PathType Leaf) {
-                Write-Verbose -Message ('Sourcing {0} from: {1}' -f $ProfileType, $profile.$ProfileType)
-                . $profile.$ProfileType
-            } else {
-                Write-Warning -Message ("Skipping {0} as it doesn't exist: {1}" -f $ProfileType, $profile.$ProfileType)
-            }
-        }
-    }
-}
+#endregion

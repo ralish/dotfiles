@@ -5,55 +5,7 @@ if (!(Test-IsWindows)) {
 # Load our custom formatting data
 Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1xml')
 
-# Helper function to connect to Azure Active Directory (AzureAD module)
-Function Connect-AzureAD {
-    [CmdletBinding()]
-    Param(
-        [ValidateNotNull()]
-        [System.Management.Automation.Credential()]
-        [PSCredential]$Credential
-    )
-
-    if (Test-ModuleAvailable -Name AzureADPreview -Return Boolean) {
-        $ModuleName = 'AzureADPreview'
-    } else {
-        Test-ModuleAvailable -Name AzureAD
-        $ModuleName = 'AzureAD'
-    }
-
-    Write-Host -ForegroundColor Green -Object 'Connecting to Azure AD (v2) ...'
-    & $ModuleName\Connect-AzureAD @PSBoundParameters
-}
-
-# Helper function to connect to Azure Resource Manager
-Function Connect-AzureRM {
-    [CmdletBinding()]
-    Param(
-        [ValidateNotNull()]
-        [System.Management.Automation.Credential()]
-        [PSCredential]$Credential
-    )
-
-    Test-ModuleAvailable -Name AzureRM
-
-    Write-Host -ForegroundColor Green -Object 'Connecting to Azure RM ...'
-    Login-AzureRmAccount @PSBoundParameters
-}
-
-# Helper function to connect to Azure Active Directory (MSOnline module)
-Function Connect-MSOnline {
-    [CmdletBinding()]
-    Param(
-        [ValidateNotNull()]
-        [System.Management.Automation.Credential()]
-        [PSCredential]$Credential
-    )
-
-    Test-ModuleAvailable -Name MSOnline
-
-    Write-Host -ForegroundColor Green -Object 'Connecting to Azure AD (v1) ...'
-    Connect-MsolService @PSBoundParameters
-}
+#region Authentication
 
 # Retrieve an Azure AD authorization header
 Function Get-AzureAuthHeader {
@@ -140,6 +92,10 @@ Function Get-AzureAuthToken {
     return $AuthResult
 }
 
+#endregion
+
+#region Reporting
+
 # Retrieve licensing summary for Azure AD users
 Function Get-AzureUsersLicensingSummary {
     [CmdletBinding()]
@@ -190,3 +146,59 @@ Function Get-AzureUsersWithDisabledServices {
 
     return $Results
 }
+
+#endregion
+
+#region Service connection helpers
+
+# Helper function to connect to Azure Active Directory (AzureAD module)
+Function Connect-AzureAD {
+    [CmdletBinding()]
+    Param(
+        [ValidateNotNull()]
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
+    )
+
+    if (Test-ModuleAvailable -Name AzureADPreview -Return Boolean) {
+        $ModuleName = 'AzureADPreview'
+    } else {
+        Test-ModuleAvailable -Name AzureAD
+        $ModuleName = 'AzureAD'
+    }
+
+    Write-Host -ForegroundColor Green -Object 'Connecting to Azure AD (v2) ...'
+    & $ModuleName\Connect-AzureAD @PSBoundParameters
+}
+
+# Helper function to connect to Azure Resource Manager
+Function Connect-AzureRM {
+    [CmdletBinding()]
+    Param(
+        [ValidateNotNull()]
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
+    )
+
+    Test-ModuleAvailable -Name AzureRM
+
+    Write-Host -ForegroundColor Green -Object 'Connecting to Azure RM ...'
+    Login-AzureRmAccount @PSBoundParameters
+}
+
+# Helper function to connect to Azure Active Directory (MSOnline module)
+Function Connect-MSOnline {
+    [CmdletBinding()]
+    Param(
+        [ValidateNotNull()]
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
+    )
+
+    Test-ModuleAvailable -Name MSOnline
+
+    Write-Host -ForegroundColor Green -Object 'Connecting to Azure AD (v1) ...'
+    Connect-MsolService @PSBoundParameters
+}
+
+#endregion
