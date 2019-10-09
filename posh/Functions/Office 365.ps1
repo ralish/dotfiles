@@ -581,7 +581,10 @@ Function Get-Office365UserLicensingMatrix {
 Function Get-Office365UserSecurityReport {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
-    Param()
+    Param(
+        [ValidateRange(1, 90)]
+        [Int]$AccountInactiveDays=30
+    )
 
     Test-CommandAvailable -Name @('Get-Mailbox', 'Get-MsolUser')
 
@@ -592,16 +595,35 @@ Function Get-Office365UserSecurityReport {
     $MailboxSendAs = @()
     $MailboxSendOnBehalf = @()
 
+    Write-Verbose -Message 'Retrieving all enabled users ...'
     $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop |
         Where-Object {
             $_.UserType -ne 'Guest'
         } | ForEach-Object {
+            Add-Member -InputObject $_ -MemberType NoteProperty -Name IsActive -Value $false
             Add-Member -InputObject $_ -MemberType ScriptProperty -Name IsFederated -Value { if ($null -ne $this.ImmutableId) { $true } else { $false } }
             Add-Member -InputObject $_ -MemberType ScriptProperty -Name StrongAuthenticationState -Value { $this.StrongAuthenticationRequirements.State }
             $_.PSObject.TypeNames.Insert(0, 'Microsoft.Online.Administration.User.Security')
             $_
         }
 
+    Write-Verbose -Message ('Retrieving user logins over last {0} days ...' -f $AccountInactiveDays)
+    $LoginsStartDate = (Get-Date).AddDays(-$AccountInactiveDays).ToString('MM/dd/yyyy')
+    $LoginsEndDate = (Get-Date).ToString('MM/dd/yyyy')
+    $Logins = Search-UnifiedAuditLog -Operations 'UserLoggedIn' -StartDate $LoginsStartDate -EndDate $LoginsEndDate -ResultSize 5000
+
+    if ($Logins.Count -eq 5000) {
+        Write-Warning 'User logins audit log search returned maximum number of results.'
+    }
+
+    $ActiveUsers = @($Logins.UserIds | Sort-Object -Unique)
+    foreach ($User in $Users) {
+        if ($User.UserPrincipalName -in $ActiveUsers) {
+            $User.IsActive = $true
+        }
+    }
+
+    Write-Verbose -Message 'Retrieving all mailboxes ...'
     $Mailboxes = Get-Mailbox -ResultSize Unlimited
     foreach ($Mailbox in $Mailboxes) {
         Write-Verbose -Message ('Inspecting mailbox: {0}' -f $Mailbox.UserPrincipalName)

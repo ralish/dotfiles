@@ -147,6 +147,9 @@
                                 <PropertyName>UserPrincipalName</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
+                                <PropertyName>IsActive</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
                                 <PropertyName>IsFederated</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
