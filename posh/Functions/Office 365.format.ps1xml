@@ -2,6 +2,38 @@
 <Configuration>
     <ViewDefinitions>
         <View>
+            <Name>Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Auditing</Name>
+            <ViewSelectedBy>
+                <TypeName>Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Auditing</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>UserPrincipalName</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>AuditEnabled</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>AuditLogAgeLimit</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>AuditOwner</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>AuditDelegate</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>AuditAdmin</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+        <View>
             <Name>Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Security</Name>
             <ViewSelectedBy>
                 <TypeName>Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Security</TypeName>

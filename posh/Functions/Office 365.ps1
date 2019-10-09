@@ -588,6 +588,7 @@ Function Get-Office365UserSecurityReport {
 
     Test-CommandAvailable -Name @('Get-Mailbox', 'Get-MsolUser')
 
+    $MailboxAuditing = @()
     $MailboxCalendar = @()
     $MailboxDelegates = @()
     $MailboxForwarding = @()
@@ -625,8 +626,14 @@ Function Get-Office365UserSecurityReport {
 
     Write-Verbose -Message 'Retrieving all mailboxes ...'
     $Mailboxes = Get-Mailbox -ResultSize Unlimited
+
     foreach ($Mailbox in $Mailboxes) {
         Write-Verbose -Message ('Inspecting mailbox: {0}' -f $Mailbox.UserPrincipalName)
+
+        $MailboxAuditing += $Mailbox | Select-Object -Property * | ForEach-Object {
+            $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Auditing')
+            $_
+        }
 
         $MailboxForwarding += $Mailboxes |
             Where-Object {
@@ -683,6 +690,7 @@ Function Get-Office365UserSecurityReport {
 
     $Results = [PSCustomObject]@{
         Users                   = $Users
+        MailboxAuditing         = $MailboxAuditing
         MailboxCalendar         = $MailboxCalendar
         MailboxDelegates        = $MailboxDelegates
         MailboxForwardingRules  = $MailboxForwardingRules
