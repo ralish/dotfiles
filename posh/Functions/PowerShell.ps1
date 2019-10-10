@@ -44,6 +44,41 @@ Function Compare-ObjectProperties {
     }
 }
 
+# Compare the properties of multiple objects against a baseline
+Function Compare-ObjectPropertiesMatrix {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [PSObject]$ReferenceObject,
+
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [PSObject[]]$DifferenceObjects,
+
+        [String[]]$IgnoredProperties
+    )
+
+    Begin {
+        [Collections.ArrayList]$DifferentProperties = @()
+    }
+
+    Process {
+        foreach ($Object in $DifferenceObjects) {
+            $Comparison = Compare-ObjectProperties -ReferenceObject $ReferenceObject -DifferenceObject $Object
+            foreach ($PropertyName in $Comparison.PropertyName) {
+                if ($DifferentProperties -notcontains $PropertyName) {
+                    $null = $DifferentProperties.Add($PropertyName)
+                }
+            }
+        }
+    }
+
+    End {
+        $FilteredProperties = @($DifferentProperties | Sort-Object -Unique | Where-Object { $_ -notin $IgnoredProperties })
+        $ReferenceObject | Select-Object -Property $FilteredProperties
+        $DifferenceObjects | Select-Object -Property $FilteredProperties
+    }
+}
+
 #endregion
 
 #region Profile management
