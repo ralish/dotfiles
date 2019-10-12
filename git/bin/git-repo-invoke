@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+
+# Run a Git command in all repositories under a path
+
+# A better class of script...
+set -o errexit          # Exit on most errors (see the manual)
+set -o errtrace         # Make sure any error trap is inherited
+set -o nounset          # Disallow expansion of unset variables
+set -o pipefail         # Use last non-zero exit code in a pipeline
+#set -o xtrace          # Trace the execution of the script (debug)
+
+# DESC: Usage help
+# ARGS: None
+# OUTS: None
+function script_usage() {
+    cat << EOF
+Usage: [OPTIONS] [COMMAND]
+     -h|--help                  Displays this help
+     -v|--verbose               Displays verbose output
+    -nc|--no-colour             Disables colour output
+
+     -p|--path                  Directory path(s)
+     -r|--recurse               Recurse into subdirectories
+EOF
+}
+
+
+# DESC: Parameter parser
+# ARGS: $@ (optional): Arguments provided to the script
+# OUTS: Variables indicating command-line parameters and options
+function parse_params() {
+    local param
+    declare -g -a cmd_paths
+
+    while [[ $# -gt 0 ]]; do
+        param="$1"
+        shift
+        case $param in
+            -h|--help)
+                script_usage
+                exit 0
+                ;;
+            -v|--verbose)
+                verbose=true
+                ;;
+            -nc|--no-colour)
+                no_colour=true
+                ;;
+            -p|--path)
+                cmd_paths+=("$1")
+                shift
+                ;;
+            -r|--recurse)
+                recurse=true
+                ;;
+            *)
+                if [[ -n $* ]]; then
+                    git_cmd="$param $*"
+                else
+                    git_cmd="$param"
+                fi
+
+                break
+                ;;
+        esac
+    done
+
+    if [[ -z ${git_cmd-} ]]; then
+        script_exit 'No git command provided.'
+    fi
+
+    if [[ -n ${cmd_paths[*]-} ]]; then
+        for dir in "${cmd_paths[@]}"; do
+            if [[ ! -d $dir ]]; then
+                script_exit "Path is not a directory: $dir"
+            fi
+        done
+    else
+        cmd_paths+=(.)
+    fi
+}
+
+
+# DESC: Find some important paths we need before script_init() is called
+# ARGS: None
+# OUTS: $script_real_path: The full canonical path to the script
+#       $script_real_dir: The canonical directory path of the script
+#       $script_real_name: The canonical file name of the script
+#       $dotfiles_path: The full path to our dotfiles directory
+#       $dotfiles_name: The name of our dotfiles directory
+function early_init() {
+    # Determine the physical directory this script resides in. This approach is
+    # necessarily clumsy as simple methods like "readlink -f" and "realpath"
+    # are not platform independent. We have to work on Linux, BSD, OS X, etc...
+    readonly script_real_path="$(perl -MCwd -le 'print Cwd::abs_path(shift)' \
+                                 "${BASH_SOURCE[0]}")"
+    readonly script_real_dir="$(dirname "$script_real_path")"
+    readonly script_real_name="$(basename "$script_real_path")"
+
+    # Dotfiles directory path & name
+    readonly dotfiles_path="$(cd -P -- "$script_real_dir/../../" && pwd)"
+    readonly dotfiles_name="$(basename "$dotfiles_path")"
+}
+
+
+# DESC: Run Git command if directory is a repository or recurse if specified
+# ARGS: $1 (required): Directory path to run in
+# OUTS: None
+function git_repo_invoke() {
+    local base_dir="$1"
+
+    (
+        cd -- "$base_dir"
+        if git rev-parse --git-dir > /dev/null 2>&1; then
+            local repo_name
+            repo_name="$(basename "$PWD")"
+
+            pretty_print "*** $repo_name ***"
+
+            # shellcheck disable=SC2086
+            git $git_cmd
+
+            echo
+        elif [[ -n ${recurse-} ]]; then
+            for dir in */; do
+                git_repo_invoke "$dir"
+            done
+        fi
+    )
+}
+
+
+# DESC: Main control flow
+# ARGS: $@ (optional): Arguments provided to the script
+# OUTS: None
+function main() {
+    early_init
+
+    # shellcheck source=scripts/bin/bash-template.sh
+    source "$dotfiles_path/scripts/bin/bash-template.sh"
+
+    trap script_trap_err ERR
+    trap script_trap_exit EXIT
+
+    script_init "$@"
+    parse_params "$@"
+    colour_init
+
+    check_binary git fatal
+
+    shopt -s nullglob
+    for cmd_path in "${cmd_paths[@]}"; do
+        for dir in "$cmd_path"/*/; do
+            git_repo_invoke "$dir"
+        done
+    done
+}
+
+
+# Make it rain
+main "$@"
+
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
