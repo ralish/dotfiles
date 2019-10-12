@@ -126,4 +126,8 @@ prompt_dir() {
     prompt_segment blue black "$(shrink_path -l -t)"
 }
 
+# Useful aliases
+alias gita='git-repo-invoke'
+alias gits='git-repo-summary'
+
 # vim: syntax=zsh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
