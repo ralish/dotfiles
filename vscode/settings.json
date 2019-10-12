@@ -97,8 +97,8 @@
     // Extension: SSH FS
     "sshfs.configs": [
         {
-            "name": "eventide",
-            "putty": "Nexiom - VMs - Eventide",
+            "name": "vega",
+            "putty": "Nexiom - VMs - Vega",
             "root": "/home/sdl"
         }
     ],
