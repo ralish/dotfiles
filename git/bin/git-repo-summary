@@ -11,6 +11,7 @@ set -o pipefail         # Use last non-zero exit code in a pipeline
 
 # DESC: Usage help
 # ARGS: None
+# OUTS: None
 function script_usage() {
     cat << EOF
 Usage: [OPTIONS] [PATHS]
@@ -27,9 +28,11 @@ EOF
 
 # DESC: Parameter parser
 # ARGS: $@ (optional): Arguments provided to the script
+# OUTS: Variables indicating command-line parameters and options
 function parse_params() {
     local param
     declare -g -a git_repos
+
     while [[ $# -gt 0 ]]; do
         param="$1"
         shift
@@ -59,6 +62,14 @@ function parse_params() {
         esac
     done
 
+    if [[ -n ${git_repos[*]-} ]]; then
+        for dir in "${git_repos[@]}"; do
+            if [[ ! -d $dir ]]; then
+                script_exit "Path is not a directory: $dir"
+            fi
+        done
+    fi
+
     if [[ -z ${git_branches-} &&
           -z ${git_remotes-} &&
           -z ${git_status-} ]]; then
@@ -71,6 +82,11 @@ function parse_params() {
 
 # DESC: Find some important paths we need before script_init() is called
 # ARGS: None
+# OUTS: $script_real_path: The full canonical path to the script
+#       $script_real_dir: The canonical directory path of the script
+#       $script_real_name: The canonical file name of the script
+#       $dotfiles_path: The full path to our dotfiles directory
+#       $dotfiles_name: The name of our dotfiles directory
 function early_init() {
     # Determine the physical directory this script resides in. This approach is
     # necessarily clumsy as simple methods like "readlink -f" and "realpath"
@@ -81,40 +97,58 @@ function early_init() {
     readonly script_real_name="$(basename "$script_real_path")"
 
     # Dotfiles directory path & name
-    readonly dotfiles_path="$(cd -P "$script_real_dir/../../" && pwd)"
+    readonly dotfiles_path="$(cd -P -- "$script_real_dir/../../" && pwd)"
     readonly dotfiles_name="$(basename "$dotfiles_path")"
 }
 
 
 # DESC: Show selected summary information for a Git repository
-# ARGS: None
-function show_git_summary() {
-    local repo_name
-    repo_name="$(basename "$PWD")"
+# ARGS: $1 (required): Directory path to run in
+# OUTS: None
+function git_repo_summary() {
+    local repo_dir="$1"
 
-    pretty_print "*** $repo_name ***"
+    (
+        cd -- "$repo_dir"
 
-    if [[ -n ${git_status-} ]]; then
-        pretty_print 'Status:'
-        git status --short --branch
-    fi
+        local repo_root
+        if ! repo_root="$(git rev-parse --git-dir 2> /dev/null)"; then
+            exit
+        fi
 
-    if [[ -n ${git_remotes-} ]]; then
-        pretty_print 'Remotes:'
-        git remote -v
-    fi
+        local repo_name
+        if [[ $repo_root == '.git' ]]; then
+            repo_name="$(basename "$PWD")"
+        else
+            repo_name="$(basename "$(dirname "$repo_root")")"
+        fi
 
-    if [[ -n ${git_branches-} ]]; then
-        pretty_print 'Branches:'
-        git --no-pager branch -vv
-    fi
 
-    echo ''
+        pretty_print "*** $repo_name ***"
+
+        if [[ -n ${git_status-} ]]; then
+            pretty_print 'Status:'
+            git status --short --branch
+        fi
+
+        if [[ -n ${git_remotes-} ]]; then
+            pretty_print 'Remotes:'
+            git remote -v
+        fi
+
+        if [[ -n ${git_branches-} ]]; then
+            pretty_print 'Branches:'
+            git --no-pager branch -vv
+        fi
+
+        echo
+    )
 }
 
 
 # DESC: Main control flow
 # ARGS: $@ (optional): Arguments provided to the script
+# OUTS: None
 function main() {
     early_init
 
@@ -130,28 +164,19 @@ function main() {
 
     check_binary git fatal
 
-    if [[ -n ${git_repos-} ]]; then
-        for repo in "${git_repos[@]}"; do
-            if ! [[ -d "$repo" ]]; then
-                script_exit "Provided path is invalid: $repo"
-            fi
-
-            (
-            cd -- "$repo"
-            show_git_summary
-            )
+    shopt -s nullglob
+    if [[ -n ${git_repos[*]-} ]]; then
+        for git_repo in "${git_repos[@]}"; do
+            git_repo_summary "$git_repo"
         done
-    elif git rev-parse --git-dir > /dev/null 2>&1; then
-        show_git_summary
     else
-        for dir in */; do
-            (
-            cd "$dir"
-            if git rev-parse --git-dir > /dev/null 2>&1; then
-                show_git_summary
-            fi
-            )
-        done
+        if git rev-parse --git-dir > /dev/null 2>&1; then
+            git_repo_summary .
+        else
+            for dir in */; do
+                git_repo_summary "$dir"
+            done
+        fi
     fi
 }
 
