@@ -275,7 +275,7 @@ function pretty_print() {
 
 
 # DESC: Only pretty_print() the provided string if verbose mode is enabled
-# ARGS: $@ (required): Passed through to pretty_pretty() function
+# ARGS: $@ (required): Passed through to pretty_print() function
 # OUTS: None
 function verbose_print() {
     if [[ -n ${verbose-} ]]; then
@@ -349,7 +349,7 @@ function check_superuser() {
         superuser=true
     elif [[ -z ${1-} ]]; then
         if check_binary sudo; then
-            pretty_print 'Sudo: Updating cached credentials ...'
+            verbose_print 'Sudo: Updating cached credentials ...'
             if ! sudo -v; then
                 verbose_print "Sudo: Couldn't acquire credentials ..." \
                               "${fg_red-}"
