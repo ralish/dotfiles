@@ -1,1 +1,0 @@
-templates/no_logic.sh
