@@ -9,6 +9,7 @@ Function Update-AllTheThings {
             'Office',
             'VisualStudio',
             'PowerShell',
+            'ModernApps',
             'Scoop',
             'npm',
             'pip'
@@ -21,6 +22,7 @@ Function Update-AllTheThings {
             'Office',
             'VisualStudio',
             'PowerShell',
+            'ModernApps',
             'Scoop',
             'npm',
             'pip'
@@ -33,6 +35,7 @@ Function Update-AllTheThings {
         Office = $null
         VisualStudio = $null
         PowerShell = $null
+        ModernApps = $null
         Scoop = $null
         npm = $null
         pip = $null
@@ -54,9 +57,9 @@ Function Update-AllTheThings {
         }
     }
 
-    if ($Tasks['Windows'] -or $Tasks['Office'] -or $Tasks['VisualStudio']) {
+    if ($Tasks['Windows'] -or $Tasks['Office'] -or $Tasks['VisualStudio'] -or $Tasks['ModernApps']) {
         if (!(Test-IsAdministrator)) {
-            throw 'You must have administrator privileges to perform Windows, Office, or Visual Studio updates.'
+            throw 'You must have administrator privileges to perform Windows, Office, Visual Studio, or Modern Apps updates.'
         }
     }
 
@@ -65,6 +68,7 @@ Function Update-AllTheThings {
         Office = $null
         VisualStudio = $null
         PowerShell = $null
+        ModernApps = $null
         Scoop = $null
         npm = $null
         pip = $null
@@ -86,6 +90,10 @@ Function Update-AllTheThings {
         $Results.PowerShell = Update-PowerShell
     }
 
+    if ($Tasks['ModernApps']) {
+        $Results.ModernApps = Update-ModernApps
+    }
+
     if ($Tasks['Scoop']) {
         $Results.Scoop = Update-Scoop
     }
@@ -99,6 +107,27 @@ Function Update-AllTheThings {
     }
 
     return $Results
+}
+
+# Update Modern Apps (Microsoft Store)
+Function Update-ModernApps {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
+    [CmdletBinding()]
+    Param()
+
+    if (!(Test-IsAdministrator)) {
+        throw 'You must have administrator privileges to perform Modern Apps updates.'
+    }
+
+    $Namespace = 'root\CIMv2\mdm\dmmap'
+    $Class = 'MDM_EnterpriseModernAppManagement_AppManagement01'
+    $Method = 'UpdateScanMethod'
+
+    $Session = New-CimSession
+    $Instance = Get-CimInstance -Namespace $Namespace -ClassName $Class
+    $Result = $Session.InvokeMethod($Namespace, $Instance, $Method, $null)
+
+    return $Result
 }
 
 # Update npm & globally installed modules
