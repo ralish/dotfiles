@@ -83,6 +83,7 @@
     // Extension: Python
     "python.jediEnabled": false,
     "python.linting.flake8Enabled": true,
+    "python.linting.pylintCategorySeverity.refactor": "Information",
 
     // Extension: Select Line Status Bar
     "selectline.alignment": "right",
