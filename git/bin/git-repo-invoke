@@ -103,6 +103,31 @@ function early_init() {
 }
 
 
+# DESC: Check the directory belongs to a Git repository
+# ARGS: $1 (required): Path to the directory to check
+# OUTS: None
+function check_is_git_repo() {
+    if [[ $# -lt 1 ]]; then
+        script_exit 'Missing required argument to check_is_git_repo()!' 2
+    fi
+
+    local git_dir="$1"
+    if [[ -d $git_dir ]]; then
+        local orig_dir="$PWD"
+
+        cd "$git_dir"
+        if git rev-parse --git-dir > /dev/null 2>&1; then
+            cd "$orig_dir"
+            return 0
+        fi
+
+        cd "$orig_dir"
+    fi
+
+    return 1
+}
+
+
 # DESC: Run Git command if directory is a repository or recurse if specified
 # ARGS: $1 (required): Directory path to run in
 # OUTS: None
@@ -150,9 +175,13 @@ function main() {
 
     shopt -s nullglob
     for cmd_path in "${cmd_paths[@]}"; do
-        for dir in "$cmd_path"/*/; do
-            git_repo_invoke "$dir"
-        done
+        if ! check_is_git_repo "$cmd_path"; then
+            for dir in "$cmd_path"/*/; do
+                git_repo_invoke "$dir"
+            done
+        else
+            git_repo_invoke "$cmd_path"
+        fi
     done
 }
 
