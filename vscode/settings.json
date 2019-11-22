@@ -1,5 +1,7 @@
 {
     // Text Editor
+    "editor.dragAndDrop": false,
+    "editor.emptySelectionClipboard": false,
     "editor.renderWhitespace": "boundary",
 
     // Text Editor: Find
