@@ -800,6 +800,7 @@ let g:syntastic_style_error_symbol = '≃'
 
 " Configure which syntax checkers to use for various languages
 let g:syntastic_javascript_checkers = ['eslint']
+let g:syntastic_yaml_checkers = ['yamllint']
 
 " Use markdownlint-cli (Node.js) instead of mdl (Ruby)
 let g:syntastic_markdown_mdl_exec = 'markdownlint'
