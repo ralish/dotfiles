@@ -616,6 +616,9 @@ Plug 'altercation/vim-colors-solarized'
 " Full path fuzzy finder
 Plug 'ctrlpvim/ctrlp.vim'
 
+" Asynchronous Lint Engine
+Plug 'dense-analysis/ale'
+
 " Improved motions handling
 Plug 'easymotion/vim-easymotion'
 
@@ -639,7 +642,7 @@ Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-surround'
 
 " Advanced syntax checking
-Plug 'vim-syntastic/syntastic'
+"Plug 'vim-syntastic/syntastic'
 
 
 " ############################### Integrations ################################
