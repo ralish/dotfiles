@@ -15,6 +15,7 @@
 
     // Text Editor: Files
     "files.autoSave": "onWindowChange",
+    "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
 
     // Workbench
@@ -23,18 +24,28 @@
     // Workbench: Appearance
     "workbench.iconTheme": "vscode-icons",
 
-    // Workbench: Navigation
-    "breadcrumbs.enabled": true,
+    // Workbench: Editor Management
+    "workbench.editor.highlightModifiedTabs": true,
+
+    // Workbench: Settings Editor
+    "workbench.settings.enableNaturalLanguageSearch": false,
+
+    // Window: New Window
+    "window.newWindowDimensions": "inherit",
 
     // Features: Explorer
     "explorer.confirmDelete": false,
     "explorer.confirmDragAndDrop": false,
+    "explorer.incrementalNaming": "smart",
 
     // Features: Search
     "search.smartCase": true,
 
     // Features: Terminal
+    "terminal.integrated.copyOnSelection": true,
+    "terminal.integrated.cursorStyle": "line",
     "terminal.integrated.fontFamily": "Hack",
+    "terminal.integrated.rightClickBehavior": "paste",
 
     // Application: Telemetry
     "telemetry.enableCrashReporter": false,
@@ -95,15 +106,6 @@
     "shellcheck.customArgs": [
         // Permit following source directives
         "-x"
-    ],
-
-    // Extension: SSH FS
-    "sshfs.configs": [
-        {
-            "name": "vega",
-            "putty": "Nexiom - VMs - Vega",
-            "root": "/home/sdl"
-        }
     ],
 
     // Extension: Visual Studio IntelliCode
