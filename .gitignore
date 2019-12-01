@@ -97,6 +97,9 @@ temp/
 # Visual Studio
 /vs/
 
+# Visual Studio Code
+/vscode/extensions.txt
+
 # Web browsers
 /chrome/
 /edge/
