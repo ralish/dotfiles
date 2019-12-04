@@ -308,6 +308,12 @@ function main() {
     fi
 
     create_dirs "$HOME/.config"
+    create_dirs "$HOME/.local/share"
+    create_dirs "$HOME/share/perl"
+    for section in $(seq 1 8); do
+        create_dirs "$HOME/share/man/man$section"
+    done
+
     case $stow_method in
         install)
             pretty_print '*** Installing all dotfiles components ...'
