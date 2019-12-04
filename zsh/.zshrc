@@ -47,6 +47,9 @@ fi
 # Actually load oh-my-zsh with our settings
 source "$ZSH/oh-my-zsh.sh"
 
+# Disable the auto_cd option enabled by oh-my-zsh
+unsetopt auto_cd
+
 # Load our common shell configuration
 #
 # By default zsh does *not* perform field splitting on unquoted parameter
