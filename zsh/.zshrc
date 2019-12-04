@@ -39,6 +39,11 @@ COMPLETION_WAITING_DOTS="true"
 # Which plugins would you like to load?
 plugins=(colored-man-pages gitfast shrink-path)
 
+# Add custom zsh completions to fpath
+if [[ -d $HOME/.local/share/zsh/site-functions ]]; then
+    fpath=($HOME/.local/share/zsh/site-functions $fpath)
+fi
+
 # Actually load oh-my-zsh with our settings
 source "$ZSH/oh-my-zsh.sh"
 
