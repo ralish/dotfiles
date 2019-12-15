@@ -120,7 +120,10 @@ Function Get-InboxRulesByFolders {
 
     $UnlinkedRules = $Rules | Where-Object { $_.LinkedToFolder -eq $false }
     if ($UnlinkedRules) {
-        Write-Warning -Message ('Number of unlinked rules: {0}' -f ($UnlinkedRules | Measure-Object).Count)
+        Write-Warning -Message 'The following rules could not be linked to a folder:'
+        foreach ($Rule in ($UnlinkedRules | Sort-Object -Property Name)) {
+            Write-Warning -Message $Rule.Name
+        }
     }
 
     if ($ReturnUnlinkedRules) {
