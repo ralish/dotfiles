@@ -92,9 +92,14 @@ Function ConvertTo-URLEncoded {
 Function Get-DirectorySummary {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory, ValueFromPipeline)]
+        [Parameter(ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
         [String]$Path
     )
+
+    if (!$Path) {
+        $Path = Get-Location -PSProvider FileSystem
+    }
 
     $Directory = Get-Item -Path $Path -ErrorAction Ignore
     if ($Directory -isnot [IO.DirectoryInfo]) {
