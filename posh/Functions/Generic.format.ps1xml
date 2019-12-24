@@ -7,6 +7,15 @@
                 <TypeName>DotFiles.Generic.DirectorySummary</TypeName>
             </ViewSelectedBy>
             <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader />
+                    <TableColumnHeader />
+                    <TableColumnHeader />
+                    <TableColumnHeader />
+                    <TableColumnHeader>
+                        <Label>Size</Label>
+                    </TableColumnHeader>
+                </TableHeaders>
                 <TableRowEntries>
                     <TableRowEntry>
                         <TableColumnItems>
@@ -21,6 +30,9 @@
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Items</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>Format-SizeDigital -Size $_.Size</ScriptBlock>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>

@@ -88,7 +88,7 @@ Function ConvertTo-URLEncoded {
 
 #region Filesystem
 
-# Summarize a directory by number of child directories and files
+# Summarize a directory by number of dirs/files and total size
 Function Get-DirectorySummary {
     [CmdletBinding()]
     Param(
@@ -104,12 +104,13 @@ Function Get-DirectorySummary {
     $TotalDirs = 0
     $TotalFiles = 0
     $TotalItems = 0
+    $TotalSize = 0
 
     $Items = Get-ChildItem -Path $Directory -Recurse
     foreach ($Item in $Items) {
         $TotalItems++
         switch ($Item.PSTypeNames[0]) {
-            'System.IO.FileInfo' { $TotalFiles++ }
+            'System.IO.FileInfo' { $TotalFiles++; $TotalSize += $Item.Length }
             'System.IO.DirectoryInfo' { $TotalDirs++ }
         }
     }
@@ -119,6 +120,7 @@ Function Get-DirectorySummary {
         Dirs = $TotalDirs
         Files = $TotalFiles
         Items = $TotalItems
+        Size = $TotalSize
     }
 
     $Summary.PSObject.TypeNames.Insert(0, 'DotFiles.Generic.DirectorySummary')
