@@ -129,6 +129,45 @@ Function Get-DirectorySummary {
 
 #region Formatting
 
+# Format a number representing the size of some digital information
+Function Format-SizeDigital {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [Double]$Size,
+
+        [ValidateSet(2, 10)]
+        [Byte]$Base=2,
+
+        [ValidateRange(0, 10)]
+        [Byte]$Precision=2
+    )
+
+    if ($Base -eq 2) {
+        $LogBase = 1024
+        $LogMagnitudes = @('bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB')
+    } else {
+        $LogBase = 1000
+        $LogMagnitudes = @('bytes', 'kB', 'MB', 'GB', 'TB', 'PB')
+    }
+
+    $Log = [Math]::Truncate([Math]::Log($Size, $LogBase))
+    if ($Log -eq 0) {
+        $Result = '{0} bytes' -f $Size
+    } else {
+        if ($Log -ge $LogMagnitudes.Count) {
+            $Log = $LogMagnitudes.Count - 1
+        }
+
+        $SizeConverted = $Size / [Math]::Pow($LogBase, $Log)
+        $SizeRounded = [Math]::Round($SizeConverted, $Precision)
+        $SizeString = $SizeRounded.ToString('N{0}' -f $Precision)
+        $Result = '{0} {1}' -f $SizeString, $LogMagnitudes[$Log]
+    }
+
+    return $Result
+}
+
 # Beautify XML strings
 # Via: https://blogs.msdn.microsoft.com/sergey_babkins_blog/2016/12/31/how-to-pretty-print-xml-in-powershell-and-text-pipelines/
 Function Format-Xml {
