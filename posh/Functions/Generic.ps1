@@ -1,3 +1,6 @@
+# Load our custom formatting data
+Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Generic.format.ps1xml')
+
 #region Encoding
 
 # Convert a string from Base64 form
@@ -79,6 +82,47 @@ Function ConvertTo-URLEncoded {
     )
 
     [Uri]::EscapeDataString($String)
+}
+
+#endregion
+
+#region Filesystem
+
+# Summarize a directory by number of child directories and files
+Function Get-DirectorySummary {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$Path
+    )
+
+    $Directory = Get-Item -Path $Path -ErrorAction Ignore
+    if ($Directory -isnot [IO.DirectoryInfo]) {
+        throw 'Provided path is invalid.'
+    }
+
+    $TotalDirs = 0
+    $TotalFiles = 0
+    $TotalItems = 0
+
+    $Items = Get-ChildItem -Path $Directory -Recurse
+    foreach ($Item in $Items) {
+        $TotalItems++
+        switch ($Item.PSTypeNames[0]) {
+            'System.IO.FileInfo' { $TotalFiles++ }
+            'System.IO.DirectoryInfo' { $TotalDirs++ }
+        }
+    }
+
+    $Summary = [PSCustomObject]@{
+        Path = $Directory
+        Dirs = $TotalDirs
+        Files = $TotalFiles
+        Items = $TotalItems
+    }
+
+    $Summary.PSObject.TypeNames.Insert(0, 'DotFiles.Generic.DirectorySummary')
+    return $Summary
 }
 
 #endregion
