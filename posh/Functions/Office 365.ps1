@@ -1,9 +1,12 @@
 if (!(Test-IsWindows)) {
+    Write-Verbose -Message '[dotfiles] Skipping import of Office 365 functions.'
     return
 }
 
+Write-Verbose -Message '[dotfiles] Importing Office 365 functions ...'
+
 # Load our custom formatting data
-Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml')
+$FormatDataPaths += Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml'
 
 #region Exchange Online
 

@@ -1,8 +1,6 @@
-if (!(Test-IsWindows)) {
-    return
-}
-
-if (!(Get-Module -Name PSDotFiles -ListAvailable)) {
+try {
+    Test-ModuleAvailable -Name PSDotFiles
+} catch {
     Write-Verbose -Message '[dotfiles] Skipping PSDotFiles settings as module not found.'
     return
 }

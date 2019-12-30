@@ -1,3 +1,5 @@
+Write-Verbose -Message '[dotfiles] Importing PowerShell functions ...'
+
 #region Object handling
 
 # Compare the properties of two objects

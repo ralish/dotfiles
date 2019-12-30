@@ -1,4 +1,6 @@
-if (!(Get-Module -Name posh-git -ListAvailable)) {
+try {
+    Test-ModuleAvailable -Name posh-git
+} catch {
     Write-Verbose -Message '[dotfiles] Skipping posh-git settings as module not found.'
     return
 }

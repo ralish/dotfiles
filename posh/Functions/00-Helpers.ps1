@@ -1,3 +1,5 @@
+Write-Verbose -Message '[dotfiles] Importing helper functions ...'
+
 # Confirm a PowerShell command is available
 Function Test-CommandAvailable {
     [CmdletBinding()]
@@ -34,22 +36,27 @@ Function Test-ModuleAvailable {
         [Parameter(Mandatory)]
         [String[]]$Name,
 
-        [ValidateSet('Boolean', 'Exception')]
-        [String]$Return='Exception'
+        [ValidateSet('Any', 'All')]
+        [String]$Require='All'
     )
 
     foreach ($Module in $Name) {
         Write-Verbose -Message ('Checking module is available: {0}' -f $Module)
         if (Get-Module -Name $Module -ListAvailable) {
-            if ($Return -eq 'Boolean') {
-                return $true
+            $ModuleAvailable = $true
+            if ($Require -eq 'Any') {
+                break
             }
         } else {
-            if ($Return -eq 'Boolean') {
-                return $false
-            } else {
-                throw ('Required module not available: {0}' -f $Module)
+            $ModuleAvailable = $false
+            $ModuleMissingName = $Module
+            if ($Require -eq 'All') {
+                break
             }
         }
+    }
+
+    if (!$ModuleAvailable) {
+        throw ('Required module not available: {0}' -f $ModuleMissingName)
     }
 }

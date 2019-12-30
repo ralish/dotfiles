@@ -1,3 +1,5 @@
+Write-Verbose -Message '[dotfiles] Importing environment functions ...'
+
 # Configure environment for Cygwin usage
 Function Switch-Cygwin {
     [CmdletBinding()]

@@ -1,4 +1,6 @@
-if (!(Get-Module -Name PSReadLine -ListAvailable)) {
+try {
+    Test-ModuleAvailable -Name PSReadLine
+} catch {
     Write-Verbose -Message '[dotfiles] Skipping PSReadLine settings as module not found.'
     return
 }

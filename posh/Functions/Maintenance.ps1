@@ -1,3 +1,5 @@
+Write-Verbose -Message '[dotfiles] Importing maintenance functions ...'
+
 # Update everything!
 Function Update-AllTheThings {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]

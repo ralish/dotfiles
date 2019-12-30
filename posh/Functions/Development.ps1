@@ -1,3 +1,5 @@
+Write-Verbose -Message '[dotfiles] Importing development functions ...'
+
 #region .NET
 
 # Retrieve available type accelerators

@@ -1,3 +1,5 @@
+Write-Verbose -Message '[dotfiles] Importing OpenSSH functions ...'
+
 # Update our OpenSSH configuration
 Function Update-OpenSSHConfig {
     [CmdletBinding()]

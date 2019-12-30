@@ -2,7 +2,9 @@ if (!(Test-IsWindows)) {
     return
 }
 
-if (!(Get-Module -Name ActiveDirectory -ListAvailable)) {
+try {
+    Test-ModuleAvailable -Name ActiveDirectory
+} catch {
     Write-Verbose -Message '[dotfiles] Skipping ActiveDirectory settings as module not found.'
     return
 }

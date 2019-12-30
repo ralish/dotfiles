@@ -1,3 +1,12 @@
+try {
+    Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+} catch {
+    Write-Verbose -Message '[dotfiles] Skipping import of AWS functions.'
+    return
+}
+
+Write-Verbose -Message '[dotfiles] Importing AWS functions ...'
+
 #region IAM
 
 # Set AWS credential environment variables from an AWSCredentials object

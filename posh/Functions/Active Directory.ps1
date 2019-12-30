@@ -2,8 +2,17 @@ if (!(Test-IsWindows)) {
     return
 }
 
+try {
+    Test-ModuleAvailable -Name ActiveDirectory
+} catch {
+    Write-Verbose -Message '[dotfiles] Skipping import of Active Directory functions.'
+    return
+}
+
+Write-Verbose -Message '[dotfiles] Importing Active Directory functions ...'
+
 # Load our custom formatting data
-Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml')
+$FormatDataPaths += Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml'
 
 #region Kerberos
 
@@ -22,8 +31,6 @@ Function Get-KerberosTokenSize {
         [ValidateRange(0, 10000)]
         [int]$TicketOverheadBytes=1200
     )
-
-    Test-ModuleAvailable -Name ActiveDirectory
 
     if ($Username.Split('\').Count -ne 1) {
         if ($Username.Split('\').Count -gt 2) {

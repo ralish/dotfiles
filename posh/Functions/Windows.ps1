@@ -1,6 +1,9 @@
 if (!(Test-IsWindows)) {
+    Write-Verbose -Message '[dotfiles] Skipping import of Windows functions.'
     return
 }
+
+Write-Verbose -Message '[dotfiles] Importing Windows functions ...'
 
 #region Environment variables
 

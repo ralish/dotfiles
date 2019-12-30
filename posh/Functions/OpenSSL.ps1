@@ -1,3 +1,5 @@
+Write-Verbose -Message '[dotfiles] Importing OpenSSL functions ...'
+
 # Certificate encoding formats
 # - DER:        Distinguished Encoding Rules
 # - PEM:        Privacy-Enhanced Mail

@@ -1,9 +1,12 @@
 if (!(Test-IsWindows)) {
+    Write-Verbose -Message '[dotfiles] Skipping import of Azure functions.'
     return
 }
 
+Write-Verbose -Message '[dotfiles] Importing Azure functions ...'
+
 # Load our custom formatting data
-Update-FormatData -PrependPath (Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1xml')
+$FormatDataPaths += Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1xml'
 
 #region Authentication
 
@@ -49,11 +52,12 @@ Function Get-AzureAuthToken {
         [String]$PromptBehaviour='Auto'
     )
 
-    if (Test-ModuleAvailable -Name AzureADPreview -Return Boolean) {
-        $AzureADModule = 'AzureADPreview'
-    } else {
-        Test-ModuleAvailable -Name AzureAD
-        $AzureADModule = 'AzureAD'
+    try {
+        $ModuleName = 'AzureADPreview'
+        Test-ModuleAvailable -Name $ModuleName
+    } catch {
+        $ModuleName = 'AzureAD'
+        Test-ModuleAvailable -Name $ModuleName
     }
 
     $AdalModule = Get-Module -Name $AzureADModule -ListAvailable
@@ -160,11 +164,12 @@ Function Connect-AzureAD {
         [PSCredential]$Credential
     )
 
-    if (Test-ModuleAvailable -Name AzureADPreview -Return Boolean) {
+    try {
         $ModuleName = 'AzureADPreview'
-    } else {
-        Test-ModuleAvailable -Name AzureAD
+        Test-ModuleAvailable -Name $ModuleName
+    } catch {
         $ModuleName = 'AzureAD'
+        Test-ModuleAvailable -Name $ModuleName
     }
 
     Write-Host -ForegroundColor Green -Object 'Connecting to Azure AD (v2) ...'

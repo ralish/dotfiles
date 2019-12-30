@@ -1,4 +1,6 @@
-if (!(Get-Module -Name oh-my-posh -ListAvailable)) {
+try {
+    Test-ModuleAvailable -Name oh-my-posh
+} catch {
     Write-Verbose -Message '[dotfiles] Skipping oh-my-posh settings as module not found.'
     return
 }
