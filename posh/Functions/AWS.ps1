@@ -16,7 +16,7 @@ Function Set-AWSCredentialEnvironment {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [AWSCredentials]$Credential
+        [Amazon.SecurityToken.Model.Credentials]$Credential
     )
 
     Set-Item -Path Env:\AWS_ACCESS_KEY_ID -Value $Credential.AccessKeyId
