@@ -1,7 +1,7 @@
 Posterity
 =========
 
-A collection of resources I've found useful while cultivating my own `dotfiles`.
+A collection of resources I've found useful while cultivating my own dotfiles.
 
 Bash
 ----
