@@ -7,10 +7,11 @@ ZSH="$HOME/.oh-my-zsh"
 SHCFG="$HOME/dotfiles/sh/common.sh"
 
 # Name of the oh-my-zsh theme to load
-ZSH_THEME="agnoster"
-
-# Used by agnoster theme to hide default user
-DEFAULT_USER="sdl"
+if [[ -d $ZSH/custom/themes/powerlevel10k ]]; then
+    ZSH_THEME="powerlevel10k/powerlevel10k"
+else
+    ZSH_THEME="agnoster"
+fi
 
 # Enable case-sensitive completion
 CASE_SENSITIVE="true"
@@ -129,10 +130,21 @@ if [ -d "$zsh_functions_dir" ]; then
 fi
 unset zsh_function zsh_functions_dir
 
-# Agnoster theme prompt customisations for current dir
-prompt_dir() {
-    prompt_segment blue black "$(shrink_path -l -t)"
-}
+# Theme customisations
+case $ZSH_THEME in
+    agnoster)
+        # Hide this user in the prompt
+        DEFAULT_USER="sdl"
+
+        # Shrink the current path
+        prompt_dir() {
+            prompt_segment blue black "$(shrink_path -l -t)"
+        }
+        ;;
+    powerlevel10k/powerlevel10k)
+        [[ ! -f $HOME/.p10k.zsh ]] || source "$HOME/.p10k.zsh"
+        ;;
+esac
 
 # Useful aliases
 alias gita='git-repo-invoke'
