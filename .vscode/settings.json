@@ -9,6 +9,8 @@
         ".editrc": "properties",
         // git
         ".gitconfig*": "gitconfig",
+        // irssi
+        "**/irssi/*": "perl",
         // less
         ".lesskey": "properties",
         // markdownlint
