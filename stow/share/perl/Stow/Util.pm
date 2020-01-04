@@ -1,3 +1,18 @@
+# This file is part of GNU Stow.
+#
+# GNU Stow is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GNU Stow is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see https://www.gnu.org/licenses/.
+
 package Stow::Util;
 
 =head1 NAME
@@ -22,11 +37,11 @@ use POSIX qw(getcwd);
 use base qw(Exporter);
 our @EXPORT_OK = qw(
     error debug set_debug_level set_test_mode
-    join_paths parent canon_path restore_cwd
+    join_paths parent canon_path restore_cwd adjust_dotfile
 );
 
 our $ProgramName = 'stow';
-our $VERSION = '2.2.2';
+our $VERSION = '2.3.1';
 
 #############################################################################
 #
@@ -191,6 +206,20 @@ sub canon_path {
 sub restore_cwd {
     my ($prev) = @_;
     chdir($prev) or error("Your current directory $prev seems to have vanished");
+}
+
+sub adjust_dotfile {
+    my ($target) = @_;
+
+    my @result = ();
+    for my $part (split m{/+}, $target) {
+        if (($part ne "dot-") && ($part ne "dot-.")) {
+            $part =~ s/^dot-/./;
+        }
+        push @result, $part;
+    }
+
+    return join '/', @result;
 }
 
 =head1 BUGS

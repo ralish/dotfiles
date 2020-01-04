@@ -1,27 +1,29 @@
 #!/usr/bin/perl
 
-# GNU Stow - manage the installation of multiple software packages
+# GNU Stow - manage farms of symbolic links
 # Copyright (C) 1993, 1994, 1995, 1996 by Bob Glickstein
 # Copyright (C) 2000, 2001 Guillaume Morin
 # Copyright (C) 2007 Kahlil Hodgson
 # Copyright (C) 2011 Adam Spiers
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# This file is part of GNU Stow.
+#
+# GNU Stow is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful, but
+# GNU Stow is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, see <http://www.gnu.org/licenses/>.
+# along with this program. If not, see https://www.gnu.org/licenses/.
 
 =head1 NAME
 
-stow - software package installation manager
+stow - manage farms of symbolic links
 
 =head1 SYNOPSIS
 
@@ -29,33 +31,34 @@ stow [ options ] package ...
 
 =head1 DESCRIPTION
 
-This manual page describes GNU Stow 2.2.2, a program for managing
-the installation of software packages. This is not the definitive
-documentation for stow; for that, see the info manual.
+This manual page describes GNU Stow 2.3.1.  This is not the
+definitive documentation for Stow; for that, see the accompanying info
+manual, e.g. by typing C<info stow>.
 
-Stow is a tool for managing the installation of multiple software
-packages in the same run-time directory tree. One historical
-difficulty of this task has been the need to administer, upgrade,
-install, and remove files in independent packages without confusing
-them with other files sharing the same filesystem space. For instance,
-it is common to install Perl and Emacs in F</usr/local>.  When one
-does so, one winds up (as of Perl 4.036 and Emacs 19.22) with the
-following files in F</usr/local/man/man1>: F<a2p.1>; F<ctags.1>;
-F<emacs.1>; F<etags.1>; F<h2ph.1>; F<perl.1>; and F<s2p.1>.  Now
-suppose it's time to uninstall Perl. Which man pages get removed?
-Obviously F<perl.1> is one of them, but it should not be the
-administrator's responsibility to memorize the ownership of individual
-files by separate packages.
+Stow is a symlink farm manager which takes distinct sets of software
+and/or data located in separate directories on the filesystem, and
+makes them all appear to be installed in a single directory tree.
 
-The approach used by Stow is to install each package into its own
-tree, then use symbolic links to make it appear as though the files
-are installed in the common tree. Administration can be performed in
-the package's private tree in isolation from clutter from other
-packages.  Stow can then be used to update the symbolic links. The
-structure of each private tree should reflect the desired structure in
-the common tree; i.e. (in the typical case) there should be a F<bin>
-directory containing executables, a F<man/man1> directory containing
-section 1 man pages, and so on.
+Originally Stow was born to address the need to administer, upgrade,
+install, and remove files in independent software packages without
+confusing them with other files sharing the same file system space.
+For instance, many years ago it used to be common to compile programs
+such as Perl and Emacs from source.  By using Stow, F</usr/local/bin>
+could contain symlinks to files within F</usr/local/stow/emacs/bin>,
+F</usr/local/stow/perl/bin> etc., and likewise recursively for any
+other subdirectories such as F<.../share>, F<.../man>, and so on.
+
+While this is useful for keeping track of system-wide and per-user
+installations of software built from source, in more recent times
+software packages are often managed by more sophisticated package
+management software such as rpm, dpkg, and Nix / GNU Guix, or
+language-native package managers such as Ruby's gem, Python's pip,
+Javascript's npm, and so on.
+
+However Stow is still used not only for software package management,
+but also for other purposes, such as facilitating a more controlled
+approach to management of configuration files in the user's home
+directory, especially when coupled with version control systems.
 
 Stow was inspired by Carnegie Mellon's Depot program, but is
 substantially simpler and safer. Whereas Depot required database files
@@ -65,6 +68,9 @@ file hierarchies don't match the database. Also unlike Depot, Stow
 will never delete any files, directories, or links that appear in a
 Stow directory (e.g., F</usr/local/stow/emacs>), so it's always
 possible to rebuild the target tree (e.g., F</usr/local>).
+
+Stow is implemented as a combination of a Perl script providing a CLI
+interface, and a backend Perl module which does most of the work.
 
 =head1 TERMINOLOGY
 
@@ -152,7 +158,7 @@ directory.
 =item --verbose[=N]
 
 Send verbose output to standard error describing what Stow is
-doing. Verbosity levels are 0, 1, 2, 3, and 4; 0 is the default.
+doing. Verbosity levels are from 0 to 5; 0 is the default.
 Using C<-v> or C<--verbose> increases the verbosity by one; using
 `--verbose=N' sets it to N.
 
@@ -213,6 +219,22 @@ stowed to another package.
 
 Force stowing files beginning with this Perl regex if the file is
 already stowed to another package.
+
+=item --dotfiles
+
+Enable special handling for "dotfiles" (files or folders whose name
+begins with a period) in the package directory. If this option is
+enabled, Stow will add a preprocessing step for each file or folder
+whose name begins with "dot-", and replace the "dot-" prefix in the
+name by a period (.). This is useful when Stow is used to manage
+collections of dotfiles, to avoid having a package directory full of
+hidden files.
+
+For example, suppose we have a package containing two files,
+F<stow/dot-bashrc> and F<stow/dot-emacs.d/init.el>. With this option,
+Stow will create symlinks from F<.bashrc> to F<stow/dot-bashrc> and
+from F<.emacs.d/init.el> to F<stow/dot-emacs.d/init.el>. Any other
+files, whose name does not begin with "dot-", will be processed as usual.
 
 =item -V
 
@@ -323,6 +345,28 @@ Stow will re-fold the tree by removing the symlinks to the surviving
 package, removing the directory, then linking the directory back to
 the surviving package.
 
+=head1 RESOURCE FILES
+
+F<Stow> searches for default command line options at F<.stowrc> (current
+directory) and F<~/.stowrc> (home directory) in that order. If both
+locations are present, the files are effectively appended together.
+
+The effect of options in the resource file is similar to simply prepending
+the options to the command line. For options that provide a single value,
+such as F<--target> or F<--dir>, the command line option will overwrite any
+options in the resource file. For options that can be given more than once,
+F<--ignore> for example, command line options and resource options are
+appended together.
+
+Environment variables and the tilde character (F<~>) will be expanded for
+options that take a file path.
+
+The options F<-D>, F<-R>, F<-S>, and any packages listed in the resource
+file are ignored.
+
+See the info manual for more information on how stow handles resource
+file.
+
 =head1 SEE ALSO
 
 The full documentation for F<stow> is maintained as a Texinfo manual.
@@ -412,7 +456,8 @@ use warnings;
 require 5.006_001;
 
 use POSIX qw(getcwd);
-use Getopt::Long;
+use Getopt::Long qw(GetOptionsFromArray);
+use Scalar::Util qw(reftype);
 
 use lib "$ENV{HOME}/dotfiles/stow/share/perl";
 use Stow;
@@ -461,27 +506,75 @@ sub main {
 
 #===== SUBROUTINE ===========================================================
 # Name      : process_options()
-# Purpose   : parse command line options
+# Purpose   : Parse and process command line and .stowrc file options
 # Parameters: none
 # Returns   : (\%options, \@pkgs_to_unstow, \@pkgs_to_stow)
-# Throws    : a fatal error if a bad command line option is given
+# Throws    : a fatal error if a bad option is given
 # Comments  : checks @ARGV for valid package names
 #============================================================================
 sub process_options {
+    # Get cli options.
+    my ($cli_options,
+        $pkgs_to_unstow,
+        $pkgs_to_stow) = parse_options(@ARGV);
+
+    # Get the .stowrc options.
+    # Note that rc_pkgs_to_unstow and rc_pkgs_to_stow are ignored.
+    my ($rc_options,
+        $rc_pkgs_to_unstow,
+        $rc_pkgs_to_stow) = get_config_file_options();
+
+    # Merge .stowrc and command line options.
+    # Preference is given to cli options.
+    my %options = %$rc_options;
+    foreach my $option (keys %$cli_options) {
+        my $rc_value = $rc_options->{$option};
+        my $cli_value = $cli_options->{$option};
+        my $type = reftype($cli_value);
+
+        if (defined $type && $type eq 'ARRAY' && defined $rc_value) {
+            # rc options come first in merged arrays.
+            $options{$option} = [@{$rc_value}, @{$cli_value}];
+        } else {
+            # cli options overwrite conflicting rc options.
+            $options{$option} = $cli_value;
+        }
+    }
+
+    # Run checks on the merged options.
+    sanitize_path_options(\%options);
+    check_packages($pkgs_to_unstow, $pkgs_to_stow);
+
+    # Return merged and processed options.
+    return (\%options, $pkgs_to_unstow, $pkgs_to_stow);
+}
+
+#===== SUBROUTINE ===========================================================
+# Name      : parse_options()
+# Purpose   : parse command line options
+# Parameters: @arg_array => array of options to parse
+#             Example: parse_options(@ARGV)
+# Returns   : (\%options, \@pkgs_to_unstow, \@pkgs_to_stow)
+# Throws    : a fatal error if a bad command line option is given
+# Comments  : Used for parsing both command line options and rc file. Used
+#             for parsing only. Sanity checks and post-processing belong in
+#             process_options().
+#============================================================================
+sub parse_options {
     my %options        = ();
     my @pkgs_to_unstow = ();
     my @pkgs_to_stow   = ();
     my $action = 'stow';
 
-    unshift @ARGV, get_config_file_options();
-    #$,="\n"; print @ARGV,"\n"; # for debugging rc file
+    #$,="\n"; print @_,"\n"; # for debugging rc file
 
     Getopt::Long::config('no_ignore_case', 'bundling', 'permute');
-    GetOptions(
+    GetOptionsFromArray(
+        \@_,
         \%options,
         'verbose|v:+', 'help|h', 'simulate|n|no',
         'version|V', 'compat|p', 'dir|d=s', 'target|t=s',
-        'adopt', 'no-folding',
+        'adopt', 'no-folding', 'dotfiles',
 
         # clean and pre-compile any regex's at parse time
         'ignore=s' =>
@@ -523,13 +616,10 @@ sub process_options {
                 push @pkgs_to_stow, $_[0];
             }
         },
-    ) or usage();
+    ) or usage('');
 
     usage()   if $options{help};
     version() if $options{version};
-
-    sanitize_path_options(\%options);
-    check_packages(\@pkgs_to_unstow, \@pkgs_to_stow);
 
     return (\%options, \@pkgs_to_unstow, \@pkgs_to_stow);
 }
@@ -537,17 +627,16 @@ sub process_options {
 sub sanitize_path_options {
     my ($options) = @_;
 
-    if (exists $options->{dir}) {
-        $options->{dir}    =~ s/\A +//;
-        $options->{dir}    =~ s/ +\z//;
-    }
-    else {
-        $options->{dir} = exists $ENV{STOW_DIR} ? $ENV{STOW_DIR} : getcwd();
+    unless (exists $options->{dir}) {
+        $options->{dir} = length $ENV{STOW_DIR} ? $ENV{STOW_DIR} : getcwd();
     }
 
+    usage("--dir value '$options->{dir}' is not a valid directory")
+        unless -d $options->{dir};
+
     if (exists $options->{target}) {
-        $options->{target} =~ s/\A +//;
-        $options->{target} =~ s/ +\z//;
+        usage("--target value '$options->{target}' is not a valid directory")
+            unless -d $options->{target};
     }
     else {
         $options->{target} = parent($options->{dir}) || '.';
@@ -570,22 +659,25 @@ sub check_packages {
     }
 }
 
-
 #===== SUBROUTINE ============================================================
 # Name      : get_config_file_options()
 # Purpose   : search for default settings in any .stowrc files
 # Parameters: none
-# Returns   : a list of default options
-# Throws    : no exceptions
-# Comments  : prepends the contents of '~/.stowrc' and '.stowrc' to the command
-#           : line so they get parsed just like normal arguments. (This was
-#           : hacked in so that Emil and I could set different preferences).
+# Returns   : (\%rc_options, \@rc_pkgs_to_unstow, \@rc_pkgs_to_stow)
+# Throws    : a fatal error if a bad option is given
+# Comments  : Parses the contents of '~/.stowrc' and '.stowrc' with the same
+#             parser as the command line options. Additionally expands any
+#             environment variables or ~ character in --target or --dir
+#             options.
 #=============================================================================
 sub get_config_file_options {
     my @defaults = ();
-    for my $file ("$ENV{HOME}/.stowrc", '.stowrc') {
+    my @dirlist = ('.stowrc');
+    if (defined($ENV{HOME})) {
+        unshift(@dirlist, "$ENV{HOME}/.stowrc");
+    }
+    for my $file (@dirlist) {
         if (-r $file) {
-            warn "Loading defaults from $file\n";
             open my $FILE, '<', $file
                 or die "Could not open $file for reading\n";
             while (my $line = <$FILE>){
@@ -595,8 +687,101 @@ sub get_config_file_options {
             close $FILE or die "Could not close open file: $file\n";
         }
     }
-    return @defaults;
+
+    # Parse the options
+    my ($rc_options, $rc_pkgs_to_unstow, $rc_pkgs_to_stow) = parse_options(@defaults);
+
+    # Expand environment variables and glob characters.
+    if (exists $rc_options->{target}) {
+        $rc_options->{target} =
+            expand_filepath($rc_options->{target}, '--target option');
+    }
+    if (exists $rc_options->{dir}) {
+        $rc_options->{dir} =
+            expand_filepath($rc_options->{dir}, '--dir option');
+    }
+
+    return ($rc_options, $rc_pkgs_to_unstow, $rc_pkgs_to_stow);
 }
+
+#===== SUBROUTINE ============================================================
+# Name      : expand_filepath()
+# Purpose   : Handles expansions that need to be applied to
+#           : file paths. Currently expands environment
+#           : variables and the tilde.
+# Parameters: $path => string to perform expansion on.
+#           : $source => where the string came from
+# Returns   : String with replacements performed.
+# Throws    : n/a
+# Comments  : n/a
+#=============================================================================
+sub expand_filepath {
+    my ($path, $source) = @_;
+
+    $path = expand_environment($path, $source);
+    $path = expand_tilde($path);
+
+    return $path;
+}
+
+#===== SUBROUTINE ============================================================
+# Name      : expand_environment()
+# Purpose   : Expands evironment variables.
+# Parameters: $path => string to perform expansion on.
+#           : $source => where the string came from
+# Returns   : String with replacements performed.
+# Throws    : n/a
+# Comments  : Variable replacement mostly based on SO answer
+#           : http://stackoverflow.com/a/24675093/558820
+#=============================================================================
+sub expand_environment {
+    my ($path, $source) = @_;
+    # Replace non-escaped $VAR and ${VAR} with $ENV{VAR}
+    # If $ENV{VAR} does not exist, perl will raise a warning
+    # and then happily treat it as an empty string.
+    $path =~ s/(?<!\\)\$\{((?:\w|\s)+)\}/
+               _safe_expand_env_var($1, $source)
+              /ge;
+    $path =~ s/(?<!\\)\$(\w+)/
+               _safe_expand_env_var($1, $source)
+              /ge;
+    # Remove \$ escapes.
+    $path =~ s/\\\$/\$/g;
+    return $path;
+}
+
+sub _safe_expand_env_var {
+    my ($var, $source) = @_;
+    unless (exists $ENV{$var}) {
+        die "$source references undefined environment variable \$$var; " .
+            "aborting!\n";
+    }
+    return $ENV{$var};
+}
+
+#===== SUBROUTINE ============================================================
+# Name      : expand_tilde()
+# Purpose   : Expands tilde to user's home directory path.
+# Parameters: $path => string to perform expansion on.
+# Returns   : String with replacements performed.
+# Throws    : n/a
+# Comments  : http://docstore.mik.ua/orelly/perl4/cook/ch07_04.htm
+#=============================================================================
+sub expand_tilde {
+    my ($path) = @_;
+    # Replace tilde with home path.
+	$path =~ s{ ^ ~ ( [^/]* ) }
+                  { $1
+                    ? (getpwnam($1))[7]
+                    : ( $ENV{HOME} || $ENV{LOGDIR}
+                         || (getpwuid($<))[7]
+                      )
+    }ex;
+    # Replace espaced tilde with regular tilde.
+    $path =~ s/\\~/~/g;
+	return $path
+}
+
 
 #===== SUBROUTINE ===========================================================
 # Name      : usage()
@@ -610,7 +795,7 @@ sub usage {
     my ($msg) = @_;
 
     if ($msg) {
-        print "$ProgramName: $msg\n\n";
+        warn "$ProgramName: $msg\n\n";
     }
 
     print <<"EOT";
@@ -639,7 +824,7 @@ OPTIONS:
     -p, --compat          Use legacy algorithm for unstowing
 
     -n, --no, --simulate  Do not actually make any filesystem changes
-    -v, --verbose[=N]     Increase verbosity (levels are 0,1,2,3;
+    -v, --verbose[=N]     Increase verbosity (levels are from 0 to 5;
                             -v or --verbose adds 1; --verbose=N sets level)
     -V, --version         Show stow version number
     -h, --help            Show this help

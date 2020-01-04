@@ -1,10 +1,25 @@
 #!/usr/bin/perl
+#
+# This file is part of GNU Stow.
+#
+# GNU Stow is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GNU Stow is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see https://www.gnu.org/licenses/.
 
 package Stow;
 
 =head1 NAME
 
-Stow - manage the installation of multiple software packages
+Stow - manage farms of symbolic links
 
 =head1 SYNOPSIS
 
@@ -41,10 +56,10 @@ use File::Spec;
 use POSIX qw(getcwd);
 
 use Stow::Util qw(set_debug_level debug error set_test_mode
-                  join_paths restore_cwd canon_path parent);
+                  join_paths restore_cwd canon_path parent adjust_dotfile);
 
 our $ProgramName = 'stow';
-our $VERSION = '2.2.2';
+our $VERSION = '2.3.1';
 
 our $LOCAL_IGNORE_FILE  = '.stow-local-ignore';
 our $GLOBAL_IGNORE_FILE = '.stow-global-ignore';
@@ -60,6 +75,7 @@ our %DEFAULT_OPTIONS = (
     paranoid     => 0,
     compat       => 0,
     test_mode    => 0,
+    dotfiles     => 0,
     adopt        => 0,
     'no-folding' => 0,
     ignore       => [],
@@ -338,7 +354,9 @@ sub within_target_do {
 # Parameters: $stow_path => relative path from current (i.e. target) directory
 #           :               to the stow dir containing the package to be stowed
 #           : $package => the package whose contents are being stowed
-#           : $target => subpath relative to package and target directories
+#           : $target => subpath relative to package directory which needs
+#           :            stowing as a symlink at subpath relative to target
+#           :            directory.
 #           : $source => relative path from the (sub)dir of target
 #           :            to symlink source
 # Returns   : n/a
@@ -377,6 +395,13 @@ sub stow_contents {
         next NODE if $node eq '..';
         my $node_target = join_paths($target, $node);
         next NODE if $self->ignore($stow_path, $package, $node_target);
+
+        if ($self->{dotfiles}) {
+            my $adj_node_target = adjust_dotfile($node_target);
+            debug(4, "  Adjusting: $node_target => $adj_node_target");
+            $node_target = $adj_node_target;
+        }
+
         $self->stow_node(
             $stow_path,
             $package,
@@ -392,7 +417,9 @@ sub stow_contents {
 # Parameters: $stow_path => relative path from current (i.e. target) directory
 #           :               to the stow dir containing the node to be stowed
 #           : $package => the package containing the node being stowed
-#           : $target => subpath relative to package and target directories
+#           : $target => subpath relative to package directory of node which
+#           :            needs stowing as a symlink at subpath relative to
+#           :            target directory.
 #           : $source => relative path to symlink source from the dir of target
 # Returns   : n/a
 # Throws    : fatal exception if a conflict arises
@@ -559,7 +586,7 @@ sub should_skip_target_which_is_stow_dir {
         return 1;
     }
 
-    debug (4, "$target not protected");
+    debug(4, "$target not protected");
     return 0;
 }
 
@@ -744,6 +771,13 @@ sub unstow_contents {
         next NODE if $node eq '..';
         my $node_target = join_paths($target, $node);
         next NODE if $self->ignore($stow_path, $package, $node_target);
+
+        if ($self->{dotfiles}) {
+            my $adj_node_target = adjust_dotfile($node_target);
+            debug(4, "  Adjusting: $node_target => $adj_node_target");
+            $node_target = $adj_node_target;
+        }
+
         $self->unstow_node($stow_path, $package, $node_target);
     }
     if (-d $target) {
@@ -801,6 +835,12 @@ sub unstow_node {
         # Does the existing $target actually point to anything?
         if (-e $existing_path) {
             # Does link points to the right place?
+
+            # Adjust for dotfile if necessary.
+            if ($self->{dotfiles}) {
+                $existing_path = adjust_dotfile($existing_path);
+            }
+
             if ($existing_path eq $path) {
                 $self->do_unlink($target);
             }
@@ -876,18 +916,20 @@ sub path_owned_by_package {
 # Name      : find_stowed_path()
 # Purpose   : determine whether the given link points to a member of a
 #           : stowed package
-# Parameters: $target => path to a symbolic link under current directory
+# Parameters: $target => path to a symbolic link under current directory.
+#           :            Must share a common prefix with $self->{stow_path}
 #           : $source => where that link points to (needed because link
 #           :            might not exist yet due to two-phase approach,
-#           :            so we can't just call readlink())
+#           :            so we can't just call readlink()).  This must be
+#           :            expressed relative to (the directory containing)
+#           :            $target.
 # Returns   : ($path, $stow_path, $package) where $path and $stow_path are
 #           : relative from the current (i.e. target) directory.  $path
 #           : is the full relative path, $stow_path is the relative path
 #           : to the stow directory, and $package is the name of the package.
 #           : or ('', '', '') if link is not owned by stow
 # Throws    : n/a
-# Comments  : Needs 
-#           : Allow for stow dir not being under target dir.
+# Comments  : Allow for stow dir not being under target dir.
 #           : We could put more logic under here for multiple stow dirs.
 #============================================================================
 sub find_stowed_path {
@@ -919,6 +961,12 @@ sub find_stowed_path {
     # If no .stow file was found, we need to find out whether it's
     # owned by the current stow directory, in which case $path will be
     # a prefix of $self->{stow_path}.
+    if (substr($path, 0, 1) eq '/' xor substr($self->{stow_path}, 0, 1) eq '/')
+    {
+        warn "BUG in find_stowed_path? Absolute/relative mismatch between " .
+             "Stow dir $self->{stow_path} and path $path";
+    }
+
     my @stow_path = split m{/+}, $self->{stow_path};
 
     # Strip off common prefixes until one is empty
@@ -935,7 +983,7 @@ sub find_stowed_path {
     }
 
     my $package = shift @path;
-    
+
     debug(4, "    yes - by $package in " . join_paths(@path));
     return ($path, $self->{stow_path}, $package);
 }
