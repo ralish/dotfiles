@@ -13,6 +13,18 @@ Icon
 ehthumbs.db
 Thumbs.db
 
+# Temporary
+*~
+*.bak
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Logs
+*.log
+logs/
+
 # Vim
 .netrwhist
 [._]*.s[a-v][a-z]
@@ -25,14 +37,6 @@ Thumbs.db
 # Visual Studio Code
 .vscode/ipch
 
-# Temporary
-*~
-*.bak
-*.tmp
-*.temp
-tmp/
-temp/
-
 
 # ******************************* Components **********************************
 
@@ -44,7 +48,6 @@ temp/
 
 # Clink
 /clink/.history
-/clink/clink.log
 
 # CPAN
 /cpan/.cpan/.lock
