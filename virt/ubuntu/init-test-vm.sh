@@ -58,3 +58,5 @@ if [[ -f /etc/update-manager/release-upgrades ]]; then
     sed -i 's/^Prompt=lts$/Prompt=never/' /etc/update-manager/release-upgrades
     echo
 fi
+
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
