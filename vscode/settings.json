@@ -91,6 +91,7 @@
     "php.executablePath": "C:\\PHP\\php.exe",
 
     // Extension: PowerShell
+    "powershell.integratedConsole.showOnStartup": false,
     "powershell.scriptAnalysis.settingsPath": "C:\\Users\\SDL\\Code\\Personal\\dotfiles\\posh\\PSScriptAnalyzerSettings.psd1",
 
     // Extension: Python
