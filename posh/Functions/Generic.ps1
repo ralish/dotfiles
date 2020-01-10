@@ -182,7 +182,7 @@ Function Format-SizeDigital {
 Function Format-Xml {
     [CmdletBinding()]
     Param(
-        [Parameter(ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [String[]]$Xml
     )
 
