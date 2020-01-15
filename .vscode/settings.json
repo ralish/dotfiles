@@ -5,6 +5,8 @@
         "**/bazaar/*.conf": "ini",
         // curl
         ".curlrc": "properties",
+        // dig
+        ".digrc": "properties",
         // editline
         ".editrc": "properties",
         // git

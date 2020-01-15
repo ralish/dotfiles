@@ -1,0 +1,4 @@
+# Suppress version and query options
++nocmd
+
+# vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
