@@ -36,6 +36,48 @@ Function Switch-Cygwin {
     }
 }
 
+# Configure environment for Google (depot_tools) usage
+Function Switch-Google {
+    [CmdletBinding()]
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [String]$Path="$HOME\Code\Google\depot_tools",
+
+        [Parameter(Mandatory)]
+        [String]$VsVersion,
+
+        [Switch]$Persist,
+        [Switch]$Disable
+    )
+
+    if (-not (Test-Path -Path $Path -PathType Container)) {
+        throw 'Provided depot_tools path is not a directory: {0}' -f $Path
+    }
+
+    $Params = @{ }
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+    } else {
+        $Operation = 'Add-PathStringElement'
+        $Params['Action'] = 'Prepend'
+    }
+
+    $env:Path = $env:Path |
+        & $Operation -Element $Path @Params
+
+    $env:DEPOT_TOOLS_WIN_TOOLCHAIN = 0
+    $env:GYP_MSVS_VERSION = $VsVersion
+
+    if ($Persist) {
+        Get-EnvironmentVariable -Name Path |
+            & $Operation -Element $Path @Params |
+            Set-EnvironmentVariable -Name Path
+
+        Set-EnvironmentVariable -Name DEPOT_TOOLS_WIN_TOOLCHAIN -Value $env:DEPOT_TOOLS_WIN_TOOLCHAIN
+        Set-EnvironmentVariable -Name GYP_MSVS_VERSION -Value $env:GYP_MSVS_VERSION
+    }
+}
+
 # Configure environment for Node.js development
 Function Switch-Nodejs {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
