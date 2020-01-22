@@ -22,7 +22,9 @@ else
     sed -i 's/\([a-z]\{2\}\.\)\?archive\.ubuntu\.com/old-releases.ubuntu.com/' /etc/apt/sources.list
     sed -i 's/security\.ubuntu\.com/old-releases.ubuntu.com/' /etc/apt/sources.list
 fi
-echo
+
+echo '[apt] Disabling automatic updates ...'
+echo 'APT::Periodic::Enable "0";' > /etc/apt/apt.conf.d/05periodic
 
 echo '[apt] Updating package indexes ...'
 apt-get update
@@ -38,25 +40,21 @@ echo
 
 echo '[apt] Cleaning local repository ...'
 apt-get clean
-echo
 
 echo '[apt] Removing package indexes ...'
 rm -rf /var/lib/apt/lists
 mkdir -p /var/lib/apt/lists/partial
-echo
 
 if [[ -f /etc/sudoers ]]; then
     echo '[sudo] Disabling password prompts ...'
     sed -i 's/^root[[:blank:]].*/root    ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
     sed -i 's/^%sudo[[:blank:]].*/%sudo   ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
     sed -i 's/^%admin[[:blank:]].*/%admin  ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
-    echo
 fi
 
 if [[ -f /etc/update-manager/release-upgrades ]]; then
     echo '[update-manager] Disabling release upgrade prompts ...'
     sed -i 's/^Prompt=lts$/Prompt=never/' /etc/update-manager/release-upgrades
-    echo
 fi
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
