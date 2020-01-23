@@ -5,6 +5,8 @@
         "**/bazaar/*.conf": "ini",
         // curl
         ".curlrc": "properties",
+        // cygwin
+        ".startxwinrc": "shellscript",
         // dig
         ".digrc": "properties",
         // editline

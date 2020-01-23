@@ -1,4 +1,4 @@
-﻿<#
+<#
 From http://ethanschoonover.com/solarized#usage-development
 Base colors:
 base03    #002b36
@@ -10,19 +10,19 @@ base1     #93a1a1
 base2     #eee8d5
 base3     #fdf6e3
 
-The base colors are chosen depending upon the light or dark theme. 
+The base colors are chosen depending upon the light or dark theme.
 base*3    background
-base*2    background highlights 
+base*2    background highlights
 base*1    optional emphasized content; comments/ secondary content
 base*0    body text/ default code/ primary content
 
 Dark theme uses base0[1-3],base[0-1].
-  Background is base03. Highlights are base02. Comments are base01. Body text is base0. Emphasized text is base1. 
+  Background is base03. Highlights are base02. Comments are base01. Body text is base0. Emphasized text is base1.
 
 Light theme uses base[1-3],base0[0-1].
-  Background is base3. Highlights are base2. Comments are base1. Body text is base00. Emphasized test is base01. 
+  Background is base3. Highlights are base2. Comments are base1. Body text is base00. Emphasized test is base01.
 
-Others colors as follows. These are common to both themes. 
+Others colors as follows. These are common to both themes.
 yellow    #b58900
 orange    #cb4b16
 red       #dc322f
@@ -32,41 +32,41 @@ blue      #268bd2
 cyan      #2aa198
 green     #859900
 
-In PowerShell ISE, token colors can be set via $psISE.Options.TokenColors. 
-Pane colors can be set via $psISE.Options.CommandPaneBackgroundColor etc. 
+In PowerShell ISE, token colors can be set via $psISE.Options.TokenColors.
+Pane colors can be set via $psISE.Options.CommandPaneBackgroundColor etc.
 See http://technet.microsoft.com/en-us/library/dd819482.aspx
 #>
 
 <#
 .SYNOPSIS
-Sets the colors of the PowerShell ISE from the Solarized color palette. 
+Sets the colors of the PowerShell ISE from the Solarized color palette.
 
 .DESCRIPTION
 Solarized is a sixteen color palette (eight monotones, eight accent colors) designed for use with terminal and GUI applications. You can read more about it at http://ethanschoonover.com/solarized.
 
 This script sets the colors of your PowerShell ISE from the Solarized color palette. Without any switches it sets colors from the light palette. With the correct it sets colors from the dark palette.
 
-It works with both PowerShell 2.0 and 3.0 ISE. Only the Script pane colors can be changed between light and dark; the Output/ Command/ Console pane colors are always set to dark. 
+It works with both PowerShell 2.0 and 3.0 ISE. Only the Script pane colors can be changed between light and dark; the Output/ Command/ Console pane colors are always set to dark.
 
 .PARAMETER Dark
-If specified, colors are set from the dark palette. 
+If specified, colors are set from the dark palette.
 
-This parameter is optional. If not specified colors are set from the light palette. 
+This parameter is optional. If not specified colors are set from the light palette.
 
 .PARAMETER FontSize
-If specified, sets the font size. 
+If specified, sets the font size.
 
-This parameter is optional. If not specified size 10 is used. 
+This parameter is optional. If not specified size 10 is used.
 
 .EXAMPLE
 Solarize-PSISE -Dark
 
-To set colors from the dark palette. 
+To set colors from the dark palette.
 
 .EXAMPLE
 Solarize-PSISE
 
-To set colors from the light palette. 
+To set colors from the light palette.
 
 .LINK
 http://ethanschoonover.com/solarized
@@ -75,9 +75,9 @@ http://ethanschoonover.com/solarized
 https://github.com/rakheshster/Solarize-PSISE
 
 .NOTES
-Future versions should allow users to specify Font Name via parameters. 
+Future versions should allow users to specify Font Name via parameters.
 
-Future version could also include a switch to set the Output/ Command/ Console pane colors along with Script pane colors. 
+Future version could also include a switch to set the Output/ Command/ Console pane colors along with Script pane colors.
 #>
 
 # Defining a switch parameter which lets you flick between dark and light themes
@@ -118,7 +118,7 @@ $secondaryCol = if ($Dark) { $base01 } else { $base1 }
 
 ## Variables for the fonts
 ## These are the default PowerShell font and size; change if you want to.
-## !!TODO!! allow users to specify this on the command line? Obviously check with the installed fonts to validate. 
+## !!TODO!! allow users to specify this on the command line? Obviously check with the installed fonts to validate.
 $Font     = "Lucida Console"
 
 # The actual action starts here.
@@ -183,7 +183,7 @@ $psISE.Options.TokenColors.Item("Unknown") = $primaryCol
 # Variables.
 $psISE.Options.TokenColors.Item("Variable") = $orange
 
-# Setting the background color of various messages to that of highlighted text of dark theme. 
+# Setting the background color of various messages to that of highlighted text of dark theme.
 $psISE.Options.ErrorBackgroundColor = $base02
 $psISE.Options.WarningBackgroundColor = $base02
 $psISE.Options.VerboseBackgroundColor = $base02
@@ -193,7 +193,7 @@ $psISE.Options.DebugBackgroundColor = $base02
 $psISE.Options.ErrorForegroundColor = $green
 $psISE.Options.WarningForegroundColor = $orange
 $psISE.Options.VerboseForegroundColor = $yellow
-$psISE.Options.DebugForegroundColor = $blue  
+$psISE.Options.DebugForegroundColor = $blue
 
 # Now for the PowerShell ISE version specific stuff
 if ($PSVersionTable.PSVersion.Major -eq 2) {
@@ -206,7 +206,7 @@ if ($PSVersionTable.PSVersion.Major -eq 2) {
   $psISE.Options.OutputPaneBackgroundColor = $psISE.Options.OutputPaneTextBackgroundColor = $base03
   $psISE.Options.OutputPaneForegroundColor = $base1
 } else {
-  # PowerShell 3.0 ISE and later specific stuff go here. No Command pane & Output pane. 
+  # PowerShell 3.0 ISE and later specific stuff go here. No Command pane & Output pane.
   # Has a Console pane that is essentially the Command & Output panes combined and supports token colors! W00t!
 
   # Console pane colors.
@@ -236,7 +236,7 @@ if ($PSVersionTable.PSVersion.Major -eq 2) {
   $psISE.Options.ConsoleTokenColors.Item("Variable") = $orange
 
   # When you hover over the outlining lines there's a brief flash of white background in the script pane
-  # I don't know any workaround so I disable Outlining altogether. 
+  # I don't know any workaround so I disable Outlining altogether.
   $psISE.Options.ShowOutlining = $false
 }
 
