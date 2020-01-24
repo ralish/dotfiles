@@ -38,6 +38,62 @@ Function Switch-Cygwin {
     }
 }
 
+# Configure environment for Go usage
+Function Switch-Go {
+    [CmdletBinding()]
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [String]$Path="$env:HOMEDRIVE\Go",
+
+        [Switch]$Persist,
+        [Switch]$Disable
+    )
+
+    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+        throw 'Provided Go path is not a directory: {0}' -f $Path
+    }
+
+    $Params = @{ }
+    if (!$Disable) {
+        $Operation = 'Add-PathStringElement'
+        $Params['Action'] = 'Prepend'
+    } else {
+        $Operation = 'Remove-PathStringElement'
+    }
+
+    $BinPath = Join-Path -Path $Path -ChildPath 'bin'
+
+    $GoPaths = @()
+    if ($env:GOPATH) {
+        foreach ($GoPath in $env:GOPATH.Split([IO.Path]::PathSeparator)) {
+            $GoPaths += Join-Path -Path $GoPath -ChildPath 'bin'
+        }
+    }
+
+    $env:Path = $env:Path |
+        & $Operation -Element $BinPath @Params
+
+    if ($GoPaths) {
+        foreach ($GoPath in $GoPaths) {
+            $env:Path = $env:Path | & $Operation -Element $GoPath @Params
+        }
+    }
+
+    if ($Persist) {
+        Get-EnvironmentVariable -Name Path |
+            & $Operation -Element $BinPath @Params |
+            Set-EnvironmentVariable -Name Path
+
+        if ($GoPaths) {
+            foreach ($GoPath in $GoPaths) {
+                Get-EnvironmentVariable -Name Path |
+                    & $Operation -Element $GoPath @Params |
+                    Set-EnvironmentVariable -Name Path
+            }
+        }
+    }
+}
+
 # Configure environment for Google (depot_tools) usage
 Function Switch-Google {
     [CmdletBinding(DefaultParameterSetName='Enable')]
