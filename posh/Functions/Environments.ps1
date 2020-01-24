@@ -15,10 +15,8 @@ Function Switch-Cygwin {
         throw 'Provided Cygwin path is not a directory: {0}' -f $Path
     }
 
-    $Params = @{ }
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
-        $Params['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
@@ -27,13 +25,13 @@ Function Switch-Cygwin {
     $LocalBinPath = Join-Path -Path $Path -ChildPath 'usr\local\bin'
 
     $env:Path = $env:Path |
-        & $Operation -Element $BinPath @Params |
-        & $Operation -Element $LocalBinPath @Params
+        & $Operation -Action Prepend -Element $BinPath |
+        & $Operation -Action Prepend -Element $LocalBinPath
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            & $Operation -Element $BinPath @Params |
-            & $Operation -Element $LocalBinPath @Params |
+            & $Operation -Action Append -Element $LocalBinPath |
+            & $Operation -Action Append -Element $BinPath |
             Set-EnvironmentVariable -Name Path
     }
 }
@@ -53,10 +51,8 @@ Function Switch-Go {
         throw 'Provided Go path is not a directory: {0}' -f $Path
     }
 
-    $Params = @{ }
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
-        $Params['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
@@ -71,23 +67,24 @@ Function Switch-Go {
     }
 
     $env:Path = $env:Path |
-        & $Operation -Element $BinPath @Params
+        & $Operation -Action Prepend -Element $BinPath
 
     if ($GoPaths) {
         foreach ($GoPath in $GoPaths) {
-            $env:Path = $env:Path | & $Operation -Element $GoPath @Params
+            $env:Path = $env:Path |
+                & $Operation -Action Prepend -Element $GoPath
         }
     }
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            & $Operation -Element $BinPath @Params |
+            & $Operation -Action Append -Element $BinPath |
             Set-EnvironmentVariable -Name Path
 
         if ($GoPaths) {
             foreach ($GoPath in $GoPaths) {
                 Get-EnvironmentVariable -Name Path |
-                    & $Operation -Element $GoPath @Params |
+                    & $Operation -Action Append -Element $GoPath |
                     Set-EnvironmentVariable -Name Path
             }
         }
@@ -114,10 +111,8 @@ Function Switch-Google {
         throw 'Provided depot_tools path is not a directory: {0}' -f $Path
     }
 
-    $Params = @{ }
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
-        $Params['Action'] = 'Prepend'
         $DepotToolsWinToolchain = 0
     } else {
         $Operation = 'Remove-PathStringElement'
@@ -126,14 +121,14 @@ Function Switch-Google {
     }
 
     $env:Path = $env:Path |
-        & $Operation -Element $Path @Params
+        & $Operation -Action Prepend -Element $Path
 
     $env:DEPOT_TOOLS_WIN_TOOLCHAIN = $DepotToolsWinToolchain
     $env:GYP_MSVS_VERSION = $VsVersion
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            & $Operation -Element $Path @Params |
+            & $Operation -Action Append -Element $Path |
             Set-EnvironmentVariable -Name Path
 
         Set-EnvironmentVariable -Name DEPOT_TOOLS_WIN_TOOLCHAIN -Value $DepotToolsWinToolchain
@@ -157,10 +152,8 @@ Function Switch-Nodejs {
         throw 'Provided Nodejs path is not a directory: {0}' -f $Path
     }
 
-    $Params = @{ }
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
-        $Params['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
@@ -168,13 +161,13 @@ Function Switch-Nodejs {
     $LocalNpmPath = Join-Path -Path $env:APPDATA -ChildPath 'npm'
 
     $env:Path = $env:Path |
-        & $Operation -Element $Path @Params |
-        & $Operation -Element $LocalNpmPath @Params
+        & $Operation -Action Prepend -Element $Path |
+        & $Operation -Action Prepend -Element $LocalNpmPath
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            & $Operation -Element $Path @Params |
-            & $Operation -Element $LocalNpmPath @Params |
+            & $Operation -Action Append -Element $LocalNpmPath |
+            & $Operation -Action Append -Element $Path |
             Set-EnvironmentVariable -Name Path
     }
 }
@@ -194,10 +187,8 @@ Function Switch-Perl {
         throw 'Provided Perl path is not a directory: {0}' -f $Path
     }
 
-    $Params = @{ }
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
-        $Params['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
@@ -207,15 +198,15 @@ Function Switch-Perl {
     $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
 
     $env:Path = $env:Path |
-        & $Operation -Element $PerlBinPath @Params |
-        & $Operation -Element $SiteBinPath @Params |
-        & $Operation -Element $RootBinPath @Params
+        & $Operation -Action Prepend -Element $PerlBinPath |
+        & $Operation -Action Prepend -Element $SiteBinPath |
+        & $Operation -Action Prepend -Element $RootBinPath
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            & $Operation -Element $PerlBinPath @Params |
-            & $Operation -Element $SiteBinPath @Params |
-            & $Operation -Element $RootBinPath @Params |
+            & $Operation -Action Append -Element $RootBinPath |
+            & $Operation -Action Append -Element $SiteBinPath |
+            & $Operation -Action Append -Element $PerlBinPath |
             Set-EnvironmentVariable -Name Path
     }
 }
@@ -234,20 +225,18 @@ Function Switch-PHP {
         throw 'Provided PHP path is not a directory: {0}' -f $Path
     }
 
-    $Params = @{ }
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
-        $Params['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
 
     $env:Path = $env:Path |
-        & $Operation -Element $Path @Params
+        & $Operation -Action Prepend -Element $Path
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            & $Operation -Element $Path @Params |
+            & $Operation -Action Append -Element $Path |
             Set-EnvironmentVariable -Name Path
     }
 }
@@ -276,10 +265,8 @@ Function Switch-Python {
         throw 'Provided Python path is not a directory: {0}' -f $Path
     }
 
-    $Params = @{ }
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
-        $Params['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
@@ -289,17 +276,17 @@ Function Switch-Python {
     $LocalScriptsVersionedPath = Join-Path -Path $env:APPDATA -ChildPath ('Python\Python{0}\Scripts' -f $StrippedVersion)
 
     $env:Path = $env:Path |
-        & $Operation -Element $Path @Params |
-        & $Operation -Element $ScriptsPath @Params |
-        & $Operation -Element $LocalScriptsSharedPath @Params |
-        & $Operation -Element $LocalScriptsVersionedPath @Params
+        & $Operation -Action Prepend -Element $Path |
+        & $Operation -Action Prepend -Element $ScriptsPath |
+        & $Operation -Action Prepend -Element $LocalScriptsSharedPath |
+        & $Operation -Action Prepend -Element $LocalScriptsVersionedPath
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            & $Operation -Element $Path @Params |
-            & $Operation -Element $ScriptsPath @Params |
-            & $Operation -Element $LocalScriptsSharedPath @Params |
-            & $Operation -Element $LocalScriptsVersionedPath @Params |
+            & $Operation -Action Append -Element $LocalScriptsVersionedPath |
+            & $Operation -Action Append -Element $LocalScriptsSharedPath |
+            & $Operation -Action Append -Element $ScriptsPath |
+            & $Operation -Action Append -Element $Path |
             Set-EnvironmentVariable -Name Path
     }
 }
@@ -324,10 +311,8 @@ Function Switch-Ruby {
         throw 'Provided Ruby path is not a directory: {0}' -f $Path
     }
 
-    $Params = @{ }
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
-        $Params['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
         $Options = [String]::Empty
@@ -336,13 +321,13 @@ Function Switch-Ruby {
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
     $env:Path = $env:Path |
-        & $Operation -Element $BinPath @Params
+        & $Operation -Action Prepend -Element $BinPath
 
     $env:RUBYOPT = $Options
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
-            & $Operation -Element $BinPath @Params |
+            & $Operation -Action Append -Element $BinPath |
             Set-EnvironmentVariable -Name Path
 
         Set-EnvironmentVariable -Name RUBYOPT -Value $Options
