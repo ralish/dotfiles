@@ -29,10 +29,15 @@ Function Switch-Cygwin {
         & $Operation -Action Prepend -Element $LocalBinPath
 
     if ($Persist) {
-        Get-EnvironmentVariable -Name Path |
+        $Params = @{ }
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $Params['Scope'] = 'Machine'
+        }
+
+        Get-EnvironmentVariable -Name Path @Params |
             & $Operation -Action Append -Element $LocalBinPath |
             & $Operation -Action Append -Element $BinPath |
-            Set-EnvironmentVariable -Name Path
+            Set-EnvironmentVariable -Name Path @Params
     }
 }
 
@@ -77,15 +82,25 @@ Function Switch-Go {
     }
 
     if ($Persist) {
-        Get-EnvironmentVariable -Name Path |
+        $Params = @{ }
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $Params['Scope'] = 'Machine'
+        }
+
+        Get-EnvironmentVariable -Name Path @Params |
             & $Operation -Action Append -Element $BinPath |
-            Set-EnvironmentVariable -Name Path
+            Set-EnvironmentVariable -Name Path @Params
 
         if ($GoPaths) {
             foreach ($GoPath in $GoPaths) {
-                Get-EnvironmentVariable -Name Path |
+                $Params = @{ }
+                if (!$GoPath.StartsWith($env:USERPROFILE)) {
+                    $Params['Scope'] = 'Machine'
+                }
+
+                Get-EnvironmentVariable -Name Path @Params |
                     & $Operation -Action Append -Element $GoPath |
-                    Set-EnvironmentVariable -Name Path
+                    Set-EnvironmentVariable -Name Path @Params
             }
         }
     }
@@ -127,9 +142,14 @@ Function Switch-Google {
     $env:GYP_MSVS_VERSION = $VsVersion
 
     if ($Persist) {
-        Get-EnvironmentVariable -Name Path |
+        $Params = @{ }
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $Params['Scope'] = 'Machine'
+        }
+
+        Get-EnvironmentVariable -Name Path @Params |
             & $Operation -Action Append -Element $Path |
-            Set-EnvironmentVariable -Name Path
+            Set-EnvironmentVariable -Name Path @Params
 
         Set-EnvironmentVariable -Name DEPOT_TOOLS_WIN_TOOLCHAIN -Value $DepotToolsWinToolchain
         Set-EnvironmentVariable -Name GYP_MSVS_VERSION -Value $VsVersion
@@ -165,9 +185,17 @@ Function Switch-Nodejs {
         & $Operation -Action Prepend -Element $LocalNpmPath
 
     if ($Persist) {
+        $Params = @{ }
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $Params['Scope'] = 'Machine'
+        }
+
+        Get-EnvironmentVariable -Name Path @Params |
+            & $Operation -Action Append -Element $Path |
+            Set-EnvironmentVariable -Name Path @Params
+
         Get-EnvironmentVariable -Name Path |
             & $Operation -Action Append -Element $LocalNpmPath |
-            & $Operation -Action Append -Element $Path |
             Set-EnvironmentVariable -Name Path
     }
 }
@@ -203,11 +231,16 @@ Function Switch-Perl {
         & $Operation -Action Prepend -Element $RootBinPath
 
     if ($Persist) {
-        Get-EnvironmentVariable -Name Path |
+        $Params = @{ }
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $Params['Scope'] = 'Machine'
+        }
+
+        Get-EnvironmentVariable -Name Path @Params |
             & $Operation -Action Append -Element $RootBinPath |
             & $Operation -Action Append -Element $SiteBinPath |
             & $Operation -Action Append -Element $PerlBinPath |
-            Set-EnvironmentVariable -Name Path
+            Set-EnvironmentVariable -Name Path @Params
     }
 }
 
@@ -235,9 +268,14 @@ Function Switch-PHP {
         & $Operation -Action Prepend -Element $Path
 
     if ($Persist) {
-        Get-EnvironmentVariable -Name Path |
+        $Params = @{ }
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $Params['Scope'] = 'Machine'
+        }
+
+        Get-EnvironmentVariable -Name Path @Params |
             & $Operation -Action Append -Element $Path |
-            Set-EnvironmentVariable -Name Path
+            Set-EnvironmentVariable -Name Path @Params
     }
 }
 
@@ -282,11 +320,19 @@ Function Switch-Python {
         & $Operation -Action Prepend -Element $LocalScriptsVersionedPath
 
     if ($Persist) {
+        $Params = @{ }
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $Params['Scope'] = 'Machine'
+        }
+
+        Get-EnvironmentVariable -Name Path @Params |
+            & $Operation -Action Append -Element $ScriptsPath |
+            & $Operation -Action Append -Element $Path |
+            Set-EnvironmentVariable -Name Path @Params
+
         Get-EnvironmentVariable -Name Path |
             & $Operation -Action Append -Element $LocalScriptsVersionedPath |
             & $Operation -Action Append -Element $LocalScriptsSharedPath |
-            & $Operation -Action Append -Element $ScriptsPath |
-            & $Operation -Action Append -Element $Path |
             Set-EnvironmentVariable -Name Path
     }
 }
@@ -326,9 +372,14 @@ Function Switch-Ruby {
     $env:RUBYOPT = $Options
 
     if ($Persist) {
-        Get-EnvironmentVariable -Name Path |
+        $Params = @{ }
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $Params['Scope'] = 'Machine'
+        }
+
+        Get-EnvironmentVariable -Name Path @Params |
             & $Operation -Action Append -Element $BinPath |
-            Set-EnvironmentVariable -Name Path
+            Set-EnvironmentVariable -Name Path @Params
 
         Set-EnvironmentVariable -Name RUBYOPT -Value $Options
     }
