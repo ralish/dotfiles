@@ -159,5 +159,10 @@
             // Organise imports with isort
             "source.organizeImports": true
         }
+    },
+
+    "[xml]": {
+        // Use Red Hat's XML extension for formatting
+        "editor.defaultFormatter": "redhat.vscode-xml"
     }
 }
