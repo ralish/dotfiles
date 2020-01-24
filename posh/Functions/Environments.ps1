@@ -11,16 +11,16 @@ Function Switch-Cygwin {
         [Switch]$Disable
     )
 
-    if (-not (Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Cygwin path is not a directory: {0}' -f $Path
     }
 
     $Params = @{ }
-    if ($Disable) {
-        $Operation = 'Remove-PathStringElement'
-    } else {
+    if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $Params['Action'] = 'Prepend'
+    } else {
+        $Operation = 'Remove-PathStringElement'
     }
 
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
@@ -40,34 +40,39 @@ Function Switch-Cygwin {
 
 # Configure environment for Google (depot_tools) usage
 Function Switch-Google {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='Enable')]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path="$HOME\Code\Google\depot_tools",
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName='Enable', Mandatory)]
         [String]$VsVersion,
 
         [Switch]$Persist,
+
+        [Parameter(ParameterSetName='Disable')]
         [Switch]$Disable
     )
 
-    if (-not (Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
         throw 'Provided depot_tools path is not a directory: {0}' -f $Path
     }
 
     $Params = @{ }
-    if ($Disable) {
-        $Operation = 'Remove-PathStringElement'
-    } else {
+    if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $Params['Action'] = 'Prepend'
+        $DepotToolsWinToolchain = 0
+    } else {
+        $Operation = 'Remove-PathStringElement'
+        $DepotToolsWinToolchain = [String]::Empty
+        $VsVersion = [String]::Empty
     }
 
     $env:Path = $env:Path |
         & $Operation -Element $Path @Params
 
-    $env:DEPOT_TOOLS_WIN_TOOLCHAIN = 0
+    $env:DEPOT_TOOLS_WIN_TOOLCHAIN = $DepotToolsWinToolchain
     $env:GYP_MSVS_VERSION = $VsVersion
 
     if ($Persist) {
@@ -75,8 +80,8 @@ Function Switch-Google {
             & $Operation -Element $Path @Params |
             Set-EnvironmentVariable -Name Path
 
-        Set-EnvironmentVariable -Name DEPOT_TOOLS_WIN_TOOLCHAIN -Value $env:DEPOT_TOOLS_WIN_TOOLCHAIN
-        Set-EnvironmentVariable -Name GYP_MSVS_VERSION -Value $env:GYP_MSVS_VERSION
+        Set-EnvironmentVariable -Name DEPOT_TOOLS_WIN_TOOLCHAIN -Value $DepotToolsWinToolchain
+        Set-EnvironmentVariable -Name GYP_MSVS_VERSION -Value $VsVersion
     }
 }
 
@@ -92,16 +97,16 @@ Function Switch-Nodejs {
         [Switch]$Disable
     )
 
-    if (-not (Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Nodejs path is not a directory: {0}' -f $Path
     }
 
     $Params = @{ }
-    if ($Disable) {
-        $Operation = 'Remove-PathStringElement'
-    } else {
+    if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $Params['Action'] = 'Prepend'
+    } else {
+        $Operation = 'Remove-PathStringElement'
     }
 
     $LocalNpmPath = Join-Path -Path $env:APPDATA -ChildPath 'npm'
@@ -129,16 +134,16 @@ Function Switch-Perl {
         [Switch]$Disable
     )
 
-    if (-not (Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Perl path is not a directory: {0}' -f $Path
     }
 
     $Params = @{ }
-    if ($Disable) {
-        $Operation = 'Remove-PathStringElement'
-    } else {
+    if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $Params['Action'] = 'Prepend'
+    } else {
+        $Operation = 'Remove-PathStringElement'
     }
 
     $RootBinPath = Join-Path -Path $Path -ChildPath 'c\bin'
@@ -161,7 +166,6 @@ Function Switch-Perl {
 
 # Configure environment for PHP development
 Function Switch-PHP {
-    [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path="$env:HOMEDRIVE\PHP",
@@ -170,16 +174,16 @@ Function Switch-PHP {
         [Switch]$Disable
     )
 
-    if (-not (Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
         throw 'Provided PHP path is not a directory: {0}' -f $Path
     }
 
     $Params = @{ }
-    if ($Disable) {
-        $Operation = 'Remove-PathStringElement'
-    } else {
+    if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $Params['Action'] = 'Prepend'
+    } else {
+        $Operation = 'Remove-PathStringElement'
     }
 
     $env:Path = $env:Path |
@@ -212,16 +216,16 @@ Function Switch-Python {
 
     if (Test-Path -Path $VersionedPath -PathType Container) {
         $Path = $VersionedPath
-    } elseif (-not (Test-Path -Path $Path -PathType Container)) {
+    } elseif (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Python path is not a directory: {0}' -f $Path
     }
 
     $Params = @{ }
-    if ($Disable) {
-        $Operation = 'Remove-PathStringElement'
-    } else {
+    if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $Params['Action'] = 'Prepend'
+    } else {
+        $Operation = 'Remove-PathStringElement'
     }
 
     $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
@@ -246,27 +250,31 @@ Function Switch-Python {
 
 # Configure environment for Ruby development
 Function Switch-Ruby {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='Enable')]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path="$env:HOMEDRIVE\Ruby",
 
+        [Parameter(ParameterSetName='Enable')]
         [String]$Options='-Eutf-8',
 
         [Switch]$Persist,
+
+        [Parameter(ParameterSetName='Disable')]
         [Switch]$Disable
     )
 
-    if (-not (Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Ruby path is not a directory: {0}' -f $Path
     }
 
     $Params = @{ }
-    if ($Disable) {
-        $Operation = 'Remove-PathStringElement'
-    } else {
+    if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $Params['Action'] = 'Prepend'
+    } else {
+        $Operation = 'Remove-PathStringElement'
+        $Options = [String]::Empty
     }
 
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
@@ -274,17 +282,13 @@ Function Switch-Ruby {
     $env:Path = $env:Path |
         & $Operation -Element $BinPath @Params
 
-    if ($Options) {
-        $env:RUBYOPT = $Options
-    }
+    $env:RUBYOPT = $Options
 
     if ($Persist) {
         Get-EnvironmentVariable -Name Path |
             & $Operation -Element $BinPath @Params |
             Set-EnvironmentVariable -Name Path
 
-        if ($Options) {
-            Set-EnvironmentVariable -Name RUBYOPT -Value $Options
-        }
+        Set-EnvironmentVariable -Name RUBYOPT -Value $Options
     }
 }
