@@ -15,6 +15,10 @@ Function Switch-Cygwin {
         throw 'Provided Cygwin path is not a directory: {0}' -f $Path
     }
 
+    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
+        throw 'You must have administrator privileges to update the system PATH variable.'
+    }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
     } else {
@@ -56,6 +60,10 @@ Function Switch-Go {
         throw 'Provided Go path is not a directory: {0}' -f $Path
     }
 
+    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
+        throw 'You must have administrator privileges to update the system PATH variable.'
+    }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
     } else {
@@ -67,6 +75,10 @@ Function Switch-Go {
     $GoPaths = @()
     if ($env:GOPATH) {
         foreach ($GoPath in $env:GOPATH.Split([IO.Path]::PathSeparator)) {
+            if ($Persist -and !$GoPath.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
+                throw 'You must have administrator privileges to update the system PATH variable.'
+            }
+
             $GoPaths += Join-Path -Path $GoPath -ChildPath 'bin'
         }
     }
@@ -126,6 +138,10 @@ Function Switch-Google {
         throw 'Provided depot_tools path is not a directory: {0}' -f $Path
     }
 
+    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
+        throw 'You must have administrator privileges to update the system PATH variable.'
+    }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $DepotToolsWinToolchain = 0
@@ -172,6 +188,10 @@ Function Switch-Nodejs {
         throw 'Provided Nodejs path is not a directory: {0}' -f $Path
     }
 
+    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
+        throw 'You must have administrator privileges to update the system PATH variable.'
+    }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
     } else {
@@ -213,6 +233,10 @@ Function Switch-Perl {
 
     if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Perl path is not a directory: {0}' -f $Path
+    }
+
+    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
+        throw 'You must have administrator privileges to update the system PATH variable.'
     }
 
     if (!$Disable) {
@@ -258,6 +282,10 @@ Function Switch-PHP {
         throw 'Provided PHP path is not a directory: {0}' -f $Path
     }
 
+    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
+        throw 'You must have administrator privileges to update the system PATH variable.'
+    }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
     } else {
@@ -301,6 +329,10 @@ Function Switch-Python {
         $Path = $VersionedPath
     } elseif (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Python path is not a directory: {0}' -f $Path
+    }
+
+    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
+        throw 'You must have administrator privileges to update the system PATH variable.'
     }
 
     if (!$Disable) {
@@ -355,6 +387,10 @@ Function Switch-Ruby {
 
     if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Ruby path is not a directory: {0}' -f $Path
+    }
+
+    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
+        throw 'You must have administrator privileges to update the system PATH variable.'
     }
 
     if (!$Disable) {
