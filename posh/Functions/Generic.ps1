@@ -169,12 +169,6 @@ Function Get-TextEncoding() {
                 Encoding = 'ascii / utf-8'
             }
 
-            if ($Content | Where-Object { $_.IndexOfAny($InvalidChars) -ge 0 }) {
-                $Result.Encoding = 'binary'
-                $null = $Results.Add($Result)
-                continue
-            }
-
             foreach ($Encoding in $Encodings) {
                 [Byte[]]$Bytes = Get-Content -Path $Item.FullName -Encoding Byte -ReadCount $Encoding.Preamble.Count | Select-Object -First 1
 
@@ -184,12 +178,20 @@ Function Get-TextEncoding() {
 
                 if ($Bytes.Count -eq 0) {
                     $Result.Encoding = 'empty'
+                    $FoundEncoding = $true
                     break
                 }
 
                 if ((Compare-Object -ReferenceObject $Encoding.Preamble -DifferenceObject $Bytes -SyncWindow 0).Length -eq 0) {
                     $Result.Encoding = $Encoding.Name
+                    $FoundEncoding = $true
                     break
+                }
+            }
+
+            if (!$FoundEncoding) {
+                if ($Content | Where-Object { $_.IndexOfAny($InvalidChars) -ge 0 }) {
+                    $Result.Encoding = 'binary'
                 }
             }
 
