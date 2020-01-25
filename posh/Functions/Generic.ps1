@@ -44,10 +44,10 @@ Function ConvertTo-TextEncoding {
     [CmdletBinding()]
     Param(
         [Parameter(ValueFromPipeline)]
-        [IO.FileInfo[]]$File,
+        [String[]]$Path,
 
-        [ValidateSet('ASCII', 'UTF7', 'UTF8', 'UTF16', 'UTF16BE', 'UTF32', 'UTF32BE')]
-        [String]$Encoding='UTF8',
+        [ValidateSet('ASCII', 'UTF-7', 'UTF-8', 'UTF-16', 'UTF-16BE', 'UTF-32', 'UTF-32BE')]
+        [String]$Encoding='UTF-8',
 
         [Switch]$ByteOrderMark
     )
@@ -55,19 +55,24 @@ Function ConvertTo-TextEncoding {
     Begin {
         switch ($Encoding) {
             ASCII       { $Encoder = New-Object -TypeName Text.ASCIIEncoding }
-            UTF7        { $Encoder = New-Object -TypeName Text.UTF7Encoding }
-            UTF8        { $Encoder = New-Object -TypeName Text.UTF8Encoding -ArgumentList $ByteOrderMark }
-            UTF16       { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList @($false, $ByteOrderMark) }
-            UTF16BE     { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList @($true, $ByteOrderMark) }
-            UTF32       { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList @($false, $ByteOrderMark) }
-            UTF32BE     { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList @($true, $ByteOrderMark) }
+            UTF-7       { $Encoder = New-Object -TypeName Text.UTF7Encoding }
+            UTF-8       { $Encoder = New-Object -TypeName Text.UTF8Encoding -ArgumentList $ByteOrderMark }
+            UTF-16      { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList @($false, $ByteOrderMark) }
+            UTF-16BE    { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList @($true, $ByteOrderMark) }
+            UTF-32      { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList @($false, $ByteOrderMark) }
+            UTF-32BE    { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList @($true, $ByteOrderMark) }
         }
     }
 
     Process {
-        foreach ($TextFile in $File) {
-            $Item = Get-Item -Path $TextFile
-            $Content = Get-Content -Path $Item
+        foreach ($TextFile in $Path) {
+            try {
+                $Item = Get-Item -Path $TextFile -ErrorAction Stop
+                $Content = [IO.File]::ReadAllLines($Item.FullName)
+            } catch {
+                Write-Error -Message $_
+                continue
+            }
 
             Write-Verbose -Message ('Converting: {0}' -f $Item.FullName)
             [IO.File]::WriteAllLines($Item.FullName, $Content, $Encoder)
