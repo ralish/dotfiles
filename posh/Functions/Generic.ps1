@@ -148,6 +148,7 @@ Function Get-TextEncoding() {
             $Preamble = $Encoding.GetEncoding().GetPreamble()
             if ($Preamble) {
                 $Encoding | Add-Member -MemberType NoteProperty -Name Preamble -Value $Preamble
+                $Encoding | Add-Member -MemberType NoteProperty -Name ByteOrderMark -Value $true
                 $null = $Encodings.Add($Encoding)
             }
         }
@@ -158,6 +159,7 @@ Function Get-TextEncoding() {
             DisplayName = 'Unicode via XML declaration'
             CodePage = '1200'
             Preamble = [Byte[]]@(60, 0, 63, 0)
+            ByteOrderMark = $false
         }
         $null = $Encodings.Add($Encoding)
 
@@ -167,6 +169,7 @@ Function Get-TextEncoding() {
             DisplayName = 'Unicode (Big-Endian) via XML declaration'
             CodePage = '1201'
             Preamble = [Byte[]]@(0, 60, 0, 63)
+            ByteOrderMark = $false
         }
         $null = $Encodings.Add($Encoding)
 
@@ -191,6 +194,7 @@ Function Get-TextEncoding() {
             $Result = [PSCustomObject]@{
                 File = $Item
                 Encoding = 'ascii / utf-8'
+                ByteOrderMark = $false
             }
 
             foreach ($Encoding in $Encodings) {
@@ -208,6 +212,7 @@ Function Get-TextEncoding() {
 
                 if ((Compare-Object -ReferenceObject $Encoding.Preamble -DifferenceObject $Bytes -SyncWindow 0).Length -eq 0) {
                     $Result.Encoding = $Encoding.Name
+                    $Result.ByteOrderMark = $Encoding.ByteOrderMark
                     $FoundEncoding = $true
                     break
                 }
