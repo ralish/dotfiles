@@ -45,7 +45,7 @@ Function Switch-Cygwin {
     }
 }
 
-# Configure environment for Go usage
+# Configure environment for Go development
 Function Switch-Go {
     [CmdletBinding()]
     Param(
