@@ -48,19 +48,52 @@ Function ConvertTo-TextEncoding {
 
         [ValidateSet('ASCII', 'UTF-7', 'UTF-8', 'UTF-16', 'UTF-16BE', 'UTF-32', 'UTF-32BE')]
         [String]$Encoding='UTF-8',
+        [Switch]$ByteOrderMark,
 
-        [Switch]$ByteOrderMark
+        [ValidateSet('ASCII', 'UTF-7', 'UTF-8', 'UTF-16', 'UTF-16BE', 'UTF-32', 'UTF-32BE')]
+        [String]$SourceEncoding,
+        [Switch]$SourceByteOrderMark
     )
 
     Begin {
-        switch ($Encoding) {
-            ASCII       { $Encoder = New-Object -TypeName Text.ASCIIEncoding }
-            UTF-7       { $Encoder = New-Object -TypeName Text.UTF7Encoding }
-            UTF-8       { $Encoder = New-Object -TypeName Text.UTF8Encoding -ArgumentList $ByteOrderMark }
-            UTF-16      { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList @($false, $ByteOrderMark) }
-            UTF-16BE    { $Encoder = New-Object -TypeName Text.UnicodeEncoding -ArgumentList @($true, $ByteOrderMark) }
-            UTF-32      { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList @($false, $ByteOrderMark) }
-            UTF-32BE    { $Encoder = New-Object -TypeName Text.UTF32Encoding -ArgumentList @($true, $ByteOrderMark) }
+        $EncodingClasses = @{
+            'ASCII'     = 'Text.ASCIIEncoding'
+            'UTF-7'     = 'Text.UTF7Encoding'
+            'UTF-8'     = 'Text.UTF8Encoding'
+            'UTF-16'    = 'Text.UnicodeEncoding'
+            'UTF-16BE'  = 'Text.UnicodeEncoding'
+            'UTF-32'    = 'Text.UTF32Encoding'
+            'UTF-32BE'  = 'Text.UTF32Encoding'
+        }
+
+        $EncoderParams = @()
+        if ($Encoding -match '^UTF-[13]') {
+            if ($Encoding -match 'BE$') {
+                $EncoderParams += $true
+            } else {
+                $EncoderParams += $false
+            }
+        }
+        if ($Encoding -match '^UTF-') {
+            $EncoderParams += $ByteOrderMark
+        }
+
+        $Encoder = New-Object -TypeName $EncodingClasses[$Encoding] -ArgumentList $EncoderParams
+
+        if ($SourceEncoding) {
+            $SourceEncoderParams = @()
+            if ($SourceEncoding -match '^UTF-[13]') {
+                if ($SourceEncoding -match 'BE$') {
+                    $SourceEncoderParams += $true
+                } else {
+                    $SourceEncoderParams += $false
+                }
+            }
+            if ($SourceEncoding -match '^UTF-') {
+                $SourceEncoderParams += $ByteOrderMark
+            }
+
+            $SourceEncoder = New-Object -TypeName $EncodingClasses[$SourceEncoding] -ArgumentList $SourceEncoderParams
         }
     }
 
@@ -68,7 +101,11 @@ Function ConvertTo-TextEncoding {
         foreach ($TextFile in $Path) {
             try {
                 $Item = Get-Item -Path $TextFile -ErrorAction Stop
-                $Content = [IO.File]::ReadAllLines($Item.FullName)
+                if ($SourceEncoder) {
+                    $Content = [IO.File]::ReadAllLines($Item.FullName, $SourceEncoder)
+                } else {
+                    $Content = [IO.File]::ReadAllLines($Item.FullName)
+                }
             } catch {
                 Write-Error -Message $_
                 continue
