@@ -152,6 +152,24 @@ Function Get-TextEncoding() {
             }
         }
 
+        # Special case for UTF-16LE encoded XML without BOM (this is legal!)
+        $Encoding = [PSCustomObject]@{
+            Name = 'utf-16'
+            DisplayName = 'Unicode via XML declaration'
+            CodePage = '1200'
+            Preamble = [Byte[]]@(60, 0, 63, 0)
+        }
+        $null = $Encodings.Add($Encoding)
+
+        # Special case for UTF-16BE encoded XML without BOM (this is legal!)
+        $Encoding = [PSCustomObject]@{
+            Name = 'utf-16BE'
+            DisplayName = 'Unicode (Big-Endian) via XML declaration'
+            CodePage = '1201'
+            Preamble = [Byte[]]@(0, 60, 0, 63)
+        }
+        $null = $Encodings.Add($Encoding)
+
         # Sort the array by size of each preamble
         foreach ($Encoding in $Encodings) {
             $Encoding | Add-Member -MemberType ScriptProperty -Name PreambleSize -Value { $this.Preamble.Count }
