@@ -151,6 +151,12 @@ Function Get-TextEncoding() {
                 $null = $Encodings.Add($Encoding)
             }
         }
+
+        # Sort the array by size of each preamble
+        foreach ($Encoding in $Encodings) {
+            $Encoding | Add-Member -MemberType ScriptProperty -Name PreambleSize -Value { $this.Preamble.Count }
+        }
+        $Encodings = $Encodings | Sort-Object -Property PreambleSize -Descending
     }
 
     Process {
