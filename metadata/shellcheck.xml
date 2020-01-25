@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ralish/PSDotFiles/master/Metadata.xsd">
+    <FriendlyName>shellcheck</FriendlyName>
+
+    <Detection>
+        <Method>FindInPath</Method>
+    </Detection>
+
+    <InstallPath>
+        <SpecialFolder>ApplicationData</SpecialFolder>
+    </InstallPath>
+
+    <RenamePaths>
+        <RenamePath source=".shellcheckrc" symlink="shellcheckrc" />
+    </RenamePaths>
+</Component>

@@ -37,6 +37,8 @@
         ".inputrc": "properties",
         // sbuild
         ".mk-sbuild.rc": "shellscript",
+        // shellcheck
+        ".shellcheckrc": "properties",
         // wget
         ".wgetrc": "properties",
         // winterm
