@@ -91,6 +91,80 @@ Function ConvertTo-URLEncoded {
     [Uri]::EscapeDataString($String)
 }
 
+# Determine the encoding of a text file
+Function Get-TextEncoding() {
+    [CmdletBinding()]
+    Param(
+        [Parameter(ValueFromPipeline)]
+        [String[]]$Path
+    )
+
+    Begin {
+        [Collections.ArrayList]$Results = @()
+
+        # Non-printable characters used to determine if file is binary
+        $InvalidChars = [Char[]]@(0..8 + 10..31 + 127 + 129 + 141 + 143 + 144 + 157)
+
+        # Construct an array of identifiable encodings by their preamble
+        [Collections.ArrayList]$Encodings = @()
+        foreach ($Encoding in [Text.Encoding]::GetEncodings()) {
+            $Preamble = $Encoding.GetEncoding().GetPreamble()
+            if ($Preamble) {
+                $Encoding | Add-Member -MemberType NoteProperty -Name Preamble -Value $Preamble
+                $null = $Encodings.Add($Encoding)
+            }
+        }
+    }
+
+    Process {
+        foreach ($TextFile in $Path) {
+            try {
+                $Item = Get-Item -Path $TextFile -ErrorAction Stop
+                $Content = Get-Content -Path $Item.FullName -TotalCount 5 -ErrorAction Stop
+            } catch {
+                Write-Error -Message $_
+                continue
+            }
+
+            Write-Verbose -Message ('Processing: {0}' -f $Item.FullName)
+            $Result = [PSCustomObject]@{
+                File = $Item
+                Encoding = 'ascii / utf-8'
+            }
+
+            if ($Content | Where-Object { $_.IndexOfAny($InvalidChars) -ge 0 }) {
+                $Result.Encoding = 'binary'
+                $null = $Results.Add($Result)
+                continue
+            }
+
+            foreach ($Encoding in $Encodings) {
+                [Byte[]]$Bytes = Get-Content -Path $Item.FullName -Encoding Byte -ReadCount $Encoding.Preamble.Count | Select-Object -First 1
+
+                if ($Bytes.Count -ne $Encoding.Preamble.Count) {
+                    continue
+                }
+
+                if ($Bytes.Count -eq 0) {
+                    $Result.Encoding = 'empty'
+                    break
+                }
+
+                if ((Compare-Object -ReferenceObject $Encoding.Preamble -DifferenceObject $Bytes -SyncWindow 0).Length -eq 0) {
+                    $Result.Encoding = $Encoding.Name
+                    break
+                }
+            }
+
+            $null = $Results.Add($Result)
+        }
+    }
+
+    End {
+        return $Results
+    }
+}
+
 #endregion
 
 #region Filesystem
