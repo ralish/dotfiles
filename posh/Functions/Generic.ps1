@@ -197,6 +197,7 @@ Function Get-TextEncoding() {
                 ByteOrderMark = $false
             }
 
+            $FoundEncoding = $false
             foreach ($Encoding in $Encodings) {
                 [Byte[]]$Bytes = Get-Content -Path $Item.FullName -Encoding Byte -ReadCount $Encoding.Preamble.Count | Select-Object -First 1
 
