@@ -709,9 +709,7 @@ Plug 'saltstack/salt-vim'
 Plug 'tmux-plugins/vim-tmux'
 
 " YAML (built-in support is very slow)
-"Plug 'stephpy/vim-yaml'
-" Using our fork until PR #20 is merged
-Plug 'ralish/vim-yaml', { 'branch': 'comment-fix' }
+Plug 'stephpy/vim-yaml'
 
 
 " ########################## vim-plug Initialisation ##########################
