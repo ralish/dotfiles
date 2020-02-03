@@ -138,6 +138,11 @@
         "rewrap.wrappingColumn": 72
     },
 
+    "[html]": {
+        // Use VS Code's built-in formatter
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+
     "[jinja]": {
         // Workaround for bug in SaltStack extension
         "editor.autoClosingBrackets": "never"
