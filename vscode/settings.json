@@ -148,6 +148,11 @@
         "editor.autoClosingBrackets": "never"
     },
 
+    "[jsonc]": {
+        // Use VS Code's built-in formatter
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+
     "[markdown]": {
         // Trailing whitespace has special meaning in Markdown syntax
         "files.trimTrailingWhitespace": false
