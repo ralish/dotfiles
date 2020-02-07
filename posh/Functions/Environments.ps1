@@ -19,8 +19,11 @@ Function Switch-Cygwin {
         throw 'You must have administrator privileges to update the system PATH variable.'
     }
 
+    $PathParams = @{ }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
@@ -29,19 +32,26 @@ Function Switch-Cygwin {
     $LocalBinPath = Join-Path -Path $Path -ChildPath 'usr\local\bin'
 
     $env:Path = $env:Path |
-        & $Operation -Action Prepend -Element $BinPath |
-        & $Operation -Action Prepend -Element $LocalBinPath
+        & $Operation @PathParams -Element $BinPath |
+        & $Operation @PathParams -Element $LocalBinPath
 
     if ($Persist) {
-        $Params = @{ }
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $Params['Scope'] = 'Machine'
+        $EnvParams = @{
+            Name = 'Path'
         }
 
-        Get-EnvironmentVariable -Name Path @Params |
-            & $Operation -Action Append -Element $LocalBinPath |
-            & $Operation -Action Append -Element $BinPath |
-            Set-EnvironmentVariable -Name Path @Params
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $EnvParams['Scope'] = 'Machine'
+        }
+
+        if (!$Disable) {
+            $PathParams['Action'] = 'Append'
+        }
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $LocalBinPath |
+            & $Operation @PathParams -Element $BinPath |
+            Set-EnvironmentVariable @EnvParams
     }
 }
 
@@ -64,8 +74,11 @@ Function Switch-Go {
         throw 'You must have administrator privileges to update the system PATH variable.'
     }
 
+    $PathParams = @{ }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
@@ -84,35 +97,37 @@ Function Switch-Go {
     }
 
     $env:Path = $env:Path |
-        & $Operation -Action Prepend -Element $BinPath
+        & $Operation @PathParams -Element $BinPath
 
     if ($GoPaths) {
         foreach ($GoPath in $GoPaths) {
             $env:Path = $env:Path |
-                & $Operation -Action Prepend -Element $GoPath
+                & $Operation @PathParams -Element $GoPath
         }
     }
 
     if ($Persist) {
-        $Params = @{ }
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $Params['Scope'] = 'Machine'
+        $EnvParams = @{
+            Name = 'Path'
         }
 
-        Get-EnvironmentVariable -Name Path @Params |
-            & $Operation -Action Append -Element $BinPath |
-            Set-EnvironmentVariable -Name Path @Params
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $EnvParams['Scope'] = 'Machine'
+        }
+
+        if (!$Disable) {
+            $PathParams['Action'] = 'Append'
+        }
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $BinPath |
+            Set-EnvironmentVariable @EnvParams
 
         if ($GoPaths) {
             foreach ($GoPath in $GoPaths) {
-                $Params = @{ }
-                if (!$GoPath.StartsWith($env:USERPROFILE)) {
-                    $Params['Scope'] = 'Machine'
-                }
-
-                Get-EnvironmentVariable -Name Path @Params |
-                    & $Operation -Action Append -Element $GoPath |
-                    Set-EnvironmentVariable -Name Path @Params
+                Get-EnvironmentVariable @EnvParams |
+                    & $Operation @PathParams -Element $GoPath |
+                    Set-EnvironmentVariable @EnvParams
             }
         }
     }
@@ -142,8 +157,11 @@ Function Switch-Google {
         throw 'You must have administrator privileges to update the system PATH variable.'
     }
 
+    $PathParams = @{ }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
         $DepotToolsWinToolchain = 0
     } else {
         $Operation = 'Remove-PathStringElement'
@@ -152,20 +170,27 @@ Function Switch-Google {
     }
 
     $env:Path = $env:Path |
-        & $Operation -Action Prepend -Element $Path
+        & $Operation @PathParams -Element $Path
 
     $env:DEPOT_TOOLS_WIN_TOOLCHAIN = $DepotToolsWinToolchain
     $env:GYP_MSVS_VERSION = $VsVersion
 
     if ($Persist) {
-        $Params = @{ }
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $Params['Scope'] = 'Machine'
+        $EnvParams = @{
+            Name = 'Path'
         }
 
-        Get-EnvironmentVariable -Name Path @Params |
-            & $Operation -Action Append -Element $Path |
-            Set-EnvironmentVariable -Name Path @Params
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $EnvParams['Scope'] = 'Machine'
+        }
+
+        if (!$Disable) {
+            $PathParams['Action'] = 'Append'
+        }
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $Path |
+            Set-EnvironmentVariable @EnvParams
 
         Set-EnvironmentVariable -Name DEPOT_TOOLS_WIN_TOOLCHAIN -Value $DepotToolsWinToolchain
         Set-EnvironmentVariable -Name GYP_MSVS_VERSION -Value $VsVersion
@@ -192,8 +217,11 @@ Function Switch-Nodejs {
         throw 'You must have administrator privileges to update the system PATH variable.'
     }
 
+    $PathParams = @{ }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
@@ -201,22 +229,31 @@ Function Switch-Nodejs {
     $LocalNpmPath = Join-Path -Path $env:APPDATA -ChildPath 'npm'
 
     $env:Path = $env:Path |
-        & $Operation -Action Prepend -Element $Path |
-        & $Operation -Action Prepend -Element $LocalNpmPath
+        & $Operation @PathParams -Element $Path |
+        & $Operation @PathParams -Element $LocalNpmPath
 
     if ($Persist) {
-        $Params = @{ }
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $Params['Scope'] = 'Machine'
+        $EnvParams = @{
+            Name = 'Path'
         }
 
-        Get-EnvironmentVariable -Name Path @Params |
-            & $Operation -Action Append -Element $Path |
-            Set-EnvironmentVariable -Name Path @Params
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $EnvParams['Scope'] = 'Machine'
+        }
 
-        Get-EnvironmentVariable -Name Path |
-            & $Operation -Action Append -Element $LocalNpmPath |
-            Set-EnvironmentVariable -Name Path
+        if (!$Disable) {
+            $PathParams['Action'] = 'Append'
+        }
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $Path |
+            Set-EnvironmentVariable @EnvParams
+
+        $EnvParams.Remove('Scope')
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $LocalNpmPath |
+            Set-EnvironmentVariable @EnvParams
     }
 }
 
@@ -239,8 +276,11 @@ Function Switch-Perl {
         throw 'You must have administrator privileges to update the system PATH variable.'
     }
 
+    $PathParams = @{ }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
@@ -250,21 +290,28 @@ Function Switch-Perl {
     $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
 
     $env:Path = $env:Path |
-        & $Operation -Action Prepend -Element $PerlBinPath |
-        & $Operation -Action Prepend -Element $SiteBinPath |
-        & $Operation -Action Prepend -Element $RootBinPath
+        & $Operation @PathParams -Element $PerlBinPath |
+        & $Operation @PathParams -Element $SiteBinPath |
+        & $Operation @PathParams -Element $RootBinPath
 
     if ($Persist) {
-        $Params = @{ }
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $Params['Scope'] = 'Machine'
+        $EnvParams = @{
+            Name = 'Path'
         }
 
-        Get-EnvironmentVariable -Name Path @Params |
-            & $Operation -Action Append -Element $RootBinPath |
-            & $Operation -Action Append -Element $SiteBinPath |
-            & $Operation -Action Append -Element $PerlBinPath |
-            Set-EnvironmentVariable -Name Path @Params
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $EnvParams['Scope'] = 'Machine'
+        }
+
+        if (!$Disable) {
+            $PathParams['Action'] = 'Append'
+        }
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $RootBinPath |
+            & $Operation @PathParams -Element $SiteBinPath |
+            & $Operation @PathParams -Element $PerlBinPath |
+            Set-EnvironmentVariable @EnvParams
     }
 }
 
@@ -287,24 +334,34 @@ Function Switch-PHP {
         throw 'You must have administrator privileges to update the system PATH variable.'
     }
 
+    $PathParams = @{ }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
 
     $env:Path = $env:Path |
-        & $Operation -Action Prepend -Element $Path
+        & $Operation @PathParams -Element $Path
 
     if ($Persist) {
-        $Params = @{ }
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $Params['Scope'] = 'Machine'
+        $EnvParams = @{
+            Name = 'Path'
         }
 
-        Get-EnvironmentVariable -Name Path @Params |
-            & $Operation -Action Append -Element $Path |
-            Set-EnvironmentVariable -Name Path @Params
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $EnvParams['Scope'] = 'Machine'
+        }
+
+        if (!$Disable) {
+            $PathParams['Action'] = 'Append'
+        }
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $Path |
+            Set-EnvironmentVariable @EnvParams
     }
 }
 
@@ -336,8 +393,11 @@ Function Switch-Python {
         throw 'You must have administrator privileges to update the system PATH variable.'
     }
 
+    $PathParams = @{ }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
     }
@@ -347,26 +407,35 @@ Function Switch-Python {
     $LocalScriptsVersionedPath = Join-Path -Path $env:APPDATA -ChildPath ('Python\Python{0}\Scripts' -f $StrippedVersion)
 
     $env:Path = $env:Path |
-        & $Operation -Action Prepend -Element $Path |
-        & $Operation -Action Prepend -Element $ScriptsPath |
-        & $Operation -Action Prepend -Element $LocalScriptsSharedPath |
-        & $Operation -Action Prepend -Element $LocalScriptsVersionedPath
+        & $Operation @PathParams -Element $Path |
+        & $Operation @PathParams -Element $ScriptsPath |
+        & $Operation @PathParams -Element $LocalScriptsSharedPath |
+        & $Operation @PathParams -Element $LocalScriptsVersionedPath
 
     if ($Persist) {
-        $Params = @{ }
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $Params['Scope'] = 'Machine'
+        $EnvParams = @{
+            Name = 'Path'
         }
 
-        Get-EnvironmentVariable -Name Path @Params |
-            & $Operation -Action Append -Element $ScriptsPath |
-            & $Operation -Action Append -Element $Path |
-            Set-EnvironmentVariable -Name Path @Params
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $EnvParams['Scope'] = 'Machine'
+        }
 
-        Get-EnvironmentVariable -Name Path |
-            & $Operation -Action Append -Element $LocalScriptsVersionedPath |
-            & $Operation -Action Append -Element $LocalScriptsSharedPath |
-            Set-EnvironmentVariable -Name Path
+        if (!$Disable) {
+            $PathParams['Action'] = 'Append'
+        }
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $ScriptsPath |
+            & $Operation @PathParams -Element $Path |
+            Set-EnvironmentVariable @EnvParams
+
+        $EnvParams.Remove('Scope')
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $LocalScriptsVersionedPath |
+            & $Operation @PathParams -Element $LocalScriptsSharedPath |
+            Set-EnvironmentVariable @EnvParams
     }
 }
 
@@ -394,8 +463,11 @@ Function Switch-Ruby {
         throw 'You must have administrator privileges to update the system PATH variable.'
     }
 
+    $PathParams = @{ }
+
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
     } else {
         $Operation = 'Remove-PathStringElement'
         $Options = [String]::Empty
@@ -404,19 +476,26 @@ Function Switch-Ruby {
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
     $env:Path = $env:Path |
-        & $Operation -Action Prepend -Element $BinPath
+        & $Operation @PathParams -Element $BinPath
 
     $env:RUBYOPT = $Options
 
     if ($Persist) {
-        $Params = @{ }
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $Params['Scope'] = 'Machine'
+        $EnvParams = @{
+            Name = 'Path'
         }
 
-        Get-EnvironmentVariable -Name Path @Params |
-            & $Operation -Action Append -Element $BinPath |
-            Set-EnvironmentVariable -Name Path @Params
+        if (!$Path.StartsWith($env:USERPROFILE)) {
+            $EnvParams['Scope'] = 'Machine'
+        }
+
+        if (!$Disable) {
+            $PathParams['Action'] = 'Append'
+        }
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $BinPath |
+            Set-EnvironmentVariable @EnvParams
 
         Set-EnvironmentVariable -Name RUBYOPT -Value $Options
     }
