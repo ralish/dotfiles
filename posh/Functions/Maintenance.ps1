@@ -178,6 +178,7 @@ Function Update-Office {
         $OfficeRegKey = Get-Item -Path $OfficeRegPath
 
         $ExecutingScenario = $OfficeRegKey.GetValue('ExecutingScenario')
+        $ExecutingScenarioPrevious = [String]::Empty
         if ($ExecutingScenario) {
             if ($ExecutingScenario -ne $ExecutingScenarioPrevious) {
                 $ExecutingScenarioPrevious = $ExecutingScenario

@@ -123,7 +123,7 @@ Function Switch-Google {
     [CmdletBinding(DefaultParameterSetName='Enable')]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path="$HOME\Code\Google\depot_tools",
+        [String]$Path=('{0}\Code\Google\depot_tools' -f $HOME),
 
         [Parameter(ParameterSetName='Enable', Mandatory)]
         [String]$VsVersion,
@@ -270,6 +270,7 @@ Function Switch-Perl {
 
 # Configure environment for PHP development
 Function Switch-PHP {
+    [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path="$env:HOMEDRIVE\PHP",

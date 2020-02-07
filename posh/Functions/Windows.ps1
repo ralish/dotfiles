@@ -486,7 +486,7 @@ Function Get-WellKnownSID {
         }
     }
 
-    return [System.Security.Principal.SecurityIdentifier]$SID
+    return [Security.Principal.SecurityIdentifier]$SID
 }
 
 #endregion
@@ -496,7 +496,7 @@ Function Get-WellKnownSID {
 # Test if the user has Administrator privileges
 Function Test-IsAdministrator {
     [CmdletBinding()]
-    [OutputType([Boolean])]
+    [OutputType([bool])]
     Param()
 
     $User = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()

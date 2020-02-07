@@ -362,7 +362,7 @@ Function Get-Office365UserLicensingMatrix {
             $UserLicensing.$LicenseName = $true
         }
 
-        $null = Matrix.Add($UserLicensing)
+        $null = $Matrix.Add($UserLicensing)
     }
 
     return $Matrix
@@ -406,7 +406,7 @@ Function Get-Office365UserSecurityReport {
     $Logins = Search-UnifiedAuditLog -Operations 'UserLoggedIn' -StartDate $LoginsStartDate -EndDate $LoginsEndDate -ResultSize 5000
 
     if ($Logins.Count -eq 5000) {
-        Write-Warning 'User logins audit log search returned maximum number of results.'
+        Write-Warning -Message 'User logins audit log search returned maximum number of results.'
     }
 
     $ActiveUsers = @($Logins.UserIds | Sort-Object -Unique)

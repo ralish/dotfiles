@@ -29,7 +29,7 @@ Function Get-KerberosTokenSize {
         [String]$OperatingSystem='Windows Server 2012 (or later)',
 
         [ValidateRange(0, 10000)]
-        [int]$TicketOverheadBytes=1200
+        [Int]$TicketOverheadBytes=1200
     )
 
     if ($Username.Split('\').Count -ne 1) {
@@ -162,7 +162,7 @@ Function Resolve-ADGuid {
                     }
 
                     'SchemaObject' {
-                        $GuidOctetString = '\{0}' -f [System.String]::Join('\', ($ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') }))
+                        $GuidOctetString = '\{0}' -f [String]::Join('\', ($ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') }))
                         $SearchFilters += '(schemaIDGUID={0})' -f $GuidOctetString
                     }
                 }
@@ -210,7 +210,7 @@ Function Add-ADShadowPrincipalMember {
         [String[]]$Members,
 
         [ValidateRange(300, 86400)]
-        [int]$Duration
+        [Int]$Duration
     )
 
     $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer
@@ -259,7 +259,7 @@ Function New-ADShadowPrincipal {
         [String]$Name,
 
         [Parameter(Mandatory)]
-        [System.Security.Principal.SecurityIdentifier]$Sid
+        [Security.Principal.SecurityIdentifier]$Sid
     )
 
     $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer
