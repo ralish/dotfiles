@@ -14,6 +14,10 @@
     "editor.suggestSelection": "first",
 
     // Text Editor: Files
+    "files.associations": {
+        // Configuration files (usually INI syntax)
+        "*.cnf": "ini"
+    },
     "files.autoSave": "onWindowChange",
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
