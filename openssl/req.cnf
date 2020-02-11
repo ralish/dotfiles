@@ -1,5 +1,5 @@
 [ req ]
-default_bits                        = 2048
+default_bits                        = 4096
 default_md                          = sha256
 
 encrypt_key                         = no
@@ -30,10 +30,11 @@ req_extensions                      = req_ext
 
 [ req_ext ]
 # Subject Alternative Name
-#
-# Specify as a comma separated list of additional names.
-#
-# Valid options are:
+#subjectAltName                      = @req_san
+
+
+[ req_san ]
+# Types:
 # - dirName
 # - DNS
 # - email
@@ -41,6 +42,7 @@ req_extensions                      = req_ext
 # - otherName
 # - RID
 # - URI
-#subjectAltName                      =
+#DNS.1                               = example.com
+#DNS.2                               = sample.com
 
 # vim: syntax=dosini cc=80 tw=79 ts=4 sw=4 sts=4 et sr
