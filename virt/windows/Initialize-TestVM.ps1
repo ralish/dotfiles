@@ -59,8 +59,10 @@ Function Optimize-WindowsUpdate {
     Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -Name 'IncludeRecommendedUpdates' -Value 1 -Type DWord
 
     # Opt-in to Microsoft Update
-    $MsUpdate = New-Object -ComObject Microsoft.Update.ServiceManager
-    $null = $MsUpdate.AddService2('7971f918-a847-4430-9279-4a52d1efe18d', 7, '')
+    $ServiceManager = New-Object -ComObject Microsoft.Update.ServiceManager
+    $ServiceRegistration = ServiceManager.AddService2('7971f918-a847-4430-9279-4a52d1efe18d', 7, '')
+    $null = [Runtime.InteropServices.Marshal]::FinalReleaseComObject($ServiceRegistration)
+    $null = [Runtime.InteropServices.Marshal]::FinalReleaseComObject($ServiceManager)
 }
 
 Function Set-RegistryValue {
