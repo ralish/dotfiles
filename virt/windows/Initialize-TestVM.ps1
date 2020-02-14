@@ -1,3 +1,5 @@
+#Requires -RunAsAdministrator
+
 Function Optimize-WindowsFeatures {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
