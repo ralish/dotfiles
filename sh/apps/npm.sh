@@ -14,6 +14,18 @@ if command -v npm > /dev/null; then
     fi
 
     unset npm_global_man npm_global_root
+
+    npm_home_root="${NPM_CONFIG_PREFIX:-$HOME/.npm/node_modules}"
+    npm_home_bin="$npm_home_root/bin"
+
+    # Change default global packages path
+    export NPM_CONFIG_PREFIX="$npm_home_root"
+
+    # Add local bin directory to PATH
+    build_path "$npm_home_bin" "$PATH"
+    export PATH="$build_path"
+
+    unset npm_home_root npm_home_bin
 fi
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
