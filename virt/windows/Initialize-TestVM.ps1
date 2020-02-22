@@ -1,5 +1,14 @@
 #Requires -RunAsAdministrator
 
+Function Optimize-WindowsComponents {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
+    [CmdletBinding()]
+    Param()
+
+    Write-Host -ForegroundColor Green 'Performing component store clean-up ...'
+    & dism.exe /Online /Cleanup-Image /StartComponentCleanup
+}
+
 Function Optimize-WindowsFeatures {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
@@ -10,14 +19,6 @@ Function Optimize-WindowsFeatures {
 
     Write-Host -ForegroundColor Green 'Installing .NET Framework 3.5 ...'
     Install-WindowsFeature -Name NET-Framework-Core -Source $NetFx35SourcePath
-}
-
-Function Optimize-WindowsImage {
-    [CmdletBinding()]
-    Param()
-
-    Write-Host -ForegroundColor Green 'Performing component store clean-up ...'
-    & dism.exe /Online /Cleanup-Image /StartComponentCleanup
 }
 
 Function Optimize-WindowsPowerShell {
@@ -102,4 +103,4 @@ Optimize-WindowsSettings
 Optimize-WindowsUpdate
 Optimize-WindowsFeatures
 Optimize-WindowsPowerShell
-Optimize-WindowsImage
+Optimize-WindowsComponents
