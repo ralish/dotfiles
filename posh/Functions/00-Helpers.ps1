@@ -1,4 +1,24 @@
-Write-Verbose -Message '[dotfiles] Importing helper functions ...'
+$Message = 'Importing helper functions ...'
+if ($DotFilesShowTimings) {
+    Write-Verbose -Message ('[dotfiles | {0}] {1}' -f (Get-Date -Format 'HH:mm:ss:fff'), $Message)
+} else {
+    Write-Verbose -Message ('[dotfiles] {0}' -f $Message)
+}
+
+# Retrieve a formatted dotfiles message
+Function Get-DotFilesMessage {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Message
+    )
+
+    if ($DotFilesShowTimings) {
+        return ('[dotfiles | {0}] {1}' -f (Get-Date -Format 'HH:mm:ss:fff'), $Message)
+    }
+
+    return ('[dotfiles] {0}' -f $Message)
+}
 
 # Confirm a PowerShell command is available
 Function Test-CommandAvailable {

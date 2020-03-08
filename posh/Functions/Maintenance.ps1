@@ -1,4 +1,4 @@
-Write-Verbose -Message '[dotfiles] Importing maintenance functions ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing maintenance functions ...')
 
 # Update everything!
 Function Update-AllTheThings {

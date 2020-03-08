@@ -1,16 +1,16 @@
 try {
     Test-ModuleAvailable -Name PSReadLine
 } catch {
-    Write-Verbose -Message '[dotfiles] Skipping PSReadLine settings as module not found.'
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSReadLine settings as module not found.')
     return
 }
 
 if ($Host.Name -ne 'ConsoleHost') {
-    Write-Verbose -Message '[dotfiles] Skipping PSReadLine settings as host is not ConsoleHost.'
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSReadLine settings as host is not ConsoleHost.')
     return
 }
 
-Write-Verbose -Message '[dotfiles] Loading PSReadLine settings ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading PSReadLine settings ...')
 Import-Module -Name PSReadLine
 
 # Don't store duplicate history entries
@@ -55,12 +55,12 @@ Set-PSReadlineKeyHandler `
 
 if (Test-IsWindows) {
     if (Get-Command -Name concfg -ErrorAction Ignore) {
-        Write-Verbose -Message '[dotfiles] Loading ConCfg settings ...'
+        Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ConCfg settings ...')
 
         # Set PSReadline colours based on theme
         & concfg tokencolor -n enable
     } else {
-        Write-Verbose -Message '[dotfiles] Skipping ConCfg settings as unable to locate concfg.'
+        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping ConCfg settings as unable to locate concfg.')
         continue
     }
 }

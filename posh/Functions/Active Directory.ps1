@@ -5,11 +5,11 @@ if (!(Test-IsWindows)) {
 try {
     Test-ModuleAvailable -Name ActiveDirectory
 } catch {
-    Write-Verbose -Message '[dotfiles] Skipping import of Active Directory functions.'
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of Active Directory functions.')
     return
 }
 
-Write-Verbose -Message '[dotfiles] Importing Active Directory functions ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Active Directory functions ...')
 
 # Load our custom formatting data
 $FormatDataPaths += Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml'

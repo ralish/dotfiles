@@ -1,4 +1,4 @@
-Write-Verbose -Message '[dotfiles] Importing OpenSSL functions ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing OpenSSL functions ...')
 
 # Certificate encoding formats
 # - DER:        Distinguished Encoding Rules

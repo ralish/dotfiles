@@ -1,4 +1,4 @@
-Write-Verbose -Message '[dotfiles] Importing environment functions ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing environment functions ...')
 
 # Configure environment for Cygwin usage
 Function Switch-Cygwin {

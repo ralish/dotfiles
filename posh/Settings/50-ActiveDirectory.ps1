@@ -5,11 +5,11 @@ if (!(Test-IsWindows)) {
 try {
     Test-ModuleAvailable -Name ActiveDirectory
 } catch {
-    Write-Verbose -Message '[dotfiles] Skipping ActiveDirectory settings as module not found.'
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping ActiveDirectory settings as module not found.')
     return
 }
 
-Write-Verbose -Message '[dotfiles] Loading ActiveDirectory settings ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ActiveDirectory settings ...')
 
 # User properties we usually don't care about
 $ADUserIgnoredProperties = @(

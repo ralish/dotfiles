@@ -3,11 +3,11 @@ if (!(Test-IsWindows)) {
 }
 
 if (!$env:ConEmuANSI -eq 'ON') {
-    Write-Verbose -Message '[dotfiles] Skipping ConEmu settings as not running under ConEmu.'
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping ConEmu settings as not running under ConEmu.')
     return
 }
 
-Write-Verbose -Message '[dotfiles] Loading ConEmu settings ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ConEmu settings ...')
 
 # Special prompt handling for PowerShell under ConEmu
 # See: https://conemu.github.io/en/PowershellPrompt.html

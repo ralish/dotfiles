@@ -1,4 +1,4 @@
-Write-Verbose -Message '[dotfiles] Importing generic functions ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing generic functions ...')
 
 # Load our custom formatting data
 $FormatDataPaths += Join-Path -Path $PSScriptRoot -ChildPath 'Generic.format.ps1xml'

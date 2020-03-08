@@ -1,4 +1,4 @@
-Write-Verbose -Message '[dotfiles] Importing OpenSSH functions ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing OpenSSH functions ...')
 
 # Update our OpenSSH configuration
 Function Update-OpenSSHConfig {

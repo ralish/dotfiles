@@ -1,4 +1,4 @@
-Write-Verbose -Message '[dotfiles] Importing PowerShell functions ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing PowerShell functions ...')
 
 #region Object handling
 

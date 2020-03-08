@@ -1,9 +1,9 @@
 if (!(Test-IsWindows)) {
-    Write-Verbose -Message '[dotfiles] Skipping import of Azure functions.'
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of Azure functions.')
     return
 }
 
-Write-Verbose -Message '[dotfiles] Importing Azure functions ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Azure functions ...')
 
 # Load our custom formatting data
 $FormatDataPaths += Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1xml'

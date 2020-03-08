@@ -1,9 +1,9 @@
 if (!(Get-Command -Name dotnet -ErrorAction Ignore)) {
-    Write-Verbose -Message '[dotfiles] Skipping .NET Core settings as unable to locate dotnet.'
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping .NET Core settings as unable to locate dotnet.')
     return
 }
 
-Write-Verbose -Message '[dotfiles] Loading .NET Core settings ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading .NET Core settings ...')
 
 # Opt-out of telemetry
 Set-Item -Path Env:\DOTNET_CLI_TELEMETRY_OPTOUT -Value 'true'

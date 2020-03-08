@@ -1,4 +1,4 @@
-Write-Verbose -Message '[dotfiles] Configuring PowerShell ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Configuring PowerShell ...')
 
 # Default to UTF-8 encoding with Out-File
 $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'

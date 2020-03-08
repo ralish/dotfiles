@@ -1,4 +1,4 @@
-Write-Verbose -Message '[dotfiles] Configuring aliases ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Configuring aliases ...')
 
 # Some useful aliases
 Set-Alias -Name cop     -Value Compare-ObjectProperties

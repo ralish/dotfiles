@@ -1,11 +1,11 @@
 try {
     Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
 } catch {
-    Write-Verbose -Message '[dotfiles] Skipping import of AWS functions.'
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of AWS functions.')
     return
 }
 
-Write-Verbose -Message '[dotfiles] Importing AWS functions ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing AWS functions ...')
 
 #region IAM
 

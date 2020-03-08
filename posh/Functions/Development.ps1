@@ -1,4 +1,4 @@
-Write-Verbose -Message '[dotfiles] Importing development functions ...'
+Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing development functions ...')
 
 #region .NET
 

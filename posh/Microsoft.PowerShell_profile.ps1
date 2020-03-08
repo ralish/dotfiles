@@ -1,3 +1,9 @@
+# Display verbose messages during profile load
+#$DotFilesVerbose = $true
+
+# Display timing data in Get-DotFilesMessage calls
+#$DotFilesShowTimings = $true
+
 # Array of paths containing additional formatting data
 #
 # Calling Update-FormatData is *very* expensive. To improve profile load
@@ -5,6 +11,19 @@
 # any formatting data files to this array. After sourcing all functions
 # and settings we'll call Update-FormatData with all specified paths.
 $FormatDataPaths=@()
+
+# Enable verbose profile load
+if ($DotFilesVerbose) {
+    # $VerbosePreference seems to have no value during profile load? Use
+    # the default of SilentlyContinue when this appears to be the case.
+    if ($VerbosePreference) {
+        $VerbosePreferenceOriginal = $VerbosePreference
+    } else {
+        $VerbosePreferenceOriginal = 'SilentlyContinue'
+    }
+
+    $VerbosePreference = 'Continue'
+}
 
 # Source custom functions
 $PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
@@ -22,7 +41,7 @@ Remove-Variable -Name PoshSettingsPath
 
 # Update formatting data
 if ($FormatDataPaths) {
-    Write-Verbose -Message '[dotfiles] Updating formatting data ...'
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Updating formatting data ...')
     Update-FormatData -PrependPath $FormatDataPaths
 }
 Remove-Variable -Name FormatDataPaths
@@ -33,3 +52,9 @@ if (Test-Path -Path $PoshScriptsPath -PathType Container) {
     $env:Path = '{0};{1}' -f $PoshScriptsPath, $env:Path
 }
 Remove-Variable -Name PoshScriptsPath
+
+# Restore original $VerbosePreference setting
+if ($DotFilesVerbose) {
+    $VerbosePreference = $VerbosePreferenceOriginal
+    Remove-Variable -Name 'VerbosePreferenceOriginal'
+}
