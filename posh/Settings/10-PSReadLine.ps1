@@ -4,7 +4,7 @@ if ($Host.Name -ne 'ConsoleHost') {
 }
 
 try {
-    Import-Module -Name PSReadLine -ErrorAction Stop
+    Import-Module -Name PSReadLine -ErrorAction Stop -Verbose:$false
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSReadLine settings as module not found.')
     return
@@ -56,8 +56,21 @@ if (Test-IsWindows) {
     if (Get-Command -Name concfg -ErrorAction Ignore) {
         Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ConCfg settings ...')
 
+        # ConCfg runs some commands with noisy verbose output. If we're
+        # running with verbose output while loading our profile it tends
+        # to just be annoying. Suppress it by setting $VerbosePreference
+        # as the ConCfg command does not support common parameters.
+        if ($DotFilesVerbose) {
+            $VerbosePreference = 'SilentlyContinue'
+        }
+
         # Set PSReadline colours based on theme
         & concfg tokencolor -n enable
+
+        # Restore the original $VerbosePreference setting
+        if ($DotFilesVerbose) {
+            $VerbosePreference = 'Continue'
+        }
     } else {
         Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping ConCfg settings as unable to locate concfg.')
         continue

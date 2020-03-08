@@ -1,8 +1,19 @@
 try {
-    Import-Module -Name posh-git -ErrorAction Stop
+    # posh-git runs some commands which don't respect the -Verbose
+    # parameter. Suppress them via $VerbosePreference before import.
+    if ($DotFilesVerbose) {
+        $VerbosePreference = 'SilentlyContinue'
+    }
+
+    Import-Module -Name posh-git -ErrorAction Stop -Verbose:$false
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping posh-git settings as module not found.')
     return
+} finally {
+    # Restore the original $VerbosePreference setting
+    if ($DotFilesVerbose) {
+        $VerbosePreference = 'Continue'
+    }
 }
 
 $CurrentVersion = (Get-Module -Name posh-git).Version
