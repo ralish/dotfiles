@@ -4,6 +4,12 @@
 # Display timing data in Get-DotFilesMessage calls
 #$DotFilesShowTimings = $true
 
+# Skip expensive calls for faster profile loading
+#
+# - Get-Module -ListAvailable
+#   Assume the module exists instead of checking
+$DotFilesFastLoad = $true
+
 # Array of paths containing additional formatting data
 #
 # Calling Update-FormatData is *very* expensive. To improve profile load

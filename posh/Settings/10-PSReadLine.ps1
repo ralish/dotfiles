@@ -1,17 +1,16 @@
-try {
-    Test-ModuleAvailable -Name PSReadLine
-} catch {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSReadLine settings as module not found.')
-    return
-}
-
 if ($Host.Name -ne 'ConsoleHost') {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSReadLine settings as host is not ConsoleHost.')
     return
 }
 
+try {
+    Import-Module -Name PSReadLine -ErrorAction Stop
+} catch {
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSReadLine settings as module not found.')
+    return
+}
+
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading PSReadLine settings ...')
-Import-Module -Name PSReadLine
 
 # Don't store duplicate history entries
 Set-PSReadLineOption -HistoryNoDuplicates

@@ -1,15 +1,14 @@
 try {
-    Test-ModuleAvailable -Name posh-git
+    Import-Module -Name posh-git -ErrorAction Stop
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping posh-git settings as module not found.')
     return
 }
 
-$CurrentVersion = (Get-Module -Name posh-git -ListAvailable).Version
+$CurrentVersion = (Get-Module -Name posh-git).Version
 $RequiredVersion = [Version]::new('1.0.0')
 if ($CurrentVersion -ge $RequiredVersion) {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading posh-git settings ...')
-    Import-Module -Name posh-git
 
     # Abbreviate home directory path with tilde
     $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true

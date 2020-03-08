@@ -1,5 +1,5 @@
 try {
-    Test-ModuleAvailable -Name oh-my-posh
+    Import-Module -Name oh-my-posh -ErrorAction Stop
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping oh-my-posh settings as module not found.')
     return

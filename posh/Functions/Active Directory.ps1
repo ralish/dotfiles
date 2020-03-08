@@ -3,7 +3,9 @@ if (!(Test-IsWindows)) {
 }
 
 try {
-    Test-ModuleAvailable -Name ActiveDirectory
+    if (!$DotFilesFastLoad) {
+        Test-ModuleAvailable -Name ActiveDirectory
+    }
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of Active Directory functions.')
     return

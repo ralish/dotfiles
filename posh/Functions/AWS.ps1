@@ -1,5 +1,7 @@
 try {
-    Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+    if (!$DotFilesFastLoad) {
+        Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+    }
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of AWS functions.')
     return

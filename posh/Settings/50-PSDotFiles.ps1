@@ -1,5 +1,7 @@
 try {
-    Test-ModuleAvailable -Name PSDotFiles
+    if (!$DotFilesFastLoad) {
+        Test-ModuleAvailable -Name PSDotFiles
+    }
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSDotFiles settings as module not found.')
     return
