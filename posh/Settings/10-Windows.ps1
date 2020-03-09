@@ -36,11 +36,14 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading Windows settings .
 # - https://github.com/microsoft/terminal/pull/2816
 if (!$env:WT_SESSION) {
     $BuildNumber = [int](Get-CimInstance -ClassName Win32_OperatingSystem -Verbose:$false).BuildNumber
+
     if ($BuildNumber -ge 10586 -and $BuildNumber -lt 19041) {
         if ((Get-ItemProperty -Path HKCU:\Console -Name VirtualTerminalLevel -ErrorAction SilentlyContinue).VirtualTerminalLevel) {
             $ConHostVT100Bug = $true
         }
     }
+
+    Remove-Variable -Name BuildNumber
 }
 
 if ($ConHostVT100Bug) {
@@ -135,5 +138,5 @@ public static extern bool SetConsoleMode(
 
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Applying fix for ConHost VT100 tab stop width bug ...')
     $ConHostVT100Fix.Invoke()
-    Remove-Variable -Name @('BuildNumber', 'ConHostVT100Bug', 'ConHostVT100Fix')
+    Remove-Variable -Name @('ConHostVT100Bug', 'ConHostVT100Fix')
 }
