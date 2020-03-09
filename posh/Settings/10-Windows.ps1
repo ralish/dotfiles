@@ -122,15 +122,9 @@ public static extern bool SetConsoleMode(
                 if (!([DotFiles.ConsoleAPI]::SetConsoleMode($ConStdHandle, [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]$ConStdMode -bxor [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
                     throw (New-Object -TypeName ComponentModel.Win32Exception)
                 }
-                if (!([DotFiles.ConsoleAPI]::GetConsoleMode($ConStdHandle, [ref]$ConStdMode))) {
-                    throw (New-Object -TypeName ComponentModel.Win32Exception)
-                }
 
                 Write-Debug -Message (Get-DotFilesMessage -Message 'Enabling console VT100 support ...')
                 if (!([DotFiles.ConsoleAPI]::SetConsoleMode($ConStdHandle, [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]$ConStdMode -bor [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
-                    throw (New-Object -TypeName ComponentModel.Win32Exception)
-                }
-                if (!([DotFiles.ConsoleAPI]::GetConsoleMode($ConStdHandle, [ref]$ConStdMode))) {
                     throw (New-Object -TypeName ComponentModel.Win32Exception)
                 }
             } else {
