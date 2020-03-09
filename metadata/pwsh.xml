@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Metadata.xsd">
+    <FriendlyName>PowerShell</FriendlyName>
+    <BasePath>.config\powershell</BasePath>
+
+    <Detection>
+        <Method>FindInPath</Method>
+    </Detection>
+
+    <InstallPath>
+        <SpecialFolder>Personal</SpecialFolder>
+        <Destination>PowerShell</Destination>
+        <HideSymlinks>true</HideSymlinks>
+    </InstallPath>
+</Component>
