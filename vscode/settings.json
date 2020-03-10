@@ -50,6 +50,7 @@
     "terminal.integrated.cursorStyle": "line",
     "terminal.integrated.fontFamily": "Hack",
     "terminal.integrated.rightClickBehavior": "paste",
+    "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
 
     // Application: Telemetry
     "telemetry.enableCrashReporter": false,
