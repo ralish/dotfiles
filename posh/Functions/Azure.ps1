@@ -36,7 +36,7 @@ Function Get-AzureAuthToken {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [ValidateSet('AzureAdGraph', 'AzureClassic', 'AzureGallery', 'AzureRm', 'MsGraph')]
+        [ValidateSet('AzureAdGraph', 'AzureClassic', 'AzureGallery', 'AzurePortal', 'AzureRm', 'MsGraph')]
         [String]$Api,
 
         [Parameter(Mandatory)]
@@ -80,12 +80,12 @@ Function Get-AzureAuthToken {
     }
 
     switch ($Api) {
-        'MsGraph'           { $ApiEndpointUri = 'https://graph.microsoft.com/' }
-        'AzureRm'           { $ApiEndpointUri = 'https://management.azure.com/' }
+        'AzureAdGraph'      { $ApiEndpointUri = 'https://graph.windows.net/' }              # Deprecated
+        'AzureClassic'      { $ApiEndpointUri = 'https://management.core.windows.net/' }    # Deprecated
         'AzureGallery'      { $ApiEndpointUri = 'https://gallery.azure.com/' }
-        # Deprecated APIs
-        'AzureAdGraph'      { $ApiEndpointUri = 'https://graph.windows.net/' }
-        'AzureClassic'      { $ApiEndpointUri = 'https://management.core.windows.net/' }
+        'AzurePortal'       { $ApiEndpointUri = '74658136-14ec-4630-ad9b-26e160ff0fc6' }    # Undocumented
+        'AzureRm'           { $ApiEndpointUri = 'https://management.azure.com/' }
+        'MsGraph'           { $ApiEndpointUri = 'https://graph.microsoft.com/' }
     }
 
     $AuthorityUri = 'https://login.microsoftonline.com/{0}.onmicrosoft.com' -f $TenantName
