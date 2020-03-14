@@ -100,6 +100,57 @@ Function Get-AzureAuthToken {
 
 #region Reporting
 
+# Retrieve filtered set of Azure AD enterprise applications
+#
+# The Azure Active Directory -> Enterprise applications pane can return
+# a filtered set of results based on whether an application is either a
+# "Enterprise Application" or a "Microsoft Application". These options
+# aren't exposed via the AzureAD command: Get-AzureADServicePrincipal.
+#
+# We can get the same functionality within PowerShell by calling the
+# undocumented API which the Azure Portal uses.
+Function Get-AzureEnterpriseApplications {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult]$AuthToken,
+
+        [ValidateSet('All', 'Enterprise', 'Microsoft')]
+        [String]$AppType='Enterprise'
+    )
+
+    switch ($AppType) {
+        'Enterprise'    { $AppTypeId = 0 }
+        'Microsoft'     { $AppTypeId = 1 }
+        'All'           { $AppTypeId = 2 }
+    }
+
+    $Uri = [Uri]::new('https://main.iam.ad.ext.azure.com/api/ManagedApplications/List')
+
+    $Headers = [Ordered]@{
+        Authorization               = $AuthToken.CreateAuthorizationHeader()
+        'Content-Type'              = 'application/json'
+        Host                        = $Uri.Host
+        'x-ms-client-request-id'    = [Guid]::NewGuid()
+    }
+
+    $Body = @{
+        appListQuery    = $AppTypeId
+        top             = 999
+    }
+
+    $Params = @{
+        Uri     = $Uri.AbsoluteUri
+        Method  = 'POST'
+        Headers = $Headers
+        Body    = ConvertTo-Json $Body
+    }
+
+    $Response = Invoke-RestMethod @Params -ErrorAction Stop
+    return $Response.appList
+}
+
 # Retrieve licensing summary for Azure AD users
 Function Get-AzureUsersLicensingSummary {
     [CmdletBinding()]
