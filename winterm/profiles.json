@@ -20,8 +20,7 @@
 
             "colorScheme": "Solarized Dark",
             "fontFace": "Hack",
-            "fontSize": 10,
-            "padding": "0, 0, 0, 0"
+            "fontSize": 10
         },
         {
             "name": "Windows PowerShell",
@@ -29,8 +28,7 @@
 
             "colorScheme": "Solarized Dark",
             "fontFace": "Hack",
-            "fontSize": 10,
-            "padding": "0, 0, 0, 0"
+            "fontSize": 10
         },
         {
             "name": "Command Prompt",
@@ -39,7 +37,6 @@
             "colorScheme": "Solarized Dark",
             "fontFace": "Hack",
             "fontSize": 10,
-            "padding": "0, 0, 0, 0",
             "useAcrylic": false
         },
         {
