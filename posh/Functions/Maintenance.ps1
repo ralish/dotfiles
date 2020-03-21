@@ -13,7 +13,7 @@ Function Update-AllTheThings {
             'PowerShell',
             'ModernApps',
             'Scoop',
-            'npm',
+            'NodejsPackages',
             'pip',
             'RubyGems'
         )]
@@ -27,7 +27,7 @@ Function Update-AllTheThings {
             'PowerShell',
             'ModernApps',
             'Scoop',
-            'npm',
+            'NodejsPackages',
             'pip',
             'RubyGems'
         )]
@@ -41,7 +41,7 @@ Function Update-AllTheThings {
         PowerShell = $null
         ModernApps = $null
         Scoop = $null
-        npm = $null
+        NodejsPackages = $null
         pip = $null
         RubyGems = $null
     }
@@ -75,7 +75,7 @@ Function Update-AllTheThings {
         PowerShell = $null
         ModernApps = $null
         Scoop = $null
-        npm = $null
+        NodejsPackages = $null
         pip = $null
         RubyGems = $null
     }
@@ -104,8 +104,8 @@ Function Update-AllTheThings {
         $Results.Scoop = Update-Scoop
     }
 
-    if ($Tasks['npm']) {
-        $Results.npm = Update-Npm
+    if ($Tasks['NodejsPackages']) {
+        $Results.NodejsPackages = Update-NodejsPackages
     }
 
     if ($Tasks['pip']) {
@@ -169,23 +169,28 @@ Function Update-ModernApps {
     return $Result
 }
 
-# Update npm & globally installed modules
-Function Update-Npm {
-    [CmdletBinding()]
+# Update Node.js packages
+Function Update-NodejsPackages {
+    [CmdletBinding(SupportsShouldProcess)]
     Param()
 
-    if (!(Get-Command -Name npm)) {
-        Write-Warning -Message 'Unable to install npm updates as npm command not found.'
-        return $false
+    try {
+        $null = Get-Command -Name npm -ErrorAction Stop
+    } catch {
+        Write-Error -Message 'Unable to update Node.js packages as npm command not found.'
+        return
     }
 
-    Write-Host -ForegroundColor Green -Object 'Updating npm ...'
-    & npm update -g npm
+    $UpdateArgs = @('update', '--global')
+    if ($PSCmdlet.ShouldProcess('Node.js packages', 'Update')) {
+        $UpdateArgs += '--dry-run'
+    }
 
-    Write-Host -ForegroundColor Green -Object 'Updating npm modules ...'
-    & npm update -g
+    Write-Host -ForegroundColor Green -Object 'Updating Node.js npm ...'
+    & npm @UpdateArgs npm
 
-    return $true
+    Write-Host -ForegroundColor Green -Object 'Updating Node.js packages ...'
+    & npm @UpdateArgs
 }
 
 # Update Microsoft Office (Click-to-Run only)
