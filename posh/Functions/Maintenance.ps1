@@ -266,6 +266,7 @@ Function Update-PowerShell {
 
 # Update Scoop & installed apps
 Function Update-Scoop {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '')]
     [CmdletBinding()]
     Param()
 
