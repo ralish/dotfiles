@@ -204,6 +204,57 @@ Function Switch-Google {
     }
 }
 
+# Configure environment for Java development
+Function Switch-Java {
+    [CmdletBinding()]
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [String]$Path="$env:HOMEDRIVE\Java",
+
+        [Switch]$Persist,
+        [Switch]$Disable
+    )
+
+    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+        throw 'Provided Java path is not a directory: {0}' -f $Path
+    }
+
+    $PathParams = @{ }
+    if (!$Disable) {
+        $Operation = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
+        $JavaHome = $Path
+    } else {
+        $Operation = 'Remove-PathStringElement'
+        $JavaHome = [String]::Empty
+    }
+
+    $BinPath = Join-Path -Path $Path -ChildPath 'bin'
+
+    $env:Path = $env:Path |
+        & $Operation @PathParams -Element $BinPath
+
+    $env:JAVA_HOME = $JavaHome
+
+    if ($Persist) {
+        $EnvParams = @{
+            Name = 'Path'
+        }
+
+        if (!$Disable) {
+            $PathParams['Action'] = 'Append'
+        }
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $BinPath |
+            Set-EnvironmentVariable @EnvParams
+
+        if (!$Disable) {
+            Set-EnvironmentVariable -Name JAVA_HOME -Value $JavaHome
+        }
+    }
+}
+
 # Configure environment for Node.js development
 #
 # Environment variables
