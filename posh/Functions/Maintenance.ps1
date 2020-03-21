@@ -34,15 +34,15 @@ Function Update-AllTheThings {
     )
 
     $Tasks = @{
-        Windows = $null
-        Office = $null
-        VisualStudio = $null
-        PowerShell = $null
-        ModernApps = $null
-        Scoop = $null
-        NodejsPackages = $null
-        PythonPackages = $null
-        RubyGems = $null
+        Windows         = $null
+        Office          = $null
+        VisualStudio    = $null
+        PowerShell      = $null
+        ModernApps      = $null
+        Scoop           = $null
+        NodejsPackages  = $null
+        PythonPackages  = $null
+        RubyGems        = $null
     }
 
     foreach ($Task in @($Tasks.Keys)) {
@@ -68,15 +68,15 @@ Function Update-AllTheThings {
     }
 
     $Results = [PSCustomObject]@{
-        Windows = $null
-        Office = $null
-        VisualStudio = $null
-        PowerShell = $null
-        ModernApps = $null
-        Scoop = $null
-        NodejsPackages = $null
-        PythonPackages = $null
-        RubyGems = $null
+        Windows         = $null
+        Office          = $null
+        VisualStudio    = $null
+        PowerShell      = $null
+        ModernApps      = $null
+        Scoop           = $null
+        NodejsPackages  = $null
+        PythonPackages  = $null
+        RubyGems        = $null
     }
 
     if ($Tasks['Windows']) {

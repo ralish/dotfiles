@@ -155,21 +155,21 @@ Function Get-TextEncoding() {
 
         # Special case for UTF-16LE encoded XML without BOM (this is legal!)
         $Encoding = [PSCustomObject]@{
-            Name = 'utf-16'
-            DisplayName = 'Unicode via XML declaration'
-            CodePage = '1200'
-            Preamble = [Byte[]]@(60, 0, 63, 0)
-            ByteOrderMark = $false
+            Name            = 'utf-16'
+            DisplayName     = 'Unicode via XML declaration'
+            CodePage        = '1200'
+            Preamble        = [Byte[]]@(60, 0, 63, 0)
+            ByteOrderMark   = $false
         }
         $null = $Encodings.Add($Encoding)
 
         # Special case for UTF-16BE encoded XML without BOM (this is legal!)
         $Encoding = [PSCustomObject]@{
-            Name = 'utf-16BE'
-            DisplayName = 'Unicode (Big-Endian) via XML declaration'
-            CodePage = '1201'
-            Preamble = [Byte[]]@(0, 60, 0, 63)
-            ByteOrderMark = $false
+            Name            = 'utf-16BE'
+            DisplayName     = 'Unicode (Big-Endian) via XML declaration'
+            CodePage        = '1201'
+            Preamble        = [Byte[]]@(0, 60, 0, 63)
+            ByteOrderMark   = $false
         }
         $null = $Encodings.Add($Encoding)
 
@@ -192,9 +192,9 @@ Function Get-TextEncoding() {
 
             Write-Verbose -Message ('Processing: {0}' -f $Item.FullName)
             $Result = [PSCustomObject]@{
-                File = $Item
-                Encoding = 'ascii / utf-8'
-                ByteOrderMark = $false
+                File            = $Item
+                Encoding        = 'ascii / utf-8'
+                ByteOrderMark   = $false
             }
 
             $FoundEncoding = $false
@@ -271,11 +271,11 @@ Function Get-DirectorySummary {
     }
 
     $Summary = [PSCustomObject]@{
-        Path = $Directory
-        Dirs = $TotalDirs
-        Files = $TotalFiles
-        Items = $TotalItems
-        Size = $TotalSize
+        Path    = $Directory
+        Dirs    = $TotalDirs
+        Files   = $TotalFiles
+        Items   = $TotalItems
+        Size    = $TotalSize
     }
 
     $Summary.PSObject.TypeNames.Insert(0, 'DotFiles.Generic.DirectorySummary')

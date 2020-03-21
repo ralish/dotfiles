@@ -19,8 +19,8 @@ Function Get-AzureAuthHeader {
     )
 
     $AuthHeader = @{
-        'Content-Type'='application/json'
-        'Authorization'=$AuthToken.CreateAuthorizationHeader()
+        Authorization   = $AuthToken.CreateAuthorizationHeader()
+        'Content-Type'  = 'application/json'
     }
 
     return $AuthHeader
@@ -191,8 +191,8 @@ Function Get-AzureUsersWithDisabledServices {
 
         if ($DisabledServices -or $ReturnAllUsers) {
             $Result = [PSCustomObject]@{
-                User        = $User.DisplayName
-                Service     = [Object[]]$DisabledServices.ServicePlan
+                User    = $User.DisplayName
+                Service = [Object[]]$DisabledServices.ServicePlan
             }
             $null = $Results.Add($Result)
         }

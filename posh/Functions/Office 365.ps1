@@ -52,7 +52,7 @@ Function Export-MailboxSpreadsheetData {
     }
 
     if (!$SkipActivitySummary) {
-        $Params = @{ Mailbox=$Mailbox }
+        $Params = @{ Mailbox = $Mailbox }
         foreach ($Parameter in @('StartDate', 'EndDate')) {
             if ($PSBoundParameters.ContainsKey($Parameter)) {
                 $Params.Add($Parameter, $PSBoundParameters.Item($Parameter))
@@ -65,8 +65,8 @@ Function Export-MailboxSpreadsheetData {
 
     Write-Host -ForegroundColor Green -Object 'Exporting mailbox data ...'
     $Params = @{
-        Encoding='UTF8'
-        NoTypeInformation=$true
+        Encoding            = 'UTF8'
+        NoTypeInformation   = $true
     }
 
     if (!$SkipActivitySummary) {
