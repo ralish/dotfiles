@@ -206,7 +206,7 @@ Function Update-Office {
     }
 
     Write-Host -ForegroundColor Green -Object 'Installing Office updates ...'
-    Start-Process -FilePath $OfficeC2RClient -ArgumentList @('/update', 'user', 'updatepromptuser=True') -NoNewWindow -Wait
+    & $OfficeC2RClient /update user updatepromptuser=True
     Start-Sleep -Seconds 3
 
     do {
@@ -352,10 +352,10 @@ Function Update-VisualStudio {
     }
 
     Write-Host -ForegroundColor Green -Object 'Updating Visual Studio Installer ...'
-    Start-Process -FilePath $VsInstaller -ArgumentList @('--update', '--passive', '--norestart', '--wait') -NoNewWindow -Wait
+    & $VsInstaller --update --passive --norestart --wait
 
     Write-Host -ForegroundColor Green -Object 'Updating Visual Studio ...'
-    Start-Process -FilePath $VsInstaller -ArgumentList @('update', '--passive', '--norestart', '--wait') -NoNewWindow -Wait
+    & $VsInstaller update --passive --norestart --wait
 
     return $true
 }
