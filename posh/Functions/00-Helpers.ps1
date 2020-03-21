@@ -4,6 +4,7 @@ if ($DotFilesShowTimings) {
 } else {
     Write-Verbose -Message ('[dotfiles] {0}' -f $Message)
 }
+Remove-Variable -Name Message
 
 # Retrieve a formatted dotfiles message
 Function Get-DotFilesMessage {
