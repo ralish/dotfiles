@@ -1,11 +1,3 @@
-$Message = 'Importing helper functions ...'
-if ($DotFilesShowTimings) {
-    Write-Verbose -Message ('[dotfiles | {0}] {1}' -f (Get-Date -Format 'HH:mm:ss:fff'), $Message)
-} else {
-    Write-Verbose -Message ('[dotfiles] {0}' -f $Message)
-}
-Remove-Variable -Name Message
-
 # Retrieve a formatted dotfiles message
 Function Get-DotFilesMessage {
     [CmdletBinding()]
