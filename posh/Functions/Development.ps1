@@ -130,7 +130,7 @@ Function Invoke-GitMergeAllBranches {
 
     if ($SourceBranch -ne $CurrentBranch) {
         & git checkout $SourceBranch
-        Write-Host ''
+        Write-Host
     }
 
     foreach ($Branch in $Branches) {
@@ -138,10 +138,10 @@ Function Invoke-GitMergeAllBranches {
             continue
         }
 
-        Write-Host -ForegroundColor Green ('Updating branch: {0}' -f $Branch)
+        Write-Host -ForegroundColor Green -Object ('Updating branch: {0}' -f $Branch)
         & git checkout $Branch
         & git merge --ff-only $SourceBranch
-        Write-Host ''
+        Write-Host
     }
 
     & git checkout $SourceBranch
