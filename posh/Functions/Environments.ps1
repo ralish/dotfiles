@@ -1,6 +1,9 @@
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing environment functions ...')
 
 # Configure environment for Cygwin usage
+#
+# Environment variables
+# https://cygwin.com/cygwin-ug-net/setup-env.html
 Function Switch-Cygwin {
     [CmdletBinding()]
     Param(
@@ -77,6 +80,9 @@ Function Switch-Cygwin {
 }
 
 # Configure environment for Go development
+#
+# Environment variables
+# https://golang.org/cmd/go/#hdr-Environment_variables
 Function Switch-Go {
     [CmdletBinding()]
     Param(
@@ -199,6 +205,9 @@ Function Switch-Google {
 }
 
 # Configure environment for Node.js development
+#
+# Environment variables
+# https://nodejs.org/api/cli.html#cli_environment_variables
 Function Switch-Nodejs {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
@@ -245,6 +254,9 @@ Function Switch-Nodejs {
 }
 
 # Configure environment for Perl development
+#
+# Environment variables
+# https://perldoc.perl.org/perlrun.html#ENVIRONMENT
 Function Switch-Perl {
     [CmdletBinding()]
     Param(
@@ -335,6 +347,9 @@ Function Switch-PHP {
 }
 
 # Configure environment for Python development
+#
+# Environment variables
+# https://docs.python.org/3/using/cmdline.html#environment-variables
 Function Switch-Python {
     [CmdletBinding()]
     Param(
