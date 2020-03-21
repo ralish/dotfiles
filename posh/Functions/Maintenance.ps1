@@ -14,7 +14,7 @@ Function Update-AllTheThings {
             'ModernApps',
             'Scoop',
             'NodejsPackages',
-            'pip',
+            'PythonPackages',
             'RubyGems'
         )]
         [String[]]$ExcludeTasks,
@@ -28,7 +28,7 @@ Function Update-AllTheThings {
             'ModernApps',
             'Scoop',
             'NodejsPackages',
-            'pip',
+            'PythonPackages',
             'RubyGems'
         )]
         [String[]]$IncludeTasks
@@ -42,7 +42,7 @@ Function Update-AllTheThings {
         ModernApps = $null
         Scoop = $null
         NodejsPackages = $null
-        pip = $null
+        PythonPackages = $null
         RubyGems = $null
     }
 
@@ -76,7 +76,7 @@ Function Update-AllTheThings {
         ModernApps = $null
         Scoop = $null
         NodejsPackages = $null
-        pip = $null
+        PythonPackages = $null
         RubyGems = $null
     }
 
@@ -108,8 +108,8 @@ Function Update-AllTheThings {
         $Results.NodejsPackages = Update-NodejsPackages
     }
 
-    if ($Tasks['pip']) {
-        $Results.pip = Update-Pip
+    if ($Tasks['PythonPackages']) {
+        $Results.PythonPackages = Update-PythonPackages
     }
 
     if ($Tasks['RubyGems']) {
@@ -259,26 +259,43 @@ Function Update-Office {
     return $true
 }
 
-# Update pip & installed packages
-Function Update-Pip {
-    [CmdletBinding()]
+# Update Python packages
+Function Update-PythonPackages {
+    [CmdletBinding(SupportsShouldProcess)]
     Param()
 
-    if (!(Get-Command -Name pip)) {
-        Write-Warning -Message 'Unable to install pip updates as pip command not found.'
-        return $false
+    try {
+        $null = Get-Command -Name pipdeptree -ErrorAction Stop
+    } catch {
+        Write-Error -Message 'Unable to update Python packages as pipdeptree command not found.'
+        return
     }
 
-    Write-Host -ForegroundColor Green -Object 'Updating pip ...'
-    & python -m pip install --upgrade pip
+    if ($PSCmdlet.ShouldProcess('Python packages', 'Update')) {
+        $UpdateArgs = @('install', '--no-python-version-warning', '--upgrade')
+    }
 
-    Write-Host -ForegroundColor Green -Object 'Updating pip modules ...'
-    $Regex = [Regex]::new('^\S+==')
-    $PipArgs = @('install', '-U')
-    & pip freeze | ForEach-Object { $PipArgs += $Regex.Match($_).Value.TrimEnd('=') }
-    Start-Process -FilePath pip -ArgumentList $PipArgs -NoNewWindow -Wait
+    if ($UpdateArgs) {
+        Write-Host -ForegroundColor Green -Object 'Updating Python pip ...'
+        & python -m pip @UpdateArgs pip
+    }
 
-    return $true
+    Write-Host -ForegroundColor Green -Object 'Enumerating Python packages ...'
+    $Packages = [Collections.ArrayList]@()
+    $PackageRegex = [Regex]::new('^\S+==')
+    & pipdeptree | ForEach-Object {
+        if ($PackageRegex.Match($_).Success) {
+            $null = $Packages.Add($_.Split('=')[0])
+        }
+    }
+
+    if ($UpdateArgs) {
+        Write-Host -ForegroundColor Green -Object 'Updating Python packages ...'
+        & pip @UpdateArgs --upgrade-strategy eager @Packages
+    } else {
+        'Packages to update:'
+        $Packages -join [Environment]::NewLine
+    }
 }
 
 # Update PowerShell modules & built-in help
