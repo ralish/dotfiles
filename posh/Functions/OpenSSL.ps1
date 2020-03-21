@@ -16,7 +16,7 @@ Function Convert-OpenSSLDerToPem {
         [String]$PemFile
     )
 
-    & openssl x509 -inform der -in `"$DerFile`" -out `"$PemFile`"
+    & openssl x509 -inform der -in $DerFile -out $PemFile
 }
 
 # Convert a certificate in PEM format to DER format
@@ -30,7 +30,7 @@ Function Convert-OpenSSLPemToDer {
         [String]$DerFile
     )
 
-    & openssl x509 -outform der -in `"$PemFile`" -out `"$DerFile`"
+    & openssl x509 -outform der -in $PemFile -out $DerFile
 }
 
 # Convert a certificate in PEM format to PKCS #12 format
@@ -50,9 +50,9 @@ Function Convert-OpenSSLPemToPkcs12 {
     )
 
     if ($CaCertsFile) {
-        & openssl pkcs12 -export -inkey `"$PrivateKeyFile`" -in `"$PemFile`" -out `"$Pkcs12File`" -certfile `"$CaCertsFile`"
+        & openssl pkcs12 -export -inkey $PrivateKeyFile -in $PemFile -out $Pkcs12File -certfile $CaCertsFile
     } else {
-        & openssl pkcs12 -export -inkey `"$PrivateKeyFile`" -in `"$PemFile`" -out `"$Pkcs12File`"
+        & openssl pkcs12 -export -inkey $PrivateKeyFile -in $PemFile -out $Pkcs12File
     }
 }
 
@@ -74,11 +74,11 @@ Function Convert-OpenSSLPkcs12ToPem {
     )
 
     if ($CertificatesOnly) {
-        & openssl pkcs12 -in `"$Pkcs12File`" -out `"$PemFile`" -nodes -nokeys
+        & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes -nokeys
     } elseif ($PrivateKeyOnly) {
-        & openssl pkcs12 -in `"$Pkcs12File`" -out `"$PemFile`" -nodes -nocerts
+        & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes -nocerts
     } else {
-        & openssl pkcs12 -in `"$Pkcs12File`" -out `"$PemFile`" -nodes
+        & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes
     }
 }
 
@@ -93,7 +93,7 @@ Function Get-OpenSSLCertificate {
     )
 
     $NameOpt = [String]::Join(',', $NameOptions)
-    & openssl x509 -in `"$Certificate`" -noout -text -nameopt `"$NameOpt`"
+    & openssl x509 -in $Certificate -noout -text -nameopt $NameOpt
 }
 
 # Retrieve the details of a certificate signing request
@@ -107,7 +107,7 @@ Function Get-OpenSSLCsr {
     )
 
     $NameOpt = [String]::Join(',', $NameOptions)
-    & openssl req -in `"$Csr`" -noout -text -verify -nameopt `"$NameOpt`"
+    & openssl req -in $Csr -noout -text -verify -nameopt $NameOpt
 }
 
 # Retrieve the details of a PKCS #12 certificate
@@ -118,7 +118,7 @@ Function Get-OpenSSLPkcs12 {
         [String]$Pkcs12
     )
 
-    & openssl rsa -in `"$Pkcs12`" -info
+    & openssl rsa -in $Pkcs12 -info
 }
 
 # Retrieve the details of a private key
@@ -129,7 +129,7 @@ Function Get-OpenSSLPrivateKey {
         [String]$PrivateKey
     )
 
-    & openssl rsa -in `"$PrivateKey`" -check
+    & openssl rsa -in $PrivateKey -check
 }
 
 # Create a private key and certificate signing request
@@ -160,12 +160,9 @@ Function New-OpenSSLPrivateKeyAndCsr {
     $Params = @(
         'req',
         '-new',
-        '-out',
-        ('"{0}"' -f $Csr),
-        '-keyout',
-        ('"{0}"' -f $PrivateKey),
-        '-newkey',
-        $NewKeyArgs
+        '-out', $Csr,
+        '-keyout', $PrivateKey,
+        '-newkey', $NewKeyArgs
     )
 
     if (!$EncryptKey) {
@@ -173,13 +170,10 @@ Function New-OpenSSLPrivateKeyAndCsr {
     }
 
     if ($Config) {
-        $Params += @(
-            '-config',
-            ('"{0}"' -f $Config)
-        )
+        $Params += @('-config', $Config)
     }
 
-    Start-Process -FilePath 'openssl' -ArgumentList $Params -NoNewWindow -Wait
+    & openssl @Params
 }
 
 # Create a private key and self-signed certificate
@@ -199,5 +193,5 @@ Function New-OpenSSLSelfSignedCertificate {
         [Int]$ValidDays=365
     )
 
-    & openssl req -out `"$Certificate`" -newkey rsa:$KeySize -nodes -keyout `"$PrivateKey`" -x509 -sha256 -days $ValidDays
+    & openssl req -out $Certificate -newkey rsa:$KeySize -nodes -keyout $PrivateKey -x509 -sha256 -days $ValidDays
 }
