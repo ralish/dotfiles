@@ -201,8 +201,8 @@ Function Update-Office {
 
     $OfficeC2RClient = Join-Path -Path $env:ProgramFiles -ChildPath 'Common Files\Microsoft Shared\ClickToRun\OfficeC2RClient.exe'
     if (!(Test-Path -Path $OfficeC2RClient -PathType Leaf)) {
-        Write-Warning -Message 'Unable to install Office updates as Click-to-Run client not found.'
-        return $false
+        Write-Error -Message 'Unable to install Office updates as Click-to-Run client not found.'
+        return
     }
 
     Write-Host -ForegroundColor Green -Object 'Installing Office updates ...'
@@ -302,7 +302,7 @@ Function Update-PowerShell {
         Write-Warning -Message 'Unable to update PowerShell modules as PowerShellGet module not available.'
     }
 
-    if (Get-Command -Name Uninstall-ObsoleteModule) {
+    if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
         Write-Host -ForegroundColor Green -Object 'Uninstalling obsolete PowerShell modules ...'
         Uninstall-ObsoleteModule
     } else {
@@ -321,17 +321,16 @@ Function Update-Scoop {
     [CmdletBinding()]
     Param()
 
-    if (!(Get-Command -Name scoop)) {
-        Write-Warning -Message 'Unable to install Scoop updates as scoop command not found.'
-        return $false
+    if (!(Get-Command -Name scoop -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to install Scoop updates as scoop command not found.'
+        return
     }
+
     Write-Host -ForegroundColor Green -Object 'Updating Scoop ...'
     & scoop update --quiet
 
     Write-Host -ForegroundColor Green -Object 'Updating Scoop apps ...'
     & scoop update * --quiet
-
-    return $true
 }
 
 # Update Microsoft Visual Studio
@@ -348,8 +347,8 @@ Function Update-VisualStudio {
 
     $VsInstaller = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
     if (!(Test-Path -Path $VsInstaller -PathType Leaf)) {
-        Write-Warning -Message 'Unable to install Visual Studio updates as VS Installer not found.'
-        return $false
+        Write-Error -Message 'Unable to install Visual Studio updates as VS Installer not found.'
+        return
     }
 
     Write-Host -ForegroundColor Green -Object 'Updating Visual Studio Installer ...'
@@ -371,8 +370,8 @@ Function Update-Windows {
     }
 
     if (!(Get-Module -Name PSWindowsUpdate -ListAvailable)) {
-        Write-Warning -Message 'Unable to install Windows updates as PSWindowsUpdate module not available.'
-        return $false
+        Write-Error -Message 'Unable to install Windows updates as PSWindowsUpdate module not available.'
+        return
     }
 
     Write-Host -ForegroundColor Green -Object 'Installing Windows updates ...'
