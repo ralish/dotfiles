@@ -15,12 +15,7 @@ Function Switch-Cygwin {
         throw 'Provided Cygwin path is not a directory: {0}' -f $Path
     }
 
-    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to update the system PATH variable.'
-    }
-
     $PathParams = @{ }
-
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -38,10 +33,6 @@ Function Switch-Cygwin {
     if ($Persist) {
         $EnvParams = @{
             Name = 'Path'
-        }
-
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $EnvParams['Scope'] = 'Machine'
         }
 
         if (!$Disable) {
@@ -70,12 +61,7 @@ Function Switch-Go {
         throw 'Provided Go path is not a directory: {0}' -f $Path
     }
 
-    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to update the system PATH variable.'
-    }
-
     $PathParams = @{ }
-
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -88,10 +74,6 @@ Function Switch-Go {
     $GoPaths = @()
     if ($env:GOPATH) {
         foreach ($GoPath in $env:GOPATH.Split([IO.Path]::PathSeparator)) {
-            if ($Persist -and !$GoPath.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
-                throw 'You must have administrator privileges to update the system PATH variable.'
-            }
-
             $GoPaths += Join-Path -Path $GoPath -ChildPath 'bin'
         }
     }
@@ -109,10 +91,6 @@ Function Switch-Go {
     if ($Persist) {
         $EnvParams = @{
             Name = 'Path'
-        }
-
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $EnvParams['Scope'] = 'Machine'
         }
 
         if (!$Disable) {
@@ -153,12 +131,7 @@ Function Switch-Google {
         throw 'Provided depot_tools path is not a directory: {0}' -f $Path
     }
 
-    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to update the system PATH variable.'
-    }
-
     $PathParams = @{ }
-
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -178,10 +151,6 @@ Function Switch-Google {
     if ($Persist) {
         $EnvParams = @{
             Name = 'Path'
-        }
-
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $EnvParams['Scope'] = 'Machine'
         }
 
         if (!$Disable) {
@@ -213,12 +182,7 @@ Function Switch-Nodejs {
         throw 'Provided Nodejs path is not a directory: {0}' -f $Path
     }
 
-    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to update the system PATH variable.'
-    }
-
     $PathParams = @{ }
-
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -237,22 +201,13 @@ Function Switch-Nodejs {
             Name = 'Path'
         }
 
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $EnvParams['Scope'] = 'Machine'
-        }
-
         if (!$Disable) {
             $PathParams['Action'] = 'Append'
         }
 
         Get-EnvironmentVariable @EnvParams |
-            & $Operation @PathParams -Element $Path |
-            Set-EnvironmentVariable @EnvParams
-
-        $EnvParams.Remove('Scope')
-
-        Get-EnvironmentVariable @EnvParams |
             & $Operation @PathParams -Element $LocalNpmPath |
+            & $Operation @PathParams -Element $Path |
             Set-EnvironmentVariable @EnvParams
     }
 }
@@ -272,12 +227,7 @@ Function Switch-Perl {
         throw 'Provided Perl path is not a directory: {0}' -f $Path
     }
 
-    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to update the system PATH variable.'
-    }
-
     $PathParams = @{ }
-
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -297,10 +247,6 @@ Function Switch-Perl {
     if ($Persist) {
         $EnvParams = @{
             Name = 'Path'
-        }
-
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $EnvParams['Scope'] = 'Machine'
         }
 
         if (!$Disable) {
@@ -330,12 +276,7 @@ Function Switch-PHP {
         throw 'Provided PHP path is not a directory: {0}' -f $Path
     }
 
-    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to update the system PATH variable.'
-    }
-
     $PathParams = @{ }
-
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -349,10 +290,6 @@ Function Switch-PHP {
     if ($Persist) {
         $EnvParams = @{
             Name = 'Path'
-        }
-
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $EnvParams['Scope'] = 'Machine'
         }
 
         if (!$Disable) {
@@ -389,12 +326,7 @@ Function Switch-Python {
         throw 'Provided Python path is not a directory: {0}' -f $Path
     }
 
-    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to update the system PATH variable.'
-    }
-
     $PathParams = @{ }
-
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -417,24 +349,15 @@ Function Switch-Python {
             Name = 'Path'
         }
 
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $EnvParams['Scope'] = 'Machine'
-        }
-
         if (!$Disable) {
             $PathParams['Action'] = 'Append'
         }
 
         Get-EnvironmentVariable @EnvParams |
-            & $Operation @PathParams -Element $ScriptsPath |
-            & $Operation @PathParams -Element $Path |
-            Set-EnvironmentVariable @EnvParams
-
-        $EnvParams.Remove('Scope')
-
-        Get-EnvironmentVariable @EnvParams |
             & $Operation @PathParams -Element $LocalScriptsVersionedPath |
             & $Operation @PathParams -Element $LocalScriptsSharedPath |
+            & $Operation @PathParams -Element $ScriptsPath |
+            & $Operation @PathParams -Element $Path |
             Set-EnvironmentVariable @EnvParams
     }
 }
@@ -459,12 +382,7 @@ Function Switch-Ruby {
         throw 'Provided Ruby path is not a directory: {0}' -f $Path
     }
 
-    if ($Persist -and !$Path.StartsWith($env:USERPROFILE) -and !(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to update the system PATH variable.'
-    }
-
     $PathParams = @{ }
-
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -483,10 +401,6 @@ Function Switch-Ruby {
     if ($Persist) {
         $EnvParams = @{
             Name = 'Path'
-        }
-
-        if (!$Path.StartsWith($env:USERPROFILE)) {
-            $EnvParams['Scope'] = 'Machine'
         }
 
         if (!$Disable) {
