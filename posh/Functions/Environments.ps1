@@ -7,6 +7,9 @@ Function Switch-Cygwin {
         [ValidateNotNullOrEmpty()]
         [String]$Path="$env:HOMEDRIVE\Cygwin",
 
+        [ValidateSet('Default', 'Lnk', 'Native', 'NativeStrict')]
+        [String]$Symlinks='NativeStrict',
+
         [Switch]$Persist,
         [Switch]$Disable
     )
@@ -30,6 +33,29 @@ Function Switch-Cygwin {
         & $Operation @PathParams -Element $BinPath |
         & $Operation @PathParams -Element $LocalBinPath
 
+    $CygwinCfg = [Collections.ArrayList]@()
+    if ($env:CYGWIN) {
+        foreach ($Setting in $env:CYGWIN.Split(' ')) {
+            if ([String]::IsNullOrEmpty($Setting)) {
+                continue
+            }
+
+            if ($Setting -notmatch 'winsymlinks') {
+                $null = $CygwinCfg.Add($Setting)
+            }
+        }
+    }
+
+    if ($Symlinks -ne 'Default') {
+        $null = $CygwinCfg.Add('winsymlinks:{0}' -f $Symlinks.ToLower())
+    }
+
+    $CygwinCfg.Sort()
+    $env:CYGWIN = $CygwinCfg -join ' '
+    if ($env:CYGWIN) {
+        Write-Host -ForegroundColor Green -Object ('Set CYGWIN environment variable to: {0}' -f $env:CYGWIN)
+    }
+
     if ($Persist) {
         $EnvParams = @{
             Name = 'Path'
@@ -43,6 +69,10 @@ Function Switch-Cygwin {
             & $Operation @PathParams -Element $LocalBinPath |
             & $Operation @PathParams -Element $BinPath |
             Set-EnvironmentVariable @EnvParams
+
+        if (!$Disable) {
+            Set-EnvironmentVariable -Name CYGWIN -Value ($CygwinCfg -join ' ')
+        }
     }
 }
 
