@@ -14,7 +14,8 @@ Function Update-AllTheThings {
             'ModernApps',
             'Scoop',
             'npm',
-            'pip'
+            'pip',
+            'RubyGems'
         )]
         [String[]]$ExcludeTasks,
 
@@ -27,7 +28,8 @@ Function Update-AllTheThings {
             'ModernApps',
             'Scoop',
             'npm',
-            'pip'
+            'pip',
+            'RubyGems'
         )]
         [String[]]$IncludeTasks
     )
@@ -41,6 +43,7 @@ Function Update-AllTheThings {
         Scoop = $null
         npm = $null
         pip = $null
+        RubyGems = $null
     }
 
     foreach ($Task in @($Tasks.Keys)) {
@@ -74,6 +77,7 @@ Function Update-AllTheThings {
         Scoop = $null
         npm = $null
         pip = $null
+        RubyGems = $null
     }
 
     if ($Tasks['Windows']) {
@@ -108,7 +112,40 @@ Function Update-AllTheThings {
         $Results.pip = Update-Pip
     }
 
+    if ($Tasks['RubyGems']) {
+        $Results.RubyGems = Update-RubyGems
+    }
+
     return $Results
+}
+
+# Update Ruby packages
+Function Update-RubyGems {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    try {
+        $null = Get-Command -Name gem -ErrorAction Stop
+    } catch {
+        Write-Error -Message 'Unable to update Ruby gems as gem command not found.'
+        return
+    }
+
+    $UpdateArgs = @('update', '--no-document')
+    if (!$PSCmdlet.ShouldProcess('Ruby gems', 'Update')) {
+        $UpdateArgs += '--explain'
+    }
+
+    Write-Host -ForegroundColor Green -Object 'Enumerating Ruby gems ...'
+    $Packages = [Collections.ArrayList]@()
+    $PackageRegex = [Regex]::new('\(default: \S+\)')
+    & gem list --local --no-details | ForEach-Object {
+        if (!$PackageRegex.Match($_).Success) {
+            $null = $Packages.Add($_.Split(' ')[0])
+        }
+    }
+
+    & gem @UpdateArgs @Packages
 }
 
 # Update Modern Apps (Microsoft Store)
