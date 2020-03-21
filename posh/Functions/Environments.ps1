@@ -161,8 +161,10 @@ Function Switch-Google {
             & $Operation @PathParams -Element $Path |
             Set-EnvironmentVariable @EnvParams
 
-        Set-EnvironmentVariable -Name DEPOT_TOOLS_WIN_TOOLCHAIN -Value $DepotToolsWinToolchain
-        Set-EnvironmentVariable -Name GYP_MSVS_VERSION -Value $VsVersion
+        if (!$Disable) {
+            Set-EnvironmentVariable -Name DEPOT_TOOLS_WIN_TOOLCHAIN -Value $DepotToolsWinToolchain
+            Set-EnvironmentVariable -Name GYP_MSVS_VERSION -Value $VsVersion
+        }
     }
 }
 
@@ -411,6 +413,8 @@ Function Switch-Ruby {
             & $Operation @PathParams -Element $BinPath |
             Set-EnvironmentVariable @EnvParams
 
-        Set-EnvironmentVariable -Name RUBYOPT -Value $Options
+        if (!$Disable) {
+            Set-EnvironmentVariable -Name RUBYOPT -Value $Options
+        }
     }
 }
