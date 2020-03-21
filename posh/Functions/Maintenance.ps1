@@ -123,9 +123,7 @@ Function Update-RubyGems {
     [CmdletBinding(SupportsShouldProcess)]
     Param()
 
-    try {
-        $null = Get-Command -Name gem -ErrorAction Stop
-    } catch {
+    if (!(Get-Command -Name gem -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update Ruby gems as gem command not found.'
         return
     }
@@ -172,9 +170,7 @@ Function Update-NodejsPackages {
     [CmdletBinding(SupportsShouldProcess)]
     Param()
 
-    try {
-        $null = Get-Command -Name npm -ErrorAction Stop
-    } catch {
+    if (!(Get-Command -Name npm -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update Node.js packages as npm command not found.'
         return
     }
@@ -262,9 +258,7 @@ Function Update-PythonPackages {
     [CmdletBinding(SupportsShouldProcess)]
     Param()
 
-    try {
-        $null = Get-Command -Name pipdeptree -ErrorAction Stop
-    } catch {
+    if (!(Get-Command -Name pipdeptree -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update Python packages as pipdeptree command not found.'
         return
     }
