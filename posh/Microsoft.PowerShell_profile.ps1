@@ -55,7 +55,7 @@ Remove-Variable -Name FormatDataPaths
 # Amend the search path to include our scripts directory
 $PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
 if (Test-Path -Path $PoshScriptsPath -PathType Container) {
-    $env:Path = '{0};{1}' -f $PoshScriptsPath, $env:Path
+    $env:Path = Add-PathStringElement -Path $env:Path -Element $PoshScriptsPath -Action Prepend
 }
 Remove-Variable -Name PoshScriptsPath
 
