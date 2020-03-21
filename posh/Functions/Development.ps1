@@ -108,7 +108,6 @@ Function Invoke-GitChildDir {
 
 # Fast-forward all branches to match a branch
 Function Invoke-GitMergeAllBranches {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
@@ -153,7 +152,6 @@ Function Invoke-GitMergeAllBranches {
 
 # Create a file in each empty directory under a path
 Function Add-FileToEmptyDirectories {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding(SupportsShouldProcess)]
     Param(
         [ValidateNotNullOrEmpty()]

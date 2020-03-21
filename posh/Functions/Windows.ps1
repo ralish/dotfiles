@@ -83,7 +83,6 @@ Function Watch-EventLog {
 
 # Retrieve files with a minimum number of hard links
 Function Get-MultipleHardLinks {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]

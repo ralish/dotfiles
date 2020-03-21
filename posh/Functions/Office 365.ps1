@@ -79,7 +79,6 @@ Function Export-MailboxSpreadsheetData {
 
 # Retrieve a summary of mailbox folders with associated rules
 Function Get-InboxRulesByFolders {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
@@ -371,7 +370,6 @@ Function Get-Office365UserLicensingMatrix {
 # Retrieve a security report for all users
 # Improved version of: https://github.com/OfficeDev/O365-InvestigationTooling/blob/master/DumpDelegatesandForwardingRules.ps1
 Function Get-Office365UserSecurityReport {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [ValidateRange(1, 90)]
@@ -532,7 +530,6 @@ Function Get-UnifiedGroupReport {
 
 # Helper function to connect to all Office 365 services
 Function Connect-Office365Services {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
         [Parameter(ParameterSetName='MFA')]

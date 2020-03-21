@@ -176,7 +176,6 @@ Function Get-AzureUsersLicensingSummary {
 
 # Retrieve Azure AD users with disabled services
 Function Get-AzureUsersWithDisabledServices {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [Switch]$ReturnAllUsers

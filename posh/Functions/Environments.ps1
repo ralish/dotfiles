@@ -209,7 +209,6 @@ Function Switch-Google {
 # Environment variables
 # https://nodejs.org/api/cli.html#cli_environment_variables
 Function Switch-Nodejs {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]

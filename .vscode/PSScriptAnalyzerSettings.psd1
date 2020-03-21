@@ -4,7 +4,8 @@
     ExcludeRules = @(
         'PSAvoidUsingWriteHost',
         'PSUseOutputTypeCorrectly',
-        'PSUseShouldProcessForStateChangingFunctions'
+        'PSUseShouldProcessForStateChangingFunctions',
+        'PSUseSingularNouns'
     )
 
     Rules = @{

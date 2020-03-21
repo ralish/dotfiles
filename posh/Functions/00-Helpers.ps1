@@ -39,7 +39,6 @@ Function Test-CommandAvailable {
 
 # Naive check for if we're running on Windows
 Function Test-IsWindows {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param()
 

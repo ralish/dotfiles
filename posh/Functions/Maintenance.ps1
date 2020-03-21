@@ -2,7 +2,6 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing maintenance func
 
 # Update everything!
 Function Update-AllTheThings {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding(DefaultParameterSetName='OptOut')]
     Param(
         [Parameter(ParameterSetName='OptOut')]
@@ -150,7 +149,6 @@ Function Update-RubyGems {
 
 # Update Modern Apps (Microsoft Store)
 Function Update-ModernApps {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param()
 
@@ -371,7 +369,6 @@ Function Update-VisualStudio {
 
 # Update Microsoft Windows
 Function Update-Windows {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param()
 

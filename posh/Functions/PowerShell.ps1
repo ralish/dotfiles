@@ -5,7 +5,6 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing PowerShell funct
 # Compare the properties of two objects
 # Via: https://blogs.technet.microsoft.com/janesays/2017/04/25/compare-all-properties-of-two-objects-in-windows-powershell/
 Function Compare-ObjectProperties {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
