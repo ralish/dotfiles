@@ -6,6 +6,12 @@ $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
 # Number of elements to enumerate when displaying arrays
 $FormatEnumerationLimit = 5
 
+# Save the output of the last command in a variable
+# http://get-powershell.com/post/2008/06/25/Stuffing-the-output-of-the-last-command-into-an-automatic-variable.aspx
+Function Out-Default {
+    $Input | Tee-Object -Variable global:LastObject | Microsoft.PowerShell.Core\Out-Default
+}
+
 # Setup our custom prompt if oh-my-posh is not loaded
 if (!(Get-Module -Name oh-my-posh)) {
     Function Prompt {
