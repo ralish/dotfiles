@@ -40,6 +40,19 @@
             "useAcrylic": false
         },
         {
+            "name": "Git Bash",
+            "guid": "{6450ef44-0210-4802-8580-a99ebeed2849}",
+
+            "commandline": "\"%ProgramFiles%\\Git\\usr\\bin\\bash.exe\" --login -i",
+            "icon": "%ProgramFiles%\\Git\\mingw64\\share\\git\\git-for-windows.ico",
+            "startingDirectory": "%USERPROFILE%",
+
+            "colorScheme": "Solarized Dark",
+            "fontFace": "Hack",
+            "fontSize": 10,
+            "useAcrylic": false
+        },
+        {
             "name": "Azure Cloud Shell",
             "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
             "source": "Windows.Terminal.Azure",
