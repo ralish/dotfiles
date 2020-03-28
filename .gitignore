@@ -75,6 +75,7 @@ logs/
 /openssh/
 
 # PowerShell
+/posh/Help/
 /posh/Modules/
 /posh/Settings/
 
