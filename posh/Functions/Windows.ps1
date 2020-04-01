@@ -145,6 +145,27 @@ Function mklink {
 
 #endregion
 
+#region Networking
+
+# Open the hosts file for editing
+Function Edit-Hosts {
+    [CmdletBinding()]
+    Param()
+
+    $StartParams = @{
+        FilePath        = 'notepad.exe'
+        ArgumentList    = '{0}\System32\drivers\etc\hosts' -f $env:SystemRoot
+    }
+
+    if (!(Test-IsAdministrator)) {
+        $null = $StartParams.Add('Verb', 'RunAs')
+    }
+
+    Start-Process @StartParams
+}
+
+#endregion
+
 #region Security
 
 # Convert security descriptors between different formats
