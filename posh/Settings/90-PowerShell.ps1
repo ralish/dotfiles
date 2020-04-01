@@ -15,6 +15,7 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 # http://get-powershell.com/post/2008/06/25/Stuffing-the-output-of-the-last-command-into-an-automatic-variable.aspx
 Function Out-Default {
     $Input | Tee-Object -Variable LastObject | Microsoft.PowerShell.Core\Out-Default
+    $Global:LastObject = $LastObject
 }
 
 # Setup our custom prompt if oh-my-posh is not loaded
