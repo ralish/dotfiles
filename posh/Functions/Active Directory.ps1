@@ -14,7 +14,7 @@ try {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Active Directory functions ...')
 
 # Load our custom formatting data
-$FormatDataPaths += Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml'
+$null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml'))
 
 #region Kerberos
 

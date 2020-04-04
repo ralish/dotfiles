@@ -6,7 +6,7 @@ if (!(Test-IsWindows)) {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Azure functions ...')
 
 # Load our custom formatting data
-$FormatDataPaths += Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1xml'
+$null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1xml'))
 
 #region Authentication
 

@@ -1,7 +1,7 @@
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing generic functions ...')
 
 # Load our custom formatting data
-$FormatDataPaths += Join-Path -Path $PSScriptRoot -ChildPath 'Generic.format.ps1xml'
+$null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Generic.format.ps1xml'))
 
 #region Encoding
 

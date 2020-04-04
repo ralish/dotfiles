@@ -6,7 +6,7 @@ if (!(Test-IsWindows)) {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Office 365 functions ...')
 
 # Load our custom formatting data
-$FormatDataPaths += Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml'
+$null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml'))
 
 #region Exchange Online
 
