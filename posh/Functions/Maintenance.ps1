@@ -134,7 +134,7 @@ Function Update-RubyGems {
     }
 
     Write-Host -ForegroundColor Green -Object 'Enumerating Ruby gems ...'
-    $Packages = [Collections.ArrayList]@()
+    [Collections.ArrayList]$Packages = @()
     $PackageRegex = [Regex]::new('\(default: \S+\)')
     & gem list --local --no-details | ForEach-Object {
         if (!$PackageRegex.Match($_).Success) {
@@ -273,7 +273,7 @@ Function Update-PythonPackages {
     }
 
     Write-Host -ForegroundColor Green -Object 'Enumerating Python packages ...'
-    $Packages = [Collections.ArrayList]@()
+    [Collections.ArrayList]$Packages = @()
     $PackageRegex = [Regex]::new('^\S+==')
     & pipdeptree | ForEach-Object {
         if ($PackageRegex.Match($_).Success) {
