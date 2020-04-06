@@ -18,9 +18,9 @@ Function Optimize-PowerShell {
     }
 
     Write-Host -ForegroundColor Green '[PowerShell] Determining modules to install ...'
-    [Collections.ArrayList]$Modules = @('SpeculationControl', 'PSWindowsUpdate', 'PSWinGlue', 'PSWinVitals')
+    $Modules = @('SpeculationControl', 'PSWindowsUpdate', 'PSWinGlue', 'PSWinVitals')
     if (!(Get-Module -Name PSReadLine)) {
-        $null = $Modules.Add('PSReadLine')
+        $Modules += 'PSReadLine'
     }
 
     Write-Host -ForegroundColor Green '[PowerShell] Installing NuGet package provider ...'
@@ -43,7 +43,6 @@ Function Optimize-PowerShell {
 }
 
 Function Optimize-WindowsComponents {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param()
 
@@ -77,7 +76,6 @@ Function Optimize-WindowsDefender {
 }
 
 Function Optimize-WindowsFeatures {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param()
 
@@ -87,7 +85,6 @@ Function Optimize-WindowsFeatures {
 }
 
 Function Optimize-WindowsSettings {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '')]
     [CmdletBinding()]
     Param()
 
