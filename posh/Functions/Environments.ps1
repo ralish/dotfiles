@@ -36,7 +36,7 @@ Function Switch-Cygwin {
         & $Operation @PathParams -Element $BinPath |
         & $Operation @PathParams -Element $LocalBinPath
 
-    [Collections.ArrayList]$CygwinCfg = @()
+    $CygwinCfg = [Collections.ArrayList]::new()
     if ($env:CYGWIN) {
         foreach ($Setting in $env:CYGWIN.Split(' ')) {
             if ([String]::IsNullOrEmpty($Setting)) {

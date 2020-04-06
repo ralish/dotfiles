@@ -185,7 +185,7 @@ Function Get-AzureUsersWithDisabledServices {
 
     $Users = Get-MsolUser -ErrorAction Stop | Where-Object { $_.IsLicensed -eq $true }
 
-    [Collections.ArrayList]$Results = @()
+    $Results = [Collections.ArrayList]::new()
     foreach ($User in $Users) {
         $DisabledServices = @($User.Licenses.ServiceStatus | Where-Object { $_.ProvisioningStatus -eq 'Disabled' })
 

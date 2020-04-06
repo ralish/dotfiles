@@ -137,13 +137,13 @@ Function Get-TextEncoding() {
     )
 
     Begin {
-        [Collections.ArrayList]$Results = @()
+        $Results = [Collections.ArrayList]::new()
 
         # Non-printable characters used to determine if file is binary
         $InvalidChars = [Char[]]@(0..8 + 10..31 + 127 + 129 + 141 + 143 + 144 + 157)
 
         # Construct an array of identifiable encodings by their preamble
-        [Collections.ArrayList]$Encodings = @()
+        $Encodings = [Collections.ArrayList]::new()
         foreach ($Encoding in [Text.Encoding]::GetEncodings()) {
             $Preamble = $Encoding.GetEncoding().GetPreamble()
             if ($Preamble) {
@@ -335,7 +335,7 @@ Function Format-Xml {
     )
 
     Begin {
-        [Collections.ArrayList]$Data = @()
+        $Data = [Collections.ArrayList]::new()
     }
 
     Process {

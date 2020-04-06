@@ -173,7 +173,7 @@ Function Add-FileToEmptyDirectories {
             Write-Error -Message ('Provided path is not a directory: {0}' -f $Path)
         }
 
-        [Collections.ArrayList]$FilesToCreate = @()
+        $FilesToCreate = [Collections.ArrayList]::new()
         Get-ChildItem -Directory -Exclude $Exclude -Force | ForEach-Object {
             if ((Get-ChildItem -Path $_.FullName -Force | Measure-Object).Count -ne 0) {
                 Get-ChildItem -Path $_.FullName -Directory -Recurse -Force | ForEach-Object {

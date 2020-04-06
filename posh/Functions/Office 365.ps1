@@ -105,7 +105,7 @@ Function Get-InboxRulesByFolders {
     $Rules | Add-Member -MemberType NoteProperty -Name LinkedToFolder -Value $false
 
     Write-Host -ForegroundColor Green -Object 'Associating rules to folders ...'
-    [Collections.ArrayList]$Results = @()
+    $Results = [Collections.ArrayList]::new()
     foreach ($Folder in $Folders) {
         $FolderName = ($Folder.FolderPath -join ' - ').Substring(8)
         $RegexMatch = '^{0}' -f [Regex]::Escape($FolderName)
@@ -343,7 +343,7 @@ Function Get-Office365UserLicensingMatrix {
     $Users = Get-MsolUser -All
     $Licenses = $Users.Licenses.AccountSkuId | Sort-Object -Unique | ForEach-Object { $_.Split(':')[1] }
 
-    [Collections.ArrayList]$Matrix = @()
+    $Matrix = [Collections.ArrayList]::new()
     $MatrixEntry = [PSCustomObject]@{ UserPrincipalName = '' }
     foreach ($License in $Licenses) {
         $MatrixEntry | Add-Member -MemberType NoteProperty -Name $License -Value $false
@@ -378,13 +378,13 @@ Function Get-Office365UserSecurityReport {
 
     Test-CommandAvailable -Name @('Get-Mailbox', 'Get-MsolUser')
 
-    [Collections.ArrayList]$MailboxAuditing = @()
-    [Collections.ArrayList]$MailboxCalendar = @()
-    [Collections.ArrayList]$MailboxDelegates = @()
-    [Collections.ArrayList]$MailboxForwarding = @()
-    [Collections.ArrayList]$MailboxForwardingRules = @()
-    [Collections.ArrayList]$MailboxSendAs = @()
-    [Collections.ArrayList]$MailboxSendOnBehalf = @()
+    $MailboxAuditing = [Collections.ArrayList]::new()
+    $MailboxCalendar = [Collections.ArrayList]::new()
+    $MailboxDelegates = [Collections.ArrayList]::new()
+    $MailboxForwarding = [Collections.ArrayList]::new()
+    $MailboxForwardingRules = [Collections.ArrayList]::new()
+    $MailboxSendAs = [Collections.ArrayList]::new()
+    $MailboxSendOnBehalf = [Collections.ArrayList]::new()
 
     Write-Verbose -Message 'Retrieving all enabled users ...'
     $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop |

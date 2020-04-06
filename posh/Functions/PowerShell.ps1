@@ -59,7 +59,7 @@ Function Compare-ObjectPropertiesMatrix {
     )
 
     Begin {
-        [Collections.ArrayList]$DifferentProperties = @()
+        $DifferentProperties = [Collections.ArrayList]::new()
     }
 
     Process {

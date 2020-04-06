@@ -183,7 +183,7 @@ Function Resolve-ADGuid {
     }
 
     End {
-        [Collections.ArrayList]$ADObjects = @()
+        $ADObjects = [Collections.ArrayList]::new()
 
         foreach ($SearchFilter in $SearchFilters) {
             $Results = Get-ADObject @CommonParams -SearchBase $SearchBase -LDAPFilter $SearchFilter -Properties *
