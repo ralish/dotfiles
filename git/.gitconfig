@@ -107,10 +107,11 @@
 	bl  = blame
 
 	br  = branch
-	bra = branch --all
-	brd = branch --delete
 	brv = branch -vv
+	bra = branch --all -vv
+	brd = branch --delete
 
+	bs  = bisect
 	bsb = bisect bad
 	bsg = bisect good
 	bsr = bisect reset
@@ -118,6 +119,9 @@
 
 	cl  = clone
 	clr = clone --recursive
+
+	clf = clean -d -x --force
+	cln = clean -d -x --dry-run
 
 	cm  = commit
 	cmm = commit --message
@@ -128,7 +132,6 @@
 
 	co  = checkout
 	cob = checkout -b
-	cof = checkout FETCH_HEAD
 
 	cp  = cherry-pick
 	cpa = cherry-pick --abort
@@ -138,7 +141,7 @@
 	dw  = diff --ignore-all-space
 	dc  = diff --cached
 	dcw = diff --cached --ignore-all-space
-	dns = diff --name-status
+	dn  = diff --name-status
 
 	f   = fetch
 	fa  = fetch --all
@@ -162,20 +165,22 @@
 
 	i   = init
 
-	l   = log --notes='*' --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%aN>%Creset' --all
-	lt  = log --notes='*' --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%aN>%Creset'
-	la  = "!git log --author=\"$(git config user.name)\" --name-status"
-	ldb = log --first-parent --no-merges
+	l   = log --notes='*' --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%aN>%Creset'
+	la  = log --notes='*' --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%aN>%Creset' --all
+	lm  = "!git log --author=\"$(git config user.name)\" --name-status"
 	ln  = log --name-status
-	ls  = ls-tree -r --name-status HEAD
+
+	ls  = ls-tree --name-only HEAD
+	lsr = ls-tree -r --name-only HEAD
 
 	m   = merge
-	mf  = merge FETCH_HEAD
 	mm  = merge master
 	mff = merge --ff-only
 	mnf = merge --no-ff
 
 	n   = notes
+
+	opt = "!git reflog expire --expire=now --all && git gc --prune=now --aggressive"
 
 	p   = push
 	pa  = push --all
@@ -193,7 +198,6 @@
 	rba = rebase --abort
 	rbc = rebase --continue
 	rbs = rebase --skip
-	rbf = rebase FETCH_HEAD
 	rbm = rebase master
 	rbi = rebase -i
 	rb1 = rebase -i HEAD~1
@@ -208,20 +212,19 @@
 	rb9 = rebase -i HEAD~9
 	rb0 = rebase -i HEAD~10
 
+	rmv = remote -v
 	rma = remote add
 	rmp = remote prune
 	rmr = remote rm
-	rmv = remote -v
 
 	rs  = reset
 	rsh = reset --hard
-	rsm = reset --hard master
 
-	rv  = revert --no-commit
-	rvn = revert
+	rv  = revert
+	rvn = revert --no-commit
 
 	s   = status --short --branch
-	sl  = status --long
+	sl  = status
 
 	sh  = shortlog --summary --email
 	shl = shortlog
@@ -245,9 +248,6 @@
 	tl  = tag --list
 	tv  = tag --verify
 
-	up  = "!git remote update --prune; git merge --ff-only @{u}"
-
-	wl  = "!watch --color --interval 5 --no-title --exec git l"
-	wlt = "!watch --color --interval 5 --no-title --exec git lt"
+	up  = "!git remote update --prune && git merge --ff-only @{u}"
 
 # vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 noet sr
