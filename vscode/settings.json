@@ -92,6 +92,9 @@
         "MD026": { "punctuation": ".,;:!" }
     },
 
+    // Extension: Maven for Java
+    "maven.executable.path": "C:\\DevEnvs\\Java\\Maven\\bin\\mvn.cmd",
+
     // Extension: PHP IntelliSense
     "php.executablePath": "C:\\PHP\\php.exe",
 
