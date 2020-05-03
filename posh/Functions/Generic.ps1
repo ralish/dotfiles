@@ -291,6 +291,7 @@ Function Format-SizeDigital {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
+        [ValidateRange("NonNegative")]
         [Double]$Size,
 
         [ValidateSet(2, 10)]
@@ -299,6 +300,10 @@ Function Format-SizeDigital {
         [ValidateRange(0, 10)]
         [Byte]$Precision=2
     )
+
+    if ($Size -eq 0) {
+        return '0 bytes'
+    }
 
     if ($Base -eq 2) {
         $LogBase = 1024
