@@ -120,7 +120,18 @@ Function fla {
         [PSObject]$InputObject
     )
 
-    Format-List -Property * @PSBoundParameters
+    Begin {
+        $Objects = [Collections.ArrayList]::new()
+    }
+
+    Process {
+        $null = $Objects.Add($InputObject)
+    }
+
+    End {
+        $null = $PSBoundParameters.Remove('InputObject')
+        $Objects | Format-List -Property * @PSBoundParameters
+    }
 }
 
 # Invoke Format-Table selecting all properties
@@ -131,7 +142,18 @@ Function fta {
         [PSObject]$InputObject
     )
 
-    Format-Table -Property * @PSBoundParameters
+    Begin {
+        $Objects = [Collections.ArrayList]::new()
+    }
+
+    Process {
+        $null = $Objects.Add($InputObject)
+    }
+
+    End {
+        $null = $PSBoundParameters.Remove('InputObject')
+        $Objects | Format-Table -Property * @PSBoundParameters
+    }
 }
 
 # Invoke Get-Help with -Detailed
