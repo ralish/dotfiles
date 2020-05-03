@@ -218,3 +218,73 @@ Function Set-R53HostedZoneParkedRecords {
 }
 
 #endregion
+
+#region S3
+
+Function Get-S3BucketSize {
+    [CmdletBinding()]
+    Param()
+
+    Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+
+    $Regions = (Get-AWSRegion).Region | Where-Object { $_ -notmatch '^us-isob?-' }
+
+    Write-Verbose -Message 'Retrieving S3 buckets ...'
+    try {
+        $Buckets = Get-S3Bucket -ErrorAction Stop
+    } catch {
+        throw $_
+    }
+
+    $Metrics = @{ }
+    foreach ($Region in $Regions) {
+        Write-Verbose -Message ('Retrieving BucketSizeBytes metrics for region: {0}' -f $Region)
+        try {
+            $Result = Get-CWMetricList -Region $Region -MetricName BucketSizeBytes -ErrorAction Stop
+        } catch {
+            Write-Warning -Message ('Error retrieving BucketSizeBytes metrics for region: {0}' -f $Region)
+            continue
+        }
+
+        if ($Result) {
+            $Metrics[$Region] = $Result
+        }
+    }
+
+    $EndDate = (Get-Date).ToUniversalTime()
+    $StartDate = $EndDate.AddDays(-2)
+    foreach ($Region in $Metrics.Keys) {
+        foreach ($Metric in $Metrics[$Region]) {
+            $BucketName = ($Metric.Dimensions | Where-Object Name -eq 'BucketName').Value
+            $StorageType = ($Metric.Dimensions | Where-Object Name -eq 'StorageType').Value
+
+            Write-Verbose -Message ('[{0}] Retrieving BucketSizeBytes for {1} ...' -f $BucketName, $StorageType)
+            try {
+                $Result = Get-CWMetricStatistic -Region $Region -Namespace AWS/S3 -MetricName BucketSizeBytes -Dimension $Metric.Dimensions -Statistic Average -Period 86400 -UtcStartTime $StartDate -UtcEndTime $EndDate -ErrorAction Stop
+            } catch {
+                Write-Warning -Message ('[{0}] Error retrieving BucksetSizeBytes for {1}.' -f $BucketName, $StorageType)
+                continue
+            }
+
+            $BucketSizeBytes = $Result.Datapoints[0].Average
+            $BucketSize = $BucketSizeBytes | Format-SizeDigital
+
+            $Bucket = $Buckets | Where-Object BucketName -eq $BucketName
+            $Bucket | Add-Member -MemberType NoteProperty -Name BucketSizeBytes -Value $BucketSizeBytes
+            $Bucket | Add-Member -MemberType NoteProperty -Name BucketSize -Value $BucketSize
+        }
+    }
+
+    $BucketSizeBytes = 0
+    $BucketSize = $BucketSizeBytes | Format-SizeDigital
+    foreach ($Bucket in $Buckets) {
+        if ($Bucket.PSObject.Properties.Name -notcontains 'BucketSize') {
+            $Bucket | Add-Member -MemberType NoteProperty -Name BucketSizeBytes -Value $BucketSizeBytes
+            $Bucket | Add-Member -MemberType NoteProperty -Name BucketSize -Value $BucketSize
+        }
+    }
+
+    return $Buckets
+}
+
+#endregion
