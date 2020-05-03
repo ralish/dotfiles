@@ -78,6 +78,7 @@ logs/
 /posh/Help/
 /posh/Modules/
 /posh/Settings/
+/pwsh/.config/powershell/
 
 # PuTTY
 /putty/
