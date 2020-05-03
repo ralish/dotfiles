@@ -123,6 +123,17 @@ Function fla {
     Format-List -Property * @PSBoundParameters
 }
 
+# Invoke Format-Table selecting all properties
+Function fta {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [PSObject]$InputObject
+    )
+
+    Format-Table -Property * @PSBoundParameters
+}
+
 # Invoke Get-Help with -Detailed
 Function ghd {
     [CmdletBinding()]
