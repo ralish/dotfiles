@@ -129,7 +129,7 @@ Function ConvertTo-URLEncoded {
 }
 
 # Determine the encoding of a text file
-Function Get-TextEncoding() {
+Function Get-TextEncoding {
     [CmdletBinding()]
     Param(
         [Parameter(ValueFromPipeline)]
@@ -178,6 +178,14 @@ Function Get-TextEncoding() {
             $Encoding | Add-Member -MemberType ScriptProperty -Name PreambleSize -Value { $this.Preamble.Count }
         }
         $Encodings = $Encodings | Sort-Object -Property PreambleSize -Descending
+
+        # PowerShell Core uses a different parameter to return a byte stream
+        $GetContentBytesParam = @{ }
+        if ($PSVersionTable.PSEdition -eq 'Core') {
+            $GetContentBytesParam['AsByteStream'] = $true
+        } else {
+            $GetContentBytesParam['Encoding'] = 'Byte'
+        }
     }
 
     Process {
@@ -199,7 +207,7 @@ Function Get-TextEncoding() {
 
             $FoundEncoding = $false
             foreach ($Encoding in $Encodings) {
-                [Byte[]]$Bytes = Get-Content -Path $Item.FullName -Encoding Byte -ReadCount $Encoding.Preamble.Count | Select-Object -First 1
+                [Byte[]]$Bytes = Get-Content -Path $Item.FullName @GetContentBytesParam -ReadCount $Encoding.Preamble.Count | Select-Object -First 1
 
                 if ($Bytes.Count -ne $Encoding.Preamble.Count) {
                     continue
