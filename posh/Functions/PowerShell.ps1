@@ -1,5 +1,44 @@
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing PowerShell functions ...')
 
+#region Internals
+
+# Retrieve custom argument completers
+# Via: https://gist.github.com/indented-automation/26c637fb530c4b168e62c72582534f5b
+Function Get-ArgumentCompleter {
+    [CmdletBinding()]
+    Param(
+        [Switch]$Native
+    )
+
+    $BindingFlags = [Reflection.BindingFlags]'NonPublic, Static'
+    $LocalPipelineType = [PowerShell].Assembly.GetType('System.Management.Automation.Runspaces.LocalPipeline')
+    $GetExecutionContextFromTLS = $LocalPipelineType.GetMethod('GetExecutionContextFromTLS', $BindingFlags)
+    $InternalExecutionContext = $GetExecutionContextFromTLS.Invoke($null, $BindingFlags, $null, $null, $PSCulture)
+
+    $BindingFlags = [Reflection.BindingFlags]'Instance, NonPublic'
+    if ($Native) {
+        $ArgumentCompletersPropertyName = 'NativeArgumentCompleters'
+    } else {
+        $ArgumentCompletersPropertyName = 'CustomArgumentCompleters'
+    }
+    $ArgumentCompletersProperty = $InternalExecutionContext.GetType().GetProperty($ArgumentCompletersPropertyName, $BindingFlags)
+
+    $BindingFlags = [Reflection.BindingFlags]'GetProperty, Instance, NonPublic'
+    $ArgumentCompleters = $ArgumentCompletersProperty.GetGetMethod($true).Invoke($InternalExecutionContext, $BindingFlags, $null, @(), $PSCulture)
+
+    foreach ($Completer in $ArgumentCompleters.Keys) {
+        $Name, $Parameter = $Completer.Split(':')
+
+        [PSCustomObject]@{
+            CommandName     = $Name
+            ParameterName   = $Parameter
+            Definition      = $ArgumentCompleters[$Completer]
+        }
+    }
+}
+
+#endregion
+
 #region Object handling
 
 # Compare the properties of two objects
