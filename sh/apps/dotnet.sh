@@ -12,6 +12,16 @@ if command -v dotnet > /dev/null; then
     # shellcheck disable=SC2154
     export PATH="$build_path"
 
+    # Command completion
+    # https://docs.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete
+    if [ -n "$BASH" ]; then
+        # shellcheck source=/dev/null
+        . "$sh_dir/apps/dotnet.bash"
+    elif [ -n "$ZSH_NAME" ]; then
+        # shellcheck source=/dev/null
+        . "$sh_dir/apps/dotnet.zsh"
+    fi
+
     unset dotnet_bin
 fi
 
