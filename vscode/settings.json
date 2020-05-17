@@ -157,6 +157,11 @@
         "editor.autoClosingBrackets": "never"
     },
 
+    "[json]": {
+        // Use VS Code's built-in formatter
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+
     "[jsonc]": {
         // Use VS Code's built-in formatter
         "editor.defaultFormatter": "vscode.json-language-features"
