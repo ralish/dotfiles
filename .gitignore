@@ -112,4 +112,7 @@ logs/
 /msie/
 /safari/
 
+# Visual Studio Code
+/vscode/venv/
+
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
