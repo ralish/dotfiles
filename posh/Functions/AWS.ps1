@@ -21,9 +21,9 @@ Function Set-AWSCredentialEnvironment {
         [Amazon.SecurityToken.Model.Credentials]$Credential
     )
 
-    Set-Item -Path Env:\AWS_ACCESS_KEY_ID -Value $Credential.AccessKeyId
-    Set-Item -Path Env:\AWS_SECRET_ACCESS_KEY -Value $Credential.SecretAccessKey
-    Set-Item -Path Env:\AWS_SESSION_TOKEN -Value $Credential.SessionToken
+    $env:AWS_ACCESS_KEY_ID = $Credential.AccessKeyId
+    $env:AWS_SECRET_ACCESS_KEY = $Credential.SecretAccessKey
+    $env:AWS_SESSION_TOKEN = $Credential.SessionToken
 }
 
 #endregion
