@@ -6,7 +6,7 @@ if (!(Get-Command -Name dotnet -ErrorAction Ignore)) {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading .NET Core settings ...')
 
 # Opt-out of telemetry
-Set-Item -Path Env:\DOTNET_CLI_TELEMETRY_OPTOUT -Value 'true'
+$env:DOTNET_CLI_TELEMETRY_OPTOUT = 'true'
 
 # How to enable TAB completion for the .NET Core CLI
 # https://docs.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete
