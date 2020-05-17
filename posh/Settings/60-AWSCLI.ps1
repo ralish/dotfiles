@@ -5,6 +5,9 @@ if (!(Get-Command -Name aws -ErrorAction Ignore)) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading AWS CLI settings ...')
 
+# Output format
+$env:AWS_DEFAULT_OUTPUT = 'table'
+
 # Configuring the AWS CLI - Command Completion
 # https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html
 if (Get-Command -Name aws_completer -ErrorAction Ignore) {
