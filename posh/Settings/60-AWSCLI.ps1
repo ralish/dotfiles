@@ -12,9 +12,19 @@ if (Get-Command -Name aws_completer -ErrorAction Ignore) {
         Param($wordToComplete, $commandAst, $cursorPosition)
         $env:COMP_LINE = $commandAst.ToString()
         $env:COMP_POINT = $cursorPosition
+
+        # ToString() in System.Management.Automation.Language.CommandAst trims
+        # trailing whitespace from the command, which breaks our emulated bash
+        # style command completion. Handle it by appending a single whitespace
+        # character if the cursor position is greater than the command length.
+        if ($cursorPosition -gt $env:COMP_LINE.Length) {
+            $env:COMP_LINE = '{0} ' -f $env:COMP_LINE
+        }
+
         aws_completer | ForEach-Object {
             [Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
         }
+
         $env:COMP_LINE = $env:COMP_POINT = $null
     }
 } else {
