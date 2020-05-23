@@ -53,26 +53,29 @@ Set-PSReadlineKeyHandler `
     }
 
 if (Test-IsWindows) {
-    if (Get-Command -Name concfg -ErrorAction Ignore) {
-        Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ConCfg settings ...')
+    if (!$env:WT_SESSION) {
+        if (Get-Command -Name concfg -ErrorAction Ignore) {
+            Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ConCfg settings ...')
 
-        # ConCfg runs some commands with noisy verbose output. If we're
-        # running with verbose output while loading our profile it tends
-        # to just be annoying. Suppress it by setting $VerbosePreference
-        # as the ConCfg command does not support common parameters.
-        if ($DotFilesVerbose) {
-            $VerbosePreference = 'SilentlyContinue'
-        }
+            # ConCfg runs some commands with noisy verbose output. If we're
+            # running with verbose output while loading our profile it tends
+            # to just be annoying. Suppress it by setting $VerbosePreference
+            # as the ConCfg command does not support common parameters.
+            if ($DotFilesVerbose) {
+                $VerbosePreference = 'SilentlyContinue'
+            }
 
-        # Set PSReadline colours based on theme
-        & concfg tokencolor -n enable
+            # Set PSReadline colours based on theme
+            & concfg tokencolor -n enable
 
-        # Restore the original $VerbosePreference setting
-        if ($DotFilesVerbose) {
-            $VerbosePreference = 'Continue'
+            # Restore the original $VerbosePreference setting
+            if ($DotFilesVerbose) {
+                $VerbosePreference = 'Continue'
+            }
+        } else {
+            Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping ConCfg settings as unable to locate concfg.')
         }
     } else {
-        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping ConCfg settings as unable to locate concfg.')
-        continue
+        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping ConCfg settings as running under Windows Terminal.')
     }
 }
