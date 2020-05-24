@@ -23,9 +23,11 @@
     "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
     "profiles": {
         "defaults": {
-            "colorScheme": "Solarized Dark",
+            "colorScheme": "Campbell",
             "fontFace": "Hack",
-            "fontSize": 10
+            "fontSize": 10,
+            "useAcrylic": true,
+            "acrylicOpacity": 0.8
         },
 
         "list": [
