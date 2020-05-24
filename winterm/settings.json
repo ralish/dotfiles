@@ -54,6 +54,14 @@
                 "startingDirectory": "%USERPROFILE%"
             },
             {
+                "name": "VS 2019 Development",
+                "guid": "{8dbe2057-bdf3-497a-af6c-aa3cbbb46249}",
+
+                "commandline": "%ComSpec% /k \"%ProgramFiles(x86)%/Microsoft Visual Studio/2019/Professional/Common7/Tools/VsDevCmd.bat\"",
+                "icon": "ms-appx:///ProfileIcons/{0caa0dad-35be-5f56-a8ff-afceeeaa6101}.png",
+                "startingDirectory": "%USERPROFILE%"
+            },
+            {
                 "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
                 "name": "Azure Cloud Shell",
                 "source": "Windows.Terminal.Azure",
