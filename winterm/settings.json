@@ -76,10 +76,6 @@
 
     // Key bindings
     "keybindings": [
-        // Add copy & paste key bindings for the default shortcut keys
-        { "command": {"action": "copy", "singleLine": false }, "keys": "ctrl+c" },
-        { "command": "paste", "keys": "ctrl+v" },
-
         // Open a new pane using the focused pane's profile and maximising surface area
         { "command": { "action": "splitPane", "split": "auto", "splitMode": "duplicate" }, "keys": "alt+shift+d" }
     ]
