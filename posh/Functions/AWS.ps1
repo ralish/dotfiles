@@ -21,9 +21,11 @@ Function Set-AWSCredentialEnvironment {
         [Amazon.SecurityToken.Model.Credentials]$Credential
     )
 
-    $env:AWS_ACCESS_KEY_ID = $Credential.AccessKeyId
-    $env:AWS_SECRET_ACCESS_KEY = $Credential.SecretAccessKey
-    $env:AWS_SESSION_TOKEN = $Credential.SessionToken
+    Process {
+        $env:AWS_ACCESS_KEY_ID = $Credential.AccessKeyId
+        $env:AWS_SECRET_ACCESS_KEY = $Credential.SecretAccessKey
+        $env:AWS_SESSION_TOKEN = $Credential.SessionToken
+    }
 }
 
 #endregion
@@ -67,7 +69,7 @@ Function Set-R53HostedZoneParkedRecords {
     Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
 
     try {
-        $Zones = Get-R53HostedZones -ErrorAction Stop
+        $Zones = Get-R53HostedZoneList -ErrorAction Stop
     } catch {
         throw $_
     }

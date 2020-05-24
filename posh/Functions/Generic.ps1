@@ -13,7 +13,9 @@ Function ConvertFrom-Base64 {
         [String]$String
     )
 
-    [Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($String))
+    Process {
+        [Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($String))
+    }
 }
 
 # Convert a string from URL encoded form
@@ -24,7 +26,9 @@ Function ConvertFrom-URLEncoded {
         [String]$String
     )
 
-    [Net.WebUtility]::UrlDecode($String)
+    Process {
+        [Net.WebUtility]::UrlDecode($String)
+    }
 }
 
 # Convert a string to Base64 form
@@ -35,7 +39,9 @@ Function ConvertTo-Base64 {
         [String]$String
     )
 
-    [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($String))
+    Process {
+        [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($String))
+    }
 }
 
 # Convert a text file to the given encoding
@@ -125,7 +131,9 @@ Function ConvertTo-URLEncoded {
         [String]$String
     )
 
-    [Uri]::EscapeDataString($String)
+    Process {
+        [Uri]::EscapeDataString($String)
+    }
 }
 
 # Determine the encoding of a text file
@@ -255,39 +263,41 @@ Function Get-DirectorySummary {
         [String]$Path
     )
 
-    if (!$Path) {
-        $Path = Get-Location -PSProvider FileSystem
-    }
-
-    $Directory = Get-Item -Path $Path -ErrorAction Ignore
-    if ($Directory -isnot [IO.DirectoryInfo]) {
-        throw 'Provided path is invalid.'
-    }
-
-    $TotalDirs = 0
-    $TotalFiles = 0
-    $TotalItems = 0
-    $TotalSize = 0
-
-    $Items = Get-ChildItem -Path $Directory -Recurse
-    foreach ($Item in $Items) {
-        $TotalItems++
-        switch ($Item.PSTypeNames[0]) {
-            'System.IO.FileInfo' { $TotalFiles++; $TotalSize += $Item.Length }
-            'System.IO.DirectoryInfo' { $TotalDirs++ }
+    Process {
+        if (!$Path) {
+            $Path = Get-Location -PSProvider FileSystem
         }
-    }
 
-    $Summary = [PSCustomObject]@{
-        Path    = $Directory
-        Dirs    = $TotalDirs
-        Files   = $TotalFiles
-        Items   = $TotalItems
-        Size    = $TotalSize
-    }
+        $Directory = Get-Item -Path $Path -ErrorAction Ignore
+        if ($Directory -isnot [IO.DirectoryInfo]) {
+            throw 'Provided path is invalid.'
+        }
 
-    $Summary.PSObject.TypeNames.Insert(0, 'DotFiles.Generic.DirectorySummary')
-    return $Summary
+        $TotalDirs = 0
+        $TotalFiles = 0
+        $TotalItems = 0
+        $TotalSize = 0
+
+        $Items = Get-ChildItem -Path $Directory -Recurse
+        foreach ($Item in $Items) {
+            $TotalItems++
+            switch ($Item.PSTypeNames[0]) {
+                'System.IO.FileInfo' { $TotalFiles++; $TotalSize += $Item.Length }
+                'System.IO.DirectoryInfo' { $TotalDirs++ }
+            }
+        }
+
+        $Summary = [PSCustomObject]@{
+            Path    = $Directory
+            Dirs    = $TotalDirs
+            Files   = $TotalFiles
+            Items   = $TotalItems
+            Size    = $TotalSize
+        }
+
+        $Summary.PSObject.TypeNames.Insert(0, 'DotFiles.Generic.DirectorySummary')
+        return $Summary
+    }
 }
 
 #endregion
@@ -309,33 +319,35 @@ Function Format-SizeDigital {
         [Byte]$Precision=2
     )
 
-    if ($Size -eq 0) {
-        return '0 bytes'
-    }
-
-    if ($Base -eq 2) {
-        $LogBase = 1024
-        $LogMagnitudes = @('bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB')
-    } else {
-        $LogBase = 1000
-        $LogMagnitudes = @('bytes', 'kB', 'MB', 'GB', 'TB', 'PB')
-    }
-
-    $Log = [Math]::Truncate([Math]::Log($Size, $LogBase))
-    if ($Log -eq 0) {
-        $Result = '{0} bytes' -f $Size
-    } else {
-        if ($Log -ge $LogMagnitudes.Count) {
-            $Log = $LogMagnitudes.Count - 1
+    Process {
+        if ($Size -eq 0) {
+            return '0 bytes'
         }
 
-        $SizeConverted = $Size / [Math]::Pow($LogBase, $Log)
-        $SizeRounded = [Math]::Round($SizeConverted, $Precision)
-        $SizeString = $SizeRounded.ToString('N{0}' -f $Precision)
-        $Result = '{0} {1}' -f $SizeString, $LogMagnitudes[$Log]
-    }
+        if ($Base -eq 2) {
+            $LogBase = 1024
+            $LogMagnitudes = @('bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB')
+        } else {
+            $LogBase = 1000
+            $LogMagnitudes = @('bytes', 'kB', 'MB', 'GB', 'TB', 'PB')
+        }
 
-    return $Result
+        $Log = [Math]::Truncate([Math]::Log($Size, $LogBase))
+        if ($Log -eq 0) {
+            $Result = '{0} bytes' -f $Size
+        } else {
+            if ($Log -ge $LogMagnitudes.Count) {
+                $Log = $LogMagnitudes.Count - 1
+            }
+
+            $SizeConverted = $Size / [Math]::Pow($LogBase, $Log)
+            $SizeRounded = [Math]::Round($SizeConverted, $Precision)
+            $SizeString = $SizeRounded.ToString('N{0}' -f $Precision)
+            $Result = '{0} {1}' -f $SizeString, $LogMagnitudes[$Log]
+        }
+
+        return $Result
+    }
 }
 
 # Beautify XML strings
@@ -392,56 +404,61 @@ Function Add-PathStringElement {
         [Switch]$SimpleAlgo
     )
 
-    if (!$NoRepair) {
-        $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
-    }
-
-    if (!$SimpleAlgo) {
-        if ($Element.EndsWith($DirectorySeparator)) {
-            $Element = $Element.TrimEnd($DirectorySeparator)
+    Begin {
+        if (!$SimpleAlgo) {
+            if ($Element.EndsWith($DirectorySeparator)) {
+                $Element = $Element.TrimEnd($DirectorySeparator)
+            }
+            $Element += $DirectorySeparator
         }
-        $Element += $DirectorySeparator
-    }
 
-    $RegExElement = [Regex]::Escape($Element)
-
-    if (!$SimpleAlgo) {
-        $RegExElement += '*'
-    }
-
-    $SingleElement = '^{0}$' -f $RegExElement
-    if ($Path -notmatch $SingleElement) {
-        $RegExPathSeparator = [Regex]::Escape($PathSeparator)
-        $FirstElement       = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
-        $LastElement        = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
-        $MiddleElement      = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
-
-        $Path = $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
+        $RegExElement = [Regex]::Escape($Element)
 
         if (!$SimpleAlgo) {
-            $Element = $PSBoundParameters.Item('Element')
+            $RegExElement += '*'
         }
 
-        switch ($Action) {
-            'Append' {
-                if ($Path.EndsWith($PathSeparator)) {
-                    $Path = '{0}{1}' -f $Path, $Element
-                } else {
-                    $Path = '{0}{1}{2}' -f $Path, $PathSeparator, $Element
-                }
-            }
-
-            'Prepend' {
-                if ($Path.StartsWith($PathSeparator)) {
-                    $Path = '{0}{1}' -f $Element, $Path
-                } else {
-                    $Path = '{0}{1}{2}' -f $Element, $PathSeparator, $Path
-                }
-            }
-        }
+        $SingleElement = '^{0}$' -f $RegExElement
     }
 
-    return $Path
+    Process {
+        if (!$NoRepair) {
+            $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
+        }
+
+        if ($Path -notmatch $SingleElement) {
+            $RegExPathSeparator = [Regex]::Escape($PathSeparator)
+            $FirstElement       = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
+            $LastElement        = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
+            $MiddleElement      = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
+
+            $Path = $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
+
+            if (!$SimpleAlgo) {
+                $Element = $PSBoundParameters.Item('Element')
+            }
+
+            switch ($Action) {
+                'Append' {
+                    if ($Path.EndsWith($PathSeparator)) {
+                        $Path = '{0}{1}' -f $Path, $Element
+                    } else {
+                        $Path = '{0}{1}{2}' -f $Path, $PathSeparator, $Element
+                    }
+                }
+
+                'Prepend' {
+                    if ($Path.StartsWith($PathSeparator)) {
+                        $Path = '{0}{1}' -f $Element, $Path
+                    } else {
+                        $Path = '{0}{1}{2}' -f $Element, $PathSeparator, $Path
+                    }
+                }
+            }
+        }
+
+        return $Path
+    }
 }
 
 # Remove an element from a Path type string
@@ -461,34 +478,39 @@ Function Remove-PathStringElement {
         [Switch]$SimpleAlgo
     )
 
-    if (!$NoRepair) {
-        $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
-    }
-
-    if (!$SimpleAlgo) {
-        if ($Element.EndsWith($DirectorySeparator)) {
-            $Element = $Element.TrimEnd($DirectorySeparator)
+    Begin {
+        if (!$SimpleAlgo) {
+            if ($Element.EndsWith($DirectorySeparator)) {
+                $Element = $Element.TrimEnd($DirectorySeparator)
+            }
+            $Element += $DirectorySeparator
         }
-        $Element += $DirectorySeparator
+
+        $RegExElement = [Regex]::Escape($Element)
+
+        if (!$SimpleAlgo) {
+            $RegExElement += '*'
+        }
+
+        $SingleElement = '^{0}$' -f $RegExElement
     }
 
-    $RegExElement = [Regex]::Escape($Element)
+    Process {
+        if (!$NoRepair) {
+            $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
+        }
 
-    if (!$SimpleAlgo) {
-        $RegExElement += '*'
+        if ($Path -match $SingleElement) {
+            return [String]::Empty
+        }
+
+        $RegExPathSeparator = [Regex]::Escape($PathSeparator)
+        $FirstElement       = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
+        $LastElement        = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
+        $MiddleElement      = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
+
+        return $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
     }
-
-    $SingleElement = '^{0}$' -f $RegExElement
-    if ($Path -match $SingleElement) {
-        return [String]::Empty
-    }
-
-    $RegExPathSeparator = [Regex]::Escape($PathSeparator)
-    $FirstElement       = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
-    $LastElement        = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
-    $MiddleElement      = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
-
-    return $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
 }
 
 # Remove excess separators from a Path type string
@@ -501,8 +523,13 @@ Function Repair-PathString {
         [Char]$PathSeparator=[IO.Path]::PathSeparator
     )
 
-    $RegExPathSeparator = [Regex]::Escape($PathSeparator)
-    $String -replace "^$RegExPathSeparator+" -replace "$RegExPathSeparator+$" -replace "$RegExPathSeparator{2,}", $PathSeparator
+    Begin {
+        $RegExPathSeparator = [Regex]::Escape($PathSeparator)
+    }
+
+    Process {
+        $String -replace "^$RegExPathSeparator+" -replace "$RegExPathSeparator+$" -replace "$RegExPathSeparator{2,}", $PathSeparator
+    }
 }
 
 #endregion
