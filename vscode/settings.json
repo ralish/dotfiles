@@ -79,6 +79,7 @@
 
     // Extension: Language Support for Java(TM) by Red Hat
     "java.configuration.checkProjectSettingsExclusions": false,
+    "java.semanticHighlighting.enabled": true,
 
     // Extension: markdownlint
     "markdownlint.config": {
