@@ -32,6 +32,32 @@ Function Set-AWSCredentialEnvironment {
 
 #region Route 53
 
+Function Set-R53HostedZoneNameTag {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [Amazon.Route53.Model.HostedZone[]]$HostedZone
+    )
+
+    Begin {
+        Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+
+        $Tag = [Amazon.Route53.Model.Tag]::new()
+        $Tag.Key = 'Name'
+    }
+
+    Process {
+        foreach ($Zone in $HostedZone) {
+            $ResourceId = $Zone.Id.Replace('/hostedzone/', [String]::Empty)
+            $Tag.Value = $Zone.Name.TrimEnd('.')
+
+            if ($PSCmdlet.ShouldProcess($Zone.Name, 'Set Name tag')) {
+                Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType 'hostedzone' -AddTag $Tag
+            }
+        }
+    }
+}
+
 Function Set-R53HostedZoneParkedRecords {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
