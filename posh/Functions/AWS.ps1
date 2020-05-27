@@ -245,6 +245,39 @@ Function Set-R53HostedZoneParkedRecords {
     return $Changes
 }
 
+Function Set-R53HostedZoneTag {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [Amazon.Route53.Model.HostedZone[]]$HostedZone,
+
+        [Parameter(Mandatory)]
+        [String]$Key,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyString()]
+        [String]$Value
+    )
+
+    Begin {
+        Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+
+        $Tag = [Amazon.Route53.Model.Tag]::new()
+        $Tag.Key = $Key
+        $Tag.Value = $Value
+    }
+
+    Process {
+        foreach ($Zone in $HostedZone) {
+            $ResourceId = $Zone.Id.Replace('/hostedzone/', [String]::Empty)
+
+            if ($PSCmdlet.ShouldProcess($Zone.Name, 'Set {0} tag' -f $Tag.Key)) {
+                Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType 'hostedzone' -AddTag $Tag
+            }
+        }
+    }
+}
+
 #endregion
 
 #region S3
