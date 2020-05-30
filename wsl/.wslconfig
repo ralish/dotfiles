@@ -1,0 +1,49 @@
+# WSL global settings
+#
+# Read from %USERPROFILE%\.wslconfig
+#
+# Initial support from Windows Build 18945 (2004+)
+
+[wsl2]
+# Number of processors to assign to the VM
+#
+# Default is all processors.
+#processors = 2
+
+# Amount of memory to assign to the VM
+#
+# Default is 80% of total memory.
+#memory = 4GB
+
+# Enable free memory page reporting
+#
+# Supported from Windows Build 19013 (2004+)
+#pageReporting = true
+
+# Idle threshold for memory compaction
+#
+# Setting to 0 will disable memory compaction on idle.
+#
+# Supported from Windows Build 19013 (2004+)
+#idleThreshold = 1
+
+# Amount of swap space to add to the VM
+#
+# Default is 25% of total memory rounded-up to the nearest GB.
+#
+# Setting to 0 will disable adding a swap file.
+#swap = 0
+
+# Absolute Windows path to the swap VHDX file
+#swapFile = %USERPROFILE%\\AppData\\Local\\Temp\\swap.vhdx
+
+# Absolute Windows path to the Linux kernel image
+#kernel = %SystemRoot%\\System32\\lxss\\tools\\kernel
+
+# Additional kernel command line arguments
+#
+# Supported from Windows Build 18995 (2004+)
+#kernelCommandLine =
+
+# Permit access from the host to listening ports in the VM
+#localhostForwarding = true

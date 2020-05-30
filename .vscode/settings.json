@@ -43,6 +43,9 @@
         ".shellcheckrc": "properties",
         // wget
         ".wgetrc": "properties",
+        // wsl
+        ".wslconfig": "ini",
+        "wsl.conf": "ini",
         // xdg-user-dir
         "user-dirs.dirs": "shellscript"
     },
