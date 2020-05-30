@@ -2,7 +2,7 @@
     // File paths to language mappings
     "files.associations": {
         // bazaar
-        "**/bazaar/*.conf": "ini",
+        "**/.bazaar/*.conf": "ini",
         // curl
         ".curlrc": "properties",
         // cygwin
@@ -13,18 +13,20 @@
         ".editrc": "properties",
         // git
         ".gitconfig*": "gitconfig",
+        // htop
+        "htoprc": "properties",
         // irssi
-        "**/irssi/*": "perl",
+        "**/.irssi/*": "perl",
         // less
         ".lesskey": "properties",
-        // markdownlint
-        ".markdownlintrc": "jsonc",
         // mysql
         ".my.cnf": "ini",
         // npm
-        ".npmrc": "ini",
+        ".npmrc": "properties",
         // openssh
-        "**/openssh/**": "ssh_config",
+        "**/openssh/.ssh/config": "ssh_config",
+        "**/openssh/.ssh/includes/*": "ssh_config",
+        "**/openssh/.ssh/templates/*": "ssh_config",
         // openssl
         "**/openssl/*.cnf": "ini",
         // pgsql
@@ -41,8 +43,6 @@
         ".shellcheckrc": "properties",
         // wget
         ".wgetrc": "properties",
-        // winterm
-        "profiles.json": "jsonc",
         // xdg-user-dir
         "user-dirs.dirs": "shellscript"
     },
