@@ -24,9 +24,11 @@
     "profiles": {
         "defaults": {
             "colorScheme": "Campbell",
+
             "fontFace": "Hack",
             "fontSize": 10,
-            "useAcrylic": true,
+
+            "useAcrylic": false,
             "acrylicOpacity": 0.8
         },
 
