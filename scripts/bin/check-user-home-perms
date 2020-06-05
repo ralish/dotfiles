@@ -13,6 +13,28 @@ set -o nounset          # Disallow expansion of unset variables
 set -o pipefail         # Use last non-zero exit code in a pipeline
 #set -o xtrace          # Trace the execution of the script (debug)
 
+# DESC: Find some important paths we need before script_init() is called
+# ARGS: None
+# OUTS: $script_real_path: The full canonicalized path to the script
+#       $script_real_dir: The canonicalized directory path of the script
+#       $script_real_name: The canonicalized file name of the script
+#       $dotfiles_path: The dotfiles directory path
+#       $dotfiles_name: The dotfiles directory name
+function early_init() {
+    # Determine the physical directory this script resides in. This approach is
+    # necessarily clumsy as simple methods like "readlink -f" and "realpath"
+    # are not platform independent. We have to work on Linux, BSD, OS X, etc...
+    readonly script_real_path="$(perl -MCwd -le 'print Cwd::abs_path(shift)' \
+                                 "${BASH_SOURCE[0]}")"
+    readonly script_real_dir="$(dirname "$script_real_path")"
+    readonly script_real_name="$(basename "$script_real_path")"
+
+    # Dotfiles directory path & name
+    readonly dotfiles_path="$(cd -P "$script_real_dir/../../" && pwd)"
+    readonly dotfiles_name="$(basename "$dotfiles_path")"
+}
+
+
 # DESC: Check permissions on a user's home directory
 # ARGS: $1 (required): User name to check
 function check_user_home_perms() {
@@ -60,11 +82,13 @@ function check_user_home_perms() {
 # DESC: Main control flow
 # ARGS: $@ (optional): Arguments provided to the script
 function main() {
-    # shellcheck source=scripts/bin/bash-template.sh
-    source "$(dirname "${BASH_SOURCE[0]}")/bash-template.sh"
+    early_init
 
-    trap "script_trap_err" ERR
-    trap "script_trap_exit" EXIT
+    # shellcheck source=scripts/bin/bash-template.sh
+    source "$script_real_dir/bash-template.sh"
+
+    trap script_trap_err ERR
+    trap script_trap_exit EXIT
 
     script_init "$@"
     colour_init
