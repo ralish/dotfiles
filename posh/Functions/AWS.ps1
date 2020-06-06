@@ -1,6 +1,6 @@
 try {
     if (!$DotFilesFastLoad) {
-        Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any -Verbose:$false
+        Test-ModuleAvailable -Name AWS.Tools.Installer, AWSPowerShell.NetCore, AWSPowerShell -Require Any -Verbose:$false
     }
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of AWS functions.')
@@ -40,7 +40,7 @@ Function Set-R53HostedZoneNameTag {
     )
 
     Begin {
-        Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+        Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = 'Name'
@@ -92,7 +92,7 @@ Function Set-R53HostedZoneParkedRecords {
         [String[]]$RedirectCloudFrontRecordTypes='A'
     )
 
-    Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+    Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any
 
     try {
         $Zones = Get-R53HostedZoneList -ErrorAction Stop
@@ -260,7 +260,7 @@ Function Set-R53HostedZoneTag {
     )
 
     Begin {
-        Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+        Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = $Key
@@ -286,7 +286,11 @@ Function Get-S3BucketSize {
     [CmdletBinding()]
     Param()
 
-    Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+    try {
+        Test-ModuleAvailable -Name AWS.Tools.CloudWatch, AWS.Tools.S3
+    } catch {
+        Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+    }
 
     $Regions = (Get-AWSRegion).Region | Where-Object { $_ -notmatch '^us-isob?-' }
 
