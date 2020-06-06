@@ -34,6 +34,9 @@
 	mnemonicPrefix = true
 	renames = copies
 
+[fetch]
+	prune = true
+
 [help]
 	autoCorrect = 0
 
@@ -50,20 +53,27 @@
 [oh-my-zsh]
 	hide-status = 0
 
+[protocol]
+	version = 2
+
 [pull]
 	ff = only
 
 [push]
 	default = simple
+	followTags = true
 
 [rebase]
 	autoSquash = true
+	autoStash = true
+	missingCommitsCheck = warn
 
 [rerere]
 	enabled = true
 	autoUpdate = true
 
 [status]
+	showStash = true
 	submoduleSummary = true
 
 [submodule]
