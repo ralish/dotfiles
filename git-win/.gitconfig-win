@@ -1,26 +1,35 @@
 [core]
+	# Use CRLF line endings for text files
+	autocrlf = true
 	# Use Visual Studio Code as our editor
 	editor = code --wait
-	# Allow paths longer than 260 characters (may have quirks!)
+	# Enable additional caching of file system
+	fscache = true
+	# Only mark the .git directory as hidden
+	hideDotFiles = dotGitOnly
+	# Enable long path (>260 chars) support
 	longpaths = true
+	# Don't checkout paths which may cause problems on NTFS
+	protectNTFS = true
 	# Don't print non-ASCII file names in quoted octal notation
 	quotePath = off
-	# Enable symlink support (requires SeCreateSymbolicLinkPrivilege)
+	# Enable symlink support (needs SeCreateSymbolicLinkPrivilege)
 	symlinks = true
-	# Treat a carriage-return as part of the line terminator
-	whitespace = cr-at-eol
+	# Potential whitespace problems which git diff should highlight
+	whitespace = blank-at-eol,space-before-tab,blank-at-eof,cr-at-eol
 
 [diff]
-	# Use Visual Studio Code for diffs
 	tool = vscode
 
 [difftool "vscode"]
 	cmd = code --wait --diff $LOCAL $REMOTE
 
-[gpg]
-	program = C:\\Program Files (x86)\\Gpg4win\\pub\\gpg.exe
-
 [http]
+	# Use the SChannel backend for SSL connections
 	sslBackend = schannel
+	# Always perform certificate revocation checks
+	schannelCheckRevoke = true
+	# Don't use any sslCAInfo certificate bundle
+	schannelUseSSLCAInfo = false
 
 # vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 noet sr
