@@ -69,6 +69,10 @@ Function Test-ModuleAvailable {
     }
 
     if (!$ModuleAvailable) {
-        throw ('Required module not available: {0}' -f $ModuleMissingName)
+        if ($Require -eq 'Any') {
+            throw ('Suitable module not available: {0}' -f [String]::Join(', ', $Name))
+        } else {
+            throw ('Required module not available: {0}' -f $ModuleMissingName)
+        }
     }
 }
