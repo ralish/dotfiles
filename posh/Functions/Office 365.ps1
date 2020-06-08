@@ -546,9 +546,9 @@ Function Connect-Office365Services {
     )
 
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        Connect-ExchangeOnline -MfaUsername $MfaUsername
+        Connect-ExchangeOnline -UserPrincipalName $MfaUsername -ShowProgress $true
     } else {
-        Connect-ExchangeOnline -Credential $Credential
+        Connect-ExchangeOnline -Credential $Credential -ShowProgress $true
     }
 
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
@@ -583,7 +583,7 @@ Function Connect-Office365Services {
 }
 
 # Helper function to connect to Exchange Online
-Function Connect-ExchangeOnline {
+Function Connect-ExchangeOnlineV1 {
     [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
         [Parameter(ParameterSetName='MFA')]
