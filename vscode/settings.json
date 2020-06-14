@@ -104,6 +104,7 @@
     "powershell.scriptAnalysis.settingsPath": "C:\\Users\\SDL\\Code\\Personal\\dotfiles\\posh\\PSScriptAnalyzerSettings.psd1",
 
     // Extension: Python
+    "python.experiments.enabled": false,
     "python.pythonPath": "~/dotfiles/vscode/venv",
     "python.jediEnabled": false,
     "python.linting.flake8Enabled": true,
