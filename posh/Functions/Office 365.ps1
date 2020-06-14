@@ -930,7 +930,7 @@ Function Connect-Office365Services {
 }
 
 # Helper function to connect to Exchange Online
-Function Connect-ExchangeOnlineV1 {
+Function Connect-ExchangeOnline {
     [CmdletBinding(DefaultParameterSetName='MFA')]
     Param(
         [Parameter(ParameterSetName='MFA')]
@@ -943,16 +943,34 @@ Function Connect-ExchangeOnlineV1 {
         [PSCredential]$Credential
     )
 
-    if ($PSCmdlet.ParameterSetName -eq 'MFA') {
+    $ErrorActionPreference = 'Stop'
+
+    $ExoModuleVersion = 2
+    try {
+        Test-ModuleAvailable -Name ExchangeOnlineManagement
+    } catch {
+        Write-Warning -Message 'The Exchange Online PowerShell v2 module is not available. Falling back to v1 ...'
+        $ExoModuleVersion = 1
+    }
+
+    if ($ExoModuleVersion -eq 1 -and $PSCmdlet.ParameterSetName -eq 'MFA') {
         Import-ExoPowershellModule
     }
 
     Write-Host -ForegroundColor Green -Object 'Connecting to Exchange Online ...'
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        Connect-EXOPSSession -UserPrincipalName $MfaUsername
+        if ($ExoModuleVersion -eq 2) {
+            ExchangeOnlineManagement\Connect-ExchangeOnline -UserPrincipalName $MfaUsername
+        } else {
+            Connect-EXOPSSession -UserPrincipalName $MfaUsername
+        }
     } else {
-        $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
-        Import-PSSession -Session $ExchangeOnline
+        if ($ExoModuleVersion -eq 2) {
+            ExchangeOnlineManagement\Connect-ExchangeOnline -Credential $Credential
+        } else {
+            $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
+            Import-PSSession -Session $ExchangeOnline -DisableNameChecking
+        }
     }
 }
 
@@ -988,7 +1006,17 @@ Function Connect-SecurityAndComplianceCenter {
         [PSCredential]$Credential
     )
 
-    if ($PSCmdlet.ParameterSetName -eq 'MFA') {
+    $ErrorActionPreference = 'Stop'
+
+    $ExoModuleVersion = 2
+    try {
+        Test-ModuleAvailable -Name ExchangeOnlineManagement
+    } catch {
+        Write-Warning -Message 'The Exchange Online PowerShell v2 module is not available. Falling back to v1 ...'
+        $ExoModuleVersion = 1
+    }
+
+    if ($ExoModuleVersion -eq 1 -and $PSCmdlet.ParameterSetName -eq 'MFA') {
         Import-ExoPowershellModule
     }
 
@@ -996,8 +1024,12 @@ Function Connect-SecurityAndComplianceCenter {
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         Connect-IPPSSession -UserPrincipalName $MfaUsername
     } else {
-        $SCC = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://ps.compliance.protection.outlook.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
-        Import-PSSession -Session $SCC
+        if ($ExoModuleVersion -eq 2) {
+            Connect-IPPSSession -Credential $Credential
+        } else {
+            $SCC = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://ps.compliance.protection.outlook.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
+            Import-PSSession -Session $SCC -DisableNameChecking
+        }
     }
 }
 
