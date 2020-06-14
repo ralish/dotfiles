@@ -214,6 +214,8 @@ Function Connect-AzureAD {
         [PSCredential]$Credential
     )
 
+    $ErrorActionPreference = 'Stop'
+
     try {
         $ModuleName = 'AzureADPreview'
         Test-ModuleAvailable -Name $ModuleName
@@ -235,6 +237,8 @@ Function Connect-AzureRM {
         [PSCredential]$Credential
     )
 
+    $ErrorActionPreference = 'Stop'
+
     Test-ModuleAvailable -Name AzureRM
 
     Write-Host -ForegroundColor Green -Object 'Connecting to Azure RM ...'
@@ -249,6 +253,8 @@ Function Connect-MSOnline {
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
     )
+
+    $ErrorActionPreference = 'Stop'
 
     Test-ModuleAvailable -Name MSOnline
 

@@ -966,6 +966,8 @@ Function Connect-Office365CentralizedDeployment {
         [PSCredential]$Credential
     )
 
+    $ErrorActionPreference = 'Stop'
+
     Test-ModuleAvailable -Name OrganizationAddInService
 
     Write-Host -ForegroundColor Green -Object 'Connecting to Office 365 Centralized Deployment ...'
@@ -1011,6 +1013,8 @@ Function Connect-SharePointOnline {
         [PSCredential]$Credential
     )
 
+    $ErrorActionPreference = 'Stop'
+
     Test-ModuleAvailable -Name Microsoft.Online.SharePoint.PowerShell
 
     Write-Host -ForegroundColor Green -Object 'Connecting to SharePoint Online ...'
@@ -1036,6 +1040,8 @@ Function Connect-SkypeForBusinessOnline {
         [PSCredential]$Credential
     )
 
+    $ErrorActionPreference = 'Stop'
+
     Test-ModuleAvailable -Name SkypeOnlineConnector
 
     # Fix a scope issue due to variable reuse by SkypeOnlineConnector?
@@ -1059,6 +1065,8 @@ Function Connect-SkypeForBusinessOnline {
 Function Import-ExoPowershellModule {
     [CmdletBinding()]
     Param()
+
+    $ErrorActionPreference = 'Stop'
 
     if (!(Get-Command -Name Connect-EXOPSSession -ErrorAction Ignore)) {
         Write-Verbose -Message 'Importing Microsoft.Exchange.Management.ExoPowershellModule ...'
