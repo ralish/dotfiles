@@ -754,19 +754,32 @@ Function Get-Office365UserSecurityReport {
     foreach ($Mailbox in $Mailboxes) {
         Write-Verbose -Message ('Inspecting mailbox: {0}' -f $Mailbox.UserPrincipalName)
 
-        $Auditing = Get-Mailbox -Identity $Mailbox.UserPrincipalName
-        $Auditing.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Auditing')
+        $Auditing = [PSCustomObject]@{
+            UserPrincipalName   = $Mailbox.UserPrincipalName
+            AuditEnabled        = $Mailbox.AuditEnabled
+            AuditLogAgeLimit    = $Mailbox.AuditLogAgeLimit
+            AuditOwner          = $Mailbox.AuditOwner
+            AuditDelegate       = $Mailbox.AuditDelegate
+            AuditAdmin          = $Mailbox.AuditAdmin
+        }
         $null = $MailboxAuditing.Add($Auditing)
 
         if ($Mailbox.ForwardingSmtpAddress) {
-            $Forwarding = Get-Mailbox -Identity $Mailbox.UserPrincipalName
-            $Forwarding.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.Forwarding')
+            $Forwarding = [PSCustomObject]@{
+                UserPrincipalName           = $Mailbox.UserPrincipalName
+                ForwardingAddress           = $Mailbox.ForwardingAddress
+                ForwardingSmtpAddress       = $Mailbox.ForwardingSmtpAddress
+                DeliverToMailboxAndForward  = $Mailbox.DeliverToMailboxAndForward
+            }
             $null = $MailboxForwarding.Add($Forwarding)
         }
 
         if ($Mailbox.GrantSendOnBehalfTo) {
-            $SendOnBehalf = Get-Mailbox -Identity $Mailbox.UserPrincipalName
-            $SendOnBehalf.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Management.Mailbox.SendOnBehalf')
+            $SendOnBehalf = [PSCustomObject]@{
+                UserPrincipalName                   = $Mailbox.UserPrincipalName
+                GrantSendOnBehalfTo                 = $Mailbox.GrantSendOnBehalfTo
+                MessageCopyForSendOnBehalfEnabled   = $Mailbox.MessageCopyForSendOnBehalfEnabled
+            }
             $null = $MailboxSendOnBehalf.Add($SendOnBehalf)
         }
 
