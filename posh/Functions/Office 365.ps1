@@ -442,82 +442,6 @@ Function Import-ContentSearchResultsEntry {
 
 #region Reporting
 
-# Compare Cloud App Security policies
-Function Compare-MCASPolicy {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [PSObject[]]$ReferenceObject,
-
-        [Parameter(Mandatory)]
-        [PSObject[]]$DifferenceObject
-    )
-
-    $IgnoredProperties = @(
-        '_id'
-        '_tid'
-        'created'
-        'createdBy'
-        'lastEntityModificationScanned'
-        'lastModified'
-        'lastNrtEntityModificationScanned'
-        'lastScanned'
-        'lastStateModified'
-        'lastStateModifiedBy'
-        'lastUserModified'
-        'ref_policy_created'
-        'ruleVersionId'
-    )
-
-    $Results = [Collections.ArrayList]::new()
-
-    foreach ($RefPol in ($ReferenceObject | Sort-Object -Property name)) {
-        if (!$RefPol.ref_policy_id) {
-            Write-Warning -Message ('[ID: {0}] Reference policy with no reference policy ID.' -f $RefPol._id)
-            continue
-        }
-
-        $DiffPol = $DifferenceObject | ? ref_policy_id -eq $RefPol.ref_policy_id
-        if (!$DiffPol) {
-            Write-Warning -Message ('[ID: {0}] Reference policy with no associated difference policy (Ref Policy ID: {1}).' -f $RefPol._id, $RefPol.ref_policy_id)
-            continue
-        }
-
-        $Diff = Compare-ObjectProperties -ReferenceObject $RefPol -DifferenceObject $DiffPol -IgnoredProperties $IgnoredProperties
-        if ($Diff) {
-            $PolicyName = [PSCustomObject]@{
-                PropertyName    = 'policyName'
-                RefValue        = $RefPol.name
-                DiffValue       = $DiffPol.name
-            }
-
-            $RefPolicyId = [PSCustomObject]@{
-                PropertyName    = 'ref_policy_id'
-                RefValue        = $RefPol.ref_policy_id
-                DiffValue       = $DiffPol.ref_policy_id
-            }
-
-            $Result = @($PolicyName, $RefPolicyId) + $Diff
-            $null = $Results.Add($Result)
-        }
-    }
-
-    foreach ($DiffPol in ($DifferenceObject | Sort-Object -Property name)) {
-        if (!$DiffPol.ref_policy_id) {
-            Write-Warning -Message ('[ID: {0}] Difference policy with no reference policy ID.' -f $DiffPol._id)
-            continue
-        }
-
-        $RefPol = $ReferenceObject | ? ref_policy_id -eq $DiffPol.ref_policy_id
-        if (!$RefPol) {
-            Write-Warning -Message ('[ID: {0}] Difference policy with no associated reference policy (Ref Policy ID: {1}).' -f $DiffPol._id, $DiffPol.ref_policy_id)
-            continue
-        }
-    }
-
-    return $Results
-}
-
 # Retrieve a usage summary for an entity
 Function Get-Office365EntityUsageSummary {
     [CmdletBinding()]
@@ -1122,6 +1046,86 @@ Function Import-ExoPowershellModule {
             throw 'Required module not available: Microsoft.Exchange.Management.ExoPowershellModule'
         }
     }
+}
+
+#endregion
+
+#region Cloud App Security
+
+# Compare Cloud App Security policies
+Function Compare-MCASPolicy {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [PSObject[]]$ReferenceObject,
+
+        [Parameter(Mandatory)]
+        [PSObject[]]$DifferenceObject
+    )
+
+    $IgnoredProperties = @(
+        '_id'
+        '_tid'
+        'created'
+        'createdBy'
+        'lastEntityModificationScanned'
+        'lastModified'
+        'lastNrtEntityModificationScanned'
+        'lastScanned'
+        'lastStateModified'
+        'lastStateModifiedBy'
+        'lastUserModified'
+        'ref_policy_created'
+        'ruleVersionId'
+    )
+
+    $Results = [Collections.ArrayList]::new()
+
+    foreach ($RefPol in ($ReferenceObject | Sort-Object -Property name)) {
+        if (!$RefPol.ref_policy_id) {
+            Write-Warning -Message ('[ID: {0}] Reference policy with no reference policy ID.' -f $RefPol._id)
+            continue
+        }
+
+        $DiffPol = $DifferenceObject | ? ref_policy_id -eq $RefPol.ref_policy_id
+        if (!$DiffPol) {
+            Write-Warning -Message ('[ID: {0}] Reference policy with no associated difference policy (Ref Policy ID: {1}).' -f $RefPol._id, $RefPol.ref_policy_id)
+            continue
+        }
+
+        $Diff = Compare-ObjectProperties -ReferenceObject $RefPol -DifferenceObject $DiffPol -IgnoredProperties $IgnoredProperties
+        if ($Diff) {
+            $PolicyName = [PSCustomObject]@{
+                PropertyName    = 'policyName'
+                RefValue        = $RefPol.name
+                DiffValue       = $DiffPol.name
+            }
+
+            $RefPolicyId = [PSCustomObject]@{
+                PropertyName    = 'ref_policy_id'
+                RefValue        = $RefPol.ref_policy_id
+                DiffValue       = $DiffPol.ref_policy_id
+            }
+
+            $Result = @($PolicyName, $RefPolicyId) + $Diff
+            $null = $Results.Add($Result)
+        }
+    }
+
+    foreach ($DiffPol in ($DifferenceObject | Sort-Object -Property name)) {
+        if (!$DiffPol.ref_policy_id) {
+            Write-Warning -Message ('[ID: {0}] Difference policy with no reference policy ID.' -f $DiffPol._id)
+            continue
+        }
+
+        $RefPol = $ReferenceObject | ? ref_policy_id -eq $DiffPol.ref_policy_id
+        if (!$RefPol) {
+            Write-Warning -Message ('[ID: {0}] Difference policy with no associated reference policy (Ref Policy ID: {1}).' -f $DiffPol._id, $DiffPol.ref_policy_id)
+            continue
+        }
+    }
+
+    return $Results
 }
 
 #endregion
