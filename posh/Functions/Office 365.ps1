@@ -1129,3 +1129,62 @@ Function Compare-MCASPolicy {
 }
 
 #endregion
+
+#region Security & Compliance
+
+# Compare Security & Compliance policies
+Function Compare-ProtectionAlert {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [PSObject[]]$ReferenceObject,
+
+        [Parameter(Mandatory)]
+        [PSObject[]]$DifferenceObject
+    )
+
+    $IgnoredProperties = @(
+        'AlertOverrideChangedUtc'
+        'RunspaceId'
+    )
+
+    $Results = [Collections.ArrayList]::new()
+
+    foreach ($RefAlert in ($ReferenceObject | Sort-Object -Property Name)) {
+        $DiffAlert = $DifferenceObject | ? Name -eq $RefAlert.Name
+        if (!$DiffAlert) {
+            Write-Warning -Message ('[ID: {0}] Reference alert with no associated difference alert (Ref Name: {1}).' -f $RefAlert.ImmutableId, $RefAlert.Name)
+            continue
+        }
+
+        $Diff = Compare-ObjectProperties -ReferenceObject $RefAlert -DifferenceObject $DiffAlert -IgnoredProperties $IgnoredProperties
+        if ($Diff) {
+            $AlertName = [PSCustomObject]@{
+                PropertyName    = 'AlertName'
+                RefValue        = $RefAlert.Name
+                DiffValue       = $DiffAlert.Name
+            }
+
+            $ImmutableId = [PSCustomObject]@{
+                PropertyName    = 'ImmutableId'
+                RefValue        = $RefAlert.ImmutableId
+                DiffValue       = $DiffAlert.ImmutableId
+            }
+
+            $Result = @($AlertName, $ImmutableId) + $Diff
+            $null = $Results.Add($Result)
+        }
+    }
+
+    foreach ($DiffAlert in ($DifferenceObject | Sort-Object -Property Name)) {
+        $RefAlert = $ReferenceObject | ? Name -eq $DiffAlert.Name
+        if (!$RefAlert) {
+            Write-Warning -Message ('[ID: {0}] Difference alert with no associated reference alert (Ref Name: {1}).' -f $DiffAlert.ImmutableId, $DiffAlert.Name)
+            continue
+        }
+    }
+
+    return $Results
+}
+
+#endregion
