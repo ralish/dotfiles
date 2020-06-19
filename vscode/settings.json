@@ -2,15 +2,25 @@
     // Text Editor
     "editor.dragAndDrop": false,
     "editor.emptySelectionClipboard": false,
+    "editor.parameterHints.cycle": true,
+    "editor.renderControlCharacters": true,
     "editor.renderWhitespace": "boundary",
+    "editor.wrappingIndent": "indent",
+
+    // Text Editor: Cursor
+    "editor.cursorBlinking": "phase",
+    "editor.cursorStyle": "line-thin",
 
     // Text Editor: Find
+    "editor.find.autoFindInSelection": "multiline",
     "editor.find.seedSearchStringFromSelection": false,
 
     // Text Editor: Minimap
     "editor.minimap.showSlider": "always",
+    "editor.minimap.size": "fit",
 
     // Text Editor: Suggestions
+    "editor.acceptSuggestionOnEnter": "smart",
     "editor.suggestSelection": "first",
 
     // Text Editor: Files
@@ -19,11 +29,14 @@
         "*.cnf": "ini"
     },
     "files.autoSave": "onWindowChange",
+    "files.defaultLanguage": "${activeEditorLanguage}",
+    "files.hotExit": "onExitAndWindowClose",
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
 
     // Workbench
     "workbench.enableExperiments": false,
+    "workbench.startupEditor": "readme",
 
     // Workbench: Appearance
     "workbench.iconTheme": "vscode-icons",
@@ -32,17 +45,20 @@
     "workbench.editor.highlightModifiedTabs": true,
 
     // Workbench: Settings Editor
+    "workbench.settings.editor": "json",
     "workbench.settings.enableNaturalLanguageSearch": false,
 
     // Window: New Window
     "window.newWindowDimensions": "inherit",
 
     // Features: Explorer
+    "explorer.autoReveal": "focusNoScroll",
     "explorer.confirmDelete": false,
     "explorer.confirmDragAndDrop": false,
     "explorer.incrementalNaming": "smart",
 
     // Features: Search
+    "search.collapseResults": "auto",
     "search.smartCase": true,
 
     // Features: Terminal
@@ -51,6 +67,12 @@
     "terminal.integrated.fontFamily": "Hack",
     "terminal.integrated.rightClickBehavior": "paste",
     "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+
+    // Features: Remote
+    "remote.downloadExtensionsLocally": true,
+
+    // Application: Update
+    "update.mode": "start",
 
     // Application: Telemetry
     "telemetry.enableCrashReporter": false,
