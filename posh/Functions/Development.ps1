@@ -51,8 +51,8 @@ Function Get-TypeMethod {
         }
 
         [PSCustomObject]@{
-            Method      = $Method.Name
-            Parameters  = $FormattedParams
+            Method     = $Method.Name
+            Parameters = $FormattedParams
         }
     }
 }
@@ -111,7 +111,7 @@ Function Invoke-GitMergeAllBranches {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$SourceBranch='master'
+        [String]$SourceBranch = 'master'
     )
 
     $Branches = @()
@@ -158,9 +158,9 @@ Function Add-FileToEmptyDirectories {
         [String[]]$Path,
 
         [ValidateNotNullOrEmpty()]
-        [String]$FileName='.keepme',
+        [String]$FileName = '.keepme',
 
-        [String[]]$Exclude=@('.git')
+        [String[]]$Exclude = '.git'
     )
 
     if (!$PSBoundParameters.ContainsKey('Path')) {

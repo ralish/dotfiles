@@ -19,8 +19,8 @@ Function Get-AzureAuthHeader {
     )
 
     $AuthHeader = @{
-        Authorization   = $AuthToken.CreateAuthorizationHeader()
-        'Content-Type'  = 'application/json'
+        Authorization  = $AuthToken.CreateAuthorizationHeader()
+        'Content-Type' = 'application/json'
     }
 
     return $AuthHeader
@@ -129,15 +129,15 @@ Function Get-AzureEnterpriseApplications {
     $Uri = [Uri]::new('https://main.iam.ad.ext.azure.com/api/ManagedApplications/List')
 
     $Headers = [Ordered]@{
-        Authorization               = $AuthToken.CreateAuthorizationHeader()
-        'Content-Type'              = 'application/json'
-        Host                        = $Uri.Host
-        'x-ms-client-request-id'    = [Guid]::NewGuid()
+        Authorization            = $AuthToken.CreateAuthorizationHeader()
+        'Content-Type'           = 'application/json'
+        Host                     = $Uri.Host
+        'x-ms-client-request-id' = [Guid]::NewGuid()
     }
 
     $Body = @{
-        appListQuery    = $AppTypeId
-        top             = 999
+        appListQuery = $AppTypeId
+        top          = 999
     }
 
     $Params = @{

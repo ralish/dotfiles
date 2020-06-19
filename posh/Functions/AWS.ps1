@@ -89,7 +89,7 @@ Function Set-R53HostedZoneParkedRecords {
         [ValidateNotNullOrEmpty()]
         [String]$RedirectCloudFrontDomainName,
         [ValidateSet('A', 'AAAA')]
-        [String[]]$RedirectCloudFrontRecordTypes='A'
+        [String[]]$RedirectCloudFrontRecordTypes = 'A'
     )
 
     Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any
@@ -150,7 +150,7 @@ Function Set-R53HostedZoneParkedRecords {
         $ZoneName = $ZoneName.TrimEnd('.').ToLower()
         $ZoneFqdn = '{0}.' -f $ZoneName
 
-        $Zone = $Zones | Where-Object Name -eq $ZoneFqdn
+        $Zone = $Zones | Where-Object Name -EQ $ZoneFqdn
         if (!$Zone) {
             Write-Warning -Message ('Unable to set records for non-existent zone: {0}' -f $ZoneName)
             continue
@@ -320,8 +320,8 @@ Function Get-S3BucketSize {
     $StartDate = $EndDate.AddDays(-2)
     foreach ($Region in $Metrics.Keys) {
         foreach ($Metric in $Metrics[$Region]) {
-            $BucketName = ($Metric.Dimensions | Where-Object Name -eq 'BucketName').Value
-            $StorageType = ($Metric.Dimensions | Where-Object Name -eq 'StorageType').Value
+            $BucketName = ($Metric.Dimensions | Where-Object Name -EQ 'BucketName').Value
+            $StorageType = ($Metric.Dimensions | Where-Object Name -EQ 'StorageType').Value
 
             Write-Verbose -Message ('[{0}] Retrieving BucketSizeBytes for {1} ...' -f $BucketName, $StorageType)
             try {
@@ -334,7 +334,7 @@ Function Get-S3BucketSize {
             $BucketSizeBytes = $Result.Datapoints[0].Average
             $BucketSize = $BucketSizeBytes | Format-SizeDigital
 
-            $Bucket = $Buckets | Where-Object BucketName -eq $BucketName
+            $Bucket = $Buckets | Where-Object BucketName -EQ $BucketName
             $Bucket | Add-Member -MemberType NoteProperty -Name BucketSizeBytes -Value $BucketSizeBytes
             $Bucket | Add-Member -MemberType NoteProperty -Name BucketSize -Value $BucketSize
         }

@@ -58,7 +58,7 @@ Function Convert-OpenSSLPemToPkcs12 {
 
 # Convert a certificate in PKCS #12 format to PEM format
 Function Convert-OpenSSLPkcs12ToPem {
-    [CmdletBinding(DefaultParameterSetName='Both')]
+    [CmdletBinding(DefaultParameterSetName = 'Both')]
     Param(
         [Parameter(Mandatory)]
         [String]$Pkcs12File,
@@ -66,10 +66,10 @@ Function Convert-OpenSSLPkcs12ToPem {
         [Parameter(Mandatory)]
         [String]$PemFile,
 
-        [Parameter(ParameterSetName='CertificatesOnly')]
+        [Parameter(ParameterSetName = 'CertificatesOnly')]
         [Switch]$CertificatesOnly,
 
-        [Parameter(ParameterSetName='PrivateKeyOnly')]
+        [Parameter(ParameterSetName = 'PrivateKeyOnly')]
         [Switch]$PrivateKeyOnly
     )
 
@@ -89,7 +89,7 @@ Function Get-OpenSSLCertificate {
         [Parameter(Mandatory)]
         [String]$Certificate,
 
-        [String[]]$NameOptions=@('oneline')
+        [String[]]$NameOptions = 'oneline'
     )
 
     $NameOpt = [String]::Join(',', $NameOptions)
@@ -103,7 +103,7 @@ Function Get-OpenSSLCsr {
         [Parameter(Mandatory)]
         [String]$Csr,
 
-        [String[]]$NameOptions=@('oneline')
+        [String[]]$NameOptions = 'oneline'
     )
 
     $NameOpt = [String]::Join(',', $NameOptions)
@@ -187,10 +187,10 @@ Function New-OpenSSLSelfSignedCertificate {
         [String]$Certificate,
 
         [ValidateScript( { $_ -gt 0 } )]
-        [Int]$KeySize=2048,
+        [Int]$KeySize = 2048,
 
         [ValidateScript( { $_ -gt 0 } )]
-        [Int]$ValidDays=365
+        [Int]$ValidDays = 365
     )
 
     & openssl req -out $Certificate -newkey rsa:$KeySize -nodes -keyout $PrivateKey -x509 -sha256 -days $ValidDays

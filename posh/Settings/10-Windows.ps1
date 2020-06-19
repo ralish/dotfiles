@@ -105,7 +105,7 @@ public static extern bool SetConsoleMode(
         }
 
         # The STD_INPUT_HANDLE shouldn't be relevant to this issue
-        $ConStdHandleNames = @('STD_OUTPUT_HANDLE', 'STD_ERROR_HANDLE')
+        $ConStdHandleNames = 'STD_OUTPUT_HANDLE', 'STD_ERROR_HANDLE'
         foreach ($ConStdHandleName in $ConStdHandleNames) {
             Write-Debug -Message (Get-DotFilesMessage -Message ('Operating on console handle: {0}' -f $ConStdHandleName))
             $ConStdHandle = [DotFiles.ConsoleAPI]::GetStdHandle([DotFiles.ConsoleAPI+StdHandleDevices]::$ConStdHandleName)
@@ -138,5 +138,5 @@ public static extern bool SetConsoleMode(
 
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Applying fix for ConHost VT100 tab stop width bug ...')
     $ConHostVT100Fix.Invoke()
-    Remove-Variable -Name @('ConHostVT100Bug', 'ConHostVT100Fix')
+    Remove-Variable -Name 'ConHostVT100Bug', 'ConHostVT100Fix'
 }

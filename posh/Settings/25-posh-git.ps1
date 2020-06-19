@@ -30,4 +30,4 @@ if ($CurrentVersion -ge $RequiredVersion) {
     Write-Warning -Message (Get-DotFilesMessage -Message ('Expecting at least posh-git {0} but you have {1}.' -f $RequiredVersion, $CurrentVersion))
 }
 
-Remove-Variable -Name @('CurrentVersion', 'RequiredVersion')
+Remove-Variable -Name 'CurrentVersion', 'RequiredVersion'

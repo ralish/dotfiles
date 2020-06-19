@@ -24,10 +24,10 @@ Function Export-MailboxSpreadsheetData {
         [Switch]$SkipActivitySummary,
 
         [ValidateNotNullOrEmpty()]
-        [String]$DescriptionTimeZone='AUS Eastern Standard Time',
+        [String]$DescriptionTimeZone = 'AUS Eastern Standard Time',
 
         [ValidateNotNullOrEmpty()]
-        [String]$DescriptionTimeFormat='yyyy/mm/dd'
+        [String]$DescriptionTimeFormat = 'yyyy/mm/dd'
     )
 
     Test-CommandAvailable -Name 'Get-Mailbox'
@@ -65,8 +65,8 @@ Function Export-MailboxSpreadsheetData {
 
     Write-Host -ForegroundColor Green -Object 'Exporting mailbox data ...'
     $Params = @{
-        Encoding            = 'UTF8'
-        NoTypeInformation   = $true
+        Encoding          = 'UTF8'
+        NoTypeInformation = $true
     }
 
     if (!$SkipActivitySummary) {
@@ -85,10 +85,10 @@ Function Get-InboxRulesByFolders {
         [String]$Mailbox,
 
         [ValidateNotNullOrEmpty()]
-        [String]$DescriptionTimeZone='AUS Eastern Standard Time',
+        [String]$DescriptionTimeZone = 'AUS Eastern Standard Time',
 
         [ValidateNotNullOrEmpty()]
-        [String]$DescriptionTimeFormat='yyyy/mm/dd',
+        [String]$DescriptionTimeFormat = 'yyyy/mm/dd',
 
         [Switch]$ReturnUnlinkedRules
     )
@@ -170,11 +170,11 @@ Function Get-MailboxActivitySummary {
     $Received = Get-MessageTrace @TraceParams -RecipientAddress $Addresses
 
     $Summary = [PSCustomObject]@{
-        Mailbox     = $ExoMailbox.PrimarySmtpAddress
-        StartDate   = $StartDate.ToString()
-        EndDate     = $EndDate.ToString()
-        Sent        = ($Sent | Measure-Object).Count
-        Received    = ($Received | Measure-Object).Count
+        Mailbox   = $ExoMailbox.PrimarySmtpAddress
+        StartDate = $StartDate.ToString()
+        EndDate   = $EndDate.ToString()
+        Sent      = ($Sent | Measure-Object).Count
+        Received  = ($Received | Measure-Object).Count
     }
 
     return $Summary
@@ -188,19 +188,19 @@ Function Get-MailboxActivitySummary {
 Function Import-ContentSearchResults {
     [CmdletBinding()]
     Param(
-        [Parameter(ParameterSetName='File', Mandatory)]
+        [Parameter(ParameterSetName = 'File', Mandatory)]
         [String[]]$CsvFile,
 
-        [Parameter(ParameterSetName='File')]
-        [Char]$CsvDelimiter=',',
+        [Parameter(ParameterSetName = 'File')]
+        [Char]$CsvDelimiter = ',',
 
-        [Parameter(ParameterSetName='Data', Mandatory)]
+        [Parameter(ParameterSetName = 'Data', Mandatory)]
         [Object[]]$CsvData,
 
         [ValidateSet('From', 'To', 'Cc', 'Bcc')]
-        [String[]]$ImportFields=@('From', 'To', 'Cc', 'Bcc'),
+        [String[]]$ImportFields = @('From', 'To', 'Cc', 'Bcc'),
 
-        [String[]]$IgnoredEntries='O=EXCHANGELABS',
+        [String[]]$IgnoredEntries = 'O=EXCHANGELABS',
         [String[]]$IgnoredDomains,
 
         [ValidateRange('Positive')]
@@ -215,21 +215,21 @@ Function Import-ContentSearchResults {
 
         $DataFields = @()
         $ImportFieldsLookup = @{
-            From    = 'Sender or Created by'
-            To      = 'Recipients in To line'
-            Cc      = 'Recipients in Cc line'
-            Bcc     = 'Recipients in Bcc line'
+            From = 'Sender or Created by'
+            To   = 'Recipients in To line'
+            Cc   = 'Recipients in Cc line'
+            Bcc  = 'Recipients in Bcc line'
         }
 
         foreach ($ImportField in $ImportFields) {
             $DataFields += $ImportFieldsLookup[$ImportField]
 
             $Statistics[$ImportField] = [Ordered]@{
-                Empty = 0
-                EntryIgnored = 0
+                Empty            = 0
+                EntryIgnored     = 0
                 AddressMalformed = 0
-                DomainIgnored = 0
-                NameMissing = 0
+                DomainIgnored    = 0
+                NameMissing      = 0
             }
         }
 
@@ -337,7 +337,7 @@ Function Import-ContentSearchResults {
 
     End {
         $Results = @{
-            Contacts = $Contacts
+            Contacts   = $Contacts
             Statistics = $Statistics
         }
 
@@ -410,7 +410,7 @@ Function Import-ContentSearchResultsEntry {
 
         $Result = [PSCustomObject]@{
             Address = $Matches[0].Trim("<>'.").ToLower()
-            Name = [String]::Empty
+            Name    = [String]::Empty
         }
 
         if ($IgnoredDomains) {
@@ -564,26 +564,26 @@ Function Get-Office365EntityUsageSummary {
     switch ($Type) {
         'User' {
             $Summary = [PSCustomObject]@{
-                Mailbox             = $Mailbox
-                MailboxStatistics   = $MailboxStatistics
-                Calendar            = $Calendar
-                Groups              = $Groups
-                Site                = $Site
-                Teams               = $Teams
-                Notebooks           = $Notebooks
+                Mailbox           = $Mailbox
+                MailboxStatistics = $MailboxStatistics
+                Calendar          = $Calendar
+                Groups            = $Groups
+                Site              = $Site
+                Teams             = $Teams
+                Notebooks         = $Notebooks
             }
         }
 
         'Group' {
             $Summary = [PSCustomObject]@{
-                Group               = $Group
-                Mailbox             = $Mailbox
-                MailboxStatistics   = $MailboxStatistics
-                Calendar            = $Calendar
-                Site                = $Site
-                Teams               = $Teams
-                Notebooks           = $Notebooks
-                Plans               = $Plans
+                Group             = $Group
+                Mailbox           = $Mailbox
+                MailboxStatistics = $MailboxStatistics
+                Calendar          = $Calendar
+                Site              = $Site
+                Teams             = $Teams
+                Notebooks         = $Notebooks
+                Plans             = $Plans
             }
         }
     }
@@ -631,7 +631,7 @@ Function Get-Office365UserSecurityReport {
     [CmdletBinding()]
     Param(
         [ValidateRange(1, 90)]
-        [Int]$AccountInactiveDays=30
+        [Int]$AccountInactiveDays = 30
     )
 
     Test-CommandAvailable -Name @('Get-Mailbox', 'Get-MsolUser')
@@ -679,30 +679,30 @@ Function Get-Office365UserSecurityReport {
         Write-Verbose -Message ('Inspecting mailbox: {0}' -f $Mailbox.UserPrincipalName)
 
         $Auditing = [PSCustomObject]@{
-            UserPrincipalName   = $Mailbox.UserPrincipalName
-            AuditEnabled        = $Mailbox.AuditEnabled
-            AuditLogAgeLimit    = $Mailbox.AuditLogAgeLimit
-            AuditOwner          = $Mailbox.AuditOwner
-            AuditDelegate       = $Mailbox.AuditDelegate
-            AuditAdmin          = $Mailbox.AuditAdmin
+            UserPrincipalName = $Mailbox.UserPrincipalName
+            AuditEnabled      = $Mailbox.AuditEnabled
+            AuditLogAgeLimit  = $Mailbox.AuditLogAgeLimit
+            AuditOwner        = $Mailbox.AuditOwner
+            AuditDelegate     = $Mailbox.AuditDelegate
+            AuditAdmin        = $Mailbox.AuditAdmin
         }
         $null = $MailboxAuditing.Add($Auditing)
 
         if ($Mailbox.ForwardingSmtpAddress) {
             $Forwarding = [PSCustomObject]@{
-                UserPrincipalName           = $Mailbox.UserPrincipalName
-                ForwardingAddress           = $Mailbox.ForwardingAddress
-                ForwardingSmtpAddress       = $Mailbox.ForwardingSmtpAddress
-                DeliverToMailboxAndForward  = $Mailbox.DeliverToMailboxAndForward
+                UserPrincipalName          = $Mailbox.UserPrincipalName
+                ForwardingAddress          = $Mailbox.ForwardingAddress
+                ForwardingSmtpAddress      = $Mailbox.ForwardingSmtpAddress
+                DeliverToMailboxAndForward = $Mailbox.DeliverToMailboxAndForward
             }
             $null = $MailboxForwarding.Add($Forwarding)
         }
 
         if ($Mailbox.GrantSendOnBehalfTo) {
             $SendOnBehalf = [PSCustomObject]@{
-                UserPrincipalName                   = $Mailbox.UserPrincipalName
-                GrantSendOnBehalfTo                 = $Mailbox.GrantSendOnBehalfTo
-                MessageCopyForSendOnBehalfEnabled   = $Mailbox.MessageCopyForSendOnBehalfEnabled
+                UserPrincipalName                 = $Mailbox.UserPrincipalName
+                GrantSendOnBehalfTo               = $Mailbox.GrantSendOnBehalfTo
+                MessageCopyForSendOnBehalfEnabled = $Mailbox.MessageCopyForSendOnBehalfEnabled
             }
             $null = $MailboxSendOnBehalf.Add($SendOnBehalf)
         }
@@ -724,7 +724,7 @@ Function Get-Office365UserSecurityReport {
                 $null = $MailboxDelegates.Add($_)
             }
 
-        $CalendarFolder = Get-MailboxFolderStatistics -Identity $Mailbox.UserPrincipalName -FolderScope Calendar | Where-Object FolderType -eq 'Calendar'
+        $CalendarFolder = Get-MailboxFolderStatistics -Identity $Mailbox.UserPrincipalName -FolderScope Calendar | Where-Object FolderType -EQ 'Calendar'
         Get-MailboxFolderPermission -Identity ('{0}:\{1}' -f $Mailbox.UserPrincipalName, $CalendarFolder.Name) |
             Where-Object {
                 !($_.User.UserType.Value -eq 'Default' -and $_.AccessRights -eq 'AvailabilityOnly') -and
@@ -746,14 +746,14 @@ Function Get-Office365UserSecurityReport {
     }
 
     $Results = [PSCustomObject]@{
-        Users                   = $Users
-        MailboxAuditing         = $MailboxAuditing
-        MailboxCalendar         = $MailboxCalendar
-        MailboxDelegates        = $MailboxDelegates
-        MailboxForwardingRules  = $MailboxForwardingRules
-        MailboxForwarding       = $MailboxForwarding
-        MailboxSendAs           = $MailboxSendAs
-        MailboxSendOnBehalf     = $MailboxSendOnBehalf
+        Users                  = $Users
+        MailboxAuditing        = $MailboxAuditing
+        MailboxCalendar        = $MailboxCalendar
+        MailboxDelegates       = $MailboxDelegates
+        MailboxForwardingRules = $MailboxForwardingRules
+        MailboxForwarding      = $MailboxForwarding
+        MailboxSendAs          = $MailboxSendAs
+        MailboxSendOnBehalf    = $MailboxSendOnBehalf
     }
 
     return $Results
@@ -801,13 +801,13 @@ Function Get-UnifiedGroupReport {
 
 # Helper function to connect to all Office 365 services
 Function Connect-Office365Services {
-    [CmdletBinding(DefaultParameterSetName='MFA')]
+    [CmdletBinding(DefaultParameterSetName = 'MFA')]
     Param(
-        [Parameter(ParameterSetName='MFA')]
+        [Parameter(ParameterSetName = 'MFA')]
         [ValidateNotNullOrEmpty()]
         [String]$MfaUsername,
 
-        [Parameter(ParameterSetName='Standard', Mandatory)]
+        [Parameter(ParameterSetName = 'Standard', Mandatory)]
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential,
@@ -855,13 +855,13 @@ Function Connect-Office365Services {
 
 # Helper function to connect to Exchange Online
 Function Connect-ExchangeOnline {
-    [CmdletBinding(DefaultParameterSetName='MFA')]
+    [CmdletBinding(DefaultParameterSetName = 'MFA')]
     Param(
-        [Parameter(ParameterSetName='MFA')]
+        [Parameter(ParameterSetName = 'MFA')]
         [ValidateNotNullOrEmpty()]
         [String]$MfaUsername,
 
-        [Parameter(ParameterSetName='Standard', Mandatory)]
+        [Parameter(ParameterSetName = 'Standard', Mandatory)]
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
@@ -918,13 +918,13 @@ Function Connect-Office365CentralizedDeployment {
 
 # Helper function to connect to Security & Compliance Center
 Function Connect-SecurityAndComplianceCenter {
-    [CmdletBinding(DefaultParameterSetName='MFA')]
+    [CmdletBinding(DefaultParameterSetName = 'MFA')]
     Param(
-        [Parameter(ParameterSetName='MFA')]
+        [Parameter(ParameterSetName = 'MFA')]
         [ValidateNotNullOrEmpty()]
         [String]$MfaUsername,
 
-        [Parameter(ParameterSetName='Standard', Mandatory)]
+        [Parameter(ParameterSetName = 'Standard', Mandatory)]
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
@@ -984,13 +984,13 @@ Function Connect-SharePointOnline {
 
 # Helper function to connect to Skype for Business Online
 Function Connect-SkypeForBusinessOnline {
-    [CmdletBinding(DefaultParameterSetName='MFA')]
+    [CmdletBinding(DefaultParameterSetName = 'MFA')]
     Param(
-        [Parameter(ParameterSetName='MFA')]
+        [Parameter(ParameterSetName = 'MFA')]
         [ValidateNotNullOrEmpty()]
         [String]$MfaUsername,
 
-        [Parameter(ParameterSetName='Standard', Mandatory)]
+        [Parameter(ParameterSetName = 'Standard', Mandatory)]
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
@@ -1087,7 +1087,7 @@ Function Compare-MCASPolicy {
             continue
         }
 
-        $DiffPol = $DifferenceObject | ? ref_policy_id -eq $RefPol.ref_policy_id
+        $DiffPol = $DifferenceObject | Where-Object ref_policy_id -EQ $RefPol.ref_policy_id
         if (!$DiffPol) {
             Write-Warning -Message ('[ID: {0}] Reference policy with no associated difference policy (Ref Policy ID: {1}).' -f $RefPol._id, $RefPol.ref_policy_id)
             continue
@@ -1096,15 +1096,15 @@ Function Compare-MCASPolicy {
         $Diff = Compare-ObjectProperties -ReferenceObject $RefPol -DifferenceObject $DiffPol -IgnoredProperties $IgnoredProperties
         if ($Diff) {
             $PolicyName = [PSCustomObject]@{
-                PropertyName    = 'policyName'
-                RefValue        = $RefPol.name
-                DiffValue       = $DiffPol.name
+                PropertyName = 'policyName'
+                RefValue     = $RefPol.name
+                DiffValue    = $DiffPol.name
             }
 
             $RefPolicyId = [PSCustomObject]@{
-                PropertyName    = 'ref_policy_id'
-                RefValue        = $RefPol.ref_policy_id
-                DiffValue       = $DiffPol.ref_policy_id
+                PropertyName = 'ref_policy_id'
+                RefValue     = $RefPol.ref_policy_id
+                DiffValue    = $DiffPol.ref_policy_id
             }
 
             $Result = @($PolicyName, $RefPolicyId) + $Diff
@@ -1118,7 +1118,7 @@ Function Compare-MCASPolicy {
             continue
         }
 
-        $RefPol = $ReferenceObject | ? ref_policy_id -eq $DiffPol.ref_policy_id
+        $RefPol = $ReferenceObject | Where-Object ref_policy_id -EQ $DiffPol.ref_policy_id
         if (!$RefPol) {
             Write-Warning -Message ('[ID: {0}] Difference policy with no associated reference policy (Ref Policy ID: {1}).' -f $DiffPol._id, $DiffPol.ref_policy_id)
             continue
@@ -1151,7 +1151,7 @@ Function Compare-ProtectionAlert {
     $Results = [Collections.ArrayList]::new()
 
     foreach ($RefAlert in ($ReferenceObject | Sort-Object -Property Name)) {
-        $DiffAlert = $DifferenceObject | ? Name -eq $RefAlert.Name
+        $DiffAlert = $DifferenceObject | Where-Object Name -EQ $RefAlert.Name
         if (!$DiffAlert) {
             Write-Warning -Message ('[ID: {0}] Reference alert with no associated difference alert (Ref Name: {1}).' -f $RefAlert.ImmutableId, $RefAlert.Name)
             continue
@@ -1160,15 +1160,15 @@ Function Compare-ProtectionAlert {
         $Diff = Compare-ObjectProperties -ReferenceObject $RefAlert -DifferenceObject $DiffAlert -IgnoredProperties $IgnoredProperties
         if ($Diff) {
             $AlertName = [PSCustomObject]@{
-                PropertyName    = 'AlertName'
-                RefValue        = $RefAlert.Name
-                DiffValue       = $DiffAlert.Name
+                PropertyName = 'AlertName'
+                RefValue     = $RefAlert.Name
+                DiffValue    = $DiffAlert.Name
             }
 
             $ImmutableId = [PSCustomObject]@{
-                PropertyName    = 'ImmutableId'
-                RefValue        = $RefAlert.ImmutableId
-                DiffValue       = $DiffAlert.ImmutableId
+                PropertyName = 'ImmutableId'
+                RefValue     = $RefAlert.ImmutableId
+                DiffValue    = $DiffAlert.ImmutableId
             }
 
             $Result = @($AlertName, $ImmutableId) + $Diff
@@ -1177,7 +1177,7 @@ Function Compare-ProtectionAlert {
     }
 
     foreach ($DiffAlert in ($DifferenceObject | Sort-Object -Property Name)) {
-        $RefAlert = $ReferenceObject | ? Name -eq $DiffAlert.Name
+        $RefAlert = $ReferenceObject | Where-Object Name -EQ $DiffAlert.Name
         if (!$RefAlert) {
             Write-Warning -Message ('[ID: {0}] Difference alert with no associated reference alert (Ref Name: {1}).' -f $DiffAlert.ImmutableId, $DiffAlert.Name)
             continue

@@ -28,10 +28,10 @@ Function Get-KerberosTokenSize {
         [String]$Username,
 
         [ValidateSet('Windows Server 2008 R2 (or earlier)', 'Windows Server 2012 (or later)')]
-        [String]$OperatingSystem='Windows Server 2012 (or later)',
+        [String]$OperatingSystem = 'Windows Server 2012 (or later)',
 
         [ValidateRange("Positive")]
-        [Int]$TicketOverheadBytes=1200
+        [Int]$TicketOverheadBytes = 1200
     )
 
     if ($Username.Split('\').Count -ne 1) {
@@ -71,11 +71,11 @@ Function Get-KerberosTokenSize {
         throw $_
     }
 
-    $SIDHistory         = $ADUser.$SIDHistory.Count
-    $DomainLocal        = @($ADGroups | Where-Object { $_.GroupScope -eq 'DomainLocal' }).Count
-    $Global             = @($ADGroups | Where-Object { $_.GroupScope -eq 'Global' }).Count
-    $UniversalInside    = @($ADGroups | Where-Object { $_.GroupScope -eq 'Universal' -and $_.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
-    $UniversalOutside   = @($ADGroups | Where-Object { $_.GroupScope -eq 'Universal' -and !$_.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
+    $SIDHistory = $ADUser.$SIDHistory.Count
+    $DomainLocal = @($ADGroups | Where-Object { $_.GroupScope -eq 'DomainLocal' }).Count
+    $Global = @($ADGroups | Where-Object { $_.GroupScope -eq 'Global' }).Count
+    $UniversalInside = @($ADGroups | Where-Object { $_.GroupScope -eq 'Universal' -and $_.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
+    $UniversalOutside = @($ADGroups | Where-Object { $_.GroupScope -eq 'Universal' -and !$_.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
 
     if ($OperatingSystem -eq 'Windows Server 2012 (or later)') {
         $TokenSizeBytes = (40 * ($SIDHistory + $UniversalOutside)) + (8 * ($DomainLocal + $Global + $UniversalInside))
@@ -90,14 +90,14 @@ Function Get-KerberosTokenSize {
     $TokenSizeBytes += $TicketOverheadBytes
 
     $TokenSize = [PSCustomObject]@{
-        SIDHistory              = $SIDHistory
-        DomainLocal             = $DomainLocal
-        Global                  = $Global
-        UniversalInside         = $UniversalInside
-        UniversalOutside        = $UniversalOutside
-        TrustedForDelegation    = $ADUser.TrustedForDelegation
-        TicketOverheadBytes     = $TicketOverheadBytes
-        TokenSizeBytes          = $TokenSizeBytes
+        SIDHistory           = $SIDHistory
+        DomainLocal          = $DomainLocal
+        Global               = $Global
+        UniversalInside      = $UniversalInside
+        UniversalOutside     = $UniversalOutside
+        TrustedForDelegation = $ADUser.TrustedForDelegation
+        TicketOverheadBytes  = $TicketOverheadBytes
+        TokenSizeBytes       = $TokenSizeBytes
     }
 
     return $TokenSize
@@ -115,10 +115,10 @@ Function Resolve-ADGuid {
         [ValidateSet('ExtendedRight', 'SchemaObject')]
         [String]$Type,
 
-        [Parameter(ParameterSetName='Guid', ValueFromPipeline)]
+        [Parameter(ParameterSetName = 'Guid', ValueFromPipeline)]
         [Guid[]]$Guid,
 
-        [Parameter(ParameterSetName='All')]
+        [Parameter(ParameterSetName = 'All')]
         [Switch]$All,
 
         [ValidateNotNullOrEmpty()]

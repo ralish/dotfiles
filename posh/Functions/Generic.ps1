@@ -63,13 +63,13 @@ Function ConvertTo-TextEncoding {
 
     Begin {
         $EncodingClasses = @{
-            'ASCII'     = 'Text.ASCIIEncoding'
-            'UTF-7'     = 'Text.UTF7Encoding'
-            'UTF-8'     = 'Text.UTF8Encoding'
-            'UTF-16'    = 'Text.UnicodeEncoding'
-            'UTF-16BE'  = 'Text.UnicodeEncoding'
-            'UTF-32'    = 'Text.UTF32Encoding'
-            'UTF-32BE'  = 'Text.UTF32Encoding'
+            'ASCII'    = 'Text.ASCIIEncoding'
+            'UTF-7'    = 'Text.UTF7Encoding'
+            'UTF-8'    = 'Text.UTF8Encoding'
+            'UTF-16'   = 'Text.UnicodeEncoding'
+            'UTF-16BE' = 'Text.UnicodeEncoding'
+            'UTF-32'   = 'Text.UTF32Encoding'
+            'UTF-32BE' = 'Text.UTF32Encoding'
         }
 
         $EncoderParams = @()
@@ -163,21 +163,21 @@ Function Get-TextEncoding {
 
         # Special case for UTF-16LE encoded XML without BOM (this is legal!)
         $Encoding = [PSCustomObject]@{
-            Name            = 'utf-16'
-            DisplayName     = 'Unicode via XML declaration'
-            CodePage        = '1200'
-            Preamble        = [Byte[]]@(60, 0, 63, 0)
-            ByteOrderMark   = $false
+            Name          = 'utf-16'
+            DisplayName   = 'Unicode via XML declaration'
+            CodePage      = '1200'
+            Preamble      = [Byte[]]@(60, 0, 63, 0)
+            ByteOrderMark = $false
         }
         $null = $Encodings.Add($Encoding)
 
         # Special case for UTF-16BE encoded XML without BOM (this is legal!)
         $Encoding = [PSCustomObject]@{
-            Name            = 'utf-16BE'
-            DisplayName     = 'Unicode (Big-Endian) via XML declaration'
-            CodePage        = '1201'
-            Preamble        = [Byte[]]@(0, 60, 0, 63)
-            ByteOrderMark   = $false
+            Name          = 'utf-16BE'
+            DisplayName   = 'Unicode (Big-Endian) via XML declaration'
+            CodePage      = '1201'
+            Preamble      = [Byte[]]@(0, 60, 0, 63)
+            ByteOrderMark = $false
         }
         $null = $Encodings.Add($Encoding)
 
@@ -208,9 +208,9 @@ Function Get-TextEncoding {
 
             Write-Verbose -Message ('Processing: {0}' -f $Item.FullName)
             $Result = [PSCustomObject]@{
-                File            = $Item
-                Encoding        = 'ascii / utf-8'
-                ByteOrderMark   = $false
+                File          = $Item
+                Encoding      = 'ascii / utf-8'
+                ByteOrderMark = $false
             }
 
             $FoundEncoding = $false
@@ -288,11 +288,11 @@ Function Get-DirectorySummary {
         }
 
         $Summary = [PSCustomObject]@{
-            Path    = $Directory
-            Dirs    = $TotalDirs
-            Files   = $TotalFiles
-            Items   = $TotalItems
-            Size    = $TotalSize
+            Path  = $Directory
+            Dirs  = $TotalDirs
+            Files = $TotalFiles
+            Items = $TotalItems
+            Size  = $TotalSize
         }
 
         $Summary.PSObject.TypeNames.Insert(0, 'DotFiles.Generic.DirectorySummary')
@@ -313,10 +313,10 @@ Function Format-SizeDigital {
         [Double]$Size,
 
         [ValidateSet(2, 10)]
-        [Byte]$Base=2,
+        [Byte]$Base = 2,
 
         [ValidateRange(0, 10)]
-        [Byte]$Precision=2
+        [Byte]$Precision = 2
     )
 
     Process {
@@ -326,10 +326,10 @@ Function Format-SizeDigital {
 
         if ($Base -eq 2) {
             $LogBase = 1024
-            $LogMagnitudes = @('bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB')
+            $LogMagnitudes = 'bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'
         } else {
             $LogBase = 1000
-            $LogMagnitudes = @('bytes', 'kB', 'MB', 'GB', 'TB', 'PB')
+            $LogMagnitudes = 'bytes', 'kB', 'MB', 'GB', 'TB', 'PB'
         }
 
         $Log = [Math]::Truncate([Math]::Log($Size, $LogBase))
@@ -395,10 +395,10 @@ Function Add-PathStringElement {
         [String]$Element,
 
         [ValidateSet('Append', 'Prepend')]
-        [String]$Action='Append',
+        [String]$Action = 'Append',
 
-        [Char]$PathSeparator=[IO.Path]::PathSeparator,
-        [Char]$DirectorySeparator=[IO.Path]::DirectorySeparatorChar,
+        [Char]$PathSeparator = [IO.Path]::PathSeparator,
+        [Char]$DirectorySeparator = [IO.Path]::DirectorySeparatorChar,
 
         [Switch]$NoRepair,
         [Switch]$SimpleAlgo
@@ -428,9 +428,9 @@ Function Add-PathStringElement {
 
         if ($Path -notmatch $SingleElement) {
             $RegExPathSeparator = [Regex]::Escape($PathSeparator)
-            $FirstElement       = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
-            $LastElement        = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
-            $MiddleElement      = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
+            $FirstElement = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
+            $LastElement = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
+            $MiddleElement = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
 
             $Path = $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
 
@@ -471,8 +471,8 @@ Function Remove-PathStringElement {
         [Parameter(Mandatory)]
         [String]$Element,
 
-        [Char]$PathSeparator=[IO.Path]::PathSeparator,
-        [Char]$DirectorySeparator=[IO.Path]::DirectorySeparatorChar,
+        [Char]$PathSeparator = [IO.Path]::PathSeparator,
+        [Char]$DirectorySeparator = [IO.Path]::DirectorySeparatorChar,
 
         [Switch]$NoRepair,
         [Switch]$SimpleAlgo
@@ -505,9 +505,9 @@ Function Remove-PathStringElement {
         }
 
         $RegExPathSeparator = [Regex]::Escape($PathSeparator)
-        $FirstElement       = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
-        $LastElement        = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
-        $MiddleElement      = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
+        $FirstElement = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
+        $LastElement = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
+        $MiddleElement = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
 
         return $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
     }
@@ -520,7 +520,7 @@ Function Repair-PathString {
         [Parameter(Mandatory, ValueFromPipeline)]
         [String]$String,
 
-        [Char]$PathSeparator=[IO.Path]::PathSeparator
+        [Char]$PathSeparator = [IO.Path]::PathSeparator
     )
 
     Begin {

@@ -121,7 +121,7 @@ Function Get-NonInheritedACL {
 
     $ACLMatches = [Collections.ArrayList]::new()
     foreach ($Directory in $Directories) {
-        $ACL = Get-ACL -LiteralPath $Directory.FullName
+        $ACL = Get-Acl -LiteralPath $Directory.FullName
         $ACLNonInherited = $ACL.Access | Where-Object { $_.IsInherited -eq $false }
 
         if (!$ACLNonInherited) {
@@ -155,8 +155,8 @@ Function Edit-Hosts {
     Param()
 
     $StartParams = @{
-        FilePath        = 'notepad.exe'
-        ArgumentList    = '{0}\System32\drivers\etc\hosts' -f $env:SystemRoot
+        FilePath     = 'notepad.exe'
+        ArgumentList = '{0}\System32\drivers\etc\hosts' -f $env:SystemRoot
     }
 
     if (!(Test-IsAdministrator)) {

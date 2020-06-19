@@ -8,4 +8,4 @@ try {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading oh-my-posh settings ...')
 
 # Set console theme
-Set-Theme -Name Agnoster -Verbose:$false
+Set-Theme -name Agnoster -Verbose:$false

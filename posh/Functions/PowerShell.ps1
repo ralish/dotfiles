@@ -13,7 +13,7 @@ Function Get-ArgumentCompleter {
     $BindingFlags = [Reflection.BindingFlags]'NonPublic, Static'
     $LocalPipelineType = [PowerShell].Assembly.GetType('System.Management.Automation.Runspaces.LocalPipeline')
     $GetExecutionContextFromTLS = $LocalPipelineType.GetMethod('GetExecutionContextFromTLS', $BindingFlags)
-    $InternalExecutionContext = $GetExecutionContextFromTLS.Invoke($null, $BindingFlags, $null, $null, $PSCulture)
+    $InternalExecutionContext = $GetExecutionContextFromTLS.Invoke($null, $BindingFlags, $null, $null, $PSCulture) #DevSkim: ignore DS440000
 
     $BindingFlags = [Reflection.BindingFlags]'Instance, NonPublic'
     if ($Native) {
@@ -30,9 +30,9 @@ Function Get-ArgumentCompleter {
         $Name, $Parameter = $Completer.Split(':')
 
         [PSCustomObject]@{
-            CommandName     = $Name
-            ParameterName   = $Parameter
-            Definition      = $ArgumentCompleters[$Completer]
+            CommandName   = $Name
+            ParameterName = $Parameter
+            Definition    = $ArgumentCompleters[$Completer]
         }
     }
 }
@@ -70,9 +70,9 @@ Function Compare-ObjectProperties {
 
         if ($Diff) {
             $DiffProps = @{
-                PropertyName    = $Property
-                RefValue        = $Diff | Where-Object { $_.SideIndicator -eq '<=' } | Select-Object -ExpandProperty $($Property)
-                DiffValue       = $Diff | Where-Object { $_.SideIndicator -eq '=>' } | Select-Object -ExpandProperty $($Property)
+                PropertyName = $Property
+                RefValue     = $Diff | Where-Object { $_.SideIndicator -eq '<=' } | Select-Object -ExpandProperty $($Property)
+                DiffValue    = $Diff | Where-Object { $_.SideIndicator -eq '=>' } | Select-Object -ExpandProperty $($Property)
             }
 
             $ObjDiffs += New-Object -TypeName PSObject -Property $DiffProps
@@ -131,10 +131,10 @@ Function Update-Profile {
         [Switch]$AllUsersAllHosts,
         [Switch]$AllUsersCurrentHost,
         [Switch]$CurrentUserAllHosts,
-        [Switch]$CurrentUserCurrentHost=$true
+        [Switch]$CurrentUserCurrentHost = $true
     )
 
-    $ProfileTypes = @('AllUsersAllHosts', 'AllUsersCurrentHost', 'CurrentUserAllHosts', 'CurrentUserCurrentHost')
+    $ProfileTypes = 'AllUsersAllHosts', 'AllUsersCurrentHost', 'CurrentUserAllHosts', 'CurrentUserCurrentHost'
     foreach ($ProfileType in $ProfileTypes) {
         if (Get-Variable -Name $ProfileType -ValueOnly) {
             if (Test-Path -Path $profile.$ProfileType -PathType Leaf) {

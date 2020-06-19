@@ -8,10 +8,10 @@ Function Switch-Cygwin {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path="$env:HOMEDRIVE\Cygwin",
+        [String]$Path = "$env:HOMEDRIVE\Cygwin",
 
         [ValidateSet('Default', 'Lnk', 'Native', 'NativeStrict')]
-        [String]$Symlinks='NativeStrict',
+        [String]$Symlinks = 'NativeStrict',
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -87,7 +87,7 @@ Function Switch-Go {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path="$env:HOMEDRIVE\Go",
+        [String]$Path = "$env:HOMEDRIVE\Go",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -149,17 +149,17 @@ Function Switch-Go {
 
 # Configure environment for Google (depot_tools) usage
 Function Switch-Google {
-    [CmdletBinding(DefaultParameterSetName='Enable')]
+    [CmdletBinding(DefaultParameterSetName = 'Enable')]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path=('{0}\Code\Google\depot_tools' -f $HOME),
+        [String]$Path = ('{0}\Code\Google\depot_tools' -f $HOME),
 
-        [Parameter(ParameterSetName='Enable', Mandatory)]
+        [Parameter(ParameterSetName = 'Enable', Mandatory)]
         [String]$VsVersion,
 
         [Switch]$Persist,
 
-        [Parameter(ParameterSetName='Disable')]
+        [Parameter(ParameterSetName = 'Disable')]
         [Switch]$Disable
     )
 
@@ -209,7 +209,7 @@ Function Switch-Java {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path="$env:HOMEDRIVE\Java",
+        [String]$Path = "$env:HOMEDRIVE\Java",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -263,7 +263,7 @@ Function Switch-Nodejs {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path="$env:HOMEDRIVE\Nodejs",
+        [String]$Path = "$env:HOMEDRIVE\Nodejs",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -311,7 +311,7 @@ Function Switch-Perl {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path="$env:HOMEDRIVE\Perl",
+        [String]$Path = "$env:HOMEDRIVE\Perl",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -360,7 +360,7 @@ Function Switch-PHP {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path="$env:HOMEDRIVE\PHP",
+        [String]$Path = "$env:HOMEDRIVE\PHP",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -408,7 +408,7 @@ Function Switch-Python {
         [String]$Version,
 
         [ValidateNotNullOrEmpty()]
-        [String]$Path="$env:HOMEDRIVE\Python",
+        [String]$Path = "$env:HOMEDRIVE\Python",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -461,17 +461,17 @@ Function Switch-Python {
 
 # Configure environment for Ruby development
 Function Switch-Ruby {
-    [CmdletBinding(DefaultParameterSetName='Enable')]
+    [CmdletBinding(DefaultParameterSetName = 'Enable')]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path="$env:HOMEDRIVE\Ruby",
+        [String]$Path = "$env:HOMEDRIVE\Ruby",
 
-        [Parameter(ParameterSetName='Enable')]
-        [String]$Options='-Eutf-8',
+        [Parameter(ParameterSetName = 'Enable')]
+        [String]$Options = '-Eutf-8',
 
         [Switch]$Persist,
 
-        [Parameter(ParameterSetName='Disable')]
+        [Parameter(ParameterSetName = 'Disable')]
         [Switch]$Disable
     )
 

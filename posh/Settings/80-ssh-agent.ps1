@@ -15,7 +15,7 @@ if (!(Get-Command -Name ssh-add -ErrorAction Ignore)) {
 # Path to our SSH keys
 $SshKeysPath = 'Y:\Secured\SSH Keys'
 # SSH keys file extension
-$SshKeysExt  = '.opk'
+$SshKeysExt = '.opk'
 
 if (Test-Path -Path $SshKeysPath -PathType Container) {
     $SshKeys = Get-ChildItem -Path $SshKeysPath -File | Where-Object { $_.Extension -eq $SshKeysExt }
@@ -30,4 +30,4 @@ if (Test-Path -Path $SshKeysPath -PathType Container) {
     Write-Warning -Message (Get-DotFilesMessage -Message ('The specified SSH keys location does not exist: {0}' -f $SshKeysPath))
 }
 
-Remove-Variable -Name @('SshKeysExt', 'SshKeysPath')
+Remove-Variable -Name 'SshKeysExt', 'SshKeysPath'

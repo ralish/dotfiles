@@ -98,8 +98,8 @@ Function Optimize-WindowsSettings {
     Write-Host -ForegroundColor Gray '[SecEdit] - Updating security policy template ...'
     $SecPol = Get-Content -Path $SecEditCfg | ForEach-Object {
         $_ -replace '^(MinimumPasswordAge) *= *.+', '$1 = 0' `
-           -replace '^(MaximumPasswordAge) *= *.+', '$1 = -1' `
-           -replace '^(PasswordComplexity) *= *.+', '$1 = 0'
+            -replace '^(MaximumPasswordAge) *= *.+', '$1 = -1' `
+            -replace '^(PasswordComplexity) *= *.+', '$1 = 0'
     }
     $SecPol | Set-Content -Path $SecEditCfg
 

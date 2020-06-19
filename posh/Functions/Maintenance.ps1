@@ -2,9 +2,9 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing maintenance func
 
 # Update everything!
 Function Update-AllTheThings {
-    [CmdletBinding(DefaultParameterSetName='OptOut')]
+    [CmdletBinding(DefaultParameterSetName = 'OptOut')]
     Param(
-        [Parameter(ParameterSetName='OptOut')]
+        [Parameter(ParameterSetName = 'OptOut')]
         [ValidateSet(
             'Windows',
             'Office',
@@ -18,7 +18,7 @@ Function Update-AllTheThings {
         )]
         [String[]]$ExcludeTasks,
 
-        [Parameter(ParameterSetName='OptIn', Mandatory)]
+        [Parameter(ParameterSetName = 'OptIn', Mandatory)]
         [ValidateSet(
             'Windows',
             'Office',
@@ -34,15 +34,15 @@ Function Update-AllTheThings {
     )
 
     $Tasks = @{
-        Windows         = $null
-        Office          = $null
-        VisualStudio    = $null
-        PowerShell      = $null
-        ModernApps      = $null
-        Scoop           = $null
-        NodejsPackages  = $null
-        PythonPackages  = $null
-        RubyGems        = $null
+        Windows        = $null
+        Office         = $null
+        VisualStudio   = $null
+        PowerShell     = $null
+        ModernApps     = $null
+        Scoop          = $null
+        NodejsPackages = $null
+        PythonPackages = $null
+        RubyGems       = $null
     }
 
     foreach ($Task in @($Tasks.Keys)) {
@@ -68,15 +68,15 @@ Function Update-AllTheThings {
     }
 
     $Results = [PSCustomObject]@{
-        Windows         = $null
-        Office          = $null
-        VisualStudio    = $null
-        PowerShell      = $null
-        ModernApps      = $null
-        Scoop           = $null
-        NodejsPackages  = $null
-        PythonPackages  = $null
-        RubyGems        = $null
+        Windows        = $null
+        Office         = $null
+        VisualStudio   = $null
+        PowerShell     = $null
+        ModernApps     = $null
+        Scoop          = $null
+        NodejsPackages = $null
+        PythonPackages = $null
+        RubyGems       = $null
     }
 
     if ($Tasks['Windows']) {
@@ -128,7 +128,7 @@ Function Update-RubyGems {
         return
     }
 
-    $UpdateArgs = @('update', '--no-document')
+    $UpdateArgs = 'update', '--no-document'
     if (!$PSCmdlet.ShouldProcess('Ruby gems', 'Update')) {
         $UpdateArgs += '--explain'
     }
@@ -175,7 +175,7 @@ Function Update-NodejsPackages {
         return
     }
 
-    $UpdateArgs = @('update', '--global')
+    $UpdateArgs = 'update', '--global'
     if ($PSCmdlet.ShouldProcess('Node.js packages', 'Update')) {
         $UpdateArgs += '--dry-run'
     }
@@ -264,7 +264,7 @@ Function Update-PythonPackages {
     }
 
     if ($PSCmdlet.ShouldProcess('Python packages', 'Update')) {
-        $UpdateArgs = @('install', '--no-python-version-warning', '--upgrade')
+        $UpdateArgs = 'install', '--no-python-version-warning', '--upgrade'
     }
 
     if ($UpdateArgs) {

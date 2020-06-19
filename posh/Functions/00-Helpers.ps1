@@ -49,7 +49,7 @@ Function Test-ModuleAvailable {
         [String[]]$Name,
 
         [ValidateSet('Any', 'All')]
-        [String]$Require='All'
+        [String]$Require = 'All'
     )
 
     foreach ($Module in $Name) {
