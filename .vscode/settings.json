@@ -129,6 +129,10 @@
         "editor.rulers": [79]
     },
 
+    "[powershell]": {
+        "editor.formatOnSave": true
+    },
+
     "[shellscript]": {
         "editor.rulers": [79]
     }
