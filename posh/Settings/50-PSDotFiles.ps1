@@ -10,7 +10,7 @@ try {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading PSDotFiles settings ...')
 
 # Path to our dotfiles directory
-$DotFilesPath = Join-Path -Path $HOME -ChildPath 'Code\Personal\dotfiles'
+$DotFilesPath = Join-Path -Path $HOME -ChildPath 'dotfiles'
 
 # Enable automatic component detection
 $DotFilesAutodetect = $true
