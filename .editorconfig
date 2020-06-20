@@ -21,5 +21,12 @@ indent_style = tab
 trim_trailing_whitespace = false
 
 # Shell scripts
-[*.sh]
+[{*.sh,.mk-sbuild.rc,.quiltrc,user-dirs.dirs}]
 max_line_length = 79
+keep_padding = true             # shfmt: -kp
+space_redirects = true          # shfmt: -sr
+switch_case_indent = true       # shfmt: -ci
+
+# Shell scripts: POSIX
+[{.mk-sbuild.rc,.quiltrc,user-dirs.dirs}]
+shell_variant = posix           # shfmt: -p
