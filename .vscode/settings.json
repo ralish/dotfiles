@@ -1,24 +1,35 @@
 {
     // File paths to language mappings
     "files.associations": {
+        // root
+        "dot-manage": "shellscript",
+        "dot-update": "shellscript",
         // bazaar
         "**/.bazaar/*.conf": "ini",
+        // clink
+        "**/clink/*": "properties",
         // curl
         ".curlrc": "properties",
         // cygwin
         ".startxwinrc": "shellscript",
+        "**/cygwin/bin/*": "shellscript",
         // dig
         ".digrc": "properties",
         // editline
         ".editrc": "properties",
         // git
         ".gitconfig*": "gitconfig",
+        "**/git/bin/*": "shellscript",
         // htop
         "htoprc": "properties",
         // irssi
         "**/.irssi/*": "perl",
+        // kpcli
+        "**/kpcli/bin/*": "perl",
         // less
         ".lesskey": "properties",
+        // markdownlint
+        ".markdownlintrc": "jsonc",
         // mysql
         ".my.cnf": "ini",
         // npm
@@ -39,24 +50,86 @@
         ".inputrc": "properties",
         // sbuild
         ".mk-sbuild.rc": "shellscript",
+        // screen
+        ".screenrc": "properties",
+        // scripts
+        "**/scripts/bin/*": "shellscript",
         // shellcheck
         ".shellcheckrc": "properties",
+        // stow
+        "**/stow/bin/*": "perl",
+        // subversion
+        "**/.subversion/*": "ini",
+        // vs
+        "*.vssettings": "xml",
         // wget
         ".wgetrc": "properties",
         // wsl
         ".wslconfig": "ini",
         "wsl.conf": "ini",
         // xdg-user-dir
-        "user-dirs.dirs": "shellscript"
+        "user-dirs.dirs": "shellscript",
+        // xlaunch
+        "*.xlaunch": "xml"
     },
 
-    "powershell.scriptAnalysis.settingsPath": ".vscode\\PSScriptAnalyzerSettings.psd1",
+    // Excludes for search & quick open
+    "search.exclude": {
+        "**/posh/Help/**": true,
+        "**/posh/Modules/**": true,
+        "**/pwsh/**": true
+    },
+
+    // Extension: PowerShell
+    "powershell.scriptAnalysis.settingsPath": ".vscode/PSScriptAnalyzerSettings.psd1",
+
+    // Extension: vscode-icons
+    "vsicons.presets.foldersAllDefaultIcon": true,
+    "vsicons.associations.files": [
+        {
+            "icon": "git",
+            "extensions": [".gitconfig-win"],
+            "filename": true,
+            "format": "svg"
+        },
+        {
+            "icon": "less",
+            "extensions": [".less"],
+            "filename": true,
+            "format": "svg",
+            "disabled": true
+        },
+        {
+            "icon": "markdownlint",
+            "extensions": [".markdownlintrc"],
+            "filename": true,
+            "format": "svg"
+        },
+        {
+            "icon": "mysql",
+            "extensions": [".my.cnf"],
+            "filename": true,
+            "format": "svg"
+        },
+        {
+            "icon": "pgsql",
+            "extensions": [".psqlrc"],
+            "filename": true,
+            "format": "svg"
+        },
+        {
+            "icon": "pip",
+            "extensions": ["pip.conf"],
+            "filename": true,
+            "format": "svg"
+        }
+    ],
 
     "[bat]": {
-        "editor.rulers": [79],
+        "editor.rulers": [79]
     },
 
     "[shellscript]": {
-        "editor.rulers": [79],
+        "editor.rulers": [79]
     }
 }
