@@ -78,9 +78,6 @@
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
 
-    // Language: PHP
-    "php.suggest.basic": false,
-
     // Extension: C/C++
     "C_Cpp.autoAddFileAssociations": false,
     "C_Cpp.loggingLevel": "Warning",
@@ -119,51 +116,67 @@
     "maven.executable.path": "C:\\DevEnvs\\Java\\Maven\\bin\\mvn.cmd",
 
     // Extension: PHP IntelliSense
-    "php.executablePath": "C:\\PHP\\php.exe",
+    "php.suggest.basic": false,
+    "php.validate.executablePath": "C:\\DevEnvs\\PHP\\php.exe",
 
     // Extension: PowerShell
+    "powershell.codeFormatting.autoCorrectAliases": true,
+    "powershell.codeFormatting.newLineAfterCloseBrace": false,
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+    "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
+    "powershell.codeFormatting.useCorrectCasing": true,
+    // Broken with interpolated strings pending fix (GH PR #1498)
+    //"powershell.codeFormatting.whitespaceBetweenParameters": true,
+    "powershell.integratedConsole.forceClearScrollbackBuffer": true,
     "powershell.integratedConsole.showOnStartup": false,
-    "powershell.scriptAnalysis.settingsPath": "C:\\Users\\SDL\\Code\\Personal\\dotfiles\\posh\\PSScriptAnalyzerSettings.psd1",
+    "powershell.integratedConsole.suppressStartupBanner": true,
+    "powershell.pester.useLegacyCodeLens": false,
+    "powershell.scriptAnalysis.settingsPath": "C:\\Users\\SDL\\dotfiles\\posh\\PSScriptAnalyzerSettings.psd1",
 
     // Extension: Python
     "python.experiments.enabled": false,
     "python.pythonPath": "~/dotfiles/vscode/venv",
-    "python.jediEnabled": false,
     "python.linting.flake8Enabled": true,
     "python.linting.pylintCategorySeverity.refactor": "Information",
 
     // Extension: Select Line Status Bar
     "selectline.alignment": "right",
+    "selectline.displayFormat": "%d lines",
+    "selectline.statusbarPriority": 200,
 
     // Extension: shellcheck
-    "shellcheck.useWorkspaceRootAsCwd": true,
     "shellcheck.customArgs": [
         // Permit following source directives
         "-x"
     ],
+    "shellcheck.useWorkspaceRootAsCwd": true,
 
     // Extension: Visual Studio IntelliCode
+    "vsintellicode.features.python.deepLearning": "enabled",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
 
     // Extension: vscode-icons
-    "vsicons.dontShowNewVersionMessage": true,
     "vsicons.associations.files": [
         {
-            "icon": "xml",
-            "extensions": [".ps1xml"],
+            "icon": "markdownlint",
+            "extensions": [".markdownlintrc"],
+            "filename": true,
             "format": "svg"
         }
     ],
+    "vsicons.dontShowNewVersionMessage": true,
 
     // Extension: XML
-    // Disable the LSP process watching for exit of the parent process
-    // Can be removed once GH #116 is merged and a new release is made
-    "xml.server.vmargs": "-noverify -Xmx64M -XX:+UseG1GC -XX:+UseStringDeduplication -DwatchParentProcess=false",
+    "xml.codeLens.enabled": true,
+    "xml.validation.resolveExternalEntities": true,
 
     // Extension: XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
     "xmlTools.removeCommentsOnMinify": true,
     "xmlTools.splitXmlnsOnFormat": false,
+
+    // Extension: YAML
+    "yaml.format.singleQuote": true,
 
     "[git-commit]": {
         // Enable Rewrap extension to automatically wrap commit messages
@@ -192,14 +205,8 @@
     },
 
     "[markdown]": {
-        // Trailing whitespace has special meaning in Markdown syntax
+        // Trailing whitespace has special meaning
         "files.trimTrailingWhitespace": false
-    },
-
-    "[powershell]": {
-        // CodeLens causes significant slowdown with the PowerShell extension
-        // See GitHub Issues: #647, #861, #1174, #1326, #1464
-        "editor.codeLens": false
     },
 
     "[python]": {
