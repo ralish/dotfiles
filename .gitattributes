@@ -4,12 +4,16 @@
 
 # Script files should always be LF terminated
 *.sh                            text        eol=lf
+*.bash                          text        eol=lf
+*.fish                          text        eol=lf
+*.zsh                           text        eol=lf
 .bashrc                         text        eol=lf
 .mk-sbuild.rc                   text        eol=lf
 .quiltrc                        text        eol=lf
+.startxwinrc                    text        eol=lf
 .zshrc                          text        eol=lf
 user-dirs.dirs                  text        eol=lf
 git/bin/*                       text        eol=lf
-scripts/**                      text        eol=lf
+scripts/bin/*                   text        eol=lf
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
