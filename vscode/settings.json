@@ -151,6 +151,9 @@
     ],
     "shellcheck.useWorkspaceRootAsCwd": true,
 
+    // Extension: shell-format
+    "shellformat.useEditorConfig": true,
+
     // Extension: Visual Studio IntelliCode
     "vsintellicode.features.python.deepLearning": "enabled",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
