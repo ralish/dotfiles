@@ -80,6 +80,10 @@
         "**/pwsh/**": true
     },
 
+    // Extension: Markdown All in One
+    "markdown.extension.toc.levels": "2..2",
+    "markdown.extension.toc.slugifyMode": "github",
+
     // Extension: PowerShell
     "powershell.scriptAnalysis.settingsPath": ".vscode/PSScriptAnalyzerSettings.psd1",
 
