@@ -1,6 +1,8 @@
 dotfiles
 ========
 
+[![license](https://img.shields.io/github/license/ralish/dotfiles)](https://choosealicense.com/licenses/unlicense/)
+
 Here lies my own collection of *dotfiles*. In contrast to many other dotfiles collections mine are setup with slightly different objectives which reflect my occupation as a SysAdmin & DevOps engineer versus a pure developer.
 
 Objectives
