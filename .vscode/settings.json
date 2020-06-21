@@ -80,14 +80,14 @@
         "**/pwsh/**": true
     },
 
-    // Extension: Markdown All in One
+    // Markdown table of contents generation
     "markdown.extension.toc.levels": "2..2",
     "markdown.extension.toc.slugifyMode": "github",
 
-    // Extension: PowerShell
+    // PowerShell script analysis
     "powershell.scriptAnalysis.settingsPath": ".vscode/PSScriptAnalyzerSettings.psd1",
 
-    // Extension: vscode-icons
+    // VS Code explorer icons
     "vsicons.presets.foldersAllDefaultIcon": true,
     "vsicons.associations.files": [
         {
