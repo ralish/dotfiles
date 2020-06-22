@@ -118,33 +118,6 @@ Function Update-AllTheThings {
     return $Results
 }
 
-# Update Ruby packages
-Function Update-RubyGems {
-    [CmdletBinding(SupportsShouldProcess)]
-    Param()
-
-    if (!(Get-Command -Name gem -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to update Ruby gems as gem command not found.'
-        return
-    }
-
-    $UpdateArgs = 'update', '--no-document'
-    if (!$PSCmdlet.ShouldProcess('Ruby gems', 'Update')) {
-        $UpdateArgs += '--explain'
-    }
-
-    Write-Host -ForegroundColor Green -Object 'Enumerating Ruby gems ...'
-    $Packages = [Collections.ArrayList]::new()
-    $PackageRegex = [Regex]::new('\(default: \S+\)')
-    & gem list --local --no-details | ForEach-Object {
-        if (!$PackageRegex.Match($_).Success) {
-            $null = $Packages.Add($_.Split(' ')[0])
-        }
-    }
-
-    & gem @UpdateArgs @Packages
-}
-
 # Update Modern Apps (Microsoft Store)
 Function Update-ModernApps {
     [CmdletBinding()]
@@ -253,6 +226,31 @@ Function Update-Office {
     return $true
 }
 
+# Update PowerShell modules & built-in help
+Function Update-PowerShell {
+    [CmdletBinding()]
+    Param()
+
+    if (Get-Module -Name PowerShellGet -ListAvailable) {
+        Write-Host -ForegroundColor Green -Object 'Updating PowerShell modules ...'
+        Update-Module
+    } else {
+        Write-Warning -Message 'Unable to update PowerShell modules as PowerShellGet module not available.'
+    }
+
+    if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
+        Write-Host -ForegroundColor Green -Object 'Uninstalling obsolete PowerShell modules ...'
+        Uninstall-ObsoleteModule
+    } else {
+        Write-Warning -Message 'Unable to uninstall obsolete PowerShell modules as Uninstall-ObsoleteModule command not available.'
+    }
+
+    Write-Host -ForegroundColor Green -Object 'Updating PowerShell help ...'
+    Update-Help -Force
+
+    return $true
+}
+
 # Update Python packages
 Function Update-PythonPackages {
     [CmdletBinding(SupportsShouldProcess)]
@@ -290,29 +288,31 @@ Function Update-PythonPackages {
     }
 }
 
-# Update PowerShell modules & built-in help
-Function Update-PowerShell {
-    [CmdletBinding()]
+# Update Ruby packages
+Function Update-RubyGems {
+    [CmdletBinding(SupportsShouldProcess)]
     Param()
 
-    if (Get-Module -Name PowerShellGet -ListAvailable) {
-        Write-Host -ForegroundColor Green -Object 'Updating PowerShell modules ...'
-        Update-Module
-    } else {
-        Write-Warning -Message 'Unable to update PowerShell modules as PowerShellGet module not available.'
+    if (!(Get-Command -Name gem -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to update Ruby gems as gem command not found.'
+        return
     }
 
-    if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
-        Write-Host -ForegroundColor Green -Object 'Uninstalling obsolete PowerShell modules ...'
-        Uninstall-ObsoleteModule
-    } else {
-        Write-Warning -Message 'Unable to uninstall obsolete PowerShell modules as Uninstall-ObsoleteModule command not available.'
+    $UpdateArgs = 'update', '--no-document'
+    if (!$PSCmdlet.ShouldProcess('Ruby gems', 'Update')) {
+        $UpdateArgs += '--explain'
     }
 
-    Write-Host -ForegroundColor Green -Object 'Updating PowerShell help ...'
-    Update-Help -Force
+    Write-Host -ForegroundColor Green -Object 'Enumerating Ruby gems ...'
+    $Packages = [Collections.ArrayList]::new()
+    $PackageRegex = [Regex]::new('\(default: \S+\)')
+    & gem list --local --no-details | ForEach-Object {
+        if (!$PackageRegex.Match($_).Success) {
+            $null = $Packages.Add($_.Split(' ')[0])
+        }
+    }
 
-    return $true
+    & gem @UpdateArgs @Packages
 }
 
 # Update Scoop & installed apps
