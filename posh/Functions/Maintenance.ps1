@@ -331,6 +331,9 @@ Function Update-Scoop {
 
     Write-Host -ForegroundColor Green -Object 'Updating Scoop apps ...'
     & scoop update * --quiet
+
+    Write-Host -ForegroundColor Green -Object 'Removing obsolete Scoop apps ...'
+    & scoop cleanup *
 }
 
 # Update Microsoft Visual Studio
