@@ -13,7 +13,7 @@ Function Get-ArgumentCompleter {
     $BindingFlags = [Reflection.BindingFlags]'NonPublic, Static'
     $LocalPipelineType = [PowerShell].Assembly.GetType('System.Management.Automation.Runspaces.LocalPipeline')
     $GetExecutionContextFromTLS = $LocalPipelineType.GetMethod('GetExecutionContextFromTLS', $BindingFlags)
-    $InternalExecutionContext = $GetExecutionContextFromTLS.Invoke($null, $BindingFlags, $null, $null, $PSCulture) #DevSkim: ignore DS440000
+    $InternalExecutionContext = $GetExecutionContextFromTLS.Invoke($null, $BindingFlags, $null, $null, $PSCulture) # DevSkim: ignore DS440000
 
     $BindingFlags = [Reflection.BindingFlags]'Instance, NonPublic'
     if ($Native) {
