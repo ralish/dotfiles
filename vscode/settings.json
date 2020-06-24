@@ -135,9 +135,10 @@
 
     // Extension: Python
     "python.experiments.enabled": false,
-    "python.pythonPath": "~/dotfiles/vscode/venv",
+    "python.languageServer": "Microsoft",
     "python.linting.flake8Enabled": true,
     "python.linting.pylintCategorySeverity.refactor": "Information",
+    "python.pythonPath": "~/dotfiles/vscode/venv",
 
     // Extension: Select Line Status Bar
     "selectline.alignment": "right",
