@@ -12,6 +12,9 @@ try {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading PSReadLine settings ...')
 
+# Disable terminal bell
+Set-PSReadLineOption -BellStyle None
+
 # Don't store duplicate history entries
 Set-PSReadLineOption -HistoryNoDuplicates
 
