@@ -236,18 +236,21 @@ Function Update-Scoop {
     Param()
 
     if (!(Get-Command -Name scoop -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to install Scoop updates as scoop command not found.'
+        Write-Error -Message 'Unable to update Scoop apps as scoop command not found.'
         return
     }
 
     Write-Host -ForegroundColor Green 'Updating Scoop ...'
     & scoop update --quiet
+    Write-Host
 
     Write-Host -ForegroundColor Green 'Updating Scoop apps ...'
     & scoop update * --quiet
+    Write-Host
 
     Write-Host -ForegroundColor Green 'Removing obsolete Scoop apps ...'
     & scoop cleanup *
+    Write-Host
 }
 
 # Update Microsoft Visual Studio
