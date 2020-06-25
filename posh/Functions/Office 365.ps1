@@ -41,11 +41,11 @@ Function Export-MailboxSpreadsheetData {
         }
     }
 
-    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox details ...'
+    Write-Host -ForegroundColor Green 'Retrieving mailbox details ...'
     $ExoMailbox = Get-Mailbox -Identity $Mailbox
     $MailboxAddress = $ExoMailbox.PrimarySmtpAddress
 
-    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
+    Write-Host -ForegroundColor Green 'Retrieving mailbox rules ...'
     $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
     foreach ($Rule in $Rules) {
         $Rule.Description = $Rule.Description -replace '\r?\n\r?\Z$'
@@ -63,7 +63,7 @@ Function Export-MailboxSpreadsheetData {
 
     $Folders = Get-InboxRulesByFolders -Mailbox $Mailbox -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
 
-    Write-Host -ForegroundColor Green -Object 'Exporting mailbox data ...'
+    Write-Host -ForegroundColor Green 'Exporting mailbox data ...'
     $Params = @{
         Encoding          = 'UTF8'
         NoTypeInformation = $true
@@ -95,16 +95,16 @@ Function Get-InboxRulesByFolders {
 
     Test-CommandAvailable -Name 'Get-Mailbox'
 
-    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox folders ...'
+    Write-Host -ForegroundColor Green 'Retrieving mailbox folders ...'
     $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object { $_.DefaultFolderType -ne 'Inbox' }
     $Folders | Add-Member -MemberType NoteProperty -Name Rules -Value @()
     $Folders | Add-Member -MemberType ScriptProperty -Name RuleCount -Value { $this.Rules.Count }
 
-    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox rules ...'
+    Write-Host -ForegroundColor Green 'Retrieving mailbox rules ...'
     $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
     $Rules | Add-Member -MemberType NoteProperty -Name LinkedToFolder -Value $false
 
-    Write-Host -ForegroundColor Green -Object 'Associating rules to folders ...'
+    Write-Host -ForegroundColor Green 'Associating rules to folders ...'
     $Results = [Collections.ArrayList]::new()
     foreach ($Folder in $Folders) {
         $FolderName = ($Folder.FolderPath -join ' - ').Substring(8)
@@ -159,14 +159,14 @@ Function Get-MailboxActivitySummary {
     $TraceParams = $PSBoundParameters
     $null = $TraceParams.Remove('Mailbox')
 
-    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox details ...'
+    Write-Host -ForegroundColor Green 'Retrieving mailbox details ...'
     $ExoMailbox = Get-Mailbox -Identity $Mailbox
     $Addresses = $ExoMailbox.EmailAddresses | Where-Object { $_ -match '^smtp:' } | ForEach-Object { $_.Substring(5) }
 
-    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox send logs ...'
+    Write-Host -ForegroundColor Green 'Retrieving mailbox send logs ...'
     $Sent = Get-MessageTrace @TraceParams -SenderAddress $Addresses
 
-    Write-Host -ForegroundColor Green -Object 'Retrieving mailbox receive logs ...'
+    Write-Host -ForegroundColor Green 'Retrieving mailbox receive logs ...'
     $Received = Get-MessageTrace @TraceParams -RecipientAddress $Addresses
 
     $Summary = [PSCustomObject]@{
@@ -770,12 +770,12 @@ Function Get-UnifiedGroupReport {
     Test-CommandAvailable -Name 'Get-UnifiedGroup'
 
     if (!$Groups) {
-        Write-Host -ForegroundColor Green -Object 'Retrieving Office 365 groups ...'
+        Write-Host -ForegroundColor Green 'Retrieving Office 365 groups ...'
         $Groups = Get-UnifiedGroup
     }
 
     foreach ($Group in $Groups) {
-        Write-Host -ForegroundColor Green -Object ('Now processing: {0}' -f $Group.Identity)
+        Write-Host -ForegroundColor Green ('Now processing: {0}' -f $Group.Identity)
 
         Write-Verbose -Message ('[{0}] Retrieving owners ...' -f $Group.Identity)
         $Owners = Get-UnifiedGroupLinks -Identity $Group.Identity -LinkType Owners
@@ -881,7 +881,7 @@ Function Connect-ExchangeOnline {
         Import-ExoPowershellModule
     }
 
-    Write-Host -ForegroundColor Green -Object 'Connecting to Exchange Online ...'
+    Write-Host -ForegroundColor Green 'Connecting to Exchange Online ...'
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         if ($ExoModuleVersion -eq 2) {
             ExchangeOnlineManagement\Connect-ExchangeOnline -UserPrincipalName $MfaUsername
@@ -912,7 +912,7 @@ Function Connect-Office365CentralizedDeployment {
 
     Test-ModuleAvailable -Name OrganizationAddInService
 
-    Write-Host -ForegroundColor Green -Object 'Connecting to Office 365 Centralized Deployment ...'
+    Write-Host -ForegroundColor Green 'Connecting to Office 365 Centralized Deployment ...'
     Connect-OrganizationAddInService @PSBoundParameters
 }
 
@@ -944,7 +944,7 @@ Function Connect-SecurityAndComplianceCenter {
         Import-ExoPowershellModule
     }
 
-    Write-Host -ForegroundColor Green -Object 'Connecting to Security and Compliance Center ...'
+    Write-Host -ForegroundColor Green 'Connecting to Security and Compliance Center ...'
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         Connect-IPPSSession -UserPrincipalName $MfaUsername
     } else {
@@ -973,7 +973,7 @@ Function Connect-SharePointOnline {
 
     Test-ModuleAvailable -Name Microsoft.Online.SharePoint.PowerShell
 
-    Write-Host -ForegroundColor Green -Object 'Connecting to SharePoint Online ...'
+    Write-Host -ForegroundColor Green 'Connecting to SharePoint Online ...'
     $SPOUrl = 'https://{0}-admin.sharepoint.com' -f $TenantName
     if ($Credential) {
         Connect-SPOService -Url $SPOUrl -Credential $Credential
@@ -1008,7 +1008,7 @@ Function Connect-SkypeForBusinessOnline {
         Remove-Variable -Name Credential
     }
 
-    Write-Host -ForegroundColor Green -Object 'Connecting to Skype for Business Online ...'
+    Write-Host -ForegroundColor Green 'Connecting to Skype for Business Online ...'
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         $CsOnlineSession = New-CsOnlineSession -UserName $MfaUsername
     } else {

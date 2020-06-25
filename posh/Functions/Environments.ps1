@@ -58,7 +58,7 @@ Function Switch-Cygwin {
     $CygwinCfg.Sort()
     $env:CYGWIN = $CygwinCfg -join ' '
     if ($env:CYGWIN) {
-        Write-Host -ForegroundColor Green -Object ('Set CYGWIN to: {0}' -f $env:CYGWIN)
+        Write-Host -ForegroundColor Green ('Set CYGWIN to: {0}' -f $env:CYGWIN)
     }
 
     if ($Persist) {
@@ -193,12 +193,12 @@ Function Switch-Google {
 
     $env:DEPOT_TOOLS_WIN_TOOLCHAIN = $DepotToolsWinToolchain
     if ($env:DEPOT_TOOLS_WIN_TOOLCHAIN) {
-        Write-Host -ForegroundColor Green -Object ('Set DEPOT_TOOLS_WIN_TOOLCHAIN to: {0}' -f $env:DEPOT_TOOLS_WIN_TOOLCHAIN)
+        Write-Host -ForegroundColor Green ('Set DEPOT_TOOLS_WIN_TOOLCHAIN to: {0}' -f $env:DEPOT_TOOLS_WIN_TOOLCHAIN)
     }
 
     $env:GYP_MSVS_VERSION = $VsVersion
     if ($env:GYP_MSVS_VERSION) {
-        Write-Host -ForegroundColor Green -Object ('Set GYP_MSVS_VERSION to: {0}' -f $env:GYP_MSVS_VERSION)
+        Write-Host -ForegroundColor Green ('Set GYP_MSVS_VERSION to: {0}' -f $env:GYP_MSVS_VERSION)
     }
 
     if ($Persist) {
@@ -257,7 +257,7 @@ Function Switch-Java {
 
     $env:JAVA_HOME = $JavaHome
     if ($env:JAVA_HOME) {
-        Write-Host -ForegroundColor Green -Object ('Set JAVA_HOME to: {0}' -f $env:JAVA_HOME)
+        Write-Host -ForegroundColor Green ('Set JAVA_HOME to: {0}' -f $env:JAVA_HOME)
     }
 
     if ($Persist) {
@@ -621,7 +621,7 @@ Function Switch-Ruby {
 
     $env:RUBYOPT = $Options
     if ($env:RUBYOPT) {
-        Write-Host -ForegroundColor Green -Object ('Set RUBYOPT to: {0}' -f $env:RUBYOPT)
+        Write-Host -ForegroundColor Green ('Set RUBYOPT to: {0}' -f $env:RUBYOPT)
     }
 
     if ($Persist) {

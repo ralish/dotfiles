@@ -222,7 +222,7 @@ Function Connect-AzureAD {
         Test-ModuleAvailable -Name $ModuleName
     }
 
-    Write-Host -ForegroundColor Green -Object 'Connecting to Azure AD (v2) ...'
+    Write-Host -ForegroundColor Green 'Connecting to Azure AD (v2) ...'
     & $ModuleName\Connect-AzureAD @PSBoundParameters
 }
 
@@ -239,7 +239,7 @@ Function Connect-AzureRM {
 
     Test-ModuleAvailable -Name AzureRM
 
-    Write-Host -ForegroundColor Green -Object 'Connecting to Azure RM ...'
+    Write-Host -ForegroundColor Green 'Connecting to Azure RM ...'
     Login-AzureRmAccount @PSBoundParameters
 }
 
@@ -256,7 +256,7 @@ Function Connect-MSOnline {
 
     Test-ModuleAvailable -Name MSOnline
 
-    Write-Host -ForegroundColor Green -Object 'Connecting to Azure AD (v1) ...'
+    Write-Host -ForegroundColor Green 'Connecting to Azure AD (v1) ...'
     Connect-MsolService @PSBoundParameters
 }
 

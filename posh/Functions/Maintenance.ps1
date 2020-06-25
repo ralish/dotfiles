@@ -156,7 +156,7 @@ Function Update-Office {
         return
     }
 
-    Write-Host -ForegroundColor Green -Object 'Installing Office updates ...'
+    Write-Host -ForegroundColor Green 'Installing Office updates ...'
     & $OfficeC2RClient /update user updatepromptuser=True
     Start-Sleep -Seconds 3
 
@@ -210,20 +210,20 @@ Function Update-PowerShell {
     Param()
 
     if (Get-Module -Name PowerShellGet -ListAvailable) {
-        Write-Host -ForegroundColor Green -Object 'Updating PowerShell modules ...'
+        Write-Host -ForegroundColor Green 'Updating PowerShell modules ...'
         Update-Module
     } else {
         Write-Warning -Message 'Unable to update PowerShell modules as PowerShellGet module not available.'
     }
 
     if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
-        Write-Host -ForegroundColor Green -Object 'Uninstalling obsolete PowerShell modules ...'
+        Write-Host -ForegroundColor Green 'Uninstalling obsolete PowerShell modules ...'
         Uninstall-ObsoleteModule
     } else {
         Write-Warning -Message 'Unable to uninstall obsolete PowerShell modules as Uninstall-ObsoleteModule command not available.'
     }
 
-    Write-Host -ForegroundColor Green -Object 'Updating PowerShell help ...'
+    Write-Host -ForegroundColor Green 'Updating PowerShell help ...'
     Update-Help -Force
 
     return $true
@@ -240,13 +240,13 @@ Function Update-Scoop {
         return
     }
 
-    Write-Host -ForegroundColor Green -Object 'Updating Scoop ...'
+    Write-Host -ForegroundColor Green 'Updating Scoop ...'
     & scoop update --quiet
 
-    Write-Host -ForegroundColor Green -Object 'Updating Scoop apps ...'
+    Write-Host -ForegroundColor Green 'Updating Scoop apps ...'
     & scoop update * --quiet
 
-    Write-Host -ForegroundColor Green -Object 'Removing obsolete Scoop apps ...'
+    Write-Host -ForegroundColor Green 'Removing obsolete Scoop apps ...'
     & scoop cleanup *
 }
 
@@ -268,10 +268,10 @@ Function Update-VisualStudio {
         return
     }
 
-    Write-Host -ForegroundColor Green -Object 'Updating Visual Studio Installer ...'
+    Write-Host -ForegroundColor Green 'Updating Visual Studio Installer ...'
     & $VsInstaller --update --passive --norestart --wait
 
-    Write-Host -ForegroundColor Green -Object 'Updating Visual Studio ...'
+    Write-Host -ForegroundColor Green 'Updating Visual Studio ...'
     & $VsInstaller update --passive --norestart --wait
 
     return $true
@@ -291,7 +291,7 @@ Function Update-Windows {
         return
     }
 
-    Write-Host -ForegroundColor Green -Object 'Installing Windows updates ...'
+    Write-Host -ForegroundColor Green 'Installing Windows updates ...'
     $Results = Install-WindowsUpdate -IgnoreReboot -NotTitle Silverlight
     if ($Results) {
         return $Results

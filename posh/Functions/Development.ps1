@@ -96,7 +96,7 @@ Function Invoke-GitChildDir {
             continue
         }
 
-        Write-Host -ForegroundColor Green -Object ('Running in: {0}' -f $Dir.Name)
+        Write-Host -ForegroundColor Green ('Running in: {0}' -f $Dir.Name)
         Set-Location -Path $Dir
         & git @GitArgs
         Set-Location -Path $BaseLocation
@@ -137,7 +137,7 @@ Function Invoke-GitMergeAllBranches {
             continue
         }
 
-        Write-Host -ForegroundColor Green -Object ('Updating branch: {0}' -f $Branch)
+        Write-Host -ForegroundColor Green ('Updating branch: {0}' -f $Branch)
         & git checkout $Branch
         & git merge --ff-only $SourceBranch
         Write-Host
