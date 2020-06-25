@@ -1,5 +1,7 @@
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing environment functions ...')
 
+#region Cygwin
+
 # Configure environment for Cygwin usage
 #
 # Environment variables
@@ -79,6 +81,10 @@ Function Switch-Cygwin {
     }
 }
 
+#endregion
+
+#region Go
+
 # Configure environment for Go development
 #
 # Environment variables
@@ -147,6 +153,10 @@ Function Switch-Go {
     }
 }
 
+#endregion
+
+#region Google
+
 # Configure environment for Google (depot_tools) usage
 Function Switch-Google {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
@@ -211,6 +221,10 @@ Function Switch-Google {
     }
 }
 
+#endregion
+
+#region Java
+
 # Configure environment for Java development
 Function Switch-Java {
     [CmdletBinding()]
@@ -265,6 +279,10 @@ Function Switch-Java {
     }
 }
 
+#endregion
+
+#region Node.js
+
 # Configure environment for Node.js development
 #
 # Environment variables
@@ -312,6 +330,32 @@ Function Switch-Nodejs {
             Set-EnvironmentVariable @EnvParams
     }
 }
+
+# Update Node.js packages
+Function Update-NodejsPackages {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    if (!(Get-Command -Name npm -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to update Node.js packages as npm command not found.'
+        return
+    }
+
+    $UpdateArgs = 'update', '--global'
+    if ($PSCmdlet.ShouldProcess('Node.js packages', 'Update')) {
+        $UpdateArgs += '--dry-run'
+    }
+
+    Write-Host -ForegroundColor Green -Object 'Updating Node.js npm ...'
+    & npm @UpdateArgs npm
+
+    Write-Host -ForegroundColor Green -Object 'Updating Node.js packages ...'
+    & npm @UpdateArgs
+}
+
+#endregion
+
+#region Perl
 
 # Configure environment for Perl development
 #
@@ -365,6 +409,10 @@ Function Switch-Perl {
     }
 }
 
+#endregion
+
+#region PHP
+
 # Configure environment for PHP development
 Function Switch-PHP {
     [CmdletBinding()]
@@ -405,6 +453,10 @@ Function Switch-PHP {
             Set-EnvironmentVariable @EnvParams
     }
 }
+
+#endregion
+
+#region Python
 
 # Configure environment for Python development
 #
@@ -481,6 +533,47 @@ Function Switch-Python {
     }
 }
 
+# Update Python packages
+Function Update-PythonPackages {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    if (!(Get-Command -Name pipdeptree -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to update Python packages as pipdeptree command not found.'
+        return
+    }
+
+    if ($PSCmdlet.ShouldProcess('Python packages', 'Update')) {
+        $UpdateArgs = 'install', '--no-python-version-warning', '--upgrade'
+    }
+
+    if ($UpdateArgs) {
+        Write-Host -ForegroundColor Green -Object 'Updating Python pip ...'
+        & python -m pip @UpdateArgs pip
+    }
+
+    Write-Host -ForegroundColor Green -Object 'Enumerating Python packages ...'
+    $Packages = [Collections.ArrayList]::new()
+    $PackageRegex = [Regex]::new('^\S+==')
+    & pipdeptree | ForEach-Object {
+        if ($PackageRegex.Match($_).Success) {
+            $null = $Packages.Add($_.Split('=')[0])
+        }
+    }
+
+    if ($UpdateArgs) {
+        Write-Host -ForegroundColor Green -Object 'Updating Python packages ...'
+        & pip @UpdateArgs --upgrade-strategy eager @Packages
+    } else {
+        'Packages to update:'
+        $Packages -join [Environment]::NewLine
+    }
+}
+
+#endregion
+
+#region Ruby
+
 # Configure environment for Ruby development
 Function Switch-Ruby {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
@@ -538,3 +631,32 @@ Function Switch-Ruby {
         }
     }
 }
+
+# Update Ruby packages
+Function Update-RubyGems {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    if (!(Get-Command -Name gem -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to update Ruby gems as gem command not found.'
+        return
+    }
+
+    $UpdateArgs = 'update', '--no-document'
+    if (!$PSCmdlet.ShouldProcess('Ruby gems', 'Update')) {
+        $UpdateArgs += '--explain'
+    }
+
+    Write-Host -ForegroundColor Green -Object 'Enumerating Ruby gems ...'
+    $Packages = [Collections.ArrayList]::new()
+    $PackageRegex = [Regex]::new('\(default: \S+\)')
+    & gem list --local --no-details | ForEach-Object {
+        if (!$PackageRegex.Match($_).Success) {
+            $null = $Packages.Add($_.Split(' ')[0])
+        }
+    }
+
+    & gem @UpdateArgs @Packages
+}
+
+#endregion
