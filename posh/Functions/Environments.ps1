@@ -403,25 +403,37 @@ Function Switch-PHP {
 Function Switch-Python {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
-        [ValidatePattern('[0-9]+\.[0-9]+')]
-        [String]$Version,
-
         [ValidateNotNullOrEmpty()]
         [String]$Path = "$env:HOMEDRIVE\Python",
+
+        [ValidatePattern('[0-9]+\.[0-9]+')]
+        [String]$Version,
 
         [Switch]$Persist,
         [Switch]$Disable
     )
 
-    $StrippedVersion = $Version -replace '\.'
-    $VersionedPath = '{0}{1}' -f $Path, $StrippedVersion
-
-    if (Test-Path -Path $VersionedPath -PathType Container) {
-        $Path = $VersionedPath
-    } elseif (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
         throw 'Provided Python path is not a directory: {0}' -f $Path
     }
+
+    if (!$Version) {
+        $PythonExe = Join-Path -Path $Path -ChildPath 'python.exe'
+
+        try {
+            $PythonVersion = & $PythonExe -V 2>&1
+        } catch {
+            throw ('Python binary missing or could not be executed: {0}' -f $PythonExe)
+        }
+
+        if ($PythonVersion -match '[0-9]+\.[0-9]+') {
+            $PythonVersion = $Matches[0]
+        } else {
+            throw ('Unable to determine Python version from output: {0}' -f $PythonVersion)
+        }
+    }
+
+    $StrippedVersion = $Version -replace '\.'
 
     $PathParams = @{ }
     if (!$Disable) {
