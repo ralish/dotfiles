@@ -255,24 +255,50 @@ Function Update-VisualStudio {
     [CmdletBinding()]
     Param()
 
-    # Use command-line parameters to install Visual Studio 2017
-    # https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio?view=vs-2017
+    # Use command-line parameters to install Visual Studio
+    # https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
 
     if (!(Test-IsAdministrator)) {
         throw 'You must have administrator privileges to perform Visual Studio updates.'
     }
 
-    $VsInstaller = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
-    if (!(Test-Path -Path $VsInstaller -PathType Leaf)) {
-        Write-Error -Message 'Unable to install Visual Studio updates as VS Installer not found.'
+    $VsInstallerExe = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
+    if (!(Test-Path -Path $VsInstallerExe -PathType Leaf)) {
+        Write-Error -Message 'Unable to update Visual Studio as VSInstaller not found.'
         return
     }
 
-    Write-Host -ForegroundColor Green 'Updating Visual Studio Installer ...'
-    & $VsInstaller --update --passive --norestart --wait
+    if (!(Get-Module -Name VSSetup -ListAvailable)) {
+        Write-Error -Message 'Unable to update Visual Studio as VSSetup module not available.'
+        return
+    }
+
+    $Instances = @(Get-VSSetupInstance)
+    if ($Instances.Count -ne 1) {
+        if ($Instances.Count -eq 0) {
+            Write-Error -Message 'Get-VSSetupInstance returned no instances.'
+        } else {
+            Write-Error -Message 'Get-VSSetupInstance returned multiple instances.'
+        }
+        return $false
+    }
+
+    $VsInstallerArgs = @(
+        'update'
+        '--installPath'
+        ('"{0}"' -f $Instances.InstallationPath)
+        '--passive'
+        '--norestart'
+    )
 
     Write-Host -ForegroundColor Green 'Updating Visual Studio ...'
-    & $VsInstaller update --passive --norestart --wait
+    $VsInstaller = Start-Process -FilePath $VsInstallerExe -ArgumentList $VsInstallerArgs -PassThru
+    $VsInstaller.WaitForExit()
+
+    if ($VsInstaller.ExitCode -ne 0) {
+        Write-Error -Message ('Visual Studio Installer returned exit code: {0}' -f $VsInstaller.ExitCode)
+        return $false
+    }
 
     return $true
 }
