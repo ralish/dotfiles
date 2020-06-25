@@ -341,16 +341,19 @@ Function Update-NodejsPackages {
         return
     }
 
-    $UpdateArgs = 'update', '--global'
-    if ($PSCmdlet.ShouldProcess('Node.js packages', 'Update')) {
-        $UpdateArgs += '--dry-run'
+    [String[]]$UpdateArgs = 'update', '--global'
+
+    Write-Host -ForegroundColor Green -NoNewline 'Updating npm: '
+    Write-Host ('npm {0} npm' -f ($UpdateArgs -join ' '))
+    if ($PSCmdlet.ShouldProcess('npm', 'Update')) {
+        & npm @UpdateArgs npm
     }
 
-    Write-Host -ForegroundColor Green -Object 'Updating Node.js npm ...'
-    & npm @UpdateArgs npm
-
-    Write-Host -ForegroundColor Green -Object 'Updating Node.js packages ...'
-    & npm @UpdateArgs
+    Write-Host -ForegroundColor Green -NoNewline 'Updating Node.js packages: '
+    Write-Host ('npm {0}' -f ($UpdateArgs -join ' '))
+    if ($PSCmdlet.ShouldProcess('Node.js packages', 'Update')) {
+        & npm @UpdateArgs
+    }
 }
 
 #endregion
@@ -543,30 +546,38 @@ Function Update-PythonPackages {
         return
     }
 
-    if ($PSCmdlet.ShouldProcess('Python packages', 'Update')) {
-        $UpdateArgs = 'install', '--no-python-version-warning', '--upgrade'
+    [String[]]$PipUpdateArgs = '-m', 'pip', 'install', '--no-python-version-warning', '--upgrade'
+    [String[]]$UpdateArgs = 'install', '--no-python-version-warning', '--upgrade', '--upgrade-strategy', 'eager'
+
+    Write-Host -ForegroundColor Green -NoNewline 'Updating pip: '
+    Write-Host ('python {0} pip' -f ($PipUpdateArgs -join ' '))
+    if ($PSCmdlet.ShouldProcess('pip', 'Update')) {
+        & python @PipUpdateArgs pip
     }
 
-    if ($UpdateArgs) {
-        Write-Host -ForegroundColor Green -Object 'Updating Python pip ...'
-        & python -m pip @UpdateArgs pip
-    }
-
-    Write-Host -ForegroundColor Green -Object 'Enumerating Python packages ...'
+    Write-Host -ForegroundColor Green -NoNewline 'Enumerating Python packages: '
+    Write-Host 'pipdeptree'
     $Packages = [Collections.ArrayList]::new()
-    $PackageRegex = [Regex]::new('^\S+==')
+    $PackageRegex = [Regex]::new('^(\S+)==')
     & pipdeptree | ForEach-Object {
-        if ($PackageRegex.Match($_).Success) {
-            $null = $Packages.Add($_.Split('=')[0])
+        $Package = $PackageRegex.Match($_)
+        if ($Package.Success) {
+            $null = $Packages.Add($Package.Groups[1].Value)
         }
     }
 
-    if ($UpdateArgs) {
-        Write-Host -ForegroundColor Green -Object 'Updating Python packages ...'
-        & pip @UpdateArgs --upgrade-strategy eager @Packages
-    } else {
-        'Packages to update:'
-        $Packages -join [Environment]::NewLine
+    Write-Host -ForegroundColor Green -NoNewline 'Updating Python packages: '
+    Write-Host ('pip {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
+    if ($PSCmdlet.ShouldProcess('Python packages', 'Update')) {
+        & pip @UpdateArgs @Packages
+    }
+
+    if (Get-Command -Name pipx -ErrorAction Ignore) {
+        Write-Host -ForegroundColor Green -NoNewline 'Updating pipx packages: '
+        Write-Host 'pipx upgrade-all'
+        if ($PSCmdlet.ShouldProcess('pipx packages', 'Update')) {
+            & pipx upgrade-all
+        }
     }
 }
 
@@ -642,20 +653,24 @@ Function Update-RubyGems {
         return
     }
 
-    $UpdateArgs = 'update', '--no-document'
+    [String[]]$ListArgs = 'list', '--local', '--no-details'
+    [String[]]$UpdateArgs = 'update', '--no-document'
     if (!$PSCmdlet.ShouldProcess('Ruby gems', 'Update')) {
         $UpdateArgs += '--explain'
     }
 
-    Write-Host -ForegroundColor Green -Object 'Enumerating Ruby gems ...'
+    Write-Host -ForegroundColor Green -NoNewline 'Enumerating Ruby gems: '
+    Write-Host ('gem {0}' -f ($ListArgs -join ' '))
     $Packages = [Collections.ArrayList]::new()
     $PackageRegex = [Regex]::new('\(default: \S+\)')
-    & gem list --local --no-details | ForEach-Object {
+    & gem @ListArgs | ForEach-Object {
         if (!$PackageRegex.Match($_).Success) {
             $null = $Packages.Add($_.Split(' ')[0])
         }
     }
 
+    Write-Host -ForegroundColor Green -NoNewline 'Updating Ruby gems: '
+    Write-Host ('gem {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
     & gem @UpdateArgs @Packages
 }
 
