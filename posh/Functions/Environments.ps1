@@ -56,7 +56,7 @@ Function Switch-Cygwin {
     $CygwinCfg.Sort()
     $env:CYGWIN = $CygwinCfg -join ' '
     if ($env:CYGWIN) {
-        Write-Host -ForegroundColor Green -Object ('Set CYGWIN environment variable to: {0}' -f $env:CYGWIN)
+        Write-Host -ForegroundColor Green -Object ('Set CYGWIN to: {0}' -f $env:CYGWIN)
     }
 
     if ($Persist) {
@@ -182,7 +182,14 @@ Function Switch-Google {
         & $Operation @PathParams -Element $Path
 
     $env:DEPOT_TOOLS_WIN_TOOLCHAIN = $DepotToolsWinToolchain
+    if ($env:DEPOT_TOOLS_WIN_TOOLCHAIN) {
+        Write-Host -ForegroundColor Green -Object ('Set DEPOT_TOOLS_WIN_TOOLCHAIN to: {0}' -f $env:DEPOT_TOOLS_WIN_TOOLCHAIN)
+    }
+
     $env:GYP_MSVS_VERSION = $VsVersion
+    if ($env:GYP_MSVS_VERSION) {
+        Write-Host -ForegroundColor Green -Object ('Set GYP_MSVS_VERSION to: {0}' -f $env:GYP_MSVS_VERSION)
+    }
 
     if ($Persist) {
         $EnvParams = @{
@@ -235,6 +242,9 @@ Function Switch-Java {
         & $Operation @PathParams -Element $BinPath
 
     $env:JAVA_HOME = $JavaHome
+    if ($env:JAVA_HOME) {
+        Write-Host -ForegroundColor Green -Object ('Set JAVA_HOME to: {0}' -f $env:JAVA_HOME)
+    }
 
     if ($Persist) {
         $EnvParams = @{
@@ -506,6 +516,9 @@ Function Switch-Ruby {
         & $Operation @PathParams -Element $BinPath
 
     $env:RUBYOPT = $Options
+    if ($env:RUBYOPT) {
+        Write-Host -ForegroundColor Green -Object ('Set RUBYOPT to: {0}' -f $env:RUBYOPT)
+    }
 
     if ($Persist) {
         $EnvParams = @{
