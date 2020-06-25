@@ -10,7 +10,7 @@ Function Switch-Cygwin {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path = "$env:HOMEDRIVE\Cygwin",
+        [String]$Path = "$env:HOMEDRIVE\DevEnvs\Cygwin",
 
         [ValidateSet('Default', 'Lnk', 'Native', 'NativeStrict')]
         [String]$Symlinks = 'NativeStrict',
@@ -93,7 +93,7 @@ Function Switch-Go {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path = "$env:HOMEDRIVE\Go",
+        [String]$Path = "$env:HOMEDRIVE\DevEnvs\Go",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -230,7 +230,7 @@ Function Switch-Java {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path = "$env:HOMEDRIVE\Java",
+        [String]$Path = "$env:HOMEDRIVE\DevEnvs\Java",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -291,7 +291,7 @@ Function Switch-Nodejs {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path = "$env:HOMEDRIVE\Nodejs",
+        [String]$Path = "$env:HOMEDRIVE\DevEnvs\Nodejs",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -365,7 +365,7 @@ Function Switch-Perl {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path = "$env:HOMEDRIVE\Perl",
+        [String]$Path = "$env:HOMEDRIVE\DevEnvs\Perl",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -418,7 +418,7 @@ Function Switch-PHP {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path = "$env:HOMEDRIVE\PHP",
+        [String]$Path = "$env:HOMEDRIVE\DevEnvs\PHP",
 
         [Switch]$Persist,
         [Switch]$Disable
@@ -466,7 +466,7 @@ Function Switch-Python {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path = "$env:HOMEDRIVE\Python",
+        [String]$Path = "$env:HOMEDRIVE\DevEnvs\Python",
 
         [ValidatePattern('[0-9]+\.[0-9]+')]
         [String]$Version,
@@ -579,7 +579,7 @@ Function Switch-Ruby {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path = "$env:HOMEDRIVE\Ruby",
+        [String]$Path = "$env:HOMEDRIVE\DevEnvs\Ruby",
 
         [Parameter(ParameterSetName = 'Enable')]
         [String]$Options = '-Eutf-8',
