@@ -46,14 +46,13 @@ Function ConvertTo-Base64 {
 
 # Convert a text file to the given encoding
 Function ConvertTo-TextEncoding {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
     [CmdletBinding()]
     Param(
         [Parameter(ValueFromPipeline)]
         [String[]]$Path,
 
         [ValidateSet('ASCII', 'UTF-7', 'UTF-8', 'UTF-16', 'UTF-16BE', 'UTF-32', 'UTF-32BE')]
-        [String]$Encoding='UTF-8',
+        [String]$Encoding = 'UTF-8',
         [Switch]$ByteOrderMark,
 
         [ValidateSet('ASCII', 'UTF-7', 'UTF-8', 'UTF-16', 'UTF-16BE', 'UTF-32', 'UTF-32BE')]

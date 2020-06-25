@@ -15,7 +15,7 @@ Function Get-EnvironmentVariable {
         [String]$Name,
 
         [ValidateSet('Machine', 'User')]
-        [String]$Scope='User'
+        [String]$Scope = 'User'
     )
 
     [Environment]::GetEnvironmentVariable($Name, [EnvironmentVariableTarget]::$Scope)
@@ -23,7 +23,6 @@ Function Get-EnvironmentVariable {
 
 # Set a persisted environment variable
 Function Set-EnvironmentVariable {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
@@ -34,10 +33,10 @@ Function Set-EnvironmentVariable {
         [String]$Value,
 
         [ValidateSet('Machine', 'User')]
-        [String]$Scope='User',
+        [String]$Scope = 'User',
 
         [ValidateSet('Overwrite', 'Append', 'Prepend')]
-        [String]$Action='Overwrite'
+        [String]$Action = 'Overwrite'
     )
 
     Process {
@@ -47,8 +46,8 @@ Function Set-EnvironmentVariable {
 
         switch ($Action) {
             'Overwrite' { $NewValue = $Value }
-            'Append'    { $NewValue = '{0}{1}' -f $CurrentValue, $Value }
-            'Prepend'   { $NewValue = '{0}{1}' -f $Value, $CurrentValue }
+            'Append' { $NewValue = '{0}{1}' -f $CurrentValue, $Value }
+            'Prepend' { $NewValue = '{0}{1}' -f $Value, $CurrentValue }
         }
 
         [Environment]::SetEnvironmentVariable($Name, $NewValue, [EnvironmentVariableTarget]::$Scope)
@@ -91,7 +90,7 @@ Function Get-MultipleHardLinks {
         [IO.DirectoryInfo]$Path,
 
         [ValidateScript( { $_ -gt 1 } )]
-        [Int]$MinimumHardLinks=2,
+        [Int]$MinimumHardLinks = 2,
 
         [Switch]$Recurse
     )
@@ -174,13 +173,13 @@ Function Edit-Hosts {
 Function Convert-SecurityDescriptor {
     [CmdletBinding()]
     Param(
-        [Parameter(ParameterSetName='Binary', Mandatory)]
+        [Parameter(ParameterSetName = 'Binary', Mandatory)]
         [Byte[]]$BinarySD,
 
-        [Parameter(ParameterSetName='SDDL', Mandatory, ValueFromPipeline)]
+        [Parameter(ParameterSetName = 'SDDL', Mandatory, ValueFromPipeline)]
         [String]$SddlSD,
 
-        [Parameter(ParameterSetName='WMI', Mandatory, ValueFromPipeline)]
+        [Parameter(ParameterSetName = 'WMI', Mandatory, ValueFromPipeline)]
         [Management.ManagementBaseObject]$WmiSD,
 
         [Parameter(Mandatory)]
@@ -228,67 +227,67 @@ Function Get-WellKnownSID {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
     [CmdletBinding()]
     Param(
-        [Parameter(ParameterSetName='NTAuthority', Mandatory)]
+        [Parameter(ParameterSetName = 'NTAuthority', Mandatory)]
         [ValidateSet('Anonymous', 'Authenticated Users', 'Batch', 'Claims Valid', 'Cloud Account Authentication', 'Compound Identity Present', 'Dialup', 'Digest Authentication', 'Enterprise Domain Controllers', 'IIS User', 'Interactive', 'Local Service', 'Local System', 'Microsoft Account Authentication', 'Network Service', 'Network', 'NTLM Authentication', 'Other Organization', 'Principal Self', 'Proxy', 'Remote Interactive Logon', 'Restricted', 'SChannel Authentication', 'Service', 'Terminal Server Users', 'This Organization Certificate', 'This Organization', 'User-mode Drivers', 'Write Restricted')]
         [String[]]$NTAuthority,
 
-        [Parameter(ParameterSetName='Builtin', Mandatory)]
+        [Parameter(ParameterSetName = 'Builtin', Mandatory)]
         [ValidateSet('Access Control Assistance Operators', 'Account Operators', 'Administrators', 'Backup Operators', 'Builtin', 'Certificate Service DCOM Access', 'Cryptographic Operators', 'Device Owners', 'Distributed COM Users', 'Event Log Readers', 'Guests', 'Hyper-V Administrators', 'IIS Users', 'Incoming Forest Trust Builders', 'Local account and member of Administrators group', 'Local account', 'Network Configuration Operators', 'Performance Log Users', 'Performance Monitor Users', 'Power Users', 'Pre-Windows 2000 Compatible Access', 'Print Operators', 'RDS Endpoint Servers', 'RDS Management Servers', 'RDS Remote Access Servers', 'Remote Desktop Users', 'Remote Management Users', 'Replicators', 'Server Operators', 'Storage Replica Administrators', 'System Managed Group', 'Terminal Server License Servers', 'Users', 'Windows Authorization Access Group')]
         [String[]]$Builtin,
 
-        [Parameter(ParameterSetName='Domain', Mandatory)]
+        [Parameter(ParameterSetName = 'Domain', Mandatory)]
         [ValidateSet('Administrator', 'Allowed RODC Password Replication Group', 'Cert Publishers', 'Cloneable Domain Controllers', 'DefaultAccount', 'Denied RODC Password Replication Group', 'Domain Admins', 'Domain Computers', 'Domain Controllers', 'Domain Guests', 'Domain Users', 'Enterprise Admins', 'Enterprise Key Admins', 'Enterprise Read-only Domain Controllers', 'Group Policy Creator Owners', 'Guest', 'Key Admins', 'krbtgt', 'Protected Users', 'RAS and IAS Servers', 'Read-only Domain Controllers', 'Schema Admins', 'WDAGUtilityAccount')]
         [String[]]$Domain,
 
-        [Parameter(ParameterSetName='Domain')]
+        [Parameter(ParameterSetName = 'Domain')]
         [ValidateNotNullOrEmpty()]
         [String]$DomainName,
 
-        [Parameter(ParameterSetName='NullAuthority', Mandatory)]
+        [Parameter(ParameterSetName = 'NullAuthority', Mandatory)]
         [ValidateSet('Nobody')]
         [String[]]$NullAuthority,
 
-        [Parameter(ParameterSetName='WorldAuthority', Mandatory)]
+        [Parameter(ParameterSetName = 'WorldAuthority', Mandatory)]
         [ValidateSet('Everyone')]
         [String[]]$WorldAuthority,
 
-        [Parameter(ParameterSetName='LocalAuthority', Mandatory)]
+        [Parameter(ParameterSetName = 'LocalAuthority', Mandatory)]
         [ValidateSet('Console Logon', 'Local')]
         [String[]]$LocalAuthority,
 
-        [Parameter(ParameterSetName='CreatorAuthority', Mandatory)]
+        [Parameter(ParameterSetName = 'CreatorAuthority', Mandatory)]
         [ValidateSet('Creator Group Server', 'Creator Group', 'Creator Owner Server', 'Creator Owner', 'Owner Rights')]
         [String[]]$CreatorAuthority,
 
-        [Parameter(ParameterSetName='NTService', Mandatory)]
+        [Parameter(ParameterSetName = 'NTService', Mandatory)]
         [ValidateSet('All Services', 'NT Service')]
         [String[]]$NTService,
 
-        [Parameter(ParameterSetName='NTVirtualMachine', Mandatory)]
+        [Parameter(ParameterSetName = 'NTVirtualMachine', Mandatory)]
         [ValidateSet('NT Virtual Machine', 'Virtual Machines')]
         [String[]]$NTVirtualMachine,
 
-        [Parameter(ParameterSetName='NTTask', Mandatory)]
+        [Parameter(ParameterSetName = 'NTTask', Mandatory)]
         [ValidateSet('NT Task')]
         [String[]]$NTTask,
 
-        [Parameter(ParameterSetName='WindowManager', Mandatory)]
+        [Parameter(ParameterSetName = 'WindowManager', Mandatory)]
         [ValidateSet('Window Manager', 'Window Manager Group')]
         [String[]]$WindowManager,
 
-        [Parameter(ParameterSetName='FontDriverHost', Mandatory)]
+        [Parameter(ParameterSetName = 'FontDriverHost', Mandatory)]
         [ValidateSet('Font Driver Host')]
         [String[]]$FontDriverHost,
 
-        [Parameter(ParameterSetName='ApplicationPackageAuthority', Mandatory)]
+        [Parameter(ParameterSetName = 'ApplicationPackageAuthority', Mandatory)]
         [ValidateSet('All Application Packages')]
         [String[]]$ApplicationPackageAuthority,
 
-        [Parameter(ParameterSetName='MandatoryLabel', Mandatory)]
+        [Parameter(ParameterSetName = 'MandatoryLabel', Mandatory)]
         [ValidateSet('High Mandatory Level', 'Low Mandatory Level', 'Medium Mandatory Level', 'Medium Plus Mandatory Level', 'Protected Process Mandatory Level', 'Secure Process Mandatory Level', 'System Mandatory Level', 'Untrusted Mandatory Level')]
         [String[]]$MandatoryLabel,
 
-        [Parameter(ParameterSetName='IdentityAuthority', Mandatory)]
+        [Parameter(ParameterSetName = 'IdentityAuthority', Mandatory)]
         [ValidateSet('Authentication authority asserted identity', 'Fresh public key identity', 'Key property attestation', 'Key property multi-factor authentication', 'Key trust identity', 'Service asserted identity')]
         [String[]]$IdentityAuthority
     )

@@ -32,7 +32,6 @@ Function Get-AzureAuthHeader {
 # - https://blogs.technet.microsoft.com/cloudlojik/2017/09/05/using-powershell-to-connect-to-microsoft-graph-api/
 # - https://blogs.technet.microsoft.com/cloudlojik/2018/06/29/connecting-to-microsoft-graph-with-a-native-app-using-powershell/
 Function Get-AzureAuthToken {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
@@ -43,13 +42,13 @@ Function Get-AzureAuthToken {
         [String]$TenantName,
 
         # Default is the well-known identifier for PowerShell clients
-        [Guid]$ClientId='1950a258-227b-4e31-a9cf-717495945fc2',
+        [Guid]$ClientId = '1950a258-227b-4e31-a9cf-717495945fc2',
 
         [ValidateNotNullOrEmpty()]
-        [String]$RedirectUri='urn:ietf:wg:oauth:2.0:oob',
+        [String]$RedirectUri = 'urn:ietf:wg:oauth:2.0:oob',
 
         [ValidateSet('Auto', 'Always', 'Never', 'RefreshSession', 'SelectAccount')]
-        [String]$PromptBehaviour='Auto'
+        [String]$PromptBehaviour = 'Auto'
     )
 
     try {
@@ -80,12 +79,12 @@ Function Get-AzureAuthToken {
     }
 
     switch ($Api) {
-        'AzureAdGraph'      { $ApiEndpointUri = 'https://graph.windows.net/' }              # Deprecated
-        'AzureClassic'      { $ApiEndpointUri = 'https://management.core.windows.net/' }    # Deprecated
-        'AzureGallery'      { $ApiEndpointUri = 'https://gallery.azure.com/' }
-        'AzurePortal'       { $ApiEndpointUri = '74658136-14ec-4630-ad9b-26e160ff0fc6' }    # Undocumented
-        'AzureRm'           { $ApiEndpointUri = 'https://management.azure.com/' }
-        'MsGraph'           { $ApiEndpointUri = 'https://graph.microsoft.com/' }
+        'AzureAdGraph' { $ApiEndpointUri = 'https://graph.windows.net/' }              # Deprecated
+        'AzureClassic' { $ApiEndpointUri = 'https://management.core.windows.net/' }    # Deprecated
+        'AzureGallery' { $ApiEndpointUri = 'https://gallery.azure.com/' }
+        'AzurePortal' { $ApiEndpointUri = '74658136-14ec-4630-ad9b-26e160ff0fc6' }     # Undocumented
+        'AzureRm' { $ApiEndpointUri = 'https://management.azure.com/' }
+        'MsGraph' { $ApiEndpointUri = 'https://graph.microsoft.com/' }
     }
 
     $AuthorityUri = 'https://login.microsoftonline.com/{0}.onmicrosoft.com' -f $TenantName
@@ -110,20 +109,19 @@ Function Get-AzureAuthToken {
 # We can get the same functionality within PowerShell by calling the
 # undocumented API which the Azure Portal uses.
 Function Get-AzureEnterpriseApplications {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
         [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult]$AuthToken,
 
         [ValidateSet('All', 'Enterprise', 'Microsoft')]
-        [String]$AppType='Enterprise'
+        [String]$AppType = 'Enterprise'
     )
 
     switch ($AppType) {
-        'Enterprise'    { $AppTypeId = 0 }
-        'Microsoft'     { $AppTypeId = 1 }
-        'All'           { $AppTypeId = 2 }
+        'Enterprise' { $AppTypeId = 0 }
+        'Microsoft' { $AppTypeId = 1 }
+        'All' { $AppTypeId = 2 }
     }
 
     $Uri = [Uri]::new('https://main.iam.ad.ext.azure.com/api/ManagedApplications/List')
