@@ -47,7 +47,10 @@
             },
             {
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "name": "Command Prompt"
+                "name": "Command Prompt",
+
+                // cmd uses the exit code of the last executed console app
+                "closeOnExit": "always"
             },
             {
                 "name": "Git Bash",
@@ -55,7 +58,10 @@
 
                 "commandline": "%ProgramFiles%/Git/usr/bin/bash.exe --login -i",
                 "icon": "%ProgramFiles%/Git/mingw64/share/git/git-for-windows.ico",
-                "startingDirectory": "%USERPROFILE%"
+                "startingDirectory": "%USERPROFILE%",
+
+                // bash uses the exit code of the last executed console app
+                "closeOnExit": "always"
             },
             {
                 "name": "VS 2019 Development",
@@ -63,7 +69,10 @@
 
                 "commandline": "%ComSpec% /k \"%ProgramFiles(x86)%/Microsoft Visual Studio/2019/Professional/Common7/Tools/VsDevCmd.bat\"",
                 "icon": "ms-appx:///ProfileIcons/{0caa0dad-35be-5f56-a8ff-afceeeaa6101}.png",
-                "startingDirectory": "%USERPROFILE%"
+                "startingDirectory": "%USERPROFILE%",
+
+                // cmd uses the exit code of the last executed console app
+                "closeOnExit": "always"
             },
             {
                 "name": "Ubuntu",
