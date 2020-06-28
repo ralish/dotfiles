@@ -12,7 +12,7 @@
     "alwaysShowTabs": true,
     "showTabsInTitlebar": true,
     "showTerminalTitleInTitlebar": false,
-    "confirmCloseAllTabs": true,
+    "confirmCloseAllTabs": false,
     "tabWidthMode": "equal",
 
     // Selection
