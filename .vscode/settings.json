@@ -26,6 +26,8 @@
         "htoprc": "properties",
         // irssi
         "**/.irssi/*": "perl",
+        // jetbrains
+        "*.DotSettings": "xml",
         // kpcli
         "**/kpcli/bin/*": "perl",
         // less
