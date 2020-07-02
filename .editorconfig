@@ -16,6 +16,11 @@ insert_final_newline = true
 [.gitconfig*]
 indent_style = tab
 
+# JetBrains DotPeek configuration
+[*.DotSettings]
+indent_style = tab
+insert_final_newline = false
+
 # JetBrains IDE configuration
 [jetbrains/**/*.xml]
 indent_size = 2
