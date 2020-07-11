@@ -97,7 +97,7 @@ logs/
 /vs/
 
 # Visual Studio Code
-/vscode/extensions.txt
+/vscode/venv/
 
 # Web browsers
 /chrome/
@@ -105,8 +105,5 @@ logs/
 /firefox/
 /msie/
 /safari/
-
-# Visual Studio Code
-/vscode/venv/
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
