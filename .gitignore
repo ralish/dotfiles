@@ -77,9 +77,6 @@ logs/
 /posh/Settings/
 /pwsh/.config/powershell/
 
-# PuTTY
-/putty/
-
 # Shell app configurations
 /sh/apps/
 
