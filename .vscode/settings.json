@@ -52,6 +52,8 @@
         ".quiltrc": "shellscript",
         // readline
         ".inputrc": "properties",
+        // ripgrep
+        ".ripgreprc": "properties",
         // sbuild
         ".mk-sbuild.rc": "shellscript",
         // screen
