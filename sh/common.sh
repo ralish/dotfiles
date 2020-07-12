@@ -39,6 +39,11 @@ elif [ "${kernel_name#*Darwin}" != "$kernel_name" ]; then
 elif [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
     # shellcheck source=sh/systems/linux.sh
     . "$sh_systems_dir/linux.sh"
+
+    # shellcheck source=sh/systems/wsl.sh
+    if [ -f "/proc/sys/fs/binfmt_misc/WSLInterop" ]; then
+        . "$sh_systems_dir/wsl.sh"
+    fi
 fi
 unset kernel_name sh_systems_dir
 
