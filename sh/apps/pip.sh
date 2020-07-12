@@ -4,6 +4,15 @@
 if command -v pip > /dev/null ||
     command -v pip2 > /dev/null ||
     command -v pip3 > /dev/null; then
+    # If pip binary isn't present add an alias to newest Python runtime pip
+    if ! command -v pip > /dev/null; then
+        if command -v pip3 > /dev/null; then
+            alias pip='pip3'
+        else
+            alias pip='pip2'
+        fi
+    fi
+
     # Disable the pip version check if any Salt packages are installed. With
     # Salt we typically will be running an older pip version due to frequent
     # incompatible changes introduced upstream which Salt needs to handle.
