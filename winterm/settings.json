@@ -78,6 +78,9 @@
                 "name": "Ubuntu",
                 "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
 
+                // Default is %USERPROFILE% which is rarely what we want
+                "startingDirectory": "//wsl$/Ubuntu/home/sdl",
+
                 "source": "Windows.Terminal.Wsl",
                 "hidden": false
             },
