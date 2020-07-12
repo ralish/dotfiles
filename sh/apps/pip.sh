@@ -1,7 +1,9 @@
 # shellcheck shell=sh
 
 # pip configuration
-if command -v pip > /dev/null; then
+if command -v pip > /dev/null ||
+    command -v pip2 > /dev/null ||
+    command -v pip3 > /dev/null; then
     # Disable the pip version check if any Salt packages are installed. With
     # Salt we typically will be running an older pip version due to frequent
     # incompatible changes introduced upstream which Salt needs to handle.
