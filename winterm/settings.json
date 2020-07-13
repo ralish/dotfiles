@@ -48,6 +48,10 @@
                 // Default is %USERPROFILE% which is rarely what we want
                 "startingDirectory": "//wsl$/Ubuntu/home/sdl",
 
+                // Use the same visual settings as our SSH configuration
+                "colorScheme": "Solarized Dark",
+                "backgroundImage": null,
+
                 "source": "Windows.Terminal.Wsl",
                 "hidden": false
             },
