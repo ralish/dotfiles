@@ -17,7 +17,7 @@ try {
         $RgScriptPath = Get-Item -Path $RgCommand.Path
 
         if ($RgScriptPath.Directory.Name -eq 'shims') {
-            $RgCompletion = Join-Path -Path $RgScriptPath.Directory.Parent -ChildPath 'apps\ripgrep\current\complete\_rg.ps1'
+            $RgCompletion = Join-Path -Path $RgScriptPath.Directory.Parent.FullName -ChildPath 'apps\ripgrep\current\complete\_rg.ps1'
         }
     }
 
