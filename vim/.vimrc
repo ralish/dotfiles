@@ -1,5 +1,5 @@
 " Consult the Vim Options Documentation as a reference:
-" http://vimhelp.appspot.com/options.txt.html
+" https://vimhelp.org/options.txt.html#options.txt
 
 " ****************************** Initialisation *******************************
 

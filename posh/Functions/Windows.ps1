@@ -59,7 +59,7 @@ Function Set-EnvironmentVariable {
 #region Event logs
 
 # Watch an Event Log (similar to Unix "tail")
-# Slightly improved from: http://stackoverflow.com/questions/15262196/powershell-tail-windows-event-log-is-it-possible
+# Slightly improved from: https://stackoverflow.com/a/15262376/8787985
 Function Watch-EventLog {
     [CmdletBinding()]
     Param(
