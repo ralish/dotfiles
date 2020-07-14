@@ -38,7 +38,7 @@ COMPLETION_WAITING_DOTS="true"
 # DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Which plugins would you like to load?
-plugins=(colored-man-pages gitfast shrink-path)
+plugins=(colored-man-pages gitfast ripgrep shrink-path)
 
 # Add custom zsh completions to fpath
 if [[ -d $HOME/.local/share/zsh/site-functions ]]; then
