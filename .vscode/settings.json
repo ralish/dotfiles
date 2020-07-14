@@ -95,6 +95,12 @@
     // PowerShell script analysis
     "powershell.scriptAnalysis.settingsPath": ".vscode/PSScriptAnalyzerSettings.psd1",
 
+    // Excludes for ShellCheck linter
+    "shellcheck.ignorePatterns": {
+        "**/*.zsh": true,
+        "**/.zshrc": true
+    },
+
     // VS Code explorer icons
     "vsicons.presets.foldersAllDefaultIcon": true,
     "vsicons.associations.files": [
