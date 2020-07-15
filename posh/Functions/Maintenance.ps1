@@ -211,7 +211,21 @@ Function Update-PowerShell {
 
     if (Get-Module -Name PowerShellGet -ListAvailable) {
         Write-Host -ForegroundColor Green 'Updating PowerShell modules ...'
-        Update-Module
+        $InstalledModules = Get-InstalledModule
+
+        # Update all modules compatible with Update-Module
+        foreach ($Module in $InstalledModules) {
+            if ($Module.Name -match '^AWS\.Tools\.' -and $Module.Repository -notmatch 'PSGallery') {
+                continue
+            }
+
+            Update-Module -Name $Module
+        }
+
+        # The modular AWS Tools for PowerShell has its own mechanism
+        if ($InstalledModules -contains 'AWS.Tools.Installer') {
+            Update-AWSToolsModule -CleanUp
+        }
     } else {
         Write-Warning -Message 'Unable to update PowerShell modules as PowerShellGet module not available.'
     }
