@@ -219,7 +219,7 @@ Function Update-PowerShell {
                 continue
             }
 
-            Update-Module -Name $Module
+            Update-Module -Name $Module -AcceptLicense
         }
 
         # The modular AWS Tools for PowerShell has its own mechanism
