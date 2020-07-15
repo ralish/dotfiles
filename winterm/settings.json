@@ -48,6 +48,9 @@
                 // Default is %USERPROFILE% which is rarely what we want
                 "startingDirectory": "//wsl$/Ubuntu/home/sdl",
 
+                // Linux shells use the exit code of the last command
+                "closeOnExit": "always",
+
                 // Use the same visual settings as our SSH configuration
                 "colorScheme": "Solarized Dark",
                 "backgroundImage": null,
@@ -74,7 +77,7 @@
                 "icon": "%ProgramFiles%/Git/mingw64/share/git/git-for-windows.ico",
                 "startingDirectory": "%USERPROFILE%",
 
-                // bash uses the exit code of the last executed console app
+                // bash uses the exit code of the last command
                 "closeOnExit": "always"
             },
             {
