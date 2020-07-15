@@ -84,6 +84,9 @@
 
     // Extension: C#
     "csharp.suppressHiddenDiagnostics": false,
+    "omnisharp.enableEditorConfigSupport": true,
+    "omnisharp.enableRoslynAnalyzers": true,
+    "omnisharp.loggingLevel": "warning",
 
     // Extension: DevSkim
     "devskim.enableBestPracticeRules": true,
