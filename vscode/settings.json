@@ -142,6 +142,7 @@
     "python.linting.flake8Enabled": true,
     "python.linting.pylintCategorySeverity.refactor": "Information",
     "python.pythonPath": "~/dotfiles/vscode/venv",
+    "python.showStartPage": false,
 
     // Extension: Select Line Status Bar
     "selectline.alignment": "right",
