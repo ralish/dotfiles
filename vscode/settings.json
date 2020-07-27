@@ -101,6 +101,7 @@
 
     // Extension: Language Support for Java(TM) by Red Hat
     "java.configuration.checkProjectSettingsExclusions": false,
+    "java.project.importHint": false,
     "java.semanticHighlighting.enabled": true,
 
     // Extension: markdownlint
