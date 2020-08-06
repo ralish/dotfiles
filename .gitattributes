@@ -16,4 +16,9 @@ user-dirs.dirs                  text        eol=lf
 git/bin/*                       text        eol=lf
 scripts/bin/*                   text        eol=lf
 
+# Exclude vendored code from Linguist language detection
+stow/*                          linguist-vendored
+themes/*                        linguist-vendored
+vim/.vim/autoload/*             linguist-vendored
+
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
