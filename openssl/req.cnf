@@ -9,6 +9,7 @@ string_mask                         = utf8only
 
 distinguished_name                  = req_dn
 req_extensions                      = req_ext
+x509_extensions                     = req_ext
 
 
 [ req_dn ]
@@ -29,6 +30,31 @@ req_extensions                      = req_ext
 
 
 [ req_ext ]
+# Basic Constraints
+#basicConstraints                    = CA:TRUE, pathlen:0
+
+# Key Usage
+#
+# Valid values are:
+# - cRLSign
+# - dataEncipherment
+# - decipherOnly
+# - digitalSignature
+# - encipherOnly
+# - keyAgreement
+# - keyCertSign
+# - keyEncipherment
+# - nonRepudiation
+#keyUsage                            = dataEncipherment, keyEncipherment
+
+# Extended Key Usage
+#
+# Common EKUs:
+# - serverAuth
+# - clientAuth
+# - Any OID
+#extendedKeyUsage                    = serverAuth, 1.2.3.4
+
 # Subject Alternative Name
 #subjectAltName                      = @req_san
 
