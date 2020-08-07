@@ -680,3 +680,81 @@ Function Update-RubyGems {
 }
 
 #endregion
+
+#region Windows
+
+# Configure environment for Windows SDK tools
+Function Switch-WindowsSDK {
+    [CmdletBinding()]
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [String]$Path,
+
+        [ValidateNotNullOrEmpty()]
+        [Version]$Version,
+
+        [Switch]$Persist,
+        [Switch]$Disable
+    )
+
+    $Win64 = [Environment]::Is64BitOperatingSystem
+    if ($Win64) {
+        $Architecture = 'x64'
+    } else {
+        $Architecture = 'x86'
+    }
+
+    if (!$Path) {
+        if ($Win64) {
+            $Path = "${Env:ProgramFiles(x86)}\Windows Kits"
+        } else {
+            $Path = "$Env:ProgramFiles\Windows Kits"
+        }
+    }
+
+    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+        throw 'Provided Windows SDK path is not a directory: {0}' -f $Path
+    }
+
+    if (!$Version) {
+        $Version = [Environment]::OSVersion.Version
+    }
+
+    if ($Version -lt '10.0') {
+        $SdkPath = Join-Path -Path $Path -ChildPath ('{0}\bin\{1}' -f $Version.ToString(2), $Architecture)
+    } else {
+        $SdkPath = Join-Path -Path $Path -ChildPath ('10\bin\{0}\{1}' -f $Version, $Architecture)
+    }
+
+    if (!$Disable -and !(Test-Path -Path $SdkPath -PathType Container)) {
+        throw 'Provided Windows SDK version path is not a directory: {0}' -f $SdkPath
+    }
+
+    $PathParams = @{ }
+    if (!$Disable) {
+        $Operation = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
+    } else {
+        $Operation = 'Remove-PathStringElement'
+    }
+
+    $env:Path = $env:Path |
+        & $Operation @PathParams -Element $SdkPath
+
+    if ($Persist) {
+        $EnvParams = @{
+            Name = 'Path'
+        }
+
+        if (!$Disable) {
+            $PathParams['Action'] = 'Append'
+        }
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $SdkPath |
+            & $Operation @PathParams -Element $Path |
+            Set-EnvironmentVariable @EnvParams
+    }
+}
+
+#endregion
