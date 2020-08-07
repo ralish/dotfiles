@@ -5,6 +5,46 @@ $null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Generic.
 
 #region Encoding
 
+# Convert a hex string to a byte array
+# Via: https://www.reddit.com/r/PowerShell/comments/5rhjsy/hex_to_byte_array_and_back/
+Function Convert-HexToBytes {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$Hex
+    )
+
+    Process {
+        $Bytes = [Byte[]]::new($Hex.Length / 2)
+
+        for ($i = 0; $i -lt $Hex.Length; $i += 2) {
+            $Bytes[$i / 2] = [Convert]::ToByte($Hex.Substring($i, 2), 16)
+        }
+
+        $Bytes
+    }
+}
+
+# Convert a byte array to a hex string
+# Via: https://www.reddit.com/r/PowerShell/comments/5rhjsy/hex_to_byte_array_and_back/
+Function Convert-BytesToHex {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [Byte[]]$Bytes
+    )
+
+    Process {
+        $Hex = [Text.StringBuilder]::new($Bytes.Length * 2)
+
+        foreach ($Byte in $Bytes) {
+            $null = $Hex.AppendFormat('{0:x2}', $Byte)
+        }
+
+        $Hex.ToString()
+    }
+}
+
 # Convert a string from Base64 form
 Function ConvertFrom-Base64 {
     [CmdletBinding()]
