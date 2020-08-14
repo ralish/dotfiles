@@ -1,5 +1,40 @@
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing environment functions ...')
 
+#region .NET
+
+# Update .NET tools
+Function Update-DotNetTools {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    if (!(Get-Command -Name dotnet -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to update .NET tools as dotnet command not found.'
+        return
+    }
+
+    [String[]]$ListArgs = 'tool', 'list', '--global'
+    [String[]]$UpdateArgs = 'tool', 'update', '--global'
+
+    Write-Host -ForegroundColor Green -NoNewline 'Enumerating .NET tools: '
+    Write-Host ('dotnet {0}' -f ($ListArgs -join ' '))
+    $Tools = [Collections.ArrayList]::new()
+    & dotnet @ListArgs | ForEach-Object {
+        if ($_ -notmatch '^(Package Id|-)' -and $_ -match '^(\S+)') {
+            $null = $Tools.Add($Matches[1])
+        }
+    }
+
+    foreach ($Tool in $Tools) {
+        if ($PSCmdlet.ShouldProcess($Tool, 'Update')) {
+            Write-Host -ForegroundColor Green -NoNewline ('Updating {0}: ' -f $Tool)
+            Write-Host ('dotnet {0} {1}' -f ($UpdateArgs -join ' '), $Tool)
+            & dotnet @UpdateArgs $Tool
+        }
+    }
+}
+
+#endregion
+
 #region Cygwin
 
 # Configure environment for Cygwin usage
