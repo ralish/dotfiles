@@ -12,6 +12,7 @@ Function Update-AllTheThings {
             'PowerShell',
             'ModernApps',
             'Scoop',
+            'DotNetTools',
             'NodejsPackages',
             'PythonPackages',
             'RubyGems'
@@ -26,6 +27,7 @@ Function Update-AllTheThings {
             'PowerShell',
             'ModernApps',
             'Scoop',
+            'DotNetTools',
             'NodejsPackages',
             'PythonPackages',
             'RubyGems'
@@ -40,6 +42,7 @@ Function Update-AllTheThings {
         PowerShell     = $null
         ModernApps     = $null
         Scoop          = $null
+        DotNetTools    = $null
         NodejsPackages = $null
         PythonPackages = $null
         RubyGems       = $null
@@ -74,6 +77,7 @@ Function Update-AllTheThings {
         PowerShell     = $null
         ModernApps     = $null
         Scoop          = $null
+        DotNetTools    = $null
         NodejsPackages = $null
         PythonPackages = $null
         RubyGems       = $null
@@ -101,6 +105,10 @@ Function Update-AllTheThings {
 
     if ($Tasks['Scoop']) {
         $Results.Scoop = Update-Scoop
+    }
+
+    if ($Tasks['DotNetTools']) {
+        $Results.DotNetTools = Update-DotNetTools
     }
 
     if ($Tasks['NodejsPackages']) {
