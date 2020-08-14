@@ -382,15 +382,15 @@ Function Update-NodejsPackages {
 
     [String[]]$UpdateArgs = 'update', '--global'
 
-    Write-Host -ForegroundColor Green -NoNewline 'Updating npm: '
-    Write-Host ('npm {0} npm' -f ($UpdateArgs -join ' '))
     if ($PSCmdlet.ShouldProcess('npm', 'Update')) {
+        Write-Host -ForegroundColor Green -NoNewline 'Updating npm: '
+        Write-Host ('npm {0} npm' -f ($UpdateArgs -join ' '))
         & npm @UpdateArgs npm
     }
 
-    Write-Host -ForegroundColor Green -NoNewline 'Updating Node.js packages: '
-    Write-Host ('npm {0}' -f ($UpdateArgs -join ' '))
     if ($PSCmdlet.ShouldProcess('Node.js packages', 'Update')) {
+        Write-Host -ForegroundColor Green -NoNewline 'Updating Node.js packages: '
+        Write-Host ('npm {0}' -f ($UpdateArgs -join ' '))
         & npm @UpdateArgs
     }
 }
@@ -588,9 +588,9 @@ Function Update-PythonPackages {
     [String[]]$PipUpdateArgs = '-m', 'pip', 'install', '--no-python-version-warning', '--upgrade'
     [String[]]$UpdateArgs = 'install', '--no-python-version-warning', '--upgrade', '--upgrade-strategy', 'eager'
 
-    Write-Host -ForegroundColor Green -NoNewline 'Updating pip: '
-    Write-Host ('python {0} pip' -f ($PipUpdateArgs -join ' '))
     if ($PSCmdlet.ShouldProcess('pip', 'Update')) {
+        Write-Host -ForegroundColor Green -NoNewline 'Updating pip: '
+        Write-Host ('python {0} pip' -f ($PipUpdateArgs -join ' '))
         & python @PipUpdateArgs pip
     }
 
@@ -605,16 +605,16 @@ Function Update-PythonPackages {
         }
     }
 
-    Write-Host -ForegroundColor Green -NoNewline 'Updating Python packages: '
-    Write-Host ('pip {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
     if ($PSCmdlet.ShouldProcess('Python packages', 'Update')) {
+        Write-Host -ForegroundColor Green -NoNewline 'Updating Python packages: '
+        Write-Host ('pip {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
         & pip @UpdateArgs @Packages
     }
 
     if (Get-Command -Name pipx -ErrorAction Ignore) {
-        Write-Host -ForegroundColor Green -NoNewline 'Updating pipx packages: '
-        Write-Host 'pipx upgrade-all'
         if ($PSCmdlet.ShouldProcess('pipx packages', 'Update')) {
+            Write-Host -ForegroundColor Green -NoNewline 'Updating pipx packages: '
+            Write-Host 'pipx upgrade-all'
             & pipx upgrade-all
         }
     }
