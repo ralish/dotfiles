@@ -17,8 +17,8 @@ $SshKeysPath = 'Y:\Secured\SSH Keys'
 # SSH keys file extension
 $SshKeysExt = '.opk'
 
-if (Test-Path -Path $SshKeysPath -PathType Container) {
-    $SshKeys = Get-ChildItem -Path $SshKeysPath -File | Where-Object { $_.Extension -eq $SshKeysExt }
+if (Test-Path -LiteralPath $SshKeysPath -PathType Container) {
+    $SshKeys = Get-ChildItem -LiteralPath $SshKeysPath -File | Where-Object { $_.Extension -eq $SshKeysExt }
     if ($SshKeys) {
         Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading SSH keys into ssh-agent ...')
         $null = $SshKeys | ForEach-Object { ssh-add $_ 2>&1 }

@@ -64,7 +64,7 @@ Function Get-AzureAuthToken {
 
     $AdalAsmName = 'Microsoft.IdentityModel.Clients.ActiveDirectory.dll'
     $AdalAsmPath = Join-Path -Path $AdalModulePath -ChildPath $AdalAsmName
-    if (Test-Path -Path $AdalAsmPath) {
+    if (Test-Path -LiteralPath $AdalAsmPath) {
         $null = [Reflection.Assembly]::LoadFrom($AdalAsmPath)
     } else {
         throw 'Unable to locate required DLL: {0}' -f $AdalAsmName
@@ -72,7 +72,7 @@ Function Get-AzureAuthToken {
 
     $AdalPlatformAsmName = 'Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll'
     $AdalPlatformAsmPath = Join-Path -Path $AdalModulePath -ChildPath $AdalPlatformAsmName
-    if (Test-Path -Path $AdalPlatformAsmPath) {
+    if (Test-Path -LiteralPath $AdalPlatformAsmPath) {
         $null = [Reflection.Assembly]::LoadFrom($AdalPlatformAsmPath)
     } else {
         throw 'Unable to locate required DLL: {0}' -f $AdalPlatformAsmName

@@ -159,7 +159,7 @@ Function Update-Office {
     }
 
     $OfficeC2RClient = Join-Path -Path $env:ProgramFiles -ChildPath 'Common Files\Microsoft Shared\ClickToRun\OfficeC2RClient.exe'
-    if (!(Test-Path -Path $OfficeC2RClient -PathType Leaf)) {
+    if (!(Test-Path -LiteralPath $OfficeC2RClient -PathType Leaf)) {
         Write-Error -Message 'Unable to install Office updates as Click-to-Run client not found.'
         return
     }
@@ -170,7 +170,7 @@ Function Update-Office {
 
     do {
         $OfficeRegPath = 'HKLM:\Software\Microsoft\Office\ClickToRun'
-        $OfficeRegKey = Get-Item -Path $OfficeRegPath
+        $OfficeRegKey = Get-Item -LiteralPath $OfficeRegPath
 
         $ExecutingScenario = $OfficeRegKey.GetValue('ExecutingScenario')
         $ExecutingScenarioPrevious = [String]::Empty
@@ -186,7 +186,7 @@ Function Update-Office {
         }
 
         $TasksRegPath = Join-Path -Path $OfficeRegPath -ChildPath ('Scenario\{0}\TasksState' -f $ExecutingScenario)
-        $TasksRegKey = Get-Item -Path $TasksRegPath
+        $TasksRegKey = Get-Item -LiteralPath $TasksRegPath
 
         foreach ($Task in $TasksRegKey.GetValueNames()) {
             $TaskName = $Task.Split(':')[0]
@@ -288,7 +288,7 @@ Function Update-VisualStudio {
     }
 
     $VsInstallerExe = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
-    if (!(Test-Path -Path $VsInstallerExe -PathType Leaf)) {
+    if (!(Test-Path -LiteralPath $VsInstallerExe -PathType Leaf)) {
         Write-Error -Message 'Unable to update Visual Studio as VSInstaller not found.'
         return
     }

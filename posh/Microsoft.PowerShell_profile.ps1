@@ -33,15 +33,15 @@ if ($DotFilesVerbose) {
 
 # Source custom functions
 $PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
-if (Test-Path -Path $PoshFunctionsPath -PathType Container) {
-    Get-ChildItem -Path $PoshFunctionsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
+if (Test-Path -LiteralPath $PoshFunctionsPath -PathType Container) {
+    Get-ChildItem -LiteralPath $PoshFunctionsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
 }
 Remove-Variable -Name PoshFunctionsPath
 
 # Source custom settings
 $PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
-if (Test-Path -Path $PoshSettingsPath -PathType Container) {
-    Get-ChildItem -Path $PoshSettingsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
+if (Test-Path -LiteralPath $PoshSettingsPath -PathType Container) {
+    Get-ChildItem -LiteralPath $PoshSettingsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
 }
 Remove-Variable -Name PoshSettingsPath
 
@@ -54,7 +54,7 @@ Remove-Variable -Name FormatDataPaths
 
 # Amend the search path to include our scripts directory
 $PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
-if (Test-Path -Path $PoshScriptsPath -PathType Container) {
+if (Test-Path -LiteralPath $PoshScriptsPath -PathType Container) {
     $env:Path = Add-PathStringElement -Path $env:Path -Element $PoshScriptsPath -Action Prepend
 }
 Remove-Variable -Name PoshScriptsPath

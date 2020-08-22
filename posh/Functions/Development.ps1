@@ -87,7 +87,7 @@ Function Invoke-GitChildDir {
     $Dirs = Get-ChildItem -Directory
     foreach ($Dir in $Dirs) {
         $GitDir = Join-Path -Path $Dir -ChildPath '.git'
-        if (-not (Test-Path -Path $GitDir -PathType Container)) {
+        if (-not (Test-Path -LiteralPath $GitDir -PathType Container)) {
             if ($Recurse) {
                 Invoke-GitChildDir -Command $Command -Path $Dir.FullName -Recurse:$Recurse
             } else {
@@ -97,13 +97,13 @@ Function Invoke-GitChildDir {
         }
 
         Write-Host -ForegroundColor Green ('Running in: {0}' -f $Dir.Name)
-        Set-Location -Path $Dir
+        Set-Location -LiteralPath $Dir
         & git @GitArgs
-        Set-Location -Path $BaseLocation
+        Set-Location -LiteralPath $BaseLocation
         Write-Host
     }
 
-    Set-Location -Path $OrigLocation
+    Set-Location -LiteralPath $OrigLocation
 }
 
 # Fast-forward all branches to match a branch
@@ -164,7 +164,7 @@ Function Add-FileToEmptyDirectories {
     )
 
     if (!$PSBoundParameters.ContainsKey('Path')) {
-        $Path += Get-Item -Path $PWD.Path
+        $Path += Get-Item -LiteralPath $PWD.Path
     }
 
     foreach ($Dir in $Path) {
@@ -175,9 +175,9 @@ Function Add-FileToEmptyDirectories {
 
         $FilesToCreate = [Collections.ArrayList]::new()
         Get-ChildItem -Directory -Exclude $Exclude -Force | ForEach-Object {
-            if ((Get-ChildItem -Path $_.FullName -Force | Measure-Object).Count -ne 0) {
-                Get-ChildItem -Path $_.FullName -Directory -Recurse -Force | ForEach-Object {
-                    if ((Get-ChildItem -Path $_.FullName -Force | Measure-Object).Count -eq 0) {
+            if ((Get-ChildItem -LiteralPath $_.FullName -Force | Measure-Object).Count -ne 0) {
+                Get-ChildItem -LiteralPath $_.FullName -Directory -Recurse -Force | ForEach-Object {
+                    if ((Get-ChildItem -LiteralPath $_.FullName -Force | Measure-Object).Count -eq 0) {
                         $null = $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
                     }
                 }

@@ -54,7 +54,7 @@ Function Switch-Cygwin {
         [Switch]$Disable
     )
 
-    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
         throw 'Provided Cygwin path is not a directory: {0}' -f $Path
     }
 
@@ -135,7 +135,7 @@ Function Switch-Go {
         [Switch]$Disable
     )
 
-    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
         throw 'Provided Go path is not a directory: {0}' -f $Path
     }
 
@@ -209,7 +209,7 @@ Function Switch-Google {
         [Switch]$Disable
     )
 
-    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
         throw 'Provided depot_tools path is not a directory: {0}' -f $Path
     }
 
@@ -274,7 +274,7 @@ Function Switch-Java {
         [Switch]$Disable
     )
 
-    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
         throw 'Provided Java path is not a directory: {0}' -f $Path
     }
 
@@ -336,7 +336,7 @@ Function Switch-Nodejs {
         [Switch]$Disable
     )
 
-    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
         throw 'Provided Nodejs path is not a directory: {0}' -f $Path
     }
 
@@ -413,7 +413,7 @@ Function Switch-Perl {
         [Switch]$Disable
     )
 
-    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
         throw 'Provided Perl path is not a directory: {0}' -f $Path
     }
 
@@ -466,7 +466,7 @@ Function Switch-PHP {
         [Switch]$Disable
     )
 
-    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
         throw 'Provided PHP path is not a directory: {0}' -f $Path
     }
 
@@ -517,7 +517,7 @@ Function Switch-Python {
         [Switch]$Disable
     )
 
-    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
         throw 'Provided Python path is not a directory: {0}' -f $Path
     }
 
@@ -640,7 +640,7 @@ Function Switch-Ruby {
         [Switch]$Disable
     )
 
-    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
         throw 'Provided Ruby path is not a directory: {0}' -f $Path
     }
 
@@ -747,7 +747,7 @@ Function Switch-WindowsSDK {
         }
     }
 
-    if (!$Disable -and !(Test-Path -Path $Path -PathType Container)) {
+    if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
         throw 'Provided Windows SDK path is not a directory: {0}' -f $Path
     }
 
@@ -761,7 +761,7 @@ Function Switch-WindowsSDK {
         $SdkPath = Join-Path -Path $Path -ChildPath ('10\bin\{0}\{1}' -f $Version, $Architecture)
     }
 
-    if (!$Disable -and !(Test-Path -Path $SdkPath -PathType Container)) {
+    if (!$Disable -and !(Test-Path -LiteralPath $SdkPath -PathType Container)) {
         throw 'Provided Windows SDK version path is not a directory: {0}' -f $SdkPath
     }
 

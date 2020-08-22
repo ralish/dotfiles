@@ -33,8 +33,8 @@ Function Export-MailboxSpreadsheetData {
     Test-CommandAvailable -Name 'Get-Mailbox'
 
     if (-not $PSBoundParameters.ContainsKey('Path')) {
-        if ((Get-Item -Path $PWD) -is [IO.DirectoryInfo]) {
-            $Path = Get-Item -Path $PWD
+        if ((Get-Item -LiteralPath $PWD) -is [IO.DirectoryInfo]) {
+            $Path = Get-Item -LiteralPath $PWD
         } else {
             Write-Warning -Message 'Defaulting to $HOME as $PWD is not a directory.'
             $Path = $HOME
@@ -70,11 +70,11 @@ Function Export-MailboxSpreadsheetData {
     }
 
     if (!$SkipActivitySummary) {
-        $Activity | Export-Csv @Params -Path (Join-Path -Path $Path -ChildPath 'Activity Summary.csv') -Append
+        $Activity | Export-Csv @Params -LiteralPath (Join-Path -Path $Path -ChildPath 'Activity Summary.csv') -Append
     }
 
-    $Folders | Export-Csv @Params -Path (Join-Path -Path $Path -ChildPath ('{0} - Folders.csv' -f $MailboxAddress))
-    $Rules | Export-Csv @Params -Path (Join-Path -Path $Path -ChildPath ('{0} - Rules.csv' -f $MailboxAddress))
+    $Folders | Export-Csv @Params -LiteralPath (Join-Path -Path $Path -ChildPath ('{0} - Folders.csv' -f $MailboxAddress))
+    $Rules | Export-Csv @Params -LiteralPath (Join-Path -Path $Path -ChildPath ('{0} - Rules.csv' -f $MailboxAddress))
 }
 
 # Retrieve a summary of mailbox folders with associated rules
@@ -257,7 +257,7 @@ Function Import-ContentSearchResults {
     Process {
         if ($PSCmdlet.ParameterSetName -eq 'File') {
             try {
-                $Data = Import-Csv -Path $CsvFile -Delimiter $CsvDelimiter -ErrorAction Stop
+                $Data = Import-Csv -LiteralPath $CsvFile -Delimiter $CsvDelimiter -ErrorAction Stop
             } catch {
                 throw $_
             }
@@ -1028,19 +1028,19 @@ Function Import-ExoPowershellModule {
         Write-Verbose -Message 'Importing Microsoft.Exchange.Management.ExoPowershellModule ...'
 
         $ClickOnceAppsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0'
-        $ExoPowerShellModule = Get-ChildItem -Path $ClickOnceAppsPath -Recurse -Include 'Microsoft.Exchange.Management.ExoPowershellModule.manifest' | Sort-Object -Property LastWriteTime | Select-Object -Last 1
+        $ExoPowerShellModule = Get-ChildItem -LiteralPath $ClickOnceAppsPath -Recurse -Include 'Microsoft.Exchange.Management.ExoPowershellModule.manifest' | Sort-Object -Property LastWriteTime | Select-Object -Last 1
         $ExoPowerShellModulePs1 = Join-Path -Path $ExoPowerShellModule.Directory -ChildPath 'CreateExoPSSession.ps1'
 
         if ($ExoPowerShellModule) {
             # Sourcing the script rudely changes the current working directory
             $CurrentPath = Get-Location
             . $ExoPowerShellModulePs1
-            Set-Location -Path $CurrentPath
+            Set-Location -LiteralPath $CurrentPath
 
             # Change the scope of imported functions to be global (better approach?)
             $Functions = @('Connect-EXOPSSession', 'Connect-IPPSSession', 'Test-Uri')
             foreach ($Function in $Functions) {
-                $null = New-Item -Path Function: -Name global:$Function -Value (Get-Content -Path Function:\$Function)
+                $null = New-Item -Path Function: -Name global:$Function -Value (Get-Content -LiteralPath Function:\$Function)
             }
         } else {
             throw 'Required module not available: Microsoft.Exchange.Management.ExoPowershellModule'

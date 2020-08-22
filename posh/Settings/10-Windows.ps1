@@ -38,7 +38,7 @@ if (!$env:WT_SESSION) {
     $BuildNumber = [int](Get-CimInstance -ClassName Win32_OperatingSystem -Verbose:$false).BuildNumber
 
     if ($BuildNumber -ge 10586 -and $BuildNumber -lt 19041) {
-        if ((Get-ItemProperty -Path HKCU:\Console -Name VirtualTerminalLevel -ErrorAction SilentlyContinue).VirtualTerminalLevel) {
+        if ((Get-ItemProperty -LiteralPath HKCU:\Console -Name VirtualTerminalLevel -ErrorAction SilentlyContinue).VirtualTerminalLevel) {
             $ConHostVT100Bug = $true
         }
     }

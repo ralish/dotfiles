@@ -16,15 +16,15 @@ Function Update-OpenSSHConfig {
     # Make sure we create the file without a BOM
     [IO.File]::WriteAllLines($ConfigFile, '')
 
-    $Banner = Get-Content -Path $BannerFile
+    $Banner = Get-Content -LiteralPath $BannerFile
     Add-Content -Path $ConfigFile -Value $Banner[0..($Banner.Length - 2)]
 
-    $Includes = Get-ChildItem -Path $IncludesDir -File | Where-Object { $_.Length -gt 0 }
+    $Includes = Get-ChildItem -LiteralPath $IncludesDir -File | Where-Object { $_.Length -gt 0 }
     foreach ($Include in $Includes) {
-        $Data = Get-Content -Path $Include.FullName
+        $Data = Get-Content -LiteralPath $Include.FullName
         Add-Content -Path $ConfigFile -Value $Data[0..($Data.Length - 2)]
     }
 
-    $Template = Get-Content -Path $TemplateFile
+    $Template = Get-Content -LiteralPath $TemplateFile
     Add-Content -Path $ConfigFile -Value $Template[0..($Template.Length - 2)]
 }

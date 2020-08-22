@@ -137,7 +137,7 @@ Function Update-Profile {
     $ProfileTypes = 'AllUsersAllHosts', 'AllUsersCurrentHost', 'CurrentUserAllHosts', 'CurrentUserCurrentHost'
     foreach ($ProfileType in $ProfileTypes) {
         if (Get-Variable -Name $ProfileType -ValueOnly) {
-            if (Test-Path -Path $profile.$ProfileType -PathType Leaf) {
+            if (Test-Path -LiteralPath $profile.$ProfileType -PathType Leaf) {
                 Write-Verbose -Message ('Sourcing {0} from: {1}' -f $ProfileType, $profile.$ProfileType)
                 . $profile.$ProfileType
             } else {

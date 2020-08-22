@@ -14,7 +14,7 @@ try {
     $RgCompletion = [String]::Empty
 
     if ($RgCommand.Name.EndsWith('.ps1')) {
-        $RgScriptPath = Get-Item -Path $RgCommand.Path
+        $RgScriptPath = Get-Item -LiteralPath $RgCommand.Path
 
         if ($RgScriptPath.Directory.Name -eq 'shims') {
             $RgCompletion = Join-Path -Path $RgScriptPath.Directory.Parent.FullName -ChildPath 'apps\ripgrep\current\complete\_rg.ps1'

@@ -145,7 +145,7 @@ Function ConvertTo-TextEncoding {
     Process {
         foreach ($TextFile in $Path) {
             try {
-                $Item = Get-Item -Path $TextFile -ErrorAction Stop
+                $Item = Get-Item -LiteralPath $TextFile -ErrorAction Stop
                 if ($SourceEncoder) {
                     $Content = [IO.File]::ReadAllLines($Item.FullName, $SourceEncoder)
                 } else {
@@ -238,8 +238,8 @@ Function Get-TextEncoding {
     Process {
         foreach ($TextFile in $Path) {
             try {
-                $Item = Get-Item -Path $TextFile -ErrorAction Stop
-                $Content = Get-Content -Path $Item.FullName -TotalCount 5 -ErrorAction Stop
+                $Item = Get-Item -LiteralPath $TextFile -ErrorAction Stop
+                $Content = Get-Content -LiteralPath $Item.FullName -TotalCount 5 -ErrorAction Stop
             } catch {
                 Write-Error -Message $_
                 continue
@@ -254,7 +254,7 @@ Function Get-TextEncoding {
 
             $FoundEncoding = $false
             foreach ($Encoding in $Encodings) {
-                [Byte[]]$Bytes = Get-Content -Path $Item.FullName @GetContentBytesParam -ReadCount $Encoding.Preamble.Count | Select-Object -First 1
+                [Byte[]]$Bytes = Get-Content -LiteralPath $Item.FullName @GetContentBytesParam -ReadCount $Encoding.Preamble.Count | Select-Object -First 1
 
                 if ($Bytes.Count -ne $Encoding.Preamble.Count) {
                     continue
@@ -307,7 +307,7 @@ Function Get-DirectorySummary {
             $Path = Get-Location -PSProvider FileSystem
         }
 
-        $Directory = Get-Item -Path $Path -ErrorAction Ignore
+        $Directory = Get-Item -LiteralPath $Path -ErrorAction Ignore
         if ($Directory -isnot [IO.DirectoryInfo]) {
             throw 'Provided path is invalid.'
         }
@@ -317,7 +317,7 @@ Function Get-DirectorySummary {
         $TotalItems = 0
         $TotalSize = 0
 
-        $Items = Get-ChildItem -Path $Directory -Recurse
+        $Items = Get-ChildItem -LiteralPath $Directory -Recurse
         foreach ($Item in $Items) {
             $TotalItems++
             switch ($Item.PSTypeNames[0]) {
