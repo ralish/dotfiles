@@ -92,10 +92,11 @@ Function Get-MultipleHardLinks {
         [ValidateScript( { $_ -gt 1 } )]
         [Int]$MinimumHardLinks = 2,
 
-        [Switch]$Recurse
+        [Switch]$Recurse,
+        [Switch]$Force
     )
 
-    $Files = Get-ChildItem -Path $Path -File -Recurse:$Recurse |
+    $Files = Get-ChildItem -Path $Path -File -Recurse:$Recurse -Force:$Force |
         Where-Object {
             $_.LinkType -eq 'HardLink' -and $_.Target.Count -ge ($MinimumHardLinks - 1)
         } | Add-Member -MemberType ScriptProperty -Name LinkCount -Value { $this.Target.Count + 1 } -Force -PassThru
@@ -113,10 +114,11 @@ Function Get-NonInheritedACL {
         [ValidateNotNullOrEmpty()]
         [String]$User,
 
-        [Switch]$Recurse
+        [Switch]$Recurse,
+        [Switch]$Force
     )
 
-    $Directories = Get-ChildItem -Path $Path -Directory -Recurse:$Recurse
+    $Directories = Get-ChildItem -Path $Path -Directory -Recurse:$Recurse -Force:$Force
 
     $ACLMatches = [Collections.ArrayList]::new()
     foreach ($Directory in $Directories) {
