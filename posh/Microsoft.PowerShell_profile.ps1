@@ -34,14 +34,16 @@ if ($DotFilesVerbose) {
 # Source custom functions
 $PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
 if (Test-Path -LiteralPath $PoshFunctionsPath -PathType Container) {
-    Get-ChildItem -LiteralPath $PoshFunctionsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
+    # PowerShell <= 5.1: Using -LiteralPath breaks wildcards in -Include
+    Get-ChildItem -Path $PoshFunctionsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
 }
 Remove-Variable -Name PoshFunctionsPath
 
 # Source custom settings
 $PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
 if (Test-Path -LiteralPath $PoshSettingsPath -PathType Container) {
-    Get-ChildItem -LiteralPath $PoshSettingsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
+    # PowerShell <= 5.1: Using -LiteralPath breaks wildcards in -Include
+    Get-ChildItem -Path $PoshSettingsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
 }
 Remove-Variable -Name PoshSettingsPath
 
