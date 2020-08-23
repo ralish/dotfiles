@@ -156,7 +156,9 @@ Function fla {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [PSObject]$InputObject
+        [PSObject]$InputObject,
+
+        [Switch]$Force
     )
 
     Begin {
@@ -178,7 +180,9 @@ Function fta {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [PSObject]$InputObject
+        [PSObject]$InputObject,
+
+        [Switch]$Force
     )
 
     Begin {
