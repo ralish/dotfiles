@@ -221,13 +221,35 @@ Function Update-PowerShell {
         Write-Host -ForegroundColor Green 'Updating PowerShell modules ...'
         $InstalledModules = Get-InstalledModule
 
+        if ((Test-IsWindows)) {
+            $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::MyDocuments)
+            $ScopePathAllUsers = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
+        } else {
+            $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
+            $ScopePathAllUsers = '/usr/local/share'
+        }
+
         # Update all modules compatible with Update-Module
         foreach ($Module in $InstalledModules) {
             if ($Module.Name -match '^AWS\.Tools\.' -and $Module.Repository -notmatch 'PSGallery') {
                 continue
             }
 
-            Update-Module -Name $Module -AcceptLicense
+            $UpdateModuleParams = @{
+                Name          = $Module.Name
+                AcceptLicense = $true
+            }
+
+            if ($Module.InstalledLocation.StartsWith($ScopePathCurrentUser)) {
+                $UpdateModuleParams['Scope'] = 'CurrentUser'
+            } elseif ($Module.InstalledLocation.StartsWith($ScopePathAllUsers)) {
+                $UpdateModuleParams['Scope'] = 'AllUsers'
+            } else {
+                Write-Warning -Message ('Unable to determine install scope for module: {0}' -f $Module)
+                continue
+            }
+
+            Update-Module @UpdateModuleParams
         }
 
         # The modular AWS Tools for PowerShell has its own mechanism
