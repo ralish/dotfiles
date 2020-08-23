@@ -215,11 +215,18 @@ Function Update-Office {
 # Update PowerShell modules & built-in help
 Function Update-PowerShell {
     [CmdletBinding()]
-    Param()
+    Param(
+        [Switch]$IncludeDscModules
+    )
 
     if (Get-Module -Name PowerShellGet -ListAvailable) {
         Write-Host -ForegroundColor Green 'Updating PowerShell modules ...'
         $InstalledModules = Get-InstalledModule
+
+        if (!$IncludeDscModules) {
+            Write-Verbose -Message 'Enumerating DSC modules for exclusion ...'
+            $DscModules = @(Get-DscResource -Module * | Select-Object -ExpandProperty ModuleName -Unique)
+        }
 
         if ((Test-IsWindows)) {
             $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::MyDocuments)
@@ -231,6 +238,11 @@ Function Update-PowerShell {
 
         # Update all modules compatible with Update-Module
         foreach ($Module in $InstalledModules) {
+            if (!$IncludeDscModules -and $Module.Name -in $DscModules) {
+                Write-Verbose -Message ('Skipping DSC module: {0}' -f $Module.Name)
+                continue
+            }
+
             if ($Module.Name -match '^AWS\.Tools\.' -and $Module.Repository -notmatch 'PSGallery') {
                 continue
             }
