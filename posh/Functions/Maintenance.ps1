@@ -216,7 +216,8 @@ Function Update-Office {
 Function Update-PowerShell {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
-        [Switch]$IncludeDscModules
+        [Switch]$IncludeDscModules,
+        [Switch]$Force
     )
 
     if (Get-Module -Name PowerShellGet -ListAvailable) {
@@ -287,7 +288,7 @@ Function Update-PowerShell {
 
     if ($PSCmdlet.ShouldProcess('PowerShell help', 'Update')) {
         Write-Host -ForegroundColor Green 'Updating PowerShell help ...'
-        Update-Help -Force
+        Update-Help -Force:$Force
     }
 
     return $true
