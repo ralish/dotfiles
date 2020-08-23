@@ -166,6 +166,12 @@
     // Extension: vscode-icons
     "vsicons.associations.files": [
         {
+            "icon": "git",
+            "extensions": [".git-blame-ignore-revs"],
+            "filename": true,
+            "format": "svg"
+        },
+        {
             "icon": "markdownlint",
             "extensions": [".markdownlintrc"],
             "filename": true,
