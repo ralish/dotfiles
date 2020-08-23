@@ -214,7 +214,7 @@ Function Update-Office {
 
 # Update PowerShell modules & built-in help
 Function Update-PowerShell {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     Param(
         [Switch]$IncludeDscModules
     )
@@ -261,26 +261,34 @@ Function Update-PowerShell {
                 continue
             }
 
-            Update-Module @UpdateModuleParams
+            if ($PSCmdlet.ShouldProcess($Module.Name, 'Update')) {
+                Update-Module @UpdateModuleParams
+            }
         }
 
         # The modular AWS Tools for PowerShell has its own mechanism
         if ($InstalledModules -contains 'AWS.Tools.Installer') {
-            Update-AWSToolsModule -CleanUp
+            if ($PSCmdlet.ShouldProcess('AWS.Tools', 'Update')) {
+                Update-AWSToolsModule -CleanUp
+            }
         }
     } else {
         Write-Warning -Message 'Unable to update PowerShell modules as PowerShellGet module not available.'
     }
 
-    if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
-        Write-Host -ForegroundColor Green 'Uninstalling obsolete PowerShell modules ...'
-        Uninstall-ObsoleteModule
-    } else {
-        Write-Warning -Message 'Unable to uninstall obsolete PowerShell modules as Uninstall-ObsoleteModule command not available.'
+    if ($PSCmdlet.ShouldProcess('Obsolete modules', 'Uninstall')) {
+        if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
+            Write-Host -ForegroundColor Green 'Uninstalling obsolete PowerShell modules ...'
+            Uninstall-ObsoleteModule
+        } else {
+            Write-Warning -Message 'Unable to uninstall obsolete PowerShell modules as Uninstall-ObsoleteModule command not available.'
+        }
     }
 
-    Write-Host -ForegroundColor Green 'Updating PowerShell help ...'
-    Update-Help -Force
+    if ($PSCmdlet.ShouldProcess('PowerShell help', 'Update')) {
+        Write-Host -ForegroundColor Green 'Updating PowerShell help ...'
+        Update-Help -Force
+    }
 
     return $true
 }
