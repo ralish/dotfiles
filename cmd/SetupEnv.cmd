@@ -1,16 +1,17 @@
 @ECHO OFF
 
-REM Bail out before doing anything if invoked by MSBuild. All manner of weird
-REM stuff may be about to run which might behave unexpectedly with our config.
+REM Bail-out: MSBuild & Visual Studio
+REM - Perf impact & our settings may cause unexpected behaviour
+IF DEFINED MSBuildExtensionsPath EXIT /B
 IF DEFINED VisualStudioVersion EXIT /B
 
-REM Bail out before doing anything if invoked by Cygwin Setup. Weird changes
-REM are made to the environment on autorebase which causes DOSKEY to crash.
-IF DEFINED CYGWINROOT EXIT /B
-
-REM Bail out before doing anything if invoked by MinGW. There are some cases I
-REM don't understand where MinGW causes this script to be executed incorrectly.
+REM Bail-out: MinGW & MSYS
+REM - In some scenarios our script doesn't execute correctly
 IF DEFINED MSYSTEM EXIT /B
+
+REM Bail-out: Cygwin Setup
+REM - Environment changes on autorebase causes DOSKEY to crash
+IF DEFINED CYGWINROOT EXIT /B
 
 REM So that we can safely run via AutoRun without infinite recursion
 REM Key Path: HKEY_CURRENT_USER\Software\Microsoft\Command Processor
