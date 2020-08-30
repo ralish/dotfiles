@@ -134,8 +134,6 @@ Function Set-R53HostedZoneParkedRecords {
             foreach ($CaaWildIssuer in $CaaIssueWild) {
                 $null = $Caa.Add(('0 issuewild "{0}"' -f $CaaWildIssuer))
             }
-        } elseif ($CaaIssue) {
-            $null = $Caa.Add('0 issuewild ";"')
         }
 
         if ($CaaIoDef) {
