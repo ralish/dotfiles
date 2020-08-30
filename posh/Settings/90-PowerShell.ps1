@@ -3,11 +3,14 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Configuring PowerShell ...
 # Number of elements to enumerate when displaying arrays
 $FormatEnumerationLimit = 5
 
-# Default to UTF-8 encoding with Out-File
+# Install-Module: Default to CurrentUser scope
+$PSDefaultParameterValues['Install-Module:Scope'] = 'CurrentUser'
+
+# Out-File: Default to UTF-8 encoding
 $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
 
-# PowerShell Core doesn't publish help for the en-GB locale
 if ($PSVersionTable.PSEdition -eq 'Core') {
+    # PowerShell Core doesn't publish help for the en-GB locale
     $PSDefaultParameterValues['Update-Help:UICulture'] = 'en-US'
 }
 
