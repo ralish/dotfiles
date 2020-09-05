@@ -194,4 +194,34 @@ Function Add-FileToEmptyDirectories {
     }
 }
 
+# Remove a subset of paths returned from git-clean
+Function Remove-GitCleanSubset {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param(
+        [Parameter(ValueFromPipeline)]
+        [String]$GitCleanDryRunOutput,
+
+        [ValidateNotNullOrEmpty()]
+        [String[]]$RemovePathsEndingWith = @('/bin/', '/obj/')
+    )
+
+    Process {
+        if ($GitCleanDryRunOutput -notmatch '^Would remove (.+)') {
+            Write-Error -Message ('Path not in expected format: {0}' -f $GitCleanDryRunOutput)
+            continue
+        }
+
+        $Path = $Matches[1]
+
+        foreach ($RemovalPath in $RemovePathsEndingWith) {
+            if ($Path.EndsWith($RemovalPath)) {
+                if ($PSCmdlet.ShouldProcess($Path, 'Remove')) {
+                    Remove-Item -Path $Path -Recurse -Force
+                }
+                continue
+            }
+        }
+    }
+}
+
 #endregion
