@@ -15,6 +15,13 @@ Function Update-DotNetTools {
     [String[]]$ListArgs = 'tool', 'list', '--global'
     [String[]]$UpdateArgs = 'tool', 'update', '--global'
 
+    # If we're running this version of dotnet for the first time the welcome
+    # banner will display. Make sure we suppress it or it'll break the regex.
+    if ($env:DOTNET_NOLOGO) {
+        $OriginalNoLogo = $env:DOTNET_NOLOGO
+    }
+    $env:DOTNET_NOLOGO = 'true'
+
     Write-Host -ForegroundColor Green -NoNewline 'Enumerating .NET tools: '
     Write-Host ('dotnet {0}' -f ($ListArgs -join ' '))
     $Tools = [Collections.ArrayList]::new()
@@ -30,6 +37,13 @@ Function Update-DotNetTools {
             Write-Host ('dotnet {0} {1}' -f ($UpdateArgs -join ' '), $Tool)
             & dotnet @UpdateArgs $Tool
         }
+    }
+
+    # Restore the original value of the DOTNET_NOLOGO environment variable
+    if ($OriginalNoLogo) {
+        $env:DOTNET_NOLOGO = $OriginalNoLogo
+    } else {
+        $env:DOTNET_NOLOGO = $null
     }
 }
 
