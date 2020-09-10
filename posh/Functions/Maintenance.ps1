@@ -139,6 +139,7 @@ Function Update-ModernApps {
     $Class = 'MDM_EnterpriseModernAppManagement_AppManagement01'
     $Method = 'UpdateScanMethod'
 
+    Write-Host -ForegroundColor Green 'Updating Microsoft Store apps ...'
     $Session = New-CimSession
     $Instance = Get-CimInstance -Namespace $Namespace -ClassName $Class
     $Result = $Session.InvokeMethod($Namespace, $Instance, $Method, $null)
