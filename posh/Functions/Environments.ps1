@@ -12,6 +12,7 @@ Function Update-DotNetTools {
         return
     }
 
+    $WriteProgressParams = @{ Activity = 'Updating .NET tools' }
     [String[]]$ListArgs = 'tool', 'list', '--global'
     [String[]]$UpdateArgs = 'tool', 'update', '--global'
 
@@ -22,6 +23,7 @@ Function Update-DotNetTools {
     }
     $env:DOTNET_NOLOGO = 'true'
 
+    Write-Progress @WriteProgressParams -Status 'Enumerating .NET tools' -PercentComplete 0
     Write-Host -ForegroundColor Green -NoNewline 'Enumerating .NET tools: '
     Write-Host ('dotnet {0}' -f ($ListArgs -join ' '))
     $Tools = [Collections.ArrayList]::new()
@@ -31,11 +33,14 @@ Function Update-DotNetTools {
         }
     }
 
+    $ToolsUpdated = 0
     foreach ($Tool in $Tools) {
         if ($PSCmdlet.ShouldProcess($Tool, 'Update')) {
+            Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $Tool) -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
             Write-Host -ForegroundColor Green -NoNewline ('Updating {0}: ' -f $Tool)
             Write-Host ('dotnet {0} {1}' -f ($UpdateArgs -join ' '), $Tool)
             & dotnet @UpdateArgs $Tool
+            $ToolsUpdated++
         }
     }
 
