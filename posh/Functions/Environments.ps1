@@ -194,10 +194,6 @@ Function Switch-Go {
             $PathParams['Action'] = 'Append'
         }
 
-        Get-EnvironmentVariable @EnvParams |
-            & $Operation @PathParams -Element $BinPath |
-            Set-EnvironmentVariable @EnvParams
-
         if ($GoPaths) {
             foreach ($GoPath in $GoPaths) {
                 Get-EnvironmentVariable @EnvParams |
@@ -205,6 +201,10 @@ Function Switch-Go {
                     Set-EnvironmentVariable @EnvParams
             }
         }
+
+        Get-EnvironmentVariable @EnvParams |
+            & $Operation @PathParams -Element $BinPath |
+            Set-EnvironmentVariable @EnvParams
     }
 }
 
