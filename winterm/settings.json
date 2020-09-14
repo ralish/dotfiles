@@ -42,6 +42,17 @@
                 "icon": "ms-appx:///ProfileIcons/{574e775e-4f2a-5b96-ac1e-a2962a402336}.png"
             },
             {
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "name": "Windows PowerShell"
+            },
+            {
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "name": "Command Prompt",
+
+                // cmd uses the exit code of the last executed console app
+                "closeOnExit": "always"
+            },
+            {
                 "name": "Ubuntu",
                 "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
 
@@ -59,15 +70,21 @@
                 "hidden": false
             },
             {
-                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "name": "Windows PowerShell"
-            },
-            {
-                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "name": "Command Prompt",
+                "name": "Kali",
+                "guid": "{46ca431a-3a87-5fb3-83cd-11ececc031d2}",
 
-                // cmd uses the exit code of the last executed console app
-                "closeOnExit": "always"
+                // Default is %USERPROFILE% which is rarely what we want
+                "startingDirectory": "//wsl$/kali-linux/home/sdl",
+
+                // Linux shells use the exit code of the last command
+                "closeOnExit": "always",
+
+                // Use the same visual settings as our SSH configuration
+                "colorScheme": "Solarized Dark",
+                "backgroundImage": null,
+
+                "source": "Windows.Terminal.Wsl",
+                "hidden": false
             },
             {
                 "name": "Git Bash",
