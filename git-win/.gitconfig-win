@@ -2,7 +2,7 @@
 	# Use CRLF line endings for text files
 	autocrlf = true
 	# Use Visual Studio Code as our editor
-	editor = code.exe --wait
+	editor = \"C:\\Users\\SDL\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe\" --wait
 	# Enable additional caching of file system
 	fscache = true
 	# Only mark the .git directory as hidden
@@ -28,7 +28,7 @@
 	tool = vscode
 
 [difftool "vscode"]
-	cmd = code.exe --wait --diff $LOCAL $REMOTE
+	cmd = \"C:\\Users\\SDL\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe\" --wait --diff \"$LOCAL\" \"$REMOTE\"
 
 [http]
 	# Use the SChannel backend for SSL connections
