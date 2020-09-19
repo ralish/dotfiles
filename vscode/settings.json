@@ -155,6 +155,9 @@
     // Extension: shell-format
     "shellformat.useEditorConfig": true,
 
+    // Extension: SonarLint
+    "sonarlint.disableTelemetry": true,
+
     // Extension: Visual Studio IntelliCode
     "vsintellicode.features.python.deepLearning": "enabled",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
