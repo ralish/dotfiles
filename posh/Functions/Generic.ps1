@@ -428,6 +428,67 @@ Function Format-Xml {
     }
 }
 
+# Sort XML elements
+# Via: https://danielsmon.com/2017/03/10/diff-xml-via-sorting-xml-elements-and-attributes/
+Function Sort-XmlElement {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [Xml.XmlElement[]]$XmlElement,
+
+        [Switch]$SortAttributes,
+
+        [ValidateRange("NonNegative")]
+        [Int]$Depth = 0,
+
+        [ValidateRange("NonNegative")]
+        [Int]$MaxDepth = 25
+    )
+
+    Begin {
+        if ($MaxDepth -lt $Depth) {
+            throw 'Maximum sorting depth cannot be less than current depth.'
+        }
+    }
+
+    Process {
+        foreach ($Element in $XmlElement) {
+            $Children = @()
+            $Attributes = @()
+
+            if ($Element.HasChildNodes) {
+                if ($Depth -lt $MaxDepth) {
+                    $ChildElements = @($Element.ChildNodes | Where-Object NodeType -EQ 'Element')
+                    foreach ($ChildElement in $ChildElements) {
+                        Sort-XmlElement -XmlElement $ChildElement -SortAttributes:$SortAttributes -Depth ($Depth + 1) -MaxDepth $MaxDepth
+                    }
+                }
+
+                $Children = @($Element.ChildNodes | Sort-Object -Property OuterXml)
+            }
+
+            if ($Element.HasAttributes) {
+                if ($SortAttributes) {
+                    $Attributes = @($Element.Attributes | Sort-Object -Property Name)
+                } else {
+                    $Attributes = @($Element.Attributes)
+                }
+            }
+
+            $Element.RemoveAll()
+
+            foreach ($Child in $Children) {
+                $null = $Element.AppendChild($Child)
+            }
+
+            foreach ($Attribute in $Attributes) {
+                $null = $Element.Attributes.Append($Attribute)
+            }
+        }
+    }
+}
+
 #endregion
 
 #region Path management
