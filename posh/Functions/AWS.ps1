@@ -157,9 +157,9 @@ Function Set-R53HostedZoneParkedRecords {
         $ZoneRecords = [Collections.ArrayList]::new()
 
         if ($Records -contains 'MX') {
-            $Record = New-Object Amazon.Route53.Model.Change
+            $Record = [Amazon.Route53.Model.Change]::new()
             $Record.Action = 'UPSERT'
-            $Record.ResourceRecordSet = New-Object Amazon.Route53.Model.ResourceRecordSet
+            $Record.ResourceRecordSet = [Amazon.Route53.Model.ResourceRecordSet]::new()
             $Record.ResourceRecordSet.Name = $ZoneName
             $Record.ResourceRecordSet.Type = 'MX'
             $Record.ResourceRecordSet.TTL = 3600
@@ -168,9 +168,9 @@ Function Set-R53HostedZoneParkedRecords {
         }
 
         if ($Records -contains 'SPF') {
-            $Record = New-Object Amazon.Route53.Model.Change
+            $Record = [Amazon.Route53.Model.Change]::new()
             $Record.Action = 'UPSERT'
-            $Record.ResourceRecordSet = New-Object Amazon.Route53.Model.ResourceRecordSet
+            $Record.ResourceRecordSet = [Amazon.Route53.Model.ResourceRecordSet]::new()
             $Record.ResourceRecordSet.Name = $ZoneName
             $Record.ResourceRecordSet.Type = 'TXT'
             $Record.ResourceRecordSet.TTL = 3600
@@ -179,9 +179,9 @@ Function Set-R53HostedZoneParkedRecords {
         }
 
         if ($Records -contains 'DKIM') {
-            $Record = New-Object Amazon.Route53.Model.Change
+            $Record = [Amazon.Route53.Model.Change]::new()
             $Record.Action = 'UPSERT'
-            $Record.ResourceRecordSet = New-Object Amazon.Route53.Model.ResourceRecordSet
+            $Record.ResourceRecordSet = [Amazon.Route53.Model.ResourceRecordSet]::new()
             $Record.ResourceRecordSet.Name = ('*._domainkey.{0}' -f $ZoneName)
             $Record.ResourceRecordSet.Type = 'TXT'
             $Record.ResourceRecordSet.TTL = 3600
@@ -190,9 +190,9 @@ Function Set-R53HostedZoneParkedRecords {
         }
 
         if ($Records -contains 'DMARC') {
-            $Record = New-Object Amazon.Route53.Model.Change
+            $Record = [Amazon.Route53.Model.Change]::new()
             $Record.Action = 'UPSERT'
-            $Record.ResourceRecordSet = New-Object Amazon.Route53.Model.ResourceRecordSet
+            $Record.ResourceRecordSet = [Amazon.Route53.Model.ResourceRecordSet]::new()
             $Record.ResourceRecordSet.Name = ('_dmarc.{0}' -f $ZoneName)
             $Record.ResourceRecordSet.Type = 'TXT'
             $Record.ResourceRecordSet.TTL = 3600
@@ -201,9 +201,9 @@ Function Set-R53HostedZoneParkedRecords {
         }
 
         if ($Caa) {
-            $Record = New-Object Amazon.Route53.Model.Change
+            $Record = [Amazon.Route53.Model.Change]::new()
             $Record.Action = 'UPSERT'
-            $Record.ResourceRecordSet = New-Object Amazon.Route53.Model.ResourceRecordSet
+            $Record.ResourceRecordSet = [Amazon.Route53.Model.ResourceRecordSet]::new()
             $Record.ResourceRecordSet.Name = $ZoneName
             $Record.ResourceRecordSet.Type = 'CAA'
             $Record.ResourceRecordSet.TTL = 900
@@ -218,12 +218,12 @@ Function Set-R53HostedZoneParkedRecords {
         if ($RedirectCloudFrontDomainName) {
             foreach ($RecordName in @($ZoneName, ('*.{0}' -f $ZoneName))) {
                 foreach ($RecordType in $RedirectCloudFrontRecordTypes) {
-                    $Record = New-Object Amazon.Route53.Model.Change
+                    $Record = [Amazon.Route53.Model.Change]::new()
                     $Record.Action = 'UPSERT'
-                    $Record.ResourceRecordSet = New-Object Amazon.Route53.Model.ResourceRecordSet
+                    $Record.ResourceRecordSet = [Amazon.Route53.Model.ResourceRecordSet]::new()
                     $Record.ResourceRecordSet.Name = $RecordName
                     $Record.ResourceRecordSet.Type = $RecordType
-                    $Record.ResourceRecordSet.AliasTarget = New-Object Amazon.Route53.Model.AliasTarget
+                    $Record.ResourceRecordSet.AliasTarget = [Amazon.Route53.Model.AliasTarget]::new()
                     $Record.ResourceRecordSet.AliasTarget.HostedZoneId = $CloudFrontHostedZoneId
                     $Record.ResourceRecordSet.AliasTarget.DNSName = $RedirectCloudFrontDomainName
                     $Record.ResourceRecordSet.AliasTarget.EvaluateTargetHealth = $false

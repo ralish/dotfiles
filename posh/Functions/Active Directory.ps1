@@ -266,7 +266,7 @@ Function New-ADShadowPrincipal {
 
     $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer
 
-    $SidByteArray = New-Object -TypeName Byte[] -ArgumentList @($Sid.BinaryLength)
+    $SidByteArray = [byte[]]::new($Sid.BinaryLength)
     $Sid.GetBinaryForm($SidByteArray, 0)
 
     New-ADObject -Type 'msDS-ShadowPrincipal' -Path $ShadowPrincipalContainer -Name $Name -OtherAttributes @{ 'msDS-ShadowPrincipalSid' = $SidByteArray }

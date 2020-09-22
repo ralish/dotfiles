@@ -110,12 +110,12 @@ public static extern bool SetConsoleMode(
             Write-Debug -Message (Get-DotFilesMessage -Message ('Operating on console handle: {0}' -f $ConStdHandleName))
             $ConStdHandle = [DotFiles.ConsoleAPI]::GetStdHandle([DotFiles.ConsoleAPI+StdHandleDevices]::$ConStdHandleName)
             if ($ConStdHandle -eq -1) {
-                throw (New-Object -TypeName ComponentModel.Win32Exception)
+                throw [ComponentModel.Win32Exception]::new()
             }
 
             [uint32]$ConStdMode = 0
             if (!([DotFiles.ConsoleAPI]::GetConsoleMode($ConStdHandle, [ref]$ConStdMode))) {
-                throw (New-Object -TypeName ComponentModel.Win32Exception)
+                throw [ComponentModel.Win32Exception]::new()
             }
             Write-Debug -Message (Get-DotFilesMessage -Message ('Current console output mode: {0}' -f [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]$ConStdMode))
 
@@ -123,12 +123,12 @@ public static extern bool SetConsoleMode(
             if ($ConStdVT100) {
                 Write-Debug -Message (Get-DotFilesMessage -Message 'Disabling console VT100 support ...')
                 if (!([DotFiles.ConsoleAPI]::SetConsoleMode($ConStdHandle, [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]$ConStdMode -bxor [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
-                    throw (New-Object -TypeName ComponentModel.Win32Exception)
+                    throw [ComponentModel.Win32Exception]::new()
                 }
 
                 Write-Debug -Message (Get-DotFilesMessage -Message 'Enabling console VT100 support ...')
                 if (!([DotFiles.ConsoleAPI]::SetConsoleMode($ConStdHandle, [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]$ConStdMode -bor [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
-                    throw (New-Object -TypeName ComponentModel.Win32Exception)
+                    throw [ComponentModel.Win32Exception]::new()
                 }
             } else {
                 Write-Debug -Message (Get-DotFilesMessage -Message 'VT100 processing not enabled on this handle.')
