@@ -93,11 +93,11 @@ Function Optimize-PowerShell {
         return
     }
 
-    Write-Host -ForegroundColor Green '[PowerShell] Setting PSGallery repository to trusted ...'
-    $null = Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-
     Write-Host -ForegroundColor Green '[PowerShell] Installing NuGet package provider ...'
     $null = Install-PackageProvider -Name NuGet -Force
+
+    Write-Host -ForegroundColor Green '[PowerShell] Setting PSGallery repository to trusted ...'
+    $null = Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
     Write-Host -ForegroundColor Green '[PowerShell] Installing PowerShellGet module ...'
     $null = Install-Module -Name PowerShellGet -Force
@@ -111,13 +111,13 @@ Function Optimize-PowerShell {
 
     Write-Host -ForegroundColor Green '[PowerShell] Installing modules ...'
     foreach ($Module in $Modules) {
-        Write-Host -ForegroundColor Grey ('[PowerShell] - {0}' -f $Module)
+        Write-Host -ForegroundColor Gray ('[PowerShell] - {0}' -f $Module)
         $null = Install-Module -Name $Module -Force
     }
 
     if ($Modules -notcontains 'PSReadLine') {
         Write-Host -ForegroundColor Cyan '[PowerShell] To update PSReadLine run the following from an elevated Command Prompt:'
-        Write-Host -ForegroundColor Cyan '             powershell -NoProfile -NonInteractive -Command "Install-Module -Name PSReadLine -AllowPrerelease -Force"'
+        Write-Host -ForegroundColor Cyan '             powershell -NoProfile -NonInteractive -Command "Install-Module -Name PSReadLine -AllowPrerelease -Force'
     }
 }
 
