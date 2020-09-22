@@ -421,6 +421,9 @@ Function Format-Xml {
         $XmlDoc = [Xml.XmlDataDocument]::new()
         $XmlDoc.LoadXml($Data)
         $XmlDoc.WriteContentTo($XmlWriter)
+
+        # Explicitly dispose to ensure buffer is flushed
+        $XmlWriter.Dispose()
         $StringWriter.ToString()
     }
 }
