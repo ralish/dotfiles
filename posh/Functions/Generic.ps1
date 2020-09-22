@@ -395,7 +395,10 @@ Function Format-Xml {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [String[]]$Xml
+        [String[]]$Xml,
+
+        [ValidateRange(-1, 100)]
+        [Int]$IndentSize = 4
     )
 
     Begin {
@@ -407,14 +410,17 @@ Function Format-Xml {
     }
 
     End {
-        $XmlDoc = New-Object -TypeName Xml.XmlDataDocument
+        $StringWriter = [IO.StringWriter]::new()
+        $XmlWriterSettings = [Xml.XmlWriterSettings]::new()
+        if ($IndentSize -ge 0) {
+            $XmlWriterSettings.Indent = $true
+            $XmlWriterSettings.IndentChars = [String]::new(' ', $IndentSize)
+        }
+        $XmlWriter = [Xml.XmlWriter]::Create($StringWriter, $XmlWriterSettings)
+
+        $XmlDoc = [Xml.XmlDataDocument]::new()
         $XmlDoc.LoadXml($Data)
-
-        $StringWriter = New-Object -TypeName IO.StringWriter
-        $XmlTextWriter = New-Object -TypeName Xml.XmlTextWriter -ArgumentList $StringWriter
-        $XmlTextWriter.Formatting = [Xml.Formatting]::Indented
-
-        $XmlDoc.WriteContentTo($XmlTextWriter)
+        $XmlDoc.WriteContentTo($XmlWriter)
         $StringWriter.ToString()
     }
 }
