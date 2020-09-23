@@ -5,6 +5,26 @@ if (!(Test-IsWindows)) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Windows functions ...')
 
+#region Desktop
+
+# Disable presentation mode
+Function Disable-PresentationMode {
+    [CmdletBinding()]
+    Param()
+
+    & PresentationSettings.exe /stop
+}
+
+# Enable presentation mode
+Function Enable-PresentationMode {
+    [CmdletBinding()]
+    Param()
+
+    & PresentationSettings.exe /start
+}
+
+#endregion
+
 #region Environment variables
 
 # Retrieve a persisted environment variable
