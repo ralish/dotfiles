@@ -175,6 +175,12 @@
             "extensions": [".markdownlintrc"],
             "filename": true,
             "format": "svg"
+        },
+        {
+            "icon": "xml",
+            "extensions": ["app.manifest"],
+            "filename": true,
+            "format": "svg"
         }
     ],
     "vsicons.dontShowNewVersionMessage": true,
