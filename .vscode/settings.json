@@ -118,12 +118,6 @@
             "disabled": true
         },
         {
-            "icon": "markdownlint",
-            "extensions": [".markdownlintrc"],
-            "filename": true,
-            "format": "svg"
-        },
-        {
             "icon": "mysql",
             "extensions": [".my.cnf"],
             "filename": true,
