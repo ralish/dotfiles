@@ -12,7 +12,7 @@ $env:DOTNET_CLI_TELEMETRY_OPTOUT = 'true'
 # https://docs.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete
 Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
-    dotnet complete --position $cursorPosition "$commandAst" | ForEach-Object {
+    dotnet complete --position $cursorPosition $commandAst.ToString() | ForEach-Object {
         [Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
     }
 }
