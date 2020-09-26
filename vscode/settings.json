@@ -26,7 +26,9 @@
     // Text Editor: Files
     "files.associations": {
         // Configuration files (usually INI syntax)
-        "*.cnf": "ini"
+        "*.cnf": "ini",
+        // NuGet restore cache files
+        "project.nuget.cache": "json"
     },
     "files.autoSave": "onWindowChange",
     "files.defaultLanguage": "${activeEditorLanguage}",
@@ -179,6 +181,12 @@
         {
             "icon": "xml",
             "extensions": ["app.manifest"],
+            "filename": true,
+            "format": "svg"
+        },
+        {
+            "icon": "json",
+            "extensions": ["project.nuget.cache"],
             "filename": true,
             "format": "svg"
         }
