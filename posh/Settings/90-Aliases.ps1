@@ -4,6 +4,7 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Configuring aliases ...')
 Set-Alias -Name cop -Value Compare-ObjectProperties
 Set-Alias -Name gh -Value Get-Help
 Set-Alias -Name gita -Value Invoke-GitChildDir
+Set-Alias -Name rdn -Value Resolve-DnsName
 Set-Alias -Name up -Value Update-Profile
 Set-Alias -Name which -Value Get-Command
 
