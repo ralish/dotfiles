@@ -3,8 +3,7 @@
     <FriendlyName>less</FriendlyName>
 
     <Detection>
-        <Method>Static</Method>
-        <Availability>AlwaysInstall</Availability>
+        <Method>FindInPath</Method>
     </Detection>
 
     <InstallPath>
