@@ -3,7 +3,7 @@ default_bits                        = 4096
 default_md                          = sha256
 
 encrypt_key                         = no
-prompt                              = no
+prompt                              = yes
 utf8                                = yes
 string_mask                         = utf8only
 
@@ -14,24 +14,28 @@ x509_extensions                     = req_ext
 
 [ req_dn ]
 # CN=
-#commonName                          =
+commonName                          = Common Name
+commonName_max                      = 64
 # E=
-#emailAddress                        =
+emailAddress                        = Email Address
+emailAddress_max                    = 64
 # OU=
-#organizationalUnitName              =
+organizationalUnitName              = Organisational Unit
 # O=
-#organizationName                    =
+organizationName                    = Organisation
 # L=
-#localityName                        =
+localityName                        = Locality/Suburb
 # ST=
-#stateOrProvinceName                 =
+stateOrProvinceName                 = State/Territory/Province
 # C=
-#countryName                         =
+countryName                         = Country (2 letter code)
+countryName_min                     = 2
+countryName_max                     = 2
 
 
 [ req_ext ]
 # Basic Constraints
-#basicConstraints                    = CA:TRUE, pathlen:0
+basicConstraints                    = CA:FALSE
 
 # Key Usage
 #
@@ -45,7 +49,7 @@ x509_extensions                     = req_ext
 # - keyCertSign
 # - keyEncipherment
 # - nonRepudiation
-#keyUsage                            = dataEncipherment, keyEncipherment
+keyUsage                            = dataEncipherment, keyEncipherment
 
 # Extended Key Usage
 #
