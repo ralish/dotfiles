@@ -38,6 +38,12 @@ REM SET SetupEnvVerbose=Yes
 IF DEFINED SetupEnvVerbose ECHO.
 IF DEFINED SetupEnvVerbose ECHO Configuring Command Processor:
 
+REM Switch to user profile directory if the current path is the Windows
+REM System32 directory. This probably means we were launched elevated.
+IF /I "%CD%" == "%SystemRoot%\System32" (
+    CD /D "%USERPROFILE%"
+)
+
 REM Inject Clink for a more pleasant experience
 IF EXIST "%CLINK_DIR%" (
     IF DEFINED SetupEnvVerbose ECHO * [Clink] Injecting ...

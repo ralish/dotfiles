@@ -4,6 +4,12 @@ if (!(Test-IsWindows)) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading Windows settings ...')
 
+# Switch to user profile directory if the current path is the Windows
+# System32 directory. This probably means we were launched elevated.
+if ($PWD.Path -eq "$env:SystemRoot\System32") {
+    Set-Location -Path $HOME
+}
+
 # Windows 10 releases starting with 1511 (Threshold 1) include improved
 # console VT100 support. Applications can enable the support by calling
 # SetConsoleMode() with the ENABLE_VIRTUAL_TERMINAL_PROCESSING flag. It
