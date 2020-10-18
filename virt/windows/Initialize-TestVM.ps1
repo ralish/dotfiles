@@ -10,6 +10,7 @@ Param(
         'WindowsComponents',
         'WindowsDefender',
         'WindowsFeatures',
+        'WindowsPower',
         'WindowsSecurity',
         'WindowsSettingsComputer',
         'WindowsSettingsUser',
@@ -25,6 +26,7 @@ Param(
         'WindowsComponents',
         'WindowsDefender',
         'WindowsFeatures',
+        'WindowsPower',
         'WindowsSecurity',
         'WindowsSettingsComputer',
         'WindowsSettingsUser',
@@ -207,6 +209,17 @@ Function Optimize-WindowsFeatures {
     Write-Host
 }
 
+Function Optimize-WindowsPower {
+    [CmdletBinding()]
+    Param()
+
+    Write-Host -ForegroundColor Green '[Windows] Applying power settings ...'
+    & PowerCfg /Change monitor-timeout-ac 0
+    & PowerCfg /Change disk-timeout-ac 0
+    & PowerCfg /Change standby-timeout-ac 0
+    & PowerCfg /Change hibernate-timeout-ac 0
+}
+
 Function Optimize-WindowsSecurity {
     [CmdletBinding()]
     Param()
@@ -384,6 +397,7 @@ $Tasks = @(
     'WindowsUpdate',
     'WindowsDefender',
     'WindowsSecurity',
+    'WindowsPower',
     'WindowsSettingsComputer',
     'WindowsSettingsUser',
     'WindowsFeatures',
