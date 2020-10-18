@@ -146,12 +146,56 @@ Function Optimize-WindowsDefender {
         return
     }
 
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling behaviour monitoring ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableBehaviorMonitoring' -Type DWord -Value 1
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling downloaded files and attachments scanning ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableIOAVProtection' -Type DWord -Value 1
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling file and program activity monitoring ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableOnAccessProtection' -Type DWord -Value 1
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling real-time protection ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableRealtimeMonitoring' -Type DWord -Value 1
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling scheduled remediation scans ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Remediation' -Name 'Scan_ScheduleDay' -Type DWord -Value 8
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling signature update before scheduled scan ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Scan' -Name 'CheckForSignaturesBeforeRunningScan' -Type DWord -Value 0
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling scheduled scans ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Scan' -Name 'ScheduleDay' -Type DWord -Value 8
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling scan on signature update ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'DisableScanOnUpdate' -Type DWord -Value 1
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling startup update on absent malware engine ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'DisableUpdateOnStartupWithoutEngine' -Type DWord -Value 1
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling scheduled signature updates ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'ScheduleDay' -Type DWord -Value 8
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling signature update on startup ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'UpdateOnStartUp' -Type DWord -Value 0
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling Microsoft Active Protection Service ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Spynet' -Name 'SpynetReporting' -Type DWord -Value 0
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling submission of file samples ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Spynet' -Name 'SubmitSamplesConsent' -Type DWord -Value 2
+
+    Write-Host -ForegroundColor Green '[Windows Defender] Disabling recent activity and scan results notifications ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows Defender Security Center\Virus and threat protection' -Name 'SummaryNotificationDisabled' -Type DWord -Value 1
+
+    if ((Get-WindowsBuild) -le '17763') {
+        Write-Host -ForegroundColor Green '[Windows Defender] Disabling service ...'
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender' -Name 'DisableAntiSpyware' -Type DWord -Value 1
+    }
+
     Write-Host -ForegroundColor Green -NoNewline '[Windows Defender] Removing definitions ...'
     & $MpCmdRun -RemoveDefinitions -All
     Write-Host
-
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling service ...'
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender' -Name 'DisableAntiSpyware' -Type DWord -Value 1
 }
 
 Function Optimize-WindowsFeatures {
@@ -258,6 +302,19 @@ Function Optimize-WindowsUpdate {
     Set-RegistryValue -Path 'HKCU:\Software\Policies\Microsoft\MRT' -Name 'DontOfferThroughWUAU' -Type DWord -Value 1
 }
 
+#region Utilities
+
+Function Get-WindowsBuild {
+    [CmdletBinding()]
+    Param()
+
+    if (!$script:WindowsBuild) {
+        $script:WindowsBuild = [int](Get-CimInstance -ClassName Win32_OperatingSystem -Verbose:$false).BuildNumber
+    }
+
+    return $script:WindowsBuild
+}
+
 Function Set-RegistryValue {
     [CmdletBinding()]
     Param(
@@ -320,6 +377,8 @@ Function Test-Wow64Present {
         $Script:Wow64Present = $false
     }
 }
+
+#endregion
 
 $Tasks = @(
     'WindowsUpdate',
