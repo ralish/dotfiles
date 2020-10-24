@@ -40,6 +40,9 @@
 [help]
 	autoCorrect = 0
 
+[init]
+	defaultBranch = main
+
 [log]
 	abbrevCommit = true
 	follow = true
