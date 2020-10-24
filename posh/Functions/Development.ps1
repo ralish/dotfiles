@@ -111,7 +111,7 @@ Function Invoke-GitMergeAllBranches {
     [CmdletBinding()]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$SourceBranch = 'master'
+        [String]$SourceBranch = 'main'
     )
 
     $Branches = @()
