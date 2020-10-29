@@ -85,6 +85,7 @@ Function Switch-Cygwin {
         $Operation = 'Remove-PathStringElement'
     }
 
+    $Path = [IO.Path]::GetFullPath($Path)
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
     $LocalBinPath = Join-Path -Path $Path -ChildPath 'usr\local\bin'
 
@@ -166,6 +167,7 @@ Function Switch-Go {
         $Operation = 'Remove-PathStringElement'
     }
 
+    $Path = [IO.Path]::GetFullPath($Path)
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
     $GoPaths = @()
@@ -243,6 +245,8 @@ Function Switch-Google {
         $VsVersion = [String]::Empty
     }
 
+    $Path = [IO.Path]::GetFullPath($Path)
+
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $Path
 
@@ -307,6 +311,7 @@ Function Switch-Java {
         $JavaHome = [String]::Empty
     }
 
+    $Path = [IO.Path]::GetFullPath($Path)
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
     $env:Path = $env:Path |
@@ -367,6 +372,7 @@ Function Switch-Nodejs {
         $Operation = 'Remove-PathStringElement'
     }
 
+    $Path = [IO.Path]::GetFullPath($Path)
     $LocalNpmPath = Join-Path -Path $env:APPDATA -ChildPath 'npm'
 
     $env:Path = $env:Path |
@@ -444,6 +450,7 @@ Function Switch-Perl {
         $Operation = 'Remove-PathStringElement'
     }
 
+    $Path = [IO.Path]::GetFullPath($Path)
     $RootBinPath = Join-Path -Path $Path -ChildPath 'c\bin'
     $SiteBinPath = Join-Path -Path $Path -ChildPath 'perl\site\bin'
     $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
@@ -496,6 +503,8 @@ Function Switch-PHP {
     } else {
         $Operation = 'Remove-PathStringElement'
     }
+
+    $Path = [IO.Path]::GetFullPath($Path)
 
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $Path
@@ -566,6 +575,7 @@ Function Switch-Python {
         $Operation = 'Remove-PathStringElement'
     }
 
+    $Path = [IO.Path]::GetFullPath($Path)
     $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
     $LocalScriptsSharedPath = Join-Path -Path $env:APPDATA -ChildPath 'Python\Scripts'
     $LocalScriptsVersionedPath = Join-Path -Path $env:APPDATA -ChildPath ('Python\Python{0}\Scripts' -f $StrippedVersion)
@@ -672,6 +682,7 @@ Function Switch-Ruby {
         $Options = [String]::Empty
     }
 
+    $Path = [IO.Path]::GetFullPath($Path)
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
     $env:Path = $env:Path |
@@ -792,6 +803,8 @@ Function Switch-WindowsSDK {
         $Operation = 'Remove-PathStringElement'
     }
 
+    $Path = [IO.Path]::GetFullPath($Path)
+
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $SdkPath
 
@@ -806,7 +819,6 @@ Function Switch-WindowsSDK {
 
         Get-EnvironmentVariable @EnvParams |
             & $Operation @PathParams -Element $SdkPath |
-            & $Operation @PathParams -Element $Path |
             Set-EnvironmentVariable @EnvParams
     }
 }
