@@ -15,12 +15,12 @@ fi
 
 ubuntu_codename="$(lsb_release -s -c)"
 
-echo '[apt] Switching to global mirror ... '
+echo '[apt] Switching to local mirror ... '
 if ! [[ $ubuntu_codename == lucid ]]; then
-    sed -i 's/\([a-z]\{2\}\.\)\?\(archive\.ubuntu\.com\)/\2/' /etc/apt/sources.list
+    sed -i 's/http:\/\/\([a-z]\{2\}\.\)\?\(archive\.ubuntu\.com\)/http:\/\/au\.\2/' /etc/apt/sources.list
 else
-    sed -i 's/\([a-z]\{2\}\.\)\?archive\.ubuntu\.com/old-releases.ubuntu.com/' /etc/apt/sources.list
-    sed -i 's/security\.ubuntu\.com/old-releases.ubuntu.com/' /etc/apt/sources.list
+    sed -i 's/http:\/\/\([a-z]\{2\}\.\)\?archive\.ubuntu\.com/http:\/\/old-releases.ubuntu.com/' /etc/apt/sources.list
+    sed -i 's/http:\/\/security\.ubuntu\.com/http:\/\/old-releases.ubuntu.com/' /etc/apt/sources.list
 fi
 
 echo '[apt] Disabling automatic updates ...'
