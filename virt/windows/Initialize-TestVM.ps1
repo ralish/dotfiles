@@ -119,7 +119,7 @@ Function Optimize-PowerShell {
 
     if ($Modules -notcontains 'PSReadLine') {
         Write-Host -ForegroundColor Cyan '[PowerShell] To update PSReadLine run the following from an elevated Command Prompt:'
-        Write-Host -ForegroundColor Cyan '             powershell -NoProfile -NonInteractive -Command "Install-Module -Name PSReadLine -AllowPrerelease -Force'
+        Write-Host -ForegroundColor Cyan '             powershell -NoProfile -NonInteractive -Command "Install-Module -Name PSReadLine -AllowPrerelease -Force"'
     }
 }
 
