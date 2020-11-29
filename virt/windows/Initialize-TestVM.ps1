@@ -90,20 +90,65 @@ Function Optimize-PowerShell {
     [CmdletBinding()]
     Param()
 
-    if (!($PSVersionTable.PSVersion.Major -gt 5 -or ($PSVersionTable.PSVersion.Major -eq 5 -and $PSVersionTable.PSVersion.Minor -ge 1))) {
-        Write-Warning 'Skipping PowerShell settings as version is not 5.1 or newer.'
+    if (!($PSVersionTable.PSVersion.Major -ge 5)) {
+        Write-Warning 'Skipping PowerShell settings as version is not 5.0 or newer.'
         return
     }
 
     Write-Host -ForegroundColor Green '[PowerShell] Installing NuGet package provider ...'
-    $null = Install-PackageProvider -Name NuGet -Force
+    if (Get-Command -Name 'Install-PackageProvider' -ErrorAction Ignore) {
+        $null = Install-PackageProvider -Name NuGet -Force
+    } else {
+        # Older versions of PowerShellGet lack the Install-PackageProvider
+        # command. They will try to download the NuGet package provider on
+        # calling Install-Module but the manifest specifies a dead URL. The
+        # workaround is to manually retrieve the required binary and place it
+        # where the module expects.
+        $ProvidersPath = Join-Path -Path $env:ProgramFiles -ChildPath 'PackageManagement\ProviderAssemblies'
+        $NuGetPath = Join-Path -Path $ProvidersPath -ChildPath 'nuget-anycpu.exe'
+        $NuGetUrl = 'https://oneget.org/nuget-anycpu-2.8.5.127.exe'
+
+        if (!(Test-Path -Path $NuGetPath -PathType Leaf)) {
+            if (!(Test-Path -Path $ProvidersPath -PathType Container)) {
+                $null = New-Item -Path $ProvidersPath -ItemType Directory
+            }
+
+            # Disabling progress output substantially improves performance
+            $ProgressPreferenceOriginal = $ProgressPreference
+            $ProgressPreference = 'SilentlyContinue'
+            $null = Invoke-WebRequest -Uri $NuGetUrl -OutFile $NuGetPath -UseBasicParsing
+            $ProgressPreference = $ProgressPreferenceOriginal
+
+            # There's some caching of package providers and I've yet to find a
+            # way to invalidate it other than restarting the session.
+            if (Get-Module -Name PowerShellGet) {
+                Write-Host -ForegroundColor Cyan '[PowerShell] You must restart PowerShell to complete NuGet package provider installation.'
+                Write-Host -ForegroundColor Cyan '             Re-run this script afterwards to continue initial PowerShell configuration.'
+                return
+            }
+        }
+    }
 
     Write-Host -ForegroundColor Green '[PowerShell] Setting PSGallery repository to trusted ...'
     $null = Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
     Write-Host -ForegroundColor Green '[PowerShell] Installing PowerShellGet module ...'
-    $null = Install-Module -Name PowerShellGet -Force
+    $PSGetLoaded = Get-Module -Name PowerShellGet | Sort-Object -Property Version -Descending | Select-Object -First 1
+    Install-Module -Name PowerShellGet -Force
     Import-Module -Name PowerShellGet -Force
+    $PSGetInstalled = Get-Module -Name PowerShellGet | Sort-Object -Property Version -Descending | Select-Object -First 1
+
+    # PowerShellGet loads various .NET types, and types can't be unloaded (at
+    # least not easily). That can be problematic as when loading a new version
+    # of PowerShellGet into a session with an earlier version already loaded,
+    # some types may have been updated but cannot be loaded to replace earlier
+    # loaded types. The simple solution is to restart PowerShell so we have a
+    # new session which isn't "polluted" by earlier module imports.
+    if ($PSGetLoaded.Version -ne $PSGetInstalled.Version) {
+        Write-Host -ForegroundColor Cyan '[PowerShell] You must restart PowerShell to complete PowerShellGet module installation.'
+        Write-Host -ForegroundColor Cyan '             Re-run this script afterwards to continue initial PowerShell configuration.'
+        return
+    }
 
     Write-Host -ForegroundColor Green '[PowerShell] Determining modules to install ...'
     $Modules = @('SpeculationControl', 'PSWindowsUpdate', 'PSWinGlue', 'PSWinVitals')
