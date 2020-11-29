@@ -260,8 +260,28 @@ Function Optimize-WindowsFeatures {
     [CmdletBinding()]
     Param()
 
+    $DismParams = [Collections.ArrayList]@(
+        '/Online',
+        '/Enable-Feature',
+        '/FeatureName:NetFx3',
+        '/All'
+    )
+
+    # Windows Server 2019 requires access to the installation media as it seems
+    # the relevant files can't be automatically retrieved from Windows Update.
+    $WinVer = Get-CimInstance -ClassName Win32_OperatingSystem
+    if ($WinVer.Version -eq '10.0.17763' -and $Winver.ProductType -ne 1) {
+        $SxsPath = 'D:\sources\sxs'
+        if (!(Test-Path -Path $SxsPath -PathType Container)) {
+            Write-Warning -Message ('Skipping .NET Framework 3.5 installation as sources path not present: {0}' -f $SxsPath)
+            return
+        }
+
+        $null = $DismParams.Add(('/Source:{0}' -f $SxsPath))
+    }
+
     Write-Host -ForegroundColor Green -NoNewline '[Windows] Installing .NET Framework 3.5 ...'
-    & dism.exe /Online /Enable-Feature /FeatureName:NetFx3 /All
+    Start-Process -FilePath 'dism.exe' -ArgumentList $DismParams -NoNewWindow -Wait
     Write-Host
 }
 
