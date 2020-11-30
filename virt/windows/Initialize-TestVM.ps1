@@ -245,7 +245,7 @@ Function Optimize-WindowsDefender {
     Write-Host -ForegroundColor Green '[Windows Defender] Disabling recent activity and scan results notifications ...'
     Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows Defender Security Center\Virus and threat protection' -Name 'SummaryNotificationDisabled' -Type DWord -Value 1
 
-    if ((Get-WindowsBuild) -le '17763') {
+    if ($script:WindowsBuildNumber -le '17763') {
         Write-Host -ForegroundColor Green '[Windows Defender] Disabling service ...'
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender' -Name 'DisableAntiSpyware' -Type DWord -Value 1
     }
@@ -266,22 +266,20 @@ Function Optimize-WindowsFeatures {
     )
 
     # The /All parameter is only available since Windows 8 and Server 2012
-    if ((Get-WindowsBuild) -ge '9200') {
+    if ($script:WindowsBuildNumber -ge '9200') {
         $null = $DismParams.Add('/All')
     }
 
     # Windows Server 2019 requires access to the installation media as it seems
     # the relevant files can't be automatically retrieved from Windows Update.
-    if ((Get-WindowsBuild) -eq '17763') {
-        if ((Get-CimInstance -ClassName Win32_OperatingSystem).ProductType -ne 1) {
-            $SxsPath = 'D:\sources\sxs'
-            if (!(Test-Path -Path $SxsPath -PathType Container)) {
-                Write-Warning -Message ('Skipping .NET Framework 3.5 installation as sources path not present: {0}' -f $SxsPath)
-                return
-            }
-
-            $null = $DismParams.Add(('/Source:{0}' -f $SxsPath))
+    if ($script:WindowsBuildNumber -eq '17763' -and $script:WindowsProductType -ne 1) {
+        $SxsPath = 'D:\sources\sxs'
+        if (!(Test-Path -Path $SxsPath -PathType Container)) {
+            Write-Warning -Message ('Skipping .NET Framework 3.5 installation as sources path not present: {0}' -f $SxsPath)
+            return
         }
+
+        $null = $DismParams.Add(('/Source:{0}' -f $SxsPath))
     }
 
     Write-Host -ForegroundColor Green -NoNewline '[Windows] Installing .NET Framework 3.5 ...'
@@ -397,19 +395,18 @@ Function Optimize-WindowsUpdate {
 
 #region Utilities
 
-Function Get-WindowsBuild {
+Function Get-WindowsInfo {
     [CmdletBinding()]
     Param()
 
-    if (!$script:WindowsBuild) {
-        if (Get-Command -Name 'Get-CimInstance' -ErrorAction SilentlyContinue) {
-            $script:WindowsBuild = [int](Get-CimInstance -ClassName Win32_OperatingSystem -Verbose:$false).BuildNumber
-        } else {
-            $script:WindowsBuild = [int](Get-WmiObject -Class Win32_OperatingSystem -Verbose:$false).BuildNumber
-        }
+    if (Get-Command -Name 'Get-CimInstance' -ErrorAction SilentlyContinue) {
+        $Win32OpSys = Get-CimInstance -ClassName Win32_OperatingSystem -Verbose:$false
+    } else {
+        $Win32OpSys = Get-WmiObject -Class Win32_OperatingSystem -Verbose:$false
     }
 
-    return $script:WindowsBuild
+    $script:WindowsBuildNumber = [int]$Win32OpSys.BuildNumber
+    $script:WindowsProductType = $Win32OpSys.ProductType
 }
 
 Function Set-RegistryValue {
@@ -491,6 +488,8 @@ Function Test-Wow64Present {
 if (!(Test-IsAdministrator)) {
     throw 'You must have administrator privileges to run this script.'
 }
+
+Get-WindowsInfo
 
 $Tasks = @(
     'WindowsUpdate',
