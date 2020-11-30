@@ -9,6 +9,7 @@ Param(
         'WindowsDefender',
         'WindowsFeatures',
         'WindowsPower',
+        'WindowsRestore',
         'WindowsSecurity',
         'WindowsSettingsComputer',
         'WindowsSettingsUser',
@@ -25,6 +26,7 @@ Param(
         'WindowsDefender',
         'WindowsFeatures',
         'WindowsPower',
+        'WindowsRestore',
         'WindowsSecurity',
         'WindowsSettingsComputer',
         'WindowsSettingsUser',
@@ -298,6 +300,19 @@ Function Optimize-WindowsPower {
     & PowerCfg /Change hibernate-timeout-ac 0
 }
 
+Function Optimize-WindowsRestore {
+    [CmdletBinding()]
+    Param()
+
+    if ($script:WindowsProductType -ne 1) {
+        Write-Warning -Message 'Skipping disabling System Restore as unsupported on server SKUs.'
+        return
+    }
+
+    Write-Host -ForegroundColor Green '[Windows] Disabling System Restore ...'
+    Disable-ComputerRestore -Drive $env:SystemDrive
+}
+
 Function Optimize-WindowsSecurity {
     [CmdletBinding()]
     Param()
@@ -496,6 +511,7 @@ $Tasks = @(
     'WindowsDefender',
     'WindowsSecurity',
     'WindowsPower',
+    'WindowsRestore',
     'WindowsSettingsComputer',
     'WindowsSettingsUser',
     'WindowsFeatures',
