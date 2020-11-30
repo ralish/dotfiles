@@ -1,5 +1,3 @@
-#Requires -RunAsAdministrator
-
 [CmdletBinding(DefaultParameterSetName = 'OptOut')]
 Param(
     [Parameter(ParameterSetName = 'OptOut')]
@@ -18,7 +16,7 @@ Param(
     )]
     [String[]]$ExcludeTasks,
 
-    [Parameter(ParameterSetName = 'OptIn', Mandatory)]
+    [Parameter(ParameterSetName = 'OptIn', Mandatory = $true)]
     [ValidateSet(
         'DotNet',
         'Office365',
@@ -189,19 +187,20 @@ Function Optimize-WindowsDefender {
 
     try {
         Get-MpComputerStatus -ErrorAction Stop
+        if ($MpStatus.IsTamperProtected) {
+            Write-Warning -Message 'Skipping Windows Defender settings as tamper protection is enabled.'
+            return
+        }
+    } catch [System.Management.Automation.CommandNotFoundException] {
+        Write-Warning -Message 'Unable to query Windows Defender status as Get-MpComputerStatus command not available.'
     } catch [Microsoft.Management.Infrastructure.CimException] {
         # The extrinsic Method could not be executed
         if ($_.FullyQualifiedErrorId -match '^MI RESULT 16,') {
-            Write-Warning -Message 'Skipping Windows Defender settings as Get-MpComputerStatus returned: MI_RESULT_METHOD_NOT_AVAILABLE'
+            Write-Warning -Message 'Unable to query Windows Defender status as Get-MpComputerStatus returned: MI_RESULT_METHOD_NOT_AVAILABLE'
         } else {
             Write-Error -Message $_
             return
         }
-    }
-
-    if ($MpStatus.IsTamperProtected) {
-        Write-Warning -Message 'Skipping Windows Defender settings as tamper protection is enabled.'
-        return
     }
 
     Write-Host -ForegroundColor Green '[Windows Defender] Disabling behaviour monitoring ...'
@@ -263,21 +262,26 @@ Function Optimize-WindowsFeatures {
     $DismParams = [Collections.ArrayList]@(
         '/Online',
         '/Enable-Feature',
-        '/FeatureName:NetFx3',
-        '/All'
+        '/FeatureName:NetFx3'
     )
+
+    # The /All parameter is only available since Windows 8 and Server 2012
+    if ((Get-WindowsBuild) -ge '9200') {
+        $null = $DismParams.Add('/All')
+    }
 
     # Windows Server 2019 requires access to the installation media as it seems
     # the relevant files can't be automatically retrieved from Windows Update.
-    $WinVer = Get-CimInstance -ClassName Win32_OperatingSystem
-    if ($WinVer.Version -eq '10.0.17763' -and $Winver.ProductType -ne 1) {
-        $SxsPath = 'D:\sources\sxs'
-        if (!(Test-Path -Path $SxsPath -PathType Container)) {
-            Write-Warning -Message ('Skipping .NET Framework 3.5 installation as sources path not present: {0}' -f $SxsPath)
-            return
-        }
+    if ((Get-WindowsBuild) -eq '17763') {
+        if ((Get-CimInstance -ClassName Win32_OperatingSystem).ProductType -ne 1) {
+            $SxsPath = 'D:\sources\sxs'
+            if (!(Test-Path -Path $SxsPath -PathType Container)) {
+                Write-Warning -Message ('Skipping .NET Framework 3.5 installation as sources path not present: {0}' -f $SxsPath)
+                return
+            }
 
-        $null = $DismParams.Add(('/Source:{0}' -f $SxsPath))
+            $null = $DismParams.Add(('/Source:{0}' -f $SxsPath))
+        }
     }
 
     Write-Host -ForegroundColor Green -NoNewline '[Windows] Installing .NET Framework 3.5 ...'
@@ -398,7 +402,11 @@ Function Get-WindowsBuild {
     Param()
 
     if (!$script:WindowsBuild) {
-        $script:WindowsBuild = [int](Get-CimInstance -ClassName Win32_OperatingSystem -Verbose:$false).BuildNumber
+        if (Get-Command -Name 'Get-CimInstance' -ErrorAction SilentlyContinue) {
+            $script:WindowsBuild = [int](Get-CimInstance -ClassName Win32_OperatingSystem -Verbose:$false).BuildNumber
+        } else {
+            $script:WindowsBuild = [int](Get-WmiObject -Class Win32_OperatingSystem -Verbose:$false).BuildNumber
+        }
     }
 
     return $script:WindowsBuild
@@ -407,16 +415,16 @@ Function Get-WindowsBuild {
 Function Set-RegistryValue {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String]$Path,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String]$Name,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String]$Type,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [String]$Value
     )
 
@@ -447,13 +455,24 @@ Function Test-DotNetPresent {
             '4.0' { $RegPath = 'HKLM:\Software\Microsoft\NET Framework Setup\NDP\v4\Full' }
         }
 
-        $RegKey = Get-Item -Path $RegPath -ErrorAction Ignore
+        $RegKey = Get-Item -Path $RegPath -ErrorAction SilentlyContinue
         if ($RegKey -and $RegKey.GetValue('Version')) {
             Set-Variable -Name $VarName -Scope Script -Value $true
         } else {
             Set-Variable -Name $VarName -Scope Script -Value $false
         }
     }
+}
+
+Function Test-IsAdministrator {
+    [CmdletBinding()]
+    Param()
+
+    $User = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+    if ($User.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        return $true
+    }
+    return $false
 }
 
 Function Test-Wow64Present {
@@ -468,6 +487,10 @@ Function Test-Wow64Present {
 }
 
 #endregion
+
+if (!(Test-IsAdministrator)) {
+    throw 'You must have administrator privileges to run this script.'
+}
 
 $Tasks = @(
     'WindowsUpdate',
