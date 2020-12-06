@@ -25,7 +25,7 @@
         "defaults": {
             "colorScheme": "Campbell",
 
-            "fontFace": "Hack",
+            "fontFace": "Hack NF",
             "fontSize": 10,
 
             "useAcrylic": false,
