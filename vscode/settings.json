@@ -246,5 +246,10 @@
     "[xml]": {
         // Use Red Hat's XML extension for formatting
         "editor.defaultFormatter": "redhat.vscode-xml"
+    },
+
+    "[yaml]": {
+        // Use Red Hat's YAML extension for formatting
+        "editor.defaultFormatter": "redhat.vscode-yaml"
     }
 }
