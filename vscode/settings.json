@@ -90,6 +90,9 @@
     "omnisharp.enableRoslynAnalyzers": true,
     "omnisharp.loggingLevel": "warning",
 
+    // Extension: CMake Tools
+    "cmake.configureOnOpen": false,
+
     // Extension: DevSkim
     "devskim.enableBestPracticeRules": true,
     "devskim.enableManualReviewRules": true,
