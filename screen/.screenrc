@@ -1,29 +1,52 @@
-# Enable usage of the alternate screen
-altscreen on
-
-# Use the current background colour when erasing characters
-defbce on
-
-# Block the display if we detach uncleanly to avoid programs hanging
-defnonblock on
-
-# Increase the default scrollback
-defscrollback 10000
-
-# Use UTF-8 encoding as the default
-defutf8 on
-
-# Shorten the time we display messages
-msgwait 2
+# ---------------------------------- Startup ----------------------------------
 
 # Disable the startup message
 startup_message off
 
+
+# ------------------------------- Copy & paste --------------------------------
+
+# Default scrollback buffer size (lines)
+defscrollback 10000
+
+
+# ------------------------------- Message line --------------------------------
+
+# Disable usage of hardware status line
+hardstatus off
+
+# Always reserve the last line for the status line
+hardstatus alwayslastline
+
+# Contents and format of the status line
+hardstatus string '%{gk}[ %{G}%H %{g}][%= %{wk}%?%-Lw%?%{=b kR}(%{W}%n*%f %t%?(%u)%?%{=b kR})%{= kw}%?%+Lw%?%?%= %{g}][ %{Y}%l%{g} ]%{=b C}[ %d/%m %C %A ]%{W}'
+
+# Time messages are displayed (secs)
+msgwait 2
+
+
+# -------------------------------- New window ---------------------------------
+
 # Use a 256 colour terminal
 term screen-256color
 
-# Don't use the alternate screen in xterm
+
+# ---------------------------------- Termcap ----------------------------------
+
+# Don't use the alternate screen for the scrollback buffer under xterm
 termcapinfo xterm* ti@:te@
+
+
+# ----------------------------- Virtual terminal ------------------------------
+
+# Enable alternate screen support
+altscreen on
+
+# Default to using the current background colour when erasing characters
+defbce on
+
+# Default to UTF-8 encoding
+defutf8 on
 
 # Enable true colour support
 truecolor on
@@ -31,15 +54,19 @@ truecolor on
 # Disable the visual bell
 vbell off
 
+
+# ------------------------------- Miscellaneous -------------------------------
+
+# Default to non-blocking mode
+defnonblock on
+
+
+# ------------------------------- Key bindings --------------------------------
+
 # Start window indexing from one
 bind c screen 1
 bind ^c screen 1
 bind 0 select 10
 screen 1
-
-# A much nicer statusbar
-hardstatus off
-hardstatus alwayslastline
-hardstatus string '%{gk}[ %{G}%H %{g}][%= %{wk}%?%-Lw%?%{=b kR}(%{W}%n*%f %t%?(%u)%?%{=b kR})%{= kw}%?%+Lw%?%?%= %{g}][ %{Y}%l%{g} ]%{=b C}[ %d/%m %C %A ]%{W}'
 
 # vim: syntax=screen cc=80 tw=79 ts=4 sw=4 sts=4 et sr
