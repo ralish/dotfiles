@@ -25,6 +25,9 @@ term screen-256color
 # Don't use the alternate screen in xterm
 termcapinfo xterm* ti@:te@
 
+# Enable true colour support
+truecolor on
+
 # Disable the visual bell
 vbell off
 
