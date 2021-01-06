@@ -614,7 +614,10 @@ endif
 "Plug 'tomasr/molokai'
 
 " Solarized
-Plug 'altercation/vim-colors-solarized'
+"Plug 'altercation/vim-colors-solarized'
+
+" Solarized 8
+Plug 'lifepillar/vim-solarized8'
 
 " Tomorrow Theme
 "Plug 'chriskempson/vim-tomorrow-theme'
@@ -730,9 +733,12 @@ call plug#end()
 " ****************************** Plugin Settings ******************************
 " ############################### Colour Scheme ###############################
 
+" Disable usage of italics (not supported by PuTTY)
+let g:solarized_italics = 0
+
 " Set our preferred colour scheme
 try
-    colorscheme solarized
+    colorscheme solarized8
 catch
     colorscheme default
 endtry
