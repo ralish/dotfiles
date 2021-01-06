@@ -20,7 +20,7 @@
         // editline
         ".editrc": "properties",
         // git
-        ".gitconfig*": "gitconfig",
+        ".gitconfig*": "properties",
         "**/git/bin/*": "shellscript",
         // htop
         "htoprc": "properties",
@@ -45,7 +45,7 @@
         // openssl
         "**/openssl/*.cnf": "ini",
         // pgsql
-        ".psqlrc": "postgres",
+        ".psqlrc": "sql",
         // pip
         "pip.conf": "ini",
         // quilt
