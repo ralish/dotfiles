@@ -6,10 +6,14 @@
         // root
         "dot-manage": "shellscript",
         "dot-update": "shellscript",
+        // bash
+        ".bash_logout": "shellscript",
+        ".bashrc": "shellscript",
         // bazaar
         "**/.bazaar/*.conf": "ini",
         // clink
-        "**/clink/*": "properties",
+        "**/clink/clink_inputrc": "properties",
+        "**/clink/settings": "properties",
         // curl
         ".curlrc": "properties",
         // cygwin
@@ -24,8 +28,6 @@
         "**/git/bin/*": "shellscript",
         // htop
         "htoprc": "properties",
-        // irssi
-        "**/.irssi/*": "perl",
         // jetbrains
         "*.DotSettings": "xml",
         // kpcli
@@ -39,15 +41,17 @@
         // npm
         ".npmrc": "properties",
         // openssh
-        "**/openssh/.ssh/config": "ssh_config",
-        "**/openssh/.ssh/includes/*": "ssh_config",
-        "**/openssh/.ssh/templates/*": "ssh_config",
+        "**/.ssh/config": "ssh_config",
+        "**/.ssh/includes/*": "ssh_config",
+        "**/.ssh/templates/*": "ssh_config",
         // openssl
         "**/openssl/*.cnf": "ini",
         // pgsql
         ".psqlrc": "sql",
         // pip
         "pip.conf": "ini",
+        // putty
+        "**/putty/Sessions/*.json": "jsonc",
         // quilt
         ".quiltrc": "shellscript",
         // readline
@@ -65,7 +69,8 @@
         // stow
         "**/stow/bin/*": "perl",
         // subversion
-        "**/.subversion/*": "ini",
+        "**/.subversion/config": "ini",
+        "**/.subversion/servers": "ini",
         // vs
         "*.vssettings": "xml",
         // wget
@@ -76,7 +81,10 @@
         // xdg-user-dir
         "user-dirs.dirs": "shellscript",
         // xlaunch
-        "*.xlaunch": "xml"
+        "*.xlaunch": "xml",
+        // zsh
+        ".zlogout": "shellscript",
+        ".zshrc": "shellscript"
     },
 
     // Excludes for search & quick open
@@ -108,6 +116,12 @@
             "icon": "git",
             "extensions": [".gitconfig-win"],
             "filename": true,
+            "format": "svg"
+        },
+        {
+            "icon": "key",
+            "extensions": ["pub"],
+            "filename": false,
             "format": "svg"
         },
         {
