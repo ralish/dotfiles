@@ -106,6 +106,88 @@ Function Invoke-GitChildDir {
     Set-Location -LiteralPath $OrigLocation
 }
 
+# Invoke a linter on matching repository files
+Function Invoke-GitLinter {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '')]
+    [CmdletBinding()]
+    Param(
+        [Parameter(ParameterSetName = 'PSScriptAnalyzer', Mandatory)]
+        [Switch]$PSScriptAnalyzer,
+
+        [Parameter(ParameterSetName = 'PSScriptAnalyzer')]
+        [Object]$Settings,
+
+        [Parameter(ParameterSetName = 'ShellCheck', Mandatory)]
+        [Switch]$ShellCheck,
+
+        [Parameter(ParameterSetName = 'ShellCheck')]
+        [Switch]$ShebangSearch,
+
+        [Parameter(ParameterSetName = 'ShellCheck')]
+        [Switch]$ShellDirectiveSearch,
+
+        [Regex]$Exclude
+    )
+
+    switch ($PSCmdlet.ParameterSetName) {
+        'PSScriptAnalyzer' {
+            if (!(Get-Command -Name 'Invoke-ScriptAnalyzer')) {
+                throw ('Required command is unavailable: Invoke-ScriptAnalyzer')
+            }
+
+            $Params = @{
+                Verbose = $false
+            }
+
+            if ($Settings) {
+                $Params['Settings'] = $Settings
+            }
+
+            git ls-files | Where-Object { $_ -match '\.ps[dm]?1$' } | ForEach-Object {
+                if ($PSBoundParameters.ContainsKey('Exclude')) {
+                    if ($_ -match $Exclude) { return }
+                }
+
+                Write-Verbose -Message ('Invoking PSScriptAnalyzer on: {0}' -f $_)
+                Invoke-ScriptAnalyzer -Path $_ @Params
+            }
+        }
+
+        'ShellCheck' {
+            if (!(Get-Command -Name 'shellcheck')) {
+                throw ('Required command is unavailable: shellcheck')
+            }
+
+            if ($ShebangSearch -or $ShellDirectiveSearch) {
+                if (!(Get-Command -Name 'rg')) {
+                    throw ('Required command is unavailable: rg')
+                }
+            }
+
+            $Files = [Collections.ArrayList]::new()
+            git ls-files | Where-Object { $_ -match '\.(ba)?sh$' } | ForEach-Object { $null = $Files.Add($_) }
+
+            if ($ShebangSearch) {
+                rg --path-separator '/' --hidden -l '^#!/usr/bin/env (ba)?sh$' | ForEach-Object { $null = $Files.Add($_) }
+            }
+
+            if ($ShellDirectiveSearch) {
+                rg --path-separator '/' --hidden -l '#.*\bshellcheck\b.*\bshell=(ba)?sh\b' | ForEach-Object { $null = $Files.Add($_) }
+            }
+
+            if ($ShebangSearch -or $ShellDirectiveSearch) {
+                $FoundFiles = $Files
+                $Files = $FoundFiles | Sort-Object -Unique
+            }
+
+            $Files | ForEach-Object {
+                Write-Verbose -Message ('Invoking ShellCheck on: {0}' -f $_)
+                shellcheck -x $_
+            }
+        }
+    }
+}
+
 # Fast-forward all branches to match a branch
 Function Invoke-GitMergeAllBranches {
     [CmdletBinding()]
