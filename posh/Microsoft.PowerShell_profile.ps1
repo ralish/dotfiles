@@ -8,6 +8,7 @@
 #
 # - Get-Module -ListAvailable
 #   Assume the module exists instead of checking
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
 $DotFilesFastLoad = $true
 
 # Array of paths containing additional formatting data

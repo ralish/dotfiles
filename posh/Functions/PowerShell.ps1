@@ -125,14 +125,20 @@ Function Compare-ObjectPropertiesMatrix {
 
 # Reload selected PowerShell profiles
 Function Update-Profile {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidDefaultValueSwitchParameter', '')]
     [CmdletBinding()]
     Param(
         [Switch]$AllUsersAllHosts,
         [Switch]$AllUsersCurrentHost,
         [Switch]$CurrentUserAllHosts,
-        [Switch]$CurrentUserCurrentHost = $true
+        [Switch]$CurrentUserCurrentHost
     )
+
+    if (!($PSBoundParameters.ContainsKey('AllUsersAllHosts') -or
+            $PSBoundParameters.ContainsKey('AllUsersCurrentHost') -or
+            $PSBoundParameters.ContainsKey('CurrentUserAllHosts') -or
+            $PSBoundParameters.ContainsKey('CurrentUserCurrentHost'))) {
+        $CurrentUserCurrentHost = $true
+    }
 
     $ProfileTypes = 'AllUsersAllHosts', 'AllUsersCurrentHost', 'CurrentUserAllHosts', 'CurrentUserCurrentHost'
     foreach ($ProfileType in $ProfileTypes) {

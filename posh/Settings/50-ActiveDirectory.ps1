@@ -14,6 +14,7 @@ try {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ActiveDirectory settings ...')
 
 # User properties we usually don't care about
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
 $ADUserIgnoredProperties = @(
     # Only exposed via LDAP attributes
     'dSCorePropagationData',

@@ -119,6 +119,7 @@ Function Invoke-GitMergeAllBranches {
         ForEach-Object {
             $Branches += $_.TrimStart('* ')
             if ($_.StartsWith('* ')) {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
                 $CurrentBranch = $_.TrimStart('* ')
             }
         }

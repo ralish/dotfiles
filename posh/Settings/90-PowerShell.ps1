@@ -1,6 +1,7 @@
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Configuring PowerShell ...')
 
 # Number of elements to enumerate when displaying arrays
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
 $FormatEnumerationLimit = 5
 
 # Install-Module: Default to CurrentUser scope
@@ -17,6 +18,10 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 # Save the output of the last command in a variable
 # http://get-powershell.com/post/2008/06/25/Stuffing-the-output-of-the-last-command-into-an-automatic-variable.aspx
 Function Out-Default {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidOverwritingBuiltInCmdlets', '')]
+    Param()
+
     $Input | Tee-Object -Variable LastObject | Microsoft.PowerShell.Core\Out-Default
     $Global:LastObject = $LastObject
 }

@@ -411,6 +411,7 @@ Function Optimize-WindowsUpdate {
 #region Utilities
 
 Function Get-WindowsInfo {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWMICmdlet', '')]
     [CmdletBinding()]
     Param()
 
