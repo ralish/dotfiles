@@ -16,6 +16,7 @@ set -o pipefail         # Use last non-zero exit code in a pipeline
 #       $script_real_name: The canonicalized file name of the script
 #       $dotfiles_path: The dotfiles directory path
 #       $dotfiles_name: The dotfiles directory name
+# shellcheck disable=SC2034
 function early_init() {
     # Determine the physical directory this script resides in. This approach is
     # necessarily clumsy as simple methods like "readlink -f" and "realpath"

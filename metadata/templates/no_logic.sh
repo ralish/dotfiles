@@ -5,6 +5,6 @@ script_dir="$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=metadata/templates/common.sh
 source "$script_dir/templates/common.sh"
 
-exit $DETECTION_NO_LOGIC
+exit "$DETECTION_NO_LOGIC"
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

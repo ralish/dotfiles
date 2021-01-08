@@ -1,3 +1,5 @@
+# shellcheck shell=sh
+
 # Enable direct hardware-accelerated OpenGL rendering
 export LIBGL_USE_WGL=1
 

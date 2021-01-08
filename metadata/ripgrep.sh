@@ -6,9 +6,9 @@ script_dir="$(dirname "${BASH_SOURCE[0]}")"
 source "$script_dir/templates/common.sh"
 
 if ! command -v rg > /dev/null; then
-    exit $DETECTION_NOT_AVAILABLE
+    exit "$DETECTION_NOT_AVAILABLE"
 fi
 
-exit $DETECTION_SUCCESS
+exit "$DETECTION_SUCCESS"
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

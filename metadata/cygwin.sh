@@ -7,9 +7,9 @@ source "$script_dir/templates/common.sh"
 
 kernel_name=$(uname -s)
 if [ "${kernel_name#*CYGWIN_NT}" != "$kernel_name" ]; then
-    exit $DETECTION_SUCCESS
+    exit "$DETECTION_SUCCESS"
 fi
 
-exit $DETECTION_IGNORE
+exit "$DETECTION_IGNORE"
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

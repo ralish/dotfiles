@@ -104,6 +104,7 @@ if [[ ${force_colour_prompt-} == 'yes' ]]; then
 fi
 
 # Configure the prompt appropriately (colour if requested & Git if available)
+# shellcheck disable=SC2034
 if [[ -n ${colour_prompt-} ]]; then
     if typeset -F __git_ps1 > /dev/null; then
         PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\$(__git_ps1)\[\033[00m\]\$ "

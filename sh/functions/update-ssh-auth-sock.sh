@@ -1,4 +1,4 @@
-# shellcheck shell=sh
+# shellcheck shell=sh disable=SC2039
 
 # When reattaching to a screen or tmux session the SSH_AUTH_SOCK environment
 # variable in existing shells will typically be incorrect. This is because the
@@ -18,10 +18,10 @@
 # Note that we do not (can not?) update the SSH_AUTH_SOCK environment variable
 # for already spawned shells outside of the one we're currently executing in.
 
-#shellcheck disable=SC2039
 update-ssh-auth-sock() {
     ssh_current_agent="$SSH_AUTH_SOCK"
 
+    # shellcheck disable=SC2154
     if [ -n "$TMUX" ]; then
         eval "$(tmux show-env -s | grep -E '^(unset )?SSH_AUTH_SOCK[=;]')"
     elif [ -n "$STY" ]; then

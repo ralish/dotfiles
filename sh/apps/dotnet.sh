@@ -14,6 +14,7 @@ if command -v dotnet > /dev/null; then
 
     # Command completion
     # https://docs.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete
+    # shellcheck disable=SC2154
     if [ -n "$BASH" ]; then
         # shellcheck source=/dev/null
         . "$sh_dir/apps/dotnet.bash"

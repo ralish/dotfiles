@@ -1,6 +1,10 @@
 # shellcheck shell=sh
 
+# Dummy command for correct scoping of subsequent shellcheck directive
+true
+
 # Enable colour support for ls and *grep
+# shellcheck disable=SC2154
 if [ -n "$LS_COLORS" ] || [ -n "$LSCOLORS" ]; then
     alias ls='ls --color=auto'
     alias grep='grep --color=auto'
