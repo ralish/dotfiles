@@ -19,4 +19,9 @@ if (Test-IsWindows) {
     if (Get-Command -Name sc.exe -ErrorAction Ignore) {
         Remove-Item -LiteralPath Alias:\sc -ErrorAction Ignore
     }
+
+    # Remove the wget alias if the real deal is present
+    if (Get-Command -Name wget.exe -ErrorAction Ignore) {
+        Remove-Item -LiteralPath Alias:\wget -ErrorAction Ignore
+    }
 }
