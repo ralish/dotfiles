@@ -254,7 +254,7 @@ Function Get-TextEncoding {
 
             $FoundEncoding = $false
             foreach ($Encoding in $Encodings) {
-                [Byte[]]$Bytes = Get-Content -LiteralPath $Item.FullName @GetContentBytesParam -ReadCount $Encoding.Preamble.Count | Select-Object -First 1
+                [Byte[]]$Bytes = Get-Content -LiteralPath $Item.FullName -ReadCount $Encoding.Preamble.Count @GetContentBytesParam | Select-Object -First 1
 
                 if ($Bytes.Count -ne $Encoding.Preamble.Count) {
                     continue

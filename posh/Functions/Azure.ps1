@@ -138,14 +138,15 @@ Function Get-AzureEnterpriseApplications {
         top          = 999
     }
 
-    $Params = @{
-        Uri     = $Uri.AbsoluteUri
-        Method  = 'POST'
-        Headers = $Headers
-        Body    = ConvertTo-Json $Body
+    $InvokeRestMethodParams = @{
+        Uri         = $Uri.AbsoluteUri
+        Method      = 'POST'
+        Headers     = $Headers
+        Body        = ConvertTo-Json $Body
+        ErrorAction = 'Stop'
     }
 
-    $Response = Invoke-RestMethod @Params -ErrorAction Stop
+    $Response = Invoke-RestMethod @InvokeRestMethodParams
     return $Response.appList
 }
 

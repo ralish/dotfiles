@@ -135,12 +135,12 @@ Function Invoke-GitLinter {
                 throw ('Required command is unavailable: Invoke-ScriptAnalyzer')
             }
 
-            $Params = @{
+            $InvokeScriptAnalyzerParams = @{
                 Verbose = $false
             }
 
             if ($Settings) {
-                $Params['Settings'] = $Settings
+                $InvokeScriptAnalyzerParams['Settings'] = $Settings
             }
 
             git ls-files | Where-Object { $_ -match '\.ps[dm]?1$' } | ForEach-Object {
@@ -149,7 +149,7 @@ Function Invoke-GitLinter {
                 }
 
                 Write-Verbose -Message ('Invoking PSScriptAnalyzer on: {0}' -f $_)
-                Invoke-ScriptAnalyzer -Path $_ @Params
+                Invoke-ScriptAnalyzer -Path $_ @InvokeScriptAnalyzerParams
             }
         }
 

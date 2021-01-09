@@ -64,17 +64,17 @@ Function Export-MailboxSpreadsheetData {
     $Folders = Get-InboxRulesByFolders -Mailbox $Mailbox -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
 
     Write-Host -ForegroundColor Green 'Exporting mailbox data ...'
-    $Params = @{
+    $ExportCsvParams = @{
         Encoding          = 'UTF8'
         NoTypeInformation = $true
     }
 
     if (!$SkipActivitySummary) {
-        $Activity | Export-Csv @Params -LiteralPath (Join-Path -Path $Path -ChildPath 'Activity Summary.csv') -Append
+        $Activity | Export-Csv -LiteralPath (Join-Path -Path $Path -ChildPath 'Activity Summary.csv') -Append @ExportCsvParams
     }
 
-    $Folders | Export-Csv @Params -LiteralPath (Join-Path -Path $Path -ChildPath ('{0} - Folders.csv' -f $MailboxAddress))
-    $Rules | Export-Csv @Params -LiteralPath (Join-Path -Path $Path -ChildPath ('{0} - Rules.csv' -f $MailboxAddress))
+    $Folders | Export-Csv -LiteralPath (Join-Path -Path $Path -ChildPath ('{0} - Folders.csv' -f $MailboxAddress)) @ExportCsvParams
+    $Rules | Export-Csv -LiteralPath (Join-Path -Path $Path -ChildPath ('{0} - Rules.csv' -f $MailboxAddress)) @ExportCsvParams
 }
 
 # Retrieve a summary of mailbox folders with associated rules
@@ -156,18 +156,17 @@ Function Get-MailboxActivitySummary {
         $StartDate = $EndDate.AddDays(-7)
     }
 
-    $TraceParams = $PSBoundParameters
-    $null = $TraceParams.Remove('Mailbox')
+    $null = $PSBoundParameters.Remove('Mailbox')
 
     Write-Host -ForegroundColor Green 'Retrieving mailbox details ...'
     $ExoMailbox = Get-Mailbox -Identity $Mailbox
     $Addresses = $ExoMailbox.EmailAddresses | Where-Object { $_ -match '^smtp:' } | ForEach-Object { $_.Substring(5) }
 
     Write-Host -ForegroundColor Green 'Retrieving mailbox send logs ...'
-    $Sent = Get-MessageTrace @TraceParams -SenderAddress $Addresses
+    $Sent = Get-MessageTrace -SenderAddress $Addresses @PSBoundParameters
 
     Write-Host -ForegroundColor Green 'Retrieving mailbox receive logs ...'
-    $Received = Get-MessageTrace @TraceParams -RecipientAddress $Addresses
+    $Received = Get-MessageTrace -RecipientAddress $Addresses @PSBoundParameters
 
     $Summary = [PSCustomObject]@{
         Mailbox   = $ExoMailbox.PrimarySmtpAddress
@@ -233,12 +232,12 @@ Function Import-ContentSearchResults {
             }
         }
 
-        $ImportEntryParams = @{
+        $ImportContentSearchResultsEntryParams = @{
             Statistics = $Statistics
         }
 
         if ($IgnoredEntries) {
-            $ImportEntryParams['IgnoredEntries'] = $IgnoredEntries
+            $ImportContentSearchResultsEntryParams['IgnoredEntries'] = $IgnoredEntries
         }
 
         if ($IgnoredDomains) {
@@ -249,7 +248,7 @@ Function Import-ContentSearchResults {
             }
 
             $IgnoredDomainsRegex = '@({0})$' -f [String]::Join('|', $EscapedDomains)
-            $ImportEntryParams['IgnoredDomains'] = $IgnoredDomainsRegex
+            $ImportContentSearchResultsEntryParams['IgnoredDomains'] = $IgnoredDomainsRegex
             Write-Verbose -Message ('Ignored domains regex: {0}' -f $IgnoredDomainsRegex)
         }
     }
@@ -283,7 +282,7 @@ Function Import-ContentSearchResults {
                     continue
                 }
 
-                foreach ($Contact in (Import-ContentSearchResultsEntry -Field $ImportField -Entry $FieldEntry -ItemId $ItemId @ImportEntryParams)) {
+                foreach ($Contact in (Import-ContentSearchResultsEntry -Field $ImportField -Entry $FieldEntry -ItemId $ItemId @ImportContentSearchResultsEntryParams)) {
                     $Address = $Contact.Address
                     $CandidateName = $Contact.Name
 
@@ -1040,7 +1039,7 @@ Function Import-ExoPowershellModule {
             # Change the scope of imported functions to be global (better approach?)
             $Functions = @('Connect-EXOPSSession', 'Connect-IPPSSession', 'Test-Uri')
             foreach ($Function in $Functions) {
-                $null = New-Item -Path Function: -Name global:$Function -Value (Get-Content -LiteralPath Function:\$Function)
+                $null = New-Item -Path Function: -Name Global:$Function -Value (Get-Content -LiteralPath Function:\$Function)
             }
         } else {
             throw 'Required module not available: Microsoft.Exchange.Management.ExoPowershellModule'

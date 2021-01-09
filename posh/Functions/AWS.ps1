@@ -341,7 +341,7 @@ Function Get-S3BucketSize {
     $BucketSizeBytes = 0
     $BucketSize = $BucketSizeBytes | Format-SizeDigital
     foreach ($Bucket in $Buckets) {
-        if ($Bucket.PSObject.Properties.Name -notcontains 'BucketSize') {
+        if (!$Bucket.PSObject.Properties['BucketSize']) {
             $Bucket | Add-Member -MemberType NoteProperty -Name BucketSizeBytes -Value $BucketSizeBytes
             $Bucket | Add-Member -MemberType NoteProperty -Name BucketSize -Value $BucketSize
         }

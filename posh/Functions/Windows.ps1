@@ -175,16 +175,16 @@ Function Edit-Hosts {
     [CmdletBinding()]
     Param()
 
-    $StartParams = @{
+    $StartProcessParams = @{
         FilePath     = 'notepad.exe'
         ArgumentList = '{0}\System32\drivers\etc\hosts' -f $env:SystemRoot
     }
 
     if (!(Test-IsAdministrator)) {
-        $null = $StartParams.Add('Verb', 'RunAs')
+        $null = $StartProcessParams.Add('Verb', 'RunAs')
     }
 
-    Start-Process @StartParams
+    Start-Process @StartProcessParams
 }
 
 #endregion
