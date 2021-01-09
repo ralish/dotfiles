@@ -1,3 +1,5 @@
+if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
+
 try {
     # Terminal-Icons runs some commands which don't respect the -Verbose
     # parameter. Suppress them via $VerbosePreference before import.

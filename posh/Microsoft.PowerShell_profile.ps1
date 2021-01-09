@@ -4,6 +4,9 @@
 # Display timing data in Get-DotFilesMessage calls
 #$DotFilesShowTimings = $true
 
+# Display message on start of processing each script
+#$DotFilesShowScriptEntry = $true
+
 # Skip expensive calls for faster profile loading
 #
 # - Get-Module -ListAvailable

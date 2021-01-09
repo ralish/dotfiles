@@ -1,3 +1,5 @@
+if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
+
 if ($Host.Name -ne 'ConsoleHost') {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSReadLine settings as host is not ConsoleHost.')
     return
@@ -56,7 +58,7 @@ $Params = @{
     LongDescription  = 'Insert parenthesis around the selection or the entire line if no text is selected'
     ScriptBlock      = $ScriptBlock
 }
-Set-PSReadlineKeyHandler @Params
+Set-PSReadLineKeyHandler @Params
 Remove-Variable -Name 'Params', 'ScriptBlock'
 
 if (Test-IsWindows) {

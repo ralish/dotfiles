@@ -1,3 +1,4 @@
+if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing OpenSSH functions ...')
 
 # Update our OpenSSH configuration

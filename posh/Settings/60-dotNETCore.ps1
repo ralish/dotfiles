@@ -1,3 +1,5 @@
+if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
+
 if (!(Get-Command -Name dotnet -ErrorAction Ignore)) {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping .NET Core settings as unable to locate dotnet.')
     return

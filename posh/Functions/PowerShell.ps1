@@ -1,3 +1,4 @@
+if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing PowerShell functions ...')
 
 #region Internals

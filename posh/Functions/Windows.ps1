@@ -1,3 +1,5 @@
+if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
+
 if (!(Test-IsWindows)) {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of Windows functions.')
     return

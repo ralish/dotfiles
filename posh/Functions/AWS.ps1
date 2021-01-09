@@ -1,3 +1,5 @@
+if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
+
 try {
     if (!$DotFilesFastLoad) {
         Test-ModuleAvailable -Name AWS.Tools.Installer, AWSPowerShell.NetCore, AWSPowerShell -Require Any -Verbose:$false

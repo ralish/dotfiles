@@ -1,3 +1,5 @@
+if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
+
 try {
     Import-Module -Name oh-my-posh -ErrorAction Stop -Verbose:$false
 } catch {
