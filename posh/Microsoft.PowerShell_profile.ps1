@@ -62,8 +62,12 @@ if (Test-Path -LiteralPath $PoshScriptsPath -PathType Container) {
 }
 Remove-Variable -Name PoshScriptsPath
 
-# Restore original $VerbosePreference setting
+# Clean-up specific to running in verbose mode
 if ($DotFilesVerbose) {
     $VerbosePreference = $VerbosePreferenceOriginal
-    Remove-Variable -Name 'VerbosePreferenceOriginal'
+    Remove-Variable -Name VerbosePreferenceOriginal
+
+    if ($DotFilesShowTimings) {
+        Remove-Variable -Name PreviousTimestamp
+    }
 }
