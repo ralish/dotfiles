@@ -27,6 +27,7 @@
     "files.associations": {
         // Configuration files (usually INI syntax)
         "*.cnf": "ini",
+        "*.inf": "ini",
         // NuGet restore cache files
         "project.nuget.cache": "json"
     },
