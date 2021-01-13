@@ -1,0 +1,58 @@
+[Version]
+Signature = "$Windows NT$"
+
+[Strings]
+; Supported OIDs can be found in the wincrypt.h header
+
+; Subject Alternative Name
+; Supported types: dn, dns, email, guid, ipaddress, upn, url
+szOID_SUBJECT_ALT_NAME2             = 2.5.29.17
+
+[NewRequest]
+; Subject name
+;
+; Specified as comma-separated Relative Distinguished Name values
+; Can be empty for TLS certificates if a SAN extension is included
+;Subject                             = "CN=example.com"
+
+; Request type
+;
+; Valid values: PKCS10, PKCS7, CMC, Cert, SCEP
+;RequestType                         = PKCS10
+
+; Cryptographic Service Provider (CSP)
+;
+; Available providers can be displayed with:
+; certutil -csplist
+;ProviderName                        = "Microsoft RSA SChannel Cryptographic Provider"
+
+; Key exchange algorithm & length
+;
+; Available algorithms can be displayed with:
+; certutil -oid 3 | findstr pwszCNGAlgid | findstr /v CryptOIDInfo
+;KeyAlgorithm                        = rsa
+;KeyLength                           = 2048
+
+; Encryption cipher & length
+;
+; Available algorithms can be displayed with:
+; certutil -oid 2 | findstr pwszCNGAlgid | findstr /v CryptOIDInfo
+;EncryptionAlgorithm                 = aes
+;EncryptionLength                    = 256
+
+; Hash function
+;
+; Available algorithms can be displayed with:
+; certutil -oid 1 | findstr pwszCNGAlgid | findstr /v CryptOIDInfo
+;HashAlgorithm                       = sha256
+
+[RequestAttributes]
+; Only applicable for Enterprise CAs
+CertificateTemplate                 = WebServer
+
+[Extensions]
+; Example extension configuration
+;
+;%szOID_SUBJECT_ALT_NAME2%           = "{text}"
+;_continue_                          = "dns=example1.com&"
+;_continue_                          = "dn=CN=example.com"

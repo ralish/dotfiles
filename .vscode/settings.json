@@ -6,6 +6,8 @@
         // root
         "dot-manage": "shellscript",
         "dot-update": "shellscript",
+        // adcs
+        "**/adcs/*.inf": "ini",
         // bash
         ".bash_logout": "shellscript",
         ".bashrc": "shellscript",
