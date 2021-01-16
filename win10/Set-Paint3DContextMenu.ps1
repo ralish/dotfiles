@@ -12,7 +12,7 @@ Param(
 $RemoveHKCRDrive = $false
 if (!(Get-PSDrive -Name HKCR -ErrorAction Ignore)) {
     $RemoveHKCRDrive = $true
-    $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+    $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT -WhatIf:$false
 }
 
 foreach ($Extension in $Extensions) {
@@ -39,5 +39,5 @@ foreach ($Extension in $Extensions) {
 }
 
 if ($RemoveHKCRDrive) {
-    Remove-PSDrive -Name HKCR
+    Remove-PSDrive -Name HKCR -WhatIf:$false
 }
