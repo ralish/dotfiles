@@ -150,25 +150,23 @@ Function Get-MailboxActivitySummary {
 
     Test-CommandAvailable -Name 'Get-Mailbox'
 
-    if (-not $PSBoundParameters.ContainsKey('EndDate')) {
+    if (!$PSBoundParameters.ContainsKey('EndDate')) {
         $EndDate = Get-Date
     }
 
-    if (-not $PSBoundParameters.ContainsKey('StartDate')) {
+    if (!$PSBoundParameters.ContainsKey('StartDate')) {
         $StartDate = $EndDate.AddDays(-7)
     }
-
-    $null = $PSBoundParameters.Remove('Mailbox')
 
     Write-Host -ForegroundColor Green 'Retrieving mailbox details ...'
     $ExoMailbox = Get-Mailbox -Identity $Mailbox
     $Addresses = $ExoMailbox.EmailAddresses | Where-Object { $_ -match '^smtp:' } | ForEach-Object { $_.Substring(5) }
 
     Write-Host -ForegroundColor Green 'Retrieving mailbox send logs ...'
-    $Sent = Get-MessageTrace -SenderAddress $Addresses @PSBoundParameters
+    $Sent = Get-MessageTrace -SenderAddress $Addresses -StartDate $StartDate -EndDate $EndDate
 
     Write-Host -ForegroundColor Green 'Retrieving mailbox receive logs ...'
-    $Received = Get-MessageTrace -RecipientAddress $Addresses @PSBoundParameters
+    $Received = Get-MessageTrace -RecipientAddress $Addresses -StartDate $StartDate -EndDate $EndDate
 
     $Summary = [PSCustomObject]@{
         Mailbox   = $ExoMailbox.PrimarySmtpAddress
