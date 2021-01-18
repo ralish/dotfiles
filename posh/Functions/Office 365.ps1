@@ -32,7 +32,7 @@ Function Export-MailboxSpreadsheetData {
         [String]$DescriptionTimeFormat = 'yyyy/mm/dd'
     )
 
-    Test-CommandAvailable -Name 'Get-Mailbox'
+    Test-CommandAvailable -Name Get-Mailbox
 
     if (-not $PSBoundParameters.ContainsKey('Path')) {
         if ((Get-Item -LiteralPath $PWD) -is [IO.DirectoryInfo]) {
@@ -95,7 +95,7 @@ Function Get-InboxRulesByFolders {
         [Switch]$ReturnUnlinkedRules
     )
 
-    Test-CommandAvailable -Name 'Get-Mailbox'
+    Test-CommandAvailable -Name Get-Mailbox
 
     Write-Host -ForegroundColor Green 'Retrieving mailbox folders ...'
     $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object { $_.DefaultFolderType -ne 'Inbox' }
@@ -148,7 +148,7 @@ Function Get-MailboxActivitySummary {
         [DateTime]$EndDate
     )
 
-    Test-CommandAvailable -Name 'Get-Mailbox'
+    Test-CommandAvailable -Name Get-Mailbox
 
     if (!$PSBoundParameters.ContainsKey('EndDate')) {
         $EndDate = Get-Date
@@ -462,7 +462,7 @@ Function Get-Office365EntityUsageSummary {
         [String]$GraphApiRedirectUri
     )
 
-    Test-CommandAvailable -Name @('Get-Mailbox', 'Get-SPOSite', 'Get-Team')
+    Test-CommandAvailable -Name Get-Mailbox, Get-SPOSite, Get-Team
 
     # Graph API setup
     Write-Verbose -Message 'Connecting to Microsoft Graph API ...'
@@ -595,7 +595,7 @@ Function Get-Office365UserLicensingMatrix {
     [CmdletBinding()]
     Param()
 
-    Test-CommandAvailable -Name 'Get-MsolUser'
+    Test-CommandAvailable -Name Get-MsolUser
 
     $Users = Get-MsolUser -All
     $Licenses = $Users.Licenses.AccountSkuId | Sort-Object -Unique | ForEach-Object { $_.Split(':')[1] }
@@ -633,7 +633,7 @@ Function Get-Office365UserSecurityReport {
         [Int]$AccountInactiveDays = 30
     )
 
-    Test-CommandAvailable -Name @('Get-Mailbox', 'Get-MsolUser')
+    Test-CommandAvailable -Name Get-Mailbox, Get-MsolUser
 
     $MailboxAuditing = [Collections.ArrayList]::new()
     $MailboxCalendar = [Collections.ArrayList]::new()
@@ -766,7 +766,7 @@ Function Get-UnifiedGroupReport {
         [PSObject[]]$Groups
     )
 
-    Test-CommandAvailable -Name 'Get-UnifiedGroup'
+    Test-CommandAvailable -Name Get-UnifiedGroup
 
     if (!$Groups) {
         Write-Host -ForegroundColor Green 'Retrieving Office 365 groups ...'
