@@ -1,4 +1,6 @@
-if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
+if ($DotFilesShowScriptEntry) {
+    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+}
 
 if (!(Get-Command -Name rg -ErrorAction Ignore)) {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping ripgrep settings as unable to locate rg.')

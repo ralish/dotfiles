@@ -1,4 +1,6 @@
-if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
+if ($DotFilesShowScriptEntry) {
+    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+}
 
 if ($Host.Name -ne 'ConsoleHost') {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSReadLine settings as host is not ConsoleHost.')

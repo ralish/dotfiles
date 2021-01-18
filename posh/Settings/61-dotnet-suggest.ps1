@@ -1,4 +1,6 @@
-if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
+if ($DotFilesShowScriptEntry) {
+    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+}
 
 if (!(Get-Command -Name dotnet-suggest -ErrorAction Ignore)) {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping dotnet-suggest settings as unable to locate dotnet-suggest.')

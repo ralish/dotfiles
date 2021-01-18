@@ -1,4 +1,7 @@
-if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
+if ($DotFilesShowScriptEntry) {
+    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+}
+
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing environment functions ...')
 
 #region .NET

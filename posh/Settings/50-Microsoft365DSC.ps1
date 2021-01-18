@@ -1,4 +1,6 @@
-if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath) }
+if ($DotFilesShowScriptEntry) {
+    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+}
 
 try {
     if (!$DotFilesFastLoad) {
