@@ -2,7 +2,7 @@ if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Mes
 
 try {
     if (!$DotFilesFastLoad) {
-        Test-ModuleAvailable -Name AWS.Tools.Installer, AWSPowerShell.NetCore, AWSPowerShell -Require Any -Verbose:$false
+        Test-ModuleAvailable -Name AWS.Tools.Installer, AWSPowerShell.NetCore, AWSPowerShell -Require Any
     }
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of AWS functions.')

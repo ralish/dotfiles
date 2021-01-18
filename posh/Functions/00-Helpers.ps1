@@ -32,7 +32,7 @@ Function Test-CommandAvailable {
     )
 
     foreach ($Command in $Name) {
-        Write-Verbose -Message ('Checking command is available: {0}' -f $Command)
+        Write-Debug -Message ('Checking command is available: {0}' -f $Command)
         if (!(Get-Command -Name $Command -ErrorAction Ignore)) {
             throw ('Required command not available: {0}' -f $Command)
         }
@@ -63,8 +63,8 @@ Function Test-ModuleAvailable {
     )
 
     foreach ($Module in $Name) {
-        Write-Verbose -Message ('Checking module is available: {0}' -f $Module)
-        if (Get-Module -Name $Module -ListAvailable) {
+        Write-Debug -Message ('Checking module is available: {0}' -f $Module)
+        if (Get-Module -Name $Module -ListAvailable -Verbose:$false) {
             $ModuleAvailable = $true
             if ($Require -eq 'Any') {
                 break

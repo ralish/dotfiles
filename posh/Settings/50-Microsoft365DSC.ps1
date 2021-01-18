@@ -2,7 +2,7 @@ if ($DotFilesShowScriptEntry) { Write-Verbose -Message (Get-DotFilesMessage -Mes
 
 try {
     if (!$DotFilesFastLoad) {
-        Test-ModuleAvailable -Name Microsoft365DSC -Verbose:$false
+        Test-ModuleAvailable -Name Microsoft365DSC
     }
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping Microsoft365DSC settings as module not found.')
