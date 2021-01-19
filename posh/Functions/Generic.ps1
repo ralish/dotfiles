@@ -646,3 +646,37 @@ Function Repair-PathString {
 }
 
 #endregion
+
+#region Security
+
+# Disable TLS certificate validation
+Function Disable-TlsCertificateValidation {
+    [CmdletBinding()]
+    Param()
+
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        throw 'Unable to disable TLS certificate validation on PowerShell Core.'
+    }
+
+    $TrustAllCerts = @'
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+
+namespace DotFiles {
+    public static class CertificateValidation {
+        public static bool TrustAllCerts(object sender,
+                                         X509Certificate certificate,
+                                         X509Chain chain,
+                                         SslPolicyErrors sslPolicyErrors) {
+            return true;
+        }
+    }
+}
+'@
+
+    Add-Type -TypeDefinition $TrustAllCerts
+    $TrustAllCertsDelegate = [Delegate]::CreateDelegate([Net.Security.RemoteCertificateValidationCallback], [DotFiles.CertificateValidation], 'TrustAllCerts')
+    [Net.ServicePointManager]::ServerCertificateValidationCallback = $TrustAllCertsDelegate
+}
+
+#endregion
