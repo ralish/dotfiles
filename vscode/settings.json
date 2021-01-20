@@ -72,6 +72,7 @@
     "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
 
     // Features: Remote
+    "remote.autoForwardPorts": false,
     "remote.downloadExtensionsLocally": true,
 
     // Application: Update
