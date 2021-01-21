@@ -234,7 +234,7 @@ Function Update-PowerShell {
             $DscModules = @(Get-DscResource -Module * | Select-Object -ExpandProperty ModuleName -Unique)
         }
 
-        if ((Test-IsWindows)) {
+        if (Test-IsWindows) {
             $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::MyDocuments)
             $ScopePathAllUsers = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
         } else {
