@@ -2,6 +2,10 @@ if ($DotFilesShowScriptEntry) {
     Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
 }
 
+if (!(Test-IsWindows)) {
+    return
+}
+
 try {
     if (!$DotFilesFastLoad) {
         Test-ModuleAvailable -Name Microsoft365DSC
