@@ -71,7 +71,8 @@ search_results=$(find "$search_path" -name '*.old*' -or \
                                      -name '*.dpkg-old*' -or \
                                      -name '*.ucf-dist*' -or \
                                      -name '*.ucf-new*' -or \
-                                     -name '*.ucf-old*' \
+                                     -name '*.ucf-old*' -or \
+                                     -name '*.distUpgrade' \
                                      || true )
 
 if [[ -n $quiet ]]; then
