@@ -108,7 +108,7 @@ Function Update-AllTheThings {
     }
 
     if ($Tasks['Scoop']) {
-        $Results.Scoop = Update-Scoop
+        $Results.Scoop = Update-Scoop -CaptureOutput
     }
 
     if ($Tasks['DotNetTools']) {
@@ -303,7 +303,9 @@ Function Update-PowerShell {
 Function Update-Scoop {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '')]
     [CmdletBinding()]
-    Param()
+    Param(
+        [Switch]$CaptureOutput
+    )
 
     if (!(Get-Command -Name scoop -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update Scoop apps as scoop command not found.'
@@ -311,16 +313,32 @@ Function Update-Scoop {
     }
 
     Write-Host -ForegroundColor Green 'Updating Scoop ...'
-    & scoop update --quiet
-    Write-Host
+    if ($CaptureOutput) {
+        $ScoopOutput = & scoop update --quiet 6>&1
+    } else {
+        & scoop update --quiet
+        Write-Host
+    }
 
     Write-Host -ForegroundColor Green 'Updating Scoop apps ...'
-    & scoop update * --quiet
-    Write-Host
+    if ($CaptureOutput) {
+        $ScoopOutput += & scoop update * --quiet 6>&1
+    } else {
+        & scoop update * --quiet
+        Write-Host
+    }
 
     Write-Host -ForegroundColor Green 'Removing obsolete Scoop apps ...'
-    & scoop cleanup *
-    Write-Host
+    if ($CaptureOutput) {
+        $ScoopOutput += & scoop cleanup * 6>&1
+    } else {
+        & scoop cleanup *
+        Write-Host
+    }
+
+    if ($CaptureOutput) {
+        return $ScoopOutput
+    }
 }
 
 # Update Microsoft Visual Studio
