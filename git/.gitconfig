@@ -145,7 +145,7 @@
 
 	co  = checkout
 	cob = checkout -b
-	com = checkout master
+	com = "!f() { if git rev-parse -q --verify main > /dev/null; then git checkout main; else git checkout master; fi }; f"
 
 	cp  = cherry-pick
 	cpa = cherry-pick --abort
@@ -188,7 +188,7 @@
 	lsr = ls-tree -r --name-only HEAD
 
 	m   = merge
-	mm  = merge master
+	mm  = "!f() { if git rev-parse -q --verify main > /dev/null; then git merge main; else git merge master; fi }; f"
 	mff = merge --ff-only
 	mnf = merge --no-ff
 
@@ -200,7 +200,7 @@
 	pa  = push --all
 	pf  = push --force
 	po  = push origin
-	pom = push origin master
+	pom = "!f() { if git rev-parse -q --verify main > /dev/null; then git push origin main; else git push origin master; fi }; f"
 	ps  = push --set-upstream
 	pso = push --set-upstream origin
 	pt  = push --tags
@@ -212,7 +212,7 @@
 	rba = rebase --abort
 	rbc = rebase --continue
 	rbs = rebase --skip
-	rbm = rebase master
+	rbm = "!f() { if git rev-parse -q --verify main > /dev/null; then git rebase main; else git rebase master; fi }; f"
 	rbi = rebase -i
 	rb1 = rebase -i HEAD~1
 	rb2 = rebase -i HEAD~2
