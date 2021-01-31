@@ -729,8 +729,10 @@ Function Update-RubyGems {
 
     [String[]]$ListArgs = 'list', '--local', '--no-details'
     [String[]]$UpdateArgs = 'update', '--no-document'
+    [String[]]$CleanupArgs = 'cleanup'
     if (!$PSCmdlet.ShouldProcess('Ruby gems', 'Update')) {
         $UpdateArgs += '--explain'
+        $CleanupArgs += '--dry-run'
     }
 
     Write-Host -ForegroundColor Green -NoNewline 'Updating RubyGems system: '
@@ -750,6 +752,10 @@ Function Update-RubyGems {
     Write-Host -ForegroundColor Green -NoNewline 'Updating Ruby gems: '
     Write-Host ('gem {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
     & gem @UpdateArgs @Packages
+
+    Write-Host -ForegroundColor Green -NoNewline 'Removing obsolete Ruby gems: '
+    Write-Host ('gem {0}' -f ($CleanupArgs -join ' '))
+    & gem @CleanupArgs
 }
 
 #endregion
