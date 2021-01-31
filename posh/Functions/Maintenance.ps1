@@ -312,7 +312,8 @@ Function Update-Scoop {
         return
     }
 
-    Write-Host -ForegroundColor Green 'Updating Scoop ...'
+    Write-Host -ForegroundColor Green -NoNewline 'Updating Scoop: '
+    Write-Host 'scoop update --quiet'
     if ($CaptureOutput) {
         $ScoopOutput = & scoop update --quiet 6>&1
     } else {
@@ -320,7 +321,8 @@ Function Update-Scoop {
         Write-Host
     }
 
-    Write-Host -ForegroundColor Green 'Updating Scoop apps ...'
+    Write-Host -ForegroundColor Green -NoNewline 'Updating Scoop apps: '
+    Write-Host 'scoop update * --quiet'
     if ($CaptureOutput) {
         $ScoopOutput += & scoop update * --quiet 6>&1
     } else {
@@ -328,7 +330,8 @@ Function Update-Scoop {
         Write-Host
     }
 
-    Write-Host -ForegroundColor Green 'Removing obsolete Scoop apps ...'
+    Write-Host -ForegroundColor Green -NoNewline 'Removing obsolete Scoop apps: '
+    Write-Host 'scoop cleanup *'
     if ($CaptureOutput) {
         $ScoopOutput += & scoop cleanup * 6>&1
     } else {
