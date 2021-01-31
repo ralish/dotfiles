@@ -733,6 +733,10 @@ Function Update-RubyGems {
         $UpdateArgs += '--explain'
     }
 
+    Write-Host -ForegroundColor Green -NoNewline 'Updating RubyGems system: '
+    Write-Host ('gem {0} --system' -f ($UpdateArgs -join ' '))
+    & gem @UpdateArgs --system
+
     Write-Host -ForegroundColor Green -NoNewline 'Enumerating Ruby gems: '
     Write-Host ('gem {0}' -f ($ListArgs -join ' '))
     $Packages = [Collections.ArrayList]::new()
