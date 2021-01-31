@@ -193,7 +193,7 @@ Function Optimize-WindowsDefender {
             Write-Warning -Message 'Skipping Windows Defender settings as tamper protection is enabled.'
             return
         }
-    } catch [System.Management.Automation.CommandNotFoundException] {
+    } catch [CommandNotFoundException] {
         Write-Warning -Message 'Unable to query Windows Defender status as Get-MpComputerStatus command not available.'
     } catch [Microsoft.Management.Infrastructure.CimException] {
         # The extrinsic Method could not be executed
