@@ -6,6 +6,10 @@ Param(
     [String]$Operation
 )
 
+if (![Environment]::OSVersion.Version -eq 10) {
+    throw 'Script is only valid for Windows 10.'
+}
+
 $ContextMenuPath = 'HKLM:\Software\Classes\PackagedCom\Package\Microsoft.SkypeApp_*\Class\{776DBC8D-7347-478C-8D71-791E12EF49D8}'
 
 try {
