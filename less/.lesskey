@@ -1,6 +1,6 @@
 #env
 # Options to pass to less automatically
-LESS = --ignore-case --jump-target=3 --no-init --quit-if-one-screen --RAW-CONTROL-CHARS
+LESS = --ignore-case --jump-target=3 --no-init --QUIET --quit-if-one-screen --RAW-CONTROL-CHARS
 # Don't store a history of search and shell commands
 LESSHISTFILE = -
 
