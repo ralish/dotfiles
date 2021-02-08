@@ -261,6 +261,11 @@ Function Connect-MSOnline {
 
     Test-ModuleAvailable -Name MSOnline
 
+    # MSOnline is incompatible with PowerShell Core
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Import-Module -Name MSOnline -UseWindowsPowerShell
+    }
+
     Write-Host -ForegroundColor Green 'Connecting to Azure AD (v1) ...'
     Connect-MsolService @PSBoundParameters
 }
