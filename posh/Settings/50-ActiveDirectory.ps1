@@ -23,6 +23,7 @@ $ADUserIgnoredProperties = @(
     # Only exposed via LDAP attributes
     'dSCorePropagationData',
     'lastLogoff',
+    'lockoutTime',
     'logonCount',
     'mS-DS-ConsistencyGuid',
     'msDS-KeyCredentialLink',
