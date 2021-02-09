@@ -92,34 +92,61 @@ Function Compare-ObjectProperties {
 Function Compare-ObjectPropertiesMatrix {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
-        [PSObject]$ReferenceObject,
-
         [Parameter(Mandatory, ValueFromPipeline)]
-        [PSObject[]]$DifferenceObjects,
+        [AllowEmptyCollection()]
+        [Object[]]$Objects,
+
+        [ValidateNotNullOrEmpty()]
+        [PSObject]$ReferenceObject,
 
         [String[]]$IgnoredProperties
     )
 
     Begin {
+        $ComparedObjects = [Collections.ArrayList]::new()
         $DifferentProperties = [Collections.ArrayList]::new()
+
+        $DiscoverReferenceObject = $false
+        if (!$PSBoundParameters.ContainsKey('ReferenceObject')) {
+            $DiscoverReferenceObject = $true
+        }
     }
 
     Process {
-        foreach ($Object in $DifferenceObjects) {
+        foreach ($Object in $Objects) {
+            if ($Object -is [Array]) {
+                Write-Warning -Message ('Skipping nested array.')
+                continue
+            }
+
+            if ($DiscoverReferenceObject) {
+                $ReferenceObject = $Object
+                $DiscoverReferenceObject = $false
+                continue
+            }
+
             $Comparison = Compare-ObjectProperties -ReferenceObject $ReferenceObject -DifferenceObject $Object
             foreach ($PropertyName in $Comparison.PropertyName) {
                 if ($DifferentProperties -notcontains $PropertyName) {
                     $null = $DifferentProperties.Add($PropertyName)
                 }
             }
+            $null = $ComparedObjects.Add($Object)
         }
     }
 
     End {
+        if ($ComparedObjects.Count -eq 0) {
+            throw 'No objects provided to compare against.'
+        }
+
+        if (!$PSBoundParameters.ContainsKey('ReferenceObject') -and !$ComparedObjects.Count -ge 2) {
+            throw 'Objects collection must have at least two items.'
+        }
+
         $FilteredProperties = @($DifferentProperties | Sort-Object -Unique | Where-Object { $_ -notin $IgnoredProperties })
         $ReferenceObject | Select-Object -Property $FilteredProperties
-        $DifferenceObjects | Select-Object -Property $FilteredProperties
+        $ComparedObjects | Select-Object -Property $FilteredProperties
     }
 }
 
