@@ -221,9 +221,21 @@ Function Add-ADShadowPrincipalMember {
 
     $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer
     $ShadowPrincipal = Get-ADObject -Filter { CN -eq $Name } -SearchBase $ShadowPrincipalContainer -SearchScope Subtree
+    if (!$ShadowPrincipal) {
+        throw ('No shadow principal found for filter on CN: {0}' -f $Name)
+    } elseif ($ShadowPrincipal -is [Array]) {
+        throw ('Expected a single shadow principal but found {0} for filter on CN: {1}' -f $ShadowPrincipal.Count, $Name)
+    }
 
     foreach ($Member in $Members) {
-        $User = Get-ADUser -Filter { CN -eq $Member }
+        $User = Get-ADUser -Filter { CN -eq $Member } -ErrorAction Stop
+        if (!$User) {
+            Write-Error -Message ('No AD user found for filter on CN: {0}' -f $Member)
+            continue
+        } elseif ($User -is [Array]) {
+            Write-Error -Message ('Expected a single user but found {0} for filter on CN: {1}' -f $User.Count, $Member)
+            continue
+        }
 
         if ($Duration) {
             $MemberValue = '<TTL={0},{1}>' -f $Duration, $User.DistinguishedName
