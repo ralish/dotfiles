@@ -259,7 +259,7 @@ Function Get-ADShadowPrincipalContainer {
 
 # Create a shadow principal
 Function New-ADShadowPrincipal {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     Param(
         [Parameter(Mandatory)]
         [String]$Name,
