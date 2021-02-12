@@ -3,5 +3,6 @@
     <IgnorePaths>
         <IgnorePath>extensions.txt</IgnorePath>
         <IgnorePath>venv</IgnorePath>
+        <IgnorePath>venv-reqs.txt</IgnorePath>
     </IgnorePaths>
 </Component>
