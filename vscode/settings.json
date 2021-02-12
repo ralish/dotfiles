@@ -11,6 +11,9 @@
     "editor.cursorBlinking": "phase",
     "editor.cursorStyle": "line-thin",
 
+    // Text Editor: Diff Editor
+    "diffEditor.ignoreTrimWhitespace": false,
+
     // Text Editor: Find
     "editor.find.autoFindInSelection": "multiline",
     "editor.find.seedSearchStringFromSelection": false,
