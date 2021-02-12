@@ -207,7 +207,7 @@ Function Resolve-ADGuid {
 
 # Add members to a shadow principal
 Function Add-ADShadowPrincipalMember {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     Param(
         [Parameter(Mandatory)]
         [String]$Name,
