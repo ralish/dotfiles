@@ -56,7 +56,7 @@ Function Get-AzureAuthToken {
     )
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        throw 'This function requires methods unavailable under PowerShell Core.'
+        throw 'This function calls assemblies incompatible with PowerShell Core.'
     }
 
     try {
@@ -109,13 +109,11 @@ Function Get-AzureAuthToken {
 
 # Retrieve filtered set of Azure AD enterprise applications
 #
-# The Azure Active Directory -> Enterprise applications pane can return
-# a filtered set of results based on whether an application is either a
-# "Enterprise Application" or a "Microsoft Application". These options
-# aren't exposed via the AzureAD command: Get-AzureADServicePrincipal.
-#
-# We can get the same functionality within PowerShell by calling the
-# undocumented API which the Azure Portal uses.
+# The Azure AD Enterprise Applications pane can return filtered results
+# based on whether a registration is an "Enterprise Application" or a
+# "Microsoft Application". These options aren't exposed via the AzureAD
+# command: Get-AzureADServicePrincipal. The same functionality can be
+# obtained in PowerShell by calling the undocumented Azure Portal API.
 Function Get-AzureEnterpriseApplications {
     [CmdletBinding()]
     Param(
@@ -146,15 +144,20 @@ Function Get-AzureEnterpriseApplications {
         top          = 999
     }
 
-    $InvokeRestMethodParams = @{
+    $RestMethodParams = @{
         Uri         = $Uri.AbsoluteUri
         Method      = 'POST'
         Headers     = $Headers
-        Body        = ConvertTo-Json $Body
+        Body        = ($Body | ConvertTo-Json)
         ErrorAction = 'Stop'
     }
 
-    $Response = Invoke-RestMethod @InvokeRestMethodParams
+    try {
+        $Response = Invoke-RestMethod @RestMethodParams
+    } catch {
+        throw $_
+    }
+
     return $Response.appList
 }
 
