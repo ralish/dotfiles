@@ -135,7 +135,7 @@ Function Resolve-ADGuid {
         }
 
         if ($Server) {
-            $CommonParams.Add('Server', $Server)
+            $CommonParams['Server'] = $Server
         }
 
         try {
@@ -148,15 +148,25 @@ Function Resolve-ADGuid {
             'ExtendedRight' {
                 $SearchBase = $RootDse.configurationNamingContext
                 $TypeName = 'Microsoft.ActiveDirectory.Management.ADObject.ControlAccessRight'
+
+                if ($PSCmdlet.ParameterSetName -eq 'All') {
+                    $LDAPFilter = '(rightsGuid=*)'
+                }
             }
 
             'SchemaObject' {
                 $SearchBase = $RootDse.schemaNamingContext
                 $TypeName = 'Microsoft.ActiveDirectory.Management.ADObject.SchemaObject'
+
+                if ($PSCmdlet.ParameterSetName -eq 'All') {
+                    $LDAPFilter = '(schemaIDGUID=*)'
+                }
             }
         }
 
-        $SearchFilters = @()
+        if ($PSCmdlet.ParameterSetName -eq 'Guid') {
+            $LDAPFilters = [Collections.ArrayList]::new()
+        }
     }
 
     Process {
@@ -164,37 +174,27 @@ Function Resolve-ADGuid {
             foreach ($ADGuid in $Guid) {
                 switch ($Type) {
                     'ExtendedRight' {
-                        $SearchFilters += '(&(objectClass=controlAccessRight)(rightsGuid={0}))' -f $ADGuid
+                        $LDAPFilters += '(rightsGuid={0})' -f $ADGuid
                     }
 
                     'SchemaObject' {
-                        $GuidOctetString = '\{0}' -f [String]::Join('\', ($ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') }))
-                        $SearchFilters += '(schemaIDGUID={0})' -f $GuidOctetString
+                        $LDAPFilters += '(schemaIDGUID=\{0})' -f [String]::Join('\', ($ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') }))
                     }
-                }
-            }
-        } else {
-            switch ($Type) {
-                'ExtendedRight' {
-                    $SearchFilters += '(objectClass=controlAccessRight)'
-                }
-
-                'SchemaObject' {
-                    $SearchFilters += '(objectClass=*)'
                 }
             }
         }
     }
 
     End {
-        $ADObjects = [Collections.ArrayList]::new()
+        if ($PSCmdlet.ParameterSetName -eq 'Guid') {
+            $LDAPFilter = '(|{0})' -f [String]::Join([String]::Empty, $LDAPFilters)
+        }
 
-        foreach ($SearchFilter in $SearchFilters) {
-            $Results = Get-ADObject @CommonParams -SearchBase $SearchBase -LDAPFilter $SearchFilter -Properties *
-            foreach ($ADObject in $Results) {
-                $ADObject.PSObject.TypeNames.Insert(0, $TypeName)
-                $null = $ADObjects.Add($ADObject)
-            }
+        Write-Debug -Message ('Retrieving AD objects using LDAP filter: {0}' -f $LDAPFilter)
+        $ADObjects = Get-ADObject @CommonParams -SearchBase $SearchBase -LDAPFilter $LDAPFilter -Properties *
+
+        foreach ($ADObject in $ADObjects) {
+            $ADObject.PSObject.TypeNames.Insert(0, $TypeName)
         }
 
         return $ADObjects
