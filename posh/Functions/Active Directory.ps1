@@ -38,6 +38,8 @@ Function Get-KerberosTokenSize {
         [Int]$TicketOverheadBytes = 1200
     )
 
+    Test-ModuleAvailable -Name ActiveDirectory
+
     if ($Username.Split('\').Count -ne 1) {
         if ($Username.Split('\').Count -gt 2) {
             throw 'Only a single backslash may be present in username.'
@@ -123,6 +125,8 @@ Function Resolve-ADGuid {
     )
 
     Begin {
+        Test-ModuleAvailable -Name ActiveDirectory
+
         $CommonParams = @{
             ErrorAction = 'Stop'
         }
@@ -212,6 +216,8 @@ Function Add-ADShadowPrincipalMember {
         [Int]$Duration
     )
 
+    Test-ModuleAvailable -Name ActiveDirectory
+
     $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer
     $ShadowPrincipal = Get-ADObject -Filter { CN -eq $Name } -SearchBase $ShadowPrincipalContainer -SearchScope Subtree
     if (!$ShadowPrincipal) {
@@ -245,6 +251,8 @@ Function Get-ADShadowPrincipalContainer {
     [CmdletBinding()]
     Param()
 
+    Test-ModuleAvailable -Name ActiveDirectory
+
     try {
         $DC = Get-ADDomainController -Discover -NextClosestSite -ErrorAction Stop
     } catch {
@@ -271,6 +279,8 @@ Function New-ADShadowPrincipal {
         [Parameter(Mandatory)]
         [Security.Principal.SecurityIdentifier]$Sid
     )
+
+    Test-ModuleAvailable -Name ActiveDirectory
 
     $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer
 
