@@ -59,7 +59,7 @@ Function Set-R53HostedZoneNameTag {
             $Tag.Value = $Zone.Name.TrimEnd('.')
 
             if ($PSCmdlet.ShouldProcess($Zone.Name, 'Set Name tag')) {
-                Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType 'hostedzone' -AddTag $Tag
+                Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType hostedzone -AddTag $Tag
             }
         }
     }
@@ -131,7 +131,7 @@ Function Set-R53HostedZoneParkedRecords {
 
         if ($CaaIssue) {
             foreach ($CaaIssuer in $CaaIssue) {
-                $null = $Caa.Add(('0 issue "{0}"' -f $CaaIssuer))
+                $null = $Caa.Add('0 issue "{0}"' -f $CaaIssuer)
             }
         } else {
             $null = $Caa.Add('0 issue ";"')
@@ -139,13 +139,13 @@ Function Set-R53HostedZoneParkedRecords {
 
         if ($CaaIssueWild) {
             foreach ($CaaWildIssuer in $CaaIssueWild) {
-                $null = $Caa.Add(('0 issuewild "{0}"' -f $CaaWildIssuer))
+                $null = $Caa.Add('0 issuewild "{0}"' -f $CaaWildIssuer)
             }
         }
 
         if ($CaaIoDef) {
             foreach ($CaaReportUrl in $CaaIoDef) {
-                $null = $Caa.Add(('0 iodef "{0}"' -f $CaaReportUrl))
+                $null = $Caa.Add('0 iodef "{0}"' -f $CaaReportUrl)
             }
         }
     }
@@ -240,10 +240,9 @@ Function Set-R53HostedZoneParkedRecords {
         }
 
         $ZoneId = $Zone.Id.TrimStart('/hostedzone/')
-        if ($PSCmdlet.ShouldProcess($ZoneName, 'Set records')) {
-            Write-Verbose -Message ('Setting records for Route 53 zone: {0}' -f $ZoneName)
-            $Result = Edit-R53ResourceRecordSet -HostedZoneId $ZoneId -ChangeBatch_Change $ZoneRecords -ChangeBatch_Comment $ZoneName
-            $null = $Changes.Add($Result)
+        if ($PSCmdlet.ShouldProcess($Zone.Name, 'Set records')) {
+            $Change = Edit-R53ResourceRecordSet -HostedZoneId $ZoneId -ChangeBatch_Change $ZoneRecords -ChangeBatch_Comment $ZoneName
+            $null = $Changes.Add($Change)
         }
     }
 
@@ -277,7 +276,7 @@ Function Set-R53HostedZoneTag {
             $ResourceId = $Zone.Id.Replace('/hostedzone/', [String]::Empty)
 
             if ($PSCmdlet.ShouldProcess($Zone.Name, 'Set {0} tag' -f $Tag.Key)) {
-                Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType 'hostedzone' -AddTag $Tag
+                Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType hostedzone -AddTag $Tag
             }
         }
     }
