@@ -13,6 +13,9 @@ try {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing AWS functions ...')
 
+# Load our custom formatting data
+$null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'AWS.format.ps1xml'))
+
 #region IAM
 
 # Set AWS credential environment variables from an AWSCredentials object
@@ -289,27 +292,32 @@ Function Get-S3BucketSize {
     Param()
 
     try {
-        Test-ModuleAvailable -Name AWS.Tools.CloudWatch, AWS.Tools.S3
+        Test-ModuleAvailable -Name AWS.Tools.CloudWatch, AWS.Tools.EC2, AWS.Tools.S3
     } catch {
         Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
     }
 
-    $Regions = (Get-AWSRegion).Region | Where-Object { $_ -notmatch '^us-isob?-' }
-
-    Write-Verbose -Message 'Retrieving S3 buckets ...'
     try {
-        $Buckets = Get-S3Bucket -ErrorAction Stop
+        Write-Verbose -Message 'Retrieving enabled regions ...'
+        $Regions = Get-EC2Region -ErrorAction Stop -Verbose:$false
+
+        Write-Verbose -Message 'Retrieving S3 buckets ...'
+        $Buckets = Get-S3Bucket -ErrorAction Stop -Verbose:$false
     } catch {
         throw $_
     }
 
+    foreach ($Bucket in $Buckets) {
+        $Bucket.PSObject.TypeNames.Insert(0, 'Amazon.S3.Model.S3Bucket.Size')
+    }
+
+    Write-Verbose -Message 'Retrieving BucketSizeBytes metrics for enabled regions ...'
     $Metrics = @{ }
-    foreach ($Region in $Regions) {
-        Write-Verbose -Message ('Retrieving BucketSizeBytes metrics for region: {0}' -f $Region)
+    foreach ($Region in $Regions.RegionName) {
         try {
-            $Result = Get-CWMetricList -Region $Region -MetricName BucketSizeBytes -ErrorAction Stop
+            $Result = Get-CWMetricList -Region $Region -MetricName BucketSizeBytes -ErrorAction Stop -Verbose:$false
         } catch {
-            Write-Warning -Message ('Error retrieving BucketSizeBytes metrics for region: {0}' -f $Region)
+            Write-Warning -Message ('Failed to retrieve BucketSizeBytes metrics for region: {0}' -f $Region)
             continue
         }
 
@@ -318,18 +326,26 @@ Function Get-S3BucketSize {
         }
     }
 
-    $EndDate = (Get-Date).ToUniversalTime()
-    $StartDate = $EndDate.AddDays(-2)
+    $CwMetricStatisticParams = @{
+        Namespace   = 'AWS/S3'
+        MetricName  = 'BucketSizeBytes'
+        Statistic   = 'Average'
+        Period      = 86400
+        ErrorAction = 'Stop'
+        Verbose     = $false
+    }
+    $CwMetricStatisticParams['UtcEndTime'] = (Get-Date).ToUniversalTime()
+    $CwMetricStatisticParams['UtcStartTime'] = $CwMetricStatisticParams['UtcEndTime'].AddDays(-2)
+
+    Write-Verbose -Message 'Retrieving BucketSizeBytes metric for each bucket ...'
     foreach ($Region in $Metrics.Keys) {
         foreach ($Metric in $Metrics[$Region]) {
             $BucketName = ($Metric.Dimensions | Where-Object Name -EQ 'BucketName').Value
-            $StorageType = ($Metric.Dimensions | Where-Object Name -EQ 'StorageType').Value
 
-            Write-Verbose -Message ('[{0}] Retrieving BucketSizeBytes for {1} ...' -f $BucketName, $StorageType)
             try {
-                $Result = Get-CWMetricStatistic -Region $Region -Namespace AWS/S3 -MetricName BucketSizeBytes -Dimension $Metric.Dimensions -Statistic Average -Period 86400 -UtcStartTime $StartDate -UtcEndTime $EndDate -ErrorAction Stop
+                $Result = Get-CWMetricStatistic @CwMetricStatisticParams -Region $Region -Dimension $Metric.Dimensions
             } catch {
-                Write-Warning -Message ('[{0}] Error retrieving BucksetSizeBytes for {1}.' -f $BucketName, $StorageType)
+                Write-Warning -Message ('Failed to retrieve BucketSizeBytes metric for bucket: {0}' -f $BucketName)
                 continue
             }
 

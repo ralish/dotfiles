@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+    <ViewDefinitions>
+        <View>
+            <Name>Amazon.S3.Model.S3Bucket.Size</Name>
+            <ViewSelectedBy>
+                <TypeName>Amazon.S3.Model.S3Bucket.Size</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>BucketName</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>BucketSize</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>
