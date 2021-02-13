@@ -55,6 +55,10 @@ Function Get-AzureAuthToken {
         [String]$PromptBehaviour = 'Auto'
     )
 
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        throw 'This function requires methods unavailable under PowerShell Core.'
+    }
+
     try {
         $ModuleName = 'AzureADPreview'
         Test-ModuleAvailable -Name $ModuleName
@@ -161,6 +165,11 @@ Function Get-AzureUsersLicensingSummary {
 
     Test-ModuleAvailable -Name MSOnline
 
+    # MSOnline is incompatible with PowerShell Core
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Import-Module -Name MSOnline -UseWindowsPowerShell
+    }
+
     $Users = Get-MsolUser -ErrorAction Stop | Where-Object { $_.UserType -ne 'Guest' }
 
     foreach ($User in $Users) {
@@ -185,6 +194,11 @@ Function Get-AzureUsersWithDisabledServices {
     )
 
     Test-ModuleAvailable -Name MSOnline
+
+    # MSOnline is incompatible with PowerShell Core
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Import-Module -Name MSOnline -UseWindowsPowerShell
+    }
 
     $Users = Get-MsolUser -ErrorAction Stop | Where-Object { $_.IsLicensed -eq $true }
 
@@ -217,14 +231,17 @@ Function Connect-AzureAD {
         [PSCredential]$Credential
     )
 
-    $ErrorActionPreference = 'Stop'
-
     try {
         $ModuleName = 'AzureADPreview'
         Test-ModuleAvailable -Name $ModuleName
     } catch {
         $ModuleName = 'AzureAD'
         Test-ModuleAvailable -Name $ModuleName
+    }
+
+    # AzureAD is incompatible with PowerShell Core
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Import-Module -Name $ModuleName -UseWindowsPowerShell
     }
 
     Write-Host -ForegroundColor Green 'Connecting to Azure AD (v2) ...'
@@ -240,9 +257,12 @@ Function Connect-AzureRM {
         [PSCredential]$Credential
     )
 
-    $ErrorActionPreference = 'Stop'
-
     Test-ModuleAvailable -Name AzureRM
+
+    # AzureRM is incompatible with PowerShell Core
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Import-Module -Name AzureRM -UseWindowsPowerShell
+    }
 
     Write-Host -ForegroundColor Green 'Connecting to Azure RM ...'
     Login-AzureRmAccount @PSBoundParameters
@@ -256,8 +276,6 @@ Function Connect-MSOnline {
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
     )
-
-    $ErrorActionPreference = 'Stop'
 
     Test-ModuleAvailable -Name MSOnline
 
