@@ -2,6 +2,34 @@
 <Configuration>
     <ViewDefinitions>
         <View>
+            <Name>Microsoft.Azure.Portal.ManagedApplication</Name>
+            <ViewSelectedBy>
+                <TypeName>Microsoft.Azure.Portal.ManagedApplication</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Label>DisplayName</Label>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>PublisherName</Label>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>displayName</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>publisherName</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+        <View>
             <Name>Microsoft.Online.Administration.User.Licenses</Name>
             <ViewSelectedBy>
                 <TypeName>Microsoft.Online.Administration.User.Licenses</TypeName>

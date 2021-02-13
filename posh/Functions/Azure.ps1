@@ -158,6 +158,10 @@ Function Get-AzureEnterpriseApplications {
         throw $_
     }
 
+    foreach ($App in $Response.appList) {
+        $App.PSObject.TypeNames.Insert(0, 'Microsoft.Azure.Portal.ManagedApplication')
+    }
+
     return $Response.appList
 }
 
