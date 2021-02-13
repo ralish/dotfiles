@@ -18,7 +18,7 @@ $null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'AWS.form
 
 #region IAM
 
-# Set AWS credential environment variables from an AWSCredentials object
+# Set AWS credentials environment variables from an AWSCredentials object
 Function Set-AWSCredentialEnvironment {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUsePSCredentialType', '')]
@@ -39,6 +39,7 @@ Function Set-AWSCredentialEnvironment {
 
 #region Route 53
 
+# Set the Name tag for a Route 53 hosted zone to the zone name
 Function Set-R53HostedZoneNameTag {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
@@ -65,6 +66,7 @@ Function Set-R53HostedZoneNameTag {
     }
 }
 
+# Set records on a Route 53 hosted zone for a parked domain
 Function Set-R53HostedZoneParkedRecords {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
@@ -249,6 +251,7 @@ Function Set-R53HostedZoneParkedRecords {
     return $Changes
 }
 
+# Set a tag on a Route 53 hosted zone
 Function Set-R53HostedZoneTag {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
@@ -286,6 +289,7 @@ Function Set-R53HostedZoneTag {
 
 #region S3
 
+# Retrieve the size of each S3 bucket
 Function Get-S3BucketSize {
     [CmdletBinding()]
     Param()
