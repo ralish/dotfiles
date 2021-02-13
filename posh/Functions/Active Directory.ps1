@@ -34,7 +34,7 @@ Function Get-KerberosTokenSize {
         [ValidateSet('Windows Server 2008 R2 (or earlier)', 'Windows Server 2012 (or later)')]
         [String]$OperatingSystem = 'Windows Server 2012 (or later)',
 
-        [ValidateRange("Positive")]
+        [ValidateRange('Positive')]
         [Int]$TicketOverheadBytes = 1200
     )
 
@@ -45,13 +45,6 @@ Function Get-KerberosTokenSize {
 
         $Domain = $Username.Split('\')[0]
         $User = $Username.Split('\')[1]
-    } elseif ($Username.Split('@').count -ne 1) {
-        if ($Username.Split('@').Count -gt 2) {
-            throw 'Only a single "@" sign may be present in username.'
-        }
-
-        $User = $Username.Split('@')[0]
-        $Domain = $Username.Split('@')[1]
     } else {
         $User = $Username
         $Domain = $env:USERDOMAIN
@@ -174,11 +167,11 @@ Function Resolve-ADGuid {
             foreach ($ADGuid in $Guid) {
                 switch ($Type) {
                     'ExtendedRight' {
-                        $LDAPFilters += '(rightsGuid={0})' -f $ADGuid
+                        $null = $LDAPFilters.Add('(rightsGuid={0})' -f $ADGuid)
                     }
 
                     'SchemaObject' {
-                        $LDAPFilters += '(schemaIDGUID=\{0})' -f [String]::Join('\', ($ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') }))
+                        $null = $LDAPFilters.Add('(schemaIDGUID=\{0})' -f [String]::Join('\', ($ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') })))
                     }
                 }
             }
@@ -228,7 +221,7 @@ Function Add-ADShadowPrincipalMember {
     }
 
     foreach ($Member in $Members) {
-        $User = Get-ADUser -Filter { CN -eq $Member } -ErrorAction Stop
+        $User = Get-ADUser -Filter { CN -eq $Member }
         if (!$User) {
             Write-Error -Message ('No AD user found for filter on CN: {0}' -f $Member)
             continue
@@ -253,19 +246,18 @@ Function Get-ADShadowPrincipalContainer {
     Param()
 
     try {
-        $Dc = Get-ADDomainController -Discover -NextClosestSite -ErrorAction Stop
+        $DC = Get-ADDomainController -Discover -NextClosestSite -ErrorAction Stop
     } catch {
         throw $_
     }
 
     try {
-        $RootDse = Get-ADRootDSE -Server $Dc.HostName.Value -ErrorAction Stop
+        $RootDse = Get-ADRootDSE -Server $DC.HostName.Value -ErrorAction Stop
     } catch {
         throw $_
     }
 
     $SpcDn = 'CN=Shadow Principal Configuration,CN=Services,{0}' -f $RootDse.configurationNamingContext
-
     return $SpcDn
 }
 
@@ -285,7 +277,7 @@ Function New-ADShadowPrincipal {
     $SidByteArray = [byte[]]::new($Sid.BinaryLength)
     $Sid.GetBinaryForm($SidByteArray, 0)
 
-    New-ADObject -Type 'msDS-ShadowPrincipal' -Path $ShadowPrincipalContainer -Name $Name -OtherAttributes @{ 'msDS-ShadowPrincipalSid' = $SidByteArray }
+    New-ADObject -Type msDS-ShadowPrincipal -Path $ShadowPrincipalContainer -Name $Name -OtherAttributes @{ 'msDS-ShadowPrincipalSid' = $SidByteArray }
 }
 
 #endregion
