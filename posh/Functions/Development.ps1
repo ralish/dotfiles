@@ -139,21 +139,24 @@ Function Invoke-GitLinter {
                 throw ('Required command is unavailable: Invoke-ScriptAnalyzer')
             }
 
-            $InvokeScriptAnalyzerParams = @{
+            $ScriptAnalyzerParams = @{
                 Verbose = $false
             }
 
             if ($Settings) {
-                $InvokeScriptAnalyzerParams['Settings'] = $Settings
+                $ScriptAnalyzerParams['Settings'] = $Settings
             }
 
-            git ls-files | Where-Object { $_ -match '\.ps[dm]?1$' } | ForEach-Object {
+            $GitOutput = git ls-files
+            if ($LASTEXITCODE -ne 0) { return }
+
+            $GitOutput | Where-Object { $_ -match '\.ps[dm]?1$' } | ForEach-Object {
                 if ($PSBoundParameters.ContainsKey('Exclude')) {
                     if ($_ -match $Exclude) { return }
                 }
 
                 Write-Verbose -Message ('Invoking PSScriptAnalyzer on: {0}' -f $_)
-                Invoke-ScriptAnalyzer -Path $_ @InvokeScriptAnalyzerParams
+                Invoke-ScriptAnalyzer -Path $_ @ScriptAnalyzerParams
             }
         }
 
@@ -168,8 +171,11 @@ Function Invoke-GitLinter {
                 }
             }
 
+            $GitOutput = git ls-files
+            if ($LASTEXITCODE -ne 0) { return }
+
             $Files = [Collections.ArrayList]::new()
-            git ls-files | Where-Object { $_ -match '\.(ba)?sh$' } | ForEach-Object { $null = $Files.Add($_) }
+            $GitOutput | Where-Object { $_ -match '\.(ba)?sh$' } | ForEach-Object { $null = $Files.Add($_) }
 
             if ($ShebangSearch) {
                 rg --path-separator '/' --hidden -l '^#!/usr/bin/env (ba)?sh$' | ForEach-Object { $null = $Files.Add($_) }
