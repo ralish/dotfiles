@@ -43,6 +43,12 @@
     // Workbench
     "workbench.enableExperiments": false,
     "workbench.startupEditor": "readme",
+    "workbench.editorAssociations": [
+        {
+            "viewType": "default",
+            "filenamePattern": "git-rebase-todo"
+        }
+    ],
 
     // Workbench: Appearance
     "workbench.iconTheme": "vscode-icons",
