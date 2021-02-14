@@ -412,7 +412,7 @@ Function Update-Windows {
     }
 
     Write-Host -ForegroundColor Green 'Installing Windows updates ...'
-    $Results = Install-WindowsUpdate -IgnoreReboot -NotTitle Silverlight
+    $Results = Get-WindowsUpdate -IgnoreReboot -NotTitle Silverlight
     if ($Results) {
         return $Results
     }
