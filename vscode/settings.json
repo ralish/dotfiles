@@ -105,9 +105,6 @@
 
     // Extension: GitLens
     "gitlens.defaultDateStyle": "absolute",
-    "gitlens.advanced.messages": {
-        "suppressShowKeyBindingsNotice": true
-    },
 
     // Extension: Language Support for Java(TM) by Red Hat
     "java.configuration.checkProjectSettingsExclusions": false,
