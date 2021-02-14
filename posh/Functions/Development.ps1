@@ -286,26 +286,31 @@ Function Remove-GitCleanSubset {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
         [Parameter(ValueFromPipeline)]
-        [String]$GitCleanDryRunOutput,
+        [String[]]$GitCleanDryRunOutput,
 
         [ValidateNotNullOrEmpty()]
         [String[]]$RemovePathsEndingWith = @('/bin/', '/obj/')
     )
 
     Process {
-        if ($GitCleanDryRunOutput -notmatch '^Would remove (.+)') {
-            Write-Error -Message ('Path not in expected format: {0}' -f $GitCleanDryRunOutput)
-            continue
-        }
-
-        $Path = $Matches[1]
-
-        foreach ($RemovalPath in $RemovePathsEndingWith) {
-            if ($Path.EndsWith($RemovalPath)) {
-                if ($PSCmdlet.ShouldProcess($Path, 'Remove')) {
-                    Remove-Item -Path $Path -Recurse -Force
-                }
+        foreach ($Line in $GitCleanDryRunOutput) {
+            if ($Line -match '^Would skip repository (.+)') {
+                Write-Warning -Message ('Ignoring repository at path: {0}' -f $Matches[1])
                 continue
+            }
+
+            if ($Line -notmatch '^Would remove (.+)') {
+                Write-Error -Message ('Path not in expected format: {0}' -f $Line)
+                continue
+            }
+
+            $Path = $Matches[1]
+
+            foreach ($RemovalPath in $RemovePathsEndingWith) {
+                if ($Path.EndsWith($RemovalPath)) {
+                    Remove-Item -LiteralPath $Path -Recurse -Force
+                    break
+                }
             }
         }
     }
