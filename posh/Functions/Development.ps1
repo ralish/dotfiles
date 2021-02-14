@@ -194,28 +194,45 @@ Function Invoke-GitLinter {
 
 # Fast-forward all branches to match a branch
 Function Invoke-GitMergeAllBranches {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$SourceBranch = 'main'
+        [String]$SourceBranch
     )
 
-    $Branches = @()
-    & git branch |
-        ForEach-Object {
-            $Branches += $_.TrimStart('* ')
-            if ($_.StartsWith('* ')) {
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
-                $CurrentBranch = $_.TrimStart('* ')
+    $GitOutput = git branch
+    if ($LASTEXITCODE -ne 0) { return }
+
+    if (!$PSBoundParameters.ContainsKey('SourceBranch')) {
+        $null = git rev-parse -q --verify main
+        if ($LASTEXITCODE -eq 0) {
+            $SourceBranch = 'main'
+        } else {
+            $null = git rev-parse -q --verify master
+            if ($LASTEXITCODE -eq 0) {
+                $SourceBranch = 'master'
+            } else {
+                throw 'Unable to guess source branch to merge.'
             }
         }
+        Write-Verbose -Message ('Using guessed source branch: {0}' -f $SourceBranch)
+    }
+
+    $Branches = [Collections.ArrayList]::new()
+    foreach ($Branch in $GitOutput) {
+        $null = $Branches.Add($Branch.TrimStart('* '))
+        if ($Branch.StartsWith('* ')) {
+            $CurrentBranch = $Branch.TrimStart('* ')
+        }
+    }
 
     if ($SourceBranch -notin $Branches) {
-        throw ('Source branch for merge does not exist locally: {0}' -f $SourceBranch)
+        throw ('Source branch for merge not checked out: {0}' -f $SourceBranch)
     }
 
     if ($SourceBranch -ne $CurrentBranch) {
-        & git checkout $SourceBranch
+        git checkout $SourceBranch
+        if ($LASTEXITCODE -ne 0) { return }
         Write-Host
     }
 
@@ -224,13 +241,17 @@ Function Invoke-GitMergeAllBranches {
             continue
         }
 
-        Write-Host -ForegroundColor Green ('Updating branch: {0}' -f $Branch)
-        & git checkout $Branch
-        & git merge --ff-only $SourceBranch
-        Write-Host
+        if ($PSCmdlet.ShouldProcess($Branch, 'Merge {0}' -f $SourceBranch)) {
+            Write-Host -ForegroundColor Green ('Updating branch: {0}' -f $Branch)
+            git checkout $Branch
+            if ($LASTEXITCODE -ne 0) { return }
+            git merge --ff-only $SourceBranch
+            if ($LASTEXITCODE -ne 0) { return }
+            Write-Host
+        }
     }
 
-    & git checkout $SourceBranch
+    git checkout $SourceBranch
 }
 
 #endregion
