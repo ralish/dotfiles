@@ -247,36 +247,51 @@ Function Add-FileToEmptyDirectories {
         [ValidateNotNullOrEmpty()]
         [String]$FileName = '.keepme',
 
+        # Non-recursive (only direct descendents)
         [String[]]$Exclude = '.git'
     )
 
     if (!$PSBoundParameters.ContainsKey('Path')) {
-        $Path += Get-Item -LiteralPath $PWD.Path
+        $Path += $PWD.Path
     }
 
-    foreach ($Dir in $Path) {
-        $Dir = Get-Item -Path $Path -ErrorAction Ignore
-        if ($Dir -isnot [IO.DirectoryInfo]) {
-            Write-Error -Message ('Provided path is not a directory: {0}' -f $Path)
+    $CurrentLocation = Get-Location
+
+    foreach ($Item in $Path) {
+        if ($CurrentLocation.Provider.Name -ne 'FileSystem' -and ![IO.Path]::IsPathFullyQualified($Item)) {
+            Write-Error -Message ('Skipping relative path as current path is not a file system: {0}' -f $Item)
+            continue
+        }
+
+        try {
+            $DirPath = Get-Item -LiteralPath $Item -Force:$Force -ErrorAction Stop
+        } catch {
+            Write-Error -Message $_.Message
+            continue
+        }
+
+        if ($DirPath -isnot [IO.DirectoryInfo]) {
+            Write-Error -Message ('Provided path is not a directory: {0}' -f $Item)
+            continue
         }
 
         $FilesToCreate = [Collections.ArrayList]::new()
-        Get-ChildItem -Directory -Exclude $Exclude -Force | ForEach-Object {
-            if ((Get-ChildItem -LiteralPath $_.FullName -Force | Measure-Object).Count -ne 0) {
-                Get-ChildItem -LiteralPath $_.FullName -Directory -Recurse -Force | ForEach-Object {
-                    if ((Get-ChildItem -LiteralPath $_.FullName -Force | Measure-Object).Count -eq 0) {
+        Get-ChildItem -LiteralPath $DirPath.FullName -Directory -Exclude $Exclude -Force:$Force | ForEach-Object {
+            if ((Get-ChildItem -LiteralPath $_.FullName -Force:$Force | Measure-Object).Count -ne 0) {
+                Get-ChildItem -LiteralPath $_.FullName -Directory -Recurse -Force:$Force | ForEach-Object {
+                    if ((Get-ChildItem -LiteralPath $_.FullName -Force:$Force | Measure-Object).Count -eq 0) {
+                        # Subdirectory (not top-level) with no children
                         $null = $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
                     }
                 }
             } else {
+                # Top-level subdirectory (minus exclusions) with no children
                 $null = $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
             }
         }
 
         foreach ($FilePath in $FilesToCreate) {
-            if ($PSCmdlet.ShouldProcess($FilePath, 'Create')) {
-                $null = New-Item -Path $FilePath -ItemType File -Verbose
-            }
+            $null = New-Item -Path $FilePath -ItemType File -Verbose
         }
     }
 }
