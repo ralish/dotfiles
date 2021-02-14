@@ -150,6 +150,7 @@
 	cp  = cherry-pick
 	cpa = cherry-pick --abort
 	cpc = cherry-pick --continue
+	cps = cherry-pick --skip
 
 	d   = diff
 	dw  = diff --ignore-all-space
