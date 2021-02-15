@@ -40,3 +40,7 @@ switch_case_indent = true       # shfmt: -ci
 # Shell scripts: POSIX
 [{.mk-sbuild.rc,.quiltrc,user-dirs.dirs}]
 shell_variant = posix           # shfmt: -p
+
+# Windows Event Viewer filters
+[windows/Event Viewer filters/*.xml]
+indent_size = 2
