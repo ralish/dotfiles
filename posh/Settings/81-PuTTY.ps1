@@ -9,7 +9,7 @@ if (!(Get-Command -Name putty -ErrorAction Ignore)) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading PuTTY settings ...')
 
-Register-ArgumentCompleter -Native -CommandName putty -ScriptBlock {
+Register-ArgumentCompleter -Native -CommandName plink, pscp, psftp, putty -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
 
     try {
