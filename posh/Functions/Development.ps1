@@ -69,11 +69,11 @@ Function Get-TypeMethod {
 Function Invoke-GitChildDir {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
-        [ValidateNotNullOrEmpty()]
-        [String[]]$Path,
-
         [Parameter(Mandatory)]
         [String]$Command,
+
+        [ValidateNotNullOrEmpty()]
+        [String[]]$Path,
 
         [Switch]$Recurse
     )
