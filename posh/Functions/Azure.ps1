@@ -246,9 +246,9 @@ Function Connect-AzureAD {
         Test-ModuleAvailable -Name $ModuleName
     }
 
-    # AzureAD is incompatible with PowerShell Core
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Import-Module -Name $ModuleName -UseWindowsPowerShell
+        Write-Error -Message ('{0} module is incompatible with PowerShell Core.' -f $ModuleName)
+        return
     }
 
     Write-Host -ForegroundColor Green 'Connecting to Azure AD (v2) ...'
@@ -264,12 +264,12 @@ Function Connect-AzureRM {
         [PSCredential]$Credential
     )
 
-    Test-ModuleAvailable -Name AzureRM
-
-    # AzureRM is incompatible with PowerShell Core
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Import-Module -Name AzureRM -UseWindowsPowerShell
+        Write-Error -Message 'AzureRM module is incompatible with PowerShell Core.'
+        return
     }
+
+    Test-ModuleAvailable -Name AzureRM
 
     Write-Host -ForegroundColor Green 'Connecting to Azure RM ...'
     Login-AzureRmAccount @PSBoundParameters
@@ -284,12 +284,12 @@ Function Connect-MSOnline {
         [PSCredential]$Credential
     )
 
-    Test-ModuleAvailable -Name MSOnline
-
-    # MSOnline is incompatible with PowerShell Core
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Import-Module -Name MSOnline -UseWindowsPowerShell
+        Write-Error -Message 'MSOnline module is incompatible with PowerShell Core.'
+        return
     }
+
+    Test-ModuleAvailable -Name MSOnline
 
     Write-Host -ForegroundColor Green 'Connecting to Azure AD (v1) ...'
     Connect-MsolService @PSBoundParameters
