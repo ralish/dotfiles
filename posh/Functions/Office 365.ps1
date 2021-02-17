@@ -12,6 +12,86 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Office 365 funct
 # Load our custom formatting data
 $null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml'))
 
+#region Cloud App Security
+
+# Compare Cloud App Security policies
+Function Compare-MCASPolicy {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [PSObject[]]$ReferenceObject,
+
+        [Parameter(Mandatory)]
+        [PSObject[]]$DifferenceObject
+    )
+
+    $IgnoredProperties = @(
+        '_id'
+        '_tid'
+        'created'
+        'createdBy'
+        'lastEntityModificationScanned'
+        'lastModified'
+        'lastNrtEntityModificationScanned'
+        'lastScanned'
+        'lastStateModified'
+        'lastStateModifiedBy'
+        'lastUserModified'
+        'ref_policy_created'
+        'ruleVersionId'
+    )
+
+    $Results = [Collections.ArrayList]::new()
+
+    foreach ($RefPol in ($ReferenceObject | Sort-Object -Property name)) {
+        if (!$RefPol.ref_policy_id) {
+            Write-Warning -Message ('[ID: {0}] Reference policy with no reference policy ID.' -f $RefPol._id)
+            continue
+        }
+
+        $DiffPol = $DifferenceObject | Where-Object ref_policy_id -EQ $RefPol.ref_policy_id
+        if (!$DiffPol) {
+            Write-Warning -Message ('[ID: {0}] Reference policy with no associated difference policy (Ref Policy ID: {1}).' -f $RefPol._id, $RefPol.ref_policy_id)
+            continue
+        }
+
+        $Diff = Compare-ObjectProperties -ReferenceObject $RefPol -DifferenceObject $DiffPol -IgnoredProperties $IgnoredProperties
+        if ($Diff) {
+            $PolicyName = [PSCustomObject]@{
+                PropertyName = 'policyName'
+                RefValue     = $RefPol.name
+                DiffValue    = $DiffPol.name
+            }
+
+            $RefPolicyId = [PSCustomObject]@{
+                PropertyName = 'ref_policy_id'
+                RefValue     = $RefPol.ref_policy_id
+                DiffValue    = $DiffPol.ref_policy_id
+            }
+
+            $Result = @($PolicyName, $RefPolicyId) + $Diff
+            $null = $Results.Add($Result)
+        }
+    }
+
+    foreach ($DiffPol in ($DifferenceObject | Sort-Object -Property name)) {
+        if (!$DiffPol.ref_policy_id) {
+            Write-Warning -Message ('[ID: {0}] Difference policy with no reference policy ID.' -f $DiffPol._id)
+            continue
+        }
+
+        $RefPol = $ReferenceObject | Where-Object ref_policy_id -EQ $DiffPol.ref_policy_id
+        if (!$RefPol) {
+            Write-Warning -Message ('[ID: {0}] Difference policy with no associated reference policy (Ref Policy ID: {1}).' -f $DiffPol._id, $DiffPol.ref_policy_id)
+            continue
+        }
+    }
+
+    return $Results
+}
+
+#endregion
+
 #region Exchange Online
 
 # Export mailbox data for our email management spreadsheet
@@ -179,264 +259,6 @@ Function Get-MailboxActivitySummary {
     }
 
     return $Summary
-}
-
-#endregion
-
-#region Security & Compliance
-
-# Extract email addresses and names from Content Search results
-Function Import-ContentSearchResults {
-    [CmdletBinding()]
-    Param(
-        [Parameter(ParameterSetName = 'File', Mandatory)]
-        [String[]]$CsvFile,
-
-        [Parameter(ParameterSetName = 'File')]
-        [Char]$CsvDelimiter = ',',
-
-        [Parameter(ParameterSetName = 'Data', Mandatory)]
-        [Object[]]$CsvData,
-
-        [ValidateSet('From', 'To', 'Cc', 'Bcc')]
-        [String[]]$ImportFields = @('From', 'To', 'Cc', 'Bcc'),
-
-        [String[]]$IgnoredEntries = 'O=EXCHANGELABS',
-        [String[]]$IgnoredDomains,
-
-        [ValidateRange('Positive')]
-        [Int]$EntryLimit
-    )
-
-    Begin {
-        $ErrorActionPreference = 'Stop'
-
-        $Contacts = @{ }
-        $Statistics = [Ordered]@{ }
-
-        $DataFields = @()
-        $ImportFieldsLookup = @{
-            From = 'Sender or Created by'
-            To   = 'Recipients in To line'
-            Cc   = 'Recipients in Cc line'
-            Bcc  = 'Recipients in Bcc line'
-        }
-
-        foreach ($ImportField in $ImportFields) {
-            $DataFields += $ImportFieldsLookup[$ImportField]
-
-            $Statistics[$ImportField] = [Ordered]@{
-                Empty            = 0
-                EntryIgnored     = 0
-                AddressMalformed = 0
-                DomainIgnored    = 0
-                NameMissing      = 0
-            }
-        }
-
-        $ImportContentSearchResultsEntryParams = @{
-            Statistics = $Statistics
-        }
-
-        if ($IgnoredEntries) {
-            $ImportContentSearchResultsEntryParams['IgnoredEntries'] = $IgnoredEntries
-        }
-
-        if ($IgnoredDomains) {
-            $EscapedDomains = @()
-
-            foreach ($Domain in $IgnoredDomains) {
-                $EscapedDomains += [Regex]::Escape($Domain.ToLower())
-            }
-
-            $IgnoredDomainsRegex = '@({0})$' -f [String]::Join('|', $EscapedDomains)
-            $ImportContentSearchResultsEntryParams['IgnoredDomains'] = $IgnoredDomainsRegex
-            Write-Verbose -Message ('Ignored domains regex: {0}' -f $IgnoredDomainsRegex)
-        }
-    }
-
-    Process {
-        if ($PSCmdlet.ParameterSetName -eq 'File') {
-            try {
-                $Data = Import-Csv -LiteralPath $CsvFile -Delimiter $CsvDelimiter -ErrorAction Stop
-            } catch {
-                throw $_
-            }
-        } else {
-            $Data = $CsvData
-        }
-        Write-Host -ForegroundColor Green ('Loaded {0} entries for processing.' -f $Data.Count)
-
-        $EntryNumber = 0
-        foreach ($Entry in $Data) {
-            $DataFieldIndex = 0
-            $EntryNumber++
-
-            foreach ($ImportField in $ImportFields) {
-                $DataField = $DataFields[$DataFieldIndex]
-                $DataFieldIndex++
-
-                $FieldEntry = $Entry.$DataField
-                $ItemId = $Entry.'Item Identity'
-                if (!$FieldEntry) {
-                    $Statistics[$ImportField]['Empty']++
-                    Write-Debug -Message ('[{0}] Skipping empty "{1}" field.' -f $ItemId, $DataField)
-                    continue
-                }
-
-                foreach ($Contact in (Import-ContentSearchResultsEntry -Field $ImportField -Entry $FieldEntry -ItemId $ItemId @ImportContentSearchResultsEntryParams)) {
-                    $Address = $Contact.Address
-                    $CandidateName = $Contact.Name
-
-                    # If the contact doesn't exist then add it
-                    if (!$Contacts.ContainsKey($Address)) {
-                        $Contacts[$Address] = $CandidateName
-                        continue
-                    }
-
-                    $CurrentName = $Contacts[$Address]
-
-                    # Bail-out early when any of:
-                    # - The candidate name is blank or whitespace
-                    # - The candidate name is identical to the current name
-                    if ([String]::IsNullOrWhiteSpace($CandidateName) -or
-                        $CandidateName -ceq $CurrentName) {
-                        continue
-                    }
-
-                    # Use the candidate name if it's longer than the current name.
-                    # If it's shorter then we've already got the best contact name.
-                    if ($CandidateName.Length -ne $CurrentName.Length) {
-                        if ($CandidateName.Length -gt $CurrentName.Length) {
-                            Write-Verbose -Message ('[{0}] Updating name for {1} to: {2}' -f $ItemId, $Address, $CandidateName)
-                            $Contacts[$Address] = $CandidateName
-                        }
-                        continue
-                    }
-
-                    # The current contact name and candidate name are:
-                    # - The same length
-                    # - Differ other than by case
-                    # It's unclear what to do here, so let's print out the options.
-                    if ($CandidateName.ToLower() -ne $CurrentName.ToLower()) {
-                        Write-Warning -Message ('[{0}] Mismatched name in "{1}" entry for email address: {2}' -f $ItemId, $DataField, $Address)
-                        Write-Warning -Message (' {0}  Current:   {1}' -f ''.PadLeft($ItemId.Length), $CurrentName)
-                        Write-Warning -Message (' {0}  Candidate: {1}' -f ''.PadLeft($ItemId.Length), $CandidateName)
-                    }
-                }
-            }
-
-            if (($EntryNumber % 1000) -eq 0) {
-                Write-Host -ForegroundColor Green ('Processed {0} entries ...' -f $EntryNumber)
-            }
-
-            if ($EntryLimit -and $EntryNumber -eq $EntryLimit) {
-                break
-            }
-        }
-    }
-
-    End {
-        $Results = @{
-            Contacts   = $Contacts
-            Statistics = $Statistics
-        }
-
-        return $Results
-    }
-}
-
-# Extract email addresses and names from an individual Content Search results entry
-Function Import-ContentSearchResultsEntry {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [String]$Field,
-
-        [Parameter(Mandatory)]
-        [String]$Entry,
-
-        [Parameter(Mandatory)]
-        [String]$ItemId,
-
-        [Parameter(Mandatory)]
-        [Hashtable]$Statistics,
-
-        [String[]]$IgnoredEntries,
-        [Regex]$IgnoredDomains
-    )
-
-    # For splitting a field into comma separated elements
-    #
-    # Each element should consist of (in order):
-    # - An optional name
-    # - An email address
-    #
-    # This gets messy fast as the formatting of the field is extremely variable. The only guarantee
-    # is that distinct elements are comma-separated. However, there may be commas within the name
-    # component (which itself is optional). Thus, separating the elements is not straightforward.
-    $ElementRegex = '^(\S+\s+)*?\S+?@\S+?\.\S+(?=, )'
-
-    # For checking if the element contains a valid SMTP address
-    $AddressRegex = '(\S+?@\S+?\.\S+)$'
-
-    # For checking if the element contains a name which is *not* the SMTP address
-    $NameRegex = '^((\S+\s+)*?)(?=(\s*\S+?@\S+?\.\S+)+)'
-
-    $Results = [Collections.ArrayList]::new()
-    $Elements = [Collections.ArrayList]::new()
-    $Entry = $Entry.Replace('"', [String]::Empty)
-
-    do {
-        if ($Entry -match $ElementRegex) {
-            $null = $Elements.Add($Matches[0])
-            $Entry = $Entry.Substring($Matches[0].Length + 2)
-        } else {
-            $null = $Elements.Add($Entry)
-            break
-        }
-    } while ($true)
-
-    foreach ($Element in $Elements) {
-        if ($Element -notmatch $AddressRegex) {
-            if ($Element -eq ';' -or $Element -in $IgnoredEntries) {
-                $Statistics[$Field]['EntryIgnored']++
-                Write-Debug -Message ('[{0}] Skipping ignored "{1}" entry: {2}' -f $ItemId, $DataField, $Element)
-            } else {
-                $Statistics[$Field]['AddressMalformed']++
-                Write-Warning -Message ('[{0}] Unable to extract email address from "{1}" entry: {2}' -f $ItemId, $DataField, $Element)
-            }
-            continue
-        }
-
-        $Result = [PSCustomObject]@{
-            Address = $Matches[0].Trim("<>'.").ToLower()
-            Name    = [String]::Empty
-        }
-
-        if ($IgnoredDomains) {
-            if ($Result.Address -match $IgnoredDomains) {
-                $Statistics[$Field]['DomainIgnored']++
-                Write-Debug -Message ('[{0}] Skipping ignored domain in "{1}" entry: {2}' -f $ItemId, $DataField, $Result.Address)
-                continue
-            }
-        }
-
-        if ($Element -match $NameRegex -and $Matches[0].Length -ne 0) {
-            $Name = $Matches[0]
-            while ($Name -match "[\s|']$") {
-                $Name = $Name.Trim().Trim("'")
-            }
-            $Result.Name = $Name
-        } else {
-            $Statistics[$Field]['NameMissing']++
-            Write-Debug -Message ('[{0}] Unable to extract name from "{1}" entry with email address: {2}' -f $ItemId, $DataField, $Result.Address)
-        }
-
-        $null = $Results.Add($Result)
-    }
-
-    return $Results
 }
 
 #endregion
@@ -798,6 +620,319 @@ Function Get-UnifiedGroupReport {
 
 #endregion
 
+#region Security & Compliance
+
+# Compare Security & Compliance policies
+Function Compare-ProtectionAlert {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [PSObject[]]$ReferenceObject,
+
+        [Parameter(Mandatory)]
+        [PSObject[]]$DifferenceObject
+    )
+
+    $IgnoredProperties = @(
+        'AlertOverrideChangedUtc'
+        'RunspaceId'
+    )
+
+    $Results = [Collections.ArrayList]::new()
+
+    foreach ($RefAlert in ($ReferenceObject | Sort-Object -Property Name)) {
+        $DiffAlert = $DifferenceObject | Where-Object Name -EQ $RefAlert.Name
+        if (!$DiffAlert) {
+            Write-Warning -Message ('[ID: {0}] Reference alert with no associated difference alert (Ref Name: {1}).' -f $RefAlert.ImmutableId, $RefAlert.Name)
+            continue
+        }
+
+        $Diff = Compare-ObjectProperties -ReferenceObject $RefAlert -DifferenceObject $DiffAlert -IgnoredProperties $IgnoredProperties
+        if ($Diff) {
+            $AlertName = [PSCustomObject]@{
+                PropertyName = 'AlertName'
+                RefValue     = $RefAlert.Name
+                DiffValue    = $DiffAlert.Name
+            }
+
+            $ImmutableId = [PSCustomObject]@{
+                PropertyName = 'ImmutableId'
+                RefValue     = $RefAlert.ImmutableId
+                DiffValue    = $DiffAlert.ImmutableId
+            }
+
+            $Result = @($AlertName, $ImmutableId) + $Diff
+            $null = $Results.Add($Result)
+        }
+    }
+
+    foreach ($DiffAlert in ($DifferenceObject | Sort-Object -Property Name)) {
+        $RefAlert = $ReferenceObject | Where-Object Name -EQ $DiffAlert.Name
+        if (!$RefAlert) {
+            Write-Warning -Message ('[ID: {0}] Difference alert with no associated reference alert (Ref Name: {1}).' -f $DiffAlert.ImmutableId, $DiffAlert.Name)
+            continue
+        }
+    }
+
+    return $Results
+}
+
+# Extract email addresses and names from Content Search results
+Function Import-ContentSearchResults {
+    [CmdletBinding()]
+    Param(
+        [Parameter(ParameterSetName = 'File', Mandatory)]
+        [String[]]$CsvFile,
+
+        [Parameter(ParameterSetName = 'File')]
+        [Char]$CsvDelimiter = ',',
+
+        [Parameter(ParameterSetName = 'Data', Mandatory)]
+        [Object[]]$CsvData,
+
+        [ValidateSet('From', 'To', 'Cc', 'Bcc')]
+        [String[]]$ImportFields = @('From', 'To', 'Cc', 'Bcc'),
+
+        [String[]]$IgnoredEntries = 'O=EXCHANGELABS',
+        [String[]]$IgnoredDomains,
+
+        [ValidateRange('Positive')]
+        [Int]$EntryLimit
+    )
+
+    Begin {
+        $ErrorActionPreference = 'Stop'
+
+        $Contacts = @{ }
+        $Statistics = [Ordered]@{ }
+
+        $DataFields = @()
+        $ImportFieldsLookup = @{
+            From = 'Sender or Created by'
+            To   = 'Recipients in To line'
+            Cc   = 'Recipients in Cc line'
+            Bcc  = 'Recipients in Bcc line'
+        }
+
+        foreach ($ImportField in $ImportFields) {
+            $DataFields += $ImportFieldsLookup[$ImportField]
+
+            $Statistics[$ImportField] = [Ordered]@{
+                Empty            = 0
+                EntryIgnored     = 0
+                AddressMalformed = 0
+                DomainIgnored    = 0
+                NameMissing      = 0
+            }
+        }
+
+        $ImportContentSearchResultsEntryParams = @{
+            Statistics = $Statistics
+        }
+
+        if ($IgnoredEntries) {
+            $ImportContentSearchResultsEntryParams['IgnoredEntries'] = $IgnoredEntries
+        }
+
+        if ($IgnoredDomains) {
+            $EscapedDomains = @()
+
+            foreach ($Domain in $IgnoredDomains) {
+                $EscapedDomains += [Regex]::Escape($Domain.ToLower())
+            }
+
+            $IgnoredDomainsRegex = '@({0})$' -f [String]::Join('|', $EscapedDomains)
+            $ImportContentSearchResultsEntryParams['IgnoredDomains'] = $IgnoredDomainsRegex
+            Write-Verbose -Message ('Ignored domains regex: {0}' -f $IgnoredDomainsRegex)
+        }
+    }
+
+    Process {
+        if ($PSCmdlet.ParameterSetName -eq 'File') {
+            try {
+                $Data = Import-Csv -LiteralPath $CsvFile -Delimiter $CsvDelimiter -ErrorAction Stop
+            } catch {
+                throw $_
+            }
+        } else {
+            $Data = $CsvData
+        }
+        Write-Host -ForegroundColor Green ('Loaded {0} entries for processing.' -f $Data.Count)
+
+        $EntryNumber = 0
+        foreach ($Entry in $Data) {
+            $DataFieldIndex = 0
+            $EntryNumber++
+
+            foreach ($ImportField in $ImportFields) {
+                $DataField = $DataFields[$DataFieldIndex]
+                $DataFieldIndex++
+
+                $FieldEntry = $Entry.$DataField
+                $ItemId = $Entry.'Item Identity'
+                if (!$FieldEntry) {
+                    $Statistics[$ImportField]['Empty']++
+                    Write-Debug -Message ('[{0}] Skipping empty "{1}" field.' -f $ItemId, $DataField)
+                    continue
+                }
+
+                foreach ($Contact in (Import-ContentSearchResultsEntry -Field $ImportField -Entry $FieldEntry -ItemId $ItemId @ImportContentSearchResultsEntryParams)) {
+                    $Address = $Contact.Address
+                    $CandidateName = $Contact.Name
+
+                    # If the contact doesn't exist then add it
+                    if (!$Contacts.ContainsKey($Address)) {
+                        $Contacts[$Address] = $CandidateName
+                        continue
+                    }
+
+                    $CurrentName = $Contacts[$Address]
+
+                    # Bail-out early when any of:
+                    # - The candidate name is blank or whitespace
+                    # - The candidate name is identical to the current name
+                    if ([String]::IsNullOrWhiteSpace($CandidateName) -or
+                        $CandidateName -ceq $CurrentName) {
+                        continue
+                    }
+
+                    # Use the candidate name if it's longer than the current name.
+                    # If it's shorter then we've already got the best contact name.
+                    if ($CandidateName.Length -ne $CurrentName.Length) {
+                        if ($CandidateName.Length -gt $CurrentName.Length) {
+                            Write-Verbose -Message ('[{0}] Updating name for {1} to: {2}' -f $ItemId, $Address, $CandidateName)
+                            $Contacts[$Address] = $CandidateName
+                        }
+                        continue
+                    }
+
+                    # The current contact name and candidate name are:
+                    # - The same length
+                    # - Differ other than by case
+                    # It's unclear what to do here, so let's print out the options.
+                    if ($CandidateName.ToLower() -ne $CurrentName.ToLower()) {
+                        Write-Warning -Message ('[{0}] Mismatched name in "{1}" entry for email address: {2}' -f $ItemId, $DataField, $Address)
+                        Write-Warning -Message (' {0}  Current:   {1}' -f ''.PadLeft($ItemId.Length), $CurrentName)
+                        Write-Warning -Message (' {0}  Candidate: {1}' -f ''.PadLeft($ItemId.Length), $CandidateName)
+                    }
+                }
+            }
+
+            if (($EntryNumber % 1000) -eq 0) {
+                Write-Host -ForegroundColor Green ('Processed {0} entries ...' -f $EntryNumber)
+            }
+
+            if ($EntryLimit -and $EntryNumber -eq $EntryLimit) {
+                break
+            }
+        }
+    }
+
+    End {
+        $Results = @{
+            Contacts   = $Contacts
+            Statistics = $Statistics
+        }
+
+        return $Results
+    }
+}
+
+# Extract email addresses and names from an individual Content Search results entry
+Function Import-ContentSearchResultsEntry {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Field,
+
+        [Parameter(Mandatory)]
+        [String]$Entry,
+
+        [Parameter(Mandatory)]
+        [String]$ItemId,
+
+        [Parameter(Mandatory)]
+        [Hashtable]$Statistics,
+
+        [String[]]$IgnoredEntries,
+        [Regex]$IgnoredDomains
+    )
+
+    # For splitting a field into comma separated elements
+    #
+    # Each element should consist of (in order):
+    # - An optional name
+    # - An email address
+    #
+    # This gets messy fast as the formatting of the field is extremely variable. The only guarantee
+    # is that distinct elements are comma-separated. However, there may be commas within the name
+    # component (which itself is optional). Thus, separating the elements is not straightforward.
+    $ElementRegex = '^(\S+\s+)*?\S+?@\S+?\.\S+(?=, )'
+
+    # For checking if the element contains a valid SMTP address
+    $AddressRegex = '(\S+?@\S+?\.\S+)$'
+
+    # For checking if the element contains a name which is *not* the SMTP address
+    $NameRegex = '^((\S+\s+)*?)(?=(\s*\S+?@\S+?\.\S+)+)'
+
+    $Results = [Collections.ArrayList]::new()
+    $Elements = [Collections.ArrayList]::new()
+    $Entry = $Entry.Replace('"', [String]::Empty)
+
+    do {
+        if ($Entry -match $ElementRegex) {
+            $null = $Elements.Add($Matches[0])
+            $Entry = $Entry.Substring($Matches[0].Length + 2)
+        } else {
+            $null = $Elements.Add($Entry)
+            break
+        }
+    } while ($true)
+
+    foreach ($Element in $Elements) {
+        if ($Element -notmatch $AddressRegex) {
+            if ($Element -eq ';' -or $Element -in $IgnoredEntries) {
+                $Statistics[$Field]['EntryIgnored']++
+                Write-Debug -Message ('[{0}] Skipping ignored "{1}" entry: {2}' -f $ItemId, $DataField, $Element)
+            } else {
+                $Statistics[$Field]['AddressMalformed']++
+                Write-Warning -Message ('[{0}] Unable to extract email address from "{1}" entry: {2}' -f $ItemId, $DataField, $Element)
+            }
+            continue
+        }
+
+        $Result = [PSCustomObject]@{
+            Address = $Matches[0].Trim("<>'.").ToLower()
+            Name    = [String]::Empty
+        }
+
+        if ($IgnoredDomains) {
+            if ($Result.Address -match $IgnoredDomains) {
+                $Statistics[$Field]['DomainIgnored']++
+                Write-Debug -Message ('[{0}] Skipping ignored domain in "{1}" entry: {2}' -f $ItemId, $DataField, $Result.Address)
+                continue
+            }
+        }
+
+        if ($Element -match $NameRegex -and $Matches[0].Length -ne 0) {
+            $Name = $Matches[0]
+            while ($Name -match "[\s|']$") {
+                $Name = $Name.Trim().Trim("'")
+            }
+            $Result.Name = $Name
+        } else {
+            $Statistics[$Field]['NameMissing']++
+            Write-Debug -Message ('[{0}] Unable to extract name from "{1}" entry with email address: {2}' -f $ItemId, $DataField, $Result.Address)
+        }
+
+        $null = $Results.Add($Result)
+    }
+
+    return $Results
+}
+
+#endregion
+
 #region Service connection helpers
 
 # Helper function to connect to all Office 365 services
@@ -1086,145 +1221,6 @@ Function Import-ExoPowershellModule {
             throw 'Required module not available: Microsoft.Exchange.Management.ExoPowershellModule'
         }
     }
-}
-
-#endregion
-
-#region Cloud App Security
-
-# Compare Cloud App Security policies
-Function Compare-MCASPolicy {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [PSObject[]]$ReferenceObject,
-
-        [Parameter(Mandatory)]
-        [PSObject[]]$DifferenceObject
-    )
-
-    $IgnoredProperties = @(
-        '_id'
-        '_tid'
-        'created'
-        'createdBy'
-        'lastEntityModificationScanned'
-        'lastModified'
-        'lastNrtEntityModificationScanned'
-        'lastScanned'
-        'lastStateModified'
-        'lastStateModifiedBy'
-        'lastUserModified'
-        'ref_policy_created'
-        'ruleVersionId'
-    )
-
-    $Results = [Collections.ArrayList]::new()
-
-    foreach ($RefPol in ($ReferenceObject | Sort-Object -Property name)) {
-        if (!$RefPol.ref_policy_id) {
-            Write-Warning -Message ('[ID: {0}] Reference policy with no reference policy ID.' -f $RefPol._id)
-            continue
-        }
-
-        $DiffPol = $DifferenceObject | Where-Object ref_policy_id -EQ $RefPol.ref_policy_id
-        if (!$DiffPol) {
-            Write-Warning -Message ('[ID: {0}] Reference policy with no associated difference policy (Ref Policy ID: {1}).' -f $RefPol._id, $RefPol.ref_policy_id)
-            continue
-        }
-
-        $Diff = Compare-ObjectProperties -ReferenceObject $RefPol -DifferenceObject $DiffPol -IgnoredProperties $IgnoredProperties
-        if ($Diff) {
-            $PolicyName = [PSCustomObject]@{
-                PropertyName = 'policyName'
-                RefValue     = $RefPol.name
-                DiffValue    = $DiffPol.name
-            }
-
-            $RefPolicyId = [PSCustomObject]@{
-                PropertyName = 'ref_policy_id'
-                RefValue     = $RefPol.ref_policy_id
-                DiffValue    = $DiffPol.ref_policy_id
-            }
-
-            $Result = @($PolicyName, $RefPolicyId) + $Diff
-            $null = $Results.Add($Result)
-        }
-    }
-
-    foreach ($DiffPol in ($DifferenceObject | Sort-Object -Property name)) {
-        if (!$DiffPol.ref_policy_id) {
-            Write-Warning -Message ('[ID: {0}] Difference policy with no reference policy ID.' -f $DiffPol._id)
-            continue
-        }
-
-        $RefPol = $ReferenceObject | Where-Object ref_policy_id -EQ $DiffPol.ref_policy_id
-        if (!$RefPol) {
-            Write-Warning -Message ('[ID: {0}] Difference policy with no associated reference policy (Ref Policy ID: {1}).' -f $DiffPol._id, $DiffPol.ref_policy_id)
-            continue
-        }
-    }
-
-    return $Results
-}
-
-#endregion
-
-#region Security & Compliance
-
-# Compare Security & Compliance policies
-Function Compare-ProtectionAlert {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [PSObject[]]$ReferenceObject,
-
-        [Parameter(Mandatory)]
-        [PSObject[]]$DifferenceObject
-    )
-
-    $IgnoredProperties = @(
-        'AlertOverrideChangedUtc'
-        'RunspaceId'
-    )
-
-    $Results = [Collections.ArrayList]::new()
-
-    foreach ($RefAlert in ($ReferenceObject | Sort-Object -Property Name)) {
-        $DiffAlert = $DifferenceObject | Where-Object Name -EQ $RefAlert.Name
-        if (!$DiffAlert) {
-            Write-Warning -Message ('[ID: {0}] Reference alert with no associated difference alert (Ref Name: {1}).' -f $RefAlert.ImmutableId, $RefAlert.Name)
-            continue
-        }
-
-        $Diff = Compare-ObjectProperties -ReferenceObject $RefAlert -DifferenceObject $DiffAlert -IgnoredProperties $IgnoredProperties
-        if ($Diff) {
-            $AlertName = [PSCustomObject]@{
-                PropertyName = 'AlertName'
-                RefValue     = $RefAlert.Name
-                DiffValue    = $DiffAlert.Name
-            }
-
-            $ImmutableId = [PSCustomObject]@{
-                PropertyName = 'ImmutableId'
-                RefValue     = $RefAlert.ImmutableId
-                DiffValue    = $DiffAlert.ImmutableId
-            }
-
-            $Result = @($AlertName, $ImmutableId) + $Diff
-            $null = $Results.Add($Result)
-        }
-    }
-
-    foreach ($DiffAlert in ($DifferenceObject | Sort-Object -Property Name)) {
-        $RefAlert = $ReferenceObject | Where-Object Name -EQ $DiffAlert.Name
-        if (!$RefAlert) {
-            Write-Warning -Message ('[ID: {0}] Difference alert with no associated reference alert (Ref Name: {1}).' -f $DiffAlert.ImmutableId, $DiffAlert.Name)
-            continue
-        }
-    }
-
-    return $Results
 }
 
 #endregion
