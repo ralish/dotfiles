@@ -817,40 +817,28 @@ Function Connect-Office365Services {
         [String]$SharePointTenantName
     )
 
+    $DefaultParams = @{ }
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        Connect-ExchangeOnline -UserPrincipalName $MfaUsername -ShowProgress $true
+        if ($PSBoundParameters.ContainsKey('MfaUsername')) {
+            $DefaultParams['MfaUsername'] = $MfaUsername
+        }
     } else {
-        Connect-ExchangeOnline -Credential $Credential -ShowProgress $true
+        $DefaultParams['Credential'] = $Credential
     }
 
-    if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        Connect-SecurityAndComplianceCenter -MfaUsername $MfaUsername
-    } else {
-        Connect-SecurityAndComplianceCenter -Credential $Credential
-    }
+    Connect-ExchangeOnline @DefaultParams
+    Connect-SecurityAndComplianceCenter @DefaultParams
 
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         Connect-SharePointOnline -TenantName $SharePointTenantName
-    } else {
-        Connect-SharePointOnline -TenantName $SharePointTenantName -Credential $Credential
-    }
-
-    if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        Connect-SkypeForBusinessOnline -MfaUsername $MfaUsername
-    } else {
-        Connect-SkypeForBusinessOnline -Credential $Credential
-    }
-
-    if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         Connect-MicrosoftTeams
+        Connect-SkypeForBusinessOnline
+        Connect-Office365CentralizedDeployment
     } else {
-        Connect-MicrosoftTeams -Credential $Credential
-    }
-
-    if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        Write-Warning -Message "Unable to connect to Office 365 Centralized Deployment as it doesn't support MFA."
-    } else {
-        Connect-Office365CentralizedDeployment -Credential $Credential
+        Connect-SharePointOnline @DefaultParams -TenantName $SharePointTenantName
+        Connect-MicrosoftTeams @DefaultParams
+        Connect-SkypeForBusinessOnline @DefaultParams
+        Connect-Office365CentralizedDeployment @DefaultParams
     }
 }
 
@@ -868,14 +856,26 @@ Function Connect-ExchangeOnline {
         [PSCredential]$Credential
     )
 
-    $ErrorActionPreference = 'Stop'
-
-    $ExoModuleVersion = 2
     try {
         Test-ModuleAvailable -Name ExchangeOnlineManagement
+        $ExoModuleVersion = 2
     } catch {
-        Write-Warning -Message 'The Exchange Online PowerShell v2 module is not available. Falling back to v1 ...'
+        Write-Warning -Message 'ExchangeOnlineManagement v2 module is not available. Falling back to v1 ...'
         $ExoModuleVersion = 1
+    }
+
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        if ($ExoModuleVersion -eq 1) {
+            Write-Error -Message 'ExchangeOnlineManagement v1 module is incompatible with PowerShell Core.'
+            return
+        }
+
+        $ExoModuleMinVersion = [Version]::new(2, 0, 4)
+        $ExoModuleCurrentVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable | Select-Object -First 1 -ExpandProperty Version
+        if ($ExoModuleCurrentVersion -lt $ExoModuleMinVersion) {
+            Write-Error -Message ('ExchangeOnlineManagement under PowerShell Core requires v{0} or newer.' -f $ExoModuleMinVersion)
+            return
+        }
     }
 
     if ($ExoModuleVersion -eq 1 -and $PSCmdlet.ParameterSetName -eq 'MFA') {
@@ -884,14 +884,19 @@ Function Connect-ExchangeOnline {
 
     Write-Host -ForegroundColor Green 'Connecting to Exchange Online ...'
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
+        $ConnectParams = @{ }
+        if ($PSBoundParameters.ContainsKey('MfaUsername')) {
+            $ConnectParams['UserPrincipalName'] = $MfaUsername
+        }
+
         if ($ExoModuleVersion -eq 2) {
-            ExchangeOnlineManagement\Connect-ExchangeOnline -UserPrincipalName $MfaUsername
+            ExchangeOnlineManagement\Connect-ExchangeOnline @ConnectParams -ShowBanner:$false
         } else {
-            Connect-EXOPSSession -UserPrincipalName $MfaUsername
+            Connect-EXOPSSession @ConnectParams
         }
     } else {
         if ($ExoModuleVersion -eq 2) {
-            ExchangeOnlineManagement\Connect-ExchangeOnline -Credential $Credential
+            ExchangeOnlineManagement\Connect-ExchangeOnline -Credential $Credential -ShowBanner:$false
         } else {
             $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
             Import-PSSession -Session $ExchangeOnline -DisableNameChecking
@@ -903,18 +908,40 @@ Function Connect-ExchangeOnline {
 Function Connect-Office365CentralizedDeployment {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
     )
 
-    $ErrorActionPreference = 'Stop'
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Write-Error -Message 'O365CentralizedAddInDeployment module is incompatible with PowerShell Core.'
+        return
+    }
 
-    Test-ModuleAvailable -Name OrganizationAddInService
+    Test-ModuleAvailable -Name O365CentralizedAddInDeployment
 
     Write-Host -ForegroundColor Green 'Connecting to Office 365 Centralized Deployment ...'
     Connect-OrganizationAddInService @PSBoundParameters
+}
+
+# Helper function to connect to Microsoft Teams
+Function Connect-MicrosoftTeams {
+    [CmdletBinding()]
+    Param(
+        [ValidateNotNull()]
+        [System.Management.Automation.Credential()]
+        [PSCredential]$Credential
+    )
+
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Write-Error -Message 'MicrosoftTeams module is incompatible with PowerShell Core.'
+        return
+    }
+
+    Test-ModuleAvailable -Name MicrosoftTeams
+
+    Write-Host -ForegroundColor Green 'Connecting to Microsoft Teams ...'
+    MicrosoftTeams\Connect-MicrosoftTeams @PSBoundParameters
 }
 
 # Helper function to connect to Security & Compliance Center
@@ -931,14 +958,31 @@ Function Connect-SecurityAndComplianceCenter {
         [PSCredential]$Credential
     )
 
-    $ErrorActionPreference = 'Stop'
-
-    $ExoModuleVersion = 2
     try {
         Test-ModuleAvailable -Name ExchangeOnlineManagement
+        $ExoModuleVersion = 2
     } catch {
-        Write-Warning -Message 'The Exchange Online PowerShell v2 module is not available. Falling back to v1 ...'
+        if ($PSCmdlet.ParameterSetName -eq 'MFA') {
+            Write-Error -Message 'ExchangeOnlineManagement v2 module is required to connect using MFA.'
+            return
+        }
+
+        Write-Warning -Message 'ExchangeOnlineManagement v2 module is not available. Falling back to v1 ...'
         $ExoModuleVersion = 1
+    }
+
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        if ($ExoModuleVersion -eq 1) {
+            Write-Error -Message 'ExchangeOnlineManagement v1 module is incompatible with PowerShell Core.'
+            return
+        }
+
+        $ExoModuleVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable | Select-Object -First 1 -ExpandProperty Version
+        $ExoModuleMinVersion = [Version]::new(2, 0, 4)
+        if ($ExoModuleVersion -lt $ExoModuleMinVersion) {
+            Write-Error -Message ('ExchangeOnlineManagement under PowerShell Core requires v{0} or newer.' -f $ExoModuleMinVersion)
+            return
+        }
     }
 
     if ($ExoModuleVersion -eq 1 -and $PSCmdlet.ParameterSetName -eq 'MFA') {
@@ -947,7 +991,11 @@ Function Connect-SecurityAndComplianceCenter {
 
     Write-Host -ForegroundColor Green 'Connecting to Security and Compliance Center ...'
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        Connect-IPPSSession -UserPrincipalName $MfaUsername
+        if ($PSBoundParameters.ContainsKey('MfaUsername')) {
+            Connect-IPPSSession -UserPrincipalName $MfaUsername
+        } else {
+            Connect-IPPSSession
+        }
     } else {
         if ($ExoModuleVersion -eq 2) {
             Connect-IPPSSession -Credential $Credential
@@ -970,76 +1018,67 @@ Function Connect-SharePointOnline {
         [PSCredential]$Credential
     )
 
-    $ErrorActionPreference = 'Stop'
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Write-Error -Message 'Microsoft.Online.SharePoint.PowerShell module is incompatible with PowerShell Core.'
+        return
+    }
 
     Test-ModuleAvailable -Name Microsoft.Online.SharePoint.PowerShell
 
-    Write-Host -ForegroundColor Green 'Connecting to SharePoint Online ...'
-    $SPOUrl = 'https://{0}-admin.sharepoint.com' -f $TenantName
-    if ($Credential) {
-        Connect-SPOService -Url $SPOUrl -Credential $Credential
-    } else {
-        Connect-SPOService -Url $SPOUrl
+    $ConnectParams = @{
+        Url = 'https://{0}-admin.sharepoint.com' -f $TenantName
     }
+
+    if ($PSBoundParameters.ContainsKey('Credential')) {
+        $ConnectParams['Credential'] = $Credential
+    }
+
+    Write-Host -ForegroundColor Green 'Connecting to SharePoint Online ...'
+    Connect-SPOService @ConnectParams
 }
 
 # Helper function to connect to Skype for Business Online
 Function Connect-SkypeForBusinessOnline {
-    [CmdletBinding(DefaultParameterSetName = 'MFA')]
+    [CmdletBinding()]
     Param(
-        [Parameter(ParameterSetName = 'MFA')]
-        [ValidateNotNullOrEmpty()]
-        [String]$MfaUsername,
-
-        [Parameter(ParameterSetName = 'Standard', Mandatory)]
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
         [PSCredential]$Credential
     )
 
-    $ErrorActionPreference = 'Stop'
-
-    Test-ModuleAvailable -Name SkypeOnlineConnector
-
-    # Fix a scope issue due to variable reuse by SkypeOnlineConnector?
-    if (-not $PSBoundParameters.ContainsKey('MfaUsername')) {
-        Remove-Variable -Name MfaUsername
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Write-Error -Message 'MicrosoftTeams module is incompatible with PowerShell Core.'
+        return
     }
-    if (-not $PSBoundParameters.ContainsKey('Credential')) {
-        Remove-Variable -Name Credential
-    }
+
+    # SfB Online Connector is included in recent MicrosoftTeams module releases
+    Test-ModuleAvailable -Name MicrosoftTeams
 
     Write-Host -ForegroundColor Green 'Connecting to Skype for Business Online ...'
-    if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        $CsOnlineSession = New-CsOnlineSession -UserName $MfaUsername
-    } else {
-        $CsOnlineSession = New-CsOnlineSession -Credential $Credential
-    }
+    $CsOnlineSession = New-CsOnlineSession @PSBoundParameters
     Import-PSSession -Session $CsOnlineSession
 }
 
-# Helper function to import the weird Exchange Online PowerShell module
+# Helper function to import the weird Exchange Online v1 module
 Function Import-ExoPowershellModule {
     [CmdletBinding()]
     Param()
-
-    $ErrorActionPreference = 'Stop'
 
     if (!(Get-Command -Name Connect-EXOPSSession -ErrorAction Ignore)) {
         Write-Verbose -Message 'Importing Microsoft.Exchange.Management.ExoPowershellModule ...'
 
         $ClickOnceAppsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0'
         $ExoPowerShellModule = Get-ChildItem -LiteralPath $ClickOnceAppsPath -Recurse -Include 'Microsoft.Exchange.Management.ExoPowershellModule.manifest' | Sort-Object -Property LastWriteTime | Select-Object -Last 1
-        $ExoPowerShellModulePs1 = Join-Path -Path $ExoPowerShellModule.Directory -ChildPath 'CreateExoPSSession.ps1'
+        $ExoPowerShellScript = Join-Path -Path $ExoPowerShellModule.Directory -ChildPath 'CreateExoPSSession.ps1'
 
         if ($ExoPowerShellModule) {
             # Sourcing the script rudely changes the current working directory
             $CurrentPath = Get-Location
-            . $ExoPowerShellModulePs1
+            . $ExoPowerShellScript
             Set-Location -LiteralPath $CurrentPath
 
             # Change the scope of imported functions to be global (better approach?)
-            $Functions = @('Connect-EXOPSSession', 'Connect-IPPSSession', 'Test-Uri')
+            $Functions = 'Connect-EXOPSSession', 'Connect-IPPSSession', 'Test-Uri'
             foreach ($Function in $Functions) {
                 $null = New-Item -Path Function: -Name Global:$Function -Value (Get-Content -LiteralPath Function:\$Function)
             }
