@@ -56,7 +56,8 @@ Function Get-AzureAuthToken {
     )
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        throw 'This function calls assemblies incompatible with PowerShell Core.'
+        Write-Error -Message 'This function calls assemblies incompatible with PowerShell Core.'
+        return
     }
 
     try {

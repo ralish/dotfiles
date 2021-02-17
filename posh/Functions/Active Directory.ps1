@@ -42,7 +42,8 @@ Function Get-KerberosTokenSize {
 
     if ($Username.Split('\').Count -ne 1) {
         if ($Username.Split('\').Count -gt 2) {
-            throw 'Only a single backslash may be present in username.'
+            Write-Error -Message 'Only a single backslash may be present in username.'
+            return
         }
 
         $Domain = $Username.Split('\')[0]
@@ -221,9 +222,11 @@ Function Add-ADShadowPrincipalMember {
     $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer
     $ShadowPrincipal = Get-ADObject -Filter { CN -eq $Name } -SearchBase $ShadowPrincipalContainer -SearchScope Subtree
     if (!$ShadowPrincipal) {
-        throw ('No shadow principal found for filter on CN: {0}' -f $Name)
+        Write-Error -Message ('No shadow principal found for filter on CN: {0}' -f $Name)
+        return
     } elseif ($ShadowPrincipal -is [Array]) {
-        throw ('Expected a single shadow principal but found {0} for filter on CN: {1}' -f $ShadowPrincipal.Count, $Name)
+        Write-Error -Message ('Expected a single shadow principal but found {0} for filter on CN: {1}' -f $ShadowPrincipal.Count, $Name)
+        return
     }
 
     foreach ($Member in $Members) {
