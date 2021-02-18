@@ -115,6 +115,12 @@
     "vsicons.presets.foldersAllDefaultIcon": true,
     "vsicons.associations.files": [
         {
+            "icon": "db",
+            "extensions": [".sdb"],
+            "filename": false,
+            "format": "svg"
+        },
+        {
             "icon": "git",
             "extensions": [".gitconfig-win"],
             "filename": true,
