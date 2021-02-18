@@ -269,89 +269,176 @@ Function Get-MailboxActivitySummary {
 Function Get-Office365EntityUsageSummary {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
-        [ValidateSet('User', 'Group')]
-        [String]$Type,
+        [Parameter(ParameterSetName = 'User', Mandatory)]
+        [String]$UserPrincipalName,
 
-        [Parameter(Mandatory)]
-        [String]$Identity,
-
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'User', Mandatory)]
         [String]$TenantName,
 
-        [Parameter(Mandatory)]
-        [Guid]$GraphApiClientId,
+        [Parameter(ParameterSetName = 'Group', Mandatory)]
+        [String]$GroupIdentity,
 
-        [Parameter(Mandatory)]
-        [String]$GraphApiRedirectUri
+        [Parameter(ParameterSetName = 'Group')]
+        [Switch]$Deleted
     )
 
-    Test-CommandAvailable -Name Get-Mailbox, Get-SPOSite, Get-Team
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        throw 'This function uses modules incompatible with PowerShell Core.'
+    }
 
-    # Graph API setup
+    $Type = $PSCmdlet.ParameterSetName.ToLower()
+
+    $Modules = @(
+        'Microsoft.Graph.Authentication',
+        'Microsoft.Graph.Notes',
+        'Microsoft.Graph.Planner',
+        'Microsoft.Online.SharePoint.PowerShell',
+        'MicrosoftTeams'
+    )
+
+    if ($Type -eq 'User') {
+        $Modules += 'MSOnline'
+    }
+
+    Write-Verbose -Message 'Checking required modules are present ...'
+    Test-ModuleAvailable -Name $Modules
+    Test-CommandAvailable -Name 'Get-OrganizationConfig'
+
+    if ($Type -eq 'User') {
+        Write-Verbose -Message 'Checking Microsoft Online connection ...'
+        try {
+            $null = Get-MsolCompanyInformation -ErrorAction Stop
+        } catch {
+            throw $_
+        }
+    }
+
+    Write-Verbose -Message 'Checking Exchange Online connection ...'
+    try {
+        $null = Get-OrganizationConfig -ErrorAction Stop
+    } catch {
+        throw $_
+    }
+
+    Write-Verbose -Message 'Checking SharePoint Online connection ...'
+    try {
+        $null = Get-SPOTenant -ErrorAction Stop
+    } catch {
+        throw $_
+    }
+
+    Write-Verbose -Message 'Checking Microsoft Teams connection ...'
+    try {
+        $null = Get-TeamsApp -ErrorAction Stop -Verbose:$false
+    } catch {
+        throw $_
+    }
+
     Write-Verbose -Message 'Connecting to Microsoft Graph API ...'
-    $GraphApiAuthToken = Get-AzureAuthToken -Api MsGraph -TenantName $TenantName -ClientId $GraphApiClientId -RedirectUri $GraphApiRedirectUri
-    $GraphApiAuthHeader = Get-AzureAuthHeader -AuthToken $GraphApiAuthToken.Result
+    try {
+        $null = Connect-MgGraph -Scopes Group.Read.All, Notes.Read.All -ErrorAction Stop
+    } catch {
+        throw $_
+    }
 
-    # Base entity data
+    # Base entity
+    Write-Verbose -Message ('Retrieving {0} ...' -f $Type)
     switch ($Type) {
         'User' {
-            $ExoIdentity = $Identity
-            $GraphApiOneNoteUri = 'https://graph.microsoft.com/v1.0/users/{0}/onenote/notebooks' -f $Identity
+            try {
+                $User = Get-MsolUser -UserPrincipalName $UserPrincipalName -ReturnDeletedUsers:$Deleted -ErrorAction Stop
+            } catch {
+                throw $_
+            }
+
+            $ExoIdentity = $UserPrincipalName
         }
 
         'Group' {
-            Write-Verbose -Message 'Retrieving group data ...'
-            $Group = Get-UnifiedGroup -Identity $Identity -IncludeAllProperties -ErrorAction Stop
+            try {
+                $Group = Get-UnifiedGroup -Identity $GroupIdentity -IncludeAllProperties -IncludeSoftDeletedGroups:$Deleted -ErrorAction Stop
+            } catch {
+                throw $_
+            }
 
             if ($Group -is [Array]) {
                 throw ('Expected a single group but {0} groups matched provided identity.' -f $Group.Count)
             }
 
             $ExoIdentity = $Group.PrimarySmtpAddress
-            $GraphApiOneNoteUri = 'https://graph.microsoft.com/v1.0/groups/{0}/onenote/notebooks' -f $Group.ExternalDirectoryObjectId
-            $GraphApiPlannerUri = 'https://graph.microsoft.com/v1.0/groups/{0}/planner/plans' -f $Group.ExternalDirectoryObjectId
         }
     }
 
     # Mailbox
-    Write-Verbose -Message 'Retrieving mailbox data ...'
-    switch ($Type) {
-        'User' {
-            $Mailbox = Get-Mailbox -Identity $ExoIdentity -ErrorAction Stop
-        }
+    $MailboxParams = @{
+        Identity           = $ExoIdentity
+        SoftDeletedMailbox = $Deleted
+        ErrorAction        = 'Stop'
+    }
 
-        'Group' {
-            $Mailbox = Get-Mailbox -Identity $ExoIdentity -GroupMailbox
-        }
+    if ($Type -eq 'Group') {
+        $MailboxParams['GroupMailbox'] = $true
+    }
+
+    Write-Verbose -Message ('Retrieving {0} mailbox ...' -f $Type)
+    try {
+        $Mailbox = Get-Mailbox @MailboxParams
+    } catch {
+        throw $_
     }
     $Mailbox | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.PrimarySmtpAddress } -Force
-    $MailboxStatistics = Get-MailboxStatistics -Identity $ExoIdentity
+
+    Write-Verbose -Message ('Retrieving {0} mailbox statistics ...' -f $Type)
+    try {
+        $MailboxStatistics = Get-MailboxStatistics -Identity $ExoIdentity -IncludeSoftDeletedRecipients:$Deleted -ErrorAction Stop
+    } catch {
+        throw $_
+    }
     $MailboxStatistics | Add-Member -MemberType ScriptMethod -Name ToString -Value { '{0} items / {1}' -f $this.ItemCount, $this.TotalItemSize } -Force
 
     # Calendar
-    Write-Verbose -Message 'Retrieving calendar data ...'
-    $Calendar = Get-MailboxFolderStatistics -Identity $ExoIdentity -FolderScope Calendar
+    Write-Verbose -Message ('Retrieving {0} calendar ...' -f $Type)
+    try {
+        $Calendar = Get-MailboxFolderStatistics -Identity $ExoIdentity -FolderScope Calendar -IncludeSoftDeletedRecipients:$Deleted -ErrorAction Stop
+    } catch {
+        throw $_
+    }
     $Calendar | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.VisibleItemsInFolder } -Force
 
     # Groups
     if ($Type -eq 'User') {
-        Write-Verbose -Message 'Retrieving group ownership data ...'
+        Write-Verbose -Message 'Retrieving user group ownership ...'
         $ExoRecipientFilter = 'ManagedBy -eq "{0}"' -f $Mailbox.DistinguishedName
-        $Groups = Get-Recipient -Filter $ExoRecipientFilter -RecipientTypeDetails GroupMailbox
+        try {
+            $Groups = Get-Recipient -Filter $ExoRecipientFilter -RecipientTypeDetails GroupMailbox -ErrorAction Stop
+        } catch {
+            throw $_
+        }
     }
 
     # Site
-    Write-Verbose -Message 'Retrieving SharePoint site ...'
+    Write-Verbose -Message ('Retrieving {0} site ...' -f $Type)
     switch ($Type) {
         'User' {
-            $SPOSiteFilter = 'Url -like "https://{0}-my.sharepoint.com/personal/*" -and Owner -eq "{1}"' -f $TenantName, $Identity
-            $PersonalSite = Get-SPOSite -IncludePersonalSite $true -Filter $SPOSiteFilter
-            $Site = Get-SPOSite -Identity $PersonalSite.Url -Detailed
+            $SPOSiteFilter = 'Url -like "https://{0}-my.sharepoint.com/personal/*" -and Owner -eq "{1}"' -f $TenantName, $UserPrincipalName
+            try {
+                $PersonalSite = Get-SPOSite -Filter $SPOSiteFilter -IncludePersonalSite:$true
+                $Site = Get-SPOSite -Identity $PersonalSite.Url -Detailed
+            } catch {
+                throw $_
+            }
         }
 
         'Group' {
-            $Site = Get-SPOSite -Identity $Group.SharePointSiteUrl -Detailed
+            try {
+                if ($Deleted) {
+                    $Site = Get-SPODeletedSite -Identity $Group.SharePointSiteUrl
+                } else {
+                    $Site = Get-SPOSite -Identity $Group.SharePointSiteUrl -Detailed
+                }
+            } catch {
+                throw $_
+            }
         }
     }
     $Site | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.StorageUsageCurrent } -Force
@@ -360,7 +447,7 @@ Function Get-Office365EntityUsageSummary {
     Write-Verbose -Message 'Retrieving Teams ...'
     switch ($Type) {
         'User' {
-            $Teams = Get-Team -User $Identity
+            $Teams = Get-Team -User $UserPrincipalName
         }
 
         'Group' {
@@ -375,13 +462,17 @@ Function Get-Office365EntityUsageSummary {
     # OneNote
     # https://docs.microsoft.com/en-us/graph/api/resources/onenote-api-overview?view=graph-rest-1.0
     Write-Verbose -Message 'Retrieving OneNote notebooks ...'
-    $Notebooks = Invoke-RestMethod -Uri $GraphApiOneNoteUri -Headers $GraphApiAuthHeader -Method Get
+    switch ($Type) {
+        'User' { $Notebooks = Get-MgUserOnenoteNotebook -UserId $User.ObjectId }
+        'Group' { $Notebooks = Get-MgGroupOnenoteNotebook -GroupId $Group.ExternalDirectoryObjectId }
+    }
 
     # Planner
     # https://docs.microsoft.com/en-us/graph/api/resources/planner-overview?view=graph-rest-1.0
-    if ($Type -eq 'Group') {
-        Write-Verbose -Message 'Retrieving Planner plans ...'
-        $Plans = Invoke-RestMethod -Uri $GraphApiPlannerUri -Headers $GraphApiAuthHeader -Method Get
+    Write-Verbose -Message 'Retrieving Planner plans ...'
+    switch ($Type) {
+        'User' { $Plans = Get-MgUserPlanner -UserId $User.ObjectId }
+        'Group' { $Plans = Get-MgGroupPlanner -GroupId $Group.ExternalDirectoryObjectId }
     }
 
     switch ($Type) {
@@ -394,6 +485,7 @@ Function Get-Office365EntityUsageSummary {
                 Site              = $Site
                 Teams             = $Teams
                 Notebooks         = $Notebooks
+                Plans             = $Plans
             }
         }
 
@@ -949,7 +1041,7 @@ Function Connect-Office365Services {
         [PSCredential]$Credential,
 
         [Parameter(Mandatory)]
-        [String]$SharePointTenantName
+        [String]$TenantName
     )
 
     $DefaultParams = @{ }
@@ -965,15 +1057,15 @@ Function Connect-Office365Services {
     Connect-SecurityAndComplianceCenter @DefaultParams
 
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        Connect-SharePointOnline -TenantName $SharePointTenantName
+        Connect-SharePointOnline -TenantName $TenantName
         Connect-MicrosoftTeams
         Connect-SkypeForBusinessOnline
-        Connect-Office365CentralizedDeployment
+        Connect-CentralizedDeployment
     } else {
-        Connect-SharePointOnline @DefaultParams -TenantName $SharePointTenantName
+        Connect-SharePointOnline @DefaultParams -TenantName $TenantName
         Connect-MicrosoftTeams @DefaultParams
         Connect-SkypeForBusinessOnline @DefaultParams
-        Connect-Office365CentralizedDeployment @DefaultParams
+        Connect-CentralizedDeployment @DefaultParams
     }
 }
 
@@ -1040,7 +1132,7 @@ Function Connect-ExchangeOnline {
 }
 
 # Helper function to connect to Centralized Deployment
-Function Connect-Office365CentralizedDeployment {
+Function Connect-CentralizedDeployment {
     [CmdletBinding()]
     Param(
         [ValidateNotNull()]
@@ -1112,9 +1204,9 @@ Function Connect-SecurityAndComplianceCenter {
             return
         }
 
-        $ExoModuleVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable | Select-Object -First 1 -ExpandProperty Version
         $ExoModuleMinVersion = [Version]::new(2, 0, 4)
-        if ($ExoModuleVersion -lt $ExoModuleMinVersion) {
+        $ExoModuleCurrentVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable | Select-Object -First 1 -ExpandProperty Version
+        if ($ExoModuleCurrentVersion -lt $ExoModuleMinVersion) {
             Write-Error -Message ('ExchangeOnlineManagement under PowerShell Core requires v{0} or newer.' -f $ExoModuleMinVersion)
             return
         }
@@ -1199,27 +1291,28 @@ Function Import-ExoPowershellModule {
     [CmdletBinding()]
     Param()
 
-    if (!(Get-Command -Name Connect-EXOPSSession -ErrorAction Ignore)) {
-        Write-Verbose -Message 'Importing Microsoft.Exchange.Management.ExoPowershellModule ...'
+    if (Get-Command -Name Connect-EXOPSSession -ErrorAction Ignore) {
+        return
+    }
 
-        $ClickOnceAppsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0'
-        $ExoPowerShellModule = Get-ChildItem -LiteralPath $ClickOnceAppsPath -Recurse -Include 'Microsoft.Exchange.Management.ExoPowershellModule.manifest' | Sort-Object -Property LastWriteTime | Select-Object -Last 1
-        $ExoPowerShellScript = Join-Path -Path $ExoPowerShellModule.Directory -ChildPath 'CreateExoPSSession.ps1'
+    $ClickOnceAppsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0'
+    $ExoPowerShellManifest = Get-ChildItem -LiteralPath $ClickOnceAppsPath -Recurse | Where-Object Name -EQ 'Microsoft.Exchange.Management.ExoPowershellModule.manifest' | Sort-Object -Property LastWriteTime | Select-Object -Last 1
+    if (!$ExoPowerShellManifest) {
+        throw 'Required module not available: Microsoft.Exchange.Management.ExoPowershellModule'
+    }
 
-        if ($ExoPowerShellModule) {
-            # Sourcing the script rudely changes the current working directory
-            $CurrentPath = Get-Location
-            . $ExoPowerShellScript
-            Set-Location -LiteralPath $CurrentPath
+    Write-Verbose -Message 'Importing Microsoft.Exchange.Management.ExoPowershellModule ...'
+    $ExoPowerShellScript = Join-Path -Path $ExoPowerShellManifest.Directory -ChildPath 'CreateExoPSSession.ps1'
 
-            # Change the scope of imported functions to be global (better approach?)
-            $Functions = 'Connect-EXOPSSession', 'Connect-IPPSSession', 'Test-Uri'
-            foreach ($Function in $Functions) {
-                $null = New-Item -Path Function: -Name Global:$Function -Value (Get-Content -LiteralPath Function:\$Function)
-            }
-        } else {
-            throw 'Required module not available: Microsoft.Exchange.Management.ExoPowershellModule'
-        }
+    # Sourcing the script rudely changes the current working directory
+    $CurrentPath = Get-Location
+    . $ExoPowerShellScript
+    Set-Location -LiteralPath $CurrentPath
+
+    # Change the scope of imported functions to be global (better approach?)
+    $Functions = 'Connect-EXOPSSession', 'Connect-IPPSSession', 'Test-Uri'
+    foreach ($Function in $Functions) {
+        $null = New-Item -Path Function: -Name Global:$Function -Value (Get-Content -LiteralPath Function:\$Function)
     }
 }
 
