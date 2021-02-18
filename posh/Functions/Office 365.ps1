@@ -272,14 +272,8 @@ Function Get-Office365EntityUsageSummary {
         [Parameter(ParameterSetName = 'User', Mandatory)]
         [String]$UserPrincipalName,
 
-        [Parameter(ParameterSetName = 'User', Mandatory)]
-        [String]$TenantName,
-
         [Parameter(ParameterSetName = 'Group', Mandatory)]
-        [String]$GroupIdentity,
-
-        [Parameter(ParameterSetName = 'Group')]
-        [Switch]$Deleted
+        [String]$GroupIdentity
     )
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
@@ -307,7 +301,7 @@ Function Get-Office365EntityUsageSummary {
     if ($Type -eq 'User') {
         Write-Verbose -Message 'Checking Microsoft Online connection ...'
         try {
-            $null = Get-MsolCompanyInformation -ErrorAction Stop
+            $CompanyInfo = Get-MsolCompanyInformation -ErrorAction Stop
         } catch {
             throw $_
         }
@@ -343,73 +337,60 @@ Function Get-Office365EntityUsageSummary {
 
     # Base entity
     Write-Verbose -Message ('Retrieving {0} ...' -f $Type)
-    switch ($Type) {
-        'User' {
-            try {
-                $User = Get-MsolUser -UserPrincipalName $UserPrincipalName -ReturnDeletedUsers:$Deleted -ErrorAction Stop
-            } catch {
-                throw $_
-            }
-
-            $ExoIdentity = $UserPrincipalName
+    if ($Type -eq 'User') {
+        try {
+            $User = Get-MsolUser -UserPrincipalName $UserPrincipalName -ErrorAction Stop
+        } catch {
+            throw $_
         }
 
-        'Group' {
-            try {
-                $Group = Get-UnifiedGroup -Identity $GroupIdentity -IncludeAllProperties -IncludeSoftDeletedGroups:$Deleted -ErrorAction Stop
-            } catch {
-                throw $_
-            }
-
-            if ($Group -is [Array]) {
-                throw ('Expected a single group but {0} groups matched provided identity.' -f $Group.Count)
-            }
-
-            $ExoIdentity = $Group.PrimarySmtpAddress
+        $ExoIdentity = $UserPrincipalName
+    } else {
+        try {
+            $Group = Get-UnifiedGroup -Identity $GroupIdentity -IncludeAllProperties -ErrorAction Stop
+        } catch {
+            throw $_
         }
+
+        $ExoIdentity = $Group.PrimarySmtpAddress
     }
 
     # Mailbox
-    $MailboxParams = @{
-        Identity           = $ExoIdentity
-        SoftDeletedMailbox = $Deleted
-        ErrorAction        = 'Stop'
-    }
-
-    if ($Type -eq 'Group') {
-        $MailboxParams['GroupMailbox'] = $true
-    }
-
     Write-Verbose -Message ('Retrieving {0} mailbox ...' -f $Type)
     try {
-        $Mailbox = Get-Mailbox @MailboxParams
+        if ($Type -eq 'User') {
+            $Mailbox = Get-Mailbox -Identity $ExoIdentity -ErrorAction Stop
+        } else {
+            $Mailbox = Get-Mailbox -Identity $ExoIdentity -GroupMailbox -ErrorAction Stop
+        }
+        $Mailbox | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.PrimarySmtpAddress } -Force
     } catch {
         throw $_
     }
-    $Mailbox | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.PrimarySmtpAddress } -Force
 
+    # Mailbox statistics
     Write-Verbose -Message ('Retrieving {0} mailbox statistics ...' -f $Type)
     try {
-        $MailboxStatistics = Get-MailboxStatistics -Identity $ExoIdentity -IncludeSoftDeletedRecipients:$Deleted -ErrorAction Stop
+        $MailboxStatistics = Get-MailboxStatistics -Identity $ExoIdentity -ErrorAction Stop
+        $MailboxStatistics | Add-Member -MemberType ScriptMethod -Name ToString -Value { '{0} items / {1}' -f $this.ItemCount, $this.TotalItemSize } -Force
     } catch {
         throw $_
     }
-    $MailboxStatistics | Add-Member -MemberType ScriptMethod -Name ToString -Value { '{0} items / {1}' -f $this.ItemCount, $this.TotalItemSize } -Force
 
     # Calendar
     Write-Verbose -Message ('Retrieving {0} calendar ...' -f $Type)
     try {
-        $Calendar = Get-MailboxFolderStatistics -Identity $ExoIdentity -FolderScope Calendar -IncludeSoftDeletedRecipients:$Deleted -ErrorAction Stop
+        $Calendar = Get-MailboxFolderStatistics -Identity $ExoIdentity -FolderScope Calendar -ErrorAction Stop | Where-Object FolderType -EQ 'Calendar'
+        $Calendar | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.VisibleItemsInFolder } -Force
     } catch {
         throw $_
     }
-    $Calendar | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.VisibleItemsInFolder } -Force
 
     # Groups
     if ($Type -eq 'User') {
         Write-Verbose -Message 'Retrieving user group ownership ...'
-        $ExoRecipientFilter = 'ManagedBy -eq "{0}"' -f $Mailbox.DistinguishedName
         try {
+            $ExoRecipientFilter = 'ManagedBy -eq "{0}"' -f $Mailbox.DistinguishedName
             $Groups = Get-Recipient -Filter $ExoRecipientFilter -RecipientTypeDetails GroupMailbox -ErrorAction Stop
         } catch {
             throw $_
@@ -418,75 +399,77 @@ Function Get-Office365EntityUsageSummary {
 
     # Site
     Write-Verbose -Message ('Retrieving {0} site ...' -f $Type)
-    switch ($Type) {
-        'User' {
+    try {
+        if ($Type -eq 'User') {
+            $TenantName = $CompanyInfo.InitialDomain.Split('.')[0]
             $SPOSiteFilter = 'Url -like "https://{0}-my.sharepoint.com/personal/*" -and Owner -eq "{1}"' -f $TenantName, $UserPrincipalName
-            try {
-                $PersonalSite = Get-SPOSite -Filter $SPOSiteFilter -IncludePersonalSite:$true
-                $Site = Get-SPOSite -Identity $PersonalSite.Url -Detailed
-            } catch {
-                throw $_
-            }
+            $PersonalSite = Get-SPOSite -Filter $SPOSiteFilter -IncludePersonalSite:$true -ErrorAction Stop
+            $Site = Get-SPOSite -Identity $PersonalSite.Url -Detailed -ErrorAction Stop
+        } else {
+            $Site = Get-SPOSite -Identity $Group.SharePointSiteUrl -Detailed -ErrorAction Stop
         }
-
-        'Group' {
-            try {
-                if ($Deleted) {
-                    $Site = Get-SPODeletedSite -Identity $Group.SharePointSiteUrl
-                } else {
-                    $Site = Get-SPOSite -Identity $Group.SharePointSiteUrl -Detailed
-                }
-            } catch {
-                throw $_
-            }
-        }
+        $Site | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.StorageUsageCurrent } -Force
+    } catch {
+        throw $_
     }
-    $Site | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.StorageUsageCurrent } -Force
 
     # Teams
-    Write-Verbose -Message 'Retrieving Teams ...'
-    switch ($Type) {
-        'User' {
-            $Teams = Get-Team -User $UserPrincipalName
-        }
-
-        'Group' {
+    if ($Type -eq 'Group') {
+        Write-Verbose -Message 'Retrieving group teams ...'
+        if ($Group.ResourceProvisioningOptions -contains 'Team') {
             try {
-                $Teams = Get-Team -GroupId $Group.ExternalDirectoryObjectId
+                $Teams = @(Get-Team -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
             } catch {
-                $Teams = $null
+                throw $_
             }
         }
     }
 
     # OneNote
     # https://docs.microsoft.com/en-us/graph/api/resources/onenote-api-overview?view=graph-rest-1.0
-    Write-Verbose -Message 'Retrieving OneNote notebooks ...'
-    switch ($Type) {
-        'User' { $Notebooks = Get-MgUserOnenoteNotebook -UserId $User.ObjectId }
-        'Group' { $Notebooks = Get-MgGroupOnenoteNotebook -GroupId $Group.ExternalDirectoryObjectId }
+    Write-Verbose -Message ('Retrieving {0} notebooks ...' -f $Type)
+    try {
+        if ($Type -eq 'User') {
+            $Notebooks = @(Get-MgUserOnenoteNotebook -UserId $User.ObjectId -ErrorAction Stop)
+            $NotebookSections = @(Get-MgUserOnenoteSection -UserId $User.ObjectId -ErrorAction Stop)
+            $NotebookPages = @(Get-MgUserOnenotePage -UserId $User.ObjectId -ErrorAction Stop)
+        } else {
+            $Notebooks = @(Get-MgGroupOnenoteNotebook -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
+            $NotebookSections = @(Get-MgGroupOnenoteSection -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
+            $NotebookPages = @(Get-MgGroupOnenotePage -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
+        }
+    } catch {
+        throw $_
     }
 
     # Planner
     # https://docs.microsoft.com/en-us/graph/api/resources/planner-overview?view=graph-rest-1.0
-    Write-Verbose -Message 'Retrieving Planner plans ...'
-    switch ($Type) {
-        'User' { $Plans = Get-MgUserPlanner -UserId $User.ObjectId }
-        'Group' { $Plans = Get-MgGroupPlanner -GroupId $Group.ExternalDirectoryObjectId }
+    Write-Verbose -Message ('Retrieving {0} plans ...' -f $Type)
+    try {
+        if ($Type -eq 'User') {
+            $Plans = @(Get-MgUserPlannerPlan -UserId $User.ObjectId -ErrorAction Stop)
+        } else {
+            $Plans = @(Get-MgGroupPlannerPlan -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
+        }
+    } catch {
+        throw $_
     }
 
     switch ($Type) {
         'User' {
             $Summary = [PSCustomObject]@{
+                User              = $User
                 Mailbox           = $Mailbox
                 MailboxStatistics = $MailboxStatistics
                 Calendar          = $Calendar
                 Groups            = $Groups
                 Site              = $Site
-                Teams             = $Teams
                 Notebooks         = $Notebooks
+                NotebookSections  = $NotebookSections
+                NotebookPages     = $NotebookPages
                 Plans             = $Plans
             }
+            $Summary.PSObject.TypeNames.Insert(0, 'Microsoft.Office365.EntityUsageSummary.User')
         }
 
         'Group' {
@@ -498,8 +481,11 @@ Function Get-Office365EntityUsageSummary {
                 Site              = $Site
                 Teams             = $Teams
                 Notebooks         = $Notebooks
+                NotebookSections  = $NotebookSections
+                NotebookPages     = $NotebookPages
                 Plans             = $Plans
             }
+            $Summary.PSObject.TypeNames.Insert(0, 'Microsoft.Office365.EntityUsageSummary.Group')
         }
     }
 
