@@ -4,7 +4,7 @@ if ($DotFilesShowScriptEntry) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing OpenSSH functions ...')
 
-# Update our OpenSSH configuration
+# Update OpenSSH configuration
 Function Update-OpenSSHConfig {
     [CmdletBinding()]
     Param()
