@@ -45,7 +45,7 @@ Function Get-AzureAuthToken {
         [Parameter(Mandatory)]
         [String]$TenantName,
 
-        # Default is the well-known identifier for PowerShell clients
+        # Well-known identifier for PowerShell clients
         [Guid]$ClientId = '1950a258-227b-4e31-a9cf-717495945fc2',
 
         [ValidateNotNullOrEmpty()]
@@ -171,12 +171,12 @@ Function Get-AzureUsersLicensingSummary {
     [CmdletBinding()]
     Param()
 
-    Test-ModuleAvailable -Name MSOnline
-
-    # MSOnline is incompatible with PowerShell Core
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Import-Module -Name MSOnline -UseWindowsPowerShell
+        Write-Error -Message 'MSOnline module is incompatible with PowerShell Core.'
+        return
     }
+
+    Test-ModuleAvailable -Name MSOnline
 
     $Users = Get-MsolUser -ErrorAction Stop | Where-Object { $_.UserType -ne 'Guest' }
 
@@ -186,8 +186,8 @@ Function Get-AzureUsersLicensingSummary {
         } else {
             $LicensingSummary = [String]::Empty
         }
-        Add-Member -InputObject $User -MemberType NoteProperty -Name LicensingSummary -Value $LicensingSummary
 
+        Add-Member -InputObject $User -MemberType NoteProperty -Name LicensingSummary -Value $LicensingSummary
         $User.PSObject.TypeNames.Insert(0, 'Microsoft.Online.Administration.User.Licenses')
     }
 
@@ -195,25 +195,24 @@ Function Get-AzureUsersLicensingSummary {
 }
 
 # Retrieve Azure AD users with disabled services
-Function Get-AzureUsersWithDisabledServices {
+Function Get-AzureUsersDisabledServices {
     [CmdletBinding()]
     Param(
         [Switch]$ReturnAllUsers
     )
 
-    Test-ModuleAvailable -Name MSOnline
-
-    # MSOnline is incompatible with PowerShell Core
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Import-Module -Name MSOnline -UseWindowsPowerShell
+        Write-Error -Message 'MSOnline module is incompatible with PowerShell Core.'
+        return
     }
 
-    $Users = Get-MsolUser -ErrorAction Stop | Where-Object { $_.IsLicensed -eq $true }
+    Test-ModuleAvailable -Name MSOnline
 
     $Results = [Collections.ArrayList]::new()
+    $Users = Get-MsolUser -ErrorAction Stop | Where-Object { $_.IsLicensed -eq $true }
+
     foreach ($User in $Users) {
         $DisabledServices = @($User.Licenses.ServiceStatus | Where-Object { $_.ProvisioningStatus -eq 'Disabled' })
-
         if ($DisabledServices -or $ReturnAllUsers) {
             $Result = [PSCustomObject]@{
                 User    = $User.DisplayName
@@ -239,17 +238,17 @@ Function Connect-AzureAD {
         [PSCredential]$Credential
     )
 
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Write-Error -Message 'AzureAD module is incompatible with PowerShell Core.'
+        return
+    }
+
     try {
         $ModuleName = 'AzureADPreview'
         Test-ModuleAvailable -Name $ModuleName
     } catch {
         $ModuleName = 'AzureAD'
         Test-ModuleAvailable -Name $ModuleName
-    }
-
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message ('{0} module is incompatible with PowerShell Core.' -f $ModuleName)
-        return
     }
 
     Write-Host -ForegroundColor Green 'Connecting to Azure AD (v2) ...'
