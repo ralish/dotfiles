@@ -62,6 +62,9 @@ logs/
 /fish/.config/fish/fishd.*
 /fish/.config/fish/generated_completions/
 
+# Git
+/git-win/.git-for-windows-updater
+
 # Irssi
 /irssi/
 
