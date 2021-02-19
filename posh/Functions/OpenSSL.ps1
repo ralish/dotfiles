@@ -4,11 +4,6 @@ if ($DotFilesShowScriptEntry) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing OpenSSL functions ...')
 
-# Certificate encoding formats
-# - DER:        Distinguished Encoding Rules
-# - PEM:        Privacy-Enhanced Mail
-# - PKCS #12:   Public-Key Cryptography Standards #12
-
 # Convert a certificate in DER format to PEM format
 Function Convert-OpenSSLDerToPem {
     [CmdletBinding()]
@@ -50,6 +45,7 @@ Function Convert-OpenSSLPemToPkcs12 {
         [Parameter(Mandatory)]
         [String]$Pkcs12File,
 
+        [ValidateNotNullOrEmpty()]
         [String]$CaCertsFile
     )
 
@@ -77,12 +73,16 @@ Function Convert-OpenSSLPkcs12ToPem {
         [Switch]$PrivateKeyOnly
     )
 
-    if ($CertificatesOnly) {
-        & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes -nokeys
-    } elseif ($PrivateKeyOnly) {
-        & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes -nocerts
-    } else {
-        & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes
+    switch ($PSCmdlet.ParameterSetName) {
+        'CertificatesOnly' {
+            & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes -nokeys
+        }
+        'PrivateKeyOnly' {
+            & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes -nocerts
+        }
+        Default {
+            & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes
+        }
     }
 }
 
@@ -96,8 +96,11 @@ Function Get-OpenSSLCertificate {
         [String[]]$NameOptions = 'oneline'
     )
 
-    $NameOpt = [String]::Join(',', $NameOptions)
-    & openssl x509 -in $Certificate -noout -text -nameopt $NameOpt
+    if ($NameOptions) {
+        & openssl x509 -in $Certificate -noout -text -nameopt [String]::Join(',', $NameOptions)
+    } else {
+        & openssl x509 -in $Certificate -noout -text
+    }
 }
 
 # Retrieve the details of a certificate signing request
@@ -110,8 +113,11 @@ Function Get-OpenSSLCsr {
         [String[]]$NameOptions = 'oneline'
     )
 
-    $NameOpt = [String]::Join(',', $NameOptions)
-    & openssl req -in $Csr -noout -text -verify -nameopt $NameOpt
+    if ($NameOptions) {
+        & openssl req -in $Csr -noout -text -verify -nameopt [String]::Join(',', $NameOptions)
+    } else {
+        & openssl req -in $Csr -noout -text -verify
+    }
 }
 
 # Retrieve the details of a PKCS #12 certificate
@@ -136,18 +142,25 @@ Function Get-OpenSSLPrivateKey {
     & openssl rsa -in $PrivateKey -check
 }
 
-# Create a private key and certificate signing request
-Function New-OpenSSLPrivateKeyAndCsr {
+# Create a certificate signing request or self-signed certificate
+Function New-OpenSSLCertificate {
     [CmdletBinding()]
     Param(
+        [Parameter(ParameterSetName = 'Csr', Mandatory)]
+        [String]$Csr,
+
+        [Parameter(ParameterSetName = 'Certificate', Mandatory)]
+        [String]$Certificate,
+
         [Parameter(Mandatory)]
         [String]$PrivateKey,
 
-        [Parameter(Mandatory)]
-        [String]$Csr,
-
-        [ValidateScript( { $_ -gt 0 } )]
+        [ValidateRange('Positive')]
         [Int]$KeySize,
+
+        [Parameter(ParameterSetName = 'Certificate', Mandatory)]
+        [ValidateRange('Positive')]
+        [Int]$ValidDays = 365,
 
         [Switch]$EncryptKey,
 
@@ -155,19 +168,30 @@ Function New-OpenSSLPrivateKeyAndCsr {
         [String]$Config
     )
 
-    if ($KeySize) {
-        $NewKeyArgs = 'rsa:{0}' -f $KeySize
+    if ($PSCmdlet.ParameterSetName -eq 'Csr') {
+        $Type = '-new'
+        $Out = $Csr
     } else {
-        $NewKeyArgs = 'rsa'
+        $Type = '-x509'
+        $Out = $Certificate
     }
 
     $Params = @(
         'req',
-        '-new',
-        '-out', $Csr,
-        '-keyout', $PrivateKey,
-        '-newkey', $NewKeyArgs
+        $Type,
+        '-out', $Out,
+        '-keyout', $PrivateKey
     )
+
+    if ($KeySize) {
+        $Params += @('-newkey', 'rsa:{0}' -f $KeySize)
+    } else {
+        $Params += @('-newkey', 'rsa')
+    }
+
+    if ($PSCmdlet.ParameterSetName -eq 'Certificate') {
+        $Params += @('-sha256', '-days', $ValidDays)
+    }
 
     if (!$EncryptKey) {
         $Params += '-nodes'
@@ -178,24 +202,4 @@ Function New-OpenSSLPrivateKeyAndCsr {
     }
 
     & openssl @Params
-}
-
-# Create a private key and self-signed certificate
-Function New-OpenSSLSelfSignedCertificate {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory)]
-        [String]$PrivateKey,
-
-        [Parameter(Mandatory)]
-        [String]$Certificate,
-
-        [ValidateScript( { $_ -gt 0 } )]
-        [Int]$KeySize = 2048,
-
-        [ValidateScript( { $_ -gt 0 } )]
-        [Int]$ValidDays = 365
-    )
-
-    & openssl req -out $Certificate -newkey rsa:$KeySize -nodes -keyout $PrivateKey -x509 -sha256 -days $ValidDays
 }
