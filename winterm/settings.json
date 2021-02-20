@@ -29,7 +29,12 @@
             "fontSize": 10,
 
             "useAcrylic": false,
-            "acrylicOpacity": 0.8
+            "acrylicOpacity": 0.8,
+
+            "backgroundImage": "%USERPROFILE%/OneDrive/Pictures/fluorescence61080p.jpg",
+            "backgroundImageStretchMode": "fill",
+            "backgroundImageAlignment": "center",
+            "backgroundImageOpacity": 0.8
         },
 
         "list": [
