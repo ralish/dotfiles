@@ -1,7 +1,7 @@
 ﻿using Fiddler;
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:ValidateArgumentsOfPublicMethods")]
@@ -274,10 +274,16 @@ namespace Fiddler
         {
             // Only display traffic from specific processes
             /*
-            ArrayList processes = new ArrayList { };
-            if (!processes.Contains(session["x-ProcessInfo"].ToLower()))
-            {
-                session["ui-hide"] = "true";
+            List<string> processes = new List<string> {
+            };
+
+            session["ui-hide"] = "true";
+            for (int i = 0; i < processes.Count; i++) {
+                string process = processes[i].ToLower() + ":";
+                if (session["x-ProcessInfo"].ToLower().StartsWith(process)) {
+                    session["ui-hide"] = null;
+                    break;
+                }
             }
             */
         }
