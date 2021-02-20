@@ -122,7 +122,10 @@
         },
         {
             "icon": "git",
-            "extensions": [".gitconfig-win"],
+            "extensions": [
+                ".gitconfig-win",
+                ".git-for-windows-updater"
+            ],
             "filename": true,
             "format": "svg"
         },
