@@ -97,7 +97,7 @@ Function Get-OpenSSLCertificate {
     )
 
     if ($NameOptions) {
-        & openssl x509 -in $Certificate -noout -text -nameopt [String]::Join(',', $NameOptions)
+        & openssl x509 -in $Certificate -noout -text -nameopt ([String]::Join(',', $NameOptions))
     } else {
         & openssl x509 -in $Certificate -noout -text
     }
@@ -114,7 +114,7 @@ Function Get-OpenSSLCsr {
     )
 
     if ($NameOptions) {
-        & openssl req -in $Csr -noout -text -verify -nameopt [String]::Join(',', $NameOptions)
+        & openssl req -in $Csr -noout -text -verify -nameopt ([String]::Join(',', $NameOptions))
     } else {
         & openssl req -in $Csr -noout -text -verify
     }
