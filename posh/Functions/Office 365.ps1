@@ -439,7 +439,7 @@ Function Get-Office365EntityUsageSummary {
             $NotebookPages = @(Get-MgGroupOnenotePage -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
         }
     } catch {
-        throw $_
+        Write-Warning -Message $_.ErrorDetails
     }
 
     # Planner
@@ -452,7 +452,7 @@ Function Get-Office365EntityUsageSummary {
             $Plans = @(Get-MgGroupPlannerPlan -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
         }
     } catch {
-        throw $_
+        Write-Warning -Message $_.ErrorDetails
     }
 
     switch ($Type) {
