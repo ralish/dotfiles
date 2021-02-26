@@ -430,9 +430,9 @@ Function Get-Office365EntityUsageSummary {
     Write-Verbose -Message ('Retrieving {0} notebooks ...' -f $Type)
     try {
         if ($Type -eq 'User') {
-            $Notebooks = @(Get-MgUserOnenoteNotebook -UserId $User.ObjectId -ErrorAction Stop)
-            $NotebookSections = @(Get-MgUserOnenoteSection -UserId $User.ObjectId -ErrorAction Stop)
-            $NotebookPages = @(Get-MgUserOnenotePage -UserId $User.ObjectId -ErrorAction Stop)
+            $Notebooks = @(Get-MgUserOnenoteNotebook -UserId $User.UserPrincipalName -ErrorAction Stop)
+            $NotebookSections = @(Get-MgUserOnenoteSection -UserId $User.UserPrincipalName -ErrorAction Stop)
+            $NotebookPages = @(Get-MgUserOnenotePage -UserId $User.UserPrincipalName -ErrorAction Stop)
         } else {
             $Notebooks = @(Get-MgGroupOnenoteNotebook -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
             $NotebookSections = @(Get-MgGroupOnenoteSection -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
@@ -444,15 +444,13 @@ Function Get-Office365EntityUsageSummary {
 
     # Planner
     # https://docs.microsoft.com/en-us/graph/api/resources/planner-overview?view=graph-rest-1.0
-    Write-Verbose -Message ('Retrieving {0} plans ...' -f $Type)
-    try {
-        if ($Type -eq 'User') {
-            $Plans = @(Get-MgUserPlannerPlan -UserId $User.ObjectId -ErrorAction Stop)
-        } else {
+    if ($Type -eq 'Group') {
+        Write-Verbose -Message ('Retrieving {0} plans ...' -f $Type)
+        try {
             $Plans = @(Get-MgGroupPlannerPlan -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
+        } catch {
+            Write-Warning -Message $_.ErrorDetails
         }
-    } catch {
-        Write-Warning -Message $_.ErrorDetails
     }
 
     switch ($Type) {
@@ -467,7 +465,6 @@ Function Get-Office365EntityUsageSummary {
                 Notebooks         = $Notebooks
                 NotebookSections  = $NotebookSections
                 NotebookPages     = $NotebookPages
-                Plans             = $Plans
             }
             $Summary.PSObject.TypeNames.Insert(0, 'Microsoft.Office365.EntityUsageSummary.User')
         }

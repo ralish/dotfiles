@@ -233,9 +233,6 @@
                     <TableColumnHeader>
                         <Label>NotebookPageCount</Label>
                     </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>PlanCount</Label>
-                    </TableColumnHeader>
                 </TableHeaders>
                 <TableRowEntries>
                     <TableRowEntry>
@@ -269,9 +266,6 @@
                             </TableColumnItem>
                             <TableColumnItem>
                                 <ScriptBlock>$_.NotebookPages.Count</ScriptBlock>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <ScriptBlock>$_.Plans.Count</ScriptBlock>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>
