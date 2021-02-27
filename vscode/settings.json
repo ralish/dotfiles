@@ -184,6 +184,12 @@
             "format": "svg"
         },
         {
+            "icon": "json",
+            "extensions": ["project.nuget.cache"],
+            "filename": true,
+            "format": "svg"
+        },
+        {
             "icon": "markdownlint",
             "extensions": [".markdownlintrc"],
             "filename": true,
@@ -192,12 +198,6 @@
         {
             "icon": "xml",
             "extensions": ["app.manifest"],
-            "filename": true,
-            "format": "svg"
-        },
-        {
-            "icon": "json",
-            "extensions": ["project.nuget.cache"],
             "filename": true,
             "format": "svg"
         }
