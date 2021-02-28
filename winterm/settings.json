@@ -28,13 +28,8 @@
             "fontFace": "Hack NF",
             "fontSize": 10,
 
-            "useAcrylic": false,
-            "acrylicOpacity": 0.8,
-
-            "backgroundImage": "%USERPROFILE%/OneDrive/Pictures/fluorescence61080p.jpg",
-            "backgroundImageStretchMode": "fill",
-            "backgroundImageAlignment": "center",
-            "backgroundImageOpacity": 0.8
+            "useAcrylic": true,
+            "acrylicOpacity": 0.5
         },
 
         "list": [
@@ -70,8 +65,7 @@
                 "closeOnExit": "always",
 
                 // Use the same visual settings as our SSH configuration
-                "colorScheme": "Solarized Dark",
-                "backgroundImage": ""
+                "colorScheme": "Solarized Dark"
             },
             {
                 "name": "Kali",
@@ -85,8 +79,7 @@
                 "closeOnExit": "always",
 
                 // Use the same visual settings as our SSH configuration
-                "colorScheme": "Solarized Dark",
-                "backgroundImage": ""
+                "colorScheme": "Solarized Dark"
             },
             {
                 "name": "Git Bash",
