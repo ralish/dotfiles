@@ -11,7 +11,7 @@ SETUP_SSH_AUTH_SOCK=true
 # Based on: https://github.com/rupor-github/wsl-ssh-agent#wsl-2-compatibility
 wsl_setup_ssh_auth_sock() {
     if [ -n "${SSH_AUTH_SOCK}" ]; then
-        echo "[WSL] Skipping \$SSH_AUTH_SOCK setup as it's already set."
+        #echo "[WSL] Skipping \$SSH_AUTH_SOCK setup as it's already set."
         return
     fi
 
