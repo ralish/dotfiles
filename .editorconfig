@@ -36,7 +36,7 @@ insert_final_newline = false
 trim_trailing_whitespace = false
 
 # Shell scripts
-[{*.sh,.bashrc,.mk-sbuild.rc,.quiltrc,user-dirs.dirs}]
+[{*/bin/*,*.sh,.bashrc,.mk-sbuild.rc,.quiltrc,user-dirs.dirs}]
 max_line_length = 79
 keep_padding = true             # shfmt: -kp
 space_redirects = true          # shfmt: -sr
