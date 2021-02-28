@@ -24,7 +24,6 @@ Usage: [OPTIONS] [COMMAND]
 EOF
 }
 
-
 # DESC: Parameter parser
 # ARGS: $@ (optional): Arguments provided to the script
 # OUTS: Variables indicating command-line parameters and options
@@ -36,21 +35,21 @@ function parse_params() {
         param="$1"
         shift
         case $param in
-            -h|--help)
+            -h | --help)
                 script_usage
                 exit 0
                 ;;
-            -v|--verbose)
+            -v | --verbose)
                 verbose=true
                 ;;
-            -nc|--no-colour)
+            -nc | --no-colour)
                 no_colour=true
                 ;;
-            -p|--path)
+            -p | --path)
                 cmd_paths+=("$1")
                 shift
                 ;;
-            -r|--recurse)
+            -r | --recurse)
                 recurse=true
                 ;;
             *)
@@ -80,7 +79,6 @@ function parse_params() {
     fi
 }
 
-
 # DESC: Find some important paths we need before script_init() is called
 # ARGS: None
 # OUTS: $script_real_path: The full canonicalized path to the script
@@ -93,8 +91,7 @@ function early_init() {
     # Determine the physical directory this script resides in. This approach is
     # necessarily clumsy as simple methods like "readlink -f" and "realpath"
     # are not platform independent. We have to work on Linux, BSD, OS X, etc...
-    readonly script_real_path="$(perl -MCwd -le 'print Cwd::abs_path(shift)' \
-                                 "${BASH_SOURCE[0]}")"
+    readonly script_real_path="$(perl -MCwd -le 'print Cwd::abs_path(shift)' "${BASH_SOURCE[0]}")"
     readonly script_real_dir="$(dirname "$script_real_path")"
     readonly script_real_name="$(basename "$script_real_path")"
 
@@ -102,7 +99,6 @@ function early_init() {
     readonly dotfiles_path="$(cd -P "$script_real_dir/../../" && pwd)"
     readonly dotfiles_name="$(basename "$dotfiles_path")"
 }
-
 
 # DESC: Check the directory belongs to a Git repository
 # ARGS: $1 (required): Path to the directory to check
@@ -127,7 +123,6 @@ function check_is_git_repo() {
 
     return 1
 }
-
 
 # DESC: Run Git command if directory is a repository or recurse if specified
 # ARGS: $1 (required): Directory path to run in
@@ -155,7 +150,6 @@ function git_repo_invoke() {
     )
 }
 
-
 # DESC: Main control flow
 # ARGS: $@ (optional): Arguments provided to the script
 # OUTS: None
@@ -163,7 +157,7 @@ function main() {
     early_init
 
     # shellcheck source=scripts/bin/bash-template.sh
-    source "$script_real_dir/bash-template.sh"
+    source "$dotfiles_path/scripts/bin/bash-template.sh"
 
     trap script_trap_err ERR
     trap script_trap_exit EXIT
@@ -185,7 +179,6 @@ function main() {
         fi
     done
 }
-
 
 # Make it rain
 main "$@"
