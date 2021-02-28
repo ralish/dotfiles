@@ -71,7 +71,7 @@
 
                 // Use the same visual settings as our SSH configuration
                 "colorScheme": "Solarized Dark",
-                "backgroundImage": null
+                "backgroundImage": ""
             },
             {
                 "name": "Kali",
@@ -86,7 +86,7 @@
 
                 // Use the same visual settings as our SSH configuration
                 "colorScheme": "Solarized Dark",
-                "backgroundImage": null
+                "backgroundImage": ""
             },
             {
                 "name": "Git Bash",
