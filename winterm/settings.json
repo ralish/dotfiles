@@ -28,7 +28,7 @@
             "fontFace": "Hack NF",
             "fontSize": 10,
 
-            "useAcrylic": true,
+            "useAcrylic": false,
             "acrylicOpacity": 0.5
         },
 
