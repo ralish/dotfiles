@@ -12,4 +12,4 @@ try {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading oh-my-posh settings ...')
 
 # Set console theme
-Set-Theme -name Agnoster -Verbose:$false
+Set-PoshPrompt -Theme slim -Verbose:$false
