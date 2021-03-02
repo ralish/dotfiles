@@ -77,6 +77,12 @@ set ttimeoutlen=100
 " Indicate we're on a fast terminal connection
 set ttyfast
 
+" Use a visual bell instead of beeping on errors without a message
+set visualbell
+
+" Disable the visual bell (i.e. no beep or flash with the above)
+set t_vb=
+
 if has('cmdline_info')
     " Show the cursor position (only if 'statusline' is not defined)
     set ruler
