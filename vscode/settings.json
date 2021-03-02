@@ -76,7 +76,7 @@
     // Features: Terminal
     "terminal.integrated.copyOnSelection": true,
     "terminal.integrated.cursorStyle": "line",
-    "terminal.integrated.fontFamily": "Hack",
+    "terminal.integrated.fontFamily": "Hack NF",
     "terminal.integrated.rightClickBehavior": "paste",
     "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
 
