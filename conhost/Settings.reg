@@ -28,7 +28,7 @@ Windows Registry Editor Version 5.00
 "EnableColorSelection"=dword:00000001
 "ExtendedEditKey"=dword:00000001
 "ExtendedEditKeyCustom"=dword:00000000
-"FaceName"="Hack"
+"FaceName"="Hack NF"
 "FilterOnPaste"=dword:00000001
 "FontFamily"=dword:00000036
 "FontSize"=dword:00100000
