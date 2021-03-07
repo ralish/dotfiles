@@ -191,6 +191,22 @@ Function Edit-Hosts {
     Start-Process @StartProcessParams
 }
 
+# Restore connections to mapped network drives
+Function Restore-MappedNetworkDrives {
+    [CmdletBinding()]
+    Param()
+
+    $MappedDrives = Get-SmbMapping | Where-Object Status -EQ Unavailable
+    foreach ($MappedDrive in $MappedDrives) {
+        Write-Verbose -Message ('Restoring mapped network drive: {0}' -f $MappedDrive.LocalPath)
+        try {
+            $null = New-SmbMapping -LocalPath $MappedDrive.LocalPath -RemotePath $MappedDrive.RemotePath -Persistent $true
+        } catch {
+            Write-Error -Message ('Failed to restore mapped network drive: {0}' -f $MappedDrive.LocalPath)
+        }
+    }
+}
+
 #endregion
 
 #region Security
