@@ -537,7 +537,7 @@ Function Switch-PHP {
 # Environment variables
 # https://docs.python.org/3/using/cmdline.html#environment-variables
 Function Switch-Python {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Enable')]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path = "$env:HOMEDRIVE\DevEnvs\Python",
@@ -545,7 +545,13 @@ Function Switch-Python {
         [ValidatePattern('[0-9]+\.[0-9]+')]
         [String]$Version,
 
+        [Parameter(ParameterSetName = 'Enable')]
+        [ValidateSet('Dev', 'UTF-8')]
+        [String[]]$Features = @('UTF-8'),
+
         [Switch]$Persist,
+
+        [Parameter(ParameterSetName = 'Disable')]
         [Switch]$Disable
     )
 
@@ -569,6 +575,7 @@ Function Switch-Python {
         }
     }
 
+    $NativeVersion = [Version]$Version
     $StrippedVersion = $Version -replace '\.'
 
     $PathParams = @{ }
@@ -590,6 +597,18 @@ Function Switch-Python {
         & $Operation @PathParams -Element $LocalScriptsSharedPath |
         & $Operation @PathParams -Element $LocalScriptsVersionedPath
 
+    # Python Development Mode
+    if ($Features -contains 'Dev' -and $NativeVersion -ge '3.7') {
+        $PythonDevMode = $true
+        $env:PYTHONDEVMODE = 1
+    }
+
+    # UTF-8 Mode (see PEP 540)
+    if ($Features -contains 'UTF-8' -and $NativeVersion -ge '3.7') {
+        $Utf8Mode = $true
+        $env:PYTHONUTF8 = 1
+    }
+
     if ($Persist) {
         $EnvParams = @{
             Name = 'Path'
@@ -605,6 +624,16 @@ Function Switch-Python {
             & $Operation @PathParams -Element $ScriptsPath |
             & $Operation @PathParams -Element $Path |
             Set-EnvironmentVariable @EnvParams
+
+        if (!$Disable) {
+            if ($PythonDevMode) {
+                Set-EnvironmentVariable -Name PYTHONDEVMODE -Value 1
+            }
+
+            if ($Utf8Mode) {
+                Set-EnvironmentVariable -Name PYTHONUTF8 -Value 1
+            }
+        }
     }
 }
 
