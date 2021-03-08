@@ -293,7 +293,11 @@ Function Update-PowerShell {
 
     if ($PSCmdlet.ShouldProcess('PowerShell help', 'Update')) {
         Write-Host -ForegroundColor Green 'Updating PowerShell help ...'
-        Update-Help -Force:$Force
+        try {
+            Update-Help -Force:$Force -ErrorAction Stop
+        } catch {
+            Write-Warning -Message 'Some errors were reported while updating PowerShell module help.'
+        }
     }
 
     return $true
