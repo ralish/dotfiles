@@ -573,6 +573,8 @@ Function Switch-Python {
         } else {
             throw ('Unable to determine Python version from output: {0}' -f $PythonVersion)
         }
+
+        $Version = $PythonVersion
     }
 
     $NativeVersion = [Version]$Version
