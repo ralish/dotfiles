@@ -15,7 +15,16 @@ Function Convert-OpenSSLDerToPem {
         [String]$PemFile
     )
 
-    & openssl x509 -inform der -in $DerFile -out $PemFile
+    $Params = @(
+        'x509',
+        '-inform', 'der',
+        '-in', $DerFile,
+        '-out', $PemFile
+    )
+
+    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
+    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params))
+    & openssl @Params
 }
 
 # Convert a certificate in PEM format to DER format
@@ -29,7 +38,16 @@ Function Convert-OpenSSLPemToDer {
         [String]$DerFile
     )
 
-    & openssl x509 -outform der -in $PemFile -out $DerFile
+    $Params = @(
+        'x509',
+        '-outform', 'der',
+        '-in', $PemFile,
+        '-out', $DerFile
+    )
+
+    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
+    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params))
+    & openssl @Params
 }
 
 # Convert a certificate in PEM format to PKCS #12 format
@@ -49,11 +67,25 @@ Function Convert-OpenSSLPemToPkcs12 {
         [String]$CaCertsFile
     )
 
+    $Params = [Collections.ArrayList]::new(
+        @(
+            'pkcs12',
+            '-export',
+            '-inkey', $PrivateKeyFile,
+            '-in', $PemFile,
+            '-out', $Pkcs12File,
+            '-nodes'
+        )
+    )
+
     if ($CaCertsFile) {
-        & openssl pkcs12 -export -inkey $PrivateKeyFile -in $PemFile -out $Pkcs12File -certfile $CaCertsFile
-    } else {
-        & openssl pkcs12 -export -inkey $PrivateKeyFile -in $PemFile -out $Pkcs12File
+        $null = $Params.Add('-certfile')
+        $null = $Params.Add($CaCertsFile)
     }
+
+    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
+    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params.ToArray()))
+    & openssl @Params
 }
 
 # Convert a certificate in PKCS #12 format to PEM format
@@ -73,17 +105,24 @@ Function Convert-OpenSSLPkcs12ToPem {
         [Switch]$PrivateKeyOnly
     )
 
-    switch ($PSCmdlet.ParameterSetName) {
-        'CertificatesOnly' {
-            & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes -nokeys
-        }
-        'PrivateKeyOnly' {
-            & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes -nocerts
-        }
-        Default {
-            & openssl pkcs12 -in $Pkcs12File -out $PemFile -nodes
-        }
+    $Params = [Collections.ArrayList]::new(
+        @(
+            'pkcs12',
+            '-in', $Pkcs12File,
+            '-out', $PemFile,
+            '-nodes'
+        )
+    )
+
+    if ($PSCmdlet.ParameterSetName -eq 'CertificatesOnly') {
+        $null = $Params.Add('-nokeys')
+    } elseif ($PSCmdlet.ParameterSetName -eq 'PrivateKeyOnly') {
+        $null = $Params.Add('-nocerts')
     }
+
+    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
+    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params.ToArray()))
+    & openssl @Params
 }
 
 # Retrieve the details of a certificate
@@ -96,11 +135,23 @@ Function Get-OpenSSLCertificate {
         [String[]]$NameOptions = 'oneline'
     )
 
+    $Params = [Collections.ArrayList]::new(
+        @(
+            'x509',
+            '-in', $Certificate,
+            '-noout',
+            '-text'
+        )
+    )
+
     if ($NameOptions) {
-        & openssl x509 -in $Certificate -noout -text -nameopt ([String]::Join(',', $NameOptions))
-    } else {
-        & openssl x509 -in $Certificate -noout -text
+        $null = $Params.Add('-nameopt')
+        $null = $Params.Add([String]::Join(',', $NameOptions))
     }
+
+    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
+    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params.ToArray()))
+    & openssl @Params
 }
 
 # Retrieve the details of a certificate signing request
@@ -113,11 +164,24 @@ Function Get-OpenSSLCsr {
         [String[]]$NameOptions = 'oneline'
     )
 
+    $Params = [Collections.ArrayList]::new(
+        @(
+            'req',
+            '-in', $Csr,
+            '-noout',
+            '-text',
+            '-verify'
+        )
+    )
+
     if ($NameOptions) {
-        & openssl req -in $Csr -noout -text -verify -nameopt ([String]::Join(',', $NameOptions))
-    } else {
-        & openssl req -in $Csr -noout -text -verify
+        $null = $Params.Add('-nameopt')
+        $null = $Params.Add([String]::Join(',', $NameOptions))
     }
+
+    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
+    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params.ToArray()))
+    & openssl @Params
 }
 
 # Retrieve the details of a PKCS #12 certificate
@@ -128,7 +192,15 @@ Function Get-OpenSSLPkcs12 {
         [String]$Pkcs12
     )
 
-    & openssl rsa -in $Pkcs12 -info
+    $Params = @(
+        'rsa',
+        '-in', $Pkcs12,
+        '-info'
+    )
+
+    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
+    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params))
+    & openssl @Params
 }
 
 # Retrieve the details of a private key
@@ -139,7 +211,15 @@ Function Get-OpenSSLPrivateKey {
         [String]$PrivateKey
     )
 
-    & openssl rsa -in $PrivateKey -check
+    $Params = @(
+        'rsa',
+        '-in', $PrivateKey,
+        '-check'
+    )
+
+    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
+    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params))
+    & openssl @Params
 }
 
 # Create a certificate signing request or self-signed certificate
@@ -176,30 +256,37 @@ Function New-OpenSSLCertificate {
         $Out = $Certificate
     }
 
-    $Params = @(
-        'req',
-        $Type,
-        '-out', $Out,
-        '-keyout', $PrivateKey
-    )
-
+    $KeyType = 'rsa'
     if ($KeySize) {
-        $Params += @('-newkey', 'rsa:{0}' -f $KeySize)
-    } else {
-        $Params += @('-newkey', 'rsa')
+        $KeyType += ':{0}' -f $KeySize
     }
 
+    $Params = [Collections.ArrayList]::new(
+        @(
+            'req',
+            $Type,
+            '-out', $Out,
+            '-keyout', $PrivateKey
+            '-newkey', $KeyType
+        )
+    )
+
     if ($PSCmdlet.ParameterSetName -eq 'Certificate') {
-        $Params += @('-sha256', '-days', $ValidDays)
+        $null = $Params.Add('-sha256')
+        $null = $Params.Add('-days')
+        $null = $Params.Add($ValidDays)
     }
 
     if (!$EncryptKey) {
-        $Params += '-nodes'
+        $null = $Params.Add('-nodes')
     }
 
     if ($Config) {
-        $Params += @('-config', $Config)
+        $null = $Params.Add('-config')
+        $null = $Params.Add($Config)
     }
 
+    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
+    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params.ToArray()))
     & openssl @Params
 }
