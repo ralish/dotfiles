@@ -39,5 +39,13 @@
         Data[@Name='Status'] and Data=3221226341
       ]]
     </Suppress>
+
+    <!--
+      Service Control Manager
+      The %1 service entered the %2 state.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Service Control Manager'] and EventID=7036]]
+    </Suppress>
   </Query>
 </QueryList>
