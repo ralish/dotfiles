@@ -5,6 +5,8 @@
     <!--
       DCOM event ID 10016 is logged in Windows
       https://docs.microsoft.com/en-us/troubleshoot/windows-client/application-management/event-10016-logged-when-accessing-dcom
+
+      Level:        Warning
     -->
     <Suppress Path="System">
       *[System[Provider[@Name='Microsoft-Windows-DistributedCOM'] and EventID=10016]]
@@ -14,7 +16,8 @@
       Windows failed to apply the MDM Policy settings error when running gpupdate /force on hybrid Azure AD-joined devices
       https://docs.microsoft.com/en-us/troubleshoot/mem/intune/windows-failed-to-apply-mdm-policy
 
-      ErrorCode: 0x8018000a (MENROLL_E_DEVICE_ALREADY_ENROLLED)
+      Level:        Warning
+      ErrorCode:    0x8018000a (MENROLL_E_DEVICE_ALREADY_ENROLLED)
     -->
     <Suppress Path="System">
       *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1085]]
@@ -29,7 +32,8 @@
       Event ID 219 is logged when a device is plugged into a Windows-based system
       https://docs.microsoft.com/en-us/troubleshoot/windows-client/deployment/event-id-219-when-device-plugged-in-windows-system
 
-      Status: 0xc0000365 (STATUS_FAILED_DRIVER_ENTRY)
+      Level:        Warning
+      Status:       0xc0000365 (STATUS_FAILED_DRIVER_ENTRY)
     -->
     <Suppress Path="System">
       *[System[Provider[@Name='Microsoft-Windows-Kernel-PnP'] and EventID=219]]
@@ -41,8 +45,11 @@
     </Suppress>
 
     <!--
-      Service Control Manager
       The %1 service entered the %2 state.
+
+      Level:        Information
+
+      Rarely of interest but often high volume, particularly on server SKUs.
     -->
     <Suppress Path="System">
       *[System[Provider[@Name='Service Control Manager'] and EventID=7036]]
