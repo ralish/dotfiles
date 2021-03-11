@@ -1,0 +1,29 @@
+<QueryList>
+  <Query Id="0" Path="Application">
+    <Select Path="Application">*</Select>
+
+    <!--
+      Microsoft Monitoring Agent
+      https://feedback.azure.com/forums/267889-azure-monitor-log-analytics/suggestions/15703083-fix-bug-in-agent
+
+      Level:        Error
+      Data:         Com Call Wrapper Unmarshal Class 4.0
+    -->
+    <Suppress Path="Application">
+      *[System[Provider[@Name='Microsoft-Windows-COMRuntime'] and EventID=10031]]
+      and
+      *[EventData[Data='{45FB4600-E6E8-4928-B25E-50476FF79425}']]
+    </Suppress>
+
+    <!--
+      Security policy in the Group policy objects has been applied successfully.
+
+      Level:        Information
+
+      Rarely of interest but often high volume, particularly on domain controllers.
+    -->
+    <Suppress Path="Application">
+      *[System[Provider[@Name='SceCli'] and EventID=1704]]
+    </Suppress>
+  </Query>
+</QueryList>
