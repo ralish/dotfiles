@@ -13,6 +13,17 @@
     </Suppress>
 
     <!--
+      UMDF reflector is unable to connect to service control manager (SCM). This is expected during boot, when SCM has not started yet. Will retry when it starts.
+
+      Level:        Informational
+
+      Rarely of interest but often emitted numerous times during system startup.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-DriverFrameworks-UserMode'] and EventID=10118]]
+    </Suppress>
+
+    <!--
       Windows failed to apply the MDM Policy settings error when running gpupdate /force on hybrid Azure AD-joined devices
       https://docs.microsoft.com/en-us/troubleshoot/mem/intune/windows-failed-to-apply-mdm-policy
 
