@@ -3,6 +3,25 @@
     <Select Path="Application">*</Select>
 
     <!--
+      Azure AD Sync
+
+      Level:        Information
+
+      Extremely noisy when present; best to view in a dedicated custom view.
+    -->
+    <Suppress Path="Application">
+      *[System[
+        (
+          Provider[@Name='ADSync']
+          or
+          Provider[@Name='Directory Synchronization']
+        )
+        and
+        Level=4
+      ]]
+    </Suppress>
+
+    <!--
       Microsoft Monitoring Agent
       https://feedback.azure.com/forums/267889-azure-monitor-log-analytics/suggestions/15703083-fix-bug-in-agent
 
