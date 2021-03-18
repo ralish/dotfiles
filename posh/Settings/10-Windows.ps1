@@ -110,34 +110,34 @@ public static extern bool SetConsoleMode(
 );
 '@
 
-        if (!('DotFiles.ConsoleAPI' -as [Type])) {
-            Add-Type -Namespace DotFiles -Name ConsoleAPI -MemberDefinition $ConsoleAPI
+        if (!('DotFiles.Console' -as [Type])) {
+            Add-Type -Namespace DotFiles -Name Console -MemberDefinition $ConsoleAPI
         }
 
         # The STD_INPUT_HANDLE shouldn't be relevant to this issue
         $ConStdHandleNames = 'STD_OUTPUT_HANDLE', 'STD_ERROR_HANDLE'
         foreach ($ConStdHandleName in $ConStdHandleNames) {
             Write-Debug -Message (Get-DotFilesMessage -Message ('Operating on console handle: {0}' -f $ConStdHandleName))
-            $ConStdHandle = [DotFiles.ConsoleAPI]::GetStdHandle([DotFiles.ConsoleAPI+StdHandleDevices]::$ConStdHandleName)
+            $ConStdHandle = [DotFiles.Console]::GetStdHandle([DotFiles.Console+StdHandleDevices]::$ConStdHandleName)
             if ($ConStdHandle -eq -1) {
                 throw [ComponentModel.Win32Exception]::new()
             }
 
             [uint32]$ConStdMode = 0
-            if (!([DotFiles.ConsoleAPI]::GetConsoleMode($ConStdHandle, [ref]$ConStdMode))) {
+            if (!([DotFiles.Console]::GetConsoleMode($ConStdHandle, [ref]$ConStdMode))) {
                 throw [ComponentModel.Win32Exception]::new()
             }
-            Write-Debug -Message (Get-DotFilesMessage -Message ('Current console output mode: {0}' -f [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]$ConStdMode))
+            Write-Debug -Message (Get-DotFilesMessage -Message ('Current console output mode: {0}' -f [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode))
 
-            $ConStdVT100 = [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]$ConStdMode -band [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING
+            $ConStdVT100 = [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -band [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING
             if ($ConStdVT100) {
                 Write-Debug -Message (Get-DotFilesMessage -Message 'Disabling console VT100 support ...')
-                if (!([DotFiles.ConsoleAPI]::SetConsoleMode($ConStdHandle, [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]$ConStdMode -bxor [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
+                if (!([DotFiles.Console]::SetConsoleMode($ConStdHandle, [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -bxor [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
                     throw [ComponentModel.Win32Exception]::new()
                 }
 
                 Write-Debug -Message (Get-DotFilesMessage -Message 'Enabling console VT100 support ...')
-                if (!([DotFiles.ConsoleAPI]::SetConsoleMode($ConStdHandle, [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]$ConStdMode -bor [DotFiles.ConsoleAPI+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
+                if (!([DotFiles.Console]::SetConsoleMode($ConStdHandle, [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -bor [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
                     throw [ComponentModel.Win32Exception]::new()
                 }
             } else {
