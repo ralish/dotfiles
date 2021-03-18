@@ -17,7 +17,7 @@ try {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading MSOnline settings ...')
 
-# Mailbox properties we usually don't care about
+# User properties we may want to ignore
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
 $MsolUserIgnoredProperties = @(
     # User identity
@@ -26,7 +26,7 @@ $MsolUserIgnoredProperties = @(
     'SignInName',
     #'UserPrincipalName',
 
-    # Uninteresting
+    # User settings
     'PortalSettings',
     'UserLandingPageIdentifierForO365Shell',
     'UserThemeIdentifierForO365Shell',

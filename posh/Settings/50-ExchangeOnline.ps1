@@ -17,7 +17,7 @@ try {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ExchangeOnline settings ...')
 
-# Mailbox properties we usually don't care about
+# Mailbox properties we may want to ignore
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
 $ExoMailboxIgnoredProperties = @(
     # User identity
