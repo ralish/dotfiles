@@ -2,6 +2,10 @@ if ($DotFilesShowScriptEntry) {
     Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
 }
 
+if (!(Test-IsWindows)) {
+    return
+}
+
 try {
     if (!$DotFilesFastLoad) {
         Test-ModuleAvailable -Name PSDotFiles
@@ -15,7 +19,7 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading PSDotFiles setting
 
 # Path to our dotfiles directory
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
-$DotFilesPath = Join-Path -Path $HOME -ChildPath 'dotfiles'
+$DotFilesPath = $DotFiles
 
 # Enable automatic component detection
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
