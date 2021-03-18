@@ -7,9 +7,10 @@ if (!(Test-IsWindows)) {
 }
 
 try {
-    if (!$DotFilesFastLoad) {
-        Test-ModuleAvailable -Name Microsoft365DSC
-    }
+    # Don't support our fast load approach as otherwise we will warn on
+    # the telemetry opt-out environment variable not being set even if
+    # the module is not present.
+    Test-ModuleAvailable -Name Microsoft365DSC
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping Microsoft365DSC settings as module not found.')
     return
