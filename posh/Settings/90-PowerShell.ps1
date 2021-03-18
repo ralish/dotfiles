@@ -8,14 +8,11 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Configuring PowerShell ...
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
 $FormatEnumerationLimit = 5
 
-# Install-Module: Default to CurrentUser scope
-$PSDefaultParameterValues['Install-Module:Scope'] = 'CurrentUser'
-
 # Out-File: Default to UTF-8 encoding
 $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
 
 if ($PSVersionTable.PSEdition -eq 'Core') {
-    # PowerShell Core doesn't publish help for the en-GB locale
+    # Update-Help: en-GB locale is not available under Core
     $PSDefaultParameterValues['Update-Help:UICulture'] = 'en-US'
 }
 
