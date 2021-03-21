@@ -3,7 +3,6 @@ if ($DotFilesShowScriptEntry) {
 }
 
 if (!(Test-IsWindows)) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of Windows functions.')
     return
 }
 

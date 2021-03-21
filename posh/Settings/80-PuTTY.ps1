@@ -2,6 +2,11 @@ if ($DotFilesShowScriptEntry) {
     Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
 }
 
+if (!(Test-IsWindows)) {
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PuTTY settings as currently Windows specific.')
+    return
+}
+
 if (!(Get-Command -Name putty -ErrorAction Ignore)) {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PuTTY settings as unable to locate putty.')
     return
