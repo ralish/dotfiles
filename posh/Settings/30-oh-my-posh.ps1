@@ -9,7 +9,19 @@ try {
     return
 }
 
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading oh-my-posh settings ...')
+$CurrentVersion = (Get-Module -Name oh-my-posh).Version
+$RequiredVersion = [Version]::new('2.0.0')
+if ($CurrentVersion -ge $RequiredVersion) {
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading oh-my-posh settings ...')
 
-# Set console theme
-Set-PoshPrompt -Theme slim -Verbose:$false
+    # Set console theme
+    if ($CurrentVersion.Major -ge 3) {
+        Set-PoshPrompt -Theme slim -Verbose:$false
+    } else {
+        Set-Theme -name Agnoster -Verbose:$false
+    }
+} else {
+    Write-Warning -Message (Get-DotFilesMessage -Message ('Expecting at least oh-my-posh {0} but you have {1}.' -f $RequiredVersion, $CurrentVersion))
+}
+
+Remove-Variable -Name 'CurrentVersion', 'RequiredVersion'
