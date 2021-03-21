@@ -17,5 +17,8 @@ try {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading PSWinVitals settings ...')
 
+# Get-VitalInformation: Exclude Silverlight updates
+$PSDefaultParameterValues['Get-VitalInformation:WUParameters'] = @{ NotTitle = 'Silverlight' }
+
 # Invoke-VitalMaintenance: Exclude Silverlight updates
-$PSDefaultParameterValues['Invoke-VitalMaintenance:WUTitleExclude'] = 'Silverlight'
+$PSDefaultParameterValues['Invoke-VitalMaintenance:WUParameters'] = @{ NotTitle = 'Silverlight' }
