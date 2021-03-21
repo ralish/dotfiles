@@ -62,3 +62,19 @@ $Params = @{
 }
 Set-PSReadLineKeyHandler @Params
 Remove-Variable -Name 'Params', 'ScriptBlock'
+
+# We use the Solarized Dark colour scheme for WSL sessions under Windows
+# Terminal. Unfortunately, some of PSReadLine's default colours are near
+# invisible in conjunction with this colour scheme. Switch the affected
+# colours to something more visible.
+#
+# References:
+# - https://github.com/microsoft/terminal/pull/6617
+# - https://github.com/microsoft/terminal/pull/6618
+# - https://github.com/microsoft/terminal/pull/6489
+if ($env:WT_SESSION -and $IsLinux) {
+    Set-PSReadLineOption -Colors @{
+        Operator  = [ConsoleColor]::Magenta
+        Parameter = [ConsoleColor]::Magenta
+    }
+}
