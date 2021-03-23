@@ -34,6 +34,18 @@ echo '[apt] Installing package updates ...'
 apt-get -y dist-upgrade
 echo
 
+if dpkg -l | grep openssh-server > /dev/null; then
+    echo '[apt] Installing OpenSSH server ...'
+    apt-get -y install openssh-server
+    echo
+fi
+
+if dpkg -l | grep vim > /dev/null; then
+    echo '[apt] Installing Vim ...'
+    apt-get -y install vim
+    echo
+fi
+
 echo '[apt] Removing stale dependencies ...'
 apt-get -y autoremove
 echo
