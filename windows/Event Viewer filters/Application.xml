@@ -3,11 +3,15 @@
     <Select Path="Application">*</Select>
 
     <!--
-      Azure AD Sync
+      Sources with high volume informational events rarely of interest
 
-      Level:        Information
-
-      Extremely noisy when present; best to view in a dedicated custom view.
+      PROVIDER                                    DESCRIPTION
+      ADSync                                      Azure AD Sync
+      Directory Synchronization                   Azure AD Sync DirSync
+      edgeupdate                                  Edge Update
+      gupdate                                     Google Update
+      Microsoft-Windows-Security-SPP              Software Protection Platform
+      Outlook                                     Outlook
     -->
     <Suppress Path="Application">
       *[System[
@@ -15,6 +19,14 @@
           Provider[@Name='ADSync']
           or
           Provider[@Name='Directory Synchronization']
+          or
+          Provider[@Name='edgeupdate']
+          or
+          Provider[@Name='gupdate']
+          or
+          Provider[@Name='Microsoft-Windows-Security-SPP']
+          or
+          Provider[@Name='Outlook']
         )
         and
         Level=4
@@ -22,10 +34,9 @@
     </Suppress>
 
     <!--
-      Microsoft Monitoring Agent
-      https://feedback.azure.com/forums/267889-azure-monitor-log-analytics/suggestions/15703083-fix-bug-in-agent
+      Microsoft-Windows-COMRuntime error on your OMS agents
+      https://docs.microsoft.com/en-us/archive/blogs/msoms/microsoft-windows-comruntime-error-on-your-oms-agents
 
-      Level:        Error
       Data:         Com Call Wrapper Unmarshal Class 4.0
     -->
     <Suppress Path="Application">
@@ -35,11 +46,10 @@
     </Suppress>
 
     <!--
+      Security Configuration Editor Client
       Security policy in the Group policy objects has been applied successfully.
 
-      Level:        Information
-
-      Rarely of interest but often high volume, particularly on domain controllers.
+      Rarely of interest and high volume on domain controllers.
     -->
     <Suppress Path="Application">
       *[System[Provider[@Name='SceCli'] and EventID=1704]]
