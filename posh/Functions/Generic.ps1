@@ -347,6 +347,39 @@ Function Get-DirectorySummary {
 
 #region Formatting
 
+# Add quotes to strings with spaces
+Function Add-QuotesToStringWithSpace {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$String,
+
+        [ValidateSet('Single', 'Double')]
+        [String]$Type = 'Double'
+    )
+
+    Begin {
+        $Array = [Collections.ArrayList]::new()
+
+        switch ($Type) {
+            'Single' { $Quote = "'" }
+            'Double' { $Quote = '"' }
+        }
+    }
+
+    Process {
+        if ($String.Contains(' ')) {
+            $null = $Array.Add(('{0}{1}{0}' -f $Quote, $String))
+        } else {
+            $null = $Array.Add($String)
+        }
+    }
+
+    End {
+        return $Array
+    }
+}
+
 # Format a number representing the size of some digital information
 Function Format-SizeDigital {
     [CmdletBinding()]
