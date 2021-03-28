@@ -2,6 +2,7 @@
 Param(
     [Parameter(ParameterSetName = 'OptOut')]
     [ValidateSet(
+        'DiskCleanup',
         'DotNetFramework',
         'Office365',
         'PowerShell',
@@ -18,6 +19,7 @@ Param(
 
     [Parameter(ParameterSetName = 'OptIn', Mandatory = $true)]
     [ValidateSet(
+        'DiskCleanup',
         'DotNetFramework',
         'Office365',
         'PowerShell',
@@ -32,6 +34,29 @@ Param(
     )]
     [String[]]$IncludeTasks
 )
+
+Function Optimize-DiskCleanup {
+    [CmdletBinding()]
+    Param()
+
+    if (!(Get-Command -Name 'cleanmgr.exe' -ErrorAction SilentlyContinue)) {
+        Write-Host -ForegroundColor Yellow '[Windows] Skipping Disk Cleanup as unable to find cleanmgr.exe.'
+        return
+    }
+
+
+    Write-Host -ForegroundColor Green '[Windows] Running Disk Cleanup ...'
+    $ExcludeCategories = @(
+        'DownloadsFolder',
+        'Setup Log Files',
+        'Update Cleanup',
+        'Windows ESD installation files',
+        'Windows Upgrade Log Files'
+    )
+    Set-DiskCleanupProfile -Number 1000 -ExcludeCategories $ExcludeCategories
+    Start-Process -FilePath 'cleanmgr.exe' -ArgumentList '/sagerun:1000' -Wait
+    Remove-DiskCleanupProfile -Number 1000
+}
 
 Function Optimize-DotNetFramework {
     [CmdletBinding()]
@@ -217,31 +242,10 @@ Function Optimize-WindowsComponents {
         return
     }
 
-    Write-Host -ForegroundColor Green '[Windows] Configuring Disk Cleanup for Windows Update Cleanup task ...'
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Active Setup Temp Folders' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Downloaded Program Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Internet Cache Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Memory Dump Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Old ChkDsk Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Previous Installations' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Recycle Bin' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Service Pack Cleanup' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Setup Log Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\System error memory dump files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\System error minidump files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Temporary Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Temporary Setup Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Thumbnail Cache' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Update Cleanup' -Name StateFlags0001 -Type DWord -Value 2
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Upgrade Discarded Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Windows Error Reporting Archive Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Windows Error Reporting Queue Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Windows Error Reporting System Archive Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Windows Error Reporting System Queue Files' -Name StateFlags0001 -Type DWord -Value 0
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Windows Upgrade Log Files' -Name StateFlags0001 -Type DWord -Value 0
-
-    Write-Host -ForegroundColor Green '[Windows] Running Disk Cleanup with Windows Update Cleanup profile ...'
-    Start-Process -FilePath 'cleanmgr.exe' -ArgumentList '/sagerun:1' -Wait
+    Write-Host -ForegroundColor Green '[Windows] Running Disk Cleanup with Update Cleanup task ...'
+    Set-DiskCleanupProfile -Number 1000 -IncludeCategories 'Update Cleanup'
+    Start-Process -FilePath 'cleanmgr.exe' -ArgumentList '/sagerun:1000' -Wait
+    Remove-DiskCleanupProfile -Number 1000
 }
 
 Function Optimize-WindowsDefender {
@@ -497,6 +501,126 @@ Function Get-WindowsInfo {
     }
 }
 
+Function Remove-DiskCleanupProfile {
+    [CmdletBinding()]
+    Param(
+        [ValidateRange(0, 9999)]
+        [int]$Number
+    )
+
+    $BasePath = 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches'
+    $ValueName = 'StateFlags{0:D4}' -f $Number
+
+    $Categories = Get-ChildItem -Path $BasePath -ErrorAction SilentlyContinue
+    foreach ($Category in $Categories) {
+        if ($Category.Property -contains $ValueName) {
+            $RegPath = Join-Path -Path $BasePath -ChildPath $Category.PSChildName
+            Remove-ItemProperty -Path $RegPath -Name $ValueName
+        }
+    }
+}
+
+Function Set-DiskCleanupProfile {
+    <#
+        Known categories
+        - Active Setup Temp Folders
+        - BranchCache
+        - Content Indexer Cleaner
+        - D3D Shader Cache
+        - Delivery Optimization Files
+        - Device Driver Packages
+        - Diagnostic Data Viewer database files
+        - Downloaded Program Files
+        - DownloadsFolder
+        - GameNewsFiles
+        - GameStatisticsFiles
+        - GameUpdateFiles
+        - Internet Cache Files
+        - Language Pack
+        - Memory Dump Files
+        - Offline Pages Files
+        - Old ChkDsk Files
+        - Previous Installations
+        - Recycle Bin
+        - RetailDemo Offline Content
+        - Service Pack Cleanup
+        - Setup Log Files
+        - System error memory dump files
+        - System error minidump files
+        - Temporary Files
+        - Temporary Setup Files
+        - Temporary Sync Files
+        - Thumbnail Cache
+        - Update Cleanup
+        - Upgrade Discarded Files
+        - User file versions
+        - Windows Defender
+        - Windows Error Reporting Archive Files
+        - Windows Error Reporting Files
+        - Windows Error Reporting Queue Files
+        - Windows Error Reporting System Archive Files
+        - Windows Error Reporting System Queue Files
+        - Windows Error Reporting Temp Files
+        - Windows ESD installation files
+        - Windows Upgrade Log Files
+    #>
+
+    [CmdletBinding(DefaultParameterSetName = 'OptOut')]
+    Param(
+        [ValidateRange(0, 9999)]
+        [int]$Number,
+
+        [Parameter(ParameterSetName = 'OptOut')]
+        [String[]]$ExcludeCategories,
+
+        [Parameter(ParameterSetName = 'OptIn', Mandatory = $true)]
+        [String[]]$IncludeCategories
+    )
+
+    $BasePath = 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches'
+    $ValueName = 'StateFlags{0:D4}' -f $Number
+
+    try {
+        $BaseKey = Get-Item -Path $BasePath -ErrorAction Stop
+        $ValidCategories = $BaseKey.GetSubKeyNames()
+    } catch {
+        throw 'Failed to enumerate categories for Disk Cleanup tool.'
+    }
+
+    if ($PSCmdlet.ParameterSetName -eq 'OptOut') {
+        $CategoriesParameter = $ExcludeCategories
+    } else {
+        $CategoriesParameter = $IncludeCategories
+    }
+
+    $UnknownCategories = [Collections.ArrayList]::new()
+    foreach ($Category in $CategoriesParameter) {
+        if ($ValidCategories -notcontains $Category) {
+            $null = $UnknownCategories.Add($Category)
+        }
+    }
+
+    $UnknownCategories.Sort()
+    Write-Warning -Message ('Some Disk Cleanup categories will be ignored: {0}' -f [String]::Join(', ', $UnknownCategories))
+
+    if ($PSCmdlet.ParameterSetName -eq 'OptOut') {
+        $Categories = $ValidCategories | Where-Object { $CategoriesParameter -notcontains $_ }
+    } else {
+        $Categories = $IncludeCategories
+    }
+
+    foreach ($Category in $ValidCategories) {
+        $RegPath = Join-Path -Path $BasePath -ChildPath $Category
+        $ValueData = 0
+
+        if ($Categories -contains $Category) {
+            $ValueData = 2
+        }
+
+        Set-RegistryValue -Path $RegPath -Name $ValueName -Type DWord -Value $ValueData
+    }
+}
+
 Function Set-RegistryValue {
     [CmdletBinding()]
     Param(
@@ -579,7 +703,8 @@ $Tasks = @(
     'WindowsComponents',
     'DotNetFramework',
     'PowerShell',
-    'Office365'
+    'Office365',
+    'DiskCleanup'
 )
 
 foreach ($Task in $Tasks) {
