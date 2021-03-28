@@ -23,7 +23,7 @@ Function Convert-OpenSSLDerToPem {
     )
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params))
+    Write-Host ('openssl {0}' -f [String]::Join(' ', ($Params | Add-QuotesToStringWithSpace)))
     & openssl @Params
 }
 
@@ -46,7 +46,7 @@ Function Convert-OpenSSLPemToDer {
     )
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params))
+    Write-Host ('openssl {0}' -f [String]::Join(' ', ($Params | Add-QuotesToStringWithSpace)))
     & openssl @Params
 }
 
@@ -84,7 +84,7 @@ Function Convert-OpenSSLPemToPkcs12 {
     }
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params.ToArray()))
+    Write-Host ('openssl {0}' -f [String]::Join(' ', ($Params.ToArray() | Add-QuotesToStringWithSpace)))
     & openssl @Params
 }
 
@@ -121,7 +121,7 @@ Function Convert-OpenSSLPkcs12ToPem {
     }
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params.ToArray()))
+    Write-Host ('openssl {0}' -f [String]::Join(' ', ($Params.ToArray() | Add-QuotesToStringWithSpace)))
     & openssl @Params
 }
 
@@ -150,7 +150,7 @@ Function Get-OpenSSLCertificate {
     }
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params.ToArray()))
+    Write-Host ('openssl {0}' -f [String]::Join(' ', ($Params.ToArray() | Add-QuotesToStringWithSpace)))
     & openssl @Params
 }
 
@@ -180,7 +180,7 @@ Function Get-OpenSSLCsr {
     }
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params.ToArray()))
+    Write-Host ('openssl {0}' -f [String]::Join(' ', ($Params.ToArray() | Add-QuotesToStringWithSpace)))
     & openssl @Params
 }
 
@@ -199,7 +199,7 @@ Function Get-OpenSSLPkcs12 {
     )
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params))
+    Write-Host ('openssl {0}' -f [String]::Join(' ', ($Params | Add-QuotesToStringWithSpace)))
     & openssl @Params
 }
 
@@ -218,7 +218,7 @@ Function Get-OpenSSLPrivateKey {
     )
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params))
+    Write-Host ('openssl {0}' -f [String]::Join(' ', ($Params | Add-QuotesToStringWithSpace)))
     & openssl @Params
 }
 
@@ -287,6 +287,6 @@ Function New-OpenSSLCertificate {
     }
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f [String]::Join(' ', $Params.ToArray()))
+    Write-Host ('openssl {0}' -f [String]::Join(' ', ($Params.ToArray() | Add-QuotesToStringWithSpace)))
     & openssl @Params
 }
