@@ -227,18 +227,23 @@ Function New-OpenSSLCertificate {
     [CmdletBinding()]
     Param(
         [Parameter(ParameterSetName = 'Csr', Mandatory)]
-        [String]$Csr,
+        [Switch]$Csr,
 
-        [Parameter(ParameterSetName = 'Certificate', Mandatory)]
-        [String]$Certificate,
+        [Parameter(ParameterSetName = 'SelfSigned', Mandatory)]
+        [Switch]$SelfSigned,
 
         [Parameter(Mandatory)]
-        [String]$PrivateKey,
+        [String]$Name,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$CommonName,
+
+        [Switch]$NoMatchingSAN,
 
         [ValidateRange('Positive')]
         [Int]$KeySize,
 
-        [Parameter(ParameterSetName = 'Certificate', Mandatory)]
+        [Parameter(ParameterSetName = 'SelfSigned', Mandatory)]
         [ValidateRange('Positive')]
         [Int]$ValidDays = 365,
 
@@ -250,15 +255,18 @@ Function New-OpenSSLCertificate {
 
     if ($PSCmdlet.ParameterSetName -eq 'Csr') {
         $Type = '-new'
-        $Out = $Csr
+        $Out = ('{0}.csr' -f $Name)
     } else {
         $Type = '-x509'
-        $Out = $Certificate
+        $Out = ('{0}.cer' -f $Name)
     }
 
-    $KeyType = 'rsa'
+    $KeyOut = '{0}.key' -f $Name
+
     if ($KeySize) {
-        $KeyType += ':{0}' -f $KeySize
+        $KeyType = 'rsa:{0}' -f $KeySize
+    } else {
+        $KeyType = 'rsa'
     }
 
     $Params = [Collections.ArrayList]::new(
@@ -266,12 +274,24 @@ Function New-OpenSSLCertificate {
             'req',
             $Type,
             '-out', $Out,
-            '-keyout', $PrivateKey
+            '-keyout', $KeyOut,
             '-newkey', $KeyType
         )
     )
 
-    if ($PSCmdlet.ParameterSetName -eq 'Certificate') {
+    if ($CommonName) {
+        $Subject = '/CN={0}' -f $CommonName
+        $null = $Params.Add('-subj')
+        $null = $Params.Add($Subject)
+
+        if (!$NoMatchingSAN) {
+            $SAN = 'subjectAltName = DNS:{0}' -f $CommonName
+            $null = $Params.Add('-addext')
+            $null = $Params.Add($SAN)
+        }
+    }
+
+    if ($PSCmdlet.ParameterSetName -eq 'SelfSigned') {
         $null = $Params.Add('-sha256')
         $null = $Params.Add('-days')
         $null = $Params.Add($ValidDays)
