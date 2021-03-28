@@ -7,7 +7,6 @@ Param(
         'PowerShell',
         'WindowsComponents',
         'WindowsDefender',
-        'WindowsFeatures',
         'WindowsPower',
         'WindowsRestore',
         'WindowsSecurity',
@@ -24,7 +23,6 @@ Param(
         'PowerShell',
         'WindowsComponents',
         'WindowsDefender',
-        'WindowsFeatures',
         'WindowsPower',
         'WindowsRestore',
         'WindowsSecurity',
@@ -259,38 +257,6 @@ Function Optimize-WindowsDefender {
 
     Write-Host -ForegroundColor Green -NoNewline '[Windows Defender] Removing definitions ...'
     & $MpCmdRun -RemoveDefinitions -All
-    Write-Host
-}
-
-Function Optimize-WindowsFeatures {
-    [CmdletBinding()]
-    Param()
-
-    $DismParams = [Collections.ArrayList]@(
-        '/Online',
-        '/Enable-Feature',
-        '/FeatureName:NetFx3'
-    )
-
-    # The /All parameter is only available since Windows 8 and Server 2012
-    if ($Script:WindowsBuildNumber -ge '9200') {
-        $null = $DismParams.Add('/All')
-    }
-
-    # Windows Server 2019 requires access to the installation media as it seems
-    # the relevant files can't be automatically retrieved from Windows Update.
-    if ($Script:WindowsBuildNumber -eq '17763' -and $Script:WindowsProductType -ne 1) {
-        $SxsPath = 'D:\sources\sxs'
-        if (!(Test-Path -Path $SxsPath -PathType Container)) {
-            Write-Warning -Message ('Skipping .NET Framework 3.5 installation as sources path not present: {0}' -f $SxsPath)
-            return
-        }
-
-        $null = $DismParams.Add(('/Source:{0}' -f $SxsPath))
-    }
-
-    Write-Host -ForegroundColor Green -NoNewline '[Windows] Installing .NET Framework 3.5 ...'
-    Start-Process -FilePath 'dism.exe' -ArgumentList $DismParams -NoNewWindow -Wait
     Write-Host
 }
 
@@ -542,7 +508,6 @@ $Tasks = @(
     'WindowsRestore',
     'WindowsSettingsComputer',
     'WindowsSettingsUser',
-    'WindowsFeatures',
     'WindowsComponents',
     'DotNet',
     'PowerShell',
