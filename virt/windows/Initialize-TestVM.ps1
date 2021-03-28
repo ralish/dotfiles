@@ -278,38 +278,14 @@ Function Optimize-WindowsDefender {
 
     Write-Host -ForegroundColor Green '[Windows] Applying Defender settings ...'
 
-    # Disable behaviour monitoring
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableBehaviorMonitoring' -Type DWord -Value 1
-
-    # Disable downloaded files and attachments scanning
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableIOAVProtection' -Type DWord -Value 1
-
-    # Disable file and program activity monitoring
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableOnAccessProtection' -Type DWord -Value 1
+    # Disable Defender antivirus
+    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender' -Name 'DisableAntiSpyware' -Type DWord -Value 1
 
     # Disable real-time protection
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableRealtimeMonitoring' -Type DWord -Value 1
 
-    # Disable scheduled remediation scans
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Remediation' -Name 'Scan_ScheduleDay' -Type DWord -Value 8
-
     # Disable signature update before scheduled scan
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Scan' -Name 'CheckForSignaturesBeforeRunningScan' -Type DWord -Value 0
-
-    # Disable scheduled scans
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Scan' -Name 'ScheduleDay' -Type DWord -Value 8
-
-    # Disable scan on signature update
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'DisableScanOnUpdate' -Type DWord -Value 1
-
-    # Disable startup update on absent malware engine
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'DisableUpdateOnStartupWithoutEngine' -Type DWord -Value 1
-
-    # Disable scheduled signature updates
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'ScheduleDay' -Type DWord -Value 8
-
-    # Disable signature update on startup
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'UpdateOnStartUp' -Type DWord -Value 0
 
     # Disable Microsoft Active Protection Service
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Spynet' -Name 'SpynetReporting' -Type DWord -Value 0
@@ -317,12 +293,38 @@ Function Optimize-WindowsDefender {
     # Disable submission of file samples
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Spynet' -Name 'SubmitSamplesConsent' -Type DWord -Value 2
 
-    # Disable recent activity and scan results notifications
-    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows Defender Security Center\Virus and threat protection' -Name 'SummaryNotificationDisabled' -Type DWord -Value 1
+    if ($Script:WindowsBuildNumber -ge 9200) {
+        # Disable behaviour monitoring
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableBehaviorMonitoring' -Type DWord -Value 1
 
-    # Disable service
-    if ($Script:WindowsBuildNumber -le '17763') {
-        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender' -Name 'DisableAntiSpyware' -Type DWord -Value 1
+        # Disable downloaded files and attachments scanning
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableIOAVProtection' -Type DWord -Value 1
+
+        # Disable file and program activity monitoring
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableOnAccessProtection' -Type DWord -Value 1
+
+        # Disable scheduled remediation scans
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Remediation' -Name 'Scan_ScheduleDay' -Type DWord -Value 8
+
+        # Disable scheduled scans
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Scan' -Name 'ScheduleDay' -Type DWord -Value 8
+
+        # Disable scan on signature update
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'DisableScanOnUpdate' -Type DWord -Value 1
+
+        # Disable startup update on absent malware engine
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'DisableUpdateOnStartupWithoutEngine' -Type DWord -Value 1
+
+        # Disable scheduled signature updates
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'ScheduleDay' -Type DWord -Value 8
+
+        # Disable signature update on startup
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'UpdateOnStartUp' -Type DWord -Value 0
+    }
+
+    # Disable recent activity and scan results notifications
+    if ($Script:WindowsBuildNumber -ge 9200) {
+        Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows Defender Security Center\Virus and threat protection' -Name 'SummaryNotificationDisabled' -Type DWord -Value 1
     }
 
     Write-Host -ForegroundColor Green -NoNewline '[Windows] Removing Defender definitions ...'
@@ -400,7 +402,7 @@ Function Optimize-WindowsSettingsComputer {
     }
 
     # Do not display Server Manager automatically at logon
-    if ($Script:WindowsBuildNumber -ge 6001 -and $Script:WindowsProductType -ne 1) {
+    if ($Script:WindowsProductType -ne 1) {
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\Server\ServerManager' -Name 'DoNotOpenAtLogon' -Type DWord -Value 1
     }
 
@@ -431,13 +433,15 @@ Function Optimize-WindowsSettingsUser {
 
     Write-Host -ForegroundColor Green '[Windows] Applying user settings ...'
 
-    # Disable startup programs launch delay
-    Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize' -Name 'StartupDelayInMSec' -Type DWord -Value 0
-
     # Remove Recycle Bin desktop icon
     Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{645FF040-5081-101B-9F08-00AA002F954E}' -Type DWord -Value 1
     if ($Script:WindowsBuildNumber -lt 7600) {
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{645FF040-5081-101B-9F08-00AA002F954E}' -Type DWord -Value 1
+    }
+
+    # Disable startup programs launch delay
+    if ($Script:WindowsBuildNumber -ge 9200) {
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize' -Name 'StartupDelayInMSec' -Type DWord -Value 0
     }
 
     # Remove volume control icon
@@ -457,7 +461,7 @@ Function Optimize-WindowsUpdate {
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'NoAutoUpdate' -Type DWord -Value 1
 
     # Enable recommended updates
-    if ($Script:WindowsBuildNumber -ge 9600) {
+    if ($Script:WindowsBuildNumber -lt 10240) {
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'IncludeRecommendedUpdates' -Type DWord -Value 1
     }
 
