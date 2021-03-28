@@ -194,7 +194,7 @@ Function Optimize-PowerShell {
         }
     }
 
-    Write-Host -ForegroundColor Green '[PowerShell] Determining modules to install ...'
+    Write-Host -ForegroundColor Green '[PowerShell] Determining modules to update ...'
     $Modules = 'PSReadLine', 'PSWinGlue', 'PSWinVitals', 'PSWindowsUpdate', 'SpeculationControl'
     $ModulesLatest = Find-Module -Name $Modules -Repository PSGallery
     $ModulesInstall = [Collections.ArrayList]::new()
@@ -254,7 +254,7 @@ Function Optimize-WindowsDefender {
 
     $MpCmdRun = Join-Path -Path $env:ProgramFiles -ChildPath 'Windows Defender\MpCmdRun.exe'
     if (!(Test-Path -Path $MpCmdRun -PathType Leaf)) {
-        Write-Host -ForegroundColor Yellow '[Windows Defender] Skipping as unable to find MpCmdRun.exe.'
+        Write-Host -ForegroundColor Yellow '[Windows] Skipping Defender as unable to find MpCmdRun.exe.'
         return
     }
 
@@ -262,13 +262,13 @@ Function Optimize-WindowsDefender {
         try {
             $MpStatus = Get-MpComputerStatus -ErrorAction Stop
             if ($MpStatus.IsTamperProtected) {
-                Write-Host -ForegroundColor Yellow '[Windows Defender] Skipping as tamper protection is enabled.'
+                Write-Host -ForegroundColor Yellow '[Windows] Skipping Defender as tamper protection is enabled.'
                 return
             }
         } catch [Microsoft.Management.Infrastructure.CimException] {
             # The extrinsic Method could not be executed
             if ($_.FullyQualifiedErrorId -match '^MI RESULT 16,') {
-                Write-Host -ForegroundColor Yellow '[Windows Defender] Unable to query status as Get-MpComputerStatus returned: MI_RESULT_METHOD_NOT_AVAILABLE'
+                Write-Host -ForegroundColor Yellow '[Windows] Unable to query Defender status as Get-MpComputerStatus returned: MI_RESULT_METHOD_NOT_AVAILABLE'
             } else {
                 Write-Error -Message $_
                 return
@@ -276,7 +276,7 @@ Function Optimize-WindowsDefender {
         }
     }
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Applying settings ...'
+    Write-Host -ForegroundColor Green '[Windows] Applying Defender settings ...'
 
     # Disable behaviour monitoring
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableBehaviorMonitoring' -Type DWord -Value 1
@@ -325,7 +325,7 @@ Function Optimize-WindowsDefender {
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender' -Name 'DisableAntiSpyware' -Type DWord -Value 1
     }
 
-    Write-Host -ForegroundColor Green -NoNewline '[Windows Defender] Removing definitions ...'
+    Write-Host -ForegroundColor Green -NoNewline '[Windows] Removing Defender definitions ...'
     & $MpCmdRun -RemoveDefinitions -All
     Write-Host
 }
@@ -350,7 +350,7 @@ Function Optimize-WindowsRestore {
         return
     }
 
-    Write-Host -ForegroundColor Green '[Windows] Disabling System Restore ...'
+    Write-Host -ForegroundColor Green '[Windows] Applying System Restore settings ...'
     Disable-ComputerRestore -Drive $env:SystemDrive
 }
 
@@ -451,7 +451,7 @@ Function Optimize-WindowsUpdate {
     [CmdletBinding()]
     Param()
 
-    Write-Host -ForegroundColor Green '[Windows Update] Applying settings ...'
+    Write-Host -ForegroundColor Green '[Windows] Applying Windows Update settings ...'
 
     # Disable automatic updates
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'NoAutoUpdate' -Type DWord -Value 1
@@ -464,7 +464,7 @@ Function Optimize-WindowsUpdate {
     # Disable MSRT updates
     Set-RegistryValue -Path 'HKCU:\Software\Policies\Microsoft\MRT' -Name 'DontOfferThroughWUAU' -Type DWord -Value 1
 
-    Write-Host -ForegroundColor Green '[Windows Update] Registering Microsoft Update ...'
+    Write-Host -ForegroundColor Green '[Windows] Registering Microsoft Update ...'
     $ServiceManager = New-Object -ComObject Microsoft.Update.ServiceManager
     $ServiceRegistration = $ServiceManager.AddService2('7971f918-a847-4430-9279-4a52d1efe18d', 7, '')
     $null = [Runtime.InteropServices.Marshal]::FinalReleaseComObject($ServiceRegistration)
