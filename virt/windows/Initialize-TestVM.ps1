@@ -82,6 +82,11 @@ Function Optimize-Office365 {
     [CmdletBinding()]
     Param()
 
+    if ($Script:WindowsServerCore) {
+        Write-Warning -Message 'Skipping Office 365 settings as unsupported on Windows Server Core.'
+        return
+    }
+
     Write-Host -ForegroundColor Green '[Office 365] Disabling automatic updates ...'
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Office\16.0\Common\OfficeUpdate' -Name 'EnableAutomaticUpdates' -Type DWord -Value 0
 }
@@ -188,7 +193,7 @@ Function Optimize-WindowsDefender {
     }
 
     try {
-        Get-MpComputerStatus -ErrorAction Stop
+        $MpStatus = Get-MpComputerStatus -ErrorAction Stop
         if ($MpStatus.IsTamperProtected) {
             Write-Warning -Message 'Skipping Windows Defender settings as tamper protection is enabled.'
             return
@@ -305,7 +310,7 @@ Function Optimize-WindowsRestore {
     Param()
 
     if ($Script:WindowsProductType -ne 1) {
-        Write-Warning -Message 'Skipping disabling System Restore as unsupported on server SKUs.'
+        Write-Warning -Message 'Skipping System Restore settings as unsupported on Windows Server.'
         return
     }
 
@@ -316,8 +321,6 @@ Function Optimize-WindowsRestore {
 Function Optimize-WindowsSecurity {
     [CmdletBinding()]
     Param()
-
-    Test-Wow64Present
 
     Write-Host -ForegroundColor Green '[Windows] Applying security policy ...'
     $SecEditDb = Join-Path $env:windir 'Security\Local.sdb'
@@ -355,37 +358,52 @@ Function Optimize-WindowsSettingsComputer {
 
     Write-Host -ForegroundColor Green '[Windows] Applying computer settings ...'
 
-    # Disable automatic maintenance
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\ScheduledDiagnostics' -Name 'EnabledExecution' -Type DWord -Value 0
+    # Disable Shutdown Event Tracker
+    if (!$Script:WindowsServerCore) {
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows NT\Reliability' -Name 'ShutdownReasonOn' -Type DWord -Value 0
+    }
 
     # Do not display Server Manager automatically at logon
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\Server\ServerManager' -Name 'DoNotOpenAtLogon' -Type DWord -Value 1
+    if ($Script:WindowsBuildNumber -ge 6001 -and $Script:WindowsProductType -ne 1) {
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\Server\ServerManager' -Name 'DoNotOpenAtLogon' -Type DWord -Value 1
+    }
+
+    # Disable automatic maintenance
+    if ($Script:WindowsBuildNumber -ge 7600) {
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\ScheduledDiagnostics' -Name 'EnabledExecution' -Type DWord -Value 0
+    }
 
     # Disable Explorer SmartScreen
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\System' -Name 'EnableSmartScreen' -Type DWord -Value 0
-
-    # Disable Shutdown Event Tracker
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows NT\Reliability' -Name 'ShutdownReasonOn' -Type DWord -Value 0
+    if ($Script:WindowsBuildNumber -ge 9200 -and !$Script:WindowsServerCore) {
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\System' -Name 'EnableSmartScreen' -Type DWord -Value 0
+    }
 }
 
 Function Optimize-WindowsSettingsUser {
     [CmdletBinding()]
     Param()
 
+    if ($Script:WindowsServerCore) {
+        Write-Warning -Message 'Skipping user settings as not applicable to Windows Server Core.'
+        return
+    }
+
     Write-Host -ForegroundColor Green '[Windows] Applying user settings ...'
+
+    # Disable startup programs launch delay
+    Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize' -Name 'StartupDelayInMSec' -Type DWord -Value 0
+
+    # Remove Recycle Bin desktop icon
+    Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{645FF040-5081-101B-9F08-00AA002F954E}' -Type DWord -Value 1
+    if ($Script:WindowsBuildNumber -lt 7600) {
+        Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{645FF040-5081-101B-9F08-00AA002F954E}' -Type DWord -Value 1
+    }
 
     # Remove volume control icon
     $AudioSrv = Get-Service -Name AudioSrv -ErrorAction SilentlyContinue
     if ($AudioSrv.StartType -eq 'Disabled') {
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer' -Name 'HideSCAVolume' -Type DWord -Value 1
     }
-
-    # Remove Recycle Bin desktop icon
-    Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\ClassicStartMenu' -Name '{645FF040-5081-101B-9F08-00AA002F954E}' -Type DWord -Value 1
-    Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel' -Name '{645FF040-5081-101B-9F08-00AA002F954E}' -Type DWord -Value 1
-
-    # Disable startup programs launch delay
-    Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize' -Name 'StartupDelayInMSec' -Type DWord -Value 0
 }
 
 Function Optimize-WindowsUpdate {
@@ -395,17 +413,19 @@ Function Optimize-WindowsUpdate {
     Write-Host -ForegroundColor Green '[Windows Update] Disabling automatic updates ...'
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'NoAutoUpdate' -Type DWord -Value 1
 
-    Write-Host -ForegroundColor Green '[Windows Update] Enabling recommended updates ...'
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'IncludeRecommendedUpdates' -Type DWord -Value 1
+    if ($Script:WindowsBuildNumber -ge 9600) {
+        Write-Host -ForegroundColor Green '[Windows Update] Enabling recommended updates ...'
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'IncludeRecommendedUpdates' -Type DWord -Value 1
+    }
+
+    Write-Host -ForegroundColor Green '[Windows Update] Suppressing MSRT updates ...'
+    Set-RegistryValue -Path 'HKCU:\Software\Policies\Microsoft\MRT' -Name 'DontOfferThroughWUAU' -Type DWord -Value 1
 
     Write-Host -ForegroundColor Green '[Windows Update] Registering Microsoft Update ...'
     $ServiceManager = New-Object -ComObject Microsoft.Update.ServiceManager
     $ServiceRegistration = $ServiceManager.AddService2('7971f918-a847-4430-9279-4a52d1efe18d', 7, '')
     $null = [Runtime.InteropServices.Marshal]::FinalReleaseComObject($ServiceRegistration)
     $null = [Runtime.InteropServices.Marshal]::FinalReleaseComObject($ServiceManager)
-
-    Write-Host -ForegroundColor Green '[Windows Update] Suppressing MSRT updates ...'
-    Set-RegistryValue -Path 'HKCU:\Software\Policies\Microsoft\MRT' -Name 'DontOfferThroughWUAU' -Type DWord -Value 1
 }
 
 #region Utilities
@@ -423,6 +443,19 @@ Function Get-WindowsInfo {
 
     $Script:WindowsBuildNumber = [int]$Win32OpSys.BuildNumber
     $Script:WindowsProductType = $Win32OpSys.ProductType
+
+    if (Test-Path -Path 'HKLM:\Software\Wow6432Node\Microsoft\Windows NT\CurrentVersion' -PathType Container) {
+        $Script:Wow64Present = $true
+    } else {
+        $Script:Wow64Present = $false
+    }
+
+    $ExplorerPath = Join-Path -Path $env:windir -ChildPath 'explorer.exe'
+    if (Test-Path -Path $ExplorerPath -PathType Leaf) {
+        $Script:WindowsServerCore = $false
+    } else {
+        $Script:WindowsServerCore = $true
+    }
 }
 
 Function Set-RegistryValue {
@@ -462,7 +495,7 @@ Function Test-DotNetPresent {
 
     $ClrVersions = '2.0', '4.0'
     foreach ($ClrVersion in $ClrVersions) {
-        $VarName = 'DotNet{0}Present' -f $ClrVersion.Replace('.', '')
+        $VarName = 'DotNet{0}Present' -f $ClrVersion.Replace('.', $null)
         switch ($ClrVersion) {
             '2.0' { $RegPath = 'HKLM:\Software\Microsoft\NET Framework Setup\NDP\v2.0.50727' }
             '4.0' { $RegPath = 'HKLM:\Software\Microsoft\NET Framework Setup\NDP\v4\Full' }
@@ -486,17 +519,6 @@ Function Test-IsAdministrator {
         return $true
     }
     return $false
-}
-
-Function Test-Wow64Present {
-    [CmdletBinding()]
-    Param()
-
-    if (Test-Path -Path 'HKLM:\Software\Wow6432Node\Microsoft\Windows NT\CurrentVersion' -PathType Container) {
-        $Script:Wow64Present = $true
-    } else {
-        $Script:Wow64Present = $false
-    }
 }
 
 #endregion
