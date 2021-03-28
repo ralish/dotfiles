@@ -254,21 +254,21 @@ Function Optimize-WindowsDefender {
         return
     }
 
-    try {
-        $MpStatus = Get-MpComputerStatus -ErrorAction Stop
-        if ($MpStatus.IsTamperProtected) {
-            Write-Host -ForegroundColor Yellow '[Windows Defender] Skipping as tamper protection is enabled.'
-            return
-        }
-    } catch [Management.Automation.CommandNotFoundException] {
-        Write-Host -ForegroundColor Yellow '[Windows Defender] Unable to query status as Get-MpComputerStatus not available.'
-    } catch [Microsoft.Management.Infrastructure.CimException] {
-        # The extrinsic Method could not be executed
-        if ($_.FullyQualifiedErrorId -match '^MI RESULT 16,') {
-            Write-Host -ForegroundColor Yellow '[Windows Defender] Unable to query status as Get-MpComputerStatus returned: MI_RESULT_METHOD_NOT_AVAILABLE'
-        } else {
-            Write-Error -Message $_
-            return
+    if (Get-Command -Name 'Get-MpComputerStatus' -ErrorAction SilentlyContinue) {
+        try {
+            $MpStatus = Get-MpComputerStatus -ErrorAction Stop
+            if ($MpStatus.IsTamperProtected) {
+                Write-Host -ForegroundColor Yellow '[Windows Defender] Skipping as tamper protection is enabled.'
+                return
+            }
+        } catch [Microsoft.Management.Infrastructure.CimException] {
+            # The extrinsic Method could not be executed
+            if ($_.FullyQualifiedErrorId -match '^MI RESULT 16,') {
+                Write-Host -ForegroundColor Yellow '[Windows Defender] Unable to query status as Get-MpComputerStatus returned: MI_RESULT_METHOD_NOT_AVAILABLE'
+            } else {
+                Write-Error -Message $_
+                return
+            }
         }
     }
 
