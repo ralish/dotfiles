@@ -205,9 +205,43 @@ Function Optimize-WindowsComponents {
     [CmdletBinding()]
     Param()
 
-    Write-Host -ForegroundColor Green -NoNewline '[Windows] Performing component store clean-up ...'
-    & dism.exe /Online /Cleanup-Image /StartComponentCleanup
-    Write-Host
+    if ($Script:WindowsBuildNumber -ge 9200) {
+        Write-Host -ForegroundColor Green -NoNewline '[Windows] Performing component store clean-up ...'
+        & dism.exe /Online /Cleanup-Image /StartComponentCleanup
+        Write-Host
+        return
+    }
+
+    if (!(Get-Command -Name 'cleanmgr.exe' -ErrorAction SilentlyContinue)) {
+        Write-Host -ForegroundColor Yellow '[Windows] Skipping component store clean-up as unable to find cleanmgr.exe.'
+        return
+    }
+
+    Write-Host -ForegroundColor Green '[Windows] Configuring Disk Cleanup for Windows Update Cleanup task ...'
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Active Setup Temp Folders' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Downloaded Program Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Internet Cache Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Memory Dump Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Old ChkDsk Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Previous Installations' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Recycle Bin' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Service Pack Cleanup' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Setup Log Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\System error memory dump files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\System error minidump files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Temporary Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Temporary Setup Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Thumbnail Cache' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Update Cleanup' -Name StateFlags0001 -Type DWord -Value 2
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Upgrade Discarded Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Windows Error Reporting Archive Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Windows Error Reporting Queue Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Windows Error Reporting System Archive Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Windows Error Reporting System Queue Files' -Name StateFlags0001 -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Windows Upgrade Log Files' -Name StateFlags0001 -Type DWord -Value 0
+
+    Write-Host -ForegroundColor Green '[Windows] Running Disk Cleanup with Windows Update Cleanup profile ...'
+    Start-Process -FilePath 'cleanmgr.exe' -ArgumentList '/sagerun:1' -Wait
 }
 
 Function Optimize-WindowsDefender {
