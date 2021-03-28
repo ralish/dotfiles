@@ -2,7 +2,7 @@
 Param(
     [Parameter(ParameterSetName = 'OptOut')]
     [ValidateSet(
-        'DotNet',
+        'DotNetFramework',
         'Office365',
         'PowerShell',
         'WindowsComponents',
@@ -18,7 +18,7 @@ Param(
 
     [Parameter(ParameterSetName = 'OptIn', Mandatory = $true)]
     [ValidateSet(
-        'DotNet',
+        'DotNetFramework',
         'Office365',
         'PowerShell',
         'WindowsComponents',
@@ -33,14 +33,14 @@ Param(
     [String[]]$IncludeTasks
 )
 
-Function Optimize-DotNet {
+Function Optimize-DotNetFramework {
     [CmdletBinding()]
     Param()
 
     Test-DotNetPresent
 
     if ($Script:DotNet20Present) {
-        Write-Host -ForegroundColor Green '[DotNet] Applying .NET Framework 2.x/3.x settings ...'
+        Write-Host -ForegroundColor Green '[.NET Framework] Applying .NET Framework 2.x settings ...'
 
         # Enable strong cryptography
         Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v2.0.50727' -Name 'SchUseStrongCrypto' -Type DWord -Value 1
@@ -54,11 +54,11 @@ Function Optimize-DotNet {
             Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v2.0.50727' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
         }
     } else {
-        Write-Warning -Message 'Skipping .NET Framework 2.x/3.x settings as not installed.'
+        Write-Host -ForegroundColor Yellow '[.NET Framework] Skipping .NET Framework 2.x as not installed.'
     }
 
     if ($Script:DotNet40Present) {
-        Write-Host -ForegroundColor Green '[DotNet] Applying .NET Framework 4.x settings ...'
+        Write-Host -ForegroundColor Green '[.NET Framework] Applying .NET Framework 4.x settings ...'
 
         # Enable strong cryptography
         Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v4.0.30319' -Name 'SchUseStrongCrypto' -Type DWord -Value 1
@@ -72,7 +72,7 @@ Function Optimize-DotNet {
             Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v4.0.30319' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
         }
     } else {
-        Write-Warning -Message 'Skipping .NET Framework 4.x settings as not installed.'
+        Write-Host -ForegroundColor Yellow '[.NET Framework] Skipping .NET Framework 4.x as not installed.'
     }
 }
 
@@ -81,11 +81,13 @@ Function Optimize-Office365 {
     Param()
 
     if ($Script:WindowsServerCore) {
-        Write-Warning -Message 'Skipping Office 365 settings as unsupported on Windows Server Core.'
+        Write-Host -ForegroundColor Yellow '[Office 365] Skipping as unsupported on Windows Server Core.'
         return
     }
 
-    Write-Host -ForegroundColor Green '[Office 365] Disabling automatic updates ...'
+    Write-Host -ForegroundColor Green '[Office 365] Applying settings ...'
+
+    # Disable automatic updates
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Office\16.0\Common\OfficeUpdate' -Name 'EnableAutomaticUpdates' -Type DWord -Value 0
 }
 
@@ -214,72 +216,74 @@ Function Optimize-WindowsDefender {
 
     $MpCmdRun = Join-Path -Path $env:ProgramFiles -ChildPath 'Windows Defender\MpCmdRun.exe'
     if (!(Test-Path -Path $MpCmdRun -PathType Leaf)) {
-        Write-Warning -Message 'Skipping Windows Defender settings as unable to find MpCmdRun.exe.'
+        Write-Host -ForegroundColor Yellow '[Windows Defender] Skipping as unable to find MpCmdRun.exe.'
         return
     }
 
     try {
         $MpStatus = Get-MpComputerStatus -ErrorAction Stop
         if ($MpStatus.IsTamperProtected) {
-            Write-Warning -Message 'Skipping Windows Defender settings as tamper protection is enabled.'
+            Write-Host -ForegroundColor Yellow '[Windows Defender] Skipping as tamper protection is enabled.'
             return
         }
     } catch [Management.Automation.CommandNotFoundException] {
-        Write-Warning -Message 'Unable to query Windows Defender status as Get-MpComputerStatus command not available.'
+        Write-Host -ForegroundColor Yellow '[Windows Defender] Unable to query status as Get-MpComputerStatus not available.'
     } catch [Microsoft.Management.Infrastructure.CimException] {
         # The extrinsic Method could not be executed
         if ($_.FullyQualifiedErrorId -match '^MI RESULT 16,') {
-            Write-Warning -Message 'Unable to query Windows Defender status as Get-MpComputerStatus returned: MI_RESULT_METHOD_NOT_AVAILABLE'
+            Write-Host -ForegroundColor Yellow '[Windows Defender] Unable to query status as Get-MpComputerStatus returned: MI_RESULT_METHOD_NOT_AVAILABLE'
         } else {
             Write-Error -Message $_
             return
         }
     }
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling behaviour monitoring ...'
+    Write-Host -ForegroundColor Green '[Windows Defender] Applying settings ...'
+
+    # Disable behaviour monitoring
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableBehaviorMonitoring' -Type DWord -Value 1
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling downloaded files and attachments scanning ...'
+    # Disable downloaded files and attachments scanning
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableIOAVProtection' -Type DWord -Value 1
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling file and program activity monitoring ...'
+    # Disable file and program activity monitoring
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableOnAccessProtection' -Type DWord -Value 1
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling real-time protection ...'
+    # Disable real-time protection
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Real-Time Protection' -Name 'DisableRealtimeMonitoring' -Type DWord -Value 1
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling scheduled remediation scans ...'
+    # Disable scheduled remediation scans
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Remediation' -Name 'Scan_ScheduleDay' -Type DWord -Value 8
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling signature update before scheduled scan ...'
+    # Disable signature update before scheduled scan
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Scan' -Name 'CheckForSignaturesBeforeRunningScan' -Type DWord -Value 0
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling scheduled scans ...'
+    # Disable scheduled scans
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Scan' -Name 'ScheduleDay' -Type DWord -Value 8
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling scan on signature update ...'
+    # Disable scan on signature update
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'DisableScanOnUpdate' -Type DWord -Value 1
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling startup update on absent malware engine ...'
+    # Disable startup update on absent malware engine
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'DisableUpdateOnStartupWithoutEngine' -Type DWord -Value 1
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling scheduled signature updates ...'
+    # Disable scheduled signature updates
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'ScheduleDay' -Type DWord -Value 8
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling signature update on startup ...'
+    # Disable signature update on startup
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Signature Updates' -Name 'UpdateOnStartUp' -Type DWord -Value 0
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling Microsoft Active Protection Service ...'
+    # Disable Microsoft Active Protection Service
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Spynet' -Name 'SpynetReporting' -Type DWord -Value 0
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling submission of file samples ...'
+    # Disable submission of file samples
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender\Spynet' -Name 'SubmitSamplesConsent' -Type DWord -Value 2
 
-    Write-Host -ForegroundColor Green '[Windows Defender] Disabling recent activity and scan results notifications ...'
+    # Disable recent activity and scan results notifications
     Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows Defender Security Center\Virus and threat protection' -Name 'SummaryNotificationDisabled' -Type DWord -Value 1
 
+    # Disable service
     if ($Script:WindowsBuildNumber -le '17763') {
-        Write-Host -ForegroundColor Green '[Windows Defender] Disabling service ...'
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows Defender' -Name 'DisableAntiSpyware' -Type DWord -Value 1
     }
 
@@ -304,7 +308,7 @@ Function Optimize-WindowsRestore {
     Param()
 
     if ($Script:WindowsProductType -ne 1) {
-        Write-Warning -Message 'Skipping System Restore settings as unsupported on Windows Server.'
+        Write-Host -ForegroundColor Yellow '[Windows] Skipping System Restore as unsupported on Windows Server.'
         return
     }
 
@@ -317,8 +321,8 @@ Function Optimize-WindowsSecurity {
     Param()
 
     Write-Host -ForegroundColor Green '[Windows] Applying security policy ...'
-    $SecEditDb = Join-Path $env:windir 'Security\Local.sdb'
-    $SecEditCfg = Join-Path $env:windir 'Temp\SecPol.cfg'
+    $SecEditDb = Join-Path -Path $env:windir -ChildPath 'Security\Local.sdb'
+    $SecEditCfg = Join-Path -Path $env:windir -ChildPath 'Temp\SecPol.cfg'
 
     Write-Host -ForegroundColor Gray '[SecEdit] - Exporting current security policy ...'
     & SecEdit.exe /export /cfg $SecEditCfg /quiet
@@ -383,7 +387,7 @@ Function Optimize-WindowsSettingsUser {
     Param()
 
     if ($Script:WindowsServerCore) {
-        Write-Warning -Message 'Skipping user settings as not applicable to Windows Server Core.'
+        Write-Host -ForegroundColor Yellow '[Windows] Skipping user settings as not applicable to Windows Server Core.'
         return
     }
 
@@ -409,15 +413,17 @@ Function Optimize-WindowsUpdate {
     [CmdletBinding()]
     Param()
 
-    Write-Host -ForegroundColor Green '[Windows Update] Disabling automatic updates ...'
+    Write-Host -ForegroundColor Green '[Windows Update] Applying settings ...'
+
+    # Disable automatic updates
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'NoAutoUpdate' -Type DWord -Value 1
 
+    # Enable recommended updates
     if ($Script:WindowsBuildNumber -ge 9600) {
-        Write-Host -ForegroundColor Green '[Windows Update] Enabling recommended updates ...'
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'IncludeRecommendedUpdates' -Type DWord -Value 1
     }
 
-    Write-Host -ForegroundColor Green '[Windows Update] Suppressing MSRT updates ...'
+    # Disable MSRT updates
     Set-RegistryValue -Path 'HKCU:\Software\Policies\Microsoft\MRT' -Name 'DontOfferThroughWUAU' -Type DWord -Value 1
 
     Write-Host -ForegroundColor Green '[Windows Update] Registering Microsoft Update ...'
@@ -537,7 +543,7 @@ $Tasks = @(
     'WindowsSettingsComputer',
     'WindowsSettingsUser',
     'WindowsComponents',
-    'DotNet',
+    'DotNetFramework',
     'PowerShell',
     'Office365'
 )
