@@ -86,7 +86,6 @@
 
     // Features: Remote
     "remote.autoForwardPorts": false,
-    "remote.downloadExtensionsLocally": true,
 
     // Application: Update
     "update.mode": "start",
