@@ -93,8 +93,8 @@ Function Optimize-PowerShell {
     [CmdletBinding()]
     Param()
 
-    if (!($PSVersionTable.PSVersion.Major -ge 5)) {
-        Write-Warning 'Skipping PowerShell settings as version is not 5.0 or newer.'
+    if ($PSVersionTable.PSVersion.Major -lt 5) {
+        Write-Host -ForegroundColor Yellow '[PowerShell] Skipping as version is not at least v5.0.'
         return
     }
 
@@ -123,7 +123,7 @@ Function Optimize-PowerShell {
             $ProgressPreference = $ProgressPreferenceOriginal
 
             # There's some caching of package providers and I've yet to find a
-            # way to invalidate it other than restarting the session.
+            # way to invalidate it so we request the user restart the session.
             if (Get-Module -Name PowerShellGet) {
                 Write-Host -ForegroundColor Cyan '[PowerShell] You must restart PowerShell to complete NuGet package provider installation.'
                 Write-Host -ForegroundColor Cyan '             Re-run this script afterwards to continue initial PowerShell configuration.'
@@ -132,42 +132,70 @@ Function Optimize-PowerShell {
         }
     }
 
-    Write-Host -ForegroundColor Green '[PowerShell] Setting PSGallery repository to trusted ...'
-    $null = Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+    $PSGallery = Get-PSRepository -Name PSGallery
+    if ($PSGallery.InstallationPolicy -ne 'Trusted') {
+        Write-Host -ForegroundColor Green '[PowerShell] Setting PSGallery repository to trusted ...'
+        $null = Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+    }
 
-    Write-Host -ForegroundColor Green '[PowerShell] Installing PowerShellGet module ...'
+    Write-Host -ForegroundColor Green '[PowerShell] Checking PowerShellGet module ...'
+    $PSGetOutdated = $true
     $PSGetLoaded = Get-Module -Name PowerShellGet | Sort-Object -Property Version -Descending | Select-Object -First 1
-    Install-Module -Name PowerShellGet -Force
-    Import-Module -Name PowerShellGet -Force
-    $PSGetInstalled = Get-Module -Name PowerShellGet | Sort-Object -Property Version -Descending | Select-Object -First 1
+    if ($PSGetLoaded) {
+        $PSGetLatest = Find-Module -Name PowerShellGet
+        if ($PSGetLoaded.Version -ge $PSGetLatest.Version) {
+            $PSGetOutdated = $false
+        }
+    }
 
-    # PowerShellGet loads various .NET types, and types can't be unloaded (at
-    # least not easily). That can be problematic as when loading a new version
-    # of PowerShellGet into a session with an earlier version already loaded,
-    # some types may have been updated but cannot be loaded to replace earlier
-    # loaded types. The simple solution is to restart PowerShell so we have a
-    # new session which isn't "polluted" by earlier module imports.
-    if ($PSGetLoaded.Version -ne $PSGetInstalled.Version) {
-        Write-Host -ForegroundColor Cyan '[PowerShell] You must restart PowerShell to complete PowerShellGet module installation.'
-        Write-Host -ForegroundColor Cyan '             Re-run this script afterwards to continue initial PowerShell configuration.'
-        return
+    if ($PSGetOutdated) {
+        Write-Host -ForegroundColor Green '[PowerShell] Updating PowerShellGet module ...'
+        Install-Module -Name PowerShellGet -Force
+        Import-Module -Name PowerShellGet -Force
+        $PSGetImported = Get-Module -Name PowerShellGet | Sort-Object -Property Version -Descending | Select-Object -First 1
+
+        # PowerShellGet loads various .NET types, and types can't be unloaded
+        # (at least not easily). That can be problematic as when loading a new
+        # version of PowerShellGet into a session which has already imported an
+        # earlier version, some types may have been updated but cannot replace
+        # the previously loaded types. The solution is to restart PowerShell so
+        # we have a new session which isn't "polluted" by an earlier import.
+        if ($PSGetLoaded.Version -ne $PSGetImported.Version) {
+            Write-Host -ForegroundColor Cyan '[PowerShell] You must restart PowerShell to complete PowerShellGet module installation.'
+            Write-Host -ForegroundColor Cyan '             Re-run this script afterwards to continue initial PowerShell configuration.'
+            return
+        }
     }
 
     Write-Host -ForegroundColor Green '[PowerShell] Determining modules to install ...'
-    $Modules = @('SpeculationControl', 'PSWindowsUpdate', 'PSWinGlue', 'PSWinVitals')
-    if (!(Get-Module -Name PSReadLine)) {
-        $Modules += 'PSReadLine'
+    $Modules = 'PSReadLine', 'PSWinGlue', 'PSWinVitals', 'PSWindowsUpdate', 'SpeculationControl'
+    $ModulesLatest = Find-Module -Name $Modules -Repository PSGallery
+    $ModulesInstall = [Collections.ArrayList]::new()
+
+    foreach ($ModuleLatest in $ModulesLatest) {
+        $ModuleCurrent = Get-Module -Name $ModuleLatest.Name -ListAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1
+        if ($ModuleCurrent.Version -ge $ModuleLatest.Version) {
+            continue
+        }
+
+        if ($ModuleLatest.Name -eq 'PSReadLine') {
+            $PSReadLineOutdated = $true
+        } else {
+            $null = $ModulesInstall.Add($ModuleLatest.Name)
+        }
     }
 
-    Write-Host -ForegroundColor Green '[PowerShell] Installing modules ...'
-    foreach ($Module in $Modules) {
-        Write-Host -ForegroundColor Gray ('[PowerShell] - {0}' -f $Module)
-        $null = Install-Module -Name $Module -Force
+    if ($ModulesInstall.Count -ne 0) {
+        Write-Host -ForegroundColor Green '[PowerShell] Updating modules ...'
+        foreach ($Module in $ModulesInstall) {
+            Write-Host -ForegroundColor Gray ('[PowerShell] - {0}' -f $Module)
+            $null = Install-Module -Name $Module -Force
+        }
     }
 
-    if ($Modules -notcontains 'PSReadLine') {
+    if ($PSReadLineOutdated) {
         Write-Host -ForegroundColor Cyan '[PowerShell] To update PSReadLine run the following from an elevated Command Prompt:'
-        Write-Host -ForegroundColor Cyan '             powershell -NoProfile -NonInteractive -Command "Install-Module -Name PSReadLine -AllowPrerelease -Force"'
+        Write-Host -ForegroundColor Cyan '             powershell -NoProfile -NonInteractive -Command "Install-Module -Name PSReadLine -Force"'
     }
 }
 
