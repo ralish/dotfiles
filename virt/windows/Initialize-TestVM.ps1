@@ -377,6 +377,11 @@ Function Optimize-WindowsSettingsComputer {
     if ($Script:WindowsBuildNumber -ge 9200 -and !$Script:WindowsServerCore) {
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\System' -Name 'EnableSmartScreen' -Type DWord -Value 0
     }
+
+    # Only send security telemetry
+    if ($Script:WindowsBuildNumber -ge 10240) {
+        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\DataCollection' -Name 'AllowTelemetry' -Type DWord -Value 0
+    }
 }
 
 Function Optimize-WindowsSettingsUser {
