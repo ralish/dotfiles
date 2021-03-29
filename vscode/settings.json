@@ -156,6 +156,9 @@
     "python.pythonPath": "~/dotfiles/vscode/venv",
     "python.showStartPage": false,
 
+    // Extension: Red Hat Commons
+    "redhat.telemetry.enabled": false,
+
     // Extension: Select Line Status Bar
     "selectline.alignment": "right",
     "selectline.displayFormat": "%d lines",
