@@ -29,7 +29,9 @@
             "fontSize": 10,
 
             "useAcrylic": false,
-            "acrylicOpacity": 0.5
+            "acrylicOpacity": 0.5,
+
+            "bellStyle": "none"
         },
 
         "list": [
