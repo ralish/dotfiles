@@ -1,4 +1,28 @@
-# OS X files
+###############
+### Generic ###
+###############
+
+# Backups
+*.bak
+
+# Logs
+*.log
+log/
+logs/
+
+# Temporary
+*~
+*.tmp
+*.temp
+tmp/
+temp/
+
+
+#########################
+### Operating Systems ###
+#########################
+
+# macOS
 .AppleDB/
 .AppleDesktop/
 .AppleDouble/
@@ -18,23 +42,43 @@ Temporary Items/
 # Icon must end with two carriage returns (\r)
 Icon
 
-# Windows files
+# Windows
 $RECYCLE.BIN/
-Desktop.ini
+[Dd]esktop.ini
 ehthumbs.db
-Thumbs.db
+ehthumbs_vista.db
+[Tt]humbs.db
 
-# Log files
-*.log
-log/
-logs/
 
-# Temporary files
-*.tmp
-tmp/
+###############
+### Editors ###
+###############
 
-# Vim files
-*~
-*.swp
+# Vim
+.netrwhist
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]*.un~
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Visual Studio
+*.user
+.vs/
+
+# Visual Studio Code
+.vscode/ipch
+
+
+###################
+### Build Tools ###
+###################
+
+# MSBuild
+**/bin/Debug/
+**/bin/Release/
+**/obj/Debug/
+**/obj/Release/
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
