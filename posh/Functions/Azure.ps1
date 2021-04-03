@@ -106,6 +106,37 @@ Function Get-AzureAuthToken {
 
 #endregion
 
+#region Module management
+
+# Uninstall obsolete Microsoft Graph modules
+Function Uninstall-MSGraphObsoleteModules {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    $Modules = Get-Module -Name 'Microsoft.Graph.*' -ListAvailable -Verbose:$false
+    $ModuleNames = $Modules | Select-Object -ExpandProperty Name | Sort-Object -Unique
+    $UninstallVersions = [Collections.ArrayList]::new()
+
+    foreach ($ModuleName in $ModuleNames) {
+        $AllVersions = $Modules | Where-Object Name -EQ $ModuleName
+        $LatestVersion = $AllVersions | Sort-Object -Property Version | Select-Object -Last 1
+        $ObsoleteVersions = @($AllVersions | Where-Object Version -NE $LatestVersion.Version)
+
+        foreach ($ObsoleteVersion in $ObsoleteVersions) {
+            $null = $UninstallVersions.Add($ObsoleteVersion)
+        }
+    }
+
+    foreach ($UninstallVersion in $UninstallVersions) {
+        $NameWithVersion = '{0} {1}' -f $UninstallVersion.Name, $UninstallVersion.Version
+        if ($PSCmdlet.ShouldProcess($NameWithVersion, 'Uninstall-Module')) {
+            Uninstall-Module -Name $UninstallVersion.Name -RequiredVersion $UninstallVersion.Version -Force
+        }
+    }
+}
+
+#endregion
+
 #region Reporting
 
 # Retrieve filtered set of Azure AD enterprise applications

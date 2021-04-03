@@ -283,6 +283,9 @@ Function Update-PowerShell {
     }
 
     if ($PSCmdlet.ShouldProcess('Obsolete modules', 'Uninstall')) {
+        Write-Host -ForegroundColor Green 'Uninstalling obsolete Microsoft Graph modules ...'
+        Uninstall-MSGraphObsoleteModules
+
         if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
             Write-Host -ForegroundColor Green 'Uninstalling obsolete PowerShell modules ...'
             Uninstall-ObsoleteModule
