@@ -17,4 +17,9 @@ if command -v ag > /dev/null; then
     alias ag-todo="ag 'fixme|hack|todo'"
 fi
 
+# Common rg searches
+if command -v rg > /dev/null; then
+    alias rg-todo="rg 'fixme|hack|todo'"
+fi
+
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
