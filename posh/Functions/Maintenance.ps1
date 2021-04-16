@@ -396,9 +396,13 @@ Function Update-VisualStudio {
     $VsInstaller = Start-Process -FilePath $VsInstallerExe -ArgumentList $VsInstallerArgs -PassThru
     $VsInstaller.WaitForExit()
 
-    if ($VsInstaller.ExitCode -ne 0) {
-        Write-Error -Message ('Visual Studio Installer returned exit code: {0}' -f $VsInstaller.ExitCode)
-        return $false
+    switch ($VsInstaller.ExitCode) {
+        3010 { Write-Warning -Message 'Visual Studio successfully updated but requires a reboot.' }
+        0 { }
+        Default {
+            Write-Error -Message ('Visual Studio Installer returned exit code: {0}' -f $VsInstaller.ExitCode)
+            return $false
+        }
     }
 
     return $true
