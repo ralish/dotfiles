@@ -535,6 +535,9 @@ endif
 inoremap <C-U> <C-G>u<C-U>
 inoremap <C-W> <C-G>u<C-W>
 
+" Exit Vim even if we didn't release the Shift key
+cnoremap Q q
+
 " Write the current buffer via sudo
 cnoremap w!! w !sudo tee % > /dev/null
 
