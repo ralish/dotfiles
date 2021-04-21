@@ -132,8 +132,8 @@
         "MD026": { "punctuation": ".,;:!" }
     },
 
-    // Extension: PHP IntelliSense
-    "php.suggest.basic": false,
+    // Extension: PHP
+    "php.validate.executablePath": "C:/DevEnvs/PHP/php.exe",
 
     // Extension: PowerShell
     "powershell.codeFormatting.autoCorrectAliases": true,
