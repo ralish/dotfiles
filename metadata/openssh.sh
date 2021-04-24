@@ -18,7 +18,7 @@ OPENSSH_BANNER="$OPENSSH_TEMPLATES/banner"
 
 # Check for a supported version
 ssh_version=$(ssh -V 2>&1 | grep -Eo '^OpenSSH_[0-9]\.[0-9]' | cut -c 9-)
-ssh_template=$(printf '%s/ssh_config.%s' "$OPENSSH_TEMPLATES" "${ssh_version//.}")
+ssh_template=$(printf '%s/ssh_config.%s' "$OPENSSH_TEMPLATES" "${ssh_version//./}")
 if ! [[ -f $ssh_template ]]; then
     printf 'Unsupported OpenSSH version: %s\n' "$ssh_version"
     exit "$DETECTION_NO_LOGIC"

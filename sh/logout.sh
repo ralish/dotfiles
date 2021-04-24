@@ -9,7 +9,7 @@ if [ -d "$HOME/.ecryptfs" ]; then
     if tmux ls > /dev/null 2>&1; then
         rm "$HOME/.ecryptfs/auto-umount"
         count="$(cat "/dev/shm/ecryptfs-$USER-Private")"
-        count="$((count-1))"
+        count="$((count - 1))"
         echo "$count" > "/dev/shm/ecryptfs-$USER-Private"
     else
         touch "$HOME/.ecryptfs/auto-umount"

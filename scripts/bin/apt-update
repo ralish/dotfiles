@@ -21,16 +21,16 @@ function early_init() {
     # Determine the physical directory this script resides in. This approach is
     # necessarily clumsy as simple methods like "readlink -f" and "realpath"
     # are not platform independent. We have to work on Linux, BSD, OS X, etc...
-    readonly script_real_path="$(perl -MCwd -le 'print Cwd::abs_path(shift)' \
-                                 "${BASH_SOURCE[0]}")"
-    readonly script_real_dir="$(dirname "$script_real_path")"
-    readonly script_real_name="$(basename "$script_real_path")"
+    script_real_path="$(perl -MCwd -le 'print Cwd::abs_path(shift)' "${BASH_SOURCE[0]}")"
+    script_real_dir="$(dirname "$script_real_path")"
+    script_real_name="$(basename "$script_real_path")"
+    readonly script_real_path script_real_dir script_real_name
 
     # Dotfiles directory path & name
-    readonly dotfiles_path="$(cd -P "$script_real_dir/../../" && pwd)"
-    readonly dotfiles_name="$(basename "$dotfiles_path")"
+    dotfiles_path="$(cd -P "$script_real_dir/../../" && pwd)"
+    dotfiles_name="$(basename "$dotfiles_path")"
+    readonly dotfiles_path dotfiles_name
 }
-
 
 # DESC: Main control flow
 # ARGS: $@ (optional): Arguments provided to the script
@@ -83,7 +83,6 @@ function main() {
 
     pretty_print '*** Done!'
 }
-
 
 # Perform system update
 main "$@"

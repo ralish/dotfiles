@@ -31,9 +31,9 @@ update-ssh-auth-sock() {
                                 -type s \
                                 -uid "$uid" \
                                 -printf '%T+ %p\n' 2> /dev/null)"
-        ssh_latest_agent="$(echo "$ssh_agents" | sort -n -r \
-                                               | head -n 1 \
-                                               | cut -d' ' -f2)"
+        ssh_latest_agent="$(echo "$ssh_agents" | sort -n -r |
+                                                 head -n 1 |
+                                                 cut -d' ' -f2)"
 
         if [ -n "$ssh_latest_agent" ]; then
             screen setenv SSH_AUTH_SOCK "$ssh_latest_agent"

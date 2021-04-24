@@ -23,22 +23,22 @@ function parse_params() {
         param="$1"
         shift
         case $param in
-            -h|--help)
+            -h | --help)
                 script_usage
                 exit 0
                 ;;
-            -q|--quiet)
+            -q | --quiet)
                 quiet=true
                 ;;
-            -f|--fast)
-                ;;
-            -a|--all)
+            -f | --fast) ;;
+            -a | --all)
                 full_search=true
                 ;;
             *)
                 echo "Invalid parameter was provided: $param"
                 exit 1
-            esac
+                ;;
+        esac
     done
 }
 
@@ -62,7 +62,7 @@ else
 fi
 
 if [[ -n $quiet ]]; then
-    exec 4>&2 2>/dev/null
+    exec 4>&2 2> /dev/null
 fi
 
 search_results=$(find "$search_path" -name '*.old*' -or \
@@ -72,11 +72,11 @@ search_results=$(find "$search_path" -name '*.old*' -or \
                                      -name '*.ucf-dist*' -or \
                                      -name '*.ucf-new*' -or \
                                      -name '*.ucf-old*' -or \
-                                     -name '*.distUpgrade' \
-                                     || true )
+                                     -name '*.distUpgrade' ||
+                                        true)
 
 if [[ -n $quiet ]]; then
-    exec 2>&4 4>/dev/null
+    exec 2>&4 4> /dev/null
 fi
 
 if [[ -n $search_results ]]; then

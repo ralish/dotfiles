@@ -36,7 +36,6 @@ Usage:
 EOF
 }
 
-
 # DESC: Parameter parser
 # ARGS: $@ (optional): Arguments provided to the script
 # OUTS: Variables indicating command-line parameters and options
@@ -50,26 +49,26 @@ function parse_params() {
         param="$1"
         shift
         case $param in
-            -h|--help)
+            -h | --help)
                 script_usage
                 exit 0
                 ;;
-            -v|--verbose)
+            -v | --verbose)
                 verbose=true
                 ;;
-            -nc|--no-colour)
+            -nc | --no-colour)
                 no_colour=true
                 ;;
-            -i|--install)
+            -i | --install)
                 stow_method=install
                 ;;
-            -r|--reinstall)
+            -r | --reinstall)
                 stow_method=reinstall
                 ;;
-            -u|--uninstall)
+            -u | --uninstall)
                 stow_method=uninstall
                 ;;
-            -dr|--detection-report)
+            -dr | --detection-report)
                 detection_report=true
                 ;;
             *)
@@ -78,7 +77,6 @@ function parse_params() {
         esac
     done
 }
-
 
 # DESC: Find some important paths we need before script_init() is called
 # ARGS: None
@@ -92,20 +90,20 @@ function early_init() {
     # Determine the physical directory this script resides in. This approach is
     # necessarily clumsy as simple methods like "readlink -f" and "realpath"
     # are not platform independent. We have to work on Linux, BSD, OS X, etc...
-    readonly script_real_path="$(perl -MCwd -le 'print Cwd::abs_path(shift)' \
-                                 "${BASH_SOURCE[0]}")"
-    readonly script_real_dir="$(dirname "$script_real_path")"
-    readonly script_real_name="$(basename "$script_real_path")"
+    script_real_path="$(perl -MCwd -le 'print Cwd::abs_path(shift)' "${BASH_SOURCE[0]}")"
+    script_real_dir="$(dirname "$script_real_path")"
+    script_real_name="$(basename "$script_real_path")"
+    readonly script_real_path script_real_dir script_real_name
 
     # Dotfiles directory path & name
-    readonly dotfiles_path="$(cd -P "$script_real_dir/../../" && pwd)"
-    readonly dotfiles_name="$(basename "$dotfiles_path")"
+    dotfiles_path="$(cd -P "$script_real_dir/../../" && pwd)"
+    dotfiles_name="$(basename "$dotfiles_path")"
+    readonly dotfiles_path dotfiles_name
 
     # Source in common metadata functions
     # shellcheck source=metadata/templates/common.sh
     source "$dotfiles_path/$META_DIR/templates/common.sh"
 }
-
 
 # DESC: Create some directories in advance so stow doesn't symlink them
 # ARGS: $@ (required): Directories to be created
@@ -119,14 +117,12 @@ function create_dirs() {
     done
 }
 
-
 # DESC: Quick, simple & dirty sorting of arguments
 # ARGS: $@ (required): Arguments to be sorted
 # OUTS: None
 function sort_args() {
     printf '%s ' "$@" | xargs -n 1 | sort | xargs
 }
-
 
 # DESC: Detect the status of each component
 # ARGS: None
@@ -142,9 +138,9 @@ function detect_components() {
     pretty_print '*** Detecting applicable dotfiles components ...'
 
     local comp_list comp_name comp_path detect_status
-    declare -g -a stow_list detect_success detect_failure detect_ignore \
-                  detect_always_install detect_never_install \
-                  detect_not_available detect_no_logic
+    declare -g -a stow_list \
+        detect_success detect_failure detect_ignore detect_always_install \
+        detect_never_install detect_not_available detect_no_logic
 
     comp_list="$(find "$dotfiles_path" \
                     -maxdepth 1 \
@@ -185,7 +181,6 @@ function detect_components() {
         fi
     done
 }
-
 
 # DESC: Output a report with the results of component detection
 # ARGS: None
@@ -250,7 +245,6 @@ function detect_report() {
     fi
 }
 
-
 # DESC: Invokes the stow executable on detected components
 # ARGS: $1 (required): The operation type (-S, -D or -R)
 # OUTS: $stow_success: Array of components Stow successfully installed
@@ -283,7 +277,6 @@ function stow_components() {
         printf '%b%s%b\n' "$fg_green" "$stow_result" "$ta_none"
     fi
 }
-
 
 # DESC: Main control flow
 # ARGS: $@ (optional): Arguments provided to the script
@@ -331,7 +324,6 @@ function main() {
             ;;
     esac
 }
-
 
 # Stow all the things!
 main "$@"
