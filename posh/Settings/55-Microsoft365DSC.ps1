@@ -13,6 +13,7 @@ try {
     Test-ModuleAvailable -Name Microsoft365DSC
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping Microsoft365DSC settings as module not found.')
+    $Error.RemoveAt(0)
     return
 }
 

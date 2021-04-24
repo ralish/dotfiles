@@ -12,6 +12,7 @@ try {
     }
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of Active Directory functions.')
+    $Error.RemoveAt(0)
     return
 }
 

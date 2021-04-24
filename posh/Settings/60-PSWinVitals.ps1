@@ -12,6 +12,7 @@ try {
     }
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSWinVitals settings as module not found.')
+    $Error.RemoveAt(0)
     return
 }
 

@@ -8,6 +8,7 @@ try {
     }
 } catch {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of AWS functions.')
+    $Error.RemoveAt(0)
     return
 }
 
