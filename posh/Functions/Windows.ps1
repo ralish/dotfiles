@@ -81,6 +81,215 @@ Function Set-EnvironmentVariable {
 
 #region Event logs
 
+# dmesg for Windows!
+Function dmesg {
+    Find-WinEvent -Filter '*Kernel*' -OutputFormat PlainText @args
+}
+
+# Find events by filtering against logs and providers
+Function Find-WinEvent {
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Filter,
+
+        [ValidateNotNullOrEmpty()]
+        [DateTime]$StartTime,
+
+        [Parameter(ParameterSetName = 'SeverityLevel', Mandatory)]
+        [ValidateSet('Any', 'Critical', 'Error', 'Warning', 'Info', 'Verbose')]
+        [String[]]$SeverityLevels,
+
+        [Parameter(ParameterSetName = 'MinSeverity', Mandatory)]
+        [ValidateSet('Any', 'Critical', 'Error', 'Warning', 'Info', 'Verbose')]
+        [String]$MinSeverityLevel,
+
+        [ValidateSet('EventLogRecord', 'PlainText')]
+        [ValidateNotNullOrEmpty()]
+        [String]$OutputFormat = 'EventLogRecord',
+
+        [Switch]$Force
+    )
+
+    $Events = [Collections.ArrayList]::new()
+    $LogGroups = [Collections.ArrayList]::new()
+
+    # EventLevel Enum
+    # https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.tracing.eventlevel
+    $EventLevelToInt = @{
+        Any      = 0
+        Critical = 1
+        Error    = 2
+        Warning  = 3
+        Info     = 4
+        Verbose  = 5
+    }
+
+    $EventLevelToName = @(
+        'Any'
+        'Critical'
+        'Error'
+        'Warning'
+        'Info'
+        'Verbose'
+    )
+
+    # Default to boot time as start time
+    if (!$PSBoundParameters.ContainsKey('StartTime')) {
+        $StartTime = (Get-CimInstance -ClassName Win32_OperatingSystem).LastBootUpTime
+    }
+
+    # Configure event severity filtering
+    if ($PSCmdlet.ParameterSetName -eq 'SeverityLevel') {
+        $EventLevels = [Collections.ArrayList]::new()
+        foreach ($Severity in $SeverityLevel) {
+            $null = $EventLevels.Add($EventLevelToInt[$Severity])
+        }
+    } elseif ($PSCmdlet.ParameterSetName -eq 'MinSeverity') {
+        $EventLevels = 0..$EventLevelToInt[$MinSeverity]
+    } else {
+        $EventLevels = 0..($EventLevelToInt.Count - 1)
+    }
+
+    # Retrieve all matching event logs
+    $EventLogs = Get-WinEvent -ListLog $Filter -Force:$Force | Where-Object LogName -NE 'Security'
+
+    # Group Administrative & Operational logs
+    $LogGroup = @($EventLogs | Where-Object LogType -In @('Administrative', 'Operational'))
+    if ($LogGroup.Count -gt 0) {
+        $null = $LogGroups.Add($LogGroup)
+    }
+
+    # Group Analytical & Debug logs (requires different handling)
+    if ($Force) {
+        $LogGroup = @($EventLogs | Where-Object LogType -In @('Analytical', 'Debug'))
+        if ($LogGroup.Count -gt 0) {
+            $null = $LogGroups.Add($LogGroup)
+        }
+    }
+
+    if ($LogGroups.Count -eq 0) {
+        Write-Error -Message 'No event logs matched the provided filter.'
+        return
+    }
+
+    # Retrieve events from matching event logs
+    foreach ($LogGroup in $LogGroups) {
+        $EventFilter = @{
+            LogName   = $LogGroup.LogName
+            Level     = $EventLevels
+            StartTime = $StartTime
+        }
+
+        $EventParams = @{
+            FilterHashtable = $EventFilter
+            Oldest          = $false
+        }
+
+        # Analytical & Debug logs must be read in forward chronological order
+        if ($LogGroup.LogType -contains @('Analytical', 'Debug')) {
+            $EventParams['Oldest'] = $true
+        }
+
+        try {
+            $FoundEvents = Get-WinEvent @EventParams -ErrorAction Stop
+            foreach ($Event in $FoundEvents) {
+                $null = $Events.Add($Event)
+            }
+        } catch {
+            $Ex = $_
+            switch -Regex ($_.FullyQualifiedErrorId) {
+                '^NoMatchingEventsFound,' { continue }
+                default {
+                    Write-Warning -Message $Ex.Exception.Message
+                    continue
+                }
+            }
+        }
+    }
+
+    # Retrieve all matching event providers
+    $EventProviders = Get-WinEvent -ListProvider $Filter -ErrorAction Ignore
+
+    # For each matching event provider, record which event logs it outputs to,
+    # excluding those which match the filter in their name (already retrieved).
+    $OtherLogs = @{}
+    foreach ($Provider in $EventProviders) {
+        $LogLinks = $Provider.LogLinks | Where-Object LogName -NotLike $Filter
+        foreach ($Log in $LogLinks) {
+            if ($OtherLogs[$Log.LogName]) {
+                $OtherLogs[$Log.LogName] += $Provider.Name
+            } else {
+                $OtherLogs[$Log.LogName] = @($Provider.Name)
+            }
+        }
+    }
+
+    # Retrieve matching provider events being logged to other event logs
+    foreach ($LogName in $OtherLogs.Keys) {
+        try {
+            $Log = Get-WinEvent -ListLog $LogName -Force:$Force -ErrorAction Stop
+        } catch {
+            Write-Warning -Message $_.Exception.Message
+            continue
+        }
+
+        $EventFilter = @{
+            LogName      = $LogName
+            ProviderName = $OtherLogs[$LogName]
+            Level        = $EventLevels
+            StartTime    = $StartTime
+        }
+
+        $EventParams = @{
+            FilterHashtable = $EventFilter
+            Oldest          = $false
+        }
+
+        # Analytical & Debug logs must be read in forward chronological order
+        if ($Log.LogType -Contains @('Analytical', 'Debug')) {
+            $EventParams['Oldest'] = $true
+        }
+
+        try {
+            $FoundEvents = Get-WinEvent @EventParams -ErrorAction Stop
+            foreach ($Event in $FoundEvents) {
+                $null = $Events.Add($Event)
+            }
+        } catch {
+            $Ex = $_
+            switch -Regex ($_.FullyQualifiedErrorId) {
+                '^NoMatchingEventsFound,' { continue }
+                default {
+                    Write-Warning -Message $Ex.Exception.Message
+                    continue
+                }
+            }
+        }
+    }
+
+    # Sort all the retrieved events
+    $SortedEvents = $Events | Sort-Object -Property TimeCreated
+
+    # Perform any output conversion
+    if ($OutputFormat -eq 'EventLogRecord') {
+        $Events = $SortedEvents
+    } else {
+        $Events = [Collections.ArrayList]::new()
+        foreach ($Event in $SortedEvents) {
+            $Time = $Event.TimeCreated
+            $Level = $EventLevelToName[$Event.Level].ToUpper()
+            $Message = $Event.Message.Split([Environment]::NewLine).Trim() | Where-Object { $_.Length -ne 0 }
+
+            $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, [String]::Join(' - ', $Message)
+
+            $null = $Events.Add($Text)
+        }
+    }
+
+    return $Events
+}
+
 # Watch an Event Log (similar to Unix "tail")
 # Slightly improved from: https://stackoverflow.com/a/15262376/8787985
 Function Watch-EventLog {
