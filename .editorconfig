@@ -36,7 +36,18 @@ insert_final_newline = false
 trim_trailing_whitespace = false
 
 # Shell scripts
-[{*/bin/*,*.sh,.bashrc,.mk-sbuild.rc,.quiltrc,user-dirs.dirs}]
+[{*.sh,.bashrc,.mk-sbuild.rc,.quiltrc,user-dirs.dirs}]
+max_line_length = 79
+keep_padding = true             # shfmt: -kp
+space_redirects = true          # shfmt: -sr
+switch_case_indent = true       # shfmt: -ci
+
+# Shell scripts: bin/
+#
+# Matching on a pattern with a path separator alongside other patterns
+# via curly braces doesn't appear to be possible. So sadly, we have to
+# duplicate the above section for matching files under "bin/" dirs.
+[**/bin/*]
 max_line_length = 79
 keep_padding = true             # shfmt: -kp
 space_redirects = true          # shfmt: -sr
