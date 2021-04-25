@@ -59,14 +59,21 @@ Function Test-ModuleAvailable {
         [String[]]$Name,
 
         [ValidateSet('Any', 'All')]
-        [String]$Require = 'All'
+        [String]$Require = 'All',
+
+        [Switch]$ReturnName
     )
+
+    if ($ReturnName -and $Require -ne 'Any') {
+        throw 'The ReturnName switch is only valid when Require is Any.'
+    }
 
     foreach ($Module in $Name) {
         Write-Debug -Message ('Checking module is available: {0}' -f $Module)
         if (Get-Module -Name $Module -ListAvailable -Verbose:$false) {
             $ModuleAvailable = $true
             if ($Require -eq 'Any') {
+                $ModuleAvailableName = $Module
                 break
             }
         } else {
@@ -84,5 +91,9 @@ Function Test-ModuleAvailable {
         } else {
             throw ('Required module not available: {0}' -f $ModuleMissingName)
         }
+    }
+
+    if ($ReturnName) {
+        return $ModuleAvailableName
     }
 }
