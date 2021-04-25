@@ -19,8 +19,18 @@ Function Get-AzureAuthHeader {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult]$AuthToken
+        [Object]$AuthToken
     )
+
+    try {
+        $CorrectType = $AuthToken -is [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult]
+    } catch {
+        throw 'Unable to locate Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult type.'
+    }
+
+    if (!$CorrectType) {
+        throw 'AuthToken must be an Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult type.'
+    }
 
     $AuthHeader = @{
         Authorization  = $AuthToken.CreateAuthorizationHeader()
@@ -154,11 +164,21 @@ Function Get-AzureEnterpriseApplications {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult]$AuthToken,
+        [Object]$AuthToken,
 
         [ValidateSet('All', 'Enterprise', 'Microsoft')]
         [String]$AppType = 'Enterprise'
     )
+
+    try {
+        $CorrectType = $AuthToken -is [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult]
+    } catch {
+        throw 'Unable to locate Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult type.'
+    }
+
+    if (!$CorrectType) {
+        throw 'AuthToken must be an Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult type.'
+    }
 
     switch ($AppType) {
         'Enterprise' { $AppTypeId = 0 }

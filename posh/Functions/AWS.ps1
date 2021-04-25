@@ -26,10 +26,20 @@ Function Set-AWSCredentialEnvironment {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [Amazon.SecurityToken.Model.Credentials]$Credential
+        [Object]$Credential
     )
 
     Process {
+        try {
+            $CorrectType = $Credential -is [Amazon.SecurityToken.Model.Credentials]
+        } catch {
+            throw 'Unable to locate Amazon.SecurityToken.Model.Credentials type.'
+        }
+
+        if (!$CorrectType) {
+            throw 'Credential must be an Amazon.SecurityToken.Model.Credentials type.'
+        }
+
         $env:AWS_ACCESS_KEY_ID = $Credential.AccessKeyId
         $env:AWS_SECRET_ACCESS_KEY = $Credential.SecretAccessKey
         $env:AWS_SESSION_TOKEN = $Credential.SessionToken
@@ -45,7 +55,7 @@ Function Set-R53HostedZoneNameTag {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [Amazon.Route53.Model.HostedZone[]]$HostedZone
+        [Object[]]$HostedZone
     )
 
     Begin {
@@ -58,6 +68,11 @@ Function Set-R53HostedZoneNameTag {
 
     Process {
         foreach ($Zone in $HostedZone) {
+            if ($Zone -isnot [Amazon.Route53.Model.HostedZone]) {
+                Write-Error -Message 'Skipping zone which is not an Amazon.Route53.Model.HostedZone type.'
+                continue
+            }
+
             $ResourceId = $Zone.Id.Replace('/hostedzone/', [String]::Empty)
             $Tag.Value = $Zone.Name.TrimEnd('.')
 
@@ -259,7 +274,7 @@ Function Set-R53HostedZoneTag {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [Amazon.Route53.Model.HostedZone[]]$HostedZone,
+        [Object[]]$HostedZone,
 
         [Parameter(Mandatory)]
         [String]$Key,
@@ -280,6 +295,11 @@ Function Set-R53HostedZoneTag {
 
     Process {
         foreach ($Zone in $HostedZone) {
+            if ($Zone -isnot [Amazon.Route53.Model.HostedZone]) {
+                Write-Error -Message 'Skipping zone which is not an Amazon.Route53.Model.HostedZone type.'
+                continue
+            }
+
             $ResourceId = $Zone.Id.Replace('/hostedzone/', [String]::Empty)
 
             if ($PSCmdlet.ShouldProcess($Zone.Name, 'Set {0} tag' -f $Tag.Key)) {
