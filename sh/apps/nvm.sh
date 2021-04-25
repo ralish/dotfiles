@@ -8,6 +8,12 @@ nvm_completion="$nvm_dir/bash_completion"
 if [ -s "$nvm_script" ]; then
     export NVM_DIR="$nvm_dir"
 
+    # nvm is incompatible with NPM_CONFIG_PREFIX:
+    # https://github.com/nvm-sh/nvm#compatibility-issues
+    if [ -n "$NPM_CONFIG_PREFIX" ]; then
+        unset NPM_CONFIG_PREFIX
+    fi
+
     # shellcheck source=/dev/null
     . "$nvm_script"
 
