@@ -1,4 +1,4 @@
-# shellcheck shell=sh disable=SC2039
+# shellcheck shell=sh disable=SC3033
 
 # When reattaching to a screen or tmux session the SSH_AUTH_SOCK environment
 # variable in existing shells will typically be incorrect. This is because the

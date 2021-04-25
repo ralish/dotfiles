@@ -17,7 +17,7 @@ if [ -d "$HOME/.ecryptfs" ]; then
 fi
 
 # Clear the console on exit if this is not a nested shell session
-# shellcheck disable=SC2039
+# shellcheck disable=SC3028
 if [ "${SHLVL:-1}" = 1 ]; then
     clear_console="$(command -v clear_console > /dev/null)"
     if [ -n "$clear_console" ]; then

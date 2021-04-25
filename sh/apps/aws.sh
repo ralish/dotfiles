@@ -11,7 +11,7 @@ if command -v aws > /dev/null; then
         fi
 
         if [ -n "$BASH" ] || [ -n "$ZSH_NAME" ]; then
-            # shellcheck disable=SC2039
+            # shellcheck disable=SC3044
             complete -C aws_completer aws
         fi
     fi
