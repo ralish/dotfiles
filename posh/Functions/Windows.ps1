@@ -276,13 +276,17 @@ Function Find-WinEvent {
         $Events = $SortedEvents
     } else {
         $Events = [Collections.ArrayList]::new()
+        $DateFormat = 'yyyy/MM/dd hh:mm:ss tt'
+        $StringSplitOptions = [StringSplitOptions]::RemoveEmptyEntries -bor [StringSplitOptions]::TrimEntries
+        $PrefixWhitespace = ' ' * ('[{0}] {1,-8} -> ' -f (Get-Date).ToString($DateFormat), $EventLevelToName[0]).Length
+        $MultilinePrefix = '{0}{1}' -f [Environment]::NewLine, $PrefixWhitespace
+
         foreach ($Event in $SortedEvents) {
-            $Time = $Event.TimeCreated
+            $Time = $Event.TimeCreated.ToString($DateFormat)
             $Level = $EventLevelToName[$Event.Level].ToUpper()
-            $Message = $Event.Message.Split([Environment]::NewLine).Trim() | Where-Object { $_.Length -ne 0 }
+            $Message = @($Event.Message.Split("`r`n", $StringSplitOptions).Split("`n", $StringSplitOptions))
 
-            $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, [String]::Join(' - ', $Message)
-
+            $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, [String]::Join($MultilinePrefix, $Message)
             $null = $Events.Add($Text)
         }
     }
