@@ -68,9 +68,13 @@ Function Get-AzureAuthToken {
         Test-ModuleAvailable -Name $ModuleName
     }
 
-    $AdalModule = Get-Module -Name $ModuleName -ListAvailable
-    $AdalModulePath = $AdalModule.ModuleBase
+    # Try to handle multiple module versions being present
+    $AdalModule = Get-Module -Name $ModuleName | Select-Object -First 1
+    if (!$AdalModule) {
+        $AdalModule = Get-Module -Name $ModuleName -ListAvailable | Select-Object -First 1
+    }
 
+    $AdalModulePath = $AdalModule.ModuleBase
     $AdalAsmName = 'Microsoft.IdentityModel.Clients.ActiveDirectory.dll'
     $AdalAsmPath = Join-Path -Path $AdalModulePath -ChildPath $AdalAsmName
     if (Test-Path -LiteralPath $AdalAsmPath) {
