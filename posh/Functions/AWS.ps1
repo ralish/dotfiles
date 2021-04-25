@@ -49,7 +49,8 @@ Function Set-R53HostedZoneNameTag {
     )
 
     Begin {
-        Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any
+        $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -ReturnName
+        Import-Module -Name $Module -ErrorAction Stop
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = 'Name'
@@ -102,7 +103,8 @@ Function Set-R53HostedZoneParkedRecords {
         [String[]]$RedirectCloudFrontRecordTypes = 'A'
     )
 
-    Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any
+    $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -ReturnName
+    Import-Module -Name $Module -ErrorAction Stop
 
     try {
         $Zones = Get-R53HostedZoneList -ErrorAction Stop
@@ -268,7 +270,8 @@ Function Set-R53HostedZoneTag {
     )
 
     Begin {
-        Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any
+        $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -ReturnName
+        Import-Module -Name $Module -ErrorAction Stop
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = $Key
@@ -296,10 +299,12 @@ Function Get-S3BucketSize {
     Param()
 
     try {
-        Test-ModuleAvailable -Name AWS.Tools.CloudWatch, AWS.Tools.EC2, AWS.Tools.S3
+        $Module = 'AWS.Tools.CloudWatch', 'AWS.Tools.EC2', 'AWS.Tools.S3'
+        Test-ModuleAvailable -Name $Module
     } catch {
-        Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any
+        $Module = Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any -ReturnName
     }
+    Import-Module -Name $Module -ErrorAction Stop
 
     try {
         Write-Verbose -Message 'Retrieving enabled regions ...'
