@@ -19,6 +19,11 @@ if (Test-IsWindows) {
         Remove-Item -LiteralPath Alias:\curl -ErrorAction Ignore
     }
 
+    # Remove the diff alias if the real deal is present
+    if (Get-Command -Name diff.exe -ErrorAction Ignore) {
+        Remove-Item -LiteralPath Alias:\diff -Force -ErrorAction Ignore
+    }
+
     # Remove the sc alias in favour of the sc.exe utility
     if (Get-Command -Name sc.exe -ErrorAction Ignore) {
         Remove-Item -LiteralPath Alias:\sc -ErrorAction Ignore
