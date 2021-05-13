@@ -83,7 +83,7 @@
     "terminal.integrated.cursorStyle": "line",
     "terminal.integrated.fontFamily": "Hack NF",
     "terminal.integrated.rightClickBehavior": "paste",
-    "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+    "terminal.integrated.defaultProfile.windows": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
 
     // Features: Remote
     "remote.autoForwardPorts": false,
