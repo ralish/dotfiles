@@ -41,6 +41,7 @@
     "files.trimTrailingWhitespace": true,
 
     // Workbench
+    "workbench.editor.untitled.hint": "hidden",
     "workbench.enableExperiments": false,
     "workbench.startupEditor": "readme",
     "workbench.editorAssociations": [
