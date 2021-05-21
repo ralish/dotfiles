@@ -160,6 +160,10 @@
     // Extension: Red Hat Commons
     "redhat.telemetry.enabled": false,
 
+    // Extension: Remote - Containers
+    "dotfiles.repository": "https://github.com/ralish/dotfiles.git",
+    "dotfiles.installCommand": "dot-update -a",
+
     // Extension: Select Line Status Bar
     "selectline.alignment": "right",
     "selectline.displayFormat": "%d lines",
