@@ -95,6 +95,17 @@
     "telemetry.enableCrashReporter": false,
     "telemetry.enableTelemetry": false,
 
+    // Built-in extension: Git
+    "git.autoStash": true,
+    "git.enableSmartCommit": true,
+    "git.timeline.date": "authored",
+
+    // Built-in extension: PHP Language Features
+    "php.validate.executablePath": "C:\\DevEnvs\\PHP\\php.exe",
+
+    // Built-in extension: TypeScript and JavaScript Language Features
+    "typescript.surveys.enabled": false,
+
     // Extension: C/C++
     "C_Cpp.autoAddFileAssociations": false,
     "C_Cpp.loggingLevel": "Warning",
@@ -116,6 +127,9 @@
     // Extension: GitLens
     "gitlens.defaultDateStyle": "absolute",
 
+    // Extension: Java Extension Pack
+    "java.help.showReleaseNotes": false,
+
     // Extension: Language Support for Java(TM) by Red Hat
     "java.configuration.checkProjectSettingsExclusions": false,
     "java.project.importHint": false,
@@ -132,9 +146,6 @@
         // Trailing punctuation in header
         "MD026": { "punctuation": ".,;:!" }
     },
-
-    // Extension: PHP
-    "php.validate.executablePath": "C:/DevEnvs/PHP/php.exe",
 
     // Extension: PowerShell
     "powershell.codeFormatting.autoCorrectAliases": true,
@@ -161,23 +172,26 @@
     "redhat.telemetry.enabled": false,
 
     // Extension: Remote - Containers
-    "dotfiles.repository": "https://github.com/ralish/dotfiles.git",
     "dotfiles.installCommand": "dot-update -a",
+    "dotfiles.repository": "ralish/dotfiles",
+
+    // Extension: Remote - WSL
+    "remote.WSL.useShellEnvironment": false,
 
     // Extension: Select Line Status Bar
     "selectline.alignment": "right",
     "selectline.displayFormat": "%d lines",
     "selectline.statusbarPriority": 200,
 
-    // Extension: shellcheck
+    // Extension: shell-format
+    "shellformat.useEditorConfig": true,
+
+    // Extension: ShellCheck
     "shellcheck.customArgs": [
         // Permit following source directives
         "-x"
     ],
     "shellcheck.useWorkspaceRootAsCwd": true,
-
-    // Extension: shell-format
-    "shellformat.useEditorConfig": true,
 
     // Extension: SonarLint
     "sonarlint.disableTelemetry": true,
@@ -222,13 +236,12 @@
     // Extension: XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
     "xmlTools.removeCommentsOnMinify": true,
-    "xmlTools.splitXmlnsOnFormat": false,
 
     // Extension: YAML
     "yaml.format.singleQuote": true,
 
     "[git-commit]": {
-        // Enable Rewrap extension to automatically wrap commit messages
+        // Configure Rewrap extension
         "rewrap.autoWrap.enabled": true,
         "rewrap.wrappingColumn": 72
     },
@@ -236,11 +249,6 @@
     "[html]": {
         // Use VS Code's built-in formatter
         "editor.defaultFormatter": "vscode.html-language-features"
-    },
-
-    "[jinja]": {
-        // Workaround for bug in SaltStack extension
-        "editor.autoClosingBrackets": "never"
     },
 
     "[json]": {
@@ -254,6 +262,9 @@
     },
 
     "[markdown]": {
+        // Use Markdown All in One extension for formatting
+        "editor.defaultFormatter": "yzhang.markdown-all-in-one",
+
         // Trailing whitespace has special meaning
         "files.trimTrailingWhitespace": false
     },
@@ -266,12 +277,12 @@
     },
 
     "[xml]": {
-        // Use Red Hat's XML extension for formatting
+        // Use Red Hat XML extension for formatting
         "editor.defaultFormatter": "redhat.vscode-xml"
     },
 
     "[yaml]": {
-        // Use Red Hat's YAML extension for formatting
+        // Use Red Hat YAML extension for formatting
         "editor.defaultFormatter": "redhat.vscode-yaml"
     }
 }
