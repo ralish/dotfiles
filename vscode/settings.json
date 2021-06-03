@@ -175,6 +175,11 @@
     "dotfiles.installCommand": "dot-update -a",
     "dotfiles.repository": "ralish/dotfiles",
 
+    // Extension: Remote - SSH
+    "remote.SSH.defaultExtensions": [
+        "tomoki1207.selectline-statusbar"
+    ],
+
     // Extension: Remote - WSL
     "remote.WSL.useShellEnvironment": false,
 
