@@ -1,0 +1,18 @@
+{
+    "$schema": "https://aka.ms/winget-settings.schema.json",
+
+    "installBehavior": {
+        "preferences": {
+            "locale": ["en-AU", "en-GB", "en-US"],
+            "scope": "user"
+        }
+    },
+
+    "telemetry": {
+        "disable": true
+    },
+
+    "visual": {
+        "progressBar": "accent"
+    }
+}
