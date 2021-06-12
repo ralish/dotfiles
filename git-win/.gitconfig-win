@@ -16,7 +16,7 @@
 	# Enable symlink support (needs SeCreateSymbolicLinkPrivilege)
 	symlinks = true
 	# Enable the built-in file system monitor daemon
-	useBuiltinFSMonitor = true
+	#useBuiltinFSMonitor = true
 	# Potential whitespace problems which git diff should highlight
 	whitespace = blank-at-eol,space-before-tab,blank-at-eof,cr-at-eol
 
