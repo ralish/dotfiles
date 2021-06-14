@@ -44,16 +44,10 @@
     "workbench.editor.untitled.hint": "hidden",
     "workbench.enableExperiments": false,
     "workbench.startupEditor": "readme",
-    "workbench.editorAssociations": [
-        {
-            "viewType": "default",
-            "filenamePattern": "git-rebase-todo"
-        },
-        {
-            "viewType": "jupyter.notebook.ipynb",
-            "filenamePattern": "*.ipynb"
-        }
-    ],
+    "workbench.editorAssociations": {
+        "git-rebase-todo": "default",
+        "*.ipynb": "jupyter.notebook.ipynb"
+    },
 
     // Workbench: Appearance
     "workbench.iconTheme": "vscode-icons",
@@ -83,7 +77,7 @@
     "terminal.integrated.cursorStyle": "line",
     "terminal.integrated.fontFamily": "Hack NF",
     "terminal.integrated.rightClickBehavior": "paste",
-    "terminal.integrated.defaultProfile.windows": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
 
     // Features: Remote
     "remote.autoForwardPorts": false,
