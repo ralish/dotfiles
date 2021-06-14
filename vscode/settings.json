@@ -177,6 +177,9 @@
     // Extension: Remote - WSL
     "remote.WSL.useShellEnvironment": false,
 
+    // Extension: Remote Repositories
+    "remoteHub.search.download.enabled": true,
+
     // Extension: Select Line Status Bar
     "selectline.alignment": "right",
     "selectline.displayFormat": "%d lines",
