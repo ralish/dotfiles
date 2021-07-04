@@ -1,0 +1,8 @@
+[
+    // Close window on Ctrl+W when there's nothing open
+    {
+        "key": "ctrl+w",
+        "command": "workbench.action.closeWindow",
+        "when": "!editorIsOpen && !multipleEditorGroups"
+    }
+]
