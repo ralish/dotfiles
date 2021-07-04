@@ -293,8 +293,8 @@ Function Connect-AzureAD {
         [PSCredential]$Credential
     )
 
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'AzureAD module is incompatible with PowerShell Core.'
+    if ($PSVersionTable.PSVersion.Major -ge 7) {
+        Write-Error -Message 'AzureAD module is incompatible with PowerShell 7+.'
         return
     }
 
