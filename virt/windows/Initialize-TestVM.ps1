@@ -113,7 +113,8 @@ Function Optimize-Office365 {
     Write-Host -ForegroundColor Green '[Office 365] Applying settings ...'
 
     # Disable automatic updates
-    Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Office\16.0\Common\OfficeUpdate' -Name 'EnableAutomaticUpdates' -Type DWord -Value 0
+    Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Office\ClickToRun\Configuration' -Name 'UpdatesEnabled' -Type String -Value 'False'
+    #Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Office\16.0\Common\OfficeUpdate' -Name 'EnableAutomaticUpdates' -Type DWord -Value 0
 }
 
 Function Optimize-PowerShell {
@@ -403,21 +404,28 @@ Function Optimize-WindowsSettingsComputer {
 
     # Do not display Server Manager automatically at logon
     if ($Script:WindowsProductType -ne 1) {
+        # The Server Manager UI only disables at the user scope
+        #Set-RegistryValue -Path 'HKCU:\Software\Microsoft\ServerManager' -Name 'DoNotOpenServerManagerAtLogon' -Type DWord -Value 1
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\Server\ServerManager' -Name 'DoNotOpenAtLogon' -Type DWord -Value 1
     }
 
     # Disable automatic maintenance
     if ($Script:WindowsBuildNumber -ge 7600) {
-        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\ScheduledDiagnostics' -Name 'EnabledExecution' -Type DWord -Value 0
+        Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance' -Name 'MaintenanceDisabled ' -Type DWord -Value 1
+        #Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\ScheduledDiagnostics' -Name 'EnabledExecution' -Type DWord -Value 0
     }
 
     # Disable Explorer SmartScreen
     if ($Script:WindowsBuildNumber -ge 9200 -and !$Script:WindowsServerCore) {
+        # Suppressing the warning when disabled via the Settings UI is non-trivial
+        #Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer' -Name 'SmartScreenEnabled' -Type String -Value 'Off'
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\System' -Name 'EnableSmartScreen' -Type DWord -Value 0
     }
 
     # Only send security telemetry
     if ($Script:WindowsBuildNumber -ge 10240) {
+        # The Settings UI doesn't support the Security telemetry level
+        #Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\DataCollection' -Name 'AllowTelemetry' -Type DWord -Value 0
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\DataCollection' -Name 'AllowTelemetry' -Type DWord -Value 0
     }
 }
@@ -447,6 +455,7 @@ Function Optimize-WindowsSettingsUser {
     # Remove volume control icon
     $AudioSrv = Get-Service -Name AudioSrv -ErrorAction SilentlyContinue
     if ($AudioSrv.StartType -eq 'Disabled') {
+        # Unclear how the equivalent UI setting is set
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer' -Name 'HideSCAVolume' -Type DWord -Value 1
     }
 }
@@ -458,11 +467,14 @@ Function Optimize-WindowsUpdate {
     Write-Host -ForegroundColor Green '[Windows] Applying Windows Update settings ...'
 
     # Disable automatic updates
+    # Unclear if the UI setting supports disabling automatic updates on all Windows releases
+    #Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -Name 'AUOptions' -Type DWord -Value 1
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'NoAutoUpdate' -Type DWord -Value 1
 
     # Enable recommended updates
     if ($Script:WindowsBuildNumber -lt 10240) {
-        Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'IncludeRecommendedUpdates' -Type DWord -Value 1
+        Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -Name 'IncludeRecommendedUpdates' -Type DWord -Value 1
+        #Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'IncludeRecommendedUpdates' -Type DWord -Value 1
     }
 
     # Disable MSRT updates
