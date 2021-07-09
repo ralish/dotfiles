@@ -13,9 +13,8 @@ if [[ $lsb_release_id != Ubuntu ]]; then
     exit 1
 fi
 
-ubuntu_codename="$(lsb_release -s -c)"
-
 echo '[apt] Switching to local mirror ... '
+ubuntu_codename="$(lsb_release -s -c)"
 if ! [[ $ubuntu_codename == lucid ]]; then
     sed -i 's/http:\/\/\([a-z]\{2\}\.\)\?\(archive\.ubuntu\.com\)/http:\/\/au\.\2/' /etc/apt/sources.list
 else
@@ -34,13 +33,13 @@ echo '[apt] Installing package updates ...'
 apt-get -y dist-upgrade
 echo
 
-if dpkg -l | grep openssh-server > /dev/null; then
+if ! dpkg -l | grep openssh-server > /dev/null; then
     echo '[apt] Installing OpenSSH server ...'
     apt-get -y install openssh-server
     echo
 fi
 
-if dpkg -l | grep vim > /dev/null; then
+if ! dpkg -l | grep vim > /dev/null; then
     echo '[apt] Installing Vim ...'
     apt-get -y install vim
     echo
