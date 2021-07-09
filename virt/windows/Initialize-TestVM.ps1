@@ -70,13 +70,13 @@ Function Optimize-DotNetFramework {
         # Enable strong cryptography
         Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v2.0.50727' -Name 'SchUseStrongCrypto' -Type DWord -Value 1
         if ($Script:Wow64Present) {
-            Set-RegistryValue -Path 'HKLM:\Software\Wow6432Node\Microsoft\.NETFramework\v2.0.50727' -Name 'SchUseStrongCrypto' -Type DWord -Value 1
+            Set-RegistryValue -Path 'HKLM:\Software\WOW6432Node\Microsoft\.NETFramework\v2.0.50727' -Name 'SchUseStrongCrypto' -Type DWord -Value 1
         }
 
         # Let OS choose protocols
         Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v2.0.50727' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
         if ($Script:Wow64Present) {
-            Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v2.0.50727' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
+            Set-RegistryValue -Path 'HKLM:\Software\WOW6432Node\Microsoft\.NETFramework\v2.0.50727' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
         }
     } else {
         Write-Host -ForegroundColor Yellow '[.NET Framework] Skipping .NET Framework 2.x as not installed.'
@@ -88,13 +88,13 @@ Function Optimize-DotNetFramework {
         # Enable strong cryptography
         Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v4.0.30319' -Name 'SchUseStrongCrypto' -Type DWord -Value 1
         if ($Script:Wow64Present) {
-            Set-RegistryValue -Path 'HKLM:\Software\Wow6432Node\Microsoft\.NETFramework\v4.0.30319' -Name 'SchUseStrongCrypto' -Type DWord -Value 1
+            Set-RegistryValue -Path 'HKLM:\Software\WOW6432Node\Microsoft\.NETFramework\v4.0.30319' -Name 'SchUseStrongCrypto' -Type DWord -Value 1
         }
 
         # Let OS choose protocols
         Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v4.0.30319' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
         if ($Script:Wow64Present) {
-            Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v4.0.30319' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
+            Set-RegistryValue -Path 'HKLM:\Software\WOW6432Node\Microsoft\.NETFramework\v4.0.30319' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
         }
     } else {
         Write-Host -ForegroundColor Yellow '[.NET Framework] Skipping .NET Framework 4.x as not installed.'
@@ -386,7 +386,7 @@ Function Optimize-WindowsSecurity {
     # Set WinHTTP default protocols to: TLS 1.0, TLS 1.1, TLS 1.2
     Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\WinHttp' -Name 'DefaultSecureProtocols' -Type DWord -Value 2688
     if ($Script:Wow64Present) {
-        Set-RegistryValue -Path 'HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Internet Settings\WinHttp' -Name 'DefaultSecureProtocols' -Type DWord -Value 2688
+        Set-RegistryValue -Path 'HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Internet Settings\WinHttp' -Name 'DefaultSecureProtocols' -Type DWord -Value 2688
     }
 }
 
@@ -491,7 +491,7 @@ Function Get-WindowsInfo {
     $Script:WindowsBuildNumber = [int]$Win32OpSys.BuildNumber
     $Script:WindowsProductType = $Win32OpSys.ProductType
 
-    if (Test-Path -Path 'HKLM:\Software\Wow6432Node\Microsoft\Windows NT\CurrentVersion' -PathType Container) {
+    if (Test-Path -Path 'HKLM:\Software\WOW6432Node\Microsoft\Windows NT\CurrentVersion' -PathType Container) {
         $Script:Wow64Present = $true
     } else {
         $Script:Wow64Present = $false
