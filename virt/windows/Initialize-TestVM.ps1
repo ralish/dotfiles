@@ -198,7 +198,7 @@ Function Optimize-PowerShell {
     Write-Host -ForegroundColor Green '[PowerShell] Determining modules to update ...'
     $Modules = 'PSReadLine', 'PSWinGlue', 'PSWinVitals', 'PSWindowsUpdate', 'SpeculationControl'
     $ModulesLatest = Find-Module -Name $Modules -Repository PSGallery
-    $ModulesInstall = [Collections.ArrayList]::new()
+    $ModulesInstall = New-Object -TypeName Collections.ArrayList
 
     foreach ($ModuleLatest in $ModulesLatest) {
         $ModuleCurrent = Get-Module -Name $ModuleLatest.Name -ListAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1
@@ -609,7 +609,7 @@ Function Set-DiskCleanupProfile {
         $CategoriesParameter = $IncludeCategories
     }
 
-    $UnknownCategories = [Collections.ArrayList]::new()
+    $UnknownCategories = New-Object -TypeName Collections.ArrayList
     foreach ($Category in $CategoriesParameter) {
         if ($ValidCategories -notcontains $Category) {
             $null = $UnknownCategories.Add($Category)
@@ -617,7 +617,9 @@ Function Set-DiskCleanupProfile {
     }
 
     $UnknownCategories.Sort()
-    Write-Warning -Message ('Some Disk Cleanup categories will be ignored: {0}' -f [String]::Join(', ', $UnknownCategories.ToArray()))
+    if ($UnknownCategories.Count -gt 0) {
+        Write-Warning -Message ('Some Disk Cleanup categories will be ignored: {0}' -f [String]::Join(', ', $UnknownCategories.ToArray()))
+    }
 
     if ($PSCmdlet.ParameterSetName -eq 'OptOut') {
         $Categories = $ValidCategories | Where-Object { $CategoriesParameter -notcontains $_ }
