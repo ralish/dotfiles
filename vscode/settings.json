@@ -76,6 +76,7 @@
     "terminal.integrated.copyOnSelection": true,
     "terminal.integrated.cursorStyle": "line",
     "terminal.integrated.fontFamily": "Hack NF",
+    "terminal.integrated.fontSize": 12,
     "terminal.integrated.rightClickBehavior": "paste",
     "terminal.integrated.defaultProfile.windows": "PowerShell",
     "terminal.integrated.profiles.windows": {
