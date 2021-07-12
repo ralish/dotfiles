@@ -78,6 +78,13 @@
     "terminal.integrated.fontFamily": "Hack NF",
     "terminal.integrated.rightClickBehavior": "paste",
     "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell",
+            "args": ["-NoLogo"]
+        }
+    },
 
     // Features: Remote
     "remote.autoForwardPorts": false,
