@@ -46,7 +46,7 @@
     "workbench.startupEditor": "readme",
     "workbench.editorAssociations": {
         "git-rebase-todo": "default",
-        "*.ipynb": "jupyter.notebook.ipynb"
+        "*.ipynb": "jupyter-notebook"
     },
 
     // Workbench: Appearance
