@@ -528,6 +528,42 @@ Function Sort-XmlElement {
 
 #endregion
 
+#region Object properties
+
+Function Add-GroupObjectComputerProperty {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [AllowEmptyCollection()]
+        [Microsoft.PowerShell.Commands.GroupInfo[]]$GroupObject,
+
+        [Switch]$Force
+    )
+
+    Process {
+        foreach ($GroupInfo in $GroupObject) {
+            $SkipGroup = $false
+
+            foreach ($GroupItem in $GroupInfo.Group) {
+                if ([String]::IsNullOrEmpty($GroupItem.PSComputerName)) {
+                    Write-Error -Message 'Group item has no PSComputerName property.'
+                    $SkipGroup = $true
+                    break
+                }
+            }
+
+            if ($SkipGroup) {
+                continue
+            }
+
+            $Computers = [String]::Join(', ', ($GroupInfo.Group.PSComputerName | Sort-Object))
+            $GroupInfo | Add-Member -Name Computer -MemberType NoteProperty -Value $Computers -PassThru -Force:$Force
+        }
+    }
+}
+
+#endregion
+
 #region Path management
 
 # Add an element to a Path type string
