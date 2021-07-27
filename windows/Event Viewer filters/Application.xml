@@ -34,6 +34,16 @@
     </Suppress>
 
     <!--
+      Security Configuration Editor Client
+      Security policy in the Group policy objects has been applied successfully.
+
+      Rarely of interest and high volume on domain controllers.
+    -->
+    <Suppress Path="Application">
+      *[System[Provider[@Name='SceCli'] and EventID=1704]]
+    </Suppress>
+
+    <!--
       Microsoft-Windows-COMRuntime error on your OMS agents
       https://docs.microsoft.com/en-us/archive/blogs/msoms/microsoft-windows-comruntime-error-on-your-oms-agents
 
@@ -43,16 +53,6 @@
       *[System[Provider[@Name='Microsoft-Windows-COMRuntime'] and EventID=10031]]
       and
       *[EventData[Data='{45FB4600-E6E8-4928-B25E-50476FF79425}']]
-    </Suppress>
-
-    <!--
-      Security Configuration Editor Client
-      Security policy in the Group policy objects has been applied successfully.
-
-      Rarely of interest and high volume on domain controllers.
-    -->
-    <Suppress Path="Application">
-      *[System[Provider[@Name='SceCli'] and EventID=1704]]
     </Suppress>
   </Query>
 </QueryList>

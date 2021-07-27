@@ -19,29 +19,6 @@
     </Suppress>
 
     <!--
-      DCOM event ID 10016 is logged in Windows
-      https://docs.microsoft.com/en-us/troubleshoot/windows-client/application-management/event-10016-logged-when-accessing-dcom
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-DistributedCOM'] and EventID=10016]]
-    </Suppress>
-
-    <!--
-      Event ID 219 is logged when a device is plugged into a Windows-based system
-      https://docs.microsoft.com/en-us/troubleshoot/windows-client/deployment/event-id-219-when-device-plugged-in-windows-system
-
-      Status:       0xc0000365 (STATUS_FAILED_DRIVER_ENTRY)
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-Kernel-PnP'] and EventID=219]]
-      and
-      *[EventData[
-        Data[@Name='FailureName'] and Data='\Driver\WudfRd' and
-        Data[@Name='Status'] and Data=3221226341
-      ]]
-    </Suppress>
-
-    <!--
       Kernel-General
       The access history in hive %2 was cleared updating %3 keys and creating %4 modified pages.
 
@@ -81,6 +58,29 @@
     -->
     <Suppress Path="System">
       *[System[Provider[@Name='Microsoft-Windows-DriverFrameworks-UserMode'] and EventID=10118]]
+    </Suppress>
+
+    <!--
+      DCOM event ID 10016 is logged in Windows
+      https://docs.microsoft.com/en-us/troubleshoot/windows-client/application-management/event-10016-logged-when-accessing-dcom
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-DistributedCOM'] and EventID=10016]]
+    </Suppress>
+
+    <!--
+      Event ID 219 is logged when a device is plugged into a Windows-based system
+      https://docs.microsoft.com/en-us/troubleshoot/windows-client/deployment/event-id-219-when-device-plugged-in-windows-system
+
+      Status:       0xc0000365 (STATUS_FAILED_DRIVER_ENTRY)
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-Kernel-PnP'] and EventID=219]]
+      and
+      *[EventData[
+        Data[@Name='FailureName'] and Data='\Driver\WudfRd' and
+        Data[@Name='Status'] and Data=3221226341
+      ]]
     </Suppress>
 
     <!--
