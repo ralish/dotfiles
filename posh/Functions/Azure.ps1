@@ -298,13 +298,19 @@ Function Connect-AzureAD {
         return
     }
 
-    try {
-        $ModuleName = 'AzureADPreview'
-        Test-ModuleAvailable -Name $ModuleName
-    } catch {
-        $ModuleName = 'AzureAD'
-        Test-ModuleAvailable -Name $ModuleName
+    # Both modules may be present but the AzureAD module is newer. Often this
+    # is due to a specific version of the AzureADPreview module being listed as
+    # a dependency in another module which has yet to be updated. As such, we
+    # shouldn't just naively import AzureADPreview assuming it's the latest.
+    $ModuleNames = 'AzureAD', 'AzureADPreview'
+    $CandidateModules = Get-Module -Name $ModuleNames -ListAvailable
+    if (!$CandidateModules) {
+        # Obviously redundant but ensures consistent error messages
+        Test-ModuleAvailable -Name $ModuleNames -Require Any
     }
+
+    $Module = $CandidateModules | Sort-Object -Property Version | Select-Object -Last 1
+    $ModuleName = $Module.Name
 
     Write-Host -ForegroundColor Green 'Connecting to Azure AD (v2) ...'
     & $ModuleName\Connect-AzureAD @PSBoundParameters
