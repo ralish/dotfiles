@@ -19,6 +19,26 @@
     </Suppress>
 
     <!--
+      GroupPolicy
+      The Group Policy settings for the computer were processed successfully. There were no changes detected since the last successful processing of Group Policy.
+
+      Rarely of interest as it's effectively a NOP.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1500]]
+    </Suppress>
+
+    <!--
+      GroupPolicy
+      The Group Policy settings for the user were processed successfully. There were no changes detected since the last successful processing of Group Policy.
+
+      Rarely of interest as it's effectively a NOP.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1501]]
+    </Suppress>
+
+    <!--
       Kernel-General
       The access history in hive %2 was cleared updating %3 keys and creating %4 modified pages.
 
