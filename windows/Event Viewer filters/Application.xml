@@ -34,6 +34,24 @@
     </Suppress>
 
     <!--
+      Group Policy Management Console
+      Crashes on exit but seemingly harmless.
+    -->
+    <Suppress Path="Application">
+      (
+        *[System[Provider[@Name='Application Error'] and EventID=1000]]
+        and
+        *[EventData[Data='mmc.exe' and Data='GPOAdmin.dll' and Data='c0000005']]
+      )
+      or
+      (
+        *[System[Provider[@Name='Windows Error Reporting'] and EventID=1001]]
+        and
+        *[EventData[Data='APPCRASH' and Data='mmc.exe' and Data='GPOAdmin.dll' and Data='c0000005']]
+      )
+    </Suppress>
+
+    <!--
       Security Configuration Editor Client
       Security policy in the Group policy objects has been applied successfully.
 
