@@ -19,68 +19,10 @@
     </Suppress>
 
     <!--
-      GroupPolicy
-      The Group Policy settings for the computer were processed successfully. There were no changes detected since the last successful processing of Group Policy.
+      Source:     DistributedCOM
+      Level:      Warning
+      Message:    The %1 permission settings do not grant %2 %3 permission for the COM Server application with CLSID %4 and APPID %5 to the user %6\%7 SID (%8) from address %9 running in the application container %10 SID (%11). This security permission can be modified using the Component Services administrative tool.
 
-      Rarely of interest as it's effectively a NOP.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1500]]
-    </Suppress>
-
-    <!--
-      GroupPolicy
-      The Group Policy settings for the user were processed successfully. There were no changes detected since the last successful processing of Group Policy.
-
-      Rarely of interest as it's effectively a NOP.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1501]]
-    </Suppress>
-
-    <!--
-      Kernel-General
-      The access history in hive %2 was cleared updating %3 keys and creating %4 modified pages.
-
-      Rarely of interest and often high volume.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Service Control Manager'] and EventID=16]]
-    </Suppress>
-
-    <!--
-      Service Control Manager
-      The %1 service entered the %2 state.
-
-      Rarely of interest and often high volume, particularly on server SKUs.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Service Control Manager'] and EventID=7036]]
-    </Suppress>
-
-    <!--
-      Service Control Manager (BITS)
-      The start type of the %1 service was changed from %2 to %3.
-
-      The Background Intelligent Transfer Service often changes its start type.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Service Control Manager'] and EventID=7040]]
-      and
-      *[EventData[Data[@Name='param4'] and Data='BITS']]
-    </Suppress>
-
-    <!--
-      User-Mode Driver Framework
-      UMDF reflector is unable to connect to service control manager (SCM). This is expected during boot, when SCM has not started yet. Will retry when it starts.
-
-      Rarely of interest and often emitted numerous times during system startup.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-DriverFrameworks-UserMode'] and EventID=10118]]
-    </Suppress>
-
-    <!--
       DCOM event ID 10016 is logged in Windows
       https://docs.microsoft.com/en-us/troubleshoot/windows-client/application-management/event-10016-logged-when-accessing-dcom
     -->
@@ -89,10 +31,75 @@
     </Suppress>
 
     <!--
+      Source:     DriverFrameworks-UserMode
+      Level:      Information
+      Message:    UMDF reflector is unable to connect to service control manager (SCM). This is expected during boot, when SCM has not started yet. Will retry when it starts.
+
+      Rarely of interest and often emitted numerous times during system startup.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-DriverFrameworks-UserMode'] and EventID=10118]]
+    </Suppress>
+
+    <!--
+      Source:     GroupPolicy
+      Level:      Warning
+      Message:    Windows failed to apply the MDM Policy settings. MDM Policy settings might have its own log file. Please click on the "More information" link.
+      ErrorCode:  0x8018000a (MENROLL_E_DEVICE_ALREADY_ENROLLED)
+
+      Windows failed to apply the MDM Policy settings error when running gpupdate /force on hybrid Azure AD-joined devices
+      https://docs.microsoft.com/en-us/troubleshoot/mem/intune/windows-failed-to-apply-mdm-policy
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1085]]
+      and
+      *[EventData[
+        Data[@Name='ExtensionName'] and Data='MDM Policy' and
+        Data[@Name='ErrorCode'] and Data=2149056522
+      ]]
+    </Suppress>
+
+    <!--
+      Source:     GroupPolicy
+      Level:      Information
+      Message:    The Group Policy settings for the computer were processed successfully. There were no changes detected since the last successful processing of Group Policy.
+
+      Rarely of interest as it's effectively a NOP.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1500]]
+    </Suppress>
+
+    <!--
+      Source:     GroupPolicy
+      Level:      Information
+      Message:    The Group Policy settings for the user were processed successfully. There were no changes detected since the last successful processing of Group Policy.
+
+      Rarely of interest as it's effectively a NOP.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1501]]
+    </Suppress>
+
+    <!--
+      Source:     Kernel-General
+      Level:      Information
+      Message:    The access history in hive %2 was cleared updating %3 keys and creating %4 modified pages.
+
+      Rarely of interest and often high volume.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-Kernel-General'] and EventID=16]]
+    </Suppress>
+
+    <!--
+      Source:     Kernel-PnP
+      Level:      Warning
+      Message:    The driver \Driver\WudfRd failed to load for the device %2.
+      Status:     0xc0000365 (STATUS_FAILED_DRIVER_ENTRY)
+
       Event ID 219 is logged when a device is plugged into a Windows-based system
       https://docs.microsoft.com/en-us/troubleshoot/windows-client/deployment/event-id-219-when-device-plugged-in-windows-system
-
-      Status:       0xc0000365 (STATUS_FAILED_DRIVER_ENTRY)
     -->
     <Suppress Path="System">
       *[System[Provider[@Name='Microsoft-Windows-Kernel-PnP'] and EventID=219]]
@@ -104,18 +111,27 @@
     </Suppress>
 
     <!--
-      Windows failed to apply the MDM Policy settings error when running gpupdate /force on hybrid Azure AD-joined devices
-      https://docs.microsoft.com/en-us/troubleshoot/mem/intune/windows-failed-to-apply-mdm-policy
+      Source:     Service Control Manager
+      Level:      Information
+      Message:    The %1 service entered the %2 state.
 
-      ErrorCode:    0x8018000a (MENROLL_E_DEVICE_ALREADY_ENROLLED)
+      Rarely of interest and often high volume, particularly on server SKUs.
     -->
     <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1085]]
+      *[System[Provider[@Name='Service Control Manager'] and EventID=7036]]
+    </Suppress>
+
+    <!--
+      Source:     Service Control Manager
+      Level:      Information
+      Message:    The start type of the BITS service was changed from %2 to %3.
+
+      The Background Intelligent Transfer Service often changes its start type.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Service Control Manager'] and EventID=7040]]
       and
-      *[EventData[
-        Data[@Name='ExtensionName'] and Data='MDM Policy' and
-        Data[@Name='ErrorCode'] and Data=2149056522
-      ]]
+      *[EventData[Data[@Name='param4'] and Data='BITS']]
     </Suppress>
   </Query>
 </QueryList>
