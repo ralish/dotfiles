@@ -45,6 +45,69 @@ Function Get-ArgumentCompleter {
 
 #region Object handling
 
+# Compare two hashtables
+Function Compare-Hashtable {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [Hashtable]$Reference,
+
+        [Parameter(Mandatory)]
+        [Hashtable]$Difference,
+
+        [ValidateSet('Default', 'Insensitive', 'Sensitive')]
+        [String]$CaseMatching = 'Default'
+    )
+
+    $Results = [Collections.ArrayList]::new()
+
+    $AllKeys = ($Reference.Keys + $Difference.Keys) | Sort-Object -Unique
+    foreach ($Key in $AllKeys) {
+        $Result = [PSCustomObject]@{
+            Key        = $Key
+            Reference  = $null
+            Difference = $null
+        }
+
+        if ($Reference.ContainsKey($Key) -and $Difference.ContainsKey($Key)) {
+            $Identical = $false
+
+            switch ($CaseMatching) {
+                'Insensitive' {
+                    if ($Reference[$Key] -ieq $Difference[$Key]) {
+                        $Identical = $true
+                    }
+                }
+                'Sensitive' {
+                    if ($Reference[$Key] -ceq $Difference[$Key]) {
+                        $Identical = $true
+                    }
+                }
+                Default {
+                    if ($Reference[$Key] -eq $Difference[$Key]) {
+                        $Identical = $true
+                    }
+                }
+            }
+
+            if ($Identical) {
+                continue
+            }
+
+            $Result.Reference = $Reference[$Key]
+            $Result.Difference = $Difference[$Key]
+        } elseif ($Reference.ContainsKey($Key)) {
+            $Result.Reference = $Reference[$Key]
+        } else {
+            $Result.Difference = $Difference[$Key]
+        }
+
+        $null = $Results.Add($Result)
+    }
+
+    return $Results
+}
+
 # Compare the properties of two objects
 # Via: https://blogs.technet.microsoft.com/janesays/2017/04/25/compare-all-properties-of-two-objects-in-windows-powershell/
 Function Compare-ObjectProperties {
