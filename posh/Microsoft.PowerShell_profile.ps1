@@ -7,6 +7,13 @@
 # Display message on start of processing each script
 #$DotFilesShowScriptEntry = $true
 
+# Skip loading profile if PowerShell was launched with -NonInteractive
+foreach ($Param in [Environment]::GetCommandLineArgs()) {
+    if ($Param -ieq '-NonInteractive') {
+        return
+    }
+}
+
 # Skip expensive calls for faster profile loading
 #
 # - Get-Module -ListAvailable
