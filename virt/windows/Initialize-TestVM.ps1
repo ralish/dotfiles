@@ -267,13 +267,20 @@ Function Optimize-WindowsDefender {
                 return
             }
         } catch [Microsoft.Management.Infrastructure.CimException] {
-            # The extrinsic Method could not be executed
-            if ($_.FullyQualifiedErrorId -match '^MI RESULT 16,') {
-                Write-Host -ForegroundColor Yellow '[Windows] Unable to query Defender status as Get-MpComputerStatus returned: MI_RESULT_METHOD_NOT_AVAILABLE'
-            } else {
-                Write-Error -Message $_
-                return
+            switch -Regex ($_.FullyQualifiedErrorId) {
+                '^MI RESULT 16,' {
+                    $MpError = 'MI_RESULT_METHOD_NOT_AVAILABLE'
+                }
+                '^HRESULT 0x800106ba,' {
+                    $MpError = 'RPC_S_SERVER_UNAVAILABLE'
+                }
+                Default {
+                    Write-Error -Message $_
+                    return
+                }
             }
+
+            Write-Host -ForegroundColor Yellow ('[Windows] Unable to query Defender status as Get-MpComputerStatus returned: {0}' -f $MpError)
         }
     }
 
