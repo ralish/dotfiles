@@ -14,11 +14,18 @@ if [[ -z $rh_release ]]; then
 fi
 
 echo '[yum] Updating package indexes ...'
+set +e
 yum check-update
-echo
-
-echo '[yum] Installing package updates ...'
-yum -y upgrade
+yum_rc="$?"
+set -e
+if [[ $yum_rc -eq 100 ]]; then
+    echo
+    echo '[yum] Installing package updates ...'
+    yum -y upgrade
+elif [[ $yum_rc -ne 0 ]]; then
+    echo "[yum] check-update rc: $yum_rc"
+    exit 1
+fi
 echo
 
 if ! rpm -qa | grep openssh-server > /dev/null; then
