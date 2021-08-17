@@ -50,17 +50,17 @@ Function Update-OpenSSHConfig {
     $BannerFile = Join-Path -Path $TemplatesDir -ChildPath 'banner'
 
     # Make sure we create the file without a BOM
-    [IO.File]::WriteAllLines($ConfigFile, '')
-
     $Banner = Get-Content -LiteralPath $BannerFile
-    Add-Content -Path $ConfigFile -Value $Banner[0..($Banner.Length - 2)]
+    $UTF8EncodingNoBom = [Text.UTF8Encoding]::new($false)
+    [IO.File]::WriteAllLines($ConfigFile, $Banner[0..($Banner.Length - 2)], $UTF8EncodingNoBom)
 
     $Includes = Get-ChildItem -LiteralPath $IncludesDir -File | Where-Object { $_.Length -gt 0 }
     foreach ($Include in $Includes) {
         $Data = Get-Content -LiteralPath $Include.FullName
         Add-Content -Path $ConfigFile -Value $Data[0..($Data.Length - 2)]
+        Add-Content -Path $ConfigFile -Value ([String]::Empty)
     }
 
     $Template = Get-Content -LiteralPath $TemplateFile
-    Add-Content -Path $ConfigFile -Value $Template[0..($Template.Length - 2)]
+    Add-Content -Path $ConfigFile -Value $Template[0..($Template.Length - 1)]
 }
