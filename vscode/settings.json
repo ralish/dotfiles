@@ -168,7 +168,6 @@
     "python.linting.flake8Enabled": true,
     "python.linting.pylintCategorySeverity.refactor": "Information",
     "python.pythonPath": "~/dotfiles/vscode/venv",
-    "python.showStartPage": false,
 
     // Extension: Red Hat Commons
     "redhat.telemetry.enabled": false,
