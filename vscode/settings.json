@@ -16,7 +16,7 @@
 
     // Text Editor: Find
     "editor.find.autoFindInSelection": "multiline",
-    "editor.find.seedSearchStringFromSelection": false,
+    "editor.find.seedSearchStringFromSelection": "never",
 
     // Text Editor: Minimap
     "editor.minimap.showSlider": "always",
