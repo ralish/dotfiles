@@ -73,69 +73,92 @@ Function Invoke-GitChildDir {
         [String]$Command,
 
         [ValidateNotNullOrEmpty()]
+        [Regex]$RepoInclude,
+
+        [ValidateNotNullOrEmpty()]
+        [Regex]$RepoExclude,
+
+        [Parameter(ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
         [String[]]$Path,
 
         [Switch]$Recurse
     )
 
-    if (!$PSBoundParameters.ContainsKey('Path')) {
-        $Path += $PWD.Path
+    Begin {
+        $GitArgs = $Command.Split()
+        $OriginalLocation = Get-Location
+
+        if (!$PSBoundParameters.ContainsKey('Path')) {
+            $Path += $PWD.Path
+        }
     }
 
-    $GitArgs = $Command.Split()
-    $OriginalLocation = Get-Location
+    Process {
+        foreach ($Item in $Path) {
+            $IsPathFullyQualified = [IO.Path]::IsPathFullyQualified($Item)
 
-    foreach ($Item in $Path) {
-        $IsPathFullyQualified = [IO.Path]::IsPathFullyQualified($Item)
-
-        if ($OriginalLocation.Provider.Name -ne 'FileSystem' -and !$IsPathFullyQualified) {
-            Write-Error -Message ('Skipping relative path as current path is not a file system: {0}' -f $Item)
-            continue
-        }
-
-        if (!$IsPathFullyQualified) {
-            try {
-                Set-Location -LiteralPath $OriginalLocation -ErrorAction Stop
-            } catch {
-                throw $_
-            }
-        }
-
-        try {
-            $BaseDir = Get-Item -LiteralPath $Item -ErrorAction Stop
-        } catch {
-            Write-Error -Message $_.Message
-            continue
-        }
-
-        if ($BaseDir -isnot [IO.DirectoryInfo]) {
-            Write-Error -Message ('Provided path is not a directory: {0}' -f $Item)
-            continue
-        }
-
-        $SubDirs = Get-ChildItem -LiteralPath $BaseDir.FullName -Directory
-        foreach ($SubDir in $SubDirs) {
-            $GitDir = Join-Path -Path $SubDir.FullName -ChildPath '.git'
-            if (-not (Test-Path -LiteralPath $GitDir -PathType Container)) {
-                if ($Recurse) {
-                    Invoke-GitChildDir -Path $SubDir.FullName -Command $Command -Recurse:$Recurse
-                } else {
-                    Write-Verbose -Message ('Skipping directory: {0}' -f $SubDir.Name)
-                }
+            if ($OriginalLocation.Provider.Name -ne 'FileSystem' -and !$IsPathFullyQualified) {
+                Write-Error -Message ('Skipping relative path as current path is not a file system: {0}' -f $Item)
                 continue
             }
 
-            if ($PSCmdlet.ShouldProcess($SubDir.Name, 'Invoke Git command')) {
-                Write-Host -ForegroundColor Green ('Running in: {0}' -f $SubDir.Name)
-                Set-Location -LiteralPath $SubDir.FullName
-                git @GitArgs
-                Set-Location -LiteralPath $BaseDir.FullName
-                Write-Host
+            if (!$IsPathFullyQualified) {
+                try {
+                    Set-Location -LiteralPath $OriginalLocation -ErrorAction Stop
+                } catch {
+                    throw $_
+                }
+            }
+
+            try {
+                $BaseDir = Get-Item -LiteralPath $Item -ErrorAction Stop
+            } catch {
+                Write-Error -Message $_.Message
+                continue
+            }
+
+            if ($BaseDir -isnot [IO.DirectoryInfo]) {
+                Write-Error -Message ('Provided path is not a directory: {0}' -f $Item)
+                continue
+            }
+
+            $SubDirs = Get-ChildItem -LiteralPath $BaseDir.FullName -Directory
+            foreach ($SubDir in $SubDirs) {
+                $GitDir = Join-Path -Path $SubDir.FullName -ChildPath '.git'
+                if (-not (Test-Path -LiteralPath $GitDir -PathType Container)) {
+                    if ($Recurse) {
+                        Invoke-GitChildDir -Path $SubDir.FullName -Command $Command -Recurse:$Recurse
+                    } else {
+                        Write-Verbose -Message ('Skipping directory: {0}' -f $SubDir.Name)
+                    }
+                    continue
+                }
+
+                if ($RepoInclude -and $SubDir.Name -notmatch $RepoInclude) {
+                    Write-Verbose -Message ('Skipping repository not matching inclusion filter: {0}' -f $SubDir.Name)
+                    continue
+                }
+
+                if ($RepoExclude -and $SubDir.Name -match $RepoExclude) {
+                    Write-Verbose -Message ('Skipping repository matching exclusion filter: {0}' -f $SubDir.Name)
+                    continue
+                }
+
+                if ($PSCmdlet.ShouldProcess($SubDir.Name, 'Invoke Git command')) {
+                    Write-Host -ForegroundColor Green ('Running in: {0}' -f $SubDir.Name)
+                    Set-Location -LiteralPath $SubDir.FullName
+                    git @GitArgs
+                    Set-Location -LiteralPath $BaseDir.FullName
+                    Write-Host
+                }
             }
         }
     }
 
-    Set-Location -LiteralPath $OriginalLocation
+    End {
+        Set-Location -LiteralPath $OriginalLocation
+    }
 }
 
 # Invoke a linter on matching repository files
