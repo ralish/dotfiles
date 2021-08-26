@@ -7,43 +7,72 @@
 [wsl2]
 # Number of processors to assign to the VM
 #
-# Default is all processors.
+# Default: All processors
 #processors = 2
+
+# Enable nested virtualisation on AMD64
+#
+# Default: true
+# Support: Build 20175
+#nestedVirtualization = true
 
 # Amount of memory to assign to the VM
 #
-# Default is 80% of total memory.
+# Default differs by Windows build:
+#  < 20175: 80% of total memory
+# >= 20175: 50% of total memory or 8GB (whichever is less)
 #memory = 4GB
 
-# Enable free memory page reporting
+# Amount of swap space to add to the VM
 #
-# Supported from Windows Build 19013 (2004+)
+# Setting to 0 disables adding a swap file.
+#
+# Default: 25% of total memory rounded-up to the nearest GB
+#swap = 0
+
+# Absolute Windows path to the swap VHDX file
+#
+# Default: %USERPROFILE%\\AppData\\Local\\Temp\\swap.vhdx
+#swapFile = %USERPROFILE%\\AppData\\Local\\Temp\\swap.vhdx
+
+# Free memory page reporting
+#
+# Default: true
+# Support: Build 19013 (2004+)
 #pageReporting = true
 
 # Idle threshold for memory compaction
 #
-# Setting to 0 will disable memory compaction on idle.
+# Setting to 0 disables memory compaction on idle.
 #
-# Supported from Windows Build 19013 (2004+)
+# Default: 1
+# Support: Build 19013 (2004+)
 #idleThreshold = 1
 
-# Amount of swap space to add to the VM
-#
-# Default is 25% of total memory rounded-up to the nearest GB.
-#
-# Setting to 0 will disable adding a swap file.
-#swap = 0
-
-# Absolute Windows path to the swap VHDX file
-#swapFile = %USERPROFILE%\\AppData\\Local\\Temp\\swap.vhdx
-
 # Absolute Windows path to the Linux kernel image
+#
+# Default: %SystemRoot%\\System32\\lxss\\tools\\kernel
 #kernel = %SystemRoot%\\System32\\lxss\\tools\\kernel
 
 # Additional kernel command line arguments
 #
-# Supported from Windows Build 18995 (2004+)
+# Default: (blank)
+# Support: Build 18995 (2004+)
 #kernelCommandLine =
 
+# Show kernel log output on WSL 2 distro start
+#
+# Default: false
+# Support: Build 21387
+#debugConsole = false
+
 # Permit access from the host to listening ports in the VM
+#
+# Default: true
 #localhostForwarding = true
+
+# Idle timeout for stopping the VM (milliseconds)
+#
+# Default: 60000
+# Support: Build 20190
+#vmIdleTimeout = 60000
