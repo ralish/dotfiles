@@ -8,7 +8,7 @@
 # Number of processors to assign to the VM
 #
 # Default: All processors
-#processors = 2
+processors = 6
 
 # Enable nested virtualisation on AMD64
 #
@@ -21,7 +21,7 @@
 # Default differs by Windows build:
 #  < 20175: 80% of total memory
 # >= 20175: 50% of total memory or 8GB (whichever is less)
-#memory = 4GB
+memory = 16GB
 
 # Amount of swap space to add to the VM
 #
