@@ -125,11 +125,15 @@ Function Export-MailboxSpreadsheetData {
         }
     }
 
-    Write-Host -ForegroundColor Green 'Retrieving mailbox details ...'
+    $WriteProgressParams = @{
+        Activity = 'Exporting mailbox data to spreadsheet'
+    }
+
+    Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving mailbox details' -PercentComplete 0
     $ExoMailbox = Get-Mailbox -Identity $Mailbox
     $MailboxAddress = $ExoMailbox.PrimarySmtpAddress
 
-    Write-Host -ForegroundColor Green 'Retrieving mailbox rules ...'
+    Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving mailbox rules' -PercentComplete 20
     $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
     foreach ($Rule in $Rules) {
         $Rule.Description = $Rule.Description -replace '\r?\n\r?\Z$'
@@ -142,12 +146,15 @@ Function Export-MailboxSpreadsheetData {
                 $Params.Add($Parameter, $PSBoundParameters.Item($Parameter))
             }
         }
+
+        Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving mailbox activity summary' -PercentComplete 40
         $Activity = Get-MailboxActivitySummary -Mailbox $Mailbox
     }
 
+    Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving inbox rules by folders' -PercentComplete 60
     $Folders = Get-InboxRulesByFolders -Mailbox $Mailbox -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
 
-    Write-Host -ForegroundColor Green 'Exporting mailbox data ...'
+    Write-Progress @WriteProgressParams -CurrentOperation 'Exporting mailbox data' -PercentComplete 80
     $ExportCsvParams = @{
         Encoding          = 'UTF8'
         NoTypeInformation = $true
@@ -159,6 +166,8 @@ Function Export-MailboxSpreadsheetData {
 
     $Folders | Export-Csv -LiteralPath (Join-Path -Path $Path -ChildPath ('{0} - Folders.csv' -f $MailboxAddress)) @ExportCsvParams
     $Rules | Export-Csv -LiteralPath (Join-Path -Path $Path -ChildPath ('{0} - Rules.csv' -f $MailboxAddress)) @ExportCsvParams
+
+    Write-Progress @WriteProgressParams -Completed
 }
 
 # Retrieve a summary of mailbox folders with associated rules
@@ -174,21 +183,33 @@ Function Get-InboxRulesByFolders {
         [ValidateNotNullOrEmpty()]
         [String]$DescriptionTimeFormat = 'yyyy/mm/dd',
 
-        [Switch]$ReturnUnlinkedRules
+        [Switch]$ReturnUnlinkedRules,
+
+        [ValidateRange('NonNegative')]
+        [Int]$ProgressParentId
     )
 
     Test-CommandAvailable -Name Get-Mailbox
 
-    Write-Host -ForegroundColor Green 'Retrieving mailbox folders ...'
+    $WriteProgressParams = @{
+        Activity = 'Retrieving inbox rules by folders'
+    }
+
+    if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+        $WriteProgressParams['ParentId'] = $ProgressParentId
+        $WriteProgressParams['Id'] = $ProgressParentId + 1
+    }
+
+    Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving mailbox folders' -PercentComplete 0
     $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object { $_.DefaultFolderType -ne 'Inbox' }
     $Folders | Add-Member -MemberType NoteProperty -Name Rules -Value @()
     $Folders | Add-Member -MemberType ScriptProperty -Name RuleCount -Value { $this.Rules.Count }
 
-    Write-Host -ForegroundColor Green 'Retrieving mailbox rules ...'
+    Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving mailbox rules' -PercentComplete 33
     $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
     $Rules | Add-Member -MemberType NoteProperty -Name LinkedToFolder -Value $false
 
-    Write-Host -ForegroundColor Green 'Associating rules to folders ...'
+    Write-Progress @WriteProgressParams -CurrentOperation 'Associating rules to folders' -PercentComplete 67
     $Results = [Collections.ArrayList]::new()
     foreach ($Folder in $Folders) {
         $FolderName = ($Folder.FolderPath -join ' - ').Substring(8)
@@ -212,6 +233,8 @@ Function Get-InboxRulesByFolders {
         }
     }
 
+    Write-Progress @WriteProgressParams -Completed
+
     if ($ReturnUnlinkedRules) {
         return $UnlinkedRules
     } else {
@@ -227,7 +250,10 @@ Function Get-MailboxActivitySummary {
         [String]$Mailbox,
 
         [DateTime]$StartDate,
-        [DateTime]$EndDate
+        [DateTime]$EndDate,
+
+        [ValidateRange('NonNegative')]
+        [Int]$ProgressParentId
     )
 
     Test-CommandAvailable -Name Get-Mailbox
@@ -240,15 +266,26 @@ Function Get-MailboxActivitySummary {
         $StartDate = $EndDate.AddDays(-7)
     }
 
-    Write-Host -ForegroundColor Green 'Retrieving mailbox details ...'
+    $WriteProgressParams = @{
+        Activity = 'Retrieving mailbox activity summary'
+    }
+
+    if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+        $WriteProgressParams['ParentId'] = $ProgressParentId
+        $WriteProgressParams['Id'] = $ProgressParentId + 1
+    }
+
+    Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving mailbox details' -PercentComplete 0
     $ExoMailbox = Get-Mailbox -Identity $Mailbox
     $Addresses = $ExoMailbox.EmailAddresses | Where-Object { $_ -match '^smtp:' } | ForEach-Object { $_.Substring(5) }
 
-    Write-Host -ForegroundColor Green 'Retrieving mailbox send logs ...'
+    Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving mailbox send logs' -PercentComplete 33
     $Sent = Get-MessageTrace -SenderAddress $Addresses -StartDate $StartDate -EndDate $EndDate
 
-    Write-Host -ForegroundColor Green 'Retrieving mailbox receive logs ...'
+    Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving mailbox receive logs' -PercentComplete 67
     $Received = Get-MessageTrace -RecipientAddress $Addresses -StartDate $StartDate -EndDate $EndDate
+
+    Write-Progress @WriteProgressParams -Completed
 
     $Summary = [PSCustomObject]@{
         Mailbox   = $ExoMailbox.PrimarySmtpAddress
@@ -667,28 +704,37 @@ Function Get-UnifiedGroupReport {
 
     Test-CommandAvailable -Name Get-UnifiedGroup
 
+    $WriteProgressParams = @{
+        Activity = 'Retrieving Unified Group report'
+    }
+
     if (!$Groups) {
-        Write-Host -ForegroundColor Green 'Retrieving Office 365 groups ...'
+        Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving Office 365 groups' -PercentComplete 0
         $Groups = Get-UnifiedGroup
     }
 
+    $GroupsDone = 0
     foreach ($Group in $Groups) {
-        Write-Host -ForegroundColor Green ('Now processing: {0}' -f $Group.Identity)
+        Write-Progress @WriteProgressParams -Status ('Retrieving group: {0}' -f $Group.Identity) -PercentComplete ($GroupsDone / $Groups.Count * 90 + 10)
 
-        Write-Verbose -Message ('[{0}] Retrieving owners ...' -f $Group.Identity)
+        Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving owners'
         $Owners = Get-UnifiedGroupLinks -Identity $Group.Identity -LinkType Owners
         if ($Owners) {
             $AllOwners = [String]::Join(', ', ($Owners | Sort-Object))
             Add-Member -InputObject $Group -MemberType NoteProperty -Name Owners -Value $AllOwners -Force
         }
 
-        Write-Verbose -Message ('[{0}] Retrieving members ...' -f $Group.Identity)
+        Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving members'
         $Members = Get-UnifiedGroupLinks -Identity $Group.Identity -LinkType Members
         if ($Members) {
             $AllMembers = [String]::Join(', ', ($Members | Sort-Object))
             Add-Member -InputObject $Group -MemberType NoteProperty -Name Members -Value $AllMembers -Force
         }
+
+        $GroupsDone++
     }
+
+    Write-Progress @WriteProgressParams -Completed
 
     return $Groups
 }
