@@ -9,14 +9,25 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing environment func
 # Update .NET tools
 Function Update-DotNetTools {
     [CmdletBinding(SupportsShouldProcess)]
-    Param()
+    Param(
+        [ValidateRange('NonNegative')]
+        [Int]$ProgressParentId
+    )
 
     if (!(Get-Command -Name dotnet -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update .NET tools as dotnet command not found.'
         return
     }
 
-    $WriteProgressParams = @{ Activity = 'Updating .NET tools' }
+    $WriteProgressParams = @{
+        Activity = 'Updating .NET tools'
+    }
+
+    if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+        $WriteProgressParams['ParentId'] = $ProgressParentId
+        $WriteProgressParams['Id'] = $ProgressParentId + 1
+    }
+
     [String[]]$ListArgs = 'tool', 'list', '--global'
     [String[]]$UpdateArgs = 'tool', 'update', '--global'
 
@@ -27,9 +38,8 @@ Function Update-DotNetTools {
     }
     $env:DOTNET_NOLOGO = 'true'
 
-    Write-Progress @WriteProgressParams -Status 'Enumerating .NET tools' -PercentComplete 0
-    Write-Host -ForegroundColor Green -NoNewline 'Enumerating .NET tools: '
-    Write-Host ('dotnet {0}' -f ($ListArgs -join ' '))
+    Write-Progress @WriteProgressParams -CurrentOperation 'Enumerating .NET tools' -PercentComplete 0
+    Write-Verbose -Message ('Enumerating .NET tools: dotnet {0}' -f ($ListArgs -join ' '))
     $Tools = [Collections.ArrayList]::new()
     & dotnet @ListArgs | ForEach-Object {
         if ($_ -notmatch '^(Package Id|-)' -and $_ -match '^(\S+)') {
@@ -40,13 +50,14 @@ Function Update-DotNetTools {
     $ToolsUpdated = 0
     foreach ($Tool in $Tools) {
         if ($PSCmdlet.ShouldProcess($Tool, 'Update')) {
-            Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $Tool) -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
-            Write-Host -ForegroundColor Green -NoNewline ('Updating {0}: ' -f $Tool)
-            Write-Host ('dotnet {0} {1}' -f ($UpdateArgs -join ' '), $Tool)
+            Write-Progress @WriteProgressParams -CurrentOperation ('Updating {0}' -f $Tool) -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
+            Write-Verbose -Message ('Updating {0}: dotnet {1} {0}' -f $Tool, ($UpdateArgs -join ' '))
             & dotnet @UpdateArgs $Tool
             $ToolsUpdated++
         }
     }
+
+    Write-Progress @WriteProgressParams -Completed
 
     # Restore the original value of the DOTNET_NOLOGO environment variable
     if ($OriginalNoLogo) {
@@ -412,14 +423,12 @@ Function Update-NodejsPackages {
     [String[]]$UpdateArgs = 'update', '--global'
 
     if ($PSCmdlet.ShouldProcess('npm', 'Update')) {
-        Write-Host -ForegroundColor Green -NoNewline 'Updating npm: '
-        Write-Host ('npm {0} npm' -f ($UpdateArgs -join ' '))
+        Write-Verbose -Message ('Updating npm: npm {0} npm' -f ($UpdateArgs -join ' '))
         & npm @UpdateArgs npm
     }
 
     if ($PSCmdlet.ShouldProcess('Node.js packages', 'Update')) {
-        Write-Host -ForegroundColor Green -NoNewline 'Updating Node.js packages: '
-        Write-Host ('npm {0}' -f ($UpdateArgs -join ' '))
+        Write-Verbose -Message ('Updating Node.js packages: npm {0}' -f ($UpdateArgs -join ' '))
         & npm @UpdateArgs
     }
 }
@@ -653,13 +662,11 @@ Function Update-PythonPackages {
     [String[]]$UpdateArgs = 'install', '--no-python-version-warning', '--upgrade', '--upgrade-strategy', 'eager'
 
     if ($PSCmdlet.ShouldProcess('pip', 'Update')) {
-        Write-Host -ForegroundColor Green -NoNewline 'Updating pip: '
-        Write-Host ('python {0} pip' -f ($PipUpdateArgs -join ' '))
+        Write-Verbose -Message ('Updating pip: python {0} pip' -f ($PipUpdateArgs -join ' '))
         & python @PipUpdateArgs pip
     }
 
-    Write-Host -ForegroundColor Green -NoNewline 'Enumerating Python packages: '
-    Write-Host 'pipdeptree'
+    Write-Verbose -Message 'Enumerating Python packages: pipdeptree'
     $Packages = [Collections.ArrayList]::new()
     $PackageRegex = [Regex]::new('^(\S+)==')
     & pipdeptree | ForEach-Object {
@@ -670,8 +677,7 @@ Function Update-PythonPackages {
     }
 
     if ($PSCmdlet.ShouldProcess('Python packages', 'Update')) {
-        Write-Host -ForegroundColor Green -NoNewline 'Updating Python packages: '
-        Write-Host ('pip {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
+        Write-Verbose -Message ('Updating Python packages: pip {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
         & pip @UpdateArgs @Packages
     }
 
@@ -688,8 +694,7 @@ Function Update-PythonPackages {
             }
             $env:USE_EMOJI = 0
 
-            Write-Host -ForegroundColor Green -NoNewline 'Updating pipx packages: '
-            Write-Host 'pipx upgrade-all'
+            Write-Verbose -Message 'Updating pipx packages: pipx upgrade-all'
             & pipx upgrade-all
 
             if ($UseEmoji) {
@@ -783,12 +788,10 @@ Function Update-RubyGems {
         $CleanupArgs += '--dry-run'
     }
 
-    Write-Host -ForegroundColor Green -NoNewline 'Updating RubyGems system: '
-    Write-Host ('gem {0} --system' -f ($UpdateArgs -join ' '))
+    Write-Verbose -Message ('Updating RubyGems system: gem {0} --system' -f ($UpdateArgs -join ' '))
     & gem @UpdateArgs --system
 
-    Write-Host -ForegroundColor Green -NoNewline 'Enumerating Ruby gems: '
-    Write-Host ('gem {0}' -f ($ListArgs -join ' '))
+    Write-Verbose -Message ('Enumerating Ruby gems: gem {0}' -f ($ListArgs -join ' '))
     $Packages = [Collections.ArrayList]::new()
     $PackageRegex = [Regex]::new('\(default: \S+\)')
     & gem @ListArgs | ForEach-Object {
@@ -797,12 +800,10 @@ Function Update-RubyGems {
         }
     }
 
-    Write-Host -ForegroundColor Green -NoNewline 'Updating Ruby gems: '
-    Write-Host ('gem {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
+    Write-Verbose -Message ('Updating Ruby gems: gem {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
     & gem @UpdateArgs @Packages
 
-    Write-Host -ForegroundColor Green -NoNewline 'Removing obsolete Ruby gems: '
-    Write-Host ('gem {0}' -f ($CleanupArgs -join ' '))
+    Write-Verbose -Message ('Uninstalling obsolete Ruby gems: gem {0}' -f ($CleanupArgs -join ' '))
     & gem @CleanupArgs
 }
 

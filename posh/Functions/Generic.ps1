@@ -385,7 +385,7 @@ Function Format-SizeDigital {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [ValidateRange("NonNegative")]
+        [ValidateRange('NonNegative')]
         [Double]$Size,
 
         [ValidateSet(2, 10)]
@@ -476,10 +476,10 @@ Function Sort-XmlElement {
 
         [Switch]$SortAttributes,
 
-        [ValidateRange("NonNegative")]
+        [ValidateRange('NonNegative')]
         [Int]$Depth = 0,
 
-        [ValidateRange("NonNegative")]
+        [ValidateRange('NonNegative')]
         [Int]$MaxDepth = 25
     )
 

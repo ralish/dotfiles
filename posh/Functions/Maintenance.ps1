@@ -52,16 +52,21 @@ Function Update-AllTheThings {
         RubyGems       = $null
     }
 
+    $TasksDone = 0
+    $TasksTotal = 0
+
     foreach ($Task in @($Tasks.Keys)) {
         if ($PSCmdlet.ParameterSetName -eq 'OptOut') {
             if ($ExcludeTasks -contains $Task) {
                 $Tasks[$Task] = $false
             } else {
                 $Tasks[$Task] = $true
+                $TasksTotal++
             }
         } else {
             if ($IncludeTasks -contains $Task) {
                 $Tasks[$Task] = $true
+                $TasksTotal++
             } else {
                 $Tasks[$Task] = $false
             }
@@ -87,45 +92,72 @@ Function Update-AllTheThings {
         RubyGems       = $null
     }
 
+    $WriteProgressParams = @{
+        Id       = 0
+        Activity = 'Updating all the things'
+    }
+
     if ($Tasks['Windows']) {
+        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.Windows = Update-Windows
+        $TasksDone++
     }
 
     if ($Tasks['Office']) {
+        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Office' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.Office = Update-Office
+        $TasksDone++
     }
 
     if ($Tasks['VisualStudio']) {
+        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.VisualStudio = Update-VisualStudio
+        $TasksDone++
     }
 
     if ($Tasks['PowerShell']) {
-        $Results.PowerShell = Update-PowerShell
+        Write-Progress @WriteProgressParams -CurrentOperation 'Updating PowerShell' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        $Results.PowerShell = Update-PowerShell -ProgressParentId $WriteProgressParams['Id']
+        $TasksDone++
     }
 
     if ($Tasks['ModernApps']) {
+        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Microsoft Store apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.ModernApps = Update-ModernApps
+        $TasksDone++
     }
 
     if ($Tasks['Scoop']) {
-        $Results.Scoop = Update-Scoop -CaptureOutput
+        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Scoop apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        $Results.Scoop = Update-Scoop -CaptureOutput -ProgressParentId $WriteProgressParams['Id']
+        $TasksDone++
     }
 
     if ($Tasks['DotNetTools']) {
-        $Results.DotNetTools = Update-DotNetTools
+        Write-Progress @WriteProgressParams -CurrentOperation 'Updating .NET tools' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        $Results.DotNetTools = Update-DotNetTools -ProgressParentId $WriteProgressParams['Id']
+        $TasksDone++
     }
 
     if ($Tasks['NodejsPackages']) {
+        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Node.js packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.NodejsPackages = Update-NodejsPackages
+        $TasksDone++
     }
 
     if ($Tasks['PythonPackages']) {
+        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Python packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.PythonPackages = Update-PythonPackages
+        $TasksDone++
     }
 
     if ($Tasks['RubyGems']) {
+        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Ruby gems' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.RubyGems = Update-RubyGems
+        $TasksDone++
     }
+
+    Write-Progress @WriteProgressParams -Completed
 
     return $Results
 }
@@ -143,7 +175,6 @@ Function Update-ModernApps {
     $Class = 'MDM_EnterpriseModernAppManagement_AppManagement01'
     $Method = 'UpdateScanMethod'
 
-    Write-Host -ForegroundColor Green 'Updating Microsoft Store apps ...'
     $Session = New-CimSession
     $Instance = Get-CimInstance -Namespace $Namespace -ClassName $Class
     $Result = $Session.InvokeMethod($Namespace, $Instance, $Method, $null)
@@ -169,7 +200,6 @@ Function Update-Office {
         return
     }
 
-    Write-Host -ForegroundColor Green 'Installing Office updates ...'
     & $OfficeC2RClient /update user updatepromptuser=True
     Start-Sleep -Seconds 3
 
@@ -222,16 +252,49 @@ Function Update-PowerShell {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
         [Switch]$IncludeDscModules,
-        [Switch]$Force
+        [Switch]$Force,
+
+        [ValidateRange('NonNegative')]
+        [Int]$ProgressParentId
     )
 
     if (Get-Module -Name PowerShellGet -ListAvailable) {
-        Write-Host -ForegroundColor Green 'Updating PowerShell modules ...'
+        $WriteProgressParams = @{
+            Activity = 'Updating PowerShell modules'
+        }
+
+        if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+            $WriteProgressParams['ParentId'] = $ProgressParentId
+            $WriteProgressParams['Id'] = $ProgressParentId + 1
+        }
+
+        Write-Progress @WriteProgressParams -CurrentOperation 'Enumerating installed modules' -PercentComplete 0
         $InstalledModules = Get-InstalledModule
 
+        # Percentage of the total progress for Update-Module
+        $ProgressPercentUpdatesBase = 10
+        if ($InstalledModules -contains 'AWS.Tools.Installer') {
+            $ProgressPercentUpdatesSection = 80
+        } else {
+            $ProgressPercentUpdatesSection = 90
+        }
+
         if (!$IncludeDscModules) {
-            Write-Verbose -Message 'Enumerating DSC modules for exclusion ...'
-            $DscModules = @(Get-DscResource -Module * | Select-Object -ExpandProperty ModuleName -Unique)
+            Write-Progress @WriteProgressParams -CurrentOperation 'Enumerating DSC modules for exclusion' -PercentComplete 5
+
+            # Get-DscResource likes to output multiple progress bars but doesn't have the manners to
+            # clean them up. The result is a total visual mess when we've got our own progress bars.
+            $OriginalProgressPreference = $ProgressPreference
+            Set-Variable -Name 'ProgressPreference' -Scope Global -Value 'Ignore'
+
+            try {
+                # Get-DscResource may output various errors, most often due to duplicate resources.
+                # That's frequently the case with, for example, the PackageManagement module being
+                # available in multiple locations accessible from the PSModulePath.
+                $DscModules = @(Get-DscResource -Module * -ErrorAction Ignore | Select-Object -ExpandProperty ModuleName -Unique)
+            } finally {
+                Set-Variable -Name 'ProgressPreference' -Scope Global -Value $OriginalProgressPreference
+            }
         }
 
         if (Test-IsWindows) {
@@ -243,7 +306,9 @@ Function Update-PowerShell {
         }
 
         # Update all modules compatible with Update-Module
-        foreach ($Module in $InstalledModules) {
+        for ($ModuleIdx = 0; $ModuleIdx -lt $InstalledModules.Count; $ModuleIdx++) {
+            $Module = $InstalledModules[$ModuleIdx]
+
             if (!$IncludeDscModules -and $Module.Name -in $DscModules) {
                 Write-Verbose -Message ('Skipping DSC module: {0}' -f $Module.Name)
                 continue
@@ -268,6 +333,8 @@ Function Update-PowerShell {
             }
 
             if ($PSCmdlet.ShouldProcess($Module.Name, 'Update')) {
+                $PercentComplete = ($ModuleIdx + 1) / $InstalledModules.Count * $ProgressPercentUpdatesSection + $ProgressPercentUpdatesBase
+                Write-Progress @WriteProgressParams -CurrentOperation ('Updating {0}' -f $Module.Name) -PercentComplete $PercentComplete
                 Update-Module @UpdateModuleParams
             }
         }
@@ -275,27 +342,30 @@ Function Update-PowerShell {
         # The modular AWS Tools for PowerShell has its own mechanism
         if ($InstalledModules -contains 'AWS.Tools.Installer') {
             if ($PSCmdlet.ShouldProcess('AWS.Tools', 'Update')) {
+                $PercentComplete = $ProgressPercentUpdatesBase + $ProgressPercentUpdatesSection
+                Write-Progress @WriteProgressParams -CurrentOperation 'Updating AWS modules' -PercentComplete $PercentComplete
                 Update-AWSToolsModule -CleanUp
             }
         }
+
+        Write-Progress @WriteProgressParams -Completed
     } else {
         Write-Warning -Message 'Unable to update PowerShell modules as PowerShellGet module not available.'
     }
 
     if ($PSCmdlet.ShouldProcess('Obsolete modules', 'Uninstall')) {
-        Write-Host -ForegroundColor Green 'Uninstalling obsolete Microsoft Graph modules ...'
-        Uninstall-MSGraphObsoleteModules
-
         if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
-            Write-Host -ForegroundColor Green 'Uninstalling obsolete PowerShell modules ...'
-            Uninstall-ObsoleteModule
+            if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+                Uninstall-ObsoleteModule -ProgressParentId $ProgressParentId
+            } else {
+                Uninstall-ObsoleteModule
+            }
         } else {
             Write-Warning -Message 'Unable to uninstall obsolete PowerShell modules as Uninstall-ObsoleteModule command not available.'
         }
     }
 
     if ($PSCmdlet.ShouldProcess('PowerShell help', 'Update')) {
-        Write-Host -ForegroundColor Green 'Updating PowerShell help ...'
         try {
             Update-Help -Force:$Force -ErrorAction Stop
         } catch {
@@ -311,7 +381,10 @@ Function Update-Scoop {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '')]
     [CmdletBinding()]
     Param(
-        [Switch]$CaptureOutput
+        [Switch]$CaptureOutput,
+
+        [ValidateRange('NonNegative')]
+        [Int]$ProgressParentId
     )
 
     if (!(Get-Command -Name scoop -ErrorAction Ignore)) {
@@ -319,8 +392,17 @@ Function Update-Scoop {
         return
     }
 
-    Write-Host -ForegroundColor Green -NoNewline 'Updating Scoop: '
-    Write-Host 'scoop update --quiet'
+    $WriteProgressParams = @{
+        Activity = 'Updating Scoop'
+    }
+
+    if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+        $WriteProgressParams['ParentId'] = $ProgressParentId
+        $WriteProgressParams['Id'] = $ProgressParentId + 1
+    }
+
+    Write-Progress @WriteProgressParams -CurrentOperation 'Updating module & repository' -PercentComplete 0
+    Write-Verbose -Message 'Updating Scoop: scoop update --quiet'
     if ($CaptureOutput) {
         $ScoopOutput = & scoop update --quiet 6>&1
     } else {
@@ -328,8 +410,8 @@ Function Update-Scoop {
         Write-Host
     }
 
-    Write-Host -ForegroundColor Green -NoNewline 'Updating Scoop apps: '
-    Write-Host 'scoop update * --quiet'
+    Write-Progress @WriteProgressParams -CurrentOperation 'Updating apps' -PercentComplete 20
+    Write-Verbose -Message 'Updating Scoop apps: scoop update * --quiet'
     if ($CaptureOutput) {
         $ScoopOutput += & scoop update * --quiet 6>&1
     } else {
@@ -337,14 +419,16 @@ Function Update-Scoop {
         Write-Host
     }
 
-    Write-Host -ForegroundColor Green -NoNewline 'Removing obsolete Scoop apps: '
-    Write-Host 'scoop cleanup *'
+    Write-Progress @WriteProgressParams -CurrentOperation 'Uninstalling obsolete apps' -PercentComplete 80
+    Write-Verbose -Message 'Uninstalling obsolete Scoop apps: scoop cleanup *'
     if ($CaptureOutput) {
         $ScoopOutput += & scoop cleanup * 6>&1
     } else {
         & scoop cleanup *
         Write-Host
     }
+
+    Write-Progress @WriteProgressParams -Completed
 
     if ($CaptureOutput) {
         return $ScoopOutput
@@ -392,7 +476,6 @@ Function Update-VisualStudio {
         '--norestart'
     )
 
-    Write-Host -ForegroundColor Green 'Updating Visual Studio ...'
     $VsInstaller = Start-Process -FilePath $VsInstallerExe -ArgumentList $VsInstallerArgs -PassThru
     $VsInstaller.WaitForExit()
 
@@ -422,7 +505,6 @@ Function Update-Windows {
         return
     }
 
-    Write-Host -ForegroundColor Green 'Installing Windows updates ...'
     $Results = Get-WindowsUpdate -IgnoreReboot -NotTitle Silverlight
     if ($Results) {
         return $Results
