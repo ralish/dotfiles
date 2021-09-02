@@ -163,11 +163,13 @@
     "powershell.scriptAnalysis.settingsPath": "C:\\Users\\SDL\\dotfiles\\posh\\PSScriptAnalyzerSettings.psd1",
 
     // Extension: Python
-    "python.experiments.enabled": false,
+    "python.experiments.enabled": true,
+    "python.experiments.optInto": ["pythonDeprecatePythonPath"],
     "python.languageServer": "Pylance",
     "python.linting.flake8Enabled": true,
     "python.linting.pylintCategorySeverity.refactor": "Information",
     "python.pythonPath": "~/dotfiles/vscode/venv",
+    "python.defaultInterpreterPath": "~/dotfiles/vscode/venv",
 
     // Extension: Red Hat Commons
     "redhat.telemetry.enabled": false,
