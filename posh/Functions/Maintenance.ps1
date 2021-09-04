@@ -98,61 +98,61 @@ Function Update-AllTheThings {
     }
 
     if ($Tasks['Windows']) {
-        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Write-Progress @WriteProgressParams -Status 'Updating Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.Windows = Update-Windows
         $TasksDone++
     }
 
     if ($Tasks['Office']) {
-        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Office' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Write-Progress @WriteProgressParams -Status 'Updating Office' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.Office = Update-Office
         $TasksDone++
     }
 
     if ($Tasks['VisualStudio']) {
-        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Write-Progress @WriteProgressParams -Status 'Updating Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.VisualStudio = Update-VisualStudio
         $TasksDone++
     }
 
     if ($Tasks['PowerShell']) {
-        Write-Progress @WriteProgressParams -CurrentOperation 'Updating PowerShell' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Write-Progress @WriteProgressParams -Status 'Updating PowerShell' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.PowerShell = Update-PowerShell -ProgressParentId $WriteProgressParams['Id']
         $TasksDone++
     }
 
     if ($Tasks['ModernApps']) {
-        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Microsoft Store apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Write-Progress @WriteProgressParams -Status 'Updating Microsoft Store apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.ModernApps = Update-ModernApps
         $TasksDone++
     }
 
     if ($Tasks['Scoop']) {
-        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Scoop apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Write-Progress @WriteProgressParams -Status 'Updating Scoop apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.Scoop = Update-Scoop -CaptureOutput -ProgressParentId $WriteProgressParams['Id']
         $TasksDone++
     }
 
     if ($Tasks['DotNetTools']) {
-        Write-Progress @WriteProgressParams -CurrentOperation 'Updating .NET tools' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Write-Progress @WriteProgressParams -Status 'Updating .NET tools' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.DotNetTools = Update-DotNetTools -ProgressParentId $WriteProgressParams['Id']
         $TasksDone++
     }
 
     if ($Tasks['NodejsPackages']) {
-        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Node.js packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Write-Progress @WriteProgressParams -Status 'Updating Node.js packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.NodejsPackages = Update-NodejsPackages
         $TasksDone++
     }
 
     if ($Tasks['PythonPackages']) {
-        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Python packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Write-Progress @WriteProgressParams -Status 'Updating Python packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.PythonPackages = Update-PythonPackages
         $TasksDone++
     }
 
     if ($Tasks['RubyGems']) {
-        Write-Progress @WriteProgressParams -CurrentOperation 'Updating Ruby gems' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Write-Progress @WriteProgressParams -Status 'Updating Ruby gems' -PercentComplete ($TasksDone / $TasksTotal * 100)
         $Results.RubyGems = Update-RubyGems
         $TasksDone++
     }
@@ -268,7 +268,7 @@ Function Update-PowerShell {
             $WriteProgressParams['Id'] = $ProgressParentId + 1
         }
 
-        Write-Progress @WriteProgressParams -CurrentOperation 'Enumerating installed modules' -PercentComplete 0
+        Write-Progress @WriteProgressParams -Status 'Enumerating installed modules' -PercentComplete 0
         $InstalledModules = Get-InstalledModule
 
         # Percentage of the total progress for Update-Module
@@ -280,7 +280,7 @@ Function Update-PowerShell {
         }
 
         if (!$IncludeDscModules) {
-            Write-Progress @WriteProgressParams -CurrentOperation 'Enumerating DSC modules for exclusion' -PercentComplete 5
+            Write-Progress @WriteProgressParams -Status 'Enumerating DSC modules for exclusion' -PercentComplete 5
 
             # Get-DscResource likes to output multiple progress bars but doesn't have the manners to
             # clean them up. The result is a total visual mess when we've got our own progress bars.
@@ -334,7 +334,7 @@ Function Update-PowerShell {
 
             if ($PSCmdlet.ShouldProcess($Module.Name, 'Update')) {
                 $PercentComplete = ($ModuleIdx + 1) / $InstalledModules.Count * $ProgressPercentUpdatesSection + $ProgressPercentUpdatesBase
-                Write-Progress @WriteProgressParams -CurrentOperation ('Updating {0}' -f $Module.Name) -PercentComplete $PercentComplete
+                Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $Module.Name) -PercentComplete $PercentComplete
                 Update-Module @UpdateModuleParams
             }
         }
@@ -343,7 +343,7 @@ Function Update-PowerShell {
         if ($InstalledModules -contains 'AWS.Tools.Installer') {
             if ($PSCmdlet.ShouldProcess('AWS.Tools', 'Update')) {
                 $PercentComplete = $ProgressPercentUpdatesBase + $ProgressPercentUpdatesSection
-                Write-Progress @WriteProgressParams -CurrentOperation 'Updating AWS modules' -PercentComplete $PercentComplete
+                Write-Progress @WriteProgressParams -Status 'Updating AWS modules' -PercentComplete $PercentComplete
                 Update-AWSToolsModule -CleanUp
             }
         }
@@ -401,7 +401,7 @@ Function Update-Scoop {
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
-    Write-Progress @WriteProgressParams -CurrentOperation 'Updating module & repository' -PercentComplete 0
+    Write-Progress @WriteProgressParams -Status 'Updating module & repository' -PercentComplete 0
     Write-Verbose -Message 'Updating Scoop: scoop update --quiet'
     if ($CaptureOutput) {
         $ScoopOutput = & scoop update --quiet 6>&1
@@ -410,7 +410,7 @@ Function Update-Scoop {
         Write-Host
     }
 
-    Write-Progress @WriteProgressParams -CurrentOperation 'Updating apps' -PercentComplete 20
+    Write-Progress @WriteProgressParams -Status 'Updating apps' -PercentComplete 20
     Write-Verbose -Message 'Updating Scoop apps: scoop update * --quiet'
     if ($CaptureOutput) {
         $ScoopOutput += & scoop update * --quiet 6>&1
@@ -419,7 +419,7 @@ Function Update-Scoop {
         Write-Host
     }
 
-    Write-Progress @WriteProgressParams -CurrentOperation 'Uninstalling obsolete apps' -PercentComplete 80
+    Write-Progress @WriteProgressParams -Status 'Uninstalling obsolete apps' -PercentComplete 80
     Write-Verbose -Message 'Uninstalling obsolete Scoop apps: scoop cleanup *'
     if ($CaptureOutput) {
         $ScoopOutput += & scoop cleanup * 6>&1

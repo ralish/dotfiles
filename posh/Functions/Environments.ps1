@@ -38,7 +38,7 @@ Function Update-DotNetTools {
     }
     $env:DOTNET_NOLOGO = 'true'
 
-    Write-Progress @WriteProgressParams -CurrentOperation 'Enumerating .NET tools' -PercentComplete 0
+    Write-Progress @WriteProgressParams -Status 'Enumerating .NET tools' -PercentComplete 0
     Write-Verbose -Message ('Enumerating .NET tools: dotnet {0}' -f ($ListArgs -join ' '))
     $Tools = [Collections.ArrayList]::new()
     & dotnet @ListArgs | ForEach-Object {
@@ -50,7 +50,7 @@ Function Update-DotNetTools {
     $ToolsUpdated = 0
     foreach ($Tool in $Tools) {
         if ($PSCmdlet.ShouldProcess($Tool, 'Update')) {
-            Write-Progress @WriteProgressParams -CurrentOperation ('Updating {0}' -f $Tool) -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
+            Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $Tool) -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
             Write-Verbose -Message ('Updating {0}: dotnet {1} {0}' -f $Tool, ($UpdateArgs -join ' '))
             & dotnet @UpdateArgs $Tool
             $ToolsUpdated++
