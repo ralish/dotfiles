@@ -114,7 +114,9 @@
 
     // Extension: C#
     "csharp.suppressHiddenDiagnostics": false,
-    "omnisharp.enableEditorConfigSupport": true,
+    // Disabled due to conflict with Visual Studio
+    // https://github.com/OmniSharp/omnisharp-roslyn/issues/2230
+    "omnisharp.enableEditorConfigSupport": false,
     "omnisharp.enableRoslynAnalyzers": true,
     "omnisharp.loggingLevel": "warning",
 
