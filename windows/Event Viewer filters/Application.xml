@@ -10,6 +10,7 @@
       Directory Synchronization                   Azure AD Sync DirSync
       edgeupdate                                  Edge Update
       gupdate                                     Google Update
+      Microsoft-Windows-RestartManager            RestartManager
       Microsoft-Windows-Security-SPP              Software Protection Platform
       Outlook                                     Outlook
     -->
@@ -23,6 +24,8 @@
           Provider[@Name='edgeupdate']
           or
           Provider[@Name='gupdate']
+          or
+          Provider[@Name='Microsoft-Windows-RestartManager']
           or
           Provider[@Name='Microsoft-Windows-Security-SPP']
           or
