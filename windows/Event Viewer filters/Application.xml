@@ -80,6 +80,19 @@
     </Suppress>
 
     <!--
+      Source:     RestartManager
+      Level:      Warning
+      Message:    Application '%3' (pid %2) cannot be restarted - Application SID does not match Conductor SID.
+
+      Rarely of interest and often high volume.
+    -->
+    <Suppress Path="Application">
+      *[System[Provider[@Name='Microsoft-Windows-RestartManager'] and EventID=10010]]
+      and
+      *[UserData[RmUnsupportedRestartEvent[Reason=1]]]
+    </Suppress>
+
+    <!--
       Source:     SceCli
       Level:      Information
       Message:    Security policy in the Group policy objects has been applied successfully.
