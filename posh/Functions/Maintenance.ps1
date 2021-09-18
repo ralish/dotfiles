@@ -105,7 +105,7 @@ Function Update-AllTheThings {
 
     if ($Tasks['Office']) {
         Write-Progress @WriteProgressParams -Status 'Updating Office' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.Office = Update-Office
+        $Results.Office = Update-Office -ProgressParentId $WriteProgressParams['Id']
         $TasksDone++
     }
 
@@ -185,7 +185,10 @@ Function Update-ModernApps {
 # Update Microsoft Office (Click-to-Run only)
 Function Update-Office {
     [CmdletBinding()]
-    Param()
+    Param(
+        [ValidateRange('NonNegative')]
+        [Int]$ProgressParentId
+    )
 
     # The new Update Now feature for Office 2013 Click-to-Run for Office365 and its associated command-line and switches
     # https://blogs.technet.microsoft.com/odsupport/2014/03/03/the-new-update-now-feature-for-office-2013-click-to-run-for-office365-and-its-associated-command-line-and-switches/
@@ -200,6 +203,16 @@ Function Update-Office {
         return
     }
 
+    $WriteProgressParams = @{
+        Activity = 'Updating Office 365'
+    }
+
+    if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+        $WriteProgressParams['ParentId'] = $ProgressParentId
+        $WriteProgressParams['Id'] = $ProgressParentId + 1
+    }
+
+    Write-Progress @WriteProgressParams
     & $OfficeC2RClient /update user updatepromptuser=True
     Start-Sleep -Seconds 3
 
@@ -208,12 +221,8 @@ Function Update-Office {
         $OfficeRegKey = Get-Item -LiteralPath $OfficeRegPath
 
         $ExecutingScenario = $OfficeRegKey.GetValue('ExecutingScenario')
-        $ExecutingScenarioPrevious = [String]::Empty
         if ($ExecutingScenario) {
-            if ($ExecutingScenario -ne $ExecutingScenarioPrevious) {
-                $ExecutingScenarioPrevious = $ExecutingScenario
-                Write-Verbose -Message ('Office update currently running scenario: {0}' -f $ExecutingScenario)
-            }
+            Write-Progress @WriteProgressParams -Status ('Executing scenario: {0}' -f $ExecutingScenario)
         } else {
             $LastScenario = $OfficeRegKey.GetValue('LastScenario')
             $LastScenarioResult = $OfficeRegKey.GetValue('LastScenarioResult')
@@ -240,6 +249,8 @@ Function Update-Office {
     } while ($true)
 
     Write-Verbose -Message ('Office update finished {0} scenario with result: {1}' -f $LastScenario, $LastScenarioResult)
+    Write-Progress @WriteProgressParams -Completed
+
     if ($LastScenarioResult -ne 'Success') {
         return $false
     }
