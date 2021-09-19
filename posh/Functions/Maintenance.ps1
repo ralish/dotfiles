@@ -99,7 +99,7 @@ Function Update-AllTheThings {
 
     if ($Tasks['Windows']) {
         Write-Progress @WriteProgressParams -Status 'Updating Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.Windows = Update-Windows
+        $Results.Windows = Update-Windows -PassThru
         $TasksDone++
     }
 
@@ -494,7 +494,9 @@ Function Update-VisualStudio {
 # Update Microsoft Windows
 Function Update-Windows {
     [CmdletBinding()]
-    Param()
+    Param(
+        [Switch]$PassThru
+    )
 
     if (!(Test-IsAdministrator)) {
         throw 'You must have administrator privileges to perform Windows updates.'
@@ -510,5 +512,7 @@ Function Update-Windows {
         return $Results
     }
 
-    return $true
+    if ($PassThru) {
+        return $true
+    }
 }
