@@ -493,16 +493,49 @@ Function Update-VisualStudio {
         '--norestart'
     )
 
-    $VsInstaller = Start-Process -FilePath $VsInstallerExe -ArgumentList $VsInstallerArgs -PassThru
-    $VsInstaller.WaitForExit()
+    # Waiting on the Visual Studio Installer to complete is far more difficult
+    # than at all reasonable. Providing the above parameters and waiting on the
+    # process to exit is sufficient *if* the installer itself does not need to
+    # be updated. In the latter case however, the original setup process will
+    # exit while the update continues in the newly launched updated installer.
+    #
+    # Contrary to what the official documentation states the "--wait" parameter
+    # does not work; in fact, it doesn't appear to even be a valid option. The
+    # best approach I've found is to try to acquire the named mutex used by the
+    # installer: DevdivInstallerUI. This is obviously undocumented and a hack,
+    # but all of the other approaches I've found have more serious downsides.
+    $VsInstaller = Start-Process -FilePath $VsInstallerExe -ArgumentList $VsInstallerArgs -PassThru -Wait
 
-    switch ($VsInstaller.ExitCode) {
-        3010 { Write-Warning -Message 'Visual Studio successfully updated but requires a reboot.' }
-        0 { }
-        Default {
-            Write-Error -Message ('Visual Studio Installer returned exit code: {0}' -f $VsInstaller.ExitCode)
-            return $false
+    # Wait a few seconds in case the original installer process has exited but
+    # the updated installer process has not yet started. I'm not sure if this
+    # is actually a possible scenario, but am just being cautious. Obviously a
+    # not particularly durable hack, but more durable approaches are a pain.
+    Start-Sleep -Seconds 3
+
+    # Try to acquire the Visual Studio Installer mutex. If the named mutex is
+    # created by us, then an updated installer is not running. If it already
+    # exists, wait on it until we acquire it. The distinction is important as
+    # if an updated Visual Studio Installer is running, the exit code we have
+    # from the original instance is not meaningful for the update operation.
+    $VsInstallerMutexCreated = $false
+    $VsInstallerMutex = [Threading.Mutex]::new($false, 'DevdivInstallerUI', [ref]$VsInstallerMutexCreated)
+    if (!$VsInstallerMutexCreated) {
+        $null = $VsInstallerMutex.WaitOne()
+        $VsInstallerMutex.ReleaseMutex()
+    }
+    $VsInstallerMutex.Close()
+
+    if ($VsInstallerMutexCreated) {
+        switch ($VsInstaller.ExitCode) {
+            3010 { Write-Warning -Message 'Visual Studio successfully updated but requires a reboot.' }
+            0 { }
+            Default {
+                Write-Error -Message ('Visual Studio Installer returned exit code: {0}' -f $VsInstaller.ExitCode)
+                return $false
+            }
         }
+    } else {
+        Write-Warning -Message 'Visual Studio Installer exit code is unknown as the update occurred in a different process.'
     }
 
     return $true
