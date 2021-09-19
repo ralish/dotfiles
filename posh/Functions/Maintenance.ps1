@@ -111,7 +111,7 @@ Function Update-AllTheThings {
 
     if ($Tasks['VisualStudio']) {
         Write-Progress @WriteProgressParams -Status 'Updating Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.VisualStudio = Update-VisualStudio -ProgressParentId $WriteProgressParams['Id']
+        $Results.VisualStudio = Update-VisualStudio -PassThru -ProgressParentId $WriteProgressParams['Id']
         $TasksDone++
     }
 
@@ -456,6 +456,8 @@ Function Update-Scoop {
 Function Update-VisualStudio {
     [CmdletBinding()]
     Param(
+        [Switch]$PassThru,
+
         [ValidateRange('NonNegative')]
         [Int]$ProgressParentId
     )
@@ -485,7 +487,11 @@ Function Update-VisualStudio {
         } else {
             Write-Error -Message 'Get-VSSetupInstance returned multiple instances.'
         }
-        return $false
+
+        if ($PassThru) {
+            return $false
+        }
+        return
     }
 
     $WriteProgressParams = @{
@@ -568,12 +574,13 @@ Function Update-VisualStudio {
 
     Write-Progress @WriteProgressParams -Completed
 
+    $Result = $true
     switch ($VsInstaller.ExitCode) {
         3010 { Write-Warning -Message 'Visual Studio successfully updated but requires a reboot.' }
         0 { }
         Default {
             Write-Error -Message ('Visual Studio Installer returned exit code: {0}' -f $VsInstaller.ExitCode)
-            return $false
+            $Result = $false
         }
     }
 
@@ -581,7 +588,9 @@ Function Update-VisualStudio {
         Write-Warning -Message 'Visual Studio Installer exit code may be unreliable.'
     }
 
-    return $true
+    if ($PassThru) {
+        return $Result
+    }
 }
 
 # Update Microsoft Windows
