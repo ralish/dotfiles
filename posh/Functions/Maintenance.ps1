@@ -105,7 +105,7 @@ Function Update-AllTheThings {
 
     if ($Tasks['Office']) {
         Write-Progress @WriteProgressParams -Status 'Updating Office' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.Office = Update-Office -ProgressParentId $WriteProgressParams['Id']
+        $Results.Office = Update-Office -PassThru -ProgressParentId $WriteProgressParams['Id']
         $TasksDone++
     }
 
@@ -186,6 +186,8 @@ Function Update-ModernApps {
 Function Update-Office {
     [CmdletBinding()]
     Param(
+        [Switch]$PassThru,
+
         [ValidateRange('NonNegative')]
         [Int]$ProgressParentId
     )
@@ -250,6 +252,10 @@ Function Update-Office {
 
     Write-Verbose -Message ('Office update finished {0} scenario with result: {1}' -f $LastScenario, $LastScenarioResult)
     Write-Progress @WriteProgressParams -Completed
+
+    if (!$PassThru) {
+        return
+    }
 
     if ($LastScenarioResult -ne 'Success') {
         return $false
