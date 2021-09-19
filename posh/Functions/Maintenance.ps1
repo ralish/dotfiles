@@ -111,7 +111,7 @@ Function Update-AllTheThings {
 
     if ($Tasks['VisualStudio']) {
         Write-Progress @WriteProgressParams -Status 'Updating Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.VisualStudio = Update-VisualStudio
+        $Results.VisualStudio = Update-VisualStudio -ProgressParentId $WriteProgressParams['Id']
         $TasksDone++
     }
 
@@ -455,7 +455,10 @@ Function Update-Scoop {
 # Update Microsoft Visual Studio
 Function Update-VisualStudio {
     [CmdletBinding()]
-    Param()
+    Param(
+        [ValidateRange('NonNegative')]
+        [Int]$ProgressParentId
+    )
 
     # Use command-line parameters to install Visual Studio
     # https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
@@ -485,6 +488,15 @@ Function Update-VisualStudio {
         return $false
     }
 
+    $WriteProgressParams = @{
+        Activity = 'Updating Visual Studio'
+    }
+
+    if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+        $WriteProgressParams['ParentId'] = $ProgressParentId
+        $WriteProgressParams['Id'] = $ProgressParentId + 1
+    }
+
     $VsInstallerArgs = @(
         'update'
         '--installPath'
@@ -504,6 +516,7 @@ Function Update-VisualStudio {
     # best approach I've found is to try to acquire the named mutex used by the
     # installer: DevdivInstallerUI. This is obviously undocumented and a hack,
     # but all of the other approaches I've found have more serious downsides.
+    Write-Progress @WriteProgressParams -Status 'Running Visual Studio Installer'
     $VsInstaller = Start-Process -FilePath $VsInstallerExe -ArgumentList $VsInstallerArgs -PassThru -Wait
 
     # Wait a few seconds in case the original installer process has exited but
@@ -520,11 +533,13 @@ Function Update-VisualStudio {
     $VsInstallerMutexCreated = $false
     $VsInstallerMutex = [Threading.Mutex]::new($false, 'DevdivInstallerUI', [ref]$VsInstallerMutexCreated)
     if (!$VsInstallerMutexCreated) {
+        Write-Progress @WriteProgressParams -Status 'Waiting for updated installer to exit'
         $null = $VsInstallerMutex.WaitOne()
         $VsInstallerMutex.ReleaseMutex()
     }
     $VsInstallerMutex.Close()
 
+    Write-Progress @WriteProgressParams -Completed
     if ($VsInstallerMutexCreated) {
         switch ($VsInstaller.ExitCode) {
             3010 { Write-Warning -Message 'Visual Studio successfully updated but requires a reboot.' }
