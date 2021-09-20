@@ -63,7 +63,7 @@ Function Set-EnvironmentVariable {
     )
 
     Process {
-        if ($Action -in @('Append', 'Prepend')) {
+        if ($Action -in 'Append', 'Prepend') {
             $CurrentValue = Get-EnvironmentVariable -Name $Name -Scope $Scope
         }
 
@@ -91,7 +91,7 @@ Function Find-WinEvent {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     Param(
         [Parameter(Mandatory)]
-        [String]$Filter,
+        [String[]]$Filter,
 
         [ValidateNotNullOrEmpty()]
         [DateTime]$StartTime,
@@ -104,15 +104,28 @@ Function Find-WinEvent {
         [ValidateSet('Any', 'Critical', 'Error', 'Warning', 'Info', 'Verbose')]
         [String]$MinSeverityLevel,
 
-        [ValidateSet('EventLogRecord', 'PlainText')]
+        [ValidateSet('EventLogRecord', 'PlainText', 'PlainTextMinimal')]
         [ValidateNotNullOrEmpty()]
         [String]$OutputFormat = 'EventLogRecord',
+
+        [String[]]$ExcludedLogs = @(
+            'Microsoft-Windows-CAPI2/Operational',
+            'Microsoft-Windows-Hyper-V-VmSwitch-Operational',
+            'PowerShellCore/Operational',
+            'Security'
+        ),
 
         [Switch]$Force
     )
 
+    if (!(Test-IsAdministrator)) {
+        Write-Warning -Message 'Some event logs may be inaccessible without administrator privileges.'
+    }
+
     $Events = [Collections.ArrayList]::new()
-    $LogGroups = [Collections.ArrayList]::new()
+    $EventLogs = [Collections.ArrayList]::new()
+    $SkippedLogs = [Collections.ArrayList]::new()
+    $ProviderLogs = @{}
 
     # EventLevel Enum
     # https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.tracing.eventlevel
@@ -140,54 +153,118 @@ Function Find-WinEvent {
     }
 
     # Configure event severity filtering
-    if ($PSCmdlet.ParameterSetName -eq 'SeverityLevel') {
+    if ($PSCmdlet.ParameterSetName -eq 'SeverityLevel' -and $SeverityLevels -notcontains 'Any') {
         $EventLevels = [Collections.ArrayList]::new()
         foreach ($Severity in $SeverityLevel) {
             $null = $EventLevels.Add($EventLevelToInt[$Severity])
         }
-    } elseif ($PSCmdlet.ParameterSetName -eq 'MinSeverity') {
+    } elseif ($PSCmdlet.ParameterSetName -eq 'MinSeverity' -and $SeverityLevel -ne 'Any') {
         $EventLevels = 0..$EventLevelToInt[$MinSeverity]
-    } else {
-        $EventLevels = 0..($EventLevelToInt.Count - 1)
     }
 
-    # Retrieve all matching event logs
-    $EventLogs = Get-WinEvent -ListLog $Filter -Force:$Force | Where-Object LogName -NE 'Security'
-
-    # Group Administrative & Operational logs
-    $LogGroup = @($EventLogs | Where-Object LogType -In @('Administrative', 'Operational'))
-    if ($LogGroup.Count -gt 0) {
-        $null = $LogGroups.Add($LogGroup)
+    # Retrieve matching event logs
+    $EventLogsToAdd = Get-WinEvent -ListLog $Filter -Force:$Force -ErrorAction Ignore | Where-Object {
+        # Explicitly excluded logs
+        $_.LogName -NotIn $ExcludedLogs -and
+        # No records (must test both!)
+        $_.RecordCount -ne 0 -and
+        $null -ne $_.RecordCount -and
+        # Written to since start time
+        $_.LastWriteTime -ge $StartTime
     }
 
-    # Group Analytical & Debug logs (requires different handling)
-    if ($Force) {
-        $LogGroup = @($EventLogs | Where-Object LogType -In @('Analytical', 'Debug'))
-        if ($LogGroup.Count -gt 0) {
-            $null = $LogGroups.Add($LogGroup)
+    # Add matched event logs to array
+    foreach ($Log in $EventLogsToAdd) {
+        $null = $EventLogs.Add($Log)
+    }
+
+    # Retrieve matching event providers. For each event provider, record which
+    # event log(s) it outputs to. We'll later retrieve events from these log(s)
+    # filtered by the event provider. Exclude any logs which match the filter,
+    # as we'll retrieve all events from these logs without any provider filter.
+    foreach ($Provider in (Get-WinEvent -ListProvider $Filter -ErrorAction Ignore)) {
+        $LogLinks = $Provider.LogLinks | Where-Object LogName -NotIn $ExcludedLogs
+
+        foreach ($Link in $LogLinks) {
+            $LogName = $Link.LogName
+
+            $LogFiltered = $false
+            foreach ($Entry in $Filter) {
+                if ($LogName -like $Entry) {
+                    $LogFiltered = $true
+                    break
+                }
+            }
+
+            # Log already included by log filter
+            if ($LogFiltered) {
+                continue
+            }
+
+            # Log previously enumerated and found to be inaccessible or irrelevant
+            if ($SkippedLogs -contains $LogName) {
+                continue
+            }
+
+            if (!$ProviderLogs.ContainsKey($LogName)) {
+                try {
+                    $Log = Get-WinEvent -ListLog $LogName -Force:$Force -ErrorAction Stop
+                } catch {
+                    Write-Error -Message $_.Exception.Message
+                    $null = $SkippedLogs.Add($LogName)
+                    continue
+                }
+
+                # No records (must test both!) or not written to since start time
+                if ($Log.RecordCount -eq 0 -or $null -eq $Log.RecordCount -or $Log.LastWriteTime -lt $StartTime) {
+                    $null = $SkippedLogs.Add($LogName)
+                    continue
+                }
+
+                $null = $EventLogs.Add($Log)
+                $ProviderLogs[$LogName] = [Collections.ArrayList]::new()
+            }
+
+            $null = $ProviderLogs[$LogName].Add($Provider.Name)
         }
     }
 
-    if ($LogGroups.Count -eq 0) {
-        Write-Error -Message 'No event logs matched the provided filter.'
+    if ($EventLogs.Count -eq 0) {
+        Write-Error -Message 'No event logs or providers matched the filter.'
         return
     }
 
-    # Retrieve events from matching event logs
-    foreach ($LogGroup in $LogGroups) {
+    $WriteProgressParams = @{
+        Activity = 'Retrieving Windows event logs'
+    }
+
+    # Retrieve all the events matching the filter
+    for ($Idx = 0; $Idx -lt $EventLogs.Count; $Idx++) {
+        $EventLog = $EventLogs[$Idx]
+        $LogName = $EventLog.LogName
+
+        Write-Progress @WriteProgressParams -Status $LogName -PercentComplete ($Idx / $EventLogs.Count * 100)
+
         $EventFilter = @{
-            LogName   = $LogGroup.LogName
-            Level     = $EventLevels
+            LogName   = $LogName
             StartTime = $StartTime
         }
 
+        if ($ProviderLogs.ContainsKey($LogName)) {
+            $EventFilter['ProviderName'] = $ProviderLogs[$LogName].ToArray()
+        }
+
+        if ($EventLevels) {
+            $EventFilter['Level'] = $EventLevels
+        }
+
         $EventParams = @{
             FilterHashtable = $EventFilter
             Oldest          = $false
         }
 
         # Analytical & Debug logs must be read in forward chronological order
-        if ($LogGroup.LogType -contains @('Analytical', 'Debug')) {
+        if ($EventLog.LogType -in 'Analytical', 'Debug') {
             $EventParams['Oldest'] = $true
         }
 
@@ -206,89 +283,52 @@ Function Find-WinEvent {
                 }
             }
         }
+
+        $LogsDone++
     }
 
-    # Retrieve all matching event providers
-    $EventProviders = Get-WinEvent -ListProvider $Filter -ErrorAction Ignore
+    Write-Progress @WriteProgressParams -Completed
 
-    # For each matching event provider, record which event logs it outputs to,
-    # excluding those which match the filter in their name (already retrieved).
-    $OtherLogs = @{}
-    foreach ($Provider in $EventProviders) {
-        $LogLinks = $Provider.LogLinks | Where-Object LogName -NotLike $Filter
-        foreach ($Log in $LogLinks) {
-            if ($OtherLogs[$Log.LogName]) {
-                $OtherLogs[$Log.LogName] += $Provider.Name
-            } else {
-                $OtherLogs[$Log.LogName] = @($Provider.Name)
-            }
-        }
-    }
-
-    # Retrieve matching provider events being logged to other event logs
-    foreach ($LogName in $OtherLogs.Keys) {
-        try {
-            $Log = Get-WinEvent -ListLog $LogName -Force:$Force -ErrorAction Stop
-        } catch {
-            Write-Warning -Message $_.Exception.Message
-            continue
-        }
-
-        $EventFilter = @{
-            LogName      = $LogName
-            ProviderName = $OtherLogs[$LogName]
-            Level        = $EventLevels
-            StartTime    = $StartTime
-        }
-
-        $EventParams = @{
-            FilterHashtable = $EventFilter
-            Oldest          = $false
-        }
-
-        # Analytical & Debug logs must be read in forward chronological order
-        if ($Log.LogType -Contains @('Analytical', 'Debug')) {
-            $EventParams['Oldest'] = $true
-        }
-
-        try {
-            $FoundEvents = Get-WinEvent @EventParams -ErrorAction Stop
-            foreach ($Event in $FoundEvents) {
-                $null = $Events.Add($Event)
-            }
-        } catch {
-            $Ex = $_
-            switch -Regex ($_.FullyQualifiedErrorId) {
-                '^NoMatchingEventsFound,' { continue }
-                default {
-                    Write-Warning -Message $Ex.Exception.Message
-                    continue
-                }
-            }
-        }
-    }
-
-    # Sort all the retrieved events
     $SortedEvents = $Events | Sort-Object -Property TimeCreated
 
-    # Perform any output conversion
     if ($OutputFormat -eq 'EventLogRecord') {
-        $Events = $SortedEvents
-    } else {
-        $Events = [Collections.ArrayList]::new()
-        $DateFormat = 'yyyy/MM/dd hh:mm:ss tt'
-        $StringSplitOptions = [StringSplitOptions]::RemoveEmptyEntries -bor [StringSplitOptions]::TrimEntries
-        $PrefixWhitespace = ' ' * ('[{0}] {1,-8} -> ' -f (Get-Date).ToString($DateFormat), $EventLevelToName[0]).Length
-        $MultilinePrefix = '{0}{1}' -f [Environment]::NewLine, $PrefixWhitespace
+        return $SortedEvents
+    }
 
-        foreach ($Event in $SortedEvents) {
-            $Time = $Event.TimeCreated.ToString($DateFormat)
-            $Level = $EventLevelToName[$Event.Level].ToUpper()
-            $Message = @($Event.Message.Split("`r`n", $StringSplitOptions).Split("`n", $StringSplitOptions))
+    $Events = [Collections.ArrayList]::new()
+    $DateFormat = 'yyyy/MM/dd hh:mm:ss tt'
+    $StringSplitOptions = [StringSplitOptions]::RemoveEmptyEntries -bor [StringSplitOptions]::TrimEntries
+    $PrefixWhitespace = ' ' * ('[{0}] {1,-8} -> ' -f (Get-Date).ToString($DateFormat), $EventLevelToName[0]).Length
+    $MultilinePrefix = '{0}{1}' -f [Environment]::NewLine, $PrefixWhitespace
 
-            $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, [String]::Join($MultilinePrefix, $Message)
-            $null = $Events.Add($Text)
+    foreach ($Event in $SortedEvents) {
+        $Time = $Event.TimeCreated.ToString($DateFormat)
+        $Level = $EventLevelToName[$Event.Level].ToUpper()
+        $Provider = $Event.ProviderName
+        $Message = $Event.Message
+
+        $ReplaceChars = [Char[]]@(
+            # Left-to-right mark
+            0x200e
+        )
+
+        foreach ($Char in $ReplaceChars) {
+            $Message = $Message.Replace([String]$Char, [String]::Empty)
         }
+
+        if ($Event.Message) {
+            $Message = $Message.Split("`r`n", $StringSplitOptions).Split("`n", $StringSplitOptions)
+        } else {
+            $Message = [String]::Empty
+        }
+
+        if ($OutputFormat -eq 'PlainText') {
+            $Text = '[{0}] {1,-8} -> {2}{3}{4}' -f $Time, $Level, $Provider, $MultilinePrefix, [String]::Join($MultilinePrefix, $Message)
+        } else {
+            $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, [String]::Join($MultilinePrefix, $Message)
+        }
+
+        $null = $Events.Add($Text)
     }
 
     return $Events
