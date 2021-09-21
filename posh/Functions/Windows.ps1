@@ -83,7 +83,21 @@ Function Set-EnvironmentVariable {
 
 # dmesg for Windows!
 Function dmesg {
-    Find-WinEvent -Filter '*Kernel*' -OutputFormat PlainText @args
+    $Filter = @(
+        '*-Kernel-*',
+        '*-TPM-*',
+        '*-FilterManager',
+        '*-HAL',
+        '*-Hypervisor',
+        '*-IsolatedUserMode',
+        '*-Ntfs',
+        '*-Wininit',
+        '*-Winlogon',
+        'TPM',
+        'Win32k'
+    )
+
+    Find-WinEvent -Filter $Filter @args
 }
 
 # Find events by filtering against logs and providers
