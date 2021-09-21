@@ -83,6 +83,11 @@ Function Set-EnvironmentVariable {
 
 # dmesg for Windows!
 Function dmesg {
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [String]$ComputerName
+    )
+
     $Filter = @(
         '*-Kernel-*',
         '*-TPM-*',
@@ -97,7 +102,7 @@ Function dmesg {
         'Win32k'
     )
 
-    Find-WinEvent -Filter $Filter @args
+    Find-WinEvent -Filter $Filter @PSBoundParameters @args
 }
 
 # Find events by filtering against logs and providers
@@ -129,6 +134,9 @@ Function Find-WinEvent {
             'Security'
         ),
 
+        [ValidateNotNullOrEmpty()]
+        [String]$ComputerName,
+
         [Switch]$Force
     )
 
@@ -140,6 +148,11 @@ Function Find-WinEvent {
     $EventLogs = [Collections.ArrayList]::new()
     $SkippedLogs = [Collections.ArrayList]::new()
     $ProviderLogs = @{}
+
+    $CommonParams = @{}
+    if ($ComputerName) {
+        $CommonParams['ComputerName'] = $ComputerName
+    }
 
     # EventLevel Enum
     # https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.tracing.eventlevel
@@ -163,7 +176,7 @@ Function Find-WinEvent {
 
     # Default to boot time as start time
     if (!$PSBoundParameters.ContainsKey('StartTime')) {
-        $StartTime = (Get-CimInstance -ClassName Win32_OperatingSystem).LastBootUpTime
+        $StartTime = (Get-CimInstance @CommonParams -ClassName Win32_OperatingSystem).LastBootUpTime
     }
 
     # Configure event severity filtering
@@ -177,7 +190,7 @@ Function Find-WinEvent {
     }
 
     # Retrieve matching event logs
-    $EventLogsToAdd = Get-WinEvent -ListLog $Filter -Force:$Force -ErrorAction Ignore | Where-Object {
+    $EventLogsToAdd = Get-WinEvent @CommonParams -ListLog $Filter -Force:$Force -ErrorAction Ignore | Where-Object {
         # Explicitly excluded logs
         $_.LogName -NotIn $ExcludedLogs -and
         # No records (must test both!)
@@ -196,7 +209,7 @@ Function Find-WinEvent {
     # event log(s) it outputs to. We'll later retrieve events from these log(s)
     # filtered by the event provider. Exclude any logs which match the filter,
     # as we'll retrieve all events from these logs without any provider filter.
-    foreach ($Provider in (Get-WinEvent -ListProvider $Filter -ErrorAction Ignore)) {
+    foreach ($Provider in (Get-WinEvent @CommonParams -ListProvider $Filter -ErrorAction Ignore)) {
         $LogLinks = $Provider.LogLinks | Where-Object LogName -NotIn $ExcludedLogs
 
         foreach ($Link in $LogLinks) {
@@ -222,7 +235,7 @@ Function Find-WinEvent {
 
             if (!$ProviderLogs.ContainsKey($LogName)) {
                 try {
-                    $Log = Get-WinEvent -ListLog $LogName -Force:$Force -ErrorAction Stop
+                    $Log = Get-WinEvent @CommonParams -ListLog $LogName -Force:$Force -ErrorAction Stop
                 } catch {
                     Write-Error -Message $_.Exception.Message
                     $null = $SkippedLogs.Add($LogName)
@@ -283,7 +296,7 @@ Function Find-WinEvent {
         }
 
         try {
-            $FoundEvents = Get-WinEvent @EventParams -ErrorAction Stop
+            $FoundEvents = Get-WinEvent @CommonParams @EventParams -ErrorAction Stop
             foreach ($Event in $FoundEvents) {
                 $null = $Events.Add($Event)
             }
