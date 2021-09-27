@@ -111,6 +111,17 @@
     </Suppress>
 
     <!--
+      Source:     Netwtw10
+      Level:      Warning
+      Message:    6062 - Lso was triggered
+
+      Emitted by the Intel Wireless WiFi Link Driver. Presumably refers to Large Send Offload and seems to occur on various connection events.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Netwtw10'] and EventID=6062]]
+    </Suppress>
+
+    <!--
       Source:     Service Control Manager
       Level:      Information
       Message:    The %1 service entered the %2 state.
