@@ -69,7 +69,8 @@
     <!--
       Source:     Defrag
       Level:      Error
-      Message:    The volume %1 was not optimized because an error was encountered: Neither Slab Consolidation nor Slab Analysis will run if slabs are less than 8 MB. (0x8900002D)
+      Message:    The volume %1 was not optimized because an error was encountered:
+                  Neither Slab Consolidation nor Slab Analysis will run if slabs are less than 8 MB. (0x8900002D)
 
       Effectively harmless and often the case on VMs with thin-provisioned storage.
     -->
@@ -77,6 +78,20 @@
       *[System[Provider[@Name='Microsoft-Windows-Defrag'] and EventID=257]]
       and
       *[EventData[Data='Neither Slab Consolidation nor Slab Analysis will run if slabs are less than 8 MB. (0x8900002D)']]
+    </Suppress>
+
+    <!--
+      Source:     Defrag
+      Level:      Error
+      Message:    The storage optimiser couldn't complete slab consolidation on %2 because:
+                  The slab consolidation operation was aborted because a sufficient number of slabs could not be reclaimed (based on the limits specified in the registry). (0x89000028)
+
+      Merely indicates defragmentation is not necessary on the given volume.
+    -->
+    <Suppress Path="Application">
+      *[System[Provider[@Name='Microsoft-Windows-Defrag'] and EventID=264]]
+      and
+      *[EventData[Data='The slab consolidation operation was aborted because a sufficient number of slabs could not be reclaimed (based on the limits specified in the registry). (0x89000028)']]
     </Suppress>
 
     <!--
