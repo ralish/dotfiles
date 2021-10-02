@@ -4,6 +4,121 @@ if ($DotFilesShowScriptEntry) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing maintenance functions ...')
 
+# Clear caches used by development environments & tooling
+Function Clear-AllDevCaches {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
+    [CmdletBinding(DefaultParameterSetName = 'OptOut', SupportsShouldProcess)]
+    Param(
+        [Parameter(ParameterSetName = 'OptOut')]
+        [ValidateSet(
+            'Docker',
+            'gem',
+            'Go',
+            'Gradle',
+            'Maven',
+            'npm',
+            'NuGet',
+            'pip'
+        )]
+        [String[]]$ExcludeTasks,
+
+        [Parameter(ParameterSetName = 'OptIn', Mandatory)]
+        [ValidateSet(
+            'Docker',
+            'gem',
+            'Go',
+            'Gradle',
+            'Maven',
+            'npm',
+            'NuGet',
+            'pip'
+        )]
+        [String[]]$IncludeTasks
+    )
+
+    $ValidTasks = @(
+        'Docker',
+        'gem',
+        'Go',
+        'Gradle',
+        'Maven',
+        'npm',
+        'NuGet',
+        'pip'
+    )
+
+    $Tasks = [Collections.ArrayList]::new()
+    $TasksDone = 0
+    $TasksTotal = 0
+
+    foreach ($Task in $ValidTasks) {
+        if ($PSCmdlet.ParameterSetName -eq 'OptOut') {
+            if ($ExcludeTasks -notcontains $Task) {
+                $null = $Tasks.Add($Task)
+                $TasksTotal++
+            }
+        } else {
+            if ($IncludeTasks -contains $Task) {
+                $null = $Tasks.Add($Task)
+                $TasksTotal++
+            }
+        }
+    }
+
+    $WriteProgressParams = @{
+        Id       = 0
+        Activity = 'Clearing caches for development environments & tooling'
+    }
+
+    if ($Tasks -contains 'Docker') {
+        Write-Progress @WriteProgressParams -Status 'Clearing Docker cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Clear-DockerCache
+        $TasksDone++
+    }
+
+    if ($Tasks -contains 'gem') {
+        Write-Progress @WriteProgressParams -Status 'Clearing gem cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Clear-GemCache
+        $TasksDone++
+    }
+
+    if ($Tasks -contains 'Go') {
+        Write-Progress @WriteProgressParams -Status 'Clearing Go cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Clear-GoCache
+        $TasksDone++
+    }
+
+    if ($Tasks -contains 'Gradle') {
+        Write-Progress @WriteProgressParams -Status 'Clearing Gradle cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Clear-GradleCache
+        $TasksDone++
+    }
+
+    if ($Tasks -contains 'Maven') {
+        Write-Progress @WriteProgressParams -Status 'Clearing Maven cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Clear-MavenCache
+        $TasksDone++
+    }
+
+    if ($Tasks -contains 'npm') {
+        Write-Progress @WriteProgressParams -Status 'Clearing npm cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Clear-NpmCache
+        $TasksDone++
+    }
+
+    if ($Tasks -contains 'NuGet') {
+        Write-Progress @WriteProgressParams -Status 'Clearing NuGet cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Clear-NuGetCache
+        $TasksDone++
+    }
+
+    if ($Tasks -contains 'pip') {
+        Write-Progress @WriteProgressParams -Status 'Clearing pip cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Clear-PipCache
+        $TasksDone++
+    }
+}
+
 # Update everything!
 Function Update-AllTheThings {
     [CmdletBinding(DefaultParameterSetName = 'OptOut')]

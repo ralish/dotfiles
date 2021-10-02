@@ -6,6 +6,52 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing environment func
 
 #region .NET
 
+# Clear NuGet cache
+Function Clear-NuGetCache {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    if (!(Get-Command -Name nuget -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to clear NuGet cache as nuget command not found.'
+        return
+    }
+
+    $KnownCaches = @{
+        HttpCache      = 'http-cache'
+        GlobalPackages = 'global-packages'
+        Temp           = 'temp'
+        PluginsCache   = 'plugins-cache'
+    }
+
+    $NuGetLocals = & nuget locals all -List
+
+    foreach ($Cache in $KnownCaches.Keys) {
+        $CacheVar = 'NuGet{0}' -f $Cache
+        $CacheRegex = '^{0}: (.*)' -f $KnownCaches[$Cache]
+        $CacheFound = $false
+
+        foreach ($Line in $NuGetLocals) {
+            if ($Line -match $CacheRegex) {
+                Set-Variable -Name $CacheVar -Value $Matches[1] -WhatIf:$false
+                $CacheFound = $true
+                break
+            }
+        }
+
+        if (!$CacheFound) {
+            Write-Error -Message ('Unable to determine NuGet {0} location.' -f $KnownCaches[$Cache])
+            return
+        }
+    }
+
+    foreach ($Cache in $KnownCaches.Keys) {
+        $CachePath = Get-Variable -Name ('NuGet{0}' -f $Cache) -ValueOnly
+        if ($PSCmdlet.ShouldProcess($CachePath, 'Clear')) {
+            & nuget locals $KnownCaches[$Cache] -Clear -Verbosity quiet
+        }
+    }
+}
+
 # Update .NET tools
 Function Update-DotNetTools {
     [CmdletBinding(SupportsShouldProcess)]
@@ -156,6 +202,22 @@ Function Switch-Cygwin {
 
 #region Go
 
+# Clear Go cache
+Function Clear-GoCache {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    if (!(Get-Command -Name go -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to clear Go cache as go command not found.'
+        return
+    }
+
+    $GoCache = & go env GOCACHE
+    if ($PSCmdlet.ShouldProcess($GoCache, 'Clear')) {
+        & go clean -cache
+    }
+}
+
 # Configure environment for Go development
 #
 # Environment variables
@@ -301,6 +363,42 @@ Function Switch-Google {
 
 #region Java
 
+# Clear Gradle cache
+Function Clear-GradleCache {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    if ($env:GRADLE_USER_HOME) {
+        $GradleCache = Join-Path -Path $env:GRADLE_USER_HOME -ChildPath 'caches'
+    } else {
+        $GradleCache = Join-Path -Path $HOME -ChildPath '.gradle\caches'
+    }
+
+    if (Test-Path -Path $GradleCache -PathType Container) {
+        if ($PSCmdlet.ShouldProcess($GradleCache, 'Clear')) {
+            Remove-Item -Path "$GradleCache\*" -Recurse -Verbose:$false
+        }
+    }
+}
+
+# Clear Maven cache
+Function Clear-MavenCache {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    if ($env:M2_HOME) {
+        $MvnRepo = Join-Path -Path $env:M2_HOME -ChildPath 'repository'
+    } else {
+        $MvnRepo = Join-Path -Path $HOME -ChildPath '.m2\repository'
+    }
+
+    if (Test-Path -Path $MvnRepo -PathType Container) {
+        if ($PSCmdlet.ShouldProcess($MvnRepo, 'Clear')) {
+            Remove-Item -Path "$MvnRepo\*" -Recurse -Verbose:$false
+        }
+    }
+}
+
 # Configure environment for Java development
 Function Switch-Java {
     [CmdletBinding()]
@@ -360,6 +458,23 @@ Function Switch-Java {
 #endregion
 
 #region Node.js
+
+# Clear npm cache
+Function Clear-NpmCache {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '')]
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    if (!(Get-Command -Name npm -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to clear npm cache as npm command not found.'
+        return
+    }
+
+    $NpmCache = & npm config get -g cache
+    if ($PSCmdlet.ShouldProcess($NpmCache, 'Clear')) {
+        & npm cache clean --force --loglevel=error
+    }
+}
 
 # Configure environment for Node.js development
 #
@@ -541,6 +656,45 @@ Function Switch-PHP {
 
 #region Python
 
+# Clear pip cache
+Function Clear-PipCache {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    if (!(Get-Command -Name pip -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to clear pip cache as pip command not found.'
+        return
+    }
+
+    $PipCacheInfo = & pip cache info
+    $PipCacheIndex = $null
+    $PipCacheWheels = $null
+
+    foreach ($Line in $PipCacheInfo) {
+        if ($PipCacheIndex -and $PipCacheWheels) {
+            break
+        } elseif (!$PipCacheIndex -and $Line -match 'Package index page cache location: (.*)') {
+            $PipCacheIndex = $Matches[1]
+        } elseif (!$PipCacheWheels -and $Line -match 'Wheels location: (.*)') {
+            $PipCacheWheels = $Matches[1]
+        }
+    }
+
+    if (!$PipCacheIndex) {
+        Write-Error -Message 'Unable to determine pip package index page cache location.'
+        return
+    }
+
+    if (!$PipCacheWheels) {
+        Write-Error -Message 'Unable to determine pip wheels cache location.'
+        return
+    }
+
+    if ($PSCmdlet.ShouldProcess(('{0}, {1}' -f $PipCacheIndex, $PipCacheWheels), 'Clear')) {
+        & pip cache purge -qqq
+    }
+}
+
 # Configure environment for Python development
 #
 # Environment variables
@@ -709,6 +863,36 @@ Function Update-PythonPackages {
 #endregion
 
 #region Ruby
+
+# Clear gem cache
+Function Clear-GemCache {
+    [CmdletBinding(SupportsShouldProcess)]
+    Param()
+
+    if (!(Get-Command -Name gem -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to clear gem cache as gem command not found.'
+        return
+    }
+
+    $GemEnv = & gem env
+    $GemSpecCache = $null
+
+    foreach ($Line in $GemEnv) {
+        if ($Line -match 'SPEC CACHE DIRECTORY: (.*)') {
+            $GemSpecCache = $Matches[1]
+            break
+        }
+    }
+
+    if (!$GemSpecCache) {
+        Write-Error -Message 'Unable to determine gem spec cache directory.'
+        return
+    }
+
+    if ($PSCmdlet.ShouldProcess($GemSpecCache, 'Clear')) {
+        & gem sources --clear-all --silent
+    }
+}
 
 # Configure environment for Ruby development
 Function Switch-Ruby {
