@@ -185,7 +185,7 @@ Function Get-InboxRulesByFolders {
 
         [Switch]$ReturnUnlinkedRules,
 
-        [ValidateRange('NonNegative')]
+        [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
 
@@ -252,7 +252,7 @@ Function Get-MailboxActivitySummary {
         [DateTime]$StartDate,
         [DateTime]$EndDate,
 
-        [ValidateRange('NonNegative')]
+        [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
 
@@ -817,7 +817,7 @@ Function Import-ContentSearchResults {
         [String[]]$IgnoredEntries = 'O=EXCHANGELABS',
         [String[]]$IgnoredDomains,
 
-        [ValidateRange('Positive')]
+        [ValidateRange(0, [Int]::MaxValue)]
         [Int]$EntryLimit
     )
 

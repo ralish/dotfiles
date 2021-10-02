@@ -240,11 +240,11 @@ Function New-OpenSSLCertificate {
 
         [Switch]$NoMatchingSAN,
 
-        [ValidateRange('Positive')]
+        [ValidateRange(1, [Int]::MaxValue)]
         [Int]$KeySize,
 
         [Parameter(ParameterSetName = 'SelfSigned', Mandatory)]
-        [ValidateRange('Positive')]
+        [ValidateRange(1, [Int]::MaxValue)]
         [Int]$ValidDays = 365,
 
         [Switch]$EncryptKey,

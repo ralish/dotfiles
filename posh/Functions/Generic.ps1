@@ -385,7 +385,7 @@ Function Format-SizeDigital {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [ValidateRange('NonNegative')]
+        [ValidateRange(0, [Double]::MaxValue)]
         [Double]$Size,
 
         [ValidateSet(2, 10)]
@@ -434,7 +434,7 @@ Function Format-Xml {
         [Parameter(Mandatory, ValueFromPipeline)]
         [String[]]$Xml,
 
-        [ValidateRange(-1, 100)]
+        [ValidateRange(0, 8)]
         [Int]$IndentSize = 4
     )
 
@@ -449,7 +449,7 @@ Function Format-Xml {
     End {
         $StringWriter = [IO.StringWriter]::new()
         $XmlWriterSettings = [Xml.XmlWriterSettings]::new()
-        if ($IndentSize -ge 0) {
+        if ($IndentSize -gt 0) {
             $XmlWriterSettings.Indent = $true
             $XmlWriterSettings.IndentChars = [String]::new(' ', $IndentSize)
         }
@@ -476,10 +476,10 @@ Function Sort-XmlElement {
 
         [Switch]$SortAttributes,
 
-        [ValidateRange('NonNegative')]
+        [ValidateRange(0, [Int]::MaxValue)]
         [Int]$Depth = 0,
 
-        [ValidateRange('NonNegative')]
+        [ValidateRange(0, [Int]::MaxValue)]
         [Int]$MaxDepth = 25
     )
 

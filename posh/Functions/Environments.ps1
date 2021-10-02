@@ -10,7 +10,7 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing environment func
 Function Update-DotNetTools {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
-        [ValidateRange('NonNegative')]
+        [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
 

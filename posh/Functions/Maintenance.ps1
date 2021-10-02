@@ -188,7 +188,7 @@ Function Update-Office {
     Param(
         [Switch]$PassThru,
 
-        [ValidateRange('NonNegative')]
+        [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
 
@@ -271,7 +271,7 @@ Function Update-PowerShell {
         [Switch]$IncludeDscModules,
         [Switch]$Force,
 
-        [ValidateRange('NonNegative')]
+        [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
 
@@ -400,7 +400,7 @@ Function Update-Scoop {
     Param(
         [Switch]$CaptureOutput,
 
-        [ValidateRange('NonNegative')]
+        [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
 
@@ -458,7 +458,7 @@ Function Update-VisualStudio {
     Param(
         [Switch]$PassThru,
 
-        [ValidateRange('NonNegative')]
+        [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
 

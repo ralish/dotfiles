@@ -35,7 +35,7 @@ Function Get-KerberosTokenSize {
         [ValidateSet('Windows Server 2008 R2 (or earlier)', 'Windows Server 2012 (or later)')]
         [String]$OperatingSystem = 'Windows Server 2012 (or later)',
 
-        [ValidateRange('Positive')]
+        [ValidateRange(1, [Int]::MaxValue)]
         [Int]$TicketOverheadBytes = 1200
     )
 
