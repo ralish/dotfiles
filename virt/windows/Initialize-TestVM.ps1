@@ -221,9 +221,9 @@ Function Optimize-PowerShell {
         }
     }
 
-    if ($PSReadLineOutdated) {
-        Write-Host -ForegroundColor Cyan '[PowerShell] To update PSReadLine run the following from an elevated Command Prompt:'
-        Write-Host -ForegroundColor Cyan '             powershell -NoProfile -NonInteractive -Command "Install-Module -Name PSReadLine -Force"'
+    if (Get-Module -Name 'PSReadLine' -ListAvailable) {
+        Write-Host -ForegroundColor Green '[PowerShell] Clearing PSReadLine history ...'
+        Remove-Item -Path (Get-PSReadLineOption).HistorySavePath -ErrorAction Ignore
     }
 
     if (Get-Command -Name 'Uninstall-ObsoleteModule' -ErrorAction Ignore) {
@@ -231,6 +231,11 @@ Function Optimize-PowerShell {
         Uninstall-ObsoleteModule
     } else {
         Write-Warning -Message '[PowerShell] Uninstalling obsolete modules requires Uninstall-ObsoleteModule command.'
+    }
+
+    if ($PSReadLineOutdated) {
+        Write-Host -ForegroundColor Cyan '[PowerShell] To update PSReadLine run the following from an elevated Command Prompt:'
+        Write-Host -ForegroundColor Cyan '             powershell -NoProfile -NonInteractive -Command "Install-Module -Name PSReadLine -Force"'
     }
 }
 
