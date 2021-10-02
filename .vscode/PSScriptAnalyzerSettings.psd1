@@ -11,6 +11,16 @@
     )
 
     Rules = @{
+        # Compatibility rules
+        PSUseCompatibleSyntax = @{
+            Enable                          = $true
+            # Only major versions from v3.0 are supported
+            TargetVersions = @(
+                '5.0',
+                '7.0'
+            )
+        }
+
         # General rules
         PSAlignAssignmentStatement = @{
             Enable                          = $false
