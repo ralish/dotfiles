@@ -34,14 +34,24 @@ Function Enable-PresentationMode {
 Function Get-EnvironmentVariable {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [String]$Name,
 
-        [ValidateSet('Machine', 'User')]
-        [String]$Scope = 'User'
+        [ValidateSet('Machine', 'Process', 'User')]
+        [String]$Scope = 'Process'
     )
 
-    [Environment]::GetEnvironmentVariable($Name, [EnvironmentVariableTarget]::$Scope)
+    if ($Name) {
+        return [Environment]::GetEnvironmentVariable($Name, [EnvironmentVariableTarget]::$Scope)
+    }
+
+    $EnvVars = [Environment]::GetEnvironmentVariables([EnvironmentVariableTarget]::$Scope)
+    $SortedEnvVars = [Collections.Generic.SortedDictionary[string, string]]::new()
+    foreach ($EnvVarName in $EnvVars.Keys) {
+        $SortedEnvVars.Add($EnvVarName, $EnvVars[$EnvVarName])
+    }
+
+    return $SortedEnvVars
 }
 
 # Set a persisted environment variable
