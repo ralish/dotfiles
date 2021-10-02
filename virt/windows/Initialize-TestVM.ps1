@@ -225,6 +225,13 @@ Function Optimize-PowerShell {
         Write-Host -ForegroundColor Cyan '[PowerShell] To update PSReadLine run the following from an elevated Command Prompt:'
         Write-Host -ForegroundColor Cyan '             powershell -NoProfile -NonInteractive -Command "Install-Module -Name PSReadLine -Force"'
     }
+
+    if (Get-Command -Name 'Uninstall-ObsoleteModule' -ErrorAction Ignore) {
+        Write-Host -ForegroundColor Green '[PowerShell] Uninstalling obsolete modules ...'
+        Uninstall-ObsoleteModule
+    } else {
+        Write-Warning -Message '[PowerShell] Uninstalling obsolete modules requires Uninstall-ObsoleteModule command.'
+    }
 }
 
 Function Optimize-WindowsComponents {
