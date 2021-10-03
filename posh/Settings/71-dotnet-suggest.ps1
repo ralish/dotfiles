@@ -10,8 +10,8 @@ if (!(Get-Command -Name dotnet-suggest -ErrorAction Ignore)) {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading dotnet-suggest settings ...')
 
 # dotnet-suggest
-# https://github.com/dotnet/command-line-api/wiki/dotnet-suggest
-$env:DOTNET_SUGGEST_SCRIPT_VERSION = '1.0.0'
+# https://github.com/dotnet/command-line-api/blob/main/docs/dotnet-suggest.md
+$env:DOTNET_SUGGEST_SCRIPT_VERSION = '1.0.2'
 
 $RegisteredApps = (dotnet-suggest list | Out-String).Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries)
 Register-ArgumentCompleter -Native -CommandName $RegisteredApps -ScriptBlock {
