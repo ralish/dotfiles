@@ -101,7 +101,9 @@ Function ConvertTo-TextEncoding {
 
         [ValidateSet('ASCII', 'UTF-7', 'UTF-8', 'UTF-16', 'UTF-16BE', 'UTF-32', 'UTF-32BE')]
         [String]$SourceEncoding,
-        [Switch]$SourceByteOrderMark
+        [Switch]$SourceByteOrderMark,
+
+        [Switch]$TrimTrailingWhitespace
     )
 
     Begin {
@@ -158,6 +160,11 @@ Function ConvertTo-TextEncoding {
             } catch {
                 Write-Error -Message $_
                 continue
+            }
+
+            if ($TrimTrailingWhitespace) {
+                $OldContent = $Content
+                $Content = $OldContent | ForEach-Object { $_.TrimEnd() }
             }
 
             Write-Verbose -Message ('Converting: {0}' -f $Item.FullName)
