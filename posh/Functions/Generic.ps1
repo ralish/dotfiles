@@ -103,6 +103,7 @@ Function ConvertTo-TextEncoding {
         [String]$SourceEncoding,
         [Switch]$SourceByteOrderMark,
 
+        [Switch]$ReplaceLeadingTabs,
         [Switch]$TrimTrailingWhitespace
     )
 
@@ -162,9 +163,32 @@ Function ConvertTo-TextEncoding {
                 continue
             }
 
-            if ($TrimTrailingWhitespace) {
-                $OldContent = $Content
-                $Content = $OldContent | ForEach-Object { $_.TrimEnd() }
+            if ($ReplaceLeadingTabs -or $TrimTrailingWhitespace) {
+                $Original = $Content
+                $Content = [Collections.ArrayList]::new()
+
+                for ($Idx = 0; $Idx -lt $Original.Count; $Idx++) {
+                    $Line = $Original[$Idx]
+
+                    if ($ReplaceLeadingTabs) {
+                        # Line has leading whitespace & subsequent content
+                        if ($Line -match '^(\s+)(.+)') {
+                            $Whitespace = $Matches[1]
+                            $Remainder = $Matches[2]
+
+                            # Leading whitespace has at least one tab character
+                            if ($Whitespace -match '\t') {
+                                $Line = '{0}{1}' -f ($Whitespace -replace '\t', '    '), $Remainder
+                            }
+                        }
+                    }
+
+                    if ($TrimTrailingWhitespace) {
+                        $Line = $Line.TrimEnd()
+                    }
+
+                    $null = $Content.Add($Line)
+                }
             }
 
             Write-Verbose -Message ('Converting: {0}' -f $Item.FullName)
