@@ -138,7 +138,7 @@ Function Switch-Cygwin {
         throw 'Provided Cygwin path is not a directory: {0}' -f $Path
     }
 
-    $PathParams = @{ }
+    $PathParams = @{}
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -236,7 +236,7 @@ Function Switch-Go {
         throw 'Provided Go path is not a directory: {0}' -f $Path
     }
 
-    $PathParams = @{ }
+    $PathParams = @{}
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -311,7 +311,7 @@ Function Switch-Google {
         throw 'Provided depot_tools path is not a directory: {0}' -f $Path
     }
 
-    $PathParams = @{ }
+    $PathParams = @{}
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -414,7 +414,7 @@ Function Switch-Java {
         throw 'Provided Java path is not a directory: {0}' -f $Path
     }
 
-    $PathParams = @{ }
+    $PathParams = @{}
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -494,7 +494,7 @@ Function Switch-Nodejs {
         throw 'Provided Nodejs path is not a directory: {0}' -f $Path
     }
 
-    $PathParams = @{ }
+    $PathParams = @{}
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -570,7 +570,7 @@ Function Switch-Perl {
         throw 'Provided Perl path is not a directory: {0}' -f $Path
     }
 
-    $PathParams = @{ }
+    $PathParams = @{}
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -624,7 +624,7 @@ Function Switch-PHP {
         throw 'Provided PHP path is not a directory: {0}' -f $Path
     }
 
-    $PathParams = @{ }
+    $PathParams = @{}
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -743,7 +743,7 @@ Function Switch-Python {
     $NativeVersion = [Version]$Version
     $StrippedVersion = $Version -replace '\.'
 
-    $PathParams = @{ }
+    $PathParams = @{}
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -914,7 +914,7 @@ Function Switch-Ruby {
         throw 'Provided Ruby path is not a directory: {0}' -f $Path
     }
 
-    $PathParams = @{ }
+    $PathParams = @{}
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
@@ -1042,7 +1042,7 @@ Function Switch-WindowsSDK {
         throw 'Provided Windows SDK version path is not a directory: {0}' -f $SdkPath
     }
 
-    $PathParams = @{ }
+    $PathParams = @{}
     if (!$Disable) {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'

@@ -341,7 +341,7 @@ Function Get-S3BucketSize {
     }
 
     Write-Verbose -Message 'Retrieving BucketSizeBytes metrics for enabled regions ...'
-    $Metrics = @{ }
+    $Metrics = @{}
     foreach ($Region in $Regions.RegionName) {
         try {
             $Result = Get-CWMetricList -Region $Region -MetricName BucketSizeBytes -ErrorAction Stop -Verbose:$false

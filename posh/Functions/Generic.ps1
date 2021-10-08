@@ -276,7 +276,7 @@ Function Get-TextEncoding {
         $Encodings = $Encodings | Sort-Object -Property PreambleSize -Descending
 
         # PowerShell Core uses a different parameter to return a byte stream
-        $GetContentBytesParam = @{ }
+        $GetContentBytesParam = @{}
         if ($PSVersionTable.PSEdition -eq 'Core') {
             $GetContentBytesParam['AsByteStream'] = $true
         } else {

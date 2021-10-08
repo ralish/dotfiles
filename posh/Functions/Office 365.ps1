@@ -822,8 +822,8 @@ Function Import-ContentSearchResults {
     )
 
     Begin {
-        $Contacts = @{ }
-        $Statistics = [Ordered]@{ }
+        $Contacts = @{}
+        $Statistics = [Ordered]@{}
 
         $DataFields = @()
         $ImportFieldsLookup = @{
@@ -1071,7 +1071,7 @@ Function Connect-Office365Services {
         [String]$TenantName
     )
 
-    $DefaultParams = @{ }
+    $DefaultParams = @{}
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         if ($PSBoundParameters.ContainsKey('MfaUsername')) {
             $DefaultParams['MfaUsername'] = $MfaUsername
@@ -1138,7 +1138,7 @@ Function Connect-ExchangeOnline {
 
     Write-Host -ForegroundColor Green 'Connecting to Exchange Online ...'
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        $ConnectParams = @{ }
+        $ConnectParams = @{}
         if ($PSBoundParameters.ContainsKey('MfaUsername')) {
             $ConnectParams['UserPrincipalName'] = $MfaUsername
         }
