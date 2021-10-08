@@ -297,7 +297,7 @@ Function Get-TextEncoding {
             Write-Verbose -Message ('Processing: {0}' -f $Item.FullName)
             $Result = [PSCustomObject]@{
                 File          = $Item
-                Encoding      = 'ascii / utf-8'
+                Encoding      = 'utf-8'
                 ByteOrderMark = $false
             }
 
