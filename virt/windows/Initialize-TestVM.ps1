@@ -473,7 +473,7 @@ Function Optimize-WindowsSettingsUser {
 
     # Remove volume control icon
     $AudioSrv = Get-Service -Name AudioSrv -ErrorAction SilentlyContinue
-    if ($AudioSrv.StartType -eq 'Disabled') {
+    if ($AudioSrv.Status -eq 'Stopped') {
         # Unclear how the equivalent UI setting is set
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer' -Name 'HideSCAVolume' -Type DWord -Value 1
     }
