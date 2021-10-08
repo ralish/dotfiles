@@ -477,6 +477,7 @@ Function Format-Xml {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
+        [AllowEmptyString()]
         [String[]]$Xml,
 
         [ValidateRange(0, 8)]
@@ -488,10 +489,13 @@ Function Format-Xml {
     }
 
     Process {
-        $null = $Data.Add($Xml -join [Environment]::NewLine)
+        $XmlString = '{0}{1}' -f ($Xml -join [Environment]::NewLine), [Environment]::NewLine
+        $null = $Data.Add($XmlString)
     }
 
     End {
+        $StringReader = [IO.StringReader]::new($Data)
+
         $StringWriter = [IO.StringWriter]::new()
         $XmlWriterSettings = [Xml.XmlWriterSettings]::new()
         if ($IndentSize -gt 0) {
@@ -500,8 +504,8 @@ Function Format-Xml {
         }
         $XmlWriter = [Xml.XmlWriter]::Create($StringWriter, $XmlWriterSettings)
 
-        $XmlDoc = [Xml.XmlDataDocument]::new()
-        $XmlDoc.LoadXml($Data)
+        $XmlDoc = [Xml.XmlDocument]::new()
+        $XmlDoc.Load($StringReader)
         $XmlDoc.WriteContentTo($XmlWriter)
 
         # Explicitly dispose to ensure buffer is flushed
