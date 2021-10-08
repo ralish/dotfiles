@@ -39,7 +39,7 @@ Function Convert-BytesToHex {
     )
 
     Process {
-        $Hex = [Text.StringBuilder]::new($Bytes.Length * 2)
+        $Hex = [Text.StringBuilder]::new($Bytes.Count * 2)
 
         foreach ($Byte in $Bytes) {
             $null = $Hex.AppendFormat('{0:x2}', $Byte)
@@ -315,7 +315,7 @@ Function Get-TextEncoding {
                     break
                 }
 
-                if ((Compare-Object -ReferenceObject $Encoding.Preamble -DifferenceObject $Bytes -SyncWindow 0).Length -eq 0) {
+                if ((Compare-Object -ReferenceObject $Encoding.Preamble -DifferenceObject $Bytes -SyncWindow 0).Count -eq 0) {
                     $Result.Encoding = $Encoding.Name
                     $Result.ByteOrderMark = $Encoding.ByteOrderMark
                     $FoundEncoding = $true
