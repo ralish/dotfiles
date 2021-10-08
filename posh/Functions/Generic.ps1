@@ -103,6 +103,7 @@ Function ConvertTo-TextEncoding {
         [String]$SourceEncoding,
         [Switch]$SourceByteOrderMark,
 
+        [Switch]$NoEndOfFileNewline,
         [Switch]$ReplaceLeadingTabs,
         [Switch]$TrimTrailingWhitespace
     )
@@ -192,7 +193,20 @@ Function ConvertTo-TextEncoding {
             }
 
             Write-Verbose -Message ('Converting: {0}' -f $Item.FullName)
-            [IO.File]::WriteAllLines($Item.FullName, $Content, $Encoder)
+            if ($NoEndOfFileNewline) {
+                $FileStream = [IO.File]::Open($Item.FullName, [IO.FileMode]::Truncate)
+                $StreamWriter = [IO.StreamWriter]::new($FileStream)
+
+                for ($LineNum = 0; $LineNum -lt ($Content.Count - 1); $LineNum++) {
+                    $StreamWriter.WriteLine($Content[$LineNum])
+                }
+
+                $StreamWriter.Write($Content[$LineNum])
+                $StreamWriter.Close()
+                $FileStream.Close()
+            } else {
+                [IO.File]::WriteAllLines($Item.FullName, $Content, $Encoder)
+            }
         }
     }
 }
