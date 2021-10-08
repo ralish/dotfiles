@@ -19,7 +19,6 @@ try {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ActiveDirectory settings ...')
 
 # AD class properties we may want to ignore: top
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
 $ADClassIgnoredPropertiesTop = @(
     # Only exposed via LDAP attributes
     'dSCorePropagationData'
@@ -44,7 +43,6 @@ $ADClassIgnoredPropertiesTop = @(
 )
 
 # AD class properties we may want to ignore: securityPrincipal
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
 $ADClassIgnoredPropertiesSecurityPrincipal = $ADClassIgnoredPropertiesTop + @(
     # PoSh property followed by equivalent LDAP attribute
     'SID', 'objectSid'

@@ -1,4 +1,3 @@
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWMICmdlet', '')]
 [CmdletBinding()]
 Param(
     [ValidateNotNullOrEmpty()]

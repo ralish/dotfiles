@@ -509,16 +509,15 @@ Function Optimize-WindowsUpdate {
 #region Utilities
 
 Function Get-WindowsInfo {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWMICmdlet', '')]
     [CmdletBinding()]
     Param()
 
-    if (Get-Command -Name 'Get-CimInstance' -ErrorAction SilentlyContinue) {
-        $Win32OpSys = Get-CimInstance -ClassName Win32_OperatingSystem -Verbose:$false
-    } else {
-        $Win32OpSys = Get-WmiObject -Class Win32_OperatingSystem -Verbose:$false
+    $WmiCommand = 'Get-CimInstance'
+    if (Get-Command -Name 'Get-WmiObject' -ErrorAction SilentlyContinue) {
+        $WmiCommand = 'Get-WmiObject'
     }
 
+    $Win32OpSys = & $WmiCommand -Class Win32_OperatingSystem -Verbose:$false
     $Script:WindowsBuildNumber = [int]$Win32OpSys.BuildNumber
     $Script:WindowsProductType = $Win32OpSys.ProductType
 
