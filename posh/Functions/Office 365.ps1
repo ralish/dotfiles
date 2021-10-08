@@ -822,8 +822,6 @@ Function Import-ContentSearchResults {
     )
 
     Begin {
-        $ErrorActionPreference = 'Stop'
-
         $Contacts = @{ }
         $Statistics = [Ordered]@{ }
 
@@ -878,7 +876,7 @@ Function Import-ContentSearchResults {
         } else {
             $Data = $CsvData
         }
-        Write-Host -ForegroundColor Green ('Loaded {0} entries for processing.' -f $Data.Count)
+        Write-Verbose -ForegroundColor Green ('Loaded {0} entries for processing.' -f $Data.Count)
 
         $EntryNumber = 0
         foreach ($Entry in $Data) {
@@ -940,7 +938,7 @@ Function Import-ContentSearchResults {
             }
 
             if (($EntryNumber % 1000) -eq 0) {
-                Write-Host -ForegroundColor Green ('Processed {0} entries ...' -f $EntryNumber)
+                Write-Verbose -ForegroundColor Green ('Processed {0} entries ...' -f $EntryNumber)
             }
 
             if ($EntryLimit -and $EntryNumber -eq $EntryLimit) {
