@@ -54,7 +54,7 @@ Function Update-OpenSSHConfig {
     $UTF8EncodingNoBom = [Text.UTF8Encoding]::new($false)
     [IO.File]::WriteAllLines($ConfigFile, $Banner[0..($Banner.Count - 2)], $UTF8EncodingNoBom)
 
-    $Includes = Get-ChildItem -LiteralPath $IncludesDir -File | Where-Object { $_.Length -gt 0 }
+    $Includes = Get-ChildItem -LiteralPath $IncludesDir -File | Where-Object Length
     foreach ($Include in $Includes) {
         $Data = Get-Content -LiteralPath $Include.FullName
         Add-Content -Path $ConfigFile -Value $Data[0..($Data.Count - 2)]

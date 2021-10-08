@@ -202,7 +202,7 @@ Function Get-AzureUsersLicensingSummary {
 
     Test-ModuleAvailable -Name MSOnline
 
-    $Users = Get-MsolUser -ErrorAction Stop | Where-Object { $_.UserType -ne 'Guest' }
+    $Users = Get-MsolUser -ErrorAction Stop | Where-Object UserType -NE 'Guest'
 
     foreach ($User in $Users) {
         if ($User.Licenses) {
@@ -233,10 +233,10 @@ Function Get-AzureUsersDisabledServices {
     Test-ModuleAvailable -Name MSOnline
 
     $Results = [Collections.ArrayList]::new()
-    $Users = Get-MsolUser -ErrorAction Stop | Where-Object { $_.IsLicensed -eq $true }
+    $Users = Get-MsolUser -ErrorAction Stop | Where-Object IsLicensed
 
     foreach ($User in $Users) {
-        $DisabledServices = @($User.Licenses.ServiceStatus | Where-Object { $_.ProvisioningStatus -eq 'Disabled' })
+        $DisabledServices = @($User.Licenses.ServiceStatus | Where-Object ProvisioningStatus -EQ 'Disabled')
         if ($DisabledServices -or $ReturnAllUsers) {
             $Result = [PSCustomObject]@{
                 User    = $User.DisplayName

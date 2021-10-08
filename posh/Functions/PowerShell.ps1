@@ -138,8 +138,8 @@ Function Compare-ObjectProperties {
         if ($Diff) {
             $DiffProps = @{
                 PropertyName = $Property
-                RefValue     = $Diff | Where-Object { $_.SideIndicator -eq '<=' } | Select-Object -ExpandProperty $($Property)
-                DiffValue    = $Diff | Where-Object { $_.SideIndicator -eq '=>' } | Select-Object -ExpandProperty $($Property)
+                RefValue     = $Diff | Where-Object SideIndicator -EQ '<=' | Select-Object -ExpandProperty $($Property)
+                DiffValue    = $Diff | Where-Object SideIndicator -EQ '=>' | Select-Object -ExpandProperty $($Property)
             }
 
             $ObjDiffs += New-Object -TypeName PSObject -Property $DiffProps

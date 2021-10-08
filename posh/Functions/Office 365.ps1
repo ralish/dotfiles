@@ -201,7 +201,7 @@ Function Get-InboxRulesByFolders {
     }
 
     Write-Progress @WriteProgressParams -Status 'Retrieving mailbox folders' -PercentComplete 0
-    $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object { $_.DefaultFolderType -ne 'Inbox' }
+    $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object DefaultFolderType -NE 'Inbox'
     $Folders | Add-Member -MemberType NoteProperty -Name Rules -Value @()
     $Folders | Add-Member -MemberType ScriptProperty -Name RuleCount -Value { $this.Rules.Count }
 
@@ -215,7 +215,7 @@ Function Get-InboxRulesByFolders {
         $FolderName = ($Folder.FolderPath -join ' - ').Substring(8)
         $RegexMatch = '^{0}' -f [Regex]::Escape($FolderName)
 
-        foreach ($Rule in ($Rules | Where-Object { $_.LinkedToFolder -eq $false })) {
+        foreach ($Rule in ($Rules | Where-Object !LinkedToFolder)) {
             if ($Rule.Name -match $RegexMatch -and $Rule.MoveToFolder -eq $Folder.Name) {
                 $Rule.LinkedToFolder = $true
                 $Folder.Rules += $Rule
@@ -225,7 +225,7 @@ Function Get-InboxRulesByFolders {
         $null = $Results.Add($Folder)
     }
 
-    $UnlinkedRules = $Rules | Where-Object { $_.LinkedToFolder -eq $false }
+    $UnlinkedRules = $Rules | Where-Object !LinkedToFolder
     if ($UnlinkedRules) {
         Write-Warning -Message 'The following rules could not be linked to a folder:'
         foreach ($Rule in ($UnlinkedRules | Sort-Object -Property Name)) {
@@ -581,9 +581,9 @@ Function Get-Office365UserSecurityReport {
 
     Write-Verbose -Message 'Retrieving all enabled users ...'
     $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop |
-        Where-Object {
-            $_.UserType -ne 'Guest'
-        } | Sort-Object -Property UserPrincipalName | ForEach-Object {
+        Where-Object UserType -NE 'Guest' |
+        Sort-Object -Property UserPrincipalName |
+        ForEach-Object {
             Add-Member -InputObject $_ -MemberType NoteProperty -Name IsActive -Value $false
             Add-Member -InputObject $_ -MemberType ScriptProperty -Name IsFederated -Value { if ($null -ne $this.ImmutableId) { $true } else { $false } }
             Add-Member -InputObject $_ -MemberType ScriptProperty -Name StrongAuthenticationState -Value { $this.StrongAuthenticationRequirements.State }
@@ -643,9 +643,8 @@ Function Get-Office365UserSecurityReport {
         }
 
         Get-RecipientPermission -Identity $Mailbox.UserPrincipalName |
-            Where-Object {
-                $_.Trustee -ne 'NT AUTHORITY\SELF'
-            } | ForEach-Object {
+            Where-Object Trustee -NE 'NT AUTHORITY\SELF' |
+            ForEach-Object {
                 $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.SendAs')
                 $null = $MailboxSendAs.Add($_)
             }
