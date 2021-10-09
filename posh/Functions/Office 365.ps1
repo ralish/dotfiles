@@ -215,7 +215,7 @@ Function Get-InboxRulesByFolders {
         $FolderName = ($Folder.FolderPath -join ' - ').Substring(8)
         $RegexMatch = '^{0}' -f [Regex]::Escape($FolderName)
 
-        foreach ($Rule in ($Rules | Where-Object !LinkedToFolder)) {
+        foreach ($Rule in ($Rules | Where-Object LinkedToFolder -EQ $false)) {
             if ($Rule.Name -match $RegexMatch -and $Rule.MoveToFolder -eq $Folder.Name) {
                 $Rule.LinkedToFolder = $true
                 $Folder.Rules += $Rule
@@ -225,7 +225,7 @@ Function Get-InboxRulesByFolders {
         $null = $Results.Add($Folder)
     }
 
-    $UnlinkedRules = $Rules | Where-Object !LinkedToFolder
+    $UnlinkedRules = $Rules | Where-Object LinkedToFolder -EQ $false
     if ($UnlinkedRules) {
         Write-Warning -Message 'The following rules could not be linked to a folder:'
         foreach ($Rule in ($UnlinkedRules | Sort-Object -Property Name)) {
