@@ -94,8 +94,7 @@
     "update.mode": "start",
 
     // Application: Telemetry
-    "telemetry.enableCrashReporter": false,
-    "telemetry.enableTelemetry": false,
+    "telemetry.telemetryLevel": "off",
 
     // Built-in extension: Git
     "git.autoStash": true,
