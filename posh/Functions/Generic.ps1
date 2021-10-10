@@ -143,7 +143,7 @@ Function ConvertTo-TextEncoding {
                 }
             }
             if ($SourceEncoding -match '^UTF-') {
-                $SourceEncoderParams += $ByteOrderMark
+                $SourceEncoderParams += $SourceByteOrderMark
             }
 
             $SourceEncoder = New-Object -TypeName $EncodingClasses[$SourceEncoding] -ArgumentList $SourceEncoderParams
