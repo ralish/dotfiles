@@ -52,6 +52,17 @@
     </Suppress>
 
     <!--
+      Source:     CertificateServicesClient-AutoEnrollment
+      Level:      Warning
+      Message:    Certificate for %1 with Thumbprint %2 is about to expire or already expired.
+
+      Expiring or expired certificates aren't necessarily a problem and other events are logged on enrollment failures.
+    -->
+    <Suppress Path="Application">
+      *[System[Provider[@Name='Microsoft-Windows-CertificateServicesClient-AutoEnrollment'] and EventID=64]]
+    </Suppress>
+
+    <!--
       Source:     COMRuntime
       Level:      Error
       Message:    An unmarshaling policy check was performed when unmarshaling a custom marshaled object and the class {45FB4600-E6E8-4928-B25E-50476FF79425} was rejected
