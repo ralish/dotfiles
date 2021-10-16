@@ -119,6 +119,9 @@
     "omnisharp.enableRoslynAnalyzers": true,
     "omnisharp.loggingLevel": "warning",
 
+    // Extension: CloudFormation Linter
+    "cfnLint.validateUsingJsonSchema": true,
+
     // Extension: CMake Tools
     "cmake.configureOnOpen": false,
 
