@@ -6,9 +6,8 @@
         // root
         "dot-manage": "shellscript",
         "dot-update": "shellscript",
-        // adcs
-        "**/adcs/*.inf": "ini",
         // bash
+        ".bash_history": "shellscript",
         ".bash_logout": "shellscript",
         ".bashrc": "shellscript",
         // bazaar
@@ -26,8 +25,11 @@
         // editline
         ".editrc": "properties",
         // git
-        ".gitconfig*": "properties",
+        ".gitconfig": "ini",
         "**/git/bin/*": "shellscript",
+        // git-win
+        ".git-for-windows-updater": "ini",
+        ".gitconfig-win": "ini",
         // htop
         "htoprc": "properties",
         // jetbrains
@@ -44,7 +46,10 @@
         ".npmrc": "properties",
         // openssh
         "**/.ssh/config": "ssh_config",
+        "**/.ssh/known_hosts": "plain",
+        "**/.ssh/hosts/*": "plain",
         "**/.ssh/includes/*": "ssh_config",
+        "**/.ssh/keys/*": "plain",
         "**/.ssh/templates/*": "ssh_config",
         // openssl
         "**/openssl/*.cnf": "ini",
@@ -69,12 +74,18 @@
         // shellcheck
         ".shellcheckrc": "properties",
         // stow
+        ".stow-local-ignore": "plain",
         "**/stow/bin/*": "perl",
         // subversion
         "**/.subversion/config": "ini",
         "**/.subversion/servers": "ini",
+        // tmux
+        "**/tmux/*.conf": "properties",
+        "**/tmux/.config/tmux/*.conf": "properties",
         // vs
         "*.vssettings": "xml",
+        // vscode
+        "venv-reqs.txt": "pip-requirements",
         // wget
         ".wgetrc": "properties",
         // wsl
@@ -82,6 +93,7 @@
         "wsl.conf": "ini",
         // xdg-user-dir
         "user-dirs.dirs": "shellscript",
+        "user-dirs.locale": "plain",
         // xlaunch
         "*.xlaunch": "xml",
         // zsh
@@ -92,8 +104,6 @@
     // Excludes for search & quick open
     "search.exclude": {
         "**/modules/oh-my-zsh/**": true,
-        "**/posh/Help/**": true,
-        "**/posh/Modules/**": true,
         "**/pwsh/**": true,
         "**/zsh/.oh-my-zsh/**": true
     },
@@ -115,18 +125,15 @@
     "vsicons.presets.foldersAllDefaultIcon": true,
     "vsicons.associations.files": [
         {
-            "icon": "db",
-            "extensions": [".sdb"],
+            "icon": "binary",
+            "extensions": [".less", ".pmf"],
             "filename": false,
             "format": "svg"
         },
         {
-            "icon": "git",
-            "extensions": [
-                ".gitconfig-win",
-                ".git-for-windows-updater"
-            ],
-            "filename": true,
+            "icon": "db",
+            "extensions": [".sdb"],
+            "filename": false,
             "format": "svg"
         },
         {
@@ -136,11 +143,16 @@
             "format": "svg"
         },
         {
-            "icon": "less",
-            "extensions": [".less"],
+            "icon": "vim",
+            "extensions": [".vim"],
+            "filename": false,
+            "format": "svg"
+        },
+        {
+            "icon": "git",
+            "extensions": [".git-for-windows-updater", ".gitconfig-win", ".keepme"],
             "filename": true,
-            "format": "svg",
-            "disabled": true
+            "format": "svg"
         },
         {
             "icon": "mysql",
