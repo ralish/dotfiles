@@ -488,7 +488,7 @@ Function Update-PowerShell {
     if ($PSCmdlet.ShouldProcess('Obsolete modules', 'Uninstall')) {
         if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
             if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
-                Uninstall-ObsoleteModule -ProgressParentId $ProgressParentId
+                Uninstall-ObsoleteModule -ProgressParentId $WriteProgressParams['Id']
             } else {
                 Uninstall-ObsoleteModule
             }
