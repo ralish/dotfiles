@@ -8,6 +8,7 @@ Param(
         'PowerShell',
         'WindowsComponents',
         'WindowsDefender',
+        'WindowsNetworkList',
         'WindowsPower',
         'WindowsRestore',
         'WindowsSecurity',
@@ -25,6 +26,7 @@ Param(
         'PowerShell',
         'WindowsComponents',
         'WindowsDefender',
+        'WindowsNetworkList',
         'WindowsPower',
         'WindowsRestore',
         'WindowsSecurity',
@@ -350,6 +352,24 @@ Function Optimize-WindowsDefender {
     Write-Host -ForegroundColor Green -NoNewline '[Windows] Removing Defender definitions ...'
     & $MpCmdRun -RemoveDefinitions -All
     Write-Host
+}
+
+Function Optimize-WindowsNetworkList {
+    [CmdletBinding()]
+    Param()
+
+    Write-Host -ForegroundColor Green '[Windows] Removing cached network list data ...'
+
+    $BasePath = 'HKLM:\Software\Microsoft\Windows NT\CurrentVersion\NetworkList'
+
+    $Nla = Join-Path -Path $BasePath -ChildPath 'Nla'
+    Remove-Item -Path "$Nla\*" -Recurse
+
+    $Profiles = Join-Path -Path $BasePath -ChildPath 'Profiles'
+    Remove-Item -Path "$Profiles\*" -Recurse
+
+    $Signatures = Join-Path -Path $BasePath -ChildPath 'Signatures'
+    Remove-Item -Path "$Signatures\*" -Recurse
 }
 
 Function Optimize-WindowsPower {
@@ -740,7 +760,8 @@ $Tasks = @(
     'DotNetFramework',
     'PowerShell',
     'Office365',
-    'DiskCleanup'
+    'DiskCleanup',
+    'WindowsNetworkList'
 )
 
 foreach ($Task in $Tasks) {
