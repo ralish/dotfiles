@@ -214,7 +214,7 @@ Function Update-AllTheThings {
 
     if ($Tasks['Windows']) {
         Write-Progress @WriteProgressParams -Status 'Updating Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.Windows = Update-Windows -PassThru
+        $Results.Windows = Update-Windows -AcceptAll -PassThru
         $TasksDone++
     }
 
@@ -712,6 +712,7 @@ Function Update-VisualStudio {
 Function Update-Windows {
     [CmdletBinding()]
     Param(
+        [Switch]$AcceptAll,
         [Switch]$PassThru
     )
 
@@ -724,7 +725,7 @@ Function Update-Windows {
         return
     }
 
-    $Results = Install-WindowsUpdate -IgnoreReboot -NotTitle Silverlight
+    $Results = Install-WindowsUpdate -AcceptAll:$AcceptAll -IgnoreReboot -NotTitle Silverlight
     if ($Results) {
         return $Results
     }
