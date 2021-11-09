@@ -25,6 +25,11 @@ Set-PSReadLineOption -HistoryNoDuplicates
 # Move the cursor to end of line while cycling through history
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
+# Enable command-line completion prediction (PSReadLine v2.1+)
+if ((Get-Module -Name PSReadLine).Version -ge [Version]::new('2.1.0')) {
+    Set-PSReadLineOption -PredictionSource History
+}
+
 # Search the command history based on any already entered text
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
