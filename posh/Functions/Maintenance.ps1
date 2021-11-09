@@ -720,7 +720,9 @@ Function Update-Windows {
         throw 'You must have administrator privileges to perform Windows updates.'
     }
 
-    if (!(Get-Module -Name PSWindowsUpdate -ListAvailable)) {
+    try {
+        Import-Module -Name PSWindowsUpdate -ErrorAction Stop -Verbose:$false
+    } catch {
         Write-Error -Message 'Unable to install Windows updates as PSWindowsUpdate module not available.'
         return
     }
