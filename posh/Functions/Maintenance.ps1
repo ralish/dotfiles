@@ -724,7 +724,7 @@ Function Update-Windows {
         return
     }
 
-    $Results = Get-WindowsUpdate -IgnoreReboot -NotTitle Silverlight
+    $Results = Install-WindowsUpdate -IgnoreReboot -NotTitle Silverlight
     if ($Results) {
         return $Results
     }
