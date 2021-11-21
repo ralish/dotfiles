@@ -6,8 +6,9 @@ script_dir="$(dirname "${BASH_SOURCE[0]}")"
 source "$script_dir/templates/common.sh"
 
 kernel_name=$(uname -s)
-if [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
+if [[ "${kernel_name#*Linux}" != "$kernel_name" ]]; then
     if command -v dpkg > /dev/null; then
+        # shellcheck disable=SC2312
         if ! dpkg --get-selections | grep -E '^libedit' > /dev/null; then
             exit "$DETECTION_NOT_AVAILABLE"
         fi
@@ -18,7 +19,8 @@ if [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
     else
         exit "$DETECTION_NO_LOGIC"
     fi
-elif [ "${kernel_name#*CYGWIN_NT}" != "$kernel_name" ]; then
+elif [[ "${kernel_name#*CYGWIN_NT}" != "$kernel_name" ]]; then
+    # shellcheck disable=SC2312
     if ! cygcheck -c -d | grep -E '^libedit' > /dev/null; then
         exit "$DETECTION_NOT_AVAILABLE"
     fi

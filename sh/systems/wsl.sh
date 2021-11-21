@@ -31,6 +31,7 @@ wsl_setup_ssh_auth_sock() {
 
     # The PATH setup for wslvar is required due to LP #1877016
     # https://bugs.launchpad.net/ubuntu/+source/wslu/+bug/1877016
+    # shellcheck disable=SC2312
     winappdata="$(wslpath "$(PATH=$PATH:/mnt/c/Windows/System32 wslvar --sys APPDATA)")"
     npiperelay="$winappdata/Go/bin/npiperelay.exe"
     if ! [ -x "$npiperelay" ]; then

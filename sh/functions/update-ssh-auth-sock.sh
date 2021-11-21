@@ -23,6 +23,7 @@ update-ssh-auth-sock() {
 
     # shellcheck disable=SC2154
     if [ -n "$TMUX" ]; then
+        # shellcheck disable=SC2312
         eval "$(tmux show-env -s | grep -E '^(unset )?SSH_AUTH_SOCK[=;]')"
     elif [ -n "$STY" ]; then
         uid="$(id -u)"

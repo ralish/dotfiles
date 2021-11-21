@@ -28,12 +28,14 @@ elif [[ $yum_rc -ne 0 ]]; then
 fi
 echo
 
+# shellcheck disable=SC2312
 if ! rpm -qa | grep openssh-server > /dev/null; then
     echo '[yum] Installing OpenSSH server ...'
     yum -y install openssh-server
     echo
 fi
 
+# shellcheck disable=SC2312
 if ! rpm -qa | grep vim > /dev/null; then
     echo '[yum] Installing Vim ...'
     yum -y install vim-minimal

@@ -185,6 +185,7 @@ function detect_components() {
 # DESC: Output a report with the results of component detection
 # ARGS: None
 # OUTS: None
+# shellcheck disable=SC2311
 function detect_report() {
     local detection_result
 
@@ -249,6 +250,7 @@ function detect_report() {
 # ARGS: $1 (required): The operation type (-S, -D or -R)
 # OUTS: $stow_success: Array of components Stow successfully installed
 #       $stow_failure: Array of components Stow failed to install
+# shellcheck disable=SC2311
 function stow_components() {
     local stow_comp stow_result
     declare -g -a stow_success stow_failure

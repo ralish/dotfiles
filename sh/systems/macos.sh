@@ -28,6 +28,7 @@ fi
 
 # Load bash completion if it's present
 if [ -n "$BASH_VERSION" ]; then
+    # shellcheck disable=SC2312
     if [ -f "$(brew --prefix)/etc/bash_completion" ]; then
         # shellcheck source=/dev/null
         . "$(brew --prefix)/etc/bash_completion"
@@ -35,6 +36,7 @@ if [ -n "$BASH_VERSION" ]; then
 fi
 
 # Load grc if it's present
+# shellcheck disable=SC2312
 if [ -f "$(brew --prefix)/etc/grc.bashrc" ]; then
     # shellcheck source=/dev/null
     . "$(brew --prefix)/etc/grc.bashrc"

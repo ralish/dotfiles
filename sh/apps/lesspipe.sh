@@ -3,6 +3,7 @@
 # lesspipe configuration
 if command -v lesspipe > /dev/null; then
     # Setup lesspipe for handling non-text input
+    # shellcheck disable=SC2312
     eval "$(lesspipe)"
 fi
 

@@ -13,6 +13,7 @@ fi
 LESSKEY="$script_dir/../less/.lesskey"
 
 # Generate the binary configuration file
+# shellcheck disable=SC2312
 lesskey -- <(cat "$LESSKEY")
 
 # Remove any existing less history file

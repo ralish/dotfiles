@@ -34,12 +34,14 @@ echo '[apt] Installing package updates ...'
 apt-get -y dist-upgrade
 echo
 
+# shellcheck disable=SC2312
 if ! dpkg -l | grep openssh-server > /dev/null; then
     echo '[apt] Installing OpenSSH server ...'
     apt-get -y install openssh-server
     echo
 fi
 
+# shellcheck disable=SC2312
 if ! dpkg -l | grep vim > /dev/null; then
     echo '[apt] Installing Vim ...'
     apt-get -y install vim

@@ -17,6 +17,7 @@ OPENSSH_TEMPLATES="$OPENSSH_DIR/templates"
 OPENSSH_BANNER="$OPENSSH_TEMPLATES/banner"
 
 # Check for a supported version
+# shellcheck disable=SC2312
 ssh_version=$(ssh -V 2>&1 | grep -Eo '^OpenSSH_[0-9]\.[0-9]' | cut -c 9-)
 ssh_template=$(printf '%s/ssh_config.%s' "$OPENSSH_TEMPLATES" "${ssh_version//./}")
 if ! [[ -f $ssh_template ]]; then

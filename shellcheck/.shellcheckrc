@@ -1,10 +1,12 @@
 # Add the script directory to the search path for source statements
 source-path=SCRIPTDIR
 
-# Enable all optional checks
+# Enable all checks (inc. optional)
 enable=all
 
-# Disable the require-variable-braces check
+# Disable some checks
+#
+# SC2250    require-variable-braces         optional
 disable=SC2250
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr

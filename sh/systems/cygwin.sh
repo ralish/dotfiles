@@ -15,7 +15,7 @@ fi
 
 # Fix Git prompt (__git_ps1 may not be available)
 if command -v git-prompt > /dev/null; then
-    # shellcheck source=/dev/null
+    # shellcheck disable=SC2312 source=/dev/null
     . "$(command -v git-prompt)"
 fi
 
