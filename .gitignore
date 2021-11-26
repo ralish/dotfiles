@@ -79,6 +79,7 @@ temp/
 # PowerShell
 /posh/Help/
 /posh/Modules/
+/posh/Scripts/
 /posh/Settings/
 /pwsh/.config/powershell/
 
