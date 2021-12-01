@@ -139,7 +139,6 @@
     // Extension: Language Support for Java(TM) by Red Hat
     "java.configuration.checkProjectSettingsExclusions": false,
     "java.project.importHint": false,
-    "java.semanticHighlighting.enabled": true,
 
     // Extension: markdownlint
     "markdownlint.config": {
@@ -189,9 +188,6 @@
 
     // Extension: Remote - WSL
     "remote.WSL.useShellEnvironment": false,
-
-    // Extension: Remote Repositories
-    "remoteHub.search.download.enabled": true,
 
     // Extension: Select Line Status Bar
     "selectline.alignment": "right",
