@@ -187,6 +187,7 @@
 	lsr = ls-tree -r --name-only HEAD
 
 	m   = merge
+	ma  = merge --abort
 	mm  = "!f() { if git rev-parse -q --verify main > /dev/null; then git merge main; else git merge master; fi }; f"
 	mff = merge --ff-only
 	mnf = merge --no-ff
