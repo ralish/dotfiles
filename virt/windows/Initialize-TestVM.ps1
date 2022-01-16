@@ -80,6 +80,15 @@ Function Optimize-DotNetFramework {
         if ($Script:Wow64Present) {
             Set-RegistryValue -Path 'HKLM:\Software\WOW6432Node\Microsoft\.NETFramework\v2.0.50727' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
         }
+
+        if (Test-IsWindows64bit) {
+            Invoke-NgenTasks -Version '2.x' -Bitness '64-bit'
+            if ($Script:Wow64Present) {
+                Invoke-NgenTasks -Version '2.x' -Bitness '32-bit'
+            }
+        } else {
+            Invoke-NgenTasks -Version '2.x' -Bitness '32-bit'
+        }
     } else {
         Write-Host -ForegroundColor Yellow '[.NET Framework] Skipping .NET Framework 2.x as not installed.'
     }
@@ -97,6 +106,15 @@ Function Optimize-DotNetFramework {
         Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v4.0.30319' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
         if ($Script:Wow64Present) {
             Set-RegistryValue -Path 'HKLM:\Software\WOW6432Node\Microsoft\.NETFramework\v4.0.30319' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
+        }
+
+        if (Test-IsWindows64bit) {
+            Invoke-NgenTasks -Version '4.x' -Bitness '64-bit'
+            if ($Script:Wow64Present) {
+                Invoke-NgenTasks -Version '4.x' -Bitness '32-bit'
+            }
+        } else {
+            Invoke-NgenTasks -Version '4.x' -Bitness '32-bit'
         }
     } else {
         Write-Host -ForegroundColor Yellow '[.NET Framework] Skipping .NET Framework 4.x as not installed.'
@@ -560,6 +578,38 @@ Function Get-WindowsInfo {
     }
 }
 
+Function Invoke-NgenTasks {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('2.x', '4.x')]
+        [String]$Version,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('32-bit', '64-bit')]
+        [String]$Bitness
+    )
+
+    switch ($Version) {
+        '2.x' { $FullVersion = 'v2.0.50727' }
+        '4.x' { $FullVersion = 'v4.0.30319' }
+    }
+
+    switch ($Bitness) {
+        '32-bit' { $Framework = 'Framework' }
+        '64-bit' { $Framework = 'Framework64' }
+    }
+
+    $NgenPath = Join-Path -Path $env:windir -ChildPath ('Microsoft.NET\{0}\{1}\ngen.exe' -f $Framework, $FullVersion)
+    if (!(Test-Path -Path $NgenPath -PathType Leaf)) {
+        Write-Warning -Message ('[.NET Framework] Unable to locate .NET Framework {0} ({1}) executable: ngen.exe' -f $Version, $Bitness)
+        return
+    }
+
+    Write-Host -ForegroundColor Green ('[.NET Framework] Running .NET Framework {0} ({1}) queued compilation jobs ...' -f $Version, $Bitness)
+    & $NgenPath executeQueuedItems /nologo /silent
+}
+
 Function Remove-DiskCleanupProfile {
     [CmdletBinding()]
     Param(
@@ -743,6 +793,21 @@ Function Test-IsAdministrator {
 
     $User = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
     if ($User.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        return $true
+    }
+    return $false
+}
+
+Function Test-IsWindows64bit {
+    [CmdletBinding()]
+    Param()
+
+    $WmiCommand = 'Get-CimInstance'
+    if (Get-Command -Name 'Get-WmiObject' -ErrorAction SilentlyContinue) {
+        $WmiCommand = 'Get-WmiObject'
+    }
+
+    if ((& $WmiCommand -Class Win32_OperatingSystem -Verbose:$false).OSArchitecture -eq '64-bit') {
         return $true
     }
     return $false
