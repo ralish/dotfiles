@@ -265,7 +265,7 @@ Function Optimize-WindowsComponents {
 
     if ($Script:WindowsBuildNumber -ge 9200) {
         Write-Host -ForegroundColor Green -NoNewline '[Windows] Performing component store clean-up ...'
-        & dism.exe /Online /Cleanup-Image /StartComponentCleanup
+        & dism.exe /Online /Cleanup-Image /StartComponentCleanup /ResetBase
         Write-Host
         return
     }
