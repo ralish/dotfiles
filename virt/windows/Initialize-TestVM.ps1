@@ -436,6 +436,11 @@ Function Optimize-WindowsSettingsComputer {
 
     Write-Host -ForegroundColor Green '[Windows] Applying computer settings ...'
 
+    # Disable Network Location Wizard
+    if (!$Script:WindowsServerCore) {
+        Set-RegistryValue -Path 'HKLM:\System\CurrentControlSet\Control\Network\NewNetworkWindowOff'
+    }
+
     # Disable Shutdown Event Tracker
     if (!$Script:WindowsServerCore) {
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows NT\Reliability' -Name 'ShutdownReasonOn' -Type DWord -Value 0
@@ -678,18 +683,19 @@ Function Set-DiskCleanupProfile {
 }
 
 Function Set-RegistryValue {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'KeyOnly')]
     Param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(ParameterSetName = 'KeyOnly', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'KeyValue', Mandatory = $true)]
         [String]$Path,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(ParameterSetName = 'KeyValue', Mandatory = $true)]
         [String]$Name,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(ParameterSetName = 'KeyValue', Mandatory = $true)]
         [String]$Type,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(ParameterSetName = 'KeyValue', Mandatory = $true)]
         [String]$Value
     )
 
@@ -701,10 +707,12 @@ Function Set-RegistryValue {
         throw ('Failure creating registry key: {0}' -f $Path)
     }
 
-    try {
-        Set-ItemProperty @PSBoundParameters -ErrorAction Stop
-    } catch {
-        throw ('Failure creating registry value "{0}" ({1}) under key: {2}' -f $Name, $Type, $Path)
+    if ($PSCmdlet.ParameterSetName -eq 'KeyValue') {
+        try {
+            Set-ItemProperty @PSBoundParameters -ErrorAction Stop
+        } catch {
+            throw ('Failure creating registry value "{0}" ({1}) under key: {2}' -f $Name, $Type, $Path)
+        }
     }
 }
 
