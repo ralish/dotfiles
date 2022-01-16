@@ -122,6 +122,30 @@
     </Suppress>
 
     <!--
+      Source:     nhi
+      Level:      Informational
+      Message:    The driver entered RTD3.
+                  All the connected devices will be removed from driver's internal state, so it is expected that DeviceDisconnected events will happen.
+
+      Emitted by the Intel Thunderbolt Bus Driver. Rarely of interest and often high volume. Paired with Event ID 9008.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='nhi'] and EventID=9007]]
+    </Suppress>
+
+    <!--
+      Source:     nhi
+      Level:      Informational
+      Message:    Driver exit RTD3.
+                  All the connected devices will now cause DeviceConnected events.
+
+      Emitted by the Intel Thunderbolt Bus Driver. Rarely of interest and often high volume. Paired with Event ID 9007.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='nhi'] and EventID=9008]]
+    </Suppress>
+
+    <!--
       Source:     Service Control Manager
       Level:      Information
       Message:    The %1 service entered the %2 state.
