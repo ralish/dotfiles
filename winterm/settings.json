@@ -61,7 +61,7 @@
                 "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
 
                 // Default is %USERPROFILE% which is rarely what we want
-                "startingDirectory": "//wsl$/Ubuntu/home/sdl",
+                "startingDirectory": "/home/sdl",
 
                 // Linux shells use the exit code of the last command
                 "closeOnExit": "always",
@@ -75,7 +75,7 @@
                 "guid": "{46ca431a-3a87-5fb3-83cd-11ececc031d2}",
 
                 // Default is %USERPROFILE% which is rarely what we want
-                "startingDirectory": "//wsl$/kali-linux/home/sdl",
+                "startingDirectory": "/home/sdl",
 
                 // Linux shells use the exit code of the last command
                 "closeOnExit": "always",
