@@ -52,16 +52,10 @@ Function Clear-AllDevCaches {
     $TasksTotal = 0
 
     foreach ($Task in $ValidTasks) {
-        if ($PSCmdlet.ParameterSetName -eq 'OptOut') {
-            if ($ExcludeTasks -notcontains $Task) {
-                $null = $Tasks.Add($Task)
-                $TasksTotal++
-            }
-        } else {
-            if ($IncludeTasks -contains $Task) {
-                $null = $Tasks.Add($Task)
-                $TasksTotal++
-            }
+        if (($PSCmdlet.ParameterSetName -eq 'OptOut' -and $ExcludeTasks -notcontains $Task) -or
+            ($PSCmdlet.ParameterSetName -eq 'OptIn' -and $IncludeTasks -contains $Task)) {
+            $null = $Tasks.Add($Task)
+            $TasksTotal++
         }
     }
 
