@@ -190,34 +190,6 @@ Function Get-AzureEnterpriseApplications {
     return $Response.appList
 }
 
-# Retrieve licensing summary for Azure AD users
-Function Get-AzureUsersLicensingSummary {
-    [CmdletBinding()]
-    Param()
-
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'MSOnline module is incompatible with PowerShell Core.'
-        return
-    }
-
-    Test-ModuleAvailable -Name MSOnline
-
-    $Users = Get-MsolUser -ErrorAction Stop | Where-Object UserType -NE 'Guest'
-
-    foreach ($User in $Users) {
-        if ($User.Licenses) {
-            $LicensingSummary = [String]::Join(', ', ($User.Licenses.AccountSku.SkuPartNumber | Sort-Object))
-        } else {
-            $LicensingSummary = [String]::Empty
-        }
-
-        Add-Member -InputObject $User -MemberType NoteProperty -Name LicensingSummary -Value $LicensingSummary
-        $User.PSObject.TypeNames.Insert(0, 'Microsoft.Online.Administration.User.Licenses')
-    }
-
-    return $Users
-}
-
 # Retrieve Azure AD users with disabled services
 Function Get-AzureUsersDisabledServices {
     [CmdletBinding()]
@@ -247,6 +219,34 @@ Function Get-AzureUsersDisabledServices {
     }
 
     return $Results
+}
+
+# Retrieve licensing summary for Azure AD users
+Function Get-AzureUsersLicensingSummary {
+    [CmdletBinding()]
+    Param()
+
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Write-Error -Message 'MSOnline module is incompatible with PowerShell Core.'
+        return
+    }
+
+    Test-ModuleAvailable -Name MSOnline
+
+    $Users = Get-MsolUser -ErrorAction Stop | Where-Object UserType -NE 'Guest'
+
+    foreach ($User in $Users) {
+        if ($User.Licenses) {
+            $LicensingSummary = [String]::Join(', ', ($User.Licenses.AccountSku.SkuPartNumber | Sort-Object))
+        } else {
+            $LicensingSummary = [String]::Empty
+        }
+
+        Add-Member -InputObject $User -MemberType NoteProperty -Name LicensingSummary -Value $LicensingSummary
+        $User.PSObject.TypeNames.Insert(0, 'Microsoft.Online.Administration.User.Licenses')
+    }
+
+    return $Users
 }
 
 #endregion

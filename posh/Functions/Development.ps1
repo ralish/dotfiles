@@ -341,69 +341,6 @@ Function Invoke-GitMergeAllBranches {
     git checkout $SourceBranch
 }
 
-#endregion
-
-#region VCS
-
-# Create a file in each empty directory under a path
-Function Add-FileToEmptyDirectories {
-    [CmdletBinding(SupportsShouldProcess)]
-    Param(
-        [ValidateNotNullOrEmpty()]
-        [String[]]$Path,
-
-        [ValidateNotNullOrEmpty()]
-        [String]$FileName = '.keepme',
-
-        # Non-recursive (only direct descendents)
-        [String[]]$Exclude = '.git'
-    )
-
-    if (!$PSBoundParameters.ContainsKey('Path')) {
-        $Path += $PWD.Path
-    }
-
-    $CurrentLocation = Get-Location
-
-    foreach ($Item in $Path) {
-        if ($CurrentLocation.Provider.Name -ne 'FileSystem' -and ![IO.Path]::IsPathFullyQualified($Item)) {
-            Write-Error -Message ('Skipping relative path as current path is not a file system: {0}' -f $Item)
-            continue
-        }
-
-        try {
-            $DirPath = Get-Item -LiteralPath $Item -Force:$Force -ErrorAction Stop
-        } catch {
-            Write-Error -Message $_.Message
-            continue
-        }
-
-        if ($DirPath -isnot [IO.DirectoryInfo]) {
-            Write-Error -Message ('Provided path is not a directory: {0}' -f $Item)
-            continue
-        }
-
-        $FilesToCreate = [Collections.ArrayList]::new()
-        Get-ChildItem -LiteralPath $DirPath.FullName -Directory -Exclude $Exclude -Force:$Force | ForEach-Object {
-            if ((Get-ChildItem -LiteralPath $_.FullName -Force:$Force | Measure-Object).Count -ne 0) {
-                Get-ChildItem -LiteralPath $_.FullName -Directory -Recurse -Force:$Force | ForEach-Object {
-                    if ((Get-ChildItem -LiteralPath $_.FullName -Force:$Force | Measure-Object).Count -eq 0) {
-                        # Subdirectory (not top-level) with no children
-                        $null = $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
-                    }
-                }
-            } else {
-                # Top-level subdirectory (minus exclusions) with no children
-                $null = $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
-            }
-        }
-
-        foreach ($FilePath in $FilesToCreate) {
-            $null = New-Item -Path $FilePath -ItemType File -Verbose
-        }
-    }
-}
-
 # Remove a subset of paths returned from git-clean
 Function Remove-GitCleanSubset {
     [CmdletBinding(SupportsShouldProcess)]
