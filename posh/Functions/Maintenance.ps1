@@ -122,157 +122,151 @@ Function Clear-AllDevCaches {
 # Update everything!
 Function Update-AllTheThings {
     [CmdletBinding(DefaultParameterSetName = 'OptOut')]
-    Param(
-        [Parameter(ParameterSetName = 'OptOut')]
-        [ValidateSet(
-            'Windows',
-            'Office',
-            'VisualStudio',
+    Param()
+
+    DynamicParam {
+        $ValidTasks = @(
             'PowerShell',
-            'ModernApps',
-            'Scoop',
             'DotNetTools',
             'NodejsPackages',
             'PythonPackages',
             'RubyGems'
-        )]
-        [String[]]$ExcludeTasks,
+        )
 
-        [Parameter(ParameterSetName = 'OptIn', Mandatory)]
-        [ValidateSet(
-            'Windows',
-            'Office',
-            'VisualStudio',
-            'PowerShell',
-            'ModernApps',
-            'Scoop',
-            'DotNetTools',
-            'NodejsPackages',
-            'PythonPackages',
-            'RubyGems'
-        )]
-        [String[]]$IncludeTasks
-    )
+        if (Test-IsWindows) {
+            $ValidTasks += @(
+                'Windows',
+                'Office',
+                'VisualStudio',
+                'ModernApps',
+                'Scoop'
+            )
+        }
 
-    $Tasks = @{
-        Windows        = $null
-        Office         = $null
-        VisualStudio   = $null
-        PowerShell     = $null
-        ModernApps     = $null
-        Scoop          = $null
-        DotNetTools    = $null
-        NodejsPackages = $null
-        PythonPackages = $null
-        RubyGems       = $null
+        $AttrValidateSet = [Management.Automation.ValidateSetAttribute]::new([String[]]$ValidTasks)
+
+        $AttrParameterOptOut = [Management.Automation.ParameterAttribute]@{
+            ParameterSetName = 'OptOut'
+        }
+
+        $AttrParameterOptIn = [Management.Automation.ParameterAttribute]@{
+            ParameterSetName = 'OptIn'
+            Mandatory        = $true
+        }
+
+        $AttrCollectionOptOut = [Collections.ObjectModel.Collection[Attribute]]::new()
+        $AttrCollectionOptOut.Add($AttrParameterOptOut)
+        $AttrCollectionOptOut.Add($AttrValidateSet)
+
+        $AttrCollectionOptIn = [Collections.ObjectModel.Collection[Attribute]]::new()
+        $AttrCollectionOptIn.Add($AttrParameterOptIn)
+        $AttrCollectionOptIn.Add($AttrValidateSet)
+
+        $ParamOptOut = [Management.Automation.RuntimeDefinedParameter]::new(
+            'ExcludeTasks', [String[]], $AttrCollectionOptOut
+        )
+
+        $ParamOptIn = [Management.Automation.RuntimeDefinedParameter]::new(
+            'IncludeTasks', [String[]], $AttrCollectionOptIn
+        )
+
+        $ParamDict = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
+        $ParamDict.Add('ExcludeTasks', $ParamOptOut)
+        $ParamDict.Add('IncludeTasks', $ParamOptIn)
+
+        return $ParamDict
     }
 
-    $TasksDone = 0
-    $TasksTotal = 0
+    End {
+        $Tasks = [Collections.ArrayList]::new()
+        $TasksDone = 0
+        $TasksTotal = 0
+        $Results = [PSCustomObject]@{}
 
-    foreach ($Task in @($Tasks.Keys)) {
-        if ($PSCmdlet.ParameterSetName -eq 'OptOut') {
-            if ($ExcludeTasks -contains $Task) {
-                $Tasks[$Task] = $false
-            } else {
-                $Tasks[$Task] = $true
+        foreach ($Task in $ValidTasks) {
+            if (($PSCmdlet.ParameterSetName -eq 'OptOut' -and $PSBoundParameters['ExcludeTasks'] -notcontains $Task) -or
+                ($PSCmdlet.ParameterSetName -eq 'OptIn' -and $PSBoundParameters['IncludeTasks'] -contains $Task)) {
+                $null = $Tasks.Add($Task)
                 $TasksTotal++
-            }
-        } else {
-            if ($IncludeTasks -contains $Task) {
-                $Tasks[$Task] = $true
-                $TasksTotal++
-            } else {
-                $Tasks[$Task] = $false
+                $Results | Add-Member -Name $Task -MemberType NoteProperty -Value $null
             }
         }
-    }
 
-    if ($Tasks['Windows'] -or $Tasks['Office'] -or $Tasks['VisualStudio'] -or $Tasks['ModernApps']) {
-        if (!(Test-IsAdministrator)) {
-            throw 'You must have administrator privileges to perform Windows, Office, Visual Studio, or Modern Apps updates.'
+        if (Test-IsWindows) {
+            if ($Tasks -contains 'Windows' -or $Tasks -contains 'Office' -or $Tasks -contains 'VisualStudio' -or $Tasks -contains 'ModernApps') {
+                if (!(Test-IsAdministrator)) {
+                    throw 'You must have administrator privileges to perform Windows, Office, Visual Studio, or Modern Apps updates.'
+                }
+            }
         }
+
+        $WriteProgressParams = @{
+            Id       = 0
+            Activity = 'Updating all the things'
+        }
+
+        if ($Tasks -contains 'Windows') {
+            Write-Progress @WriteProgressParams -Status 'Updating Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.Windows = Update-Windows -AcceptAll -PassThru
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'Office') {
+            Write-Progress @WriteProgressParams -Status 'Updating Office' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.Office = Update-Office -PassThru -ProgressParentId $WriteProgressParams['Id']
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'VisualStudio') {
+            Write-Progress @WriteProgressParams -Status 'Updating Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.VisualStudio = Update-VisualStudio -PassThru -ProgressParentId $WriteProgressParams['Id']
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'PowerShell') {
+            Write-Progress @WriteProgressParams -Status 'Updating PowerShell' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.PowerShell = Update-PowerShell -ProgressParentId $WriteProgressParams['Id']
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'ModernApps') {
+            Write-Progress @WriteProgressParams -Status 'Updating Microsoft Store apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.ModernApps = Update-ModernApps
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'Scoop') {
+            Write-Progress @WriteProgressParams -Status 'Updating Scoop apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.Scoop = Update-Scoop -CaptureOutput -ProgressParentId $WriteProgressParams['Id']
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'DotNetTools') {
+            Write-Progress @WriteProgressParams -Status 'Updating .NET tools' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.DotNetTools = Update-DotNetTools -ProgressParentId $WriteProgressParams['Id']
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'NodejsPackages') {
+            Write-Progress @WriteProgressParams -Status 'Updating Node.js packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.NodejsPackages = Update-NodejsPackages
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'PythonPackages') {
+            Write-Progress @WriteProgressParams -Status 'Updating Python packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.PythonPackages = Update-PythonPackages
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'RubyGems') {
+            Write-Progress @WriteProgressParams -Status 'Updating Ruby gems' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.RubyGems = Update-RubyGems
+            $TasksDone++
+        }
+
+        Write-Progress @WriteProgressParams -Completed
+
+        return $Results
     }
-
-    $Results = [PSCustomObject]@{
-        Windows        = $null
-        Office         = $null
-        VisualStudio   = $null
-        PowerShell     = $null
-        ModernApps     = $null
-        Scoop          = $null
-        DotNetTools    = $null
-        NodejsPackages = $null
-        PythonPackages = $null
-        RubyGems       = $null
-    }
-
-    $WriteProgressParams = @{
-        Id       = 0
-        Activity = 'Updating all the things'
-    }
-
-    if ($Tasks['Windows']) {
-        Write-Progress @WriteProgressParams -Status 'Updating Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.Windows = Update-Windows -AcceptAll -PassThru
-        $TasksDone++
-    }
-
-    if ($Tasks['Office']) {
-        Write-Progress @WriteProgressParams -Status 'Updating Office' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.Office = Update-Office -PassThru -ProgressParentId $WriteProgressParams['Id']
-        $TasksDone++
-    }
-
-    if ($Tasks['VisualStudio']) {
-        Write-Progress @WriteProgressParams -Status 'Updating Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.VisualStudio = Update-VisualStudio -PassThru -ProgressParentId $WriteProgressParams['Id']
-        $TasksDone++
-    }
-
-    if ($Tasks['PowerShell']) {
-        Write-Progress @WriteProgressParams -Status 'Updating PowerShell' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.PowerShell = Update-PowerShell -ProgressParentId $WriteProgressParams['Id']
-        $TasksDone++
-    }
-
-    if ($Tasks['ModernApps']) {
-        Write-Progress @WriteProgressParams -Status 'Updating Microsoft Store apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.ModernApps = Update-ModernApps
-        $TasksDone++
-    }
-
-    if ($Tasks['Scoop']) {
-        Write-Progress @WriteProgressParams -Status 'Updating Scoop apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.Scoop = Update-Scoop -CaptureOutput -ProgressParentId $WriteProgressParams['Id']
-        $TasksDone++
-    }
-
-    if ($Tasks['DotNetTools']) {
-        Write-Progress @WriteProgressParams -Status 'Updating .NET tools' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.DotNetTools = Update-DotNetTools -ProgressParentId $WriteProgressParams['Id']
-        $TasksDone++
-    }
-
-    if ($Tasks['NodejsPackages']) {
-        Write-Progress @WriteProgressParams -Status 'Updating Node.js packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.NodejsPackages = Update-NodejsPackages
-        $TasksDone++
-    }
-
-    if ($Tasks['PythonPackages']) {
-        Write-Progress @WriteProgressParams -Status 'Updating Python packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.PythonPackages = Update-PythonPackages
-        $TasksDone++
-    }
-
-    if ($Tasks['RubyGems']) {
-        Write-Progress @WriteProgressParams -Status 'Updating Ruby gems' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        $Results.RubyGems = Update-RubyGems
-        $TasksDone++
-    }
-
-    Write-Progress @WriteProgressParams -Completed
-
-    return $Results
 }
