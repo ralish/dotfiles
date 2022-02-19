@@ -595,13 +595,9 @@ Function Update-VisualStudio {
         return
     }
 
-    $Instances = @(Get-VSSetupInstance)
-    if ($Instances.Count -ne 1) {
-        if ($Instances.Count -eq 0) {
-            Write-Error -Message 'Get-VSSetupInstance returned no instances.'
-        } else {
-            Write-Error -Message 'Get-VSSetupInstance returned multiple instances.'
-        }
+    $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property InstallationVersion)
+    if ($VsSetupInstances.Count -eq 0) {
+        Write-Error -Message 'Get-VSSetupInstance returned no instances.'
 
         if ($PassThru) {
             return $false
@@ -618,93 +614,96 @@ Function Update-VisualStudio {
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
-    # Waiting on the Visual Studio Installer to complete is far more difficult
-    # than at all reasonable. Providing the below parameters and waiting on the
-    # process to exit is sufficient *if* the installer itself does not need to
-    # be updated. In the latter case however, the original setup process will
-    # exit while the update continues in the newly launched updated installer.
-    #
-    # Contrary to what the official documentation states the "--wait" parameter
-    # does not work; in fact, it doesn't appear to even be a valid option. The
-    # best approach I've found is to try to acquire the named mutex used by the
-    # installer: DevdivInstallerUI. This is obviously undocumented and a hack,
-    # but all of the other approaches I've found have more serious downsides.
-    # We use this approach later after the original setup process has exited.
-    #
-    # Further, when launched via a console application the installer will spam
-    # the terminal with various debug output, even if running in quiet mode. I
-    # can't find any command-line parameter to suppress it, and redirecting the
-    # process output streams doesn't seem to work either. Given it's a GUI app,
-    # I suspect it's doing something nefarious if it detects it's launched via
-    # a console environment. This also occurs for child processes it launches,
-    # presumably due to process handle inheritance. Whatever it's doing really
-    # confuses PowerShell and/or PSReadline, seemingly causing it to lose track
-    # of the console state; subsequent output will often overlap earlier debug
-    # output from the installer.
-    #
-    # The filthy but workable solution is to launch the install from a separate
-    # console, but as the executable is a GUI app, we have to do that by first
-    # launching a separate console instance and then launching the installer
-    # within it. We use cmd for this purpose and have it return the exit code
-    # of the Visual Studio Installer as soon as it completes.
-    #
-    # And yes, the command-line argument quoting for cmd looks weird and wrong.
-    # It's not; cmd itself is weird and wrong. See its help for the specifics.
-    Write-Progress @WriteProgressParams -Status 'Running Visual Studio Installer'
-    $VsInstallerArgs = 'update --installPath "{0}" --passive --norestart' -f $Instances.InstallationPath
-    $CmdArgs = '/D /C ""{0}" {1}"' -f $VsInstallerExe, $VsInstallerArgs
-    $VsInstaller = Start-Process -FilePath $env:ComSpec -ArgumentList $CmdArgs -PassThru -Wait
+    # Set to false if an unexpected exit code is returned for any update
+    $VsInstallerStatus = $true
 
-    # If the mutex existed at any point while running this loop, the exit code
-    # we have from the original installer is not meaningful for the update of
-    # Visual Studio itself, and we'll output a warning later on.
-    $VsInstallerUpdated = $false
+    for ($Idx = 0; $Idx -lt $VsSetupInstances.Count; $Idx++) {
+        $VsSetupInstance = $VsSetupInstances[$Idx]
+        $VsDisplayName = $VsSetupInstance.DisplayName
 
-    # Set to true initially to avoid the subsequent Write-Progress call on the
-    # first iteration of the loop (and possibly the only iteration).
-    $VsInstallerMutexCreated = $true
-    do {
-        if (!$VsInstallerMutexCreated) {
-            Write-Progress @WriteProgressParams -Status 'Waiting for updated installer to exit'
+        # Waiting on the Visual Studio Installer to complete is far more difficult
+        # than at all reasonable. Providing the below parameters and waiting on the
+        # process to exit is sufficient *if* the installer itself does not need to
+        # be updated. In the latter case however, the original setup process will
+        # exit while the update continues in the newly launched updated installer.
+        #
+        # Contrary to what the official documentation states the "--wait" parameter
+        # does not work; in fact, it doesn't appear to even be a valid option. The
+        # best approach I've found is to try to acquire the named mutex used by the
+        # installer: DevdivInstallerUI. This is obviously undocumented and a hack,
+        # but all of the other approaches I've found have more serious downsides.
+        # We use this approach later after the original setup process has exited.
+        #
+        # Further, when launched via a console application the installer will spam
+        # the terminal with various debug output, even if running in quiet mode. I
+        # can't find any command-line parameter to suppress it, and redirecting the
+        # process output streams doesn't seem to work either. Given it's a GUI app,
+        # I suspect it's doing something nefarious if it detects it's launched via
+        # a console environment. This also occurs for child processes it launches,
+        # presumably due to process handle inheritance. Whatever it's doing really
+        # confuses PowerShell and/or PSReadline, seemingly causing it to lose track
+        # of the console state; subsequent output will often overlap earlier debug
+        # output from the installer.
+        #
+        # The filthy but workable solution is to launch the install from a separate
+        # console, but as the executable is a GUI app, we have to do that by first
+        # launching a separate console instance and then launching the installer
+        # within it. We use cmd for this purpose and have it return the exit code
+        # of the Visual Studio Installer as soon as it completes.
+        #
+        # And yes, the command-line argument quoting for cmd looks weird and wrong.
+        # It's not; cmd itself is weird and wrong. See its help for the specifics.
+        Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $VsDisplayName) -PercentComplete ($Idx / $VsSetupInstances.Count * 100)
+        $VsInstallerArgs = 'update --installPath "{0}" --passive --norestart' -f $VsSetupInstance.InstallationPath
+        $CmdArgs = '/D /C ""{0}" {1}"' -f $VsInstallerExe, $VsInstallerArgs
+        $VsInstaller = Start-Process -FilePath $env:ComSpec -ArgumentList $CmdArgs -PassThru -Wait
+
+        # If the mutex existed at any point while running this loop, the exit code
+        # we have from the original installer is not meaningful for the update of
+        # Visual Studio itself, and we'll output a warning later on.
+        $VsInstallerUpdated = $false
+
+        # Set to true initially to avoid the subsequent Write-Progress call on the
+        # first iteration of the loop (and possibly the only iteration).
+        $VsInstallerMutexCreated = $true
+        do {
+            # Wait a few seconds in case the original installer process has exited
+            # but the updated installer process has not yet started. I'm unsure if
+            # this is actually a possible scenario but am being cautious. Obviously
+            # a not particularly durable hack, but more durable approaches aren't
+            # worth the effort. For further iterations the delay is for efficiency.
+            Start-Sleep -Seconds 3
+
+            # Try to acquire the Visual Studio Installer mutex. If the named mutex
+            # is created, then an updated installer is not running. If it exists, a
+            # Visual Studio Installer is running. We avoid actually waiting on the
+            # mutex as it's unclear if it existing, even if not held, causes any
+            # problems for the installer.
+            [Threading.Mutex]::new($false, 'DevdivInstallerUI', [ref]$VsInstallerMutexCreated).Close()
+
+            if (!$VsInstallerMutexCreated) {
+                $VsInstallerUpdated = $true
+            }
+        } while (!$VsInstallerMutexCreated)
+
+        if ($VsInstallerUpdated) {
+            Write-Warning -Message ('{0} update exit code may be unreliable.' -f $VsDisplayName)
         }
 
-        # Wait a few seconds in case the original installer process has exited
-        # but the updated installer process has not yet started. I'm unsure if
-        # this is actually a possible scenario but am being cautious. Obviously
-        # a not particularly durable hack, but more durable approaches aren't
-        # worth the effort. For further iterations the delay is for efficiency.
-        Start-Sleep -Seconds 3
-
-        # Try to acquire the Visual Studio Installer mutex. If the named mutex
-        # is created, then an updated installer is not running. If it exists, a
-        # Visual Studio Installer is running. We avoid actually waiting on the
-        # mutex as it's unclear if it existing, even if not held, causes any
-        # problems for the installer.
-        [Threading.Mutex]::new($false, 'DevdivInstallerUI', [ref]$VsInstallerMutexCreated).Close()
-
-        if (!$VsInstallerMutexCreated) {
-            $VsInstallerUpdated = $true
+        switch ($VsInstaller.ExitCode) {
+            3010 { Write-Warning -Message ('{0} successfully updated but requires a reboot.' -f $VsDisplayName) }
+            0 { }
+            Default {
+                Write-Error -Message ('Update of {0} returned exit code: {1}' -f $VsDisplayName, $VsInstaller.ExitCode)
+                $VsInstallerStatus = $false
+            }
         }
-    } while (!$VsInstallerMutexCreated)
+    }
 
     Write-Progress @WriteProgressParams -Completed
 
-    $Result = $true
-    switch ($VsInstaller.ExitCode) {
-        3010 { Write-Warning -Message 'Visual Studio successfully updated but requires a reboot.' }
-        0 { }
-        Default {
-            Write-Error -Message ('Visual Studio Installer returned exit code: {0}' -f $VsInstaller.ExitCode)
-            $Result = $false
-        }
-    }
-
-    if ($VsInstallerUpdated) {
-        Write-Warning -Message 'Visual Studio Installer exit code may be unreliable.'
-    }
-
     if ($PassThru) {
-        return $Result
+        return $VsInstallerStatus
     }
 }
 
