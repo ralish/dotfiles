@@ -11,22 +11,34 @@ SETUP_SSH_AUTH_SOCK=true
 # Based on: https://github.com/rupor-github/wsl-ssh-agent#wsl-2-compatibility
 wsl_setup_ssh_auth_sock() {
     if [ -n "${SSH_AUTH_SOCK}" ]; then
-        #echo "[WSL] Skipping \$SSH_AUTH_SOCK setup as it's already set."
+        #echo "[WSL] Skipping SSH_AUTH_SOCK setup as it's already set."
         return
     fi
 
     deps='socat ss wslpath wslvar'
     for dep in $deps; do
         if ! command -v "$dep" > /dev/null; then
-            echo "[WSL] Skipping \$SSH_AUTH_SOCK setup as missing dependency: $dep"
+            echo "[WSL] Skipping SSH_AUTH_SOCK setup as missing dependency: $dep"
             return
         fi
     done
 
     SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
-    if ss -l | grep -q "$SSH_AUTH_SOCK"; then
-        export SSH_AUTH_SOCK
-        return
+    if [ -e "$SSH_AUTH_SOCK" ]; then
+        if ! [ -S "$SSH_AUTH_SOCK" ]; then
+            echo '[WSL] Skipping SSH_AUTH_SOCK setup as file is not a socket.'
+            return
+        fi
+
+        # Socket appears to be alive
+        if socat OPEN:/dev/null UNIX-CONNECT:/home/sdl/.ssh/agent.sock; then
+            export SSH_AUTH_SOCK
+            return
+        fi
+
+        # Socket exists but is dead. Most likely the previous socat process
+        # didn't exit cleanly. Remove it and continue to setup a new socket.
+        rm "$SSH_AUTH_SOCK"
     fi
 
     # The PATH setup for wslvar is required due to LP #1877016
@@ -35,7 +47,7 @@ wsl_setup_ssh_auth_sock() {
     winappdata="$(wslpath "$(PATH=$PATH:/mnt/c/Windows/System32 wslvar --sys APPDATA)")"
     npiperelay="$winappdata/Go/bin/npiperelay.exe"
     if ! [ -x "$npiperelay" ]; then
-        echo "[WSL] Skipping \$SSH_AUTH_SOCK setup as missing dependency: $npiperelay"
+        echo "[WSL] Skipping SSH_AUTH_SOCK setup as missing dependency: $npiperelay"
         unset SSH_AUTH_SOCK
         return
     fi
