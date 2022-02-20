@@ -250,6 +250,40 @@
 
     // Extension: YAML
     "yaml.format.singleQuote": true,
+    // Present due to limitations in the CloudFormation Linter extension. See:
+    // https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/issues/213
+    "yaml.customTags": [
+        "!And",
+        "!And sequence",
+        "!If",
+        "!If sequence",
+        "!Not",
+        "!Not sequence",
+        "!Equals",
+        "!Equals sequence",
+        "!Or",
+        "!Or sequence",
+        "!FindInMap",
+        "!FindInMap sequence",
+        "!Base64",
+        "!Join",
+        "!Join sequence",
+        "!Cidr",
+        "!Ref",
+        "!Sub",
+        "!Sub sequence",
+        "!GetAtt",
+        "!GetAZs",
+        "!ImportValue",
+        "!ImportValue sequence",
+        "!Select",
+        "!Select sequence",
+        "!Split",
+        "!Split sequence"
+    ],
+    // Present due to limitations in the CloudFormation Linter extension. See:
+    // https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/issues/214
+    "yaml.validate": false,
 
     "[git-commit]": {
         // Configure Rewrap extension
