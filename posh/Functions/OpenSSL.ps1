@@ -64,7 +64,9 @@ Function Convert-OpenSSLPemToPkcs12 {
         [String]$Pkcs12File,
 
         [ValidateNotNullOrEmpty()]
-        [String]$CaCertsFile
+        [String]$CaCertsFile,
+
+        [Switch]$LegacyEncryption
     )
 
     $Params = [Collections.ArrayList]::new(
@@ -73,14 +75,17 @@ Function Convert-OpenSSLPemToPkcs12 {
             '-export',
             '-inkey', $PrivateKeyFile,
             '-in', $PemFile,
-            '-out', $Pkcs12File,
-            '-nodes'
+            '-out', $Pkcs12File
         )
     )
 
     if ($CaCertsFile) {
         $null = $Params.Add('-certfile')
         $null = $Params.Add($CaCertsFile)
+    }
+
+    if ($LegacyEncryption) {
+        $null = $Params.Add('-legacy')
     }
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
@@ -102,15 +107,17 @@ Function Convert-OpenSSLPkcs12ToPem {
         [Switch]$CertificatesOnly,
 
         [Parameter(ParameterSetName = 'PrivateKeyOnly')]
-        [Switch]$PrivateKeyOnly
+        [Switch]$PrivateKeyOnly,
+
+        [Parameter(ParameterSetName = 'PrivateKeyOnly')]
+        [Switch]$EncryptKey
     )
 
     $Params = [Collections.ArrayList]::new(
         @(
             'pkcs12',
             '-in', $Pkcs12File,
-            '-out', $PemFile,
-            '-nodes'
+            '-out', $PemFile
         )
     )
 
@@ -118,6 +125,10 @@ Function Convert-OpenSSLPkcs12ToPem {
         $null = $Params.Add('-nokeys')
     } elseif ($PSCmdlet.ParameterSetName -eq 'PrivateKeyOnly') {
         $null = $Params.Add('-nocerts')
+
+        if (!$EncryptKey) {
+            $null = $Params.Add('-nodes')
+        }
     }
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
