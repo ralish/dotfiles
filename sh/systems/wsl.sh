@@ -31,7 +31,7 @@ wsl_setup_ssh_auth_sock() {
         fi
 
         # Socket appears to be alive
-        if socat OPEN:/dev/null UNIX-CONNECT:/home/sdl/.ssh/agent.sock; then
+        if socat OPEN:/dev/null UNIX-CONNECT:/home/sdl/.ssh/agent.sock 2> /dev/null; then
             export SSH_AUTH_SOCK
             return
         fi
