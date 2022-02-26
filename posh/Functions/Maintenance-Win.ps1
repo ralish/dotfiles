@@ -156,7 +156,7 @@ Function Update-Scoop {
     Write-Progress @WriteProgressParams -Status 'Uninstalling obsolete apps' -PercentComplete 80
     Write-Verbose -Message 'Uninstalling obsolete Scoop apps: scoop cleanup *'
     if ($CaptureOutput) {
-        $ScoopOutput += & scoop cleanup * 6>&1
+        $ScoopOutput += & scoop cleanup -k * 6>&1
     } else {
         & scoop cleanup *
         Write-Host
