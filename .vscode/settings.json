@@ -32,6 +32,8 @@
         ".gitconfig-win": "ini",
         // htop
         "htoprc": "properties",
+        // irssi
+        "**/irssi/*": "plain",
         // jetbrains
         "*.DotSettings": "xml",
         // kpcli
@@ -47,6 +49,7 @@
         // openssh
         "**/.ssh/config": "ssh_config",
         "**/.ssh/known_hosts": "plain",
+        "**/.ssh/known_hosts.old": "plain",
         "**/.ssh/hosts/*": "plain",
         "**/.ssh/includes/*": "ssh_config",
         "**/.ssh/keys/*": "plain",
@@ -127,7 +130,13 @@
     "vsicons.associations.files": [
         {
             "icon": "binary",
-            "extensions": [".less", ".pmf"],
+            "extensions": [".less"],
+            "filename": true,
+            "format": "svg"
+        },
+        {
+            "icon": "binary",
+            "extensions": [".pmf"],
             "filename": false,
             "format": "svg"
         },
@@ -138,21 +147,15 @@
             "format": "svg"
         },
         {
-            "icon": "key",
-            "extensions": ["pub"],
-            "filename": false,
-            "format": "svg"
-        },
-        {
-            "icon": "vim",
-            "extensions": [".vim"],
-            "filename": false,
-            "format": "svg"
-        },
-        {
             "icon": "git",
             "extensions": [".git-for-windows-updater", ".gitconfig-win", ".keepme"],
             "filename": true,
+            "format": "svg"
+        },
+        {
+            "icon": "key",
+            "extensions": [".pub"],
+            "filename": false,
             "format": "svg"
         },
         {
@@ -162,14 +165,26 @@
             "format": "svg"
         },
         {
+            "icon": "onenote",
+            "extensions": [".onetastic"],
+            "filename": false,
+            "format": "svg"
+        },
+        {
             "icon": "pgsql",
             "extensions": [".psqlrc"],
             "filename": true,
             "format": "svg"
         },
         {
-            "icon": "pip",
-            "extensions": ["pip.conf"],
+            "icon": "vim",
+            "extensions": [".vim"],
+            "filename": false,
+            "format": "svg"
+        },
+        {
+            "icon": "vim",
+            "extensions": [".viminfo"],
             "filename": true,
             "format": "svg"
         }
