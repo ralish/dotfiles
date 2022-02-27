@@ -192,10 +192,7 @@ Function Update-VisualStudio {
         return
     }
 
-    if (!(Get-Module -Name VSSetup -ListAvailable)) {
-        Write-Error -Message 'Unable to update Visual Studio as VSSetup module not available.'
-        return
-    }
+    Test-ModuleAvailable -Name VSSetup
 
     $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property InstallationVersion)
     if ($VsSetupInstances.Count -eq 0) {
