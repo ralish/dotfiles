@@ -56,100 +56,105 @@ Function Update-PowerShell {
         [Int]$ProgressParentId
     )
 
-    if (Get-Module -Name PowerShellGet -ListAvailable) {
-        $WriteProgressParams = @{
-            Activity = 'Updating PowerShell modules'
-        }
+    Test-ModuleAvailable -Name PowerShellGet
 
-        if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
-            $WriteProgressParams['ParentId'] = $ProgressParentId
-            $WriteProgressParams['Id'] = $ProgressParentId + 1
-        }
-
-        Write-Progress @WriteProgressParams -Status 'Enumerating installed modules' -PercentComplete 0
-        $InstalledModules = Get-InstalledModule
-
-        # Percentage of the total progress for Update-Module
-        $ProgressPercentUpdatesBase = 10
-        if ($InstalledModules -contains 'AWS.Tools.Installer') {
-            $ProgressPercentUpdatesSection = 80
-        } else {
-            $ProgressPercentUpdatesSection = 90
-        }
-
-        if (!$IncludeDscModules) {
-            Write-Progress @WriteProgressParams -Status 'Enumerating DSC modules for exclusion' -PercentComplete 5
-
-            # Get-DscResource likes to output multiple progress bars but doesn't have the manners to
-            # clean them up. The result is a total visual mess when we've got our own progress bars.
-            $OriginalProgressPreference = $ProgressPreference
-            Set-Variable -Name 'ProgressPreference' -Scope Global -Value 'Ignore'
-
-            try {
-                # Get-DscResource may output various errors, most often due to duplicate resources.
-                # That's frequently the case with, for example, the PackageManagement module being
-                # available in multiple locations accessible from the PSModulePath.
-                $DscModules = @(Get-DscResource -Module * -ErrorAction Ignore | Select-Object -ExpandProperty ModuleName -Unique)
-            } finally {
-                Set-Variable -Name 'ProgressPreference' -Scope Global -Value $OriginalProgressPreference
-            }
-        }
-
-        if (Test-IsWindows) {
-            $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::MyDocuments)
-            $ScopePathAllUsers = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
-        } else {
-            $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
-            $ScopePathAllUsers = '/usr/local/share'
-        }
-
-        # Update all modules compatible with Update-Module
-        for ($ModuleIdx = 0; $ModuleIdx -lt $InstalledModules.Count; $ModuleIdx++) {
-            $Module = $InstalledModules[$ModuleIdx]
-
-            if (!$IncludeDscModules -and $Module.Name -in $DscModules) {
-                Write-Verbose -Message ('Skipping DSC module: {0}' -f $Module.Name)
-                continue
-            }
-
-            if ($Module.Name -match '^AWS\.Tools\.' -and $Module.Repository -notmatch 'PSGallery') {
-                continue
-            }
-
-            $UpdateModuleParams = @{
-                Name          = $Module.Name
-                AcceptLicense = $true
-            }
-
-            if ($Module.InstalledLocation.StartsWith($ScopePathCurrentUser)) {
-                $UpdateModuleParams['Scope'] = 'CurrentUser'
-            } elseif ($Module.InstalledLocation.StartsWith($ScopePathAllUsers)) {
-                $UpdateModuleParams['Scope'] = 'AllUsers'
-            } else {
-                Write-Warning -Message ('Unable to determine install scope for module: {0}' -f $Module)
-                continue
-            }
-
-            if ($PSCmdlet.ShouldProcess($Module.Name, 'Update')) {
-                $PercentComplete = ($ModuleIdx + 1) / $InstalledModules.Count * $ProgressPercentUpdatesSection + $ProgressPercentUpdatesBase
-                Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $Module.Name) -PercentComplete $PercentComplete
-                Update-Module @UpdateModuleParams
-            }
-        }
-
-        # The modular AWS Tools for PowerShell has its own mechanism
-        if ($InstalledModules -contains 'AWS.Tools.Installer') {
-            if ($PSCmdlet.ShouldProcess('AWS.Tools', 'Update')) {
-                $PercentComplete = $ProgressPercentUpdatesBase + $ProgressPercentUpdatesSection
-                Write-Progress @WriteProgressParams -Status 'Updating AWS modules' -PercentComplete $PercentComplete
-                Update-AWSToolsModule -CleanUp
-            }
-        }
-
-        Write-Progress @WriteProgressParams -Completed
-    } else {
-        Write-Warning -Message 'Unable to update PowerShell modules as PowerShellGet module not available.'
+    # Not all platforms have DSC support as part of PowerShell itself
+    $DscSupported = Get-Command -Name Get-DscResource -ErrorAction Ignore
+    if ($IncludeDscModules -and !$DscSupported) {
+        Write-Error -Message 'Unable to enumerate DSC modules as Get-DscResource command not available.'
+        return
     }
+
+    $WriteProgressParams = @{
+        Activity = 'Updating PowerShell modules'
+    }
+
+    if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+        $WriteProgressParams['ParentId'] = $ProgressParentId
+        $WriteProgressParams['Id'] = $ProgressParentId + 1
+    }
+
+    Write-Progress @WriteProgressParams -Status 'Enumerating installed modules' -PercentComplete 0
+    $InstalledModules = Get-InstalledModule
+
+    # Percentage of the total progress for Update-Module
+    $ProgressPercentUpdatesBase = 10
+    if ($InstalledModules -contains 'AWS.Tools.Installer') {
+        $ProgressPercentUpdatesSection = 80
+    } else {
+        $ProgressPercentUpdatesSection = 90
+    }
+
+    if (!$IncludeDscModules -and $DscSupported) {
+        Write-Progress @WriteProgressParams -Status 'Enumerating DSC modules for exclusion' -PercentComplete 5
+
+        # Get-DscResource likes to output multiple progress bars but doesn't have the manners to
+        # clean them up. The result is a total visual mess when we've got our own progress bars.
+        $OriginalProgressPreference = $ProgressPreference
+        Set-Variable -Name 'ProgressPreference' -Scope Global -Value 'Ignore'
+
+        try {
+            # Get-DscResource may output various errors, most often due to duplicate resources.
+            # That's frequently the case with, for example, the PackageManagement module being
+            # available in multiple locations accessible from the PSModulePath.
+            $DscModules = @(Get-DscResource -Module * -ErrorAction Ignore | Select-Object -ExpandProperty ModuleName -Unique)
+        } finally {
+            Set-Variable -Name 'ProgressPreference' -Scope Global -Value $OriginalProgressPreference
+        }
+    }
+
+    if (Test-IsWindows) {
+        $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::MyDocuments)
+        $ScopePathAllUsers = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
+    } else {
+        $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
+        $ScopePathAllUsers = '/usr/local/share'
+    }
+
+    # Update all modules compatible with Update-Module
+    for ($ModuleIdx = 0; $ModuleIdx -lt $InstalledModules.Count; $ModuleIdx++) {
+        $Module = $InstalledModules[$ModuleIdx]
+
+        if (!$IncludeDscModules -and $DscSupported -and $Module.Name -in $DscModules) {
+            Write-Verbose -Message ('Skipping DSC module: {0}' -f $Module.Name)
+            continue
+        }
+
+        if ($Module.Name -match '^AWS\.Tools\.' -and $Module.Repository -notmatch 'PSGallery') {
+            continue
+        }
+
+        $UpdateModuleParams = @{
+            Name          = $Module.Name
+            AcceptLicense = $true
+        }
+
+        if ($Module.InstalledLocation.StartsWith($ScopePathCurrentUser)) {
+            $UpdateModuleParams['Scope'] = 'CurrentUser'
+        } elseif ($Module.InstalledLocation.StartsWith($ScopePathAllUsers)) {
+            $UpdateModuleParams['Scope'] = 'AllUsers'
+        } else {
+            Write-Warning -Message ('Unable to determine install scope for module: {0}' -f $Module)
+            continue
+        }
+
+        if ($PSCmdlet.ShouldProcess($Module.Name, 'Update')) {
+            $PercentComplete = ($ModuleIdx + 1) / $InstalledModules.Count * $ProgressPercentUpdatesSection + $ProgressPercentUpdatesBase
+            Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $Module.Name) -PercentComplete $PercentComplete
+            Update-Module @UpdateModuleParams
+        }
+    }
+
+    # The modular AWS Tools for PowerShell has its own mechanism
+    if ($InstalledModules -contains 'AWS.Tools.Installer') {
+        if ($PSCmdlet.ShouldProcess('AWS.Tools', 'Update')) {
+            $PercentComplete = $ProgressPercentUpdatesBase + $ProgressPercentUpdatesSection
+            Write-Progress @WriteProgressParams -Status 'Updating AWS modules' -PercentComplete $PercentComplete
+            Update-AWSToolsModule -CleanUp
+        }
+    }
+
+    Write-Progress @WriteProgressParams -Completed
 
     if ($PSCmdlet.ShouldProcess('Obsolete modules', 'Uninstall')) {
         if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
