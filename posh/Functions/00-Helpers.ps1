@@ -61,39 +61,46 @@ Function Test-ModuleAvailable {
         [ValidateSet('Any', 'All')]
         [String]$Require = 'All',
 
-        [Switch]$ReturnName
+        [Switch]$PassThru
     )
 
-    if ($ReturnName -and $Require -ne 'Any') {
-        throw 'The ReturnName switch is only valid when Require is Any.'
+    if ($PassThru) {
+        $ModuleInfo = [Collections.Generic.List[PSModuleInfo]]::new()
     }
 
     foreach ($Module in $Name) {
         Write-Debug -Message ('Checking module is available: {0}' -f $Module)
-        if (Get-Module -Name $Module -ListAvailable -Verbose:$false) {
-            $ModuleAvailable = $true
+        $ModuleListAvailable = @(Get-Module -Name $Module -ListAvailable -Verbose:$false)
+
+        if ($ModuleListAvailable) {
+            $MissingModule = $false
+
+            if ($PassThru) {
+                $ModuleInfo.Add(($ModuleListAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1))
+            }
+
             if ($Require -eq 'Any') {
-                $ModuleAvailableName = $Module
                 break
             }
         } else {
-            $ModuleAvailable = $false
-            $ModuleMissingName = $Module
+            $MissingModule = $true
+            $MissingModuleName = $Module
+
             if ($Require -eq 'All') {
                 break
             }
         }
     }
 
-    if (!$ModuleAvailable) {
+    if ($MissingModule) {
         if ($Require -eq 'Any') {
             throw ('Suitable module not available: {0}' -f [String]::Join(', ', $Name))
         } else {
-            throw ('Required module not available: {0}' -f $ModuleMissingName)
+            throw ('Required module not available: {0}' -f $MissingModuleName)
         }
     }
 
-    if ($ReturnName) {
-        return $ModuleAvailableName
+    if ($PassThru -and $ModuleInfo.Count -gt 0) {
+        return @($ModuleInfo.ToArray())
     }
 }

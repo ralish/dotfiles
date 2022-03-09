@@ -59,8 +59,8 @@ Function Set-R53HostedZoneNameTag {
     )
 
     Begin {
-        $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -ReturnName
-        Import-Module -Name $Module -ErrorAction Stop
+        $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
+        $Module | Import-Module -ErrorAction Stop
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = 'Name'
@@ -118,8 +118,8 @@ Function Set-R53HostedZoneParkedRecords {
         [String[]]$RedirectCloudFrontRecordTypes = 'A'
     )
 
-    $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -ReturnName
-    Import-Module -Name $Module -ErrorAction Stop
+    $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
+    $Module | Import-Module -ErrorAction Stop
 
     try {
         $Zones = Get-R53HostedZoneList -ErrorAction Stop
@@ -285,8 +285,8 @@ Function Set-R53HostedZoneTag {
     )
 
     Begin {
-        $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -ReturnName
-        Import-Module -Name $Module -ErrorAction Stop
+        $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
+        $Module | Import-Module -ErrorAction Stop
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = $Key
@@ -319,12 +319,11 @@ Function Get-S3BucketSize {
     Param()
 
     try {
-        $Module = 'AWS.Tools.CloudWatch', 'AWS.Tools.EC2', 'AWS.Tools.S3'
-        Test-ModuleAvailable -Name $Module
+        $Module = Test-ModuleAvailable -Name 'AWS.Tools.CloudWatch', 'AWS.Tools.EC2', 'AWS.Tools.S3' -PassThru
     } catch {
-        $Module = Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any -ReturnName
+        $Module = Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
     }
-    Import-Module -Name $Module -ErrorAction Stop
+    $Module | Import-Module -ErrorAction Stop
 
     try {
         Write-Verbose -Message 'Retrieving enabled regions ...'
