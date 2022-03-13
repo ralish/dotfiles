@@ -32,8 +32,6 @@ Function Update-ModernApps {
 Function Update-Office {
     [CmdletBinding()]
     Param(
-        [Switch]$PassThru,
-
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
@@ -99,15 +97,7 @@ Function Update-Office {
     Write-Verbose -Message ('Office update finished {0} scenario with result: {1}' -f $LastScenario, $LastScenarioResult)
     Write-Progress @WriteProgressParams -Completed
 
-    if (!$PassThru) {
-        return
-    }
-
-    if ($LastScenarioResult -ne 'Success') {
-        return $false
-    }
-
-    return $true
+    return $LastScenarioResult
 }
 
 # Update Scoop & installed apps
@@ -135,30 +125,34 @@ Function Update-Scoop {
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
-    Write-Progress @WriteProgressParams -Status 'Updating module & repository' -PercentComplete 0
-    Write-Verbose -Message 'Updating Scoop: scoop update --quiet'
+    [String[]]$UpdateArgs = 'update', '--quiet'
+    [String[]]$UpdateAppsArgs = 'update', '*', '--quiet'
+    [String[]]$CleanupArgs = 'cleanup', '-k', '*'
+
+    Write-Progress @WriteProgressParams -Status 'Updating module & repository' -PercentComplete 1
+    Write-Verbose -Message ('Updating Scoop: scoop {0}' -f ($UpdateArgs -join ' '))
     if ($CaptureOutput) {
-        $ScoopOutput = & scoop update --quiet 6>&1
+        $ScoopOutput = & scoop @UpdateArgs 6>&1
     } else {
-        & scoop update --quiet
+        & scoop @UpdateArgs
         Write-Host
     }
 
     Write-Progress @WriteProgressParams -Status 'Updating apps' -PercentComplete 20
-    Write-Verbose -Message 'Updating Scoop apps: scoop update * --quiet'
+    Write-Verbose -Message ('Updating Scoop apps: scoop {0}' -f ($UpdateAppsArgs -join ' '))
     if ($CaptureOutput) {
-        $ScoopOutput += & scoop update * --quiet 6>&1
+        $ScoopOutput += & scoop @UpdateAppsArgs 6>&1
     } else {
-        & scoop update * --quiet
+        & scoop @UpdateAppsArgs
         Write-Host
     }
 
     Write-Progress @WriteProgressParams -Status 'Uninstalling obsolete apps' -PercentComplete 80
-    Write-Verbose -Message 'Uninstalling obsolete Scoop apps: scoop cleanup *'
+    Write-Verbose -Message ('Uninstalling obsolete Scoop apps: scoop {0}' -f ($CleanupArgs -join ' '))
     if ($CaptureOutput) {
-        $ScoopOutput += & scoop cleanup -k * 6>&1
+        $ScoopOutput += & scoop @CleanupArgs 6>&1
     } else {
-        & scoop cleanup *
+        & scoop @CleanupArgs
         Write-Host
     }
 
@@ -173,8 +167,6 @@ Function Update-Scoop {
 Function Update-VisualStudio {
     [CmdletBinding()]
     Param(
-        [Switch]$PassThru,
-
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
@@ -197,10 +189,6 @@ Function Update-VisualStudio {
     $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property InstallationVersion)
     if ($VsSetupInstances.Count -eq 0) {
         Write-Error -Message 'Get-VSSetupInstance returned no instances.'
-
-        if ($PassThru) {
-            return $false
-        }
         return
     }
 
@@ -301,17 +289,14 @@ Function Update-VisualStudio {
 
     Write-Progress @WriteProgressParams -Completed
 
-    if ($PassThru) {
-        return $VsInstallerStatus
-    }
+    return $VsInstallerStatus
 }
 
 # Update Microsoft Windows
 Function Update-Windows {
     [CmdletBinding()]
     Param(
-        [Switch]$AcceptAll,
-        [Switch]$PassThru
+        [Switch]$AcceptAll
     )
 
     if (!(Test-IsAdministrator)) {
@@ -328,9 +313,5 @@ Function Update-Windows {
     $Results = Install-WindowsUpdate -AcceptAll:$AcceptAll -IgnoreReboot -NotTitle Silverlight
     if ($Results) {
         return $Results
-    }
-
-    if ($PassThru) {
-        return $true
     }
 }

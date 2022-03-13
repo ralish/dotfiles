@@ -23,7 +23,11 @@ Function Clear-NuGetCache {
         PluginsCache   = 'plugins-cache'
     }
 
-    $NuGetLocals = & nuget locals all -List
+    [String[]]$GetArgs = 'locals', 'all', '-list'
+    [String[]]$ClearArgs = '-clear', '-verbosity', 'quiet'
+
+    Write-Verbose -Message ('Enumerating NuGet caches: nuget {0}' -f ($GetArgs -join ' '))
+    $NuGetLocals = & nuget @GetArgs
 
     foreach ($Cache in $KnownCaches.Keys) {
         $CacheVar = 'NuGet{0}' -f $Cache
@@ -47,7 +51,8 @@ Function Clear-NuGetCache {
     foreach ($Cache in $KnownCaches.Keys) {
         $CachePath = Get-Variable -Name ('NuGet{0}' -f $Cache) -ValueOnly
         if ($PSCmdlet.ShouldProcess($CachePath, 'Clear')) {
-            & nuget locals $KnownCaches[$Cache] -Clear -Verbosity quiet
+            Write-Verbose -Message ('Clearing {0} cache: nuget locals {0} {1}' -f $Cache, ($ClearArgs -join ' '))
+            & nuget locals $KnownCaches[$Cache] @ClearArgs
         }
     }
 }
@@ -84,7 +89,7 @@ Function Update-DotNetTools {
     }
     $env:DOTNET_NOLOGO = 'true'
 
-    Write-Progress @WriteProgressParams -Status 'Enumerating .NET tools' -PercentComplete 0
+    Write-Progress @WriteProgressParams -Status 'Enumerating .NET tools' -PercentComplete 1
     Write-Verbose -Message ('Enumerating .NET tools: dotnet {0}' -f ($ListArgs -join ' '))
     $Tools = [Collections.ArrayList]::new()
     & dotnet @ListArgs | ForEach-Object {
@@ -95,8 +100,8 @@ Function Update-DotNetTools {
 
     $ToolsUpdated = 0
     foreach ($Tool in $Tools) {
+        Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $Tool) -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
         if ($PSCmdlet.ShouldProcess($Tool, 'Update')) {
-            Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $Tool) -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
             Write-Verbose -Message ('Updating {0}: dotnet {1} {0}' -f $Tool, ($UpdateArgs -join ' '))
             & dotnet @UpdateArgs $Tool
             $ToolsUpdated++
@@ -127,9 +132,15 @@ Function Clear-GoCache {
         return
     }
 
-    $GoCache = & go env GOCACHE
+    [String[]]$GetArgs = 'env', 'GOCACHE'
+    [String[]]$ClearArgs = 'clean', '-cache'
+
+    Write-Verbose -Message ('Determining Go cache path: go {0}' -f ($GetArgs -join ' '))
+    $GoCache = & go @GetArgs
+
     if ($PSCmdlet.ShouldProcess($GoCache, 'Clear')) {
-        & go clean -cache
+        Write-Verbose -Message ('Clearing Go cache: go {0}' -f ($ClearArgs -join ' '))
+        & go @ClearArgs
     }
 }
 
@@ -385,9 +396,15 @@ Function Clear-NpmCache {
         return
     }
 
-    $NpmCache = & npm config get -g cache
+    [String[]]$GetArgs = 'config', 'get', '-g', 'cache'
+    [String[]]$ClearArgs = 'cache', 'clean', '--force', '--loglevel=error'
+
+    Write-Verbose -Message ('Determining npm cache path: npm {0}' -f ($GetArgs -join ' '))
+    $NpmCache = & npm @GetArgs
+
     if ($PSCmdlet.ShouldProcess($NpmCache, 'Clear')) {
-        & npm cache clean --force --loglevel=error
+        Write-Verbose -Message ('Clearing npm cache: npm {0}' -f ($ClearArgs -join ' '))
+        & npm @ClearArgs
     }
 }
 
@@ -581,7 +598,12 @@ Function Clear-PipCache {
         return
     }
 
-    $PipCacheInfo = & pip cache info
+    [String[]]$GetArgs = 'cache', 'info'
+    [String[]]$ClearArgs = 'cache', 'purge', '-qqq'
+
+    Write-Verbose -Message ('Determining pip cache path: pip {0}' -f ($GetArgs -join ' '))
+    $PipCacheInfo = & pip @GetArgs
+
     $PipCacheIndex = $null
     $PipCacheWheels = $null
 
@@ -606,7 +628,8 @@ Function Clear-PipCache {
     }
 
     if ($PSCmdlet.ShouldProcess(('{0}, {1}' -f $PipCacheIndex, $PipCacheWheels), 'Clear')) {
-        & pip cache purge -qqq
+        Write-Verbose -Message ('Clearing pip cache: pip {0}' -f ($ClearArgs -join ' '))
+        & pip @ClearArgs
     }
 }
 
@@ -643,13 +666,13 @@ Function Switch-Python {
         try {
             $PythonVersion = & $PythonExe -V 2>&1
         } catch {
-            throw ('Python binary missing or could not be executed: {0}' -f $PythonExe)
+            throw 'Python binary missing or could not be executed: {0}' -f $PythonExe
         }
 
         if ($PythonVersion -match '[0-9]+\.[0-9]+') {
             $PythonVersion = $Matches[0]
         } else {
-            throw ('Unable to determine Python version from output: {0}' -f $PythonVersion)
+            throw 'Unable to determine Python version from output: {0}' -f $PythonVersion
         }
 
         $Version = $PythonVersion
@@ -681,12 +704,16 @@ Function Switch-Python {
     if ($Features -contains 'Dev' -and $NativeVersion -ge '3.7') {
         $PythonDevMode = $true
         $env:PYTHONDEVMODE = 1
+        Write-Host -ForegroundColor Green -NoNewline 'Set PYTHONDEVMODE to: '
+        Write-Host $env:PYTHONDEVMODE
     }
 
     # UTF-8 Mode (see PEP 540)
     if ($Features -contains 'UTF-8' -and $NativeVersion -ge '3.7') {
         $Utf8Mode = $true
         $env:PYTHONUTF8 = 1
+        Write-Host -ForegroundColor Green -NoNewline 'Set PYTHONUTF8 to: '
+        Write-Host $env:PYTHONUTF8
     }
 
     if ($Persist) {
@@ -727,8 +754,9 @@ Function Update-PythonPackages {
         return
     }
 
-    [String[]]$PipUpdateArgs = '-m', 'pip', 'install', '--no-python-version-warning', '--upgrade'
     [String[]]$UpdateArgs = 'install', '--no-python-version-warning', '--upgrade', '--upgrade-strategy', 'eager'
+    [String[]]$PipUpdateArgs = '-m', 'pip', 'install', '--no-python-version-warning', '--upgrade'
+    [String[]]$PipxUpdateArgs = 'upgrade-all'
 
     if ($PSCmdlet.ShouldProcess('pip', 'Update')) {
         Write-Verbose -Message ('Updating pip: python {0} pip' -f ($PipUpdateArgs -join ' '))
@@ -763,8 +791,8 @@ Function Update-PythonPackages {
             }
             $env:USE_EMOJI = 0
 
-            Write-Verbose -Message 'Updating pipx packages: pipx upgrade-all'
-            & pipx upgrade-all
+            Write-Verbose -Message ('Updating pipx packages: pipx {0}' -f ($PipxUpdateArgs -join ' '))
+            & pipx @PipxUpdateArgs
 
             if ($UseEmoji) {
                 $env:USE_EMOJI = $UseEmoji
@@ -789,7 +817,11 @@ Function Clear-GemCache {
         return
     }
 
-    $GemEnv = & gem env
+    [String[]]$GetArgs = 'env'
+    [String[]]$ClearArgs = 'sources', '--clear-all', '--silent'
+
+    Write-Verbose -Message ('Determining gem cache path: gem {0}' -f ($GetArgs -join ' '))
+    $GemEnv = & gem @GetArgs
     $GemSpecCache = $null
 
     foreach ($Line in $GemEnv) {
@@ -805,7 +837,8 @@ Function Clear-GemCache {
     }
 
     if ($PSCmdlet.ShouldProcess($GemSpecCache, 'Clear')) {
-        & gem sources --clear-all --silent
+        Write-Verbose -Message ('Clearing gem cache: gem {0}' -f ($ClearArgs -join ' '))
+        & gem @ClearArgs
     }
 }
 

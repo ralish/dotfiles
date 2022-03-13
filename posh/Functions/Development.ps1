@@ -26,7 +26,8 @@ Function Get-TypeConstructor {
     foreach ($Constructor in $Constructors) {
         $ConstructorParams = $Constructor.GetParameters()
         if ($ConstructorParams.Count -gt 0) {
-            $FormattedParams = '{0}({1})' -f $Type.FullName, [String]::Join(', ', ($ConstructorParams | ForEach-Object { $_.ToString() }))
+            $FormattedConstructorParams = @($ConstructorParams | ForEach-Object { $_.ToString() })
+            $FormattedParams = '{0}({1})' -f $Type.FullName, ($FormattedConstructorParams -join ', ')
         } else {
             $FormattedParams = '{0}()' -f $Type.FullName
         }
@@ -49,7 +50,8 @@ Function Get-TypeMethod {
     foreach ($Method in $Methods) {
         $MethodParams = $Method.GetParameters()
         if ($MethodParams.Count -gt 0) {
-            $FormattedParams = '{0}({1})' -f $Type.FullName, [String]::Join(', ', ($MethodParams | ForEach-Object { $_.ToString() }))
+            $FormattedMethodParams = @($MethodParams | ForEach-Object { $_.ToString() })
+            $FormattedParams = '{0}({1})' -f $Type.FullName, ($FormattedMethodParams -join ', ')
         } else {
             $FormattedParams = '{0}()' -f $Type.FullName
         }
@@ -338,7 +340,9 @@ Function Invoke-GitMergeAllBranches {
         }
     }
 
-    git checkout $SourceBranch
+    if ($PSCmdlet.ShouldProcess($SourceBranch, 'Checkout')) {
+        git checkout $SourceBranch
+    }
 }
 
 # Remove a subset of paths returned from git-clean

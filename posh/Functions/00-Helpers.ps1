@@ -34,7 +34,7 @@ Function Test-CommandAvailable {
     foreach ($Command in $Name) {
         Write-Debug -Message ('Checking command is available: {0}' -f $Command)
         if (!(Get-Command -Name $Command -ErrorAction Ignore)) {
-            throw ('Required command not available: {0}' -f $Command)
+            throw 'Required command not available: {0}' -f $Command
         }
     }
 }
@@ -47,7 +47,6 @@ Function Test-IsWindows {
     if ($PSVersionTable.PSEdition -eq 'Desktop' -or $PSVersionTable.Platform -eq 'Win32NT') {
         return $true
     }
-
     return $false
 }
 
@@ -94,9 +93,9 @@ Function Test-ModuleAvailable {
 
     if ($MissingModule) {
         if ($Require -eq 'Any') {
-            throw ('Suitable module not available: {0}' -f [String]::Join(', ', $Name))
+            throw 'Suitable module not available: {0}' -f ($Name -join ', ')
         } else {
-            throw ('Required module not available: {0}' -f $MissingModuleName)
+            throw 'Required module not available: {0}' -f $MissingModuleName
         }
     }
 

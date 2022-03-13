@@ -664,7 +664,7 @@ Function Add-GroupObjectComputerProperty {
                 continue
             }
 
-            $Computers = [String]::Join(', ', ($GroupInfo.Group.PSComputerName | Sort-Object))
+            $Computers = ($GroupInfo.Group.PSComputerName | Sort-Object) -join ', '
             $GroupInfo | Add-Member -Name Computer -MemberType NoteProperty -Value $Computers -PassThru -Force:$Force
         }
     }

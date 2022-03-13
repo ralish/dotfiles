@@ -60,7 +60,7 @@ Function Set-R53HostedZoneNameTag {
 
     Begin {
         $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
-        $Module | Import-Module -ErrorAction Stop
+        $Module | Import-Module -ErrorAction Stop -Verbose:$false
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = 'Name'
@@ -76,7 +76,7 @@ Function Set-R53HostedZoneNameTag {
             $ResourceId = $Zone.Id.Replace('/hostedzone/', [String]::Empty)
             $Tag.Value = $Zone.Name.TrimEnd('.')
 
-            if ($PSCmdlet.ShouldProcess($Zone.Name, 'Set Name tag')) {
+            if ($PSCmdlet.ShouldProcess($Tag.Value, 'Set Name tag')) {
                 Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType hostedzone -AddTag $Tag
             }
         }
@@ -119,7 +119,7 @@ Function Set-R53HostedZoneParkedRecords {
     )
 
     $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
-    $Module | Import-Module -ErrorAction Stop
+    $Module | Import-Module -ErrorAction Stop -Verbose:$false
 
     try {
         $Zones = Get-R53HostedZoneList -ErrorAction Stop
@@ -135,14 +135,28 @@ Function Set-R53HostedZoneParkedRecords {
         $Dmarc = 'v=DMARC1; p=reject'
 
         if ($DmarcRua) {
-            $Dmarc = '{0}; rua={1}' -f $Dmarc, [String]::Join(',', $DmarcRua)
+            $Dmarc = '{0}; rua={1}' -f $Dmarc, ($DmarcRua -join ',')
         }
 
         if ($DmarcRuf) {
-            $Dmarc = '{0}; ruf={1}' -f $Dmarc, [String]::Join(',', $DmarcRuf)
+            $Dmarc = '{0}; ruf={1}' -f $Dmarc, ($DmarcRuf -join ',')
         }
 
         $Dmarc = '{0}; fo=1' -f $Dmarc
+    } elseif ($DmarcRua -or $DmarcRuf) {
+        $IgnoredParams = @()
+
+        if ($DmarcRua) {
+            $IgnoredParams += 'DmarcRua'
+        }
+
+        if ($DmarcRuf) {
+            $IgnoredParams += 'DmarcRuf'
+        }
+
+        if ($IgnoredParams.Count -ge 1) {
+            Write-Warning -Message ('Parameter(s) will be ignored as not setting DMARC record: {0}' -f ($IgnoredParams -join ', '))
+        }
     }
 
     # Construct each CAA record
@@ -167,6 +181,41 @@ Function Set-R53HostedZoneParkedRecords {
             foreach ($CaaReportUrl in $CaaIoDef) {
                 $null = $Caa.Add('0 iodef "{0}"' -f $CaaReportUrl)
             }
+        }
+    } elseif ($CaaIssue -or $CaaIssueWild -or $CaaIoDef) {
+        $IgnoredParams = @()
+
+        if ($CaaIssue) {
+            $IgnoredParams += 'CaaIssue'
+        }
+
+        if ($CaaIssueWild) {
+            $IgnoredParams += 'CaaIssueWild'
+        }
+
+        if ($CaaIoDef) {
+            $IgnoredParams += 'CaaIoDef'
+        }
+
+        if ($IgnoredParams.Count -ge 1) {
+            Write-Warning -Message ('Parameter(s) will be ignored as not setting CAA record: {0}' -f ($IgnoredParams -join ', '))
+        }
+    }
+
+    # Check for CloudFront redirect parameters
+    if ($Records -notcontains 'Redirect' -and ($RedirectCloudFrontDomainName -or $PSBoundParameters.ContainsKey('RedirectCloudFrontRecordTypes'))) {
+        $IgnoredParams = @()
+
+        if ($RedirectCloudFrontDomainName) {
+            $IgnoredParams += 'RedirectCloudFrontDomainName'
+        }
+
+        if ($PSBoundParameters.ContainsKey('RedirectCloudFrontRecordTypes')) {
+            $IgnoredParams += 'RedirectCloudFrontRecordTypes'
+        }
+
+        if ($IgnoredParams.Count -ge 1) {
+            Write-Warning -Message ('Parameter(s) will be ignored as not setting redirect record(s): {0}' -f ($IgnoredParams -join ', '))
         }
     }
 
@@ -260,7 +309,7 @@ Function Set-R53HostedZoneParkedRecords {
         }
 
         $ZoneId = $Zone.Id.TrimStart('/hostedzone/')
-        if ($PSCmdlet.ShouldProcess($Zone.Name, 'Set records')) {
+        if ($PSCmdlet.ShouldProcess($ZoneName, 'Set records')) {
             $Change = Edit-R53ResourceRecordSet -HostedZoneId $ZoneId -ChangeBatch_Change $ZoneRecords -ChangeBatch_Comment $ZoneName
             $null = $Changes.Add($Change)
         }
@@ -286,7 +335,7 @@ Function Set-R53HostedZoneTag {
 
     Begin {
         $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
-        $Module | Import-Module -ErrorAction Stop
+        $Module | Import-Module -ErrorAction Stop -Verbose:$false
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = $Key
@@ -302,7 +351,7 @@ Function Set-R53HostedZoneTag {
 
             $ResourceId = $Zone.Id.Replace('/hostedzone/', [String]::Empty)
 
-            if ($PSCmdlet.ShouldProcess($Zone.Name, 'Set {0} tag' -f $Tag.Key)) {
+            if ($PSCmdlet.ShouldProcess($Zone.Name.TrimEnd('.'), 'Set {0} tag' -f $Tag.Key)) {
                 Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType hostedzone -AddTag $Tag
             }
         }
@@ -323,7 +372,7 @@ Function Get-S3BucketSize {
     } catch {
         $Module = Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
     }
-    $Module | Import-Module -ErrorAction Stop
+    $Module | Import-Module -ErrorAction Stop -Verbose:$false
 
     try {
         Write-Verbose -Message 'Retrieving enabled regions ...'

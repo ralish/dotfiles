@@ -79,9 +79,9 @@ Function Get-AzureAuthToken {
     }
 
     # Try to handle multiple module versions being present
-    $AdalModule = Get-Module -Name $ModuleName | Select-Object -First 1
+    $AdalModule = Get-Module -Name $ModuleName -Verbose:$false | Select-Object -First 1
     if (!$AdalModule) {
-        $AdalModule = Get-Module -Name $ModuleName -ListAvailable | Select-Object -First 1
+        $AdalModule = Get-Module -Name $ModuleName -ListAvailable -Verbose:$false | Select-Object -First 1
     }
 
     $AdalModulePath = $AdalModule.ModuleBase
@@ -175,6 +175,7 @@ Function Get-AzureEnterpriseApplications {
         Headers     = $Headers
         Body        = ($Body | ConvertTo-Json)
         ErrorAction = 'Stop'
+        Verbose     = $false
     }
 
     try {
@@ -237,7 +238,8 @@ Function Get-AzureUsersLicensingSummary {
 
     foreach ($User in $Users) {
         if ($User.Licenses) {
-            $LicensingSummary = [String]::Join(', ', ($User.Licenses.AccountSku.SkuPartNumber | Sort-Object))
+            $SkuPartNumbers = @($User.Licenses.AccountSku.SkuPartNumber | Sort-Object)
+            $LicensingSummary = $SkuPartNumbers -join ', '
         } else {
             $LicensingSummary = [String]::Empty
         }
@@ -262,8 +264,8 @@ Function Connect-AzureAD {
         [PSCredential]$Credential
     )
 
-    if ($PSVersionTable.PSVersion.Major -ge 7) {
-        Write-Error -Message 'AzureAD module is incompatible with PowerShell 7+.'
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        Write-Error -Message 'AzureAD module is incompatible with PowerShell Core.'
         return
     }
 
@@ -272,7 +274,7 @@ Function Connect-AzureAD {
     # a dependency in another module which has yet to be updated. As such, we
     # shouldn't just naively import AzureADPreview assuming it's the latest.
     $ModuleNames = 'AzureAD', 'AzureADPreview'
-    $CandidateModules = Get-Module -Name $ModuleNames -ListAvailable
+    $CandidateModules = Get-Module -Name $ModuleNames -ListAvailable -Verbose:$false
     if (!$CandidateModules) {
         # Obviously redundant but ensures consistent error messages
         Test-ModuleAvailable -Name $ModuleNames -Require Any

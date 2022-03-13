@@ -360,9 +360,9 @@ Function Find-WinEvent {
         }
 
         if ($OutputFormat -eq 'PlainText') {
-            $Text = '[{0}] {1,-8} -> {2}{3}{4}' -f $Time, $Level, $Provider, $MultilinePrefix, [String]::Join($MultilinePrefix, $Message)
+            $Text = '[{0}] {1,-8} -> {2}{3}{4}' -f $Time, $Level, $Provider, $MultilinePrefix, ($Message -join $MultilinePrefix)
         } else {
-            $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, [String]::Join($MultilinePrefix, $Message)
+            $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, ($Message -join $MultilinePrefix)
         }
 
         $null = $Events.Add($Text)
@@ -538,7 +538,7 @@ Function Convert-SecurityDescriptor {
 
             'WMI' {
                 if ($WmiSD.__CLASS -ne 'Win32_SecurityDescriptor') {
-                    throw ('Expected Win32_SecurityDescriptor instance but received: {0}' -f $WmiSD.__CLASS)
+                    throw 'Expected Win32_SecurityDescriptor instance but received: {0}' -f $WmiSD.__CLASS
                 }
 
                 if ($TargetType -eq 'Binary') {

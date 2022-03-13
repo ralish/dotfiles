@@ -185,7 +185,8 @@ Function Resolve-ADGuid {
                     }
 
                     'SchemaObject' {
-                        $null = $LDAPFilters.Add('(schemaIDGUID=\{0})' -f [String]::Join('\', ($ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') })))
+                        $HexBytes = $ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') }
+                        $null = $LDAPFilters.Add('(schemaIDGUID=\{0})' -f ($HexBytes -join '\'))
                     }
                 }
             }
@@ -194,7 +195,7 @@ Function Resolve-ADGuid {
 
     End {
         if ($PSCmdlet.ParameterSetName -eq 'Guid') {
-            $LDAPFilter = '(|{0})' -f [String]::Join([String]::Empty, $LDAPFilters)
+            $LDAPFilter = '(|{0})' -f ($LDAPFilters -join [String]::Empty)
         }
 
         Write-Debug -Message ('Retrieving AD objects using LDAP filter: {0}' -f $LDAPFilter)

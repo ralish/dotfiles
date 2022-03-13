@@ -129,7 +129,7 @@ Function Export-MailboxSpreadsheetData {
         Activity = 'Exporting mailbox data to spreadsheet'
     }
 
-    Write-Progress @WriteProgressParams -Status 'Retrieving mailbox details' -PercentComplete 0
+    Write-Progress @WriteProgressParams -Status 'Retrieving mailbox details' -PercentComplete 1
     $ExoMailbox = Get-Mailbox -Identity $Mailbox
     $MailboxAddress = $ExoMailbox.PrimarySmtpAddress
 
@@ -200,7 +200,7 @@ Function Get-InboxRulesByFolders {
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
-    Write-Progress @WriteProgressParams -Status 'Retrieving mailbox folders' -PercentComplete 0
+    Write-Progress @WriteProgressParams -Status 'Retrieving mailbox folders' -PercentComplete 1
     $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object DefaultFolderType -NE 'Inbox'
     $Folders | Add-Member -MemberType NoteProperty -Name Rules -Value @()
     $Folders | Add-Member -MemberType ScriptProperty -Name RuleCount -Value { $this.Rules.Count }
@@ -275,7 +275,7 @@ Function Get-MailboxActivitySummary {
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
-    Write-Progress @WriteProgressParams -Status 'Retrieving mailbox details' -PercentComplete 0
+    Write-Progress @WriteProgressParams -Status 'Retrieving mailbox details' -PercentComplete 1
     $ExoMailbox = Get-Mailbox -Identity $Mailbox
     $Addresses = $ExoMailbox.EmailAddresses | Where-Object { $_ -match '^smtp:' } | ForEach-Object { $_.Substring(5) }
 
@@ -708,7 +708,7 @@ Function Get-UnifiedGroupReport {
     }
 
     if (!$Groups) {
-        Write-Progress @WriteProgressParams -Status 'Retrieving Office 365 groups' -PercentComplete 0
+        Write-Progress @WriteProgressParams -Status 'Retrieving Office 365 groups' -PercentComplete 1
         $Groups = Get-UnifiedGroup
     }
 
@@ -719,14 +719,14 @@ Function Get-UnifiedGroupReport {
         Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving owners'
         $Owners = Get-UnifiedGroupLinks -Identity $Group.Identity -LinkType Owners
         if ($Owners) {
-            $AllOwners = [String]::Join(', ', ($Owners | Sort-Object))
+            $AllOwners = ($Owners | Sort-Object) -join ', '
             Add-Member -InputObject $Group -MemberType NoteProperty -Name Owners -Value $AllOwners -Force
         }
 
         Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving members'
         $Members = Get-UnifiedGroupLinks -Identity $Group.Identity -LinkType Members
         if ($Members) {
-            $AllMembers = [String]::Join(', ', ($Members | Sort-Object))
+            $AllMembers = ($Members | Sort-Object) -join ', '
             Add-Member -InputObject $Group -MemberType NoteProperty -Name Members -Value $AllMembers -Force
         }
 
@@ -859,7 +859,7 @@ Function Import-ContentSearchResults {
                 $EscapedDomains += [Regex]::Escape($Domain.ToLower())
             }
 
-            $IgnoredDomainsRegex = '@({0})$' -f [String]::Join('|', $EscapedDomains)
+            $IgnoredDomainsRegex = '@({0})$' -f ($EscapedDomains -join '|')
             $ImportContentSearchResultsEntryParams['IgnoredDomains'] = $IgnoredDomainsRegex
             Write-Verbose -Message ('Ignored domains regex: {0}' -f $IgnoredDomainsRegex)
         }
@@ -1124,7 +1124,7 @@ Function Connect-ExchangeOnline {
         }
 
         $ExoModuleMinVersion = [Version]::new(2, 0, 4)
-        $ExoModuleCurrentVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable | Select-Object -First 1 -ExpandProperty Version
+        $ExoModuleCurrentVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable -Verbose:$false | Select-Object -First 1 -ExpandProperty Version
         if ($ExoModuleCurrentVersion -lt $ExoModuleMinVersion) {
             Write-Error -Message ('ExchangeOnlineManagement under PowerShell Core requires v{0} or newer.' -f $ExoModuleMinVersion)
             return
@@ -1231,7 +1231,7 @@ Function Connect-SecurityAndComplianceCenter {
         }
 
         $ExoModuleMinVersion = [Version]::new(2, 0, 4)
-        $ExoModuleCurrentVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable | Select-Object -First 1 -ExpandProperty Version
+        $ExoModuleCurrentVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable -Verbose:$false | Select-Object -First 1 -ExpandProperty Version
         if ($ExoModuleCurrentVersion -lt $ExoModuleMinVersion) {
             Write-Error -Message ('ExchangeOnlineManagement under PowerShell Core requires v{0} or newer.' -f $ExoModuleMinVersion)
             return

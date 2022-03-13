@@ -175,8 +175,6 @@ Function Update-PowerShell {
             Write-Warning -Message 'Some errors were reported while updating PowerShell module help.'
         }
     }
-
-    return $true
 }
 
 #endregion
@@ -383,6 +381,8 @@ Function Update-Profile {
             }
         }
     }
+
+    Remove-Variable -Name ($ProfileTypes + @('ProfileType', 'ProfileTypes'))
 }
 
 #endregion

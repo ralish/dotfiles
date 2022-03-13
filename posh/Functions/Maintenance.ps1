@@ -201,19 +201,19 @@ Function Update-AllTheThings {
 
         if ($Tasks -contains 'Windows') {
             Write-Progress @WriteProgressParams -Status 'Updating Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.Windows = Update-Windows -AcceptAll -PassThru
+            $Results.Windows = Update-Windows -AcceptAll
             $TasksDone++
         }
 
         if ($Tasks -contains 'Office') {
             Write-Progress @WriteProgressParams -Status 'Updating Office' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.Office = Update-Office -PassThru -ProgressParentId $WriteProgressParams['Id']
+            $Results.Office = Update-Office -ProgressParentId $WriteProgressParams['Id']
             $TasksDone++
         }
 
         if ($Tasks -contains 'VisualStudio') {
             Write-Progress @WriteProgressParams -Status 'Updating Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.VisualStudio = Update-VisualStudio -PassThru -ProgressParentId $WriteProgressParams['Id']
+            $Results.VisualStudio = Update-VisualStudio -ProgressParentId $WriteProgressParams['Id']
             $TasksDone++
         }
 
