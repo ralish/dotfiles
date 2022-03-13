@@ -66,6 +66,14 @@ Function Get-KerberosTokenSize {
         throw $_
     }
 
+    # There appears to be a bug in the Get-ADPrincipalGroupMembership cmdlet
+    # where it may construct an incorrect LDAP path when an explicit AD server
+    # is provided. What appears to be happening internally is the DC Locator
+    # service is used to locate a DC which is populated into the LDAP path to
+    # search. The connection will be made to the specified AD server, but if
+    # the AD server returned by the DC Locator is different an error will be
+    # returned by the AD server. This manifests on the client as a cryptic:
+    # "An unspecified error has occurred" exception indicating a server error.
     try {
         $ADGroups = Get-ADPrincipalGroupMembership -Server $ADDomain.PDCEmulator -Identity $User -ErrorAction Stop
     } catch {
