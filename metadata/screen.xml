@@ -3,7 +3,10 @@
     <FriendlyName>Screen</FriendlyName>
 
     <Detection>
-        <Method>Static</Method>
-        <Availability>Ignored</Availability>
+        <Method>FindInPath</Method>
     </Detection>
+
+    <InstallPath>
+        <HideSymlinks>true</HideSymlinks>
+    </InstallPath>
 </Component>
