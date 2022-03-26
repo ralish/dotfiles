@@ -219,7 +219,7 @@ Function Get-AzureUsersDisabledServices {
         }
     }
 
-    return $Results
+    return $Results.ToArray()
 }
 
 # Retrieve licensing summary for Azure AD users

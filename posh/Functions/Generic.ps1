@@ -334,7 +334,7 @@ Function Get-TextEncoding {
     }
 
     End {
-        return $Results
+        return $Results.ToArray()
     }
 }
 
@@ -480,7 +480,7 @@ Function Add-QuotesToStringWithSpace {
     }
 
     End {
-        return $Array
+        return $Array.ToArray()
     }
 }
 

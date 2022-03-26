@@ -262,7 +262,7 @@ Function Compare-Hashtable {
         $null = $Results.Add($Result)
     }
 
-    return $Results
+    return $Results.ToArray()
 }
 
 # Compare the properties of two objects

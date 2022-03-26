@@ -87,7 +87,7 @@ Function Compare-MCASPolicy {
         }
     }
 
-    return $Results
+    return $Results.ToArray()
 }
 
 #endregion
@@ -557,7 +557,7 @@ Function Get-Office365UserLicensingMatrix {
         $null = $Matrix.Add($UserLicensing)
     }
 
-    return $Matrix
+    return $Matrix.ToArray()
 }
 
 # Retrieve a security report for all users
@@ -794,7 +794,7 @@ Function Compare-ProtectionAlert {
         }
     }
 
-    return $Results
+    return $Results.ToArray()
 }
 
 # Extract email addresses and names from Content Search results
@@ -1046,7 +1046,7 @@ Function Import-ContentSearchResultsEntry {
         $null = $Results.Add($Result)
     }
 
-    return $Results
+    return $Results.ToArray()
 }
 
 #endregion

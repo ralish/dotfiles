@@ -368,7 +368,7 @@ Function Find-WinEvent {
         $null = $Events.Add($Text)
     }
 
-    return $Events
+    return $Events.ToArray()
 }
 
 # Watch an Event Log (similar to Unix "tail")
@@ -451,7 +451,7 @@ Function Get-NonInheritedACL {
         $null = $ACLMatches.Add($Directory)
     }
 
-    return $ACLMatches
+    return $ACLMatches.ToArray()
 }
 
 # Helper function to call MKLINK in cmd

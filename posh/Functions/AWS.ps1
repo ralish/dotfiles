@@ -315,7 +315,7 @@ Function Set-R53HostedZoneParkedRecords {
         }
     }
 
-    return $Changes
+    return $Changes.ToArray()
 }
 
 # Set a tag on a Route 53 hosted zone

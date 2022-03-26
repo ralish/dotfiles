@@ -100,6 +100,6 @@ Function Test-ModuleAvailable {
     }
 
     if ($PassThru -and $ModuleInfo.Count -gt 0) {
-        return @($ModuleInfo.ToArray())
+        return $ModuleInfo.ToArray()
     }
 }
