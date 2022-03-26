@@ -20,7 +20,7 @@ Function Get-DotFilesMessage {
         return $Message
     }
 
-    return ('[dotfiles] {0}' -f $Message)
+    return '[dotfiles] {0}' -f $Message
 }
 
 # Confirm a PowerShell command is available

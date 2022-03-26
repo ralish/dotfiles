@@ -278,8 +278,7 @@ Function Get-ADShadowPrincipalContainer {
         throw $_
     }
 
-    $SpcDn = 'CN=Shadow Principal Configuration,CN=Services,{0}' -f $RootDse.configurationNamingContext
-    return $SpcDn
+    return 'CN=Shadow Principal Configuration,CN=Services,{0}' -f $RootDse.configurationNamingContext
 }
 
 # Create a shadow principal
