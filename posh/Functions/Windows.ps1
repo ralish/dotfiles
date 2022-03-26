@@ -45,13 +45,19 @@ Function Get-EnvironmentVariable {
         return [Environment]::GetEnvironmentVariable($Name, [EnvironmentVariableTarget]::$Scope)
     }
 
-    $EnvVars = [Environment]::GetEnvironmentVariables([EnvironmentVariableTarget]::$Scope)
-    $SortedEnvVars = [Collections.Generic.SortedDictionary[string, string]]::new()
-    foreach ($EnvVarName in $EnvVars.Keys) {
-        $SortedEnvVars.Add($EnvVarName, $EnvVars[$EnvVarName])
+    $EnvVarsRaw = [Environment]::GetEnvironmentVariables([EnvironmentVariableTarget]::$Scope)
+    $EnvVars = [Collections.Generic.List[PSCustomObject]]::new()
+
+    foreach ($EnvVarName in ($EnvVarsRaw.Keys | Sort-Object)) {
+        $EnvVar = [PSCustomObject]@{
+            Name  = $EnvVarName
+            Value = $EnvVarsRaw[$EnvVarName]
+        }
+
+        $EnvVars.Add($EnvVar)
     }
 
-    return $SortedEnvVars
+    return $EnvVars.ToArray()
 }
 
 # Set a persisted environment variable
