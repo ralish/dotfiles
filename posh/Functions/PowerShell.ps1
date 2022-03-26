@@ -167,11 +167,38 @@ Function Update-PowerShell {
 
     # The modular AWS Tools for PowerShell has its own mechanism
     if ($UniqueModules -contains 'AWS.Tools.Installer') {
-        $PercentComplete = $ProgressPercentUpdatesBase + $ProgressPercentUpdatesSection
-        Write-Progress @WriteProgressParams -Status 'Updating AWS modules' -PercentComplete $PercentComplete
+        $PowerShellGetV2 = $false
+        if (Get-Command -Name 'PowerShellGet\Find-Module' -ErrorAction Ignore) {
+            $PowerShellGetV2 = $true
+        }
 
-        if ($PSCmdlet.ShouldProcess('AWS.Tools', 'Update')) {
-            Update-AWSToolsModule -CleanUp
+        # The Update-AWSToolsModule function is not yet compatible with PowerShellGet v3. If we're
+        # using PowerShellGet v3 but PowerShellGet v2 is available, then import it side-by-side.
+        if (!$PowerShellGetV2) {
+            $PowerShellGet = Get-Module -Name PowerShellGet -ListAvailable |
+                Where-Object Version -Match '^2\.' |
+                Sort-Object -Property Version -Descending |
+                Select-Object -First 1
+
+            if ($PowerShellGet) {
+                try {
+                    $PowerShellGet | Import-Module -ErrorAction Stop -Verbose:$false
+                    $PowerShellGetV2 = $true
+                } catch {
+                    Write-Error -Message 'Unable to update AWS modules as failed to import PowerShellGet v2 module.'
+                }
+            } else {
+                Write-Warning -Message 'Unable to update AWS modules as PowerShellGet v2 module not available.'
+            }
+        }
+
+        if ($PowerShellGetV2) {
+            $PercentComplete = $ProgressPercentUpdatesBase + $ProgressPercentUpdatesSection
+            Write-Progress @WriteProgressParams -Status 'Updating AWS modules' -PercentComplete $PercentComplete
+
+            if ($PSCmdlet.ShouldProcess('AWS.Tools', 'Update')) {
+                Update-AWSToolsModule -CleanUp -Force
+            }
         }
     }
 
