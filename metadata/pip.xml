@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ralish/PSDotFiles/main/Metadata.xsd">
     <FriendlyName>pip</FriendlyName>
-    <BasePath>.config\pip</BasePath>
+    <BasePath>.config</BasePath>
 
     <Detection>
         <Method>FindInPath</Method>
@@ -9,7 +9,6 @@
 
     <InstallPath>
         <SpecialFolder>ApplicationData</SpecialFolder>
-        <Destination>pip</Destination>
     </InstallPath>
 
     <RenamePaths>
