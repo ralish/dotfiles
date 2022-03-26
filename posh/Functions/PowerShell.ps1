@@ -216,7 +216,7 @@ Function Compare-Hashtable {
         [String]$CaseMatching = 'Default'
     )
 
-    $Results = [Collections.ArrayList]::new()
+    $Results = [Collections.Generic.List[PSCustomObject]]::new()
 
     $AllKeys = ($Reference.Keys + $Difference.Keys) | Sort-Object -Unique
     foreach ($Key in $AllKeys) {
@@ -323,8 +323,8 @@ Function Compare-ObjectPropertiesMatrix {
     )
 
     Begin {
-        $ComparedObjects = [Collections.ArrayList]::new()
-        $DifferentProperties = [Collections.ArrayList]::new()
+        $ComparedObjects = [Collections.Generic.List[Object]]::new()
+        $DifferentProperties = [Collections.Generic.List[String]]::new()
 
         $DiscoverReferenceObject = $false
         if (!$PSBoundParameters.ContainsKey('ReferenceObject')) {
@@ -455,7 +455,7 @@ Function fla {
     )
 
     Begin {
-        $Objects = [Collections.ArrayList]::new()
+        $Objects = [Collections.Generic.List[PSObject]]::new()
     }
 
     Process {
@@ -479,7 +479,7 @@ Function fta {
     )
 
     Begin {
-        $Objects = [Collections.ArrayList]::new()
+        $Objects = [Collections.Generic.List[PSObject]]::new()
     }
 
     Process {

@@ -47,7 +47,7 @@ Function Clear-AllDevCaches {
         'pip'
     )
 
-    $Tasks = [Collections.ArrayList]::new()
+    $Tasks = [Collections.Generic.List[String]]::new()
     $TasksDone = 0
     $TasksTotal = 0
 
@@ -172,7 +172,7 @@ Function Update-AllTheThings {
     }
 
     End {
-        $Tasks = [Collections.ArrayList]::new()
+        $Tasks = [Collections.Generic.List[String]]::new()
         $TasksDone = 0
         $TasksTotal = 0
         $Results = [PSCustomObject]@{}

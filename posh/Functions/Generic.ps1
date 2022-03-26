@@ -166,7 +166,7 @@ Function ConvertTo-TextEncoding {
 
             if ($ReplaceLeadingTabs -or $TrimTrailingWhitespace) {
                 $Original = $Content
-                $Content = [Collections.ArrayList]::new()
+                $Content = [Collections.Generic.List[String]]::new()
 
                 for ($Idx = 0; $Idx -lt $Original.Count; $Idx++) {
                     $Line = $Original[$Idx]
@@ -233,13 +233,13 @@ Function Get-TextEncoding {
     )
 
     Begin {
-        $Results = [Collections.ArrayList]::new()
+        $Results = [Collections.Generic.List[PSCustomObject]]::new()
 
         # Non-printable characters used to determine if file is binary
         $InvalidChars = [Char[]]@(0..8 + 10..31 + 127 + 129 + 141 + 143 + 144 + 157)
 
         # Construct an array of identifiable encodings by their preamble
-        $Encodings = [Collections.ArrayList]::new()
+        $Encodings = [Collections.Generic.List[Object]]::new()
         foreach ($Encoding in [Text.Encoding]::GetEncodings()) {
             $Preamble = $Encoding.GetEncoding().GetPreamble()
             if ($Preamble) {
@@ -380,7 +380,7 @@ Function Add-FileToEmptyDirectories {
             continue
         }
 
-        $FilesToCreate = [Collections.ArrayList]::new()
+        $FilesToCreate = [Collections.Generic.List[String]]::new()
         Get-ChildItem -LiteralPath $DirPath.FullName -Directory -Exclude $Exclude -Force:$Force | ForEach-Object {
             if ((Get-ChildItem -LiteralPath $_.FullName -Force:$Force | Measure-Object).Count -ne 0) {
                 Get-ChildItem -LiteralPath $_.FullName -Directory -Recurse -Force:$Force | ForEach-Object {
@@ -463,7 +463,7 @@ Function Add-QuotesToStringWithSpace {
     )
 
     Begin {
-        $Array = [Collections.ArrayList]::new()
+        $Array = [Collections.Generic.List[String]]::new()
 
         switch ($Type) {
             'Single' { $Quote = "'" }
@@ -544,7 +544,7 @@ Function Format-Xml {
     )
 
     Begin {
-        $Data = [Collections.ArrayList]::new()
+        $Data = [Collections.Generic.List[String]]::new()
     }
 
     Process {

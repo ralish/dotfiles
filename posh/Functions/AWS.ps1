@@ -128,7 +128,7 @@ Function Set-R53HostedZoneParkedRecords {
     }
 
     $CloudFrontHostedZoneId = 'Z2FDTNDATAQYW2'
-    $Changes = [Collections.ArrayList]::new()
+    $Changes = [Collections.Generic.List[Amazon.Route53.Model.ChangeInfo]]::new()
 
     # Construct the DMARC record
     if ($Records -contains 'DMARC') {
@@ -161,7 +161,7 @@ Function Set-R53HostedZoneParkedRecords {
 
     # Construct each CAA record
     if ($Records -contains 'CAA') {
-        $Caa = [Collections.ArrayList]::new()
+        $Caa = [Collections.Generic.List[String]]::new()
 
         if ($CaaIssue) {
             foreach ($CaaIssuer in $CaaIssue) {
@@ -230,7 +230,7 @@ Function Set-R53HostedZoneParkedRecords {
             continue
         }
 
-        $ZoneRecords = [Collections.ArrayList]::new()
+        $ZoneRecords = [Collections.Generic.List[Amazon.Route53.Model.Change]]::new()
 
         if ($Records -contains 'MX') {
             $Record = [Amazon.Route53.Model.Change]::new()

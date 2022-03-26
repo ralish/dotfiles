@@ -571,13 +571,13 @@ Function Get-Office365UserSecurityReport {
 
     Test-CommandAvailable -Name Get-Mailbox, Get-MsolUser
 
-    $MailboxAuditing = [Collections.ArrayList]::new()
-    $MailboxCalendar = [Collections.ArrayList]::new()
-    $MailboxDelegates = [Collections.ArrayList]::new()
-    $MailboxForwarding = [Collections.ArrayList]::new()
-    $MailboxForwardingRules = [Collections.ArrayList]::new()
-    $MailboxSendAs = [Collections.ArrayList]::new()
-    $MailboxSendOnBehalf = [Collections.ArrayList]::new()
+    $MailboxAuditing = [Collections.Generic.List[PSCustomObject]]::new()
+    $MailboxCalendar = [Collections.Generic.List[Deserialized.Microsoft.Exchange.Management.StoreTasks.MailboxFolderPermission.Calendar]]::new()
+    $MailboxDelegates = [Collections.Generic.List[Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Delegates]]::new()
+    $MailboxForwarding = [Collections.Generic.List[PSCustomObject]]::new()
+    $MailboxForwardingRules = [Collections.Generic.List[Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Forwarding]]::new()
+    $MailboxSendAs = [Collections.Generic.List[Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.SendAs]]::new()
+    $MailboxSendOnBehalf = [Collections.Generic.List[PSCustomObject]]::new()
 
     Write-Verbose -Message 'Retrieving all enabled users ...'
     $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop |
@@ -993,8 +993,8 @@ Function Import-ContentSearchResultsEntry {
     # For checking if the element contains a name which is *not* the SMTP address
     $NameRegex = '^((\S+\s+)*?)(?=(\s*\S+?@\S+?\.\S+)+)'
 
-    $Results = [Collections.ArrayList]::new()
-    $Elements = [Collections.ArrayList]::new()
+    $Results = [Collections.Generic.List[PSCustomObject]]::new()
+    $Elements = [Collections.Generic.List[String]]::new()
     $Entry = $Entry.Replace('"', [String]::Empty)
 
     do {

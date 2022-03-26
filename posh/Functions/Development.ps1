@@ -255,7 +255,7 @@ Function Invoke-GitLinter {
             $GitOutput = git ls-files
             if ($LASTEXITCODE -ne 0) { return }
 
-            $Files = [Collections.ArrayList]::new()
+            $Files = [Collections.Generic.List[String]]::new()
             $GitOutput | Where-Object { $_ -match '\.(ba)?sh$' } | ForEach-Object { $null = $Files.Add($_) }
 
             if ($ShebangSearch) {
@@ -306,7 +306,7 @@ Function Invoke-GitMergeAllBranches {
         Write-Verbose -Message ('Using guessed source branch: {0}' -f $SourceBranch)
     }
 
-    $Branches = [Collections.ArrayList]::new()
+    $Branches = [Collections.Generic.List[String]]::new()
     foreach ($Branch in $GitOutput) {
         $null = $Branches.Add($Branch.TrimStart('* '))
         if ($Branch.StartsWith('* ')) {

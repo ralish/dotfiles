@@ -172,7 +172,7 @@ Function Resolve-ADGuid {
         }
 
         if ($PSCmdlet.ParameterSetName -eq 'Guid') {
-            $LDAPFilters = [Collections.ArrayList]::new()
+            $LDAPFilters = [Collections.Generic.List[String]]::new()
         }
     }
 

@@ -91,7 +91,7 @@ Function Update-DotNetTools {
 
     Write-Progress @WriteProgressParams -Status 'Enumerating .NET tools' -PercentComplete 1
     Write-Verbose -Message ('Enumerating .NET tools: dotnet {0}' -f ($ListArgs -join ' '))
-    $Tools = [Collections.ArrayList]::new()
+    $Tools = [Collections.Generic.List[String]]::new()
     & dotnet @ListArgs | ForEach-Object {
         if ($_ -notmatch '^(Package Id|-)' -and $_ -match '^(\S+)') {
             $null = $Tools.Add($Matches[1])
@@ -764,7 +764,7 @@ Function Update-PythonPackages {
     }
 
     Write-Verbose -Message 'Enumerating Python packages: pipdeptree'
-    $Packages = [Collections.ArrayList]::new()
+    $Packages = [Collections.Generic.List[String]]::new()
     $PackageRegex = [Regex]::new('^(\S+)==')
     & pipdeptree | ForEach-Object {
         $Package = $PackageRegex.Match($_)
@@ -924,7 +924,7 @@ Function Update-RubyGems {
     & gem @UpdateArgs --system
 
     Write-Verbose -Message ('Enumerating Ruby gems: gem {0}' -f ($ListArgs -join ' '))
-    $Packages = [Collections.ArrayList]::new()
+    $Packages = [Collections.Generic.List[String]]::new()
     $PackageRegex = [Regex]::new('\(default: \S+\)')
     & gem @ListArgs | ForEach-Object {
         if (!$PackageRegex.Match($_).Success) {

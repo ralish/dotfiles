@@ -154,9 +154,9 @@ Function Find-WinEvent {
         Write-Warning -Message 'Some event logs may be inaccessible without administrator privileges.'
     }
 
-    $Events = [Collections.ArrayList]::new()
-    $EventLogs = [Collections.ArrayList]::new()
-    $SkippedLogs = [Collections.ArrayList]::new()
+    $Events = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogRecord]]::new()
+    $EventLogs = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogConfiguration]]::new()
+    $SkippedLogs = [Collections.Generic.List[String]]::new()
     $ProviderLogs = @{}
 
     $CommonParams = @{}
@@ -191,7 +191,7 @@ Function Find-WinEvent {
 
     # Configure event severity filtering
     if ($PSCmdlet.ParameterSetName -eq 'SeverityLevel' -and $SeverityLevels -notcontains 'Any') {
-        $EventLevels = [Collections.ArrayList]::new()
+        $EventLevels = [Collections.Generic.List[Int]]::new()
         foreach ($Severity in $SeverityLevel) {
             $null = $EventLevels.Add($EventLevelToInt[$Severity])
         }
@@ -259,7 +259,7 @@ Function Find-WinEvent {
                 }
 
                 $null = $EventLogs.Add($Log)
-                $ProviderLogs[$LogName] = [Collections.ArrayList]::new()
+                $ProviderLogs[$LogName] = [Collections.Generic.List[String]]::new()
             }
 
             $null = $ProviderLogs[$LogName].Add($Provider.Name)
@@ -332,7 +332,7 @@ Function Find-WinEvent {
         return $SortedEvents
     }
 
-    $Events = [Collections.ArrayList]::new()
+    $Events = [Collections.Generic.List[String]]::new()
     $DateFormat = 'yyyy/MM/dd hh:mm:ss tt'
     $StringSplitOptions = [StringSplitOptions]::RemoveEmptyEntries -bor [StringSplitOptions]::TrimEntries
     $PrefixWhitespace = ' ' * ('[{0}] {1,-8} -> ' -f (Get-Date).ToString($DateFormat), $EventLevelToName[0]).Length
@@ -433,7 +433,7 @@ Function Get-NonInheritedACL {
 
     $Directories = Get-ChildItem -Path $Path -Directory -Recurse:$Recurse -Force:$Force
 
-    $ACLMatches = [Collections.ArrayList]::new()
+    $ACLMatches = [Collections.Generic.List[IO.DirectoryInfo]]::new()
     foreach ($Directory in $Directories) {
         $ACL = Get-Acl -LiteralPath $Directory.FullName
         $ACLNonInherited = $ACL.Access | Where-Object { $_.IsInherited -eq $false }

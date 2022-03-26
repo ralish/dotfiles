@@ -205,7 +205,7 @@ Function Get-AzureUsersDisabledServices {
 
     Test-ModuleAvailable -Name MSOnline
 
-    $Results = [Collections.ArrayList]::new()
+    $Results = [Collections.Generic.List[PSCustomObject]]::new()
     $Users = Get-MsolUser -ErrorAction Stop | Where-Object IsLicensed
 
     foreach ($User in $Users) {

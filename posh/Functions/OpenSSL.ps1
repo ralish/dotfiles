@@ -69,8 +69,8 @@ Function Convert-OpenSSLPemToPkcs12 {
         [Switch]$LegacyEncryption
     )
 
-    $Params = [Collections.ArrayList]::new(
-        @(
+    $Params = [Collections.Generic.List[String]]::new(
+        [String[]]@(
             'pkcs12',
             '-export',
             '-inkey', $PrivateKeyFile,
@@ -113,8 +113,8 @@ Function Convert-OpenSSLPkcs12ToPem {
         [Switch]$EncryptKey
     )
 
-    $Params = [Collections.ArrayList]::new(
-        @(
+    $Params = [Collections.Generic.List[String]]::new(
+        [String[]]@(
             'pkcs12',
             '-in', $Pkcs12File,
             '-out', $PemFile
@@ -146,8 +146,8 @@ Function Get-OpenSSLCertificate {
         [String[]]$NameOptions = 'oneline'
     )
 
-    $Params = [Collections.ArrayList]::new(
-        @(
+    $Params = [Collections.Generic.List[String]]::new(
+        [String[]]@(
             'x509',
             '-in', $Certificate,
             '-noout',
@@ -175,8 +175,8 @@ Function Get-OpenSSLCsr {
         [String[]]$NameOptions = 'oneline'
     )
 
-    $Params = [Collections.ArrayList]::new(
-        @(
+    $Params = [Collections.Generic.List[String]]::new(
+        [String[]]@(
             'req',
             '-in', $Csr,
             '-noout',
@@ -280,8 +280,8 @@ Function New-OpenSSLCertificate {
         $KeyType = 'rsa'
     }
 
-    $Params = [Collections.ArrayList]::new(
-        @(
+    $Params = [Collections.Generic.List[String]]::new(
+        [String[]]@(
             'req',
             $Type,
             '-out', $Out,
