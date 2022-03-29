@@ -128,19 +128,30 @@ Function Clear-GoCache {
     Param()
 
     if (!(Get-Command -Name go -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to clear Go cache as go command not found.'
+        Write-Error -Message 'Unable to clear Go caches as go command not found.'
         return
     }
 
-    [String[]]$GetArgs = 'env', 'GOCACHE'
-    [String[]]$ClearArgs = 'clean', '-cache'
+    [String[]]$BuildGetArgs = 'env', 'GOCACHE'
+    [String[]]$ModuleGetArgs = 'env', 'GOMODCACHE'
 
-    Write-Verbose -Message ('Determining Go cache path: go {0}' -f ($GetArgs -join ' '))
-    $GoCache = & go @GetArgs
+    [String[]]$BuildClearArgs = 'clean', '-cache'
+    [String[]]$ModuleClearArgs = 'clean', '-modcache'
 
-    if ($PSCmdlet.ShouldProcess($GoCache, 'Clear')) {
-        Write-Verbose -Message ('Clearing Go cache: go {0}' -f ($ClearArgs -join ' '))
-        & go @ClearArgs
+    Write-Verbose -Message ('Determining Go build cache path: go {0}' -f ($BuildGetArgs -join ' '))
+    $GoBuildCache = & go @BuildGetArgs
+
+    Write-Verbose -Message ('Determining Go module cache path: go {0}' -f ($ModuleGetArgs -join ' '))
+    $GoModuleCache = & go @ModuleGetArgs
+
+    if ($PSCmdlet.ShouldProcess($GoBuildCache, 'Clear')) {
+        Write-Verbose -Message ('Clearing Go build cache: go {0}' -f ($BuildClearArgs -join ' '))
+        & go @BuildClearArgs
+    }
+
+    if ($PSCmdlet.ShouldProcess($GoModuleCache, 'Clear')) {
+        Write-Verbose -Message ('Clearing Go module cache: go {0}' -f ($ModuleClearArgs -join ' '))
+        & go @ModuleClearArgs
     }
 }
 
