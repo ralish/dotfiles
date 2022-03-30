@@ -206,6 +206,12 @@
 
     // Extension: SonarLint
     "sonarlint.disableTelemetry": true,
+    "sonarlint.rules": {
+        // Remove commented out code
+        "javascript:S125": {
+            "level": "off"
+        }
+    },
 
     // Extension: Visual Studio IntelliCode
     "vsintellicode.features.python.deepLearning": "enabled",
