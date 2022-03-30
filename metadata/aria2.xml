@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ralish/PSDotFiles/main/Metadata.xsd">
+    <FriendlyName>aria2</FriendlyName>
+    <BasePath>.config</BasePath>
+
+    <Detection>
+        <Method>FindInPath</Method>
+        <FindInPath>aria2c</FindInPath>
+    </Detection>
+
+    <InstallPath>
+        <SpecialFolder>ApplicationData</SpecialFolder>
+    </InstallPath>
+</Component>
