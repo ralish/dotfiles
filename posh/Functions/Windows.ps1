@@ -504,6 +504,147 @@ Function Restore-MappedNetworkDrives {
 
 #endregion
 
+#region Registry
+
+# Search the registry
+Function Search-Registry {
+    # This function is unfortunately extremely slow compared to tools such as
+    # reg.exe and regedit.exe. The primary cause is PowerShell's behaviour of
+    # avoiding maintaining open handles to registry keys. This makes sense in
+    # the context of the managed environment it's running in, and the typical
+    # interactive usage scenario, but is horrendous when performing any bulk
+    # operations on the registry.
+    #
+    # In that scenario, as handles to registry keys aren't maintained, every
+    # individual operation (e.g. enumerating subkeys, retrieving value names,
+    # etc ...) needs to (re-)acquire an open handle to the registry key being
+    # operated on, including *all* intermediate keys in the path. This results
+    # in an increase of several orders of magnitude in RegOpenKey() calls.
+    #
+    # The solution is to not use PowerShell registry cmdlets at all, instead
+    # calling the underlying .NET methods, and being careful to dispose each
+    # RegistryKey instance once processing is complete.
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Path,
+
+        [Parameter(Mandatory)]
+        [String]$SimpleMatch,
+
+        [ValidateSet('Keys', 'Values', 'Data')]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$Types = @('Keys', 'Values', 'Data'),
+
+        [Switch]$NoRecurse,
+
+        [Parameter(Mandatory, ParameterSetName = 'Recursion')]
+        [AllowEmptyCollection()]
+        [Collections.Generic.List[PSCustomObject]]$Results
+    )
+
+    try {
+        $RegKey = Get-Item -Path $Path -ErrorAction Stop
+    } catch {
+        throw $_
+    }
+
+    if ($RegKey -isnot [Microsoft.Win32.RegistryKey]) {
+        Write-Error -Message ('Path is not a registry key: {0}' -f $Path)
+        return
+    }
+
+    if (!$NoRecurse) {
+        $SearchParams = @{
+            Path        = $null
+            SimpleMatch = $SimpleMatch
+            Types       = $Types
+            Results     = $Results
+        }
+    }
+
+    if (!$PSBoundParameters.ContainsKey('Results')) {
+        $Results = [Collections.Generic.List[PSCustomObject]]::new()
+    }
+
+    if ($Types -contains 'Keys' -or !$NoRecurse) {
+        $SubKeyNames = $RegKey.GetSubKeyNames()
+
+        foreach ($SubKeyName in $SubKeyNames) {
+            $SubKeyPath = Join-Path -Path $Path -ChildPath $SubKeyName
+
+            if ($Types -contains 'Keys') {
+                if ($SubKeyName -like $SimpleMatch) {
+                    $Result = [PSCustomObject]@{
+                        Key       = $SubKeyPath
+                        MatchType = 'Key'
+                        ValueName = $null
+                        ValueData = $null
+                    }
+
+                    $Results.Add($Result)
+                }
+            }
+
+            if (!$NoRecurse) {
+                $SearchParams.Path = $SubKeyPath
+
+                $WriteProgressParams = @{
+                    Activity = 'Searching registry for simple match: {0}' -f $SimpleMatch
+                    Status   = $SearchParams.Path
+                }
+                Write-Progress @WriteProgressParams
+
+                try {
+                    Search-Registry @SearchParams
+                } catch {
+                    Write-Verbose -Message ('Failed to search key "{0}" with error: {1}' -f $SearchParams.Path, $_.Exception.Message)
+                }
+            }
+        }
+    }
+
+    if ($Types -contains 'Values' -or $Types -contains 'Data') {
+        $ValueNames = $RegKey.GetValueNames()
+
+        foreach ($ValueName in $ValueNames) {
+            if ($Types -contains 'Values') {
+                if ($ValueName -like $SimpleMatch) {
+                    $Result = [PSCustomObject]@{
+                        Key       = $Path
+                        MatchType = 'Value'
+                        ValueName = $ValueName
+                        ValueData = $null
+                    }
+
+                    $Results.Add($Result)
+                }
+            }
+
+            if ($Types -contains 'Data') {
+                $ValueData = $RegKey.GetValue($ValueName)
+
+                if ($ValueData -like $SimpleMatch) {
+                    $Result = [PSCustomObject]@{
+                        Key       = $Path
+                        MatchType = 'Data'
+                        ValueName = $ValueName
+                        ValueData = $ValueData
+                    }
+
+                    $Results.Add($Result)
+                }
+            }
+        }
+    }
+
+    if (!$PSBoundParameters.ContainsKey('Results')) {
+        return $Results.ToArray()
+    }
+}
+
+#endregion
+
 #region Security
 
 # Convert security descriptors between different formats
