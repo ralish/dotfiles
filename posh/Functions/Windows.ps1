@@ -508,25 +508,13 @@ Function Restore-MappedNetworkDrives {
 
 # Search the registry
 Function Search-Registry {
-    # This function is unfortunately extremely slow compared to tools such as
-    # reg.exe and regedit.exe. The primary cause is PowerShell's behaviour of
-    # avoiding maintaining open handles to registry keys. This makes sense in
-    # the context of the managed environment it's running in, and the typical
-    # interactive usage scenario, but is horrendous when performing any bulk
-    # operations on the registry.
-    #
-    # In that scenario, as handles to registry keys aren't maintained, every
-    # individual operation (e.g. enumerating subkeys, retrieving value names,
-    # etc ...) needs to (re-)acquire an open handle to the registry key being
-    # operated on, including *all* intermediate keys in the path. This results
-    # in an increase of several orders of magnitude in RegOpenKey() calls.
-    #
-    # The solution is to not use PowerShell registry cmdlets at all, instead
-    # calling the underlying .NET methods, and being careful to dispose each
-    # RegistryKey instance once processing is complete.
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     Param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'Default')]
+        [ValidateSet('HKCC', 'HKCR', 'HKCU', 'HKLM', 'HKPD', 'HKU')]
+        [String]$Hive,
+
+        [Parameter(ParameterSetName = 'Default')]
         [String]$Path,
 
         [Parameter(Mandatory)]
@@ -536,42 +524,108 @@ Function Search-Registry {
         [ValidateNotNullOrEmpty()]
         [String[]]$Types = @('Keys', 'Values', 'Data'),
 
+        [Parameter(ParameterSetName = 'Default')]
         [Switch]$NoRecurse,
+
+        [Parameter(Mandatory, ParameterSetName = 'Recursion')]
+        [Microsoft.Win32.RegistryKey]$ParentKey,
+
+        [Parameter(Mandatory, ParameterSetName = 'Recursion')]
+        [String]$SubKeyName,
 
         [Parameter(Mandatory, ParameterSetName = 'Recursion')]
         [AllowEmptyCollection()]
         [Collections.Generic.List[PSCustomObject]]$Results
     )
 
-    try {
-        $RegKey = Get-Item -Path $Path -ErrorAction Stop
-    } catch {
-        throw $_
+    if ($PSCmdlet.ParameterSetName -eq 'Default') {
+        switch ($Hive) {
+            'HKCC' { $RegHive = [Microsoft.Win32.Registry]::CurrentConfig }
+            'HKCR' { $RegHive = [Microsoft.Win32.Registry]::ClassesRoot }
+            'HKCU' { $RegHive = [Microsoft.Win32.Registry]::CurrentUser }
+            'HKLM' { $RegHive = [Microsoft.Win32.Registry]::LocalMachine }
+            'HKPD' { $RegHive = [Microsoft.Win32.Registry]::PerformanceData }
+            'HKU' { $RegHive = [Microsoft.Win32.Registry]::Users }
+        }
+
+        $RegKeys = [Collections.Generic.List[Microsoft.Win32.RegistryKey]]::new()
+        $RegKeys.Add($RegHive)
+
+        $DirSepChar = [IO.Path]::DirectorySeparatorChar
+        $OpenSubKeyFailed = $false
+        $SubKeys = $Path.Split($DirSepChar)
+
+        foreach ($SubKey in $SubKeys) {
+            try {
+                $RegKey = $RegKeys[-1].OpenSubKey($SubKey)
+                if (!$RegKey) {
+                    $OpenSubKeyFailed = $true
+                }
+            } catch {
+                $OpenSubKeyFailed = $true
+            }
+
+            if ($OpenSubKeyFailed) {
+                $RegPath = '{0}{1}{2}' -f $SubKeys[-1].Name, $DirSepChar, $SubKeys[$RegKeys.Count - 1]
+                Write-Error -Message ('Failed to open registry key: {0}' -f $RegPath)
+                break
+            }
+
+            $RegKeys.Add($RegKey)
+        }
+
+        if ($OpenSubKeyFailed) {
+            for ($i = $RegKeys.Count - 1; $i -ne 0; $i--) {
+                $RegKeys[$i].Close()
+            }
+            return
+        }
+
+        $RegistryKey = $RegKeys[-1]
+        $Results = [Collections.Generic.List[PSCustomObject]]::new()
+    } else {
+        $OpenSubKeyFailed = $false
+
+        try {
+            $RegistryKey = $ParentKey.OpenSubKey($SubKeyName)
+            if (!$RegistryKey) {
+                $OpenSubKeyFailed = $true
+            }
+        } catch {
+            $OpenSubKeyFailed = $true
+        }
+
+        if ($OpenSubKeyFailed) {
+            $RegPath = '{0}{1}{2}' -f $ParentKey.Name, [IO.Path]::DirectorySeparatorChar, $SubKeyName
+            Write-Verbose -Message ('Failed to open registry key: {0}' -f $RegPath)
+            return
+        }
+
+        $WriteProgressParams = @{
+            Activity = 'Searching registry for simple match: {0}' -f $SimpleMatch
+            Status   = $RegistryKey.Name
+        }
+        Write-Progress @WriteProgressParams
     }
 
-    if ($RegKey -isnot [Microsoft.Win32.RegistryKey]) {
-        Write-Error -Message ('Path is not a registry key: {0}' -f $Path)
-        return
-    }
+    $Recurse = $false
+    if ($PSCmdlet.ParameterSetName -eq 'Recursion' -or !$NoRecurse) {
+        $Recurse = $true
 
-    if (!$NoRecurse) {
         $SearchParams = @{
-            Path        = $null
             SimpleMatch = $SimpleMatch
             Types       = $Types
+            ParentKey   = $RegistryKey
+            SubKeyName  = $null
             Results     = $Results
         }
     }
 
-    if (!$PSBoundParameters.ContainsKey('Results')) {
-        $Results = [Collections.Generic.List[PSCustomObject]]::new()
-    }
-
-    if ($Types -contains 'Keys' -or !$NoRecurse) {
-        $SubKeyNames = $RegKey.GetSubKeyNames()
+    if ($Types -contains 'Keys' -or $Recurse) {
+        $SubKeyNames = $RegistryKey.GetSubKeyNames()
 
         foreach ($SubKeyName in $SubKeyNames) {
-            $SubKeyPath = Join-Path -Path $Path -ChildPath $SubKeyName
+            $SubKeyPath = Join-Path -Path $RegistryKey.Name -ChildPath $SubKeyName
 
             if ($Types -contains 'Keys') {
                 if ($SubKeyName -like $SimpleMatch) {
@@ -586,32 +640,21 @@ Function Search-Registry {
                 }
             }
 
-            if (!$NoRecurse) {
-                $SearchParams.Path = $SubKeyPath
-
-                $WriteProgressParams = @{
-                    Activity = 'Searching registry for simple match: {0}' -f $SimpleMatch
-                    Status   = $SearchParams.Path
-                }
-                Write-Progress @WriteProgressParams
-
-                try {
-                    Search-Registry @SearchParams
-                } catch {
-                    Write-Verbose -Message ('Failed to search key "{0}" with error: {1}' -f $SearchParams.Path, $_.Exception.Message)
-                }
+            if ($Recurse) {
+                $SearchParams.SubKeyName = $SubKeyName
+                Search-Registry @SearchParams
             }
         }
     }
 
     if ($Types -contains 'Values' -or $Types -contains 'Data') {
-        $ValueNames = $RegKey.GetValueNames()
+        $ValueNames = $RegistryKey.GetValueNames()
 
         foreach ($ValueName in $ValueNames) {
             if ($Types -contains 'Values') {
                 if ($ValueName -like $SimpleMatch) {
                     $Result = [PSCustomObject]@{
-                        Key       = $Path
+                        Key       = $RegistryKey.Name
                         MatchType = 'Value'
                         ValueName = $ValueName
                         ValueData = $null
@@ -622,11 +665,11 @@ Function Search-Registry {
             }
 
             if ($Types -contains 'Data') {
-                $ValueData = $RegKey.GetValue($ValueName)
+                $ValueData = $RegistryKey.GetValue($ValueName)
 
                 if ($ValueData -like $SimpleMatch) {
                     $Result = [PSCustomObject]@{
-                        Key       = $Path
+                        Key       = $RegistryKey.Name
                         MatchType = 'Data'
                         ValueName = $ValueName
                         ValueData = $ValueData
@@ -638,7 +681,16 @@ Function Search-Registry {
         }
     }
 
-    if (!$PSBoundParameters.ContainsKey('Results')) {
+    if ($PSCmdlet.ParameterSetName -eq 'Recursion') {
+        $RegistryKey.Close()
+        return
+    }
+
+    for ($i = $RegKeys.Count - 1; $i -ne 0; $i--) {
+        $RegKeys[$i].Close()
+    }
+
+    if ($Results.Count -gt 0) {
         return $Results.ToArray()
     }
 }
