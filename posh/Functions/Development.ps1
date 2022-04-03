@@ -353,7 +353,7 @@ Function Remove-GitCleanSubset {
         [String[]]$GitCleanDryRunOutput,
 
         [ValidateNotNullOrEmpty()]
-        [String[]]$RemovePathsEndingWith = @('/bin/', '/obj/')
+        [String[]]$RemovePaths = @('(^|/)bin/', '(^|/)obj/')
     )
 
     Process {
@@ -370,8 +370,8 @@ Function Remove-GitCleanSubset {
 
             $Path = $Matches[1]
 
-            foreach ($RemovalPath in $RemovePathsEndingWith) {
-                if ($Path.EndsWith($RemovalPath)) {
+            foreach ($RemovalPath in $RemovePaths) {
+                if ($Path -match $RemovalPath) {
                     Remove-Item -LiteralPath $Path -Recurse -Force
                     break
                 }
