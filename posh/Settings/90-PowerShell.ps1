@@ -28,7 +28,7 @@ Function Out-Default {
 }
 
 # Setup our custom prompt if oh-my-posh is not loaded
-if (!(Get-Module -Name oh-my-posh)) {
+if (!(Get-Command -Name oh-my-posh -ErrorAction Ignore)) {
     Function Prompt {
         $prompt = ''
 
