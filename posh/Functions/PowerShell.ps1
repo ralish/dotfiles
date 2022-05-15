@@ -50,6 +50,7 @@ Function Update-PowerShell {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
         [Switch]$IncludeDscModules,
+        [Switch]$SkipUninstallObsolete,
         [Switch]$Force,
 
         [ValidateRange(-1, [Int]::MaxValue)]
@@ -204,7 +205,7 @@ Function Update-PowerShell {
 
     Write-Progress @WriteProgressParams -Completed
 
-    if ($PSCmdlet.ShouldProcess('Obsolete modules', 'Uninstall')) {
+    if (!$SkipUninstallObsolete -and $PSCmdlet.ShouldProcess('Obsolete modules', 'Uninstall')) {
         if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
             if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
                 Uninstall-ObsoleteModule -ProgressParentId $WriteProgressParams['Id']
