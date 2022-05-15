@@ -49,6 +49,8 @@ Function Get-ArgumentCompleter {
 Function Update-PowerShell {
     [CmdletBinding(SupportsShouldProcess)]
     Param(
+        [String[]]$PsGetV3Blacklist = @('ExchangeOnlineManagement', 'PnP.PowerShell'),
+
         [Switch]$IncludeDscModules,
         [Switch]$SkipUninstallObsolete,
         [Switch]$SkipUpdateHelp,
@@ -58,11 +60,53 @@ Function Update-PowerShell {
         [Int]$ProgressParentId
     )
 
+    Function Import-PsGetV2SxS {
+        [CmdletBinding()]
+        Param()
+
+        if ($Script:PsGetV2) {
+            return $true
+        }
+
+        if ($Script:PsGetV2AttemptedSxS) {
+            return $false
+        }
+
+        Write-Verbose -Message 'Attempting to import PowerShellGet v2 side-by-side ...'
+        $Script:PsGetV2AttemptedSxS = $true
+        $PowerShellGet = Get-Module -Name PowerShellGet -ListAvailable -Verbose:$false |
+            Where-Object Version -Match '^2\.' |
+            Sort-Object -Property Version -Descending |
+            Select-Object -First 1
+
+        if ($PowerShellGet) {
+            try {
+                $PowerShellGet | Import-Module -ErrorAction Stop -Verbose:$false
+                $Script:PsGetV2 = $true
+                return $true
+            } catch {
+                Write-Error -Message 'Failed to import PowerShellGet v2 module side-by-side.'
+            }
+        } else {
+            Write-Error -Message 'No PowerShellGet v2 module was found for importing side-by-side.'
+        }
+
+        return $false
+    }
+
     $PowerShellGet = Test-ModuleAvailable -Name PowerShellGet -PassThru
 
-    $PowerShellGetV3 = $false
-    if ($PowerShellGet.Version.Major -ge 3) {
-        $PowerShellGetV3 = $true
+    $Script:PsGetV2 = $false
+    $Script:PsGetV3 = $false
+    $Script:PsGetV2AttemptedSxS = $false
+
+    if ($PowerShellGet.Version.Major -eq 2) {
+        $Script:PsGetV2 = $true
+    } elseif ($PowerShellGet.Version.Major -ge 3) {
+        $Script:PsGetV3 = $true
+    } else {
+        Write-Error -Message ('PowerShellGet must be at least v2 but found: {0}' -f $PowerShellGet.Version)
+        return
     }
     Write-Verbose -Message ('Using PowerShellGet v{0}' -f $PowerShellGet.Version)
 
@@ -83,7 +127,7 @@ Function Update-PowerShell {
     }
 
     Write-Progress @WriteProgressParams -Status 'Enumerating installed modules' -PercentComplete 1
-    if ($PowerShellGetV3) {
+    if ($Script:PsGetV3) {
         $InstalledModules = Get-PSResource -Verbose:$false
     } else {
         $InstalledModules = Get-InstalledModule -Verbose:$false
@@ -159,42 +203,39 @@ Function Update-PowerShell {
         Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $ModuleName) -PercentComplete $PercentComplete
 
         if ($PSCmdlet.ShouldProcess($ModuleName, 'Update')) {
-            if ($PowerShellGetV3) {
+            if ($Script:PsGetV3 -and $ModuleName -notin $PsGetV3Blacklist) {
                 Update-PSResource @UpdateParams -Verbose:$false
-            } else {
-                Update-Module @UpdateParams -Verbose:$false
+                continue
             }
+
+            # If PowerShellGet v2 has not been imported, then we're using PowerShellGet v3 but need
+            # to fallback to v2 for this module due to a compatibility issue. Attempt to import the
+            # previous major version side-by-side.
+            if (!$Script:PsGetV2) {
+                $ImportSxS = Import-PsGetV2SxS
+                if (!$ImportSxS) {
+                    Write-Warning -Message ('Unable to update module as PowerShellGet v2 is unavailable: {0}' -f $ModuleName)
+                    continue
+                }
+            }
+
+            Update-Module @UpdateParams -Verbose:$false
         }
     }
 
     # The modular AWS Tools for PowerShell has its own mechanism
     if ($UniqueModules -contains 'AWS.Tools.Installer') {
-        $PowerShellGetV2 = $false
-        if (Get-Command -Name 'PowerShellGet\Find-Module' -ErrorAction Ignore) {
-            $PowerShellGetV2 = $true
-        }
-
         # The Update-AWSToolsModule function is not yet compatible with PowerShellGet v3. If we're
         # using PowerShellGet v3 but PowerShellGet v2 is available, then import it side-by-side.
-        if (!$PowerShellGetV2) {
-            $PowerShellGet = Get-Module -Name PowerShellGet -ListAvailable |
-                Where-Object Version -Match '^2\.' |
-                Sort-Object -Property Version -Descending |
-                Select-Object -First 1
-
-            if ($PowerShellGet) {
-                try {
-                    $PowerShellGet | Import-Module -ErrorAction Stop -Verbose:$false
-                    $PowerShellGetV2 = $true
-                } catch {
-                    Write-Error -Message 'Unable to update AWS modules as failed to import PowerShellGet v2 module.'
-                }
-            } else {
-                Write-Warning -Message 'Unable to update AWS modules as PowerShellGet v2 module not available.'
+        if (!$Script:PsGetV2) {
+            $ImportSxS = Import-PsGetV2SxS
+            if (!$ImportSxS) {
+                Write-Warning -Message 'Unable to update AWS modules as PowerShellGet v2 is unavailable.'
+                continue
             }
         }
 
-        if ($PowerShellGetV2) {
+        if ($Script:PsGetV2) {
             $PercentComplete = $ProgressPercentUpdatesBase + $ProgressPercentUpdatesSection
             Write-Progress @WriteProgressParams -Status 'Updating AWS modules' -PercentComplete $PercentComplete
 
