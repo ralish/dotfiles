@@ -51,6 +51,7 @@ Function Update-PowerShell {
     Param(
         [Switch]$IncludeDscModules,
         [Switch]$SkipUninstallObsolete,
+        [Switch]$SkipUpdateHelp,
         [Switch]$Force,
 
         [ValidateRange(-1, [Int]::MaxValue)]
@@ -217,7 +218,7 @@ Function Update-PowerShell {
         }
     }
 
-    if ($PSCmdlet.ShouldProcess('PowerShell help', 'Update')) {
+    if (!$SkipUpdateHelp -and $PSCmdlet.ShouldProcess('PowerShell help', 'Update')) {
         try {
             Update-Help -Force:$Force -ErrorAction Stop
         } catch {
