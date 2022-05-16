@@ -314,17 +314,28 @@ Function New-ADShadowPrincipal {
         [String]$Name,
 
         [Parameter(Mandatory)]
-        [Security.Principal.SecurityIdentifier]$Sid
+        [Security.Principal.SecurityIdentifier]$Sid,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$Server
     )
 
     Test-ModuleAvailable -Name ActiveDirectory
 
-    $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer
+    $CommonParams = @{
+        ErrorAction = 'Stop'
+    }
+
+    if ($Server) {
+        $CommonParams['Server'] = $Server
+    }
+
+    $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer @CommonParams
 
     $SidByteArray = [byte[]]::new($Sid.BinaryLength)
     $Sid.GetBinaryForm($SidByteArray, 0)
 
-    New-ADObject -Type msDS-ShadowPrincipal -Path $ShadowPrincipalContainer -Name $Name -OtherAttributes @{ 'msDS-ShadowPrincipalSid' = $SidByteArray }
+    New-ADObject @CommonParams -Type msDS-ShadowPrincipal -Path $ShadowPrincipalContainer -Name $Name -OtherAttributes @{ 'msDS-ShadowPrincipalSid' = $SidByteArray }
 }
 
 #endregion
