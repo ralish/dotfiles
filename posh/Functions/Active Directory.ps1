@@ -35,11 +35,18 @@ Function Get-KerberosTokenSize {
         [ValidateSet('Windows Server 2008 R2 (or earlier)', 'Windows Server 2012 (or later)')]
         [String]$OperatingSystem = 'Windows Server 2012 (or later)',
 
-        [ValidateRange(1, [Int]::MaxValue)]
-        [Int]$TicketOverheadBytes = 1200
+        [ValidateRange(0, [Int]::MaxValue)]
+        [Int]$TicketOverheadBytes = 1200,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$Server
     )
 
     Test-ModuleAvailable -Name ActiveDirectory
+
+    $CommonParams = @{
+        ErrorAction = 'Stop'
+    }
 
     if ($Username.Split('\').Count -ne 1) {
         if ($Username.Split('\').Count -gt 2) {
@@ -55,13 +62,19 @@ Function Get-KerberosTokenSize {
     }
 
     try {
-        $ADDomain = Get-ADDomain -Identity $Domain -ErrorAction Stop
+        if ($Server) {
+            $ADDomain = Get-ADDomain @CommonParams -Identity $Domain -Server $Server
+            $CommonParams['Server'] = $Server
+        } else {
+            $ADDomain = Get-ADDomain @CommonParams -Identity $Domain
+            $CommonParams['Server'] = $ADDomain.PDCEmulator
+        }
     } catch {
         throw $_
     }
 
     try {
-        $ADUser = Get-ADUser -Server $ADDomain.PDCEmulator -Identity $User -Properties SIDHistory, TrustedForDelegation -ErrorAction Stop
+        $ADUser = Get-ADUser @CommonParams -Identity $User -Properties SIDHistory, TrustedForDelegation
     } catch {
         throw $_
     }
@@ -75,7 +88,7 @@ Function Get-KerberosTokenSize {
     # returned by the AD server. This manifests on the client as a cryptic:
     # "An unspecified error has occurred" exception indicating a server error.
     try {
-        $ADGroups = Get-ADPrincipalGroupMembership -Server $ADDomain.PDCEmulator -Identity $User -ErrorAction Stop
+        $ADGroups = Get-ADPrincipalGroupMembership @CommonParams -Identity $User
     } catch {
         throw $_
     }
