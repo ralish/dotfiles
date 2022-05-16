@@ -275,18 +275,30 @@ Function Add-ADShadowPrincipalMember {
 # Retrieve the DN for the Shadow Principal Configuration container
 Function Get-ADShadowPrincipalContainer {
     [CmdletBinding()]
-    Param()
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [String]$Server
+    )
 
     Test-ModuleAvailable -Name ActiveDirectory
 
-    try {
-        $DC = Get-ADDomainController -Discover -NextClosestSite -ErrorAction Stop
-    } catch {
-        throw $_
+    $CommonParams = @{
+        ErrorAction = 'Stop'
+    }
+
+    if ($PSBoundParameters.ContainsKey('Server')) {
+        $CommonParams['Server'] = $Server
+    } else {
+        try {
+            $DC = Get-ADDomainController @CommonParams -Discover -NextClosestSite
+            $CommonParams['Server'] = $DC.HostName.Value
+        } catch {
+            throw $_
+        }
     }
 
     try {
-        $RootDse = Get-ADRootDSE -Server $DC.HostName.Value -ErrorAction Stop
+        $RootDse = Get-ADRootDSE @CommonParams
     } catch {
         throw $_
     }
