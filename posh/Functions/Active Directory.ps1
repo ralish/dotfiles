@@ -237,13 +237,25 @@ Function Add-ADShadowPrincipalMember {
         [String[]]$Members,
 
         [ValidateRange(300, 86400)]
-        [Int]$Duration
+        [Int]$Duration,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$Server
     )
 
     Test-ModuleAvailable -Name ActiveDirectory
 
-    $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer
-    $ShadowPrincipal = Get-ADObject -Filter { CN -eq $Name } -SearchBase $ShadowPrincipalContainer -SearchScope Subtree
+    $CommonParams = @{
+        ErrorAction = 'Stop'
+    }
+
+    if ($Server) {
+        $CommonParams['Server'] = $Server
+    }
+
+    $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer @CommonParams
+
+    $ShadowPrincipal = Get-ADObject @CommonParams -Filter { CN -eq $Name } -SearchBase $ShadowPrincipalContainer -SearchScope Subtree
     if (!$ShadowPrincipal) {
         Write-Error -Message ('No shadow principal found for filter on CN: {0}' -f $Name)
         return
@@ -253,7 +265,7 @@ Function Add-ADShadowPrincipalMember {
     }
 
     foreach ($Member in $Members) {
-        $User = Get-ADUser -Filter { CN -eq $Member }
+        $User = Get-ADUser @CommonParams -Filter { CN -eq $Member }
         if (!$User) {
             Write-Error -Message ('No AD user found for filter on CN: {0}' -f $Member)
             continue
@@ -268,7 +280,7 @@ Function Add-ADShadowPrincipalMember {
             $MemberValue = $User.DistinguishedName
         }
 
-        Set-ADObject -Identity $ShadowPrincipal -Add @{ member = $MemberValue }
+        Set-ADObject @CommonParams -Identity $ShadowPrincipal -Add @{ member = $MemberValue }
     }
 }
 
