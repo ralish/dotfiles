@@ -19,6 +19,17 @@
     </Suppress>
 
     <!--
+      Source:     DHCPv6-Client
+      Level:      Information
+      Message:    DHCPv6 client service stop is almost done.DHCP Context Ref count is %1
+
+      Rarely of interest and emitted multiple times on shutdown.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-DHCPv6-Client'] and EventID=51057]]
+    </Suppress>
+
+    <!--
       Source:     DistributedCOM
       Level:      Warning
       Message:    The %1 permission settings do not grant %2 %3 permission for the COM Server application with CLSID %4 and APPID %5 to the user %6\%7 SID (%8) from address %9 running in the application container %10 SID (%11). This security permission can be modified using the Component Services administrative tool.
@@ -35,7 +46,7 @@
       Level:      Information
       Message:    UMDF reflector is unable to connect to service control manager (SCM). This is expected during boot, when SCM has not started yet. Will retry when it starts.
 
-      Rarely of interest and often emitted numerous times during system startup.
+      Rarely of interest and emitted multiple times on startup.
     -->
     <Suppress Path="System">
       *[System[Provider[@Name='Microsoft-Windows-DriverFrameworks-UserMode'] and EventID=10118]]
