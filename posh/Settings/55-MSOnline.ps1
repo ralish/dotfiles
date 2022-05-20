@@ -6,14 +6,14 @@ if (!(Test-IsWindows)) {
     return
 }
 
-try {
-    if (!$DotFilesFastLoad) {
+if (!$DotFilesFastLoad) {
+    try {
         Test-ModuleAvailable -Name MSOnline
+    } catch {
+        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping MSOnline settings as module not found.')
+        $Error.RemoveAt(0)
+        return
     }
-} catch {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping MSOnline settings as module not found.')
-    $Error.RemoveAt(0)
-    return
 }
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading MSOnline settings ...')

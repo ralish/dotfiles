@@ -6,14 +6,14 @@ if (!(Test-IsWindows)) {
     return
 }
 
-try {
-    if (!$DotFilesFastLoad) {
+if (!$DotFilesFastLoad) {
+    try {
         Test-ModuleAvailable -Name PSWinVitals
+    } catch {
+        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSWinVitals settings as module not found.')
+        $Error.RemoveAt(0)
+        return
     }
-} catch {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSWinVitals settings as module not found.')
-    $Error.RemoveAt(0)
-    return
 }
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading PSWinVitals settings ...')
