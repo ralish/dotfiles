@@ -18,22 +18,24 @@ Function Get-TypeAccelerator {
 Function Get-TypeConstructor {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [Type]$Type
     )
 
-    $Constructors = $Type.GetConstructors()
-    foreach ($Constructor in $Constructors) {
-        $ConstructorParams = $Constructor.GetParameters()
-        if ($ConstructorParams.Count -gt 0) {
-            $FormattedConstructorParams = @($ConstructorParams | ForEach-Object { $_.ToString() })
-            $FormattedParams = '{0}({1})' -f $Type.FullName, ($FormattedConstructorParams -join ', ')
-        } else {
-            $FormattedParams = '{0}()' -f $Type.FullName
-        }
+    Process {
+        $Constructors = $Type.GetConstructors()
+        foreach ($Constructor in $Constructors) {
+            $ConstructorParams = $Constructor.GetParameters()
+            if ($ConstructorParams.Count -gt 0) {
+                $FormattedConstructorParams = @($ConstructorParams | ForEach-Object { $_.ToString() })
+                $FormattedParams = '{0}({1})' -f $Type.FullName, ($FormattedConstructorParams -join ', ')
+            } else {
+                $FormattedParams = '{0}()' -f $Type.FullName
+            }
 
-        [PSCustomObject]@{
-            Constructor = $FormattedParams
+            [PSCustomObject]@{
+                Constructor = $FormattedParams
+            }
         }
     }
 }
