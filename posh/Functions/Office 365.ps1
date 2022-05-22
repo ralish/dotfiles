@@ -1088,12 +1088,10 @@ Function Connect-Office365Services {
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         Connect-SharePointOnline -TenantName $TenantName
         Connect-MicrosoftTeams
-        Connect-SkypeForBusinessOnline
         Connect-CentralizedDeployment
     } else {
         Connect-SharePointOnline @DefaultParams -TenantName $TenantName
         Connect-MicrosoftTeams @DefaultParams
-        Connect-SkypeForBusinessOnline @DefaultParams
         Connect-CentralizedDeployment @DefaultParams
     }
 }
@@ -1291,28 +1289,6 @@ Function Connect-SharePointOnline {
 
     Write-Host -ForegroundColor Green 'Connecting to SharePoint Online ...'
     Connect-SPOService @ConnectParams
-}
-
-# Helper function to connect to Skype for Business Online
-Function Connect-SkypeForBusinessOnline {
-    [CmdletBinding()]
-    Param(
-        [ValidateNotNull()]
-        [System.Management.Automation.Credential()]
-        [PSCredential]$Credential
-    )
-
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'MicrosoftTeams module is incompatible with PowerShell Core.'
-        return
-    }
-
-    # SfB Online Connector is included in recent MicrosoftTeams module releases
-    Test-ModuleAvailable -Name MicrosoftTeams
-
-    Write-Host -ForegroundColor Green 'Connecting to Skype for Business Online ...'
-    $CsOnlineSession = New-CsOnlineSession @PSBoundParameters
-    Import-PSSession -Session $CsOnlineSession
 }
 
 # Helper function to import the weird Exchange Online v1 module
