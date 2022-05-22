@@ -317,4 +317,6 @@ Function Update-Windows {
     if ($Results) {
         return $Results
     }
+
+    return $true
 }
