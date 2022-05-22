@@ -19,17 +19,35 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'AWS.format.ps1xm
 
 #region IAM
 
-# Set AWS credentials environment variables from an AWSCredentials object
+# Set AWS credential environment variables
 Function Set-AWSCredentialEnvironment {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUsePSCredentialType', '')]
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [Object]$Credential
+        [Parameter(ParameterSetName = 'AWSCredentials', Mandatory, ValueFromPipeline)]
+        [Object]$Credential,
+
+        [Parameter(ParameterSetName = 'PlainText', Mandatory)]
+        [String]$AccessKey,
+
+        [Parameter(ParameterSetName = 'PlainText', Mandatory)]
+        [String]$SecretKey,
+
+        [Parameter(ParameterSetName = 'PlainText')]
+        [ValidateNotNullOrEmpty()]
+        [String]$SessionToken
     )
 
     Process {
+        if ($PSCmdlet.ParameterSetName -eq 'PlainText') {
+            $env:AWS_ACCESS_KEY_ID = $AccessKey
+            $env:AWS_SECRET_ACCESS_KEY = $SecretKey
+            $env:AWS_SESSION_TOKEN = $SessionToken
+
+            return
+        }
+
         try {
             $CorrectType = $Credential -is [Amazon.SecurityToken.Model.Credentials]
         } catch {
