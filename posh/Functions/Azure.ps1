@@ -9,8 +9,8 @@ if (!(Test-IsWindows)) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Azure functions ...')
 
-# Load our custom formatting data
-$null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1xml'))
+# Load custom formatting data
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1xml'))
 
 #region Authentication
 
@@ -41,10 +41,15 @@ Function Get-AzureAuthHeader {
 }
 
 # Retrieve an Azure AD authentication token
-# Based on: https://blogs.technet.microsoft.com/paulomarques/2016/04/05/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script/
-# Useful links:
-# - https://blogs.technet.microsoft.com/cloudlojik/2017/09/05/using-powershell-to-connect-to-microsoft-graph-api/
-# - https://blogs.technet.microsoft.com/cloudlojik/2018/06/29/connecting-to-microsoft-graph-with-a-native-app-using-powershell/
+#
+# Working with Azure REST APIs from Powershell - Getting page and block blob information from ARM based storage account sample script
+# https://docs.microsoft.com/en-au/archive/blogs/paulomarques/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script
+#
+# Using PowerShell to Connect to Microsoft Graph API
+# https://docs.microsoft.com/en-au/archive/blogs/cloudlojik/using-powershell-to-connect-to-microsoft-graph-api
+#
+# Connecting to Microsoft Graph with a Native App using PowerShell
+# https://docs.microsoft.com/en-au/archive/blogs/cloudlojik/connecting-to-microsoft-graph-with-a-native-app-using-powershell
 Function Get-AzureAuthToken {
     [CmdletBinding()]
     Param(
@@ -124,11 +129,11 @@ Function Get-AzureAuthToken {
 
 # Retrieve filtered set of Azure AD enterprise applications
 #
-# The Azure AD Enterprise Applications pane can return filtered results
-# based on whether a registration is an "Enterprise Application" or a
-# "Microsoft Application". These options aren't exposed via the AzureAD
-# command: Get-AzureADServicePrincipal. The same functionality can be
-# obtained in PowerShell by calling the undocumented Azure Portal API.
+# The Azure AD Enterprise Applications pane can filter results on whether a
+# registration is an "Enterprise Application" or a "Microsoft Application".
+# These options aren't exposed via the AzureAD PowerShell module command:
+# Get-AzureADServicePrincipal. The same functionality can be obtained in
+# PowerShell by calling the undocumented Azure Portal API.
 Function Get-AzureEnterpriseApplications {
     [CmdletBinding()]
     Param(
@@ -215,7 +220,7 @@ Function Get-AzureUsersDisabledServices {
                 User    = $User.DisplayName
                 Service = [Object[]]$DisabledServices.ServicePlan
             }
-            $null = $Results.Add($Result)
+            $Results.Add($Result)
         }
     }
 

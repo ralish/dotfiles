@@ -14,8 +14,8 @@ if (!$DotFilesFastLoad) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing AWS functions ...')
 
-# Load our custom formatting data
-$null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'AWS.format.ps1xml'))
+# Load custom formatting data
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'AWS.format.ps1xml'))
 
 #region IAM
 
@@ -165,21 +165,21 @@ Function Set-R53HostedZoneParkedRecords {
 
         if ($CaaIssue) {
             foreach ($CaaIssuer in $CaaIssue) {
-                $null = $Caa.Add('0 issue "{0}"' -f $CaaIssuer)
+                $Caa.Add('0 issue "{0}"' -f $CaaIssuer)
             }
         } else {
-            $null = $Caa.Add('0 issue ";"')
+            $Caa.Add('0 issue ";"')
         }
 
         if ($CaaIssueWild) {
             foreach ($CaaWildIssuer in $CaaIssueWild) {
-                $null = $Caa.Add('0 issuewild "{0}"' -f $CaaWildIssuer)
+                $Caa.Add('0 issuewild "{0}"' -f $CaaWildIssuer)
             }
         }
 
         if ($CaaIoDef) {
             foreach ($CaaReportUrl in $CaaIoDef) {
-                $null = $Caa.Add('0 iodef "{0}"' -f $CaaReportUrl)
+                $Caa.Add('0 iodef "{0}"' -f $CaaReportUrl)
             }
         }
     } elseif ($CaaIssue -or $CaaIssueWild -or $CaaIoDef) {
@@ -240,7 +240,7 @@ Function Set-R53HostedZoneParkedRecords {
             $Record.ResourceRecordSet.Type = 'MX'
             $Record.ResourceRecordSet.TTL = 3600
             $Record.ResourceRecordSet.ResourceRecords.Add(@{ Value = '0 .' })
-            $null = $ZoneRecords.Add($Record)
+            $ZoneRecords.Add($Record)
         }
 
         if ($Records -contains 'SPF') {
@@ -251,7 +251,7 @@ Function Set-R53HostedZoneParkedRecords {
             $Record.ResourceRecordSet.Type = 'TXT'
             $Record.ResourceRecordSet.TTL = 3600
             $Record.ResourceRecordSet.ResourceRecords.Add(@{ Value = '"v=spf1 -all"' })
-            $null = $ZoneRecords.Add($Record)
+            $ZoneRecords.Add($Record)
         }
 
         if ($Records -contains 'DKIM') {
@@ -262,7 +262,7 @@ Function Set-R53HostedZoneParkedRecords {
             $Record.ResourceRecordSet.Type = 'TXT'
             $Record.ResourceRecordSet.TTL = 3600
             $Record.ResourceRecordSet.ResourceRecords.Add(@{ Value = '"v=DKIM1; p="' })
-            $null = $ZoneRecords.Add($Record)
+            $ZoneRecords.Add($Record)
         }
 
         if ($Records -contains 'DMARC') {
@@ -273,7 +273,7 @@ Function Set-R53HostedZoneParkedRecords {
             $Record.ResourceRecordSet.Type = 'TXT'
             $Record.ResourceRecordSet.TTL = 3600
             $Record.ResourceRecordSet.ResourceRecords.Add(@{ Value = ('"{0}"' -f $Dmarc) })
-            $null = $ZoneRecords.Add($Record)
+            $ZoneRecords.Add($Record)
         }
 
         if ($Caa) {
@@ -288,7 +288,7 @@ Function Set-R53HostedZoneParkedRecords {
                 $Record.ResourceRecordSet.ResourceRecords.Add(@{ Value = $Entry })
             }
 
-            $null = $ZoneRecords.Add($Record)
+            $ZoneRecords.Add($Record)
         }
 
         if ($RedirectCloudFrontDomainName) {
@@ -303,7 +303,7 @@ Function Set-R53HostedZoneParkedRecords {
                     $Record.ResourceRecordSet.AliasTarget.HostedZoneId = $CloudFrontHostedZoneId
                     $Record.ResourceRecordSet.AliasTarget.DNSName = $RedirectCloudFrontDomainName
                     $Record.ResourceRecordSet.AliasTarget.EvaluateTargetHealth = $false
-                    $null = $ZoneRecords.Add($Record)
+                    $ZoneRecords.Add($Record)
                 }
             }
         }
@@ -311,7 +311,7 @@ Function Set-R53HostedZoneParkedRecords {
         $ZoneId = $Zone.Id.TrimStart('/hostedzone/')
         if ($PSCmdlet.ShouldProcess($ZoneName, 'Set records')) {
             $Change = Edit-R53ResourceRecordSet -HostedZoneId $ZoneId -ChangeBatch_Change $ZoneRecords -ChangeBatch_Comment $ZoneName
-            $null = $Changes.Add($Change)
+            $Changes.Add($Change)
         }
     }
 

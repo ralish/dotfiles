@@ -80,12 +80,12 @@ Function Convert-OpenSSLPemToPkcs12 {
     )
 
     if ($CaCertsFile) {
-        $null = $Params.Add('-certfile')
-        $null = $Params.Add($CaCertsFile)
+        $Params.Add('-certfile')
+        $Params.Add($CaCertsFile)
     }
 
     if ($LegacyEncryption) {
-        $null = $Params.Add('-legacy')
+        $Params.Add('-legacy')
     }
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
@@ -122,12 +122,12 @@ Function Convert-OpenSSLPkcs12ToPem {
     )
 
     if ($PSCmdlet.ParameterSetName -eq 'CertificatesOnly') {
-        $null = $Params.Add('-nokeys')
+        $Params.Add('-nokeys')
     } elseif ($PSCmdlet.ParameterSetName -eq 'PrivateKeyOnly') {
-        $null = $Params.Add('-nocerts')
+        $Params.Add('-nocerts')
 
         if (!$EncryptKey) {
-            $null = $Params.Add('-nodes')
+            $Params.Add('-nodes')
         }
     }
 
@@ -156,8 +156,8 @@ Function Get-OpenSSLCertificate {
     )
 
     if ($NameOptions) {
-        $null = $Params.Add('-nameopt')
-        $null = $Params.Add($NameOptions -join ',')
+        $Params.Add('-nameopt')
+        $Params.Add($NameOptions -join ',')
     }
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
@@ -186,8 +186,8 @@ Function Get-OpenSSLCsr {
     )
 
     if ($NameOptions) {
-        $null = $Params.Add('-nameopt')
-        $null = $Params.Add($NameOptions -join ',')
+        $Params.Add('-nameopt')
+        $Params.Add($NameOptions -join ',')
     }
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
@@ -292,29 +292,29 @@ Function New-OpenSSLCertificate {
 
     if ($CommonName) {
         $Subject = '/CN={0}' -f $CommonName
-        $null = $Params.Add('-subj')
-        $null = $Params.Add($Subject)
+        $Params.Add('-subj')
+        $Params.Add($Subject)
 
         if (!$NoMatchingSAN) {
             $SAN = 'subjectAltName = DNS:{0}' -f $CommonName
-            $null = $Params.Add('-addext')
-            $null = $Params.Add($SAN)
+            $Params.Add('-addext')
+            $Params.Add($SAN)
         }
     }
 
     if ($PSCmdlet.ParameterSetName -eq 'SelfSigned') {
-        $null = $Params.Add('-sha256')
-        $null = $Params.Add('-days')
-        $null = $Params.Add($ValidDays)
+        $Params.Add('-sha256')
+        $Params.Add('-days')
+        $Params.Add($ValidDays)
     }
 
     if (!$EncryptKey) {
-        $null = $Params.Add('-nodes')
+        $Params.Add('-nodes')
     }
 
     if ($Config) {
-        $null = $Params.Add('-config')
-        $null = $Params.Add($Config)
+        $Params.Add('-config')
+        $Params.Add($Config)
     }
 
     Write-Host -NoNewline -ForegroundColor Green 'Invoking: '

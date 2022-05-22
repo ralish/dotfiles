@@ -9,8 +9,8 @@ if (!(Test-IsWindows)) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Office 365 functions ...')
 
-# Load our custom formatting data
-$null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml'))
+# Load custom formatting data
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml'))
 
 #region Cloud App Security
 
@@ -41,7 +41,7 @@ Function Compare-MCASPolicy {
         'ruleVersionId'
     )
 
-    $Results = [Collections.ArrayList]::new()
+    $Results = [Collections.Generic.List[PSCustomObject]]::new()
 
     foreach ($RefPol in ($ReferenceObject | Sort-Object -Property name)) {
         if (!$RefPol.ref_policy_id) {
@@ -69,8 +69,8 @@ Function Compare-MCASPolicy {
                 DiffValue    = $DiffPol.ref_policy_id
             }
 
-            $Result = @($PolicyName, $RefPolicyId) + $Diff
-            $null = $Results.Add($Result)
+            $Result = @($PolicyName, $RefPolicyId, $Diff)
+            $Results.Add($Result)
         }
     }
 
@@ -101,7 +101,8 @@ Function Export-MailboxSpreadsheetData {
         [Parameter(Mandatory)]
         [String]$Mailbox,
 
-        [IO.DirectoryInfo]$Path,
+        [ValidateNotNullOrEmpty()]
+        [String]$Path,
 
         [DateTime]$StartDate,
         [DateTime]$EndDate,
@@ -116,13 +117,18 @@ Function Export-MailboxSpreadsheetData {
 
     Test-CommandAvailable -Name Get-Mailbox
 
-    if (-not $PSBoundParameters.ContainsKey('Path')) {
-        if ((Get-Item -LiteralPath $PWD) -is [IO.DirectoryInfo]) {
-            $Path = Get-Item -LiteralPath $PWD
+    if (!$Path) {
+        if ((Get-Item -LiteralPath $PWD -ErrorAction Ignore) -is [IO.DirectoryInfo]) {
+            $Path = $PWD
         } else {
             Write-Warning -Message 'Defaulting to $HOME as $PWD is not a directory.'
             $Path = $HOME
         }
+    }
+
+    $ExportDir = Get-Item -LiteralPath $Path -ErrorAction Ignore
+    if ($ExportDir -isnot [IO.DirectoryInfo]) {
+        throw 'Provided path is invalid.'
     }
 
     $WriteProgressParams = @{
@@ -210,7 +216,6 @@ Function Get-InboxRulesByFolders {
     $Rules | Add-Member -MemberType NoteProperty -Name LinkedToFolder -Value $false
 
     Write-Progress @WriteProgressParams -Status 'Associating rules to folders' -PercentComplete 67
-    $Results = [Collections.ArrayList]::new()
     foreach ($Folder in $Folders) {
         $FolderName = ($Folder.FolderPath -join ' - ').Substring(8)
         $RegexMatch = '^{0}' -f [Regex]::Escape($FolderName)
@@ -221,8 +226,6 @@ Function Get-InboxRulesByFolders {
                 $Folder.Rules += $Rule
             }
         }
-
-        $null = $Results.Add($Folder)
     }
 
     $UnlinkedRules = $Rules | Where-Object LinkedToFolder -EQ $false
@@ -258,11 +261,11 @@ Function Get-MailboxActivitySummary {
 
     Test-CommandAvailable -Name Get-Mailbox
 
-    if (!$PSBoundParameters.ContainsKey('EndDate')) {
+    if (!$EndDate) {
         $EndDate = Get-Date
     }
 
-    if (!$PSBoundParameters.ContainsKey('StartDate')) {
+    if (!$StartDate) {
         $StartDate = $EndDate.AddDays(-7)
     }
 
@@ -536,7 +539,7 @@ Function Get-Office365UserLicensingMatrix {
     $Users = Get-MsolUser -All
     $Licenses = $Users.Licenses.AccountSkuId | Sort-Object -Unique | ForEach-Object { $_.Split(':')[1] }
 
-    $Matrix = [Collections.ArrayList]::new()
+    $Matrix = [Collections.Generic.List[PSCustomObject]]::new()
     $MatrixEntry = [PSCustomObject]@{ UserPrincipalName = '' }
     foreach ($License in $Licenses) {
         $MatrixEntry | Add-Member -MemberType NoteProperty -Name $License -Value $false
@@ -554,7 +557,7 @@ Function Get-Office365UserLicensingMatrix {
             $UserLicensing.$LicenseName = $true
         }
 
-        $null = $Matrix.Add($UserLicensing)
+        $Matrix.Add($UserLicensing)
     }
 
     return $Matrix.ToArray()
@@ -572,11 +575,11 @@ Function Get-Office365UserSecurityReport {
     Test-CommandAvailable -Name Get-Mailbox, Get-MsolUser
 
     $MailboxAuditing = [Collections.Generic.List[PSCustomObject]]::new()
-    $MailboxCalendar = [Collections.Generic.List[Deserialized.Microsoft.Exchange.Management.StoreTasks.MailboxFolderPermission.Calendar]]::new()
-    $MailboxDelegates = [Collections.Generic.List[Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Delegates]]::new()
+    $MailboxCalendar = [Collections.Generic.List[Object]]::new()
+    $MailboxDelegates = [Collections.Generic.List[Object]]::new()
     $MailboxForwarding = [Collections.Generic.List[PSCustomObject]]::new()
-    $MailboxForwardingRules = [Collections.Generic.List[Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Forwarding]]::new()
-    $MailboxSendAs = [Collections.Generic.List[Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.SendAs]]::new()
+    $MailboxForwardingRules = [Collections.Generic.List[Object]]::new()
+    $MailboxSendAs = [Collections.Generic.List[Object]]::new()
     $MailboxSendOnBehalf = [Collections.Generic.List[PSCustomObject]]::new()
 
     Write-Verbose -Message 'Retrieving all enabled users ...'
@@ -621,7 +624,7 @@ Function Get-Office365UserSecurityReport {
             AuditDelegate     = $Mailbox.AuditDelegate
             AuditAdmin        = $Mailbox.AuditAdmin
         }
-        $null = $MailboxAuditing.Add($Auditing)
+        $MailboxAuditing.Add($Auditing)
 
         if ($Mailbox.ForwardingSmtpAddress) {
             $Forwarding = [PSCustomObject]@{
@@ -630,7 +633,7 @@ Function Get-Office365UserSecurityReport {
                 ForwardingSmtpAddress      = $Mailbox.ForwardingSmtpAddress
                 DeliverToMailboxAndForward = $Mailbox.DeliverToMailboxAndForward
             }
-            $null = $MailboxForwarding.Add($Forwarding)
+            $MailboxForwarding.Add($Forwarding)
         }
 
         if ($Mailbox.GrantSendOnBehalfTo) {
@@ -639,14 +642,14 @@ Function Get-Office365UserSecurityReport {
                 GrantSendOnBehalfTo               = $Mailbox.GrantSendOnBehalfTo
                 MessageCopyForSendOnBehalfEnabled = $Mailbox.MessageCopyForSendOnBehalfEnabled
             }
-            $null = $MailboxSendOnBehalf.Add($SendOnBehalf)
+            $MailboxSendOnBehalf.Add($SendOnBehalf)
         }
 
         Get-RecipientPermission -Identity $Mailbox.UserPrincipalName |
             Where-Object Trustee -NE 'NT AUTHORITY\SELF' |
             ForEach-Object {
                 $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Data.Directory.Permission.RecipientPermission.SendAs')
-                $null = $MailboxSendAs.Add($_)
+                $MailboxSendAs.Add($_)
             }
 
         Get-MailboxPermission -Identity $Mailbox.UserPrincipalName |
@@ -655,7 +658,7 @@ Function Get-Office365UserSecurityReport {
                 $_.User -ne 'NT AUTHORITY\SELF'
             } | ForEach-Object {
                 $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.RecipientTasks.MailboxAcePresentationObject.Delegates')
-                $null = $MailboxDelegates.Add($_)
+                $MailboxDelegates.Add($_)
             }
 
         $CalendarFolder = Get-MailboxFolderStatistics -Identity $Mailbox.UserPrincipalName -FolderScope Calendar | Where-Object FolderType -EQ 'Calendar'
@@ -665,7 +668,7 @@ Function Get-Office365UserSecurityReport {
                 !($_.User.UserType.Value -eq 'Anonymous' -and $_.AccessRights -eq 'None')
             } | ForEach-Object {
                 $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.StoreTasks.MailboxFolderPermission.Calendar')
-                $null = $MailboxCalendar.Add($_)
+                $MailboxCalendar.Add($_)
             }
 
         Get-InboxRule -Mailbox $Mailbox.UserPrincipalname |
@@ -675,19 +678,19 @@ Function Get-Office365UserSecurityReport {
                 $null -ne $_.RedirectTo
             } | ForEach-Object {
                 $_.PSObject.TypeNames.Insert(0, 'Deserialized.Microsoft.Exchange.Management.Common.InboxRule.Forwarding')
-                $null = $MailboxForwardingRules.Add($_)
+                $MailboxForwardingRules.Add($_)
             }
     }
 
     $Results = [PSCustomObject]@{
         Users                  = $Users
-        MailboxAuditing        = $MailboxAuditing
-        MailboxCalendar        = $MailboxCalendar
-        MailboxDelegates       = $MailboxDelegates
-        MailboxForwardingRules = $MailboxForwardingRules
-        MailboxForwarding      = $MailboxForwarding
-        MailboxSendAs          = $MailboxSendAs
-        MailboxSendOnBehalf    = $MailboxSendOnBehalf
+        MailboxAuditing        = $MailboxAuditing.ToArray()
+        MailboxCalendar        = $MailboxCalendar.ToArray()
+        MailboxDelegates       = $MailboxDelegates.ToArray()
+        MailboxForwarding      = $MailboxForwarding.ToArray()
+        MailboxForwardingRules = $MailboxForwardingRules.ToArray()
+        MailboxSendAs          = $MailboxSendAs.ToArray()
+        MailboxSendOnBehalf    = $MailboxSendOnBehalf.ToArray()
     }
 
     return $Results
@@ -758,7 +761,7 @@ Function Compare-ProtectionAlert {
         'RunspaceId'
     )
 
-    $Results = [Collections.ArrayList]::new()
+    $Results = [Collections.Generic.List[PSCustomObject]]::new()
 
     foreach ($RefAlert in ($ReferenceObject | Sort-Object -Property Name)) {
         $DiffAlert = $DifferenceObject | Where-Object Name -EQ $RefAlert.Name
@@ -781,8 +784,8 @@ Function Compare-ProtectionAlert {
                 DiffValue    = $DiffAlert.ImmutableId
             }
 
-            $Result = @($AlertName, $ImmutableId) + $Diff
-            $null = $Results.Add($Result)
+            $Result = @($AlertName, $ImmutableId, $Diff)
+            $Results.Add($Result)
         }
     }
 
@@ -982,9 +985,9 @@ Function Import-ContentSearchResultsEntry {
     # - An optional name
     # - An email address
     #
-    # This gets messy fast as the formatting of the field is extremely variable. The only guarantee
-    # is that distinct elements are comma-separated. However, there may be commas within the name
-    # component (which itself is optional). Thus, separating the elements is not straightforward.
+    # This gets messy fast as the formatting of is extremely variable. The only
+    # guarantee is that distinct elements are comma-separated. However, there
+    # may be commas within the name component (which itself is optional).
     $ElementRegex = '^(\S+\s+)*?\S+?@\S+?\.\S+(?=, )'
 
     # For checking if the element contains a valid SMTP address
@@ -999,10 +1002,10 @@ Function Import-ContentSearchResultsEntry {
 
     do {
         if ($Entry -match $ElementRegex) {
-            $null = $Elements.Add($Matches[0])
+            $Elements.Add($Matches[0])
             $Entry = $Entry.Substring($Matches[0].Length + 2)
         } else {
-            $null = $Elements.Add($Entry)
+            $Elements.Add($Entry)
             break
         }
     } while ($true)
@@ -1043,7 +1046,7 @@ Function Import-ContentSearchResultsEntry {
             Write-Debug -Message ('[{0}] Unable to extract name from "{1}" entry with email address: {2}' -f $ItemId, $DataField, $Result.Address)
         }
 
-        $null = $Results.Add($Result)
+        $Results.Add($Result)
     }
 
     return $Results.ToArray()
@@ -1072,7 +1075,7 @@ Function Connect-Office365Services {
 
     $DefaultParams = @{}
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        if ($PSBoundParameters.ContainsKey('MfaUsername')) {
+        if ($MfaUsername) {
             $DefaultParams['MfaUsername'] = $MfaUsername
         }
     } else {
@@ -1138,7 +1141,7 @@ Function Connect-ExchangeOnline {
     Write-Host -ForegroundColor Green 'Connecting to Exchange Online ...'
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         $ConnectParams = @{}
-        if ($PSBoundParameters.ContainsKey('MfaUsername')) {
+        if ($MfaUsername) {
             $ConnectParams['UserPrincipalName'] = $MfaUsername
         }
 
@@ -1244,7 +1247,7 @@ Function Connect-SecurityAndComplianceCenter {
 
     Write-Host -ForegroundColor Green 'Connecting to Security and Compliance Center ...'
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-        if ($PSBoundParameters.ContainsKey('MfaUsername')) {
+        if ($MfaUsername) {
             Connect-IPPSSession -UserPrincipalName $MfaUsername
         } else {
             Connect-IPPSSession
@@ -1282,7 +1285,7 @@ Function Connect-SharePointOnline {
         Url = 'https://{0}-admin.sharepoint.com' -f $TenantName
     }
 
-    if ($PSBoundParameters.ContainsKey('Credential')) {
+    if ($Credential) {
         $ConnectParams['Credential'] = $Credential
     }
 

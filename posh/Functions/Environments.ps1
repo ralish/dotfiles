@@ -94,7 +94,7 @@ Function Update-DotNetTools {
     $Tools = [Collections.Generic.List[String]]::new()
     & dotnet @ListArgs | ForEach-Object {
         if ($_ -notmatch '^(Package Id|-)' -and $_ -match '^(\S+)') {
-            $null = $Tools.Add($Matches[1])
+            $Tools.Add($Matches[1])
         }
     }
 
@@ -780,7 +780,7 @@ Function Update-PythonPackages {
     & pipdeptree | ForEach-Object {
         $Package = $PackageRegex.Match($_)
         if ($Package.Success) {
-            $null = $Packages.Add($Package.Groups[1].Value)
+            $Packages.Add($Package.Groups[1].Value)
         }
     }
 
@@ -791,12 +791,14 @@ Function Update-PythonPackages {
 
     if (Get-Command -Name pipx -ErrorAction Ignore) {
         if ($PSCmdlet.ShouldProcess('pipx packages', 'Update')) {
-            # Outputting emojis can be problematic on Windows. This isn't as big an issue as it used
-            # to be, but there's still some nasty edge cases. In particular, Python will default to
-            # MBCS encoding on Windows when sys.stdin and/or sys.output is redirected to a pipe.
+            # Outputting emojis can be problematic on Windows. This isn't as
+            # big an issue as it used to be, but there's still some nasty edge
+            # cases. In particular, Python will default to MBCS encoding on
+            # Windows when sys.stdin and/or sys.output is redirected to a pipe.
             #
-            # Enabling Python's UTF-8 Mode will resolve this issue, but it's non-default and only
-            # available since Python 3.7, so just disable emojis outright as the simple workaround.
+            # Enabling Python's UTF-8 Mode will resolve this issue, but it's
+            # non-default and only available since Python 3.7, so just disable
+            # emojis outright as the simple workaround.
             if ($env:USE_EMOJI) {
                 $UseEmoji = $env:USE_EMOJI
             }
@@ -939,7 +941,7 @@ Function Update-RubyGems {
     $PackageRegex = [Regex]::new('\(default: \S+\)')
     & gem @ListArgs | ForEach-Object {
         if (!$PackageRegex.Match($_).Success) {
-            $null = $Packages.Add($_.Split(' ')[0])
+            $Packages.Add($_.Split(' ')[0])
         }
     }
 

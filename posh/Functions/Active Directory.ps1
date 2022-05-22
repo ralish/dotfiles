@@ -18,14 +18,15 @@ if (!$DotFilesFastLoad) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Active Directory functions ...')
 
-# Load our custom formatting data
-$null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml'))
+# Load custom formatting data
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml'))
 
 #region Kerberos
 
 # Estimate the Kerberos token size for a user
-# Reference: https://support.microsoft.com/kb/327825
-# Inspired by: https://jacob.ludriks.com/2014/05/27/Getting-Kerberos-token-size-with-Powershell/
+#
+# Problems with Kerberos authentication when a user belongs to many groups
+# https://docs.microsoft.com/en-AU/troubleshoot/windows-server/windows-security/kerberos-authentication-problems-if-user-belongs-to-groups
 Function Get-KerberosTokenSize {
     [CmdletBinding()]
     Param(
@@ -82,11 +83,11 @@ Function Get-KerberosTokenSize {
     # There appears to be a bug in the Get-ADPrincipalGroupMembership cmdlet
     # where it may construct an incorrect LDAP path when an explicit AD server
     # is provided. What appears to be happening internally is the DC Locator
-    # service is used to locate a DC which is populated into the LDAP path to
+    # service is used to locate a DC, which is populated into the LDAP path to
     # search. The connection will be made to the specified AD server, but if
-    # the AD server returned by the DC Locator is different an error will be
-    # returned by the AD server. This manifests on the client as a cryptic:
-    # "An unspecified error has occurred" exception indicating a server error.
+    # the AD server returned by the DC Locator is different then an error will
+    # be returned by the AD server. This manifests on the client as a generic
+    # "An unspecified error has occurred" exception.
     try {
         $ADGroups = Get-ADPrincipalGroupMembership @CommonParams -Identity $User
     } catch {
@@ -194,12 +195,12 @@ Function Resolve-ADGuid {
             foreach ($ADGuid in $Guid) {
                 switch ($Type) {
                     'ExtendedRight' {
-                        $null = $LDAPFilters.Add('(rightsGuid={0})' -f $ADGuid)
+                        $LDAPFilters.Add('(rightsGuid={0})' -f $ADGuid)
                     }
 
                     'SchemaObject' {
                         $HexBytes = $ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') }
-                        $null = $LDAPFilters.Add('(schemaIDGUID=\{0})' -f ($HexBytes -join '\'))
+                        $LDAPFilters.Add('(schemaIDGUID=\{0})' -f ($HexBytes -join '\'))
                     }
                 }
             }
@@ -298,7 +299,7 @@ Function Get-ADShadowPrincipalContainer {
         ErrorAction = 'Stop'
     }
 
-    if ($PSBoundParameters.ContainsKey('Server')) {
+    if ($Server) {
         $CommonParams['Server'] = $Server
     } else {
         try {

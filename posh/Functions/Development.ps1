@@ -116,7 +116,7 @@ Function Invoke-GitChildDir {
         $GitArgs = $Command.Split()
         $OriginalLocation = Get-Location
 
-        if (!$PSBoundParameters.ContainsKey('Path')) {
+        if (!$Path) {
             $Path += $PWD.Path
         }
     }
@@ -230,7 +230,7 @@ Function Invoke-GitLinter {
             if ($LASTEXITCODE -ne 0) { return }
 
             $GitOutput | Where-Object { $_ -match '\.ps[dm]?1$' } | ForEach-Object {
-                if ($PSBoundParameters.ContainsKey('Exclude')) {
+                if ($Exclude) {
                     if ($_ -match $Exclude) { return }
                 }
 
@@ -256,14 +256,14 @@ Function Invoke-GitLinter {
             if ($LASTEXITCODE -ne 0) { return }
 
             $Files = [Collections.Generic.List[String]]::new()
-            $GitOutput | Where-Object { $_ -match '\.(ba)?sh$' } | ForEach-Object { $null = $Files.Add($_) }
+            $GitOutput | Where-Object { $_ -match '\.(ba)?sh$' } | ForEach-Object { $Files.Add($_) }
 
             if ($ShebangSearch) {
-                rg --path-separator '/' --hidden -l '^#!/usr/bin/env (ba)?sh$' | ForEach-Object { $null = $Files.Add($_) }
+                rg --path-separator '/' --hidden -l '^#!/usr/bin/env (ba)?sh$' | ForEach-Object { $Files.Add($_) }
             }
 
             if ($ShellDirectiveSearch) {
-                rg --path-separator '/' --hidden -l '#.*\bshellcheck\b.*\bshell=(ba)?sh\b' | ForEach-Object { $null = $Files.Add($_) }
+                rg --path-separator '/' --hidden -l '#.*\bshellcheck\b.*\bshell=(ba)?sh\b' | ForEach-Object { $Files.Add($_) }
             }
 
             if ($ShebangSearch -or $ShellDirectiveSearch) {
@@ -290,7 +290,7 @@ Function Invoke-GitMergeAllBranches {
     $GitOutput = git branch
     if ($LASTEXITCODE -ne 0) { return }
 
-    if (!$PSBoundParameters.ContainsKey('SourceBranch')) {
+    if (!$SourceBranch) {
         $null = git rev-parse -q --verify main
         if ($LASTEXITCODE -eq 0) {
             $SourceBranch = 'main'
@@ -308,7 +308,7 @@ Function Invoke-GitMergeAllBranches {
 
     $Branches = [Collections.Generic.List[String]]::new()
     foreach ($Branch in $GitOutput) {
-        $null = $Branches.Add($Branch.TrimStart('* '))
+        $Branches.Add($Branch.TrimStart('* '))
         if ($Branch.StartsWith('* ')) {
             $CurrentBranch = $Branch.TrimStart('* ')
         }

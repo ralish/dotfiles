@@ -191,7 +191,7 @@ Function Find-WinEvent {
     )
 
     # Default to boot time as start time
-    if (!$PSBoundParameters.ContainsKey('StartTime')) {
+    if (!$StartTime) {
         $StartTime = (Get-CimInstance @CommonParams -ClassName Win32_OperatingSystem).LastBootUpTime
     }
 
@@ -199,7 +199,7 @@ Function Find-WinEvent {
     if ($PSCmdlet.ParameterSetName -eq 'SeverityLevel' -and $SeverityLevels -notcontains 'Any') {
         $EventLevels = [Collections.Generic.List[Int]]::new()
         foreach ($Severity in $SeverityLevel) {
-            $null = $EventLevels.Add($EventLevelToInt[$Severity])
+            $EventLevels.Add($EventLevelToInt[$Severity])
         }
     } elseif ($PSCmdlet.ParameterSetName -eq 'MinSeverity' -and $SeverityLevel -ne 'Any') {
         $EventLevels = 0..$EventLevelToInt[$MinSeverity]
@@ -218,7 +218,7 @@ Function Find-WinEvent {
 
     # Add matched event logs to array
     foreach ($Log in $EventLogsToAdd) {
-        $null = $EventLogs.Add($Log)
+        $EventLogs.Add($Log)
     }
 
     # Retrieve matching event providers. For each event provider, record which
@@ -254,21 +254,21 @@ Function Find-WinEvent {
                     $Log = Get-WinEvent @CommonParams -ListLog $LogName -Force:$Force -ErrorAction Stop
                 } catch {
                     Write-Error -Message $_.Exception.Message
-                    $null = $SkippedLogs.Add($LogName)
+                    $SkippedLogs.Add($LogName)
                     continue
                 }
 
                 # No records (must test both!) or not written to since start time
                 if ($Log.RecordCount -eq 0 -or $null -eq $Log.RecordCount -or $Log.LastWriteTime -lt $StartTime) {
-                    $null = $SkippedLogs.Add($LogName)
+                    $SkippedLogs.Add($LogName)
                     continue
                 }
 
-                $null = $EventLogs.Add($Log)
+                $EventLogs.Add($Log)
                 $ProviderLogs[$LogName] = [Collections.Generic.List[String]]::new()
             }
 
-            $null = $ProviderLogs[$LogName].Add($Provider.Name)
+            $ProviderLogs[$LogName].Add($Provider.Name)
         }
     }
 
@@ -314,7 +314,7 @@ Function Find-WinEvent {
         try {
             $FoundEvents = Get-WinEvent @CommonParams @EventParams -ErrorAction Stop
             foreach ($Event in $FoundEvents) {
-                $null = $Events.Add($Event)
+                $Events.Add($Event)
             }
         } catch {
             $Ex = $_
@@ -371,7 +371,7 @@ Function Find-WinEvent {
             $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, ($Message -join $MultilinePrefix)
         }
 
-        $null = $Events.Add($Text)
+        $Events.Add($Text)
     }
 
     return $Events.ToArray()
@@ -448,13 +448,13 @@ Function Get-NonInheritedACL {
             continue
         }
 
-        if ($PSBoundParameters.ContainsKey('User')) {
+        if ($User) {
             if ($ACLNonInherited.IdentityReference -notcontains $User) {
                 continue
             }
         }
 
-        $null = $ACLMatches.Add($Directory)
+        $ACLMatches.Add($Directory)
     }
 
     return $ACLMatches.ToArray()
@@ -480,7 +480,7 @@ Function Edit-Hosts {
     }
 
     if (!(Test-IsAdministrator)) {
-        $null = $StartProcessParams.Add('Verb', 'RunAs')
+        $StartProcessParams.Add('Verb', 'RunAs')
     }
 
     Start-Process @StartProcessParams

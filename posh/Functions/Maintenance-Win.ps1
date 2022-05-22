@@ -36,9 +36,6 @@ Function Update-Office {
         [Int]$ProgressParentId
     )
 
-    # The new Update Now feature for Office 2013 Click-to-Run for Office365 and its associated command-line and switches
-    # https://blogs.technet.microsoft.com/odsupport/2014/03/03/the-new-update-now-feature-for-office-2013-click-to-run-for-office365-and-its-associated-command-line-and-switches/
-
     if (!(Test-IsAdministrator)) {
         throw 'You must have administrator privileges to perform Office updates.'
     }
@@ -164,15 +161,15 @@ Function Update-Scoop {
 }
 
 # Update Microsoft Visual Studio
+#
+# Use command-line parameters to install, update, and manage Visual Studio
+# https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
 Function Update-VisualStudio {
     [CmdletBinding()]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
-
-    # Use command-line parameters to install Visual Studio
-    # https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
 
     if (!(Test-IsAdministrator)) {
         throw 'You must have administrator privileges to perform Visual Studio updates.'

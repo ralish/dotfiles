@@ -54,7 +54,7 @@ Function Clear-AllDevCaches {
     foreach ($Task in $ValidTasks) {
         if (($PSCmdlet.ParameterSetName -eq 'OptOut' -and $ExcludeTasks -notcontains $Task) -or
             ($PSCmdlet.ParameterSetName -eq 'OptIn' -and $IncludeTasks -contains $Task)) {
-            $null = $Tasks.Add($Task)
+            $Tasks.Add($Task)
             $TasksTotal++
         }
     }
@@ -180,7 +180,7 @@ Function Update-AllTheThings {
         foreach ($Task in $ValidTasks) {
             if (($PSCmdlet.ParameterSetName -eq 'OptOut' -and $PSBoundParameters['ExcludeTasks'] -notcontains $Task) -or
                 ($PSCmdlet.ParameterSetName -eq 'OptIn' -and $PSBoundParameters['IncludeTasks'] -contains $Task)) {
-                $null = $Tasks.Add($Task)
+                $Tasks.Add($Task)
                 $TasksTotal++
                 $Results | Add-Member -Name $Task -MemberType NoteProperty -Value $null
             }

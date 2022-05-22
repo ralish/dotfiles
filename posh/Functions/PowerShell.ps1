@@ -329,7 +329,7 @@ Function Compare-Hashtable {
             $Result.Difference = $Difference[$Key]
         }
 
-        $null = $Results.Add($Result)
+        $Results.Add($Result)
     }
 
     return $Results.ToArray()
@@ -358,23 +358,23 @@ Function Compare-ObjectProperties {
         $ObjProps = $ObjProps | Where-Object { $_ -notin $IgnoredProperties }
     }
 
-    $ObjDiffs = @()
+    $ObjDiffs = [Collections.Generic.List[PSCustomObject]]::new()
     foreach ($Property in $ObjProps) {
         $Diff = Compare-Object -ReferenceObject $ReferenceObject -DifferenceObject $DifferenceObject -Property $Property
 
         if ($Diff) {
-            $DiffProps = @{
+            $DiffProps = [PSCustomObject]@{
                 PropertyName = $Property
                 RefValue     = $Diff | Where-Object SideIndicator -EQ '<=' | Select-Object -ExpandProperty $($Property)
                 DiffValue    = $Diff | Where-Object SideIndicator -EQ '=>' | Select-Object -ExpandProperty $($Property)
             }
 
-            $ObjDiffs += New-Object -TypeName PSObject -Property $DiffProps
+            $ObjDiffs.Add($DiffProps)
         }
     }
 
     if ($ObjDiffs) {
-        return ($ObjDiffs | Select-Object -Property PropertyName, RefValue, DiffValue)
+        return $ObjDiffs.ToArray()
     }
 }
 
@@ -397,7 +397,7 @@ Function Compare-ObjectPropertiesMatrix {
         $DifferentProperties = [Collections.Generic.List[String]]::new()
 
         $DiscoverReferenceObject = $false
-        if (!$PSBoundParameters.ContainsKey('ReferenceObject')) {
+        if (!$ReferenceObject) {
             $DiscoverReferenceObject = $true
         }
     }
@@ -418,10 +418,10 @@ Function Compare-ObjectPropertiesMatrix {
             $Comparison = Compare-ObjectProperties -ReferenceObject $ReferenceObject -DifferenceObject $Object
             foreach ($PropertyName in $Comparison.PropertyName) {
                 if ($DifferentProperties -notcontains $PropertyName) {
-                    $null = $DifferentProperties.Add($PropertyName)
+                    $DifferentProperties.Add($PropertyName)
                 }
             }
-            $null = $ComparedObjects.Add($Object)
+            $ComparedObjects.Add($Object)
         }
     }
 
@@ -430,7 +430,7 @@ Function Compare-ObjectPropertiesMatrix {
             throw 'No objects provided to compare against.'
         }
 
-        if (!$PSBoundParameters.ContainsKey('ReferenceObject') -and !$ComparedObjects.Count -ge 2) {
+        if (!$ReferenceObject -and !$ComparedObjects.Count -ge 2) {
             throw 'Objects collection must have at least two items.'
         }
 
@@ -454,10 +454,7 @@ Function Update-Profile {
         [Switch]$CurrentUserCurrentHost
     )
 
-    if (!($PSBoundParameters.ContainsKey('AllUsersAllHosts') -or
-            $PSBoundParameters.ContainsKey('AllUsersCurrentHost') -or
-            $PSBoundParameters.ContainsKey('CurrentUserAllHosts') -or
-            $PSBoundParameters.ContainsKey('CurrentUserCurrentHost'))) {
+    if (!($AllUsersAllHosts -or $AllUsersCurrentHost -or $CurrentUserAllHosts -or $CurrentUserCurrentHost)) {
         $CurrentUserCurrentHost = $true
     }
 
@@ -529,7 +526,7 @@ Function fla {
     }
 
     Process {
-        $null = $Objects.Add($InputObject)
+        $Objects.Add($InputObject)
     }
 
     End {
@@ -553,7 +550,7 @@ Function fta {
     }
 
     Process {
-        $null = $Objects.Add($InputObject)
+        $Objects.Add($InputObject)
     }
 
     End {

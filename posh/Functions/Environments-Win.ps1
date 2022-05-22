@@ -55,13 +55,13 @@ Function Switch-Cygwin {
             }
 
             if ($Setting -notmatch 'winsymlinks') {
-                $null = $CygwinCfg.Add($Setting)
+                $CygwinCfg.Add($Setting)
             }
         }
     }
 
     if ($Symlinks -ne 'Default') {
-        $null = $CygwinCfg.Add('winsymlinks:{0}' -f $Symlinks.ToLower())
+        $CygwinCfg.Add('winsymlinks:{0}' -f $Symlinks.ToLower())
     }
 
     $CygwinCfg.Sort()

@@ -4,30 +4,10 @@ if ($DotFilesShowScriptEntry) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing generic functions ...')
 
-# Load our custom formatting data
-$null = $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Generic.format.ps1xml'))
+# Load custom formatting data
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Generic.format.ps1xml'))
 
 #region Encoding
-
-# Convert a hex string to a byte array
-# Via: https://www.reddit.com/r/PowerShell/comments/5rhjsy/hex_to_byte_array_and_back/
-Function Convert-HexToBytes {
-    [CmdletBinding()]
-    Param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [String]$Hex
-    )
-
-    Process {
-        $Bytes = [Byte[]]::new($Hex.Length / 2)
-
-        for ($i = 0; $i -lt $Hex.Length; $i += 2) {
-            $Bytes[$i / 2] = [Convert]::ToByte($Hex.Substring($i, 2), 16)
-        }
-
-        $Bytes
-    }
-}
 
 # Convert a byte array to a hex string
 # Via: https://www.reddit.com/r/PowerShell/comments/5rhjsy/hex_to_byte_array_and_back/
@@ -46,6 +26,26 @@ Function Convert-BytesToHex {
         }
 
         $Hex.ToString()
+    }
+}
+
+# Convert a hex string to a byte array
+# Via: https://www.reddit.com/r/PowerShell/comments/5rhjsy/hex_to_byte_array_and_back/
+Function Convert-HexToBytes {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$Hex
+    )
+
+    Process {
+        $Bytes = [Byte[]]::new($Hex.Length / 2)
+
+        for ($i = 0; $i -lt $Hex.Length; $i += 2) {
+            $Bytes[$i / 2] = [Convert]::ToByte($Hex.Substring($i, 2), 16)
+        }
+
+        $Bytes
     }
 }
 
@@ -188,7 +188,7 @@ Function ConvertTo-TextEncoding {
                         $Line = $Line.TrimEnd()
                     }
 
-                    $null = $Content.Add($Line)
+                    $Content.Add($Line)
                 }
             }
 
@@ -239,13 +239,13 @@ Function Get-TextEncoding {
         $InvalidChars = [Char[]]@(0..8 + 10..31 + 127 + 129 + 141 + 143 + 144 + 157)
 
         # Construct an array of identifiable encodings by their preamble
-        $Encodings = [Collections.Generic.List[Object]]::new()
+        $Encodings = [Collections.Generic.List[Text.EncodingInfo]]::new()
         foreach ($Encoding in [Text.Encoding]::GetEncodings()) {
             $Preamble = $Encoding.GetEncoding().GetPreamble()
             if ($Preamble) {
                 $Encoding | Add-Member -MemberType NoteProperty -Name Preamble -Value $Preamble
                 $Encoding | Add-Member -MemberType NoteProperty -Name ByteOrderMark -Value $true
-                $null = $Encodings.Add($Encoding)
+                $Encodings.Add($Encoding)
             }
         }
 
@@ -257,7 +257,7 @@ Function Get-TextEncoding {
             Preamble      = [Byte[]]@(60, 0, 63, 0)
             ByteOrderMark = $false
         }
-        $null = $Encodings.Add($Encoding)
+        $Encodings.Add($Encoding)
 
         # Special case for UTF-16BE encoded XML without BOM (this is legal!)
         $Encoding = [PSCustomObject]@{
@@ -267,7 +267,7 @@ Function Get-TextEncoding {
             Preamble      = [Byte[]]@(0, 60, 0, 63)
             ByteOrderMark = $false
         }
-        $null = $Encodings.Add($Encoding)
+        $Encodings.Add($Encoding)
 
         # Sort the array by size of each preamble
         foreach ($Encoding in $Encodings) {
@@ -329,7 +329,7 @@ Function Get-TextEncoding {
                 }
             }
 
-            $null = $Results.Add($Result)
+            $Results.Add($Result)
         }
     }
 
@@ -356,7 +356,7 @@ Function Add-FileToEmptyDirectories {
         [String[]]$Exclude = '.git'
     )
 
-    if (!$PSBoundParameters.ContainsKey('Path')) {
+    if (!$Path) {
         $Path += $PWD.Path
     }
 
@@ -386,12 +386,12 @@ Function Add-FileToEmptyDirectories {
                 Get-ChildItem -LiteralPath $_.FullName -Directory -Recurse -Force:$Force | ForEach-Object {
                     if ((Get-ChildItem -LiteralPath $_.FullName -Force:$Force | Measure-Object).Count -eq 0) {
                         # Subdirectory (not top-level) with no children
-                        $null = $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
+                        $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
                     }
                 }
             } else {
                 # Top-level subdirectory (minus exclusions) with no children
-                $null = $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
+                $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
             }
         }
 
@@ -473,9 +473,9 @@ Function Add-QuotesToStringWithSpace {
 
     Process {
         if ($String.Contains(' ')) {
-            $null = $Array.Add(('{0}{1}{0}' -f $Quote, $String))
+            $Array.Add(('{0}{1}{0}' -f $Quote, $String))
         } else {
-            $null = $Array.Add($String)
+            $Array.Add($String)
         }
     }
 
@@ -549,7 +549,7 @@ Function Format-Xml {
 
     Process {
         $XmlString = '{0}{1}' -f ($Xml -join [Environment]::NewLine), [Environment]::NewLine
-        $null = $Data.Add($XmlString)
+        $Data.Add($XmlString)
     }
 
     End {

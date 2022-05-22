@@ -40,7 +40,7 @@ Function Update-OpenSSHConfig {
     $TemplatesDir = Join-Path -Path $BaseDir -ChildPath 'templates'
     $TemplateFile = Join-Path -Path $TemplatesDir -ChildPath ('ssh_config.{0}' -f $Version.Replace('.', [String]::Empty))
 
-    if (!(Test-Path -Path $TemplateFile)) {
+    if (!(Test-Path -LiteralPath $TemplateFile)) {
         Write-Error -Message ('No configuration template for OpenSSH version: {0}' -f $Version)
         return
     }
@@ -57,10 +57,10 @@ Function Update-OpenSSHConfig {
     $Includes = Get-ChildItem -LiteralPath $IncludesDir -File | Where-Object Length
     foreach ($Include in $Includes) {
         $Data = Get-Content -LiteralPath $Include.FullName
-        Add-Content -Path $ConfigFile -Value $Data[0..($Data.Count - 2)]
-        Add-Content -Path $ConfigFile -Value ([String]::Empty)
+        Add-Content -LiteralPath $ConfigFile -Value $Data[0..($Data.Count - 2)]
+        Add-Content -LiteralPath $ConfigFile -Value ([String]::Empty)
     }
 
     $Template = Get-Content -LiteralPath $TemplateFile
-    Add-Content -Path $ConfigFile -Value $Template[0..($Template.Count - 1)]
+    Add-Content -LiteralPath $ConfigFile -Value $Template[0..($Template.Count - 1)]
 }
