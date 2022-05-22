@@ -23,7 +23,13 @@ Function Update-ModernApps {
 
     $Session = New-CimSession
     $Instance = Get-CimInstance -Namespace $Namespace -ClassName $Class
-    $Result = $Session.InvokeMethod($Namespace, $Instance, $Method, $null)
+    $UpdateScan = $Session.InvokeMethod($Namespace, $Instance, $Method, $null)
+
+    $Result = $true
+    if ($UpdateScan.ReturnValue.Value -ne 0) {
+        Write-Error -Message ('Update of Modern Apps returned: {0}' -f $UpdateScan.ReturnValue.Value)
+        $Result = $false
+    }
 
     return $Result
 }
