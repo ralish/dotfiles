@@ -44,23 +44,25 @@ Function Get-TypeConstructor {
 Function Get-TypeMethod {
     [CmdletBinding()]
     Param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [Type]$Type
     )
 
-    $Methods = $Type.GetMethods() | Sort-Object -Property Name
-    foreach ($Method in $Methods) {
-        $MethodParams = $Method.GetParameters()
-        if ($MethodParams.Count -gt 0) {
-            $FormattedMethodParams = @($MethodParams | ForEach-Object { $_.ToString() })
-            $FormattedParams = '{0}({1})' -f $Type.FullName, ($FormattedMethodParams -join ', ')
-        } else {
-            $FormattedParams = '{0}()' -f $Type.FullName
-        }
+    Process {
+        $Methods = $Type.GetMethods() | Sort-Object -Property Name
+        foreach ($Method in $Methods) {
+            $MethodParams = $Method.GetParameters()
+            if ($MethodParams.Count -gt 0) {
+                $FormattedMethodParams = @($MethodParams | ForEach-Object { $_.ToString() })
+                $FormattedParams = '{0}({1})' -f $Type.FullName, ($FormattedMethodParams -join ', ')
+            } else {
+                $FormattedParams = '{0}()' -f $Type.FullName
+            }
 
-        [PSCustomObject]@{
-            Method     = $Method.Name
-            Parameters = $FormattedParams
+            [PSCustomObject]@{
+                Method     = $Method.Name
+                Parameters = $FormattedParams
+            }
         }
     }
 }
