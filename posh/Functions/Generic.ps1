@@ -417,7 +417,7 @@ Function Get-DirectorySummary {
 
         $Directory = Get-Item -LiteralPath $Path -ErrorAction Ignore
         if ($Directory -isnot [IO.DirectoryInfo]) {
-            throw 'Provided path is invalid.'
+            throw 'Provided path is not a directory: {0}' -f $Path
         }
 
         $TotalDirs = 0

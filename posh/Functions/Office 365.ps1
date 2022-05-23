@@ -128,7 +128,7 @@ Function Export-MailboxSpreadsheetData {
 
     $ExportDir = Get-Item -LiteralPath $Path -ErrorAction Ignore
     if ($ExportDir -isnot [IO.DirectoryInfo]) {
-        throw 'Provided path is invalid.'
+        throw 'Provided path is not a directory: {0}' -f $Path
     }
 
     $WriteProgressParams = @{
