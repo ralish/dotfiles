@@ -20,6 +20,6 @@ if (!$env:POSH_THEMES_PATH) {
 $OmpThemeFile = '{0}.omp.json' -f $OmpThemeName
 $OmpThemePath = Join-Path -Path $env:POSH_THEMES_PATH -ChildPath $OmpThemeFile
 
-oh-my-posh init pwsh --config $OmpThemePath | Invoke-Expression
+& oh-my-posh init pwsh --config $OmpThemePath | Invoke-Expression
 
 Remove-Variable -Name 'OmpThemeName', 'OmpThemeFile', 'OmpThemePath'

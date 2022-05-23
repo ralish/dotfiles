@@ -2,6 +2,7 @@
     IncludeRules = @('*')
 
     ExcludeRules = @(
+        'PSAvoidUsingInvokeExpression',
         'PSAvoidUsingWriteHost',
         # Broken with child scopes pending fix (GH PR #1489)
         'PSReviewUnusedParameter',
