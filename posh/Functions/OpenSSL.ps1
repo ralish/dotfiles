@@ -195,6 +195,21 @@ Function Get-OpenSSLCsr {
     & openssl @Params
 }
 
+# Retrieve the list of supported ECC curves
+Function Get-OpenSSLEccCurves {
+    [CmdletBinding()]
+    Param()
+
+    $Params = @(
+        'ecparam',
+        '-list_curves'
+    )
+
+    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
+    Write-Host ('openssl {0}' -f (($Params | Add-QuotesToStringWithSpace) -join ' '))
+    & openssl @Params
+}
+
 # Retrieve the details of a PKCS #12 certificate
 Function Get-OpenSSLPkcs12 {
     [CmdletBinding()]
