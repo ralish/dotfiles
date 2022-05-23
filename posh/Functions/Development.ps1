@@ -227,6 +227,28 @@ Function Invoke-GitLinter {
             }
 
             if ($Settings) {
+                $SettingsType = $Settings.GetType().FullName
+
+                switch -Regex ($SettingsType) {
+                    '^System\.(String|IO\.FileInfo)$' {
+                        try {
+                            $SettingsFile = Get-Item -LiteralPath $Settings -ErrorAction Stop
+                        } catch {
+                            throw $_
+                        }
+
+                        if ($SettingsFile -isnot [IO.FileInfo]) {
+                            throw 'Provided settings path is not a file: {0}' -f $Settings
+                        }
+                    }
+
+                    '^System\.Collections\.Hashtable$' { }
+
+                    Default {
+                        throw 'Settings parameter has unsupported type: {0}' -f $SettingsType
+                    }
+                }
+
                 $ScriptAnalyzerParams['Settings'] = $Settings
             }
 
