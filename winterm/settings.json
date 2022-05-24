@@ -1,36 +1,114 @@
 {
+    "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
 
-    // Window
+    // Startup
+    "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+    "startOnUserLogin": false,
     "launchMode": "maximized",
+    "windowingBehavior": "useExisting",
     "initialCols": 120,
     "initialRows": 30,
-    "rowsToScroll": "system",
-    "snapToGridOnResize": true,
 
-    // Tabs
+    // Interaction
+    "copyOnSelect": true,
+    "copyFormatting": "none",
+    "trimBlockSelection": true,
+    "wordDelimiters": " ./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}~?│",
+    "snapToGridOnResize": true,
+    "tabSwitcherMode": "inOrder",
+    "focusFollowMouse": false,
+    "experimental.detectURLs": true,
+
+    // Appearance
+    "theme": "dark",
     "alwaysShowTabs": true,
     "showTabsInTitlebar": true,
+    "useAcrylicInTabRow": false,
     "showTerminalTitleInTitlebar": false,
-    "confirmCloseAllTabs": false,
+    "alwaysOnTop": false,
     "tabWidthMode": "equal",
+    "disableAnimations": false,
 
-    // Selection
-    "copyOnSelect": true,
-    "copyFormatting": false,
+    // Rendering
+    "experimental.rendering.forceFullRepaint": false,
+    "experimental.rendering.software": false,
 
-    // Terminal profiles
-    "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+    // Advanced (not in UI)
+    "alwaysShowNotificationIcon": false,
+    "centerOnLaunch": true,
+    "confirmCloseAllTabs": false,
+    "disabledProfileSources": ["Windows.Terminal.Azure"],
+    "firstWindowPreference": "defaultProfile",
+    "inputServiceWarning": true,
+    "largePasteWarning": true,
+    "minimizeToNotificationArea": false,
+    "multiLinePasteWarning": true,
+    "showAdminShield": true,
+    "trimPaste": true,
+
+    // Color schemes
+    "schemes": [],
+
+    // Actions
+    "actions": [
+        {
+            "keys": "ctrl+shift+f",
+            "command": "find"
+        },
+        {
+            "keys": "alt+shift+d",
+            "command": {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            }
+        }
+    ],
+
+    // Profiles
     "profiles": {
         "defaults": {
+            // General
+            "startingDirectory": null,
+            "tabTitle": null,
+
+            // Appearance: Text
             "colorScheme": "Campbell",
+            "font": {
+                "face": "Hack NF",
+                "size": 10,
+                "weight": "normal"
+            },
+            "experimental.retroTerminalEffect": false,
 
-            "fontFace": "Hack NF",
-            "fontSize": 10,
+            // Appearance: Cursor
+            "cursorShape": "bar",
 
+            // Appearance: Background image
+            "backgroundImage": null,
+            "backgroundImageStretchMode": "uniformToFill",
+            "backgroundImageAlignment": "center",
+            "backgroundImageOpacity": 1,
+
+            // Appearance: Text Formatting
+            "intenseTextStyle": "bright",
+
+            // Appearance: Transparency
+            "opacity": 90,
             "useAcrylic": false,
-            "acrylicOpacity": 0.5,
 
+            // Appearance: Window
+            "padding": "8, 8, 8, 8",
+            "scrollbarState": "visible",
+
+            // Advanced
+            "suppressApplicationTitle": false,
+            "antialiasingMode": "grayscale",
+            "altGrAliasing": true,
+            "snapOnInput": true,
+            "historySize": 10000,
+            "closeOnExit": "graceful",
             "bellStyle": "none"
         },
 
@@ -52,7 +130,6 @@
                 "name": "Command Prompt",
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
 
-                // cmd uses the exit code of the last executed console app
                 "closeOnExit": "always"
             },
             {
@@ -60,64 +137,62 @@
                 "source": "Windows.Terminal.Wsl",
                 "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
 
-                // Default is %USERPROFILE% which is rarely what we want
                 "startingDirectory": "/home/sdl",
-
-                // Linux shells use the exit code of the last command
-                "closeOnExit": "always",
-
-                // Use the same visual settings as our SSH configuration
-                "colorScheme": "Solarized Dark"
+                "colorScheme": "Solarized Dark",
+                "closeOnExit": "always"
             },
             {
                 "name": "Kali",
                 "source": "Windows.Terminal.Wsl",
                 "guid": "{46ca431a-3a87-5fb3-83cd-11ececc031d2}",
 
-                // Default is %USERPROFILE% which is rarely what we want
                 "startingDirectory": "/home/sdl",
-
-                // Linux shells use the exit code of the last command
-                "closeOnExit": "always",
-
-                // Use the same visual settings as our SSH configuration
-                "colorScheme": "Solarized Dark"
+                "colorScheme": "Solarized Dark",
+                "closeOnExit": "always"
             },
             {
                 "name": "Git Bash",
                 "source": "Git",
                 "guid": "{2ece5bfe-50ed-5f3a-ab87-5cd4baafed2b}",
 
-                // bash uses the exit code of the last command
                 "closeOnExit": "always"
             },
             {
-                "name": "VS 2019 Development",
-                "guid": "{8dbe2057-bdf3-497a-af6c-aa3cbbb46249}",
+                "guid": "{59771b87-e259-5f7e-a309-fc31d6190dba}",
+                "name": "Developer Command Prompt for VS 2019",
+                "source": "Windows.Terminal.VisualStudio",
+                "hidden": true,
 
-                "commandline": "%ComSpec% /k \"%ProgramFiles(x86)%/Microsoft Visual Studio/2019/Professional/Common7/Tools/VsDevCmd.bat\"",
-                "icon": "ms-appx:///ProfileIcons/{0caa0dad-35be-5f56-a8ff-afceeeaa6101}.png",
+                "commandline": "%ComSpec% /k \"%ProgramFiles(x86)%\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\"",
                 "startingDirectory": "%USERPROFILE%",
-
-                // cmd uses the exit code of the last executed console app
                 "closeOnExit": "always"
             },
             {
-                "name": "Azure Cloud Shell",
-                "source": "Windows.Terminal.Azure",
-                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
-                "hidden": true
+                "guid": "{e328694f-d477-5b27-affb-74320d074101}",
+                "name": "Developer PowerShell for VS 2019",
+                "source": "Windows.Terminal.VisualStudio",
+                "hidden": true,
+
+                "commandline": "%SystemRoot%\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -NoExit -Command \"& { Import-Module \"$env:ProgramFiles\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\Microsoft.VisualStudio.DevShell.dll\"; Enter-VsDevShell 45ad4e04 }\"",
+                "startingDirectory": "%USERPROFILE%"
+            },
+            {
+                "guid": "{b00471e1-8900-5d14-9e92-f8542faceaed}",
+                "name": "Developer Command Prompt for VS 2022",
+                "source": "Windows.Terminal.VisualStudio",
+
+                "commandline": "%ComSpec% /k \"%ProgramFiles%\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\"",
+                "startingDirectory": "%USERPROFILE%",
+                "closeOnExit": "always"
+            },
+            {
+                "guid": "{264e4e11-d916-5289-b8f4-b6ef5433d1d7}",
+                "name": "Developer PowerShell for VS 2022",
+                "source": "Windows.Terminal.VisualStudio",
+
+                "commandline": "%SystemRoot%\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -NoExit -Command \"& { Import-Module \"$env:ProgramW6432\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\Microsoft.VisualStudio.DevShell.dll\"; Enter-VsDevShell 20622545 }\"",
+                "startingDirectory": "%USERPROFILE%"
             }
         ]
-    },
-
-    // Colour schemes
-    "theme": "dark",
-    "schemes": [],
-
-    // Key bindings
-    "keybindings": [
-        // Open a new pane using the focused pane's profile and maximising surface area
-        { "command": { "action": "splitPane", "split": "auto", "splitMode": "duplicate" }, "keys": "alt+shift+d" }
-    ]
+    }
 }
