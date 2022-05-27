@@ -2,57 +2,241 @@
 Signature = "$Windows NT$"
 
 [Strings]
-; Supported OIDs can be found in the wincrypt.h header
+; Supported OIDs can be found in wincrypt.h
 
-; Subject Alternative Name
-; Supported types: dn, dns, email, guid, ipaddress, upn, url
-szOID_SUBJECT_ALT_NAME2             = 2.5.29.17
+; Extensions
+;
+; Subject alternative name
+szOID_SUBJECT_ALT_NAME2     = 2.5.29.17
+; Basic constraints
+szOID_BASIC_CONSTRAINTS2    = 2.5.29.19
+; Enhanced key usage
+szOID_ENHANCED_KEY_USAGE    = 2.5.29.37
+
+; EKUs
+;
+; Server authentication
+; KeyUsage: DIGITAL_SIGNATURE | KEY_AGREEMENT | KEY_ENCIPHERMENT
+szOID_PKIX_KP_SERVER_AUTH   = 1.3.6.1.5.5.7.3.1
+; Client authentication
+; KeyUsage: DIGITAL_SIGNATURE
+szOID_PKIX_KP_CLIENT_AUTH   = 1.3.6.1.5.5.7.3.2
+; Code-signing
+; KeyUsage: DIGITAL_SIGNATURE
+szOID_PKIX_KP_CODE_SIGNING  = 1.3.6.1.5.5.7.3.3
+
 
 [NewRequest]
-; Subject name
-;
-; Specified as comma-separated Relative Distinguished Name values
-; Can be empty for TLS certificates if a SAN extension is included
-;Subject                             = "CN=example.com"
-
 ; Request type
 ;
-; Valid values: PKCS10, PKCS7, CMC, Cert, SCEP
-;RequestType                         = PKCS10
+; Valid values:
+; - 0x1         PKCS10
+; - 0x2         PKCS7
+; - 0x3         CMC
+; - 0x4         Cert
+; - 0xFD00      SCEP
+;RequestType = Cert
 
-; Cryptographic Service Provider (CSP)
+; Friendly name
+;FriendlyName = "Example"
+
+; Subject name
 ;
-; Available providers can be displayed with:
+; Comma-separated Relative Distinguished Name (RDN) values.
+;Subject = "CN=example.com"
+
+; Time before/after which the certificate is not valid
+;
+; Date with optional time (locale-sensitive).
+; Only valid for Cert request type.
+; NotAfter cannot be used with ValidityPeriod keys.
+;
+;NotBefore = 20/07/2022 10:35 AM
+;NotAfter = 20/07/2023 11:25 AM
+
+; Validity period & units
+;
+; Only valid for Cert request type.
+; Cannot be used with the NotAfter key.
+;
+; Valid values
+; - Years
+; - Months
+; - Weeks
+; - Days
+; - Hours
+; - Minutes
+; - Seconds
+;ValidityPeriod = Years
+;ValidityPeriodUnits = 3
+
+; Hash algorithm
+;
+; Display available hash algorithms:
+; certutil -oid 1 | findstr pwszCNGAlgid | findstr /v CryptOIDInfo | sort /uniq
+;HashAlgorithm = SHA256
+
+; Signature scheme
+;
+; If enabled, the Probabilistic Signature Scheme (PSS) will be used, as defined
+; in PKCS #1 v2.1. Otherwise the original Signature Scheme with Appendix (SSA),
+; as defined in PKCS #1 v1.5, will be used.
+;AlternateSignatureAlgorithm = false
+
+; Cryptographic Service Provider (CSP) name & type
+;
+; Display available CSPs:
 ; certutil -csplist
-;ProviderName                        = "Microsoft RSA SChannel Cryptographic Provider"
+;ProviderName = "Microsoft Software Key Storage Provider"
+;ProviderType = 1
 
-; Key exchange algorithm & length
+; Key algorithm & length
 ;
-; Available algorithms can be displayed with:
-; certutil -oid 3 | findstr pwszCNGAlgid | findstr /v CryptOIDInfo
-;KeyAlgorithm                        = rsa
-;KeyLength                           = 2048
+; Display available key algorithms:
+; certutil -oid 3 | findstr pwszCNGAlgid | findstr /v CryptOIDInfo | sort /uniq
+;KeyAlgorithm = RSA
+;KeyLength = 4096
+
+; Key specification
+;
+; Hexadecimal value or symbolic values joined by a pipe.
+;
+; Valid values:
+; - 0x1         AT_KEYEXCHANGE                      Key-exchange (encryption)
+; - 0x2         AT_SIGNATURE                        Signature
+;KeySpec = "AT_KEYEXCHANGE | AT_SIGNATURE"
+
+; Key usage
+;
+; Hexadecimal value or symbolic values joined by a pipe.
+;
+; Valid values:
+; - 0x1         CERT_ENCIPHER_ONLY_KEY_USAGE        Encipher only
+; - 0x2         CERT_CRL_SIGN_KEY_USAGE             CRL signing
+; - 0x2         CERT_OFFLINE_CRL_SIGN_KEY_USAGE     Offline CRL signing
+; - 0x4         CERT_KEY_CERT_SIGN_KEY_USAGE        Key certificate signing
+; - 0x8         CERT_KEY_AGREEMENT_KEY_USAGE        Key agreement
+; - 0x10        CERT_DATA_ENCIPHERMENT_KEY_USAGE    Data encipherment
+; - 0x20        CERT_KEY_ENCIPHERMENT_KEY_USAGE     Key encipherment
+; - 0x40        CERT_NON_REPUDIATION_KEY_USAGE      Non-repudiation
+; - 0x80        CERT_DIGITAL_SIGNATURE_KEY_USAGE    Digital signature
+; - 0x8000      CERT_DECIPHER_ONLY_KEY_USAGE        Decipher only
+;KeyUsage = "CERT_DIGITAL_SIGNATURE_KEY_USAGE | CERT_KEY_ENCIPHERMENT_KEY_USAGE"
+
+; Key usage properties
+;
+; Hexadecimal value or symbolic values joined by a pipe.
+;
+; Valid values:
+; - 0x1         NCRYPT_ALLOW_DECRYPT_FLAG           Decryption
+; - 0x2         NCRYPT_ALLOW_SIGNING_FLAG           Signing
+; - 0x4         NCRYPT_ALLOW_KEY_AGREEMENT_FLAG     Key agreement
+; - 0x8         NCRYPT_ALLOW_KEY_IMPORT_FLAG        Undocumented
+; - 0xFFFFFF    NCRYPT_ALLOW_ALL_USAGES             Any purpose
+;KeyUsageProperty = "NCRYPT_ALLOW_DECRYPT_FLAG | NCRYPT_ALLOW_SIGNING_FLAG"
+
+; Level of protection for private key
+;
+; Hexadecimal value or symbolic values joined by a pipe.
+;
+; Valid values:
+; - 0x1     NCRYPT_UI_PROTECT_KEY_FLAG                  Show strong key UI
+; - 0x2     NCRYPT_UI_FORCE_HIGH_PROTECTION_FLAG        Force high protection
+; - 0x4     NCRYPT_UI_FINGERPRINT_PROTECTION_FLAG       Undocumented
+; - 0x8     NCRYPT_UI_APPCONTAINER_ACCESS_MEDIUM_FLAG   Undocumented
+;KeyProtection
+
+; Create key material in the machine's security context
+;MachineKeySet = false
+
+; Permit exporting the private key in plain-text
+;Exportable = false
+
+; Permit exporting the private key with encryption
+;ExportableEncrypted = false
+
+; Archive the private key on the CA
+;
+; Only valid for CMC request type.
+;PrivateKeyArchive = false
+
+; Use an existing key pair when building the certificate request
+;
+; Requires the RenewalCert or KeyContainer keys to be set.
+; The Exportable key must not be set as the properties of an existing key
+; cannot be modified as part of a certificate request.
+;UseExistingKeySet = false
+
+; Key container for reusing existing key material
+;
+; Display existing key containers:
+; certutil -key [-user]
+;KeyContainer = "{C347BD28-7F69-4090-AA16-BC58CF4D749C}"
+
+; Hash of the certificate to be renewed
+;
+; Only valid for CMC and PKCS7 request types.
+;RenewalCert = 4EDF274BD2919C6E9EC6A522F0F3B153E9B1582D
+
+; Requests enrollment on behalf of another user
+;
+; Only valid for CMC and PKCS7 request types.
+; The request must be signed with an Enrollment Agent certificate.
+;RequesterName = DOMAIN\User
 
 ; Encryption cipher & length
 ;
-; Available algorithms can be displayed with:
-; certutil -oid 2 | findstr pwszCNGAlgid | findstr /v CryptOIDInfo
-;EncryptionAlgorithm                 = aes
-;EncryptionLength                    = 256
+; Display available cipher algorithms:
+; certutil -oid 2 | findstr pwszCNGAlgid | findstr /v CryptOIDInfo | sort /uniq
+;EncryptionAlgorithm = AES
+;EncryptionLength = 256
 
-; Hash function
+; Security descriptor for the private key
 ;
-; Available algorithms can be displayed with:
-; certutil -oid 1 | findstr pwszCNGAlgid | findstr /v CryptOIDInfo
-;HashAlgorithm                       = sha256
+; Only relevant for machine context requests excluding smart card keys.
+;SecurityDescriptor = "D:P(A;;GA;;;SY)(A;;GA;;;BA)"
 
-[RequestAttributes]
-; Only applicable for Enterprise CAs
-CertificateTemplate                 = WebServer
+; Add the S/MIME Capabilities OID to the issued certificate
+;SMIME = false
+
+; Suppress default extensions and attributes in the request
+;SuppressDefaults = true
+
+; Disable interaction with the user during request processing
+;Silent = false
+
 
 [Extensions]
-; Example extension configuration
+; Critical extensions
+;Critical = %szOID_BASIC_CONSTRAINTS2%, %szOID_ENHANCED_KEY_USAGE%
+
+; Basic constraints
+;%szOID_BASIC_CONSTRAINTS2% = "{text}"
+;_continue = "CA=false&PathLength=0"
+
+; Enhanced key usage
+;%szOID_ENHANCED_KEY_USAGE% = "{text}"
+;_continue_ = "%szOID_PKIX_KP_SERVER_AUTH%,"
+;_continue_ = "%szOID_PKIX_KP_CLIENT_AUTH%"
+
+; Subject alternative name
 ;
-;%szOID_SUBJECT_ALT_NAME2%           = "{text}"
-;_continue_                          = "dns=example1.com&"
-;_continue_                          = "dn=CN=example.com"
+; Supported types:
+; - DirectoryName       CN=name,DC=domain,DC=tld
+; - DNS                 machine.domain.tld
+; - Email               user@domain.tld
+; - GUID                6c117505-7ccd-4583-9203-e1fb9258c671
+; - IPAddress           10.0.0.1
+; - RegisteredId        1.2.3.4.5
+; - UPN                 user@domain.tld
+; - URL                 http://machine.domain.tld/index.html
+;%szOID_SUBJECT_ALT_NAME2% = "{text}"
+;continue = "DNS=example.com&"
+;continue = "CN=example.com"
+
+
+[RequestAttributes]
+; Certificate template to use for the request
+;
+; Only applicable when request is to an Enterprise CA.
+;CertificateTemplate = WebServer
