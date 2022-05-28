@@ -1,18 +1,14 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Settings'
+    Name     = 'PuTTY'
+    Platform = 'Windows'
+    Command  = @('putty')
 }
 
-if (!(Test-IsWindows)) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PuTTY settings as currently Windows specific.')
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-if (!(Get-Command -Name putty -ErrorAction Ignore)) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PuTTY settings as unable to locate putty.')
-    return
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading PuTTY settings ...')
 
 Register-ArgumentCompleter -Native -CommandName plink, pscp, psftp, putty -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
@@ -53,3 +49,5 @@ Register-ArgumentCompleter -Native -CommandName plink, pscp, psftp, putty -Scrip
         [Management.Automation.CompletionResult]::new($completionText, $listItemText, 'ParameterValue', $toolTip)
     }
 }
+
+Complete-DotFilesSection

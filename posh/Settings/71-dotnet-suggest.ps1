@@ -1,13 +1,13 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type    = 'Settings'
+    Name    = 'dotnet-suggest'
+    Command = @('dotnet-suggest')
 }
 
-if (!(Get-Command -Name dotnet-suggest -ErrorAction Ignore)) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping dotnet-suggest settings as unable to locate dotnet-suggest.')
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading dotnet-suggest settings ...')
 
 # dotnet-suggest
 # https://github.com/dotnet/command-line-api/blob/main/docs/dotnet-suggest.md
@@ -23,4 +23,5 @@ Register-ArgumentCompleter -Native -CommandName $RegisteredApps -ScriptBlock {
     }
 }
 
-Remove-Variable -Name 'RegisteredApps'
+Remove-Variable -Name RegisteredApps
+Complete-DotFilesSection

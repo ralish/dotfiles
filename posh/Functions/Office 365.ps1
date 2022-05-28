@@ -1,13 +1,13 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Functions'
+    Name     = 'Office 365'
+    Platform = 'Windows'
 }
 
-if (!(Test-IsWindows)) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of Office 365 functions.')
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Office 365 functions ...')
 
 # Load custom formatting data
 $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml'))
@@ -1322,3 +1322,5 @@ Function Import-ExoPowershellModule {
 }
 
 #endregion
+
+Complete-DotFilesSection

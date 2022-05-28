@@ -1,22 +1,14 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Functions'
+    Name     = 'Active Directory'
+    Platform = 'Windows'
+    Module   = @('ActiveDirectory')
 }
 
-if (!(Test-IsWindows)) {
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-if (!$DotFilesFastLoad) {
-    try {
-        Test-ModuleAvailable -Name ActiveDirectory
-    } catch {
-        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of Active Directory functions.')
-        $Error.RemoveAt(0)
-        return
-    }
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Active Directory functions ...')
 
 # Load custom formatting data
 $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml'))
@@ -352,3 +344,5 @@ Function New-ADShadowPrincipal {
 }
 
 #endregion
+
+Complete-DotFilesSection

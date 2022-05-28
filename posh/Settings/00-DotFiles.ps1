@@ -1,10 +1,19 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Settings'
+    Name     = 'dotfiles'
+    Platform = 'Windows'
 }
 
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading dotfiles settings ...')
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
+    return
+}
 
-if (Test-IsWindows) {
+Function Initialize-DotFiles {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
+    Param()
+
     $FinalPathAPI = @'
 public const int INVALID_HANDLE_VALUE = -1;
 
@@ -100,7 +109,10 @@ public static extern uint GetFinalPathNameByHandle(
     }
 
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-    $DotFiles = Split-Path -Path $ProfileDirFinalPath.ToString().TrimStart('\', '?') -Parent
-
-    Remove-Variable -Name 'FinalPathAPI', 'ProfileDirPath', 'ProfileDirHandle', 'ProfileDirFinalPath', 'Result'
+    $Global:DotFiles = Split-Path -Path $ProfileDirFinalPath.ToString().TrimStart('\', '?') -Parent
 }
+
+Initialize-DotFiles
+
+Remove-Item -Path Function:\Initialize-DotFiles
+Complete-DotFilesSection

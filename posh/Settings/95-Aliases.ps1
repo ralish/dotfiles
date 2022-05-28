@@ -1,8 +1,4 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Configuring aliases ...')
+Start-DotFilesSection -Type Settings -Name Aliases
 
 # Some useful aliases
 Set-Alias -Name cop -Value Compare-ObjectProperties
@@ -34,3 +30,5 @@ if (Test-IsWindows) {
         Remove-Item -LiteralPath Alias:\wget -ErrorAction Ignore
     }
 }
+
+Complete-DotFilesSection

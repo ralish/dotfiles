@@ -1,18 +1,15 @@
-# Display verbose messages during profile load
-#$DotFilesVerbose = $true
-
-# Display timing data in Get-DotFilesMessage calls
-#$DotFilesShowTimings = $true
-
-# Display message on start of processing each script
-#$DotFilesShowScriptEntry = $true
-
 # Skip loading profile if PowerShell was launched with -NonInteractive
 foreach ($Param in [Environment]::GetCommandLineArgs()) {
     if ($Param -ieq '-NonInteractive') {
         return
     }
 }
+
+# Display verbose messages during profile load
+#$DotFilesVerbose = $true
+
+# Display timing data during profile load (requires verbose)
+#$DotFilesShowTimings = $true
 
 # Skip expensive calls for faster profile loading
 #
@@ -21,6 +18,24 @@ foreach ($Param in [Environment]::GetCommandLineArgs()) {
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesFastLoad = $true
 
+# Enable verbose profile load
+if ($DotFilesVerbose) {
+    # $VerbosePreference seems to have no value during profile load? Use
+    # the default of SilentlyContinue when this appears to be the case.
+    if ($VerbosePreference) {
+        $DotFilesVerboseOriginal = $VerbosePreference
+    } else {
+        $DotFilesVerboseOriginal = 'SilentlyContinue'
+    }
+
+    $VerbosePreference = 'Continue'
+
+    # Record start of profile load
+    if ($DotFilesShowTimings) {
+        $DotFilesLoadStart = Get-Date
+    }
+}
+
 # Array of paths containing additional formatting data
 #
 # Calling Update-FormatData is *very* expensive. To improve profile load
@@ -28,19 +43,6 @@ $DotFilesFastLoad = $true
 # any formatting data files to this array. After sourcing all functions
 # and settings we'll call Update-FormatData with all specified paths.
 $FormatDataPaths = [Collections.Generic.List[String]]::new()
-
-# Enable verbose profile load
-if ($DotFilesVerbose) {
-    # $VerbosePreference seems to have no value during profile load? Use
-    # the default of SilentlyContinue when this appears to be the case.
-    if ($VerbosePreference) {
-        $VerbosePreferenceOriginal = $VerbosePreference
-    } else {
-        $VerbosePreferenceOriginal = 'SilentlyContinue'
-    }
-
-    $VerbosePreference = 'Continue'
-}
 
 # Source custom functions
 $PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
@@ -60,12 +62,13 @@ Remove-Variable -Name PoshSettingsPath
 
 # Update formatting data
 if ($FormatDataPaths) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Updating formatting data ...')
+    Start-DotFilesSection -Type Profile -Name Formatting
     Update-FormatData -PrependPath $FormatDataPaths
+    Complete-DotFilesSection
 }
 Remove-Variable -Name FormatDataPaths
 
-# Amend the search path to include our scripts directory
+# Amend the search path to include scripts directory
 $PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
 if (Test-Path -LiteralPath $PoshScriptsPath -PathType Container) {
     $env:Path = Add-PathStringElement -Path $env:Path -Element $PoshScriptsPath -Action Prepend
@@ -74,10 +77,21 @@ Remove-Variable -Name PoshScriptsPath
 
 # Clean-up specific to running in verbose mode
 if ($DotFilesVerbose) {
-    $VerbosePreference = $VerbosePreferenceOriginal
-    Remove-Variable -Name VerbosePreferenceOriginal
-
+    # Output total profile load time
     if ($DotFilesShowTimings) {
-        Remove-Variable -Name PreviousTimestamp
+        $MessageParams = @{
+            Message     = (Get-DotFilesTiming -StartTime $DotFilesLoadStart)
+            SectionType = 'Profile'
+            SectionName = 'End'
+        }
+        Write-Verbose -Message (Get-DotFilesMessage @MessageParams)
+        Remove-Variable -Name DotFilesLoadStart, MessageParams
     }
+
+    $VerbosePreference = $DotFilesVerboseOriginal
+    Remove-Variable -Name DotFilesVerboseOriginal
 }
+
+# Clean-up profile loading functions and variables
+Remove-Variable -Name DotFilesVerbose, DotFilesShowTimings, DotFilesFastLoad -ErrorAction Ignore
+Remove-DotFilesHelpers

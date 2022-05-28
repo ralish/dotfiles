@@ -1,16 +1,14 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type            = 'Settings'
+    Name            = 'Docker'
+    Command         = @('docker')
+    Module          = @('DockerCompletion')
+    ModuleOperation = 'Import'
 }
 
-if (!(Get-Command -Name docker -ErrorAction Ignore)) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping Docker settings as unable to locate docker.')
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
 
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading Docker settings ...')
-
-try {
-    Import-Module -Name DockerCompletion -ErrorAction Stop -Verbose:$false
-} catch {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Docker command completion unavailable as DockerCompletion module not found.')
-}
+Complete-DotFilesSection

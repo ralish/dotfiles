@@ -1,17 +1,14 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type        = 'Settings'
+    Name        = 'ConEmu'
+    Platform    = 'Windows'
+    Environment = @{ ConEmuANSI = 'ON' }
 }
 
-if (!(Test-IsWindows)) {
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-if (!$env:ConEmuANSI -eq 'ON') {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping ConEmu settings as not running under ConEmu.')
-    return
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ConEmu settings ...')
 
 # Special prompt handling for PowerShell under ConEmu
 # See: https://conemu.github.io/en/PowershellPrompt.html
@@ -27,3 +24,5 @@ $ConEmuPrompt = {
 
     return $prompt
 }
+
+Complete-DotFilesSection

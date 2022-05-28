@@ -1,12 +1,13 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Functions'
+    Name     = 'Maintenance (Windows)'
+    Platform = 'Windows'
 }
 
-if (!(Test-IsWindows)) {
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing maintenance functions (Windows only) ...')
 
 # Update Modern Apps (Microsoft Store)
 Function Update-ModernApps {
@@ -319,3 +320,5 @@ Function Update-Windows {
 
     return $true
 }
+
+Complete-DotFilesSection

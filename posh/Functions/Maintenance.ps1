@@ -1,8 +1,4 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing maintenance functions ...')
+Start-DotFilesSection -Type Functions -Name Maintenance
 
 # Clear caches used by development environments & tooling
 Function Clear-AllDevCaches {
@@ -264,3 +260,5 @@ Function Update-AllTheThings {
         return $Results
     }
 }
+
+Complete-DotFilesSection

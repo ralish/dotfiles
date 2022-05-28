@@ -1,25 +1,43 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type    = 'Settings'
+    Name    = 'oh-my-posh'
+    Command = @('oh-my-posh')
 }
 
-if (!(Get-Command -Name oh-my-posh -ErrorAction Ignore)) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping oh-my-posh settings as unable to locate oh-my-posh.')
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading oh-my-posh settings ...')
 
 # Name of theme to use
 $OmpThemeName = 'slim'
 
-if (!$env:POSH_THEMES_PATH) {
-    $OmpBasePath = Split-Path -Path (Split-Path -Path (Get-Command -Name oh-my-posh).Source)
-    $env:POSH_THEMES_PATH = Join-Path -Path $OmpBasePath -ChildPath 'themes'
+Function Get-OhMyPoshConfig {
+    [CmdletBinding()]
+    Param()
+
+    if (!$env:POSH_THEMES_PATH) {
+        $OmpBasePath = Split-Path -Path (Split-Path -Path (Get-Command -Name oh-my-posh).Source)
+        $env:POSH_THEMES_PATH = Join-Path -Path $OmpBasePath -ChildPath 'themes'
+    }
+
+    $OmpThemeFile = '{0}.omp.json' -f $OmpThemeName
+    $OmpThemePath = Join-Path -Path $env:POSH_THEMES_PATH -ChildPath $OmpThemeFile
+
+    return $OmpThemePath
 }
 
-$OmpThemeFile = '{0}.omp.json' -f $OmpThemeName
-$OmpThemePath = Join-Path -Path $env:POSH_THEMES_PATH -ChildPath $OmpThemeFile
+# Suppress verbose output on loading
+$VerboseOriginal = $VerbosePreference
+$VerbosePreference = 'SilentlyContinue'
 
-& oh-my-posh init pwsh --config $OmpThemePath | Invoke-Expression
+# Load oh-my-posh
+& oh-my-posh init pwsh --config (Get-OhMyPoshConfig) | Invoke-Expression
 
-Remove-Variable -Name 'OmpThemeName', 'OmpThemeFile', 'OmpThemePath'
+# Restore the original $VerbosePreference setting
+$VerbosePreference = $VerboseOriginal
+Remove-Variable -Name VerboseOriginal
+
+Remove-Item -Path Function:\Get-OhMyPoshConfig
+Remove-Variable -Name OmpThemeName
+Complete-DotFilesSection

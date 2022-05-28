@@ -1,12 +1,13 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Functions'
+    Name     = 'Environments (Windows)'
+    Platform = 'Windows'
 }
 
-if (!(Test-IsWindows)) {
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing environment functions (Windows only) ...')
 
 #region Cygwin
 
@@ -171,3 +172,5 @@ Function Switch-WindowsSDK {
 }
 
 #endregion
+
+Complete-DotFilesSection

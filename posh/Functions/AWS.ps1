@@ -1,18 +1,14 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type          = 'Functions'
+    Name          = 'AWS'
+    Module        = @('AWS.Tools.Installer', 'AWSPowerShell.NetCore', 'AWSPowerShell')
+    ModuleRequire = 'Any'
 }
 
-if (!$DotFilesFastLoad) {
-    try {
-        Test-ModuleAvailable -Name AWS.Tools.Installer, AWSPowerShell.NetCore, AWSPowerShell -Require Any
-    } catch {
-        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of AWS functions.')
-        $Error.RemoveAt(0)
-        return
-    }
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
+    return
 }
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing AWS functions ...')
 
 # Load custom formatting data
 $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'AWS.format.ps1xml'))
@@ -466,3 +462,5 @@ Function Get-S3BucketSize {
 }
 
 #endregion
+
+Complete-DotFilesSection

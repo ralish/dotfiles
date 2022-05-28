@@ -1,22 +1,14 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Settings'
+    Name     = 'Exchange Online'
+    Platform = 'Windows'
+    Module   = @('ExchangeOnlineManagement')
 }
 
-if (!(Test-IsWindows)) {
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-if (!$DotFilesFastLoad) {
-    try {
-        Test-ModuleAvailable -Name ExchangeOnlineManagement
-    } catch {
-        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping ExchangeOnline settings as module not found.')
-        $Error.RemoveAt(0)
-        return
-    }
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ExchangeOnline settings ...')
 
 # Mailbox properties we may want to ignore
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
@@ -62,3 +54,5 @@ $ExoMailboxIgnoredProperties = @(
     'WhenCreatedUTC',
     'WhenMailboxCreated'
 )
+
+Complete-DotFilesSection

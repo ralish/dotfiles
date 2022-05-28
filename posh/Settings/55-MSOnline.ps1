@@ -1,22 +1,14 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Settings'
+    Name     = 'MSOnline'
+    Platform = 'Windows'
+    Module   = @('MSOnline')
 }
 
-if (!(Test-IsWindows)) {
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-if (!$DotFilesFastLoad) {
-    try {
-        Test-ModuleAvailable -Name MSOnline
-    } catch {
-        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping MSOnline settings as module not found.')
-        $Error.RemoveAt(0)
-        return
-    }
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading MSOnline settings ...')
 
 # User properties we may want to ignore
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
@@ -43,3 +35,5 @@ $MsolUserIgnoredProperties = @(
     'StsRefreshTokensValidFrom',
     'WhenCreated'
 )
+
+Complete-DotFilesSection

@@ -1,13 +1,13 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type    = 'Settings'
+    Name    = 'AWS CLI'
+    Command = @('aws')
 }
 
-if (!(Get-Command -Name aws -ErrorAction Ignore)) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping AWS CLI settings as unable to locate aws.')
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading AWS CLI settings ...')
 
 # Output format
 $env:AWS_DEFAULT_OUTPUT = 'table'
@@ -37,3 +37,5 @@ if (Get-Command -Name aws_completer -ErrorAction Ignore) {
 } else {
     Write-Warning -Message (Get-DotFilesMessage -Message 'Skipping AWS CLI completion as unable to locate aws_completer.')
 }
+
+Complete-DotFilesSection

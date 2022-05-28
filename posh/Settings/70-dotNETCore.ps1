@@ -1,13 +1,13 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type    = 'Settings'
+    Name    = '.NET Core'
+    Command = @('dotnet')
 }
 
-if (!(Get-Command -Name dotnet -ErrorAction Ignore)) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping .NET Core settings as unable to locate dotnet.')
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading .NET Core settings ...')
 
 # Opt-out of telemetry
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = 'true'
@@ -20,3 +20,5 @@ Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
         [Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
     }
 }
+
+Complete-DotFilesSection

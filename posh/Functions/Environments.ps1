@@ -1,8 +1,4 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing environment functions ...')
+Start-DotFilesSection -Type Functions -Name Environments
 
 #region .NET
 
@@ -952,3 +948,5 @@ Function Update-RubyGems {
 }
 
 #endregion
+
+Complete-DotFilesSection

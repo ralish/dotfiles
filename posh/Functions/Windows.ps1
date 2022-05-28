@@ -1,12 +1,13 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Functions'
+    Name     = 'Windows'
+    Platform = 'Windows'
 }
 
-if (!(Test-IsWindows)) {
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Windows functions ...')
 
 #region Desktop
 
@@ -1059,3 +1060,5 @@ Function Test-IsAdministrator {
 }
 
 #endregion
+
+Complete-DotFilesSection

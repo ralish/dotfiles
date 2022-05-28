@@ -1,8 +1,4 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing generic functions ...')
+Start-DotFilesSection -Type Functions -Name Generic
 
 # Load custom formatting data
 $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Generic.format.ps1xml'))
@@ -823,3 +819,5 @@ Function Repair-PathString {
 }
 
 #endregion
+
+Complete-DotFilesSection

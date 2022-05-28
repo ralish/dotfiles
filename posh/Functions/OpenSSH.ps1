@@ -1,8 +1,4 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing OpenSSH functions ...')
+Start-DotFilesSection -Type Functions -Name OpenSSH
 
 # Update OpenSSH configuration
 Function Update-OpenSSHConfig {
@@ -64,3 +60,5 @@ Function Update-OpenSSHConfig {
     $Template = Get-Content -LiteralPath $TemplateFile
     Add-Content -LiteralPath $ConfigFile -Value $Template[0..($Template.Count - 1)]
 }
+
+Complete-DotFilesSection

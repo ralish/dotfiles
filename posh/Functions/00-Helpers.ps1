@@ -1,27 +1,183 @@
+#region Profile utilities
+
+# Complete a dotfiles section by running any final tasks
+Function Complete-DotFilesSection {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
+    Param()
+
+    if ($Global:DotFilesShowTimings) {
+        $Timing = Get-DotFilesTiming -StartTime $Global:DotFilesSectionStart
+        Write-Verbose -Message (Get-DotFilesMessage -Message $Timing)
+    }
+
+    Remove-Variable -Name DotFilesSection* -Scope Global
+}
+
 # Retrieve a formatted dotfiles message
 Function Get-DotFilesMessage {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [String]$Message
+        [String]$Message,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$SectionType,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$SectionName
     )
 
-    if ($DotFilesShowTimings) {
-        $CurrentTimestamp = Get-Date
-        if (!$PreviousTimestamp) {
-            $Global:PreviousTimestamp = $CurrentTimestamp
-        }
-
-        $ElapsedTime = $CurrentTimestamp - $PreviousTimestamp
-        $Message = '[dotfiles | {0} | {1} secs] {2}' -f $CurrentTimestamp.ToString('HH:mm:ss:fff'), $ElapsedTime.TotalSeconds.ToString('F2'), $Message
-        $Global:PreviousTimestamp = $CurrentTimestamp
-
-        return $Message
+    if (!$SectionType) {
+        $SectionType = $Global:DotFilesSectionType
     }
 
-    return '[dotfiles] {0}' -f $Message
+    if (!$SectionName) {
+        $SectionName = $Global:DotFilesSectionName
+    }
+
+    return '[dotfiles | {0,-10} | {1,-25}] {2}' -f $SectionType, $SectionName, $Message
 }
+
+# Retrieve the elapsed time in milliseconds from a starting time
+Function Get-DotFilesTiming {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [DateTime]$StartTime
+    )
+
+    if (!$Global:DotFilesShowTimings) {
+        return
+    }
+
+    $ElapsedTime = (Get-Date) - $StartTime
+    return 'Elapsed time: {0} ms' -f [Int]($ElapsedTime.TotalMilliseconds)
+}
+
+# Remove dotfiles helper functions
+Function Remove-DotFilesHelpers {
+    [CmdletBinding()]
+    Param()
+
+    $Helpers = @(
+        '*-DotFilesSection'
+        'Get-DotFilesMessage'
+        'Get-DotFilesTiming'
+        'Remove-DotFilesHelpers'
+    )
+
+    foreach ($Helper in $Helpers) {
+        $Path = 'Function:\{0}' -f $Helper
+        Remove-Item -Path $Path
+    }
+}
+
+# Start a dotfiles section with optional prerequisite checks
+Function Start-DotFilesSection {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Type,
+
+        [Parameter(Mandatory)]
+        [String]$Name,
+
+        [ValidateSet('Unix', 'Windows')]
+        [String]$Platform,
+
+        [ValidateNotNullOrEmpty()]
+        [String[]]$PwshHostName,
+
+        # Test-CommandAvailable
+        [ValidateNotNullOrEmpty()]
+        [String[]]$Command,
+
+        # Test-EnvironmentMatch
+        [ValidateNotNullOrEmpty()]
+        [Hashtable]$Environment,
+
+        # Test-ModuleAvailable
+        [ValidateNotNullOrEmpty()]
+        [String[]]$Module,
+        [ValidateSet('Get', 'Import')]
+        [String]$ModuleOperation = 'Get',
+        [ValidateSet('Any', 'All')]
+        [String]$ModuleRequire = 'All',
+        [Switch]$ForceTestModule
+    )
+
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+    $Global:DotFilesSectionType = $Type
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+    $Global:DotFilesSectionName = $Name
+
+    if ($Global:DotFilesShowTimings) {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+        $Global:DotFilesSectionStart = Get-Date
+    }
+
+    if ($Platform -eq 'Windows') {
+        if (!(Test-IsWindows)) {
+            Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as platform is not Windows.')
+            return $false
+        }
+    } elseif ($Platform -eq 'Unix') {
+        if (Test-IsWindows) {
+            Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as platform is not Unix-like.')
+            return $false
+        }
+    }
+
+    if ($PwshHostName) {
+        if ($Host.Name -notin $PwshHostName) {
+            Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as host is not supported: {0}' -f $Host.Name)
+            return $false
+        }
+    }
+
+    if ($Command) {
+        try {
+            Test-CommandAvailable -Name $Command
+        } catch {
+            Write-Verbose -Message (Get-DotFilesMessage -Message $_.Exception.Message)
+            return $false
+        }
+    }
+
+    if ($Environment) {
+        try {
+            Test-EnvironmentMatch -Environment $Environment
+        } catch {
+            Write-Verbose -Message (Get-DotFilesMessage -Message $_.Exception.Message)
+            return $false
+        }
+    }
+
+    $ProcessModules = $ModuleOperation -eq 'Import' -or $ForceTestModule -or !$Global:DotFilesFastLoad
+    if ($Module -and $ProcessModules) {
+        try {
+            Test-ModuleAvailable -Name $Module -Operation $ModuleOperation -Require $ModuleRequire
+        } catch {
+            Write-Verbose -Message (Get-DotFilesMessage -Message $_.Exception.Message)
+            $Error.RemoveAt(0)
+            return $false
+        }
+    }
+
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'All prerequisites met.')
+
+    if ($Platform -or $Command -or $Module) {
+        return $true
+    }
+}
+
+#endregion
+
+#region Environment & platform tests
 
 # Confirm a PowerShell command is available
 Function Test-CommandAvailable {
@@ -39,6 +195,48 @@ Function Test-CommandAvailable {
     }
 }
 
+# Check environment matches expectations
+Function Test-EnvironmentMatch {
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory)]
+        [Hashtable]$Environment
+    )
+
+    foreach ($EnvName in $Environment.Keys) {
+        $EnvExpectedValue = $Environment[$EnvName]
+
+        if (!($EnvExpectedValue -is [Boolean] -or $EnvExpectedValue -is [String])) {
+            throw 'Value for key "{0}" is not a Boolean or String type.' -f $EnvName
+        }
+
+        $EnvCurrentValue = [Environment]::GetEnvironmentVariable($EnvName)
+
+        if ($EnvExpectedValue -is [Boolean]) {
+            # Environment variable must not exist
+            if ($EnvExpectedValue -eq $false) {
+                if ($null -ne $EnvCurrentValue) {
+                    throw 'Environment variable exists: {0}' -f $EnvName
+                }
+                continue
+            }
+
+            # Environment variable must exist (any value)
+            if ($null -eq $EnvCurrentValue) {
+                throw 'Environment variable not set: {0}' -f $EnvName
+            }
+            continue
+        }
+
+        # Environment variable must match provided value
+        if ($null -ne $EnvCurrentValue) {
+            throw 'Environment variable "{0}" set to "{1}" but expected "{2}".' -f $EnvName, $EnvCurrentValue, $EnvExpectedValue
+        } else {
+            throw 'Environment variable "{0}" is not set but expected "{1}".' -f $EnvName, $EnvExpectedValue
+        }
+    }
+}
+
 # Naive check for if we're running on Windows
 Function Test-IsWindows {
     [CmdletBinding()]
@@ -52,10 +250,14 @@ Function Test-IsWindows {
 
 # Confirm a PowerShell module is available
 Function Test-ModuleAvailable {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
         [String[]]$Name,
+
+        [ValidateSet('Get', 'Import')]
+        [String]$Operation = 'Get',
 
         [ValidateSet('Any', 'All')]
         [String]$Require = 'All',
@@ -69,13 +271,31 @@ Function Test-ModuleAvailable {
 
     foreach ($Module in $Name) {
         Write-Debug -Message ('Checking module is available: {0}' -f $Module)
-        $ModuleListAvailable = @(Get-Module -Name $Module -ListAvailable -Verbose:$false)
 
-        if ($ModuleListAvailable) {
+        if ($Operation -eq 'Get') {
+            $ModuleAvailable = @(Get-Module -Name $Module -ListAvailable -Verbose:$false)
+        } else {
+            # Suppress verbose output on import
+            $VerboseOriginal = $VerbosePreference
+            $VerbosePreference = 'SilentlyContinue'
+
+            try {
+                Import-Module -Name $Module -ErrorAction Stop -Verbose:$false
+            } catch {
+                throw $_
+            } finally {
+                # Restore the original $VerbosePreference setting
+                $VerbosePreference = $VerboseOriginal
+            }
+
+            $ModuleAvailable = @(Get-Module -Name $Module -Verbose:$false)
+        }
+
+        if ($ModuleAvailable) {
             $MissingModule = $false
 
             if ($PassThru) {
-                $ModuleInfo.Add(($ModuleListAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1))
+                $ModuleInfo.Add(($ModuleAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1))
             }
 
             if ($Require -eq 'Any') {
@@ -103,3 +323,5 @@ Function Test-ModuleAvailable {
         return $ModuleInfo.ToArray()
     }
 }
+
+#endregion

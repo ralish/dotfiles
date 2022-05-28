@@ -1,8 +1,4 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing OpenSSL functions ...')
+Start-DotFilesSection -Type Functions -Name OpenSSL
 
 # Convert a certificate in DER format to PEM format
 Function Convert-OpenSSLDerToPem {
@@ -336,3 +332,5 @@ Function New-OpenSSLCertificate {
     Write-Host ('openssl {0}' -f (($Params.ToArray() | Add-QuotesToStringWithSpace) -join ' '))
     & openssl @Params
 }
+
+Complete-DotFilesSection

@@ -1,22 +1,14 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Settings'
+    Name     = 'Active Directory'
+    Platform = 'Windows'
+    Module   = @('ActiveDirectory')
 }
 
-if (!(Test-IsWindows)) {
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-if (!$DotFilesFastLoad) {
-    try {
-        Test-ModuleAvailable -Name ActiveDirectory
-    } catch {
-        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping ActiveDirectory settings as module not found.')
-        $Error.RemoveAt(0)
-        return
-    }
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ActiveDirectory settings ...')
 
 # AD class properties we may want to ignore: top
 $ADClassIgnoredPropertiesTop = @(
@@ -86,3 +78,5 @@ $ADClassIgnoredPropertiesUser = $ADClassIgnoredPropertiesSecurityPrincipal + @(
     'MobilePhone'                   # mobile
     'Organization'                  # o
 )
+
+Complete-DotFilesSection

@@ -1,13 +1,13 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Functions'
+    Name     = 'Azure'
+    Platform = 'Windows'
 }
 
-if (!(Test-IsWindows)) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping import of Azure functions.')
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing Azure functions ...')
 
 # Load custom formatting data
 $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1xml'))
@@ -333,3 +333,5 @@ Function Connect-MSOnline {
 }
 
 #endregion
+
+Complete-DotFilesSection

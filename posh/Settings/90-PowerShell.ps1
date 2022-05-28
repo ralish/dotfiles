@@ -1,8 +1,4 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Configuring PowerShell ...')
+Start-DotFilesSection -Type Settings -Name PowerShell
 
 # Number of elements to enumerate when displaying arrays
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
@@ -50,3 +46,5 @@ if (!(Get-Command -Name oh-my-posh -ErrorAction Ignore)) {
         return $prompt
     }
 }
+
+Complete-DotFilesSection

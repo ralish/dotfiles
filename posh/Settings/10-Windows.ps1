@@ -1,12 +1,13 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type     = 'Settings'
+    Name     = 'Windows'
+    Platform = 'Windows'
 }
 
-if (!(Test-IsWindows)) {
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading Windows settings ...')
 
 # Switch to user profile directory if the current path is the Windows
 # System32 directory. This probably means we were launched elevated.
@@ -44,21 +45,30 @@ if ($PWD.Path -eq "$env:SystemRoot\System32") {
 # - https://github.com/Microsoft/WSL/issues/1173#issuecomment-254250445
 # - https://github.com/microsoft/terminal/issues/1965#issuecomment-533290250
 # - https://github.com/microsoft/terminal/pull/2816
-if (!$env:WT_SESSION) {
-    $BuildNumber = [int](Get-CimInstance -ClassName Win32_OperatingSystem -Verbose:$false).BuildNumber
+Function Repair-ConHostVT100Bug {
+    [CmdletBinding()]
+    Param()
 
-    if ($BuildNumber -ge 10586 -and $BuildNumber -lt 19041) {
-        if ((Get-ItemProperty -LiteralPath HKCU:\Console -Name VirtualTerminalLevel -ErrorAction SilentlyContinue).VirtualTerminalLevel) {
-            $ConHostVT100Bug = $true
-        }
+    # Windows Terminal has its own mitigation (since v0.5.2661.0)
+    if ($env:WT_SESSION) {
+        return
     }
 
-    Remove-Variable -Name BuildNumber
-}
+    # Bug only present in Windows builds 10586 through 19040
+    $BuildNumber = [int](Get-CimInstance -ClassName Win32_OperatingSystem -Verbose:$false).BuildNumber
+    if (!($BuildNumber -ge 10586 -and $BuildNumber -lt 19041)) {
+        return
+    }
 
-if ($ConHostVT100Bug) {
-    $ConHostVT100Fix = {
-        $ConsoleAPI = @'
+    # Bug only occurs if VirtualTerminalLevel setting is set to 1
+    $VirtualTerminalLevel = (Get-ItemProperty -LiteralPath HKCU:\Console -Name VirtualTerminalLevel -ErrorAction SilentlyContinue).VirtualTerminalLevel
+    if ($VirtualTerminalLevel -ne 1) {
+        return
+    }
+
+    Write-Verbose -Message (Get-DotFilesMessage -Message 'Applying fix for ConHost VT100 tab stop width bug ...')
+
+    $ConsoleAPI = @'
 [Flags]
 public enum ConsoleModeInputFlags
 {
@@ -110,43 +120,43 @@ public static extern bool SetConsoleMode(
 );
 '@
 
-        if (!('DotFiles.Console' -as [Type])) {
-            Add-Type -Namespace DotFiles -Name Console -MemberDefinition $ConsoleAPI
-        }
-
-        # The STD_INPUT_HANDLE shouldn't be relevant to this issue
-        $ConStdHandleNames = 'STD_OUTPUT_HANDLE', 'STD_ERROR_HANDLE'
-        foreach ($ConStdHandleName in $ConStdHandleNames) {
-            Write-Debug -Message (Get-DotFilesMessage -Message ('Operating on console handle: {0}' -f $ConStdHandleName))
-            $ConStdHandle = [DotFiles.Console]::GetStdHandle([DotFiles.Console+StdHandleDevices]::$ConStdHandleName)
-            if ($ConStdHandle -eq -1) {
-                throw [ComponentModel.Win32Exception]::new()
-            }
-
-            [uint32]$ConStdMode = 0
-            if (!([DotFiles.Console]::GetConsoleMode($ConStdHandle, [ref]$ConStdMode))) {
-                throw [ComponentModel.Win32Exception]::new()
-            }
-            Write-Debug -Message (Get-DotFilesMessage -Message ('Current console output mode: {0}' -f [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode))
-
-            $ConStdVT100 = [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -band [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING
-            if ($ConStdVT100) {
-                Write-Debug -Message (Get-DotFilesMessage -Message 'Disabling console VT100 support ...')
-                if (!([DotFiles.Console]::SetConsoleMode($ConStdHandle, [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -bxor [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
-                    throw [ComponentModel.Win32Exception]::new()
-                }
-
-                Write-Debug -Message (Get-DotFilesMessage -Message 'Enabling console VT100 support ...')
-                if (!([DotFiles.Console]::SetConsoleMode($ConStdHandle, [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -bor [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
-                    throw [ComponentModel.Win32Exception]::new()
-                }
-            } else {
-                Write-Debug -Message (Get-DotFilesMessage -Message 'VT100 processing not enabled on this handle.')
-            }
-        }
+    if (!('DotFiles.Console' -as [Type])) {
+        Add-Type -Namespace DotFiles -Name Console -MemberDefinition $ConsoleAPI
     }
 
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Applying fix for ConHost VT100 tab stop width bug ...')
-    $ConHostVT100Fix.Invoke()
-    Remove-Variable -Name 'ConHostVT100Bug', 'ConHostVT100Fix'
+    # The STD_INPUT_HANDLE shouldn't be relevant to this issue
+    $ConStdHandleNames = 'STD_OUTPUT_HANDLE', 'STD_ERROR_HANDLE'
+    foreach ($ConStdHandleName in $ConStdHandleNames) {
+        Write-Debug -Message (Get-DotFilesMessage -Message ('Operating on console handle: {0}' -f $ConStdHandleName))
+        $ConStdHandle = [DotFiles.Console]::GetStdHandle([DotFiles.Console+StdHandleDevices]::$ConStdHandleName)
+        if ($ConStdHandle -eq -1) {
+            throw [ComponentModel.Win32Exception]::new()
+        }
+
+        [uint32]$ConStdMode = 0
+        if (!([DotFiles.Console]::GetConsoleMode($ConStdHandle, [ref]$ConStdMode))) {
+            throw [ComponentModel.Win32Exception]::new()
+        }
+        Write-Debug -Message (Get-DotFilesMessage -Message ('Current console output mode: {0}' -f [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode))
+
+        $ConStdVT100 = [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -band [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING
+        if ($ConStdVT100) {
+            Write-Debug -Message (Get-DotFilesMessage -Message 'Disabling console VT100 support ...')
+            if (!([DotFiles.Console]::SetConsoleMode($ConStdHandle, [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -bxor [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
+                throw [ComponentModel.Win32Exception]::new()
+            }
+
+            Write-Debug -Message (Get-DotFilesMessage -Message 'Enabling console VT100 support ...')
+            if (!([DotFiles.Console]::SetConsoleMode($ConStdHandle, [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -bor [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
+                throw [ComponentModel.Win32Exception]::new()
+            }
+        } else {
+            Write-Debug -Message (Get-DotFilesMessage -Message 'VT100 processing not enabled on this handle.')
+        }
+    }
 }
+
+Repair-ConHostVT100Bug
+
+Remove-Item -Path Function:\Repair-ConHostVT100Bug
+Complete-DotFilesSection

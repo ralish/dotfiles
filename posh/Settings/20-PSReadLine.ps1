@@ -1,20 +1,15 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
+$DotFilesSection = @{
+    Type            = 'Settings'
+    Name            = 'PSReadLine'
+    PwshHostName    = @('ConsoleHost')
+    Module          = @('PSReadLine')
+    ModuleOperation = 'Import'
 }
 
-if ($Host.Name -ne 'ConsoleHost') {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSReadLine settings as host is not ConsoleHost.')
+if (!(Start-DotFilesSection @DotFilesSection)) {
+    Complete-DotFilesSection
     return
 }
-
-try {
-    Import-Module -Name PSReadLine -ErrorAction Stop -Verbose:$false
-} catch {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping PSReadLine settings as module not found.')
-    return
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading PSReadLine settings ...')
 
 # Disable terminal bell
 Set-PSReadLineOption -BellStyle None
@@ -66,7 +61,7 @@ $Params = @{
     ScriptBlock      = $ScriptBlock
 }
 Set-PSReadLineKeyHandler @Params
-Remove-Variable -Name 'Params', 'ScriptBlock'
+Remove-Variable -Name Params, ScriptBlock
 
 # We use the Solarized Dark colour scheme for WSL sessions under Windows
 # Terminal. Unfortunately, some of PSReadLine's default colours are near
@@ -83,3 +78,5 @@ if ($env:WT_SESSION -and $IsLinux) {
         Parameter = [ConsoleColor]::Magenta
     }
 }
+
+Complete-DotFilesSection

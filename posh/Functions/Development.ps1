@@ -1,8 +1,4 @@
-if ($DotFilesShowScriptEntry) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message $PSCommandPath)
-}
-
-Write-Verbose -Message (Get-DotFilesMessage -Message 'Importing development functions ...')
+Start-DotFilesSection -Type Functions -Name Development
 
 #region .NET
 
@@ -407,3 +403,5 @@ Function Remove-GitCleanSubset {
 }
 
 #endregion
+
+Complete-DotFilesSection
