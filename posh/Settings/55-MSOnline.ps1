@@ -19,7 +19,7 @@ if (!$DotFilesFastLoad) {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading MSOnline settings ...')
 
 # User properties we may want to ignore
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $MsolUserIgnoredProperties = @(
     # User identity
     'ImmutableId',

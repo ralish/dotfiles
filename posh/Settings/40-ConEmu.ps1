@@ -15,7 +15,7 @@ Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ConEmu settings ..
 
 # Special prompt handling for PowerShell under ConEmu
 # See: https://conemu.github.io/en/PowershellPrompt.html
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $ConEmuPrompt = {
     # Let ConEmu know where the prompt ends
     $prompt = '{0}]9;12{1}' -f [char]27, [char]7

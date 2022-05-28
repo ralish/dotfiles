@@ -99,7 +99,7 @@ public static extern uint GetFinalPathNameByHandle(
         throw [ComponentModel.Win32Exception]::new()
     }
 
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     $DotFiles = Split-Path -Path $ProfileDirFinalPath.ToString().TrimStart('\', '?') -Parent
 
     Remove-Variable -Name 'FinalPathAPI', 'ProfileDirPath', 'ProfileDirHandle', 'ProfileDirFinalPath', 'Result'

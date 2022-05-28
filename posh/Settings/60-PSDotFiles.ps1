@@ -19,13 +19,13 @@ if (!$DotFilesFastLoad) {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading PSDotFiles settings ...')
 
 # Path to our dotfiles directory
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesPath = $DotFiles
 
 # Enable automatic component detection
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesAutodetect = $true
 
 # Allow evaluation of nested symlinks
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesAllowNestedSymlinks = $true

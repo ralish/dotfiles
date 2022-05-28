@@ -5,7 +5,7 @@ if ($DotFilesShowScriptEntry) {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Configuring PowerShell ...')
 
 # Number of elements to enumerate when displaying arrays
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $FormatEnumerationLimit = 5
 
 # Out-File: Default to UTF-8 encoding

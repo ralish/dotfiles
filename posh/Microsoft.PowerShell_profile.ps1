@@ -18,7 +18,7 @@ foreach ($Param in [Environment]::GetCommandLineArgs()) {
 #
 # - Get-Module -ListAvailable
 #   Assume the module exists instead of checking
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesFastLoad = $true
 
 # Array of paths containing additional formatting data

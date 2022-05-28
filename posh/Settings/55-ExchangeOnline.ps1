@@ -19,7 +19,7 @@ if (!$DotFilesFastLoad) {
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ExchangeOnline settings ...')
 
 # Mailbox properties we may want to ignore
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignment', '')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $ExoMailboxIgnoredProperties = @(
     # User identity
     'MicrosoftOnlineServicesID',
