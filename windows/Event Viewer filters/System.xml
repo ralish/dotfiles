@@ -1,4 +1,4 @@
-<QueryList>
+<QueryList xmlns="http://schemas.microsoft.com/win/2004/08/events/eventquery">
   <Query Id="0" Path="System">
     <Select Path="System">*</Select>
 
