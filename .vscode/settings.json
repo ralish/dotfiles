@@ -196,12 +196,29 @@
         "editor.rulers": [79]
     },
 
+    "[ini]": {
+        "editor.rulers": [79]
+    },
+
     "[powershell]": {
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "editor.rulers": [79]
+    },
+
+    "[properties]": {
+        "editor.rulers": [79]
     },
 
     "[shellscript]": {
         "editor.formatOnSave": true,
+        "editor.rulers": [79]
+    },
+
+    "[sql]": {
+        "editor.rulers": [79]
+    },
+
+    "[ssh_config]": {
         "editor.rulers": [79]
     }
 }
