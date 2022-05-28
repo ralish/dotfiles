@@ -2,7 +2,7 @@
 #
 # Read from %USERPROFILE%\.wslconfig
 #
-# Initial support from Windows Build 18945 (2004+)
+# Initial support from Windows Build 18945 (Windows 10 2004+)
 
 [wsl2]
 # Number of processors to assign to the VM
@@ -13,7 +13,7 @@ processors = 6
 # Enable nested virtualisation on AMD64
 #
 # Default: true
-# Support: Build 20175
+# Support: Build 20175 (Windows 11 21H2+)
 #nestedVirtualization = true
 
 # Amount of memory to assign to the VM
@@ -38,7 +38,7 @@ memory = 16GB
 # Free memory page reporting
 #
 # Default: true
-# Support: Build 19013 (2004+)
+# Support: Build 19013 (Windows 10 2004+)
 #pageReporting = true
 
 # Idle threshold for memory compaction
@@ -46,7 +46,7 @@ memory = 16GB
 # Setting to 0 disables memory compaction on idle.
 #
 # Default: 1
-# Support: Build 19013 (2004+)
+# Support: Build 19013 (Windows 10 2004+)
 #idleThreshold = 1
 
 # Absolute Windows path to the Linux kernel image
@@ -57,22 +57,28 @@ memory = 16GB
 # Additional kernel command line arguments
 #
 # Default: (blank)
-# Support: Build 18995 (2004+)
+# Support: Build 18995 (Windows 10 2004+)
 #kernelCommandLine =
-
-# Show kernel log output on WSL 2 distro start
-#
-# Default: false
-# Support: Build 21387
-#debugConsole = false
 
 # Permit access from the host to listening ports in the VM
 #
 # Default: true
 #localhostForwarding = true
 
+# Support for GUI applications (WSLg)
+#
+# Default: true
+# Support: Build 21364 (Windows 11 21H2+)
+#guiApplications = true
+
 # Idle timeout for stopping the VM (milliseconds)
 #
 # Default: 60000
-# Support: Build 20190
+# Support: Build 20190 (Windows 11 21H2+)
 #vmIdleTimeout = 60000
+
+# Show kernel log output on WSL 2 distro start
+#
+# Default: false
+# Support: Build 21387 (Windows 11 21H2+)
+#debugConsole = false
