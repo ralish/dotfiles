@@ -23,15 +23,12 @@ if (!(Get-Command -Name concfg -ErrorAction Ignore)) {
 
 Write-Verbose -Message (Get-DotFilesMessage -Message 'Loading ConCfg settings ...')
 
-# ConCfg runs some commands with noisy verbose output. When loading our
-# profile with verbose output it tends to just be annoying. Suppress it
-# by setting $VerbosePreference as the concfg command does not support
-# the common PowerShell cmdlet parameters.
+# Suppress ConCfg verbose output on loading
 if ($DotFilesVerbose) {
     $VerbosePreference = 'SilentlyContinue'
 }
 
-# Set PSReadline colours based on theme
+# Set PSReadLine colours based on theme
 & concfg tokencolor -n enable
 
 # Restore the original $VerbosePreference setting

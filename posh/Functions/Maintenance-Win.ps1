@@ -105,7 +105,6 @@ Function Update-Office {
 
 # Update Scoop & installed apps
 Function Update-Scoop {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '')]
     [CmdletBinding()]
     Param(
         [Switch]$CaptureOutput,
@@ -231,7 +230,7 @@ Function Update-VisualStudio {
         # I suspect it's doing something nefarious if it detects it's launched via
         # a console environment. This also occurs for child processes it launches,
         # presumably due to process handle inheritance. Whatever it's doing really
-        # confuses PowerShell and/or PSReadline, seemingly causing it to lose track
+        # confuses PowerShell and/or PSReadLine, seemingly causing it to lose track
         # of the console state; subsequent output will often overlap earlier debug
         # output from the installer.
         #

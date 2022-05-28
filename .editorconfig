@@ -12,6 +12,14 @@ indent_size = 4
 trim_trailing_whitespace = true
 insert_final_newline = true
 
+# Markdown
+[*.md]
+trim_trailing_whitespace = false
+
+# XML documents & schemas
+[*.{xml,xsd}]
+insert_final_newline = false
+
 # Fiddler scripts
 [fiddler/Scripts/*.{cs,js}]
 charset = utf-8-bom
@@ -29,11 +37,6 @@ insert_final_newline = false
 # JetBrains IDE configuration
 [jetbrains/**/*.xml]
 indent_size = 2
-insert_final_newline = false
-
-# Markdown
-[*.md]
-trim_trailing_whitespace = false
 
 # Shell scripts
 [{*.sh,.bashrc,.mk-sbuild.rc,.quiltrc,user-dirs.dirs}]
@@ -60,3 +63,7 @@ shell_variant = posix           # shfmt: -p
 # Windows Event Viewer filters
 [windows/Event Viewer filters/*.xml]
 indent_size = 2
+
+# XDG user directories locale
+[xdg-user-dir/.config/user-dirs.locale]
+insert_final_newline = false

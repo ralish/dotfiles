@@ -18,7 +18,7 @@ Register-ArgumentCompleter -Native -CommandName plink, pscp, psftp, putty -Scrip
     Param($wordToComplete, $commandAst, $cursorPosition)
 
     try {
-        $SessionsKey = Get-Item -Path 'HKCU:\Software\SimonTatham\PuTTY\Sessions' -ErrorAction Stop
+        $SessionsKey = Get-Item -Path HKCU:\Software\SimonTatham\PuTTY\Sessions -ErrorAction Stop
     } catch {
         return
     }

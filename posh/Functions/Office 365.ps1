@@ -323,10 +323,10 @@ Function Get-Office365EntityUsageSummary {
     $Type = $PSCmdlet.ParameterSetName.ToLower()
 
     $Modules = @(
-        'Microsoft.Graph.Authentication',
-        'Microsoft.Graph.Notes',
-        'Microsoft.Graph.Planner',
-        'Microsoft.Online.SharePoint.PowerShell',
+        'Microsoft.Graph.Authentication'
+        'Microsoft.Graph.Notes'
+        'Microsoft.Graph.Planner'
+        'Microsoft.Online.SharePoint.PowerShell'
         'MicrosoftTeams'
     )
 
@@ -336,7 +336,7 @@ Function Get-Office365EntityUsageSummary {
 
     Write-Verbose -Message 'Checking required modules are present ...'
     Test-ModuleAvailable -Name $Modules
-    Test-CommandAvailable -Name 'Get-OrganizationConfig'
+    Test-CommandAvailable -Name Get-OrganizationConfig
 
     if ($Type -eq 'User') {
         Write-Verbose -Message 'Checking Microsoft Online connection ...'
@@ -597,7 +597,7 @@ Function Get-Office365UserSecurityReport {
     Write-Verbose -Message ('Retrieving user logins over last {0} days ...' -f $AccountInactiveDays)
     $LoginsStartDate = (Get-Date).AddDays(-$AccountInactiveDays).ToString('MM/dd/yyyy')
     $LoginsEndDate = (Get-Date).ToString('MM/dd/yyyy')
-    $Logins = Search-UnifiedAuditLog -Operations 'UserLoggedIn' -StartDate $LoginsStartDate -EndDate $LoginsEndDate -ResultSize 5000
+    $Logins = Search-UnifiedAuditLog -Operations UserLoggedIn -StartDate $LoginsStartDate -EndDate $LoginsEndDate -ResultSize 5000
 
     if ($Logins.Count -eq 5000) {
         Write-Warning -Message 'User logins audit log search returned maximum number of results.'

@@ -217,7 +217,7 @@ Function Invoke-GitLinter {
 
     switch ($PSCmdlet.ParameterSetName) {
         'PSScriptAnalyzer' {
-            if (!(Get-Command -Name 'Invoke-ScriptAnalyzer')) {
+            if (!(Get-Command -Name Invoke-ScriptAnalyzer)) {
                 Write-Error -Message 'Required command is unavailable: Invoke-ScriptAnalyzer'
                 return
             }
@@ -266,13 +266,13 @@ Function Invoke-GitLinter {
         }
 
         'ShellCheck' {
-            if (!(Get-Command -Name 'shellcheck')) {
+            if (!(Get-Command -Name shellcheck)) {
                 Write-Error -Message 'Required command is unavailable: shellcheck'
                 return
             }
 
             if ($ShebangSearch -or $ShellDirectiveSearch) {
-                if (!(Get-Command -Name 'rg')) {
+                if (!(Get-Command -Name rg)) {
                     Write-Error -Message 'Required command is unavailable: rg'
                     return
                 }

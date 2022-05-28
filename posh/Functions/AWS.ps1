@@ -386,7 +386,7 @@ Function Get-S3BucketSize {
     Param()
 
     try {
-        $Module = Test-ModuleAvailable -Name 'AWS.Tools.CloudWatch', 'AWS.Tools.EC2', 'AWS.Tools.S3' -PassThru
+        $Module = Test-ModuleAvailable -Name AWS.Tools.CloudWatch, AWS.Tools.EC2, AWS.Tools.S3 -PassThru
     } catch {
         $Module = Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
     }

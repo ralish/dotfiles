@@ -10,4 +10,4 @@
     "MD026": { "punctuation": ".,;:!" }
 }
 
-// vim: syntax=jsonc cc=80 tw=79 ts=4 sw=4 sts=4 et sr
+// vim: syntax=jsonc ts=4 sw=4 sts=4 et sr

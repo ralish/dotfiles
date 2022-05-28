@@ -281,7 +281,7 @@ Function Connect-AzureAD {
     $ModuleNames = 'AzureAD', 'AzureADPreview'
     $CandidateModules = Get-Module -Name $ModuleNames -ListAvailable -Verbose:$false
     if (!$CandidateModules) {
-        # Obviously redundant but ensures consistent error messages
+        # Redundant but ensures consistent error messages
         Test-ModuleAvailable -Name $ModuleNames -Require Any
     }
 

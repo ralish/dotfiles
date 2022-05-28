@@ -22,6 +22,8 @@
         "**/cygwin/bin/*": "shellscript",
         // dig
         ".digrc": "properties",
+        // dircolors
+        ".dircolors": "plain",
         // editline
         ".editrc": "properties",
         // git
@@ -33,7 +35,7 @@
         // htop
         "htoprc": "properties",
         // irssi
-        "**/irssi/*": "plain",
+        "**/irssi/.irssi/*": "plain",
         // jetbrains
         "*.DotSettings": "xml",
         // kpcli

@@ -151,7 +151,7 @@ Function Update-PowerShell {
         # Get-DscResource likes to output multiple progress bars but doesn't have the manners to
         # clean them up. The result is a total visual mess when we've got our own progress bars.
         $OriginalProgressPreference = $ProgressPreference
-        Set-Variable -Name 'ProgressPreference' -Scope Global -Value 'Ignore' -WhatIf:$false
+        Set-Variable -Name ProgressPreference -Scope Global -Value Ignore -WhatIf:$false
 
         try {
             # Get-DscResource may output various errors, most often due to duplicate resources.
@@ -159,7 +159,7 @@ Function Update-PowerShell {
             # available in multiple locations accessible from the PSModulePath.
             $DscModules = @(Get-DscResource -Module * -ErrorAction Ignore -Verbose:$false | Select-Object -ExpandProperty ModuleName -Unique)
         } finally {
-            Set-Variable -Name 'ProgressPreference' -Scope Global -Value $OriginalProgressPreference -WhatIf:$false
+            Set-Variable -Name ProgressPreference -Scope Global -Value $OriginalProgressPreference -WhatIf:$false
         }
     }
 

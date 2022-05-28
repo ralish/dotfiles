@@ -483,7 +483,7 @@ Function Optimize-WindowsSettingsComputer {
 
     # Disable Explorer SmartScreen
     if ($Script:WindowsBuildNumber -ge 9200 -and !$Script:WindowsServerCore) {
-        # Suppressing the warning when disabled via the Settings UI is non-trivial
+        # Suppressing the warning disabled via the Settings UI is non-trivial
         #Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer' -Name 'SmartScreenEnabled' -Type String -Value 'Off'
         Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\System' -Name 'EnableSmartScreen' -Type DWord -Value 0
     }
@@ -533,7 +533,7 @@ Function Optimize-WindowsUpdate {
     Write-Host -ForegroundColor Green '[Windows] Applying Windows Update settings ...'
 
     # Disable automatic updates
-    # Unclear if the UI setting supports disabling automatic updates on all Windows releases
+    # Unclear if the UI setting is supported on all Windows releases
     #Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update' -Name 'AUOptions' -Type DWord -Value 1
     Set-RegistryValue -Path 'HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name 'NoAutoUpdate' -Type DWord -Value 1
 

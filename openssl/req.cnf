@@ -39,7 +39,7 @@ basicConstraints                    = CA:FALSE
 
 # Key Usage
 #
-# Valid values are:
+# Valid values:
 # - cRLSign
 # - dataEncipherment
 # - decipherOnly

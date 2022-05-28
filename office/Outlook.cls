@@ -1,4 +1,4 @@
-' Shortcut or macro for changing font type in Microsoft Outlook
+' Macro for changing font type in Microsoft Outlook
 ' https://superuser.com/a/757514
 Sub SetCodeFont()
     On Error Resume Next

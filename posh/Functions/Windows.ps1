@@ -105,16 +105,16 @@ Function dmesg {
     )
 
     $Filter = @(
-        '*-Kernel-*',
-        '*-TPM-*',
-        '*-FilterManager',
-        '*-HAL',
-        '*-Hypervisor',
-        '*-IsolatedUserMode',
-        '*-Ntfs',
-        '*-Wininit',
-        '*-Winlogon',
-        'TPM',
+        '*-Kernel-*'
+        '*-TPM-*'
+        '*-FilterManager'
+        '*-HAL'
+        '*-Hypervisor'
+        '*-IsolatedUserMode'
+        '*-Ntfs'
+        '*-Wininit'
+        '*-Winlogon'
+        'TPM'
         'Win32k'
     )
 
@@ -144,9 +144,9 @@ Function Find-WinEvent {
         [String]$OutputFormat = 'EventLogRecord',
 
         [String[]]$ExcludedLogs = @(
-            'Microsoft-Windows-CAPI2/Operational',
-            'Microsoft-Windows-Hyper-V-VmSwitch-Operational',
-            'PowerShellCore/Operational',
+            'Microsoft-Windows-CAPI2/Operational'
+            'Microsoft-Windows-Hyper-V-VmSwitch-Operational'
+            'PowerShellCore/Operational'
             'Security'
         ),
 
@@ -244,7 +244,7 @@ Function Find-WinEvent {
                 continue
             }
 
-            # Log previously enumerated and found to be inaccessible or irrelevant
+            # Log previously enumerated and inaccessible or irrelevant
             if ($SkippedLogs -contains $LogName) {
                 continue
             }
@@ -258,7 +258,7 @@ Function Find-WinEvent {
                     continue
                 }
 
-                # No records (must test both!) or not written to since start time
+                # No records or not written to since start time
                 if ($Log.RecordCount -eq 0 -or $null -eq $Log.RecordCount -or $Log.LastWriteTime -lt $StartTime) {
                     $SkippedLogs.Add($LogName)
                     continue

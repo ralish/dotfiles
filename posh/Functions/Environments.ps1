@@ -398,7 +398,6 @@ Function Switch-Java {
 
 # Clear npm cache
 Function Clear-NpmCache {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '')]
     [CmdletBinding(SupportsShouldProcess)]
     Param()
 

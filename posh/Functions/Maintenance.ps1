@@ -37,13 +37,13 @@ Function Clear-AllDevCaches {
     )
 
     $ValidTasks = @(
-        'Docker',
-        'gem',
-        'Go',
-        'Gradle',
-        'Maven',
-        'npm',
-        'NuGet',
+        'Docker'
+        'gem'
+        'Go'
+        'Gradle'
+        'Maven'
+        'npm'
+        'NuGet'
         'pip'
     )
 
@@ -120,19 +120,19 @@ Function Update-AllTheThings {
 
     DynamicParam {
         $ValidTasks = @(
-            'PowerShell',
-            'DotNetTools',
-            'NodejsPackages',
-            'PythonPackages',
+            'PowerShell'
+            'DotNetTools'
+            'NodejsPackages'
+            'PythonPackages'
             'RubyGems'
         )
 
         if (Test-IsWindows) {
             $ValidTasks += @(
-                'Windows',
-                'Office',
-                'VisualStudio',
-                'ModernApps',
+                'Windows'
+                'Office'
+                'VisualStudio'
+                'ModernApps'
                 'Scoop'
             )
         }
