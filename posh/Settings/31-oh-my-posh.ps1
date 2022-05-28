@@ -38,6 +38,11 @@ $VerbosePreference = 'SilentlyContinue'
 $VerbosePreference = $VerboseOriginal
 Remove-Variable -Name VerboseOriginal
 
+# Enable posh-git support if previously imported
+if (Get-Module -Name posh-git) {
+    $env:POSH_GIT_ENABLED = $true
+}
+
 Remove-Item -Path Function:\Get-OhMyPoshConfig
 Remove-Variable -Name OmpThemeName
 Complete-DotFilesSection
