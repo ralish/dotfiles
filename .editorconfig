@@ -17,7 +17,7 @@ insert_final_newline = true
 trim_trailing_whitespace = false
 
 # XML documents & schemas
-[*.{xml,xsd}]
+[*.{xml,xsd,ps1xml}]
 insert_final_newline = false
 
 # Fiddler scripts
