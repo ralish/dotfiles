@@ -62,6 +62,8 @@
         ".psqlrc": "sql",
         // pip
         "pip.conf": "ini",
+        // prettier
+        ".prettierrc": "json",
         // putty
         "**/putty/Sessions/*.json": "jsonc",
         // quilt
@@ -120,6 +122,9 @@
 
     // PowerShell script analysis
     "powershell.scriptAnalysis.settingsPath": ".config/PSScriptAnalyzerSettings.psd1",
+
+    // Prettier code formatter
+    "prettier.configPath": ".config/.prettierrc",
 
     // Excludes for ShellCheck linter
     "shellcheck.ignorePatterns": {
@@ -205,6 +210,12 @@
     },
 
     "[ini]": {
+        "editor.rulers": [79]
+    },
+
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
         "editor.rulers": [79]
     },
 
