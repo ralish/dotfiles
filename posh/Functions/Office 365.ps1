@@ -917,8 +917,9 @@ Function Import-ContentSearchResults {
                         continue
                     }
 
-                    # Use the candidate name if it's longer than the current name.
-                    # If it's shorter then we've already got the best contact name.
+                    # Use the candidate name if it's longer than the current
+                    # name. If it's shorter then we've already got the best
+                    # contact name.
                     if ($CandidateName.Length -ne $CurrentName.Length) {
                         if ($CandidateName.Length -gt $CurrentName.Length) {
                             Write-Verbose -Message ('[{0}] Updating name for {1} to: {2}' -f $ItemId, $Address, $CandidateName)
@@ -930,7 +931,8 @@ Function Import-ContentSearchResults {
                     # The current contact name and candidate name are:
                     # - The same length
                     # - Differ other than by case
-                    # It's unclear what to do here, so let's print out the options.
+                    #
+                    # It's unclear what to do here so print out the options.
                     if ($CandidateName.ToLower() -ne $CurrentName.ToLower()) {
                         Write-Warning -Message ('[{0}] Mismatched name in "{1}" entry for email address: {2}' -f $ItemId, $DataField, $Address)
                         Write-Warning -Message (' {0}  Current:   {1}' -f ''.PadLeft($ItemId.Length), $CurrentName)
@@ -959,7 +961,7 @@ Function Import-ContentSearchResults {
     }
 }
 
-# Extract email addresses and names from an individual Content Search results entry
+# Extract email addresses and names from a Content Search results entry
 Function Import-ContentSearchResultsEntry {
     [CmdletBinding()]
     Param(
@@ -979,7 +981,7 @@ Function Import-ContentSearchResultsEntry {
         [Regex]$IgnoredDomains
     )
 
-    # For splitting a field into comma separated elements
+    # Split a field into comma separated elements
     #
     # Each element should consist of (in order):
     # - An optional name
@@ -990,10 +992,10 @@ Function Import-ContentSearchResultsEntry {
     # may be commas within the name component (which itself is optional).
     $ElementRegex = '^(\S+\s+)*?\S+?@\S+?\.\S+(?=, )'
 
-    # For checking if the element contains a valid SMTP address
+    # Check if an element contains a valid SMTP address
     $AddressRegex = '(\S+?@\S+?\.\S+)$'
 
-    # For checking if the element contains a name which is *not* the SMTP address
+    # Check if an element contains a name which is *not* the SMTP address
     $NameRegex = '^((\S+\s+)*?)(?=(\s*\S+?@\S+?\.\S+)+)'
 
     $Results = [Collections.Generic.List[PSCustomObject]]::new()

@@ -9,37 +9,32 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
     return
 }
 
-# Switch to user profile directory if the current path is the Windows
+# Switch to the user profile directory if the current path is the Windows
 # System32 directory. This probably means we were launched elevated.
 if ($PWD.Path -eq "$env:SystemRoot\System32") {
     Set-Location -Path $HOME
 }
 
-# Windows 10 releases starting with 1511 (Threshold 1) include improved
-# console VT100 support. Applications can enable the support by calling
-# SetConsoleMode() with the ENABLE_VIRTUAL_TERMINAL_PROCESSING flag. It
-# can also be enabled by default for all console applications by setting
-# VirtualTerminalLevel (REG_DWORD) to 1 under the HKCU:\Console key.
+# Windows 10 releases starting with v1511 (TH1) include improved console VT100
+# support. Applications enable the support by calling SetConsoleMode() with the
+# ENABLE_VIRTUAL_TERMINAL_PROCESSING flag. It can also be enabled by default by
+# setting VirtualTerminalLevel (REG_DWORD) to 1 under the HKCU:\Console key.
 #
-# This surfaces a subtle bug in the Windows Console Host (conhost.exe).
-# If the console is initialised with VT100 support enabled (i.e. there
-# is no transition from not enabled to enabled), the default tab stop
-# width is not correctly set. It appears to default to the number of
-# columns in the console minus one? Thus, the first character of each
-# line will appear to be "right-aligned".
+# This surfaces a subtle bug in the Windows Console Host (conhost.exe). If the
+# console is initialised with VT100 support enabled (i.e. there's no transition
+# from disabled to enabled) the default tab stop width is not correctly set. It
+# appears to default to the number of columns in the console minus one, giving
+# the appearance of the first character of each line being right-justified.
 #
-# Apparently the bug is fixed in the 2004 (20H1) release. Until then, a
-# workaround is to use P/Invoke and call SetConsoleMode() to perform the
-# required VT100 state transitions for tab stops to be correctly set.
+# The bug is fixed in the v2004 (20H1) release. Until then, a workaround is to
+# call SetConsoleMode() via P/Invoke to perform the required state transitions
+# for the tab stop width to be correctly set.
 #
-# To avoid unnecessary P/Invoke calls and associated type compilation
-# check if we're running an affected configuration. This means all of:
-# - Windows 10 1511 through 1909
+# To avoid unnecessary P/Invoke calls and associated type compilation, check if
+# we're running an affected configuration. This means all of:
+# - Windows 10 v1511 through v1909
 # - VirtualTerminalLevel is set to 1
 # - Not running under Windows Terminal (mitigated since v0.5.2661.0)
-#
-# The fact I bothered to implement this workaround is fairly persuasive
-# evidence that I may, in fact, be completely insane.
 #
 # References:
 # - https://github.com/Microsoft/WSL/issues/1173#issuecomment-254250445

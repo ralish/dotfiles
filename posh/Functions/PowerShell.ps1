@@ -144,15 +144,16 @@ Function Update-PowerShell {
     if (!$IncludeDscModules -and $DscSupported) {
         Write-Progress @WriteProgressParams -Status 'Enumerating DSC modules for exclusion' -PercentComplete 5
 
-        # Get-DscResource likes to output multiple progress bars but doesn't have the manners to
-        # clean them up. The result is a total visual mess when we've got our own progress bars.
+        # Get-DscResource likes to output multiple progress bars but doesn't
+        # have the good manners to clean them up. The result is a visual mess
+        # when we've got our own progress bars.
         $OriginalProgressPreference = $ProgressPreference
         Set-Variable -Name ProgressPreference -Scope Global -Value Ignore -WhatIf:$false
 
         try {
-            # Get-DscResource may output various errors, most often due to duplicate resources.
-            # That's frequently the case with, for example, the PackageManagement module being
-            # available in multiple locations accessible from the PSModulePath.
+            # Get-DscResource may output various errors, most often due to
+            # duplicate resources. That's often the case with, for example, the
+            # PackageManagement module being available in multiple locations.
             $DscModules = @(Get-DscResource -Module * -ErrorAction Ignore -Verbose:$false | Select-Object -ExpandProperty ModuleName -Unique)
         } finally {
             Set-Variable -Name ProgressPreference -Scope Global -Value $OriginalProgressPreference -WhatIf:$false
@@ -204,9 +205,9 @@ Function Update-PowerShell {
                 continue
             }
 
-            # If PowerShellGet v2 has not been imported, then we're using PowerShellGet v3 but need
-            # to fallback to v2 for this module due to a compatibility issue. Attempt to import the
-            # previous major version side-by-side.
+            # If PowerShellGet v2 has not been imported then we're using
+            # PowerShellGet v3 but need to fallback to the previous major
+            # version for this module due to a compatibility issue.
             if (!$Script:PsGetV2) {
                 $ImportSxS = Import-PsGetV2SxS
                 if (!$ImportSxS) {
@@ -221,8 +222,9 @@ Function Update-PowerShell {
 
     # The modular AWS Tools for PowerShell has its own mechanism
     if ($UniqueModules -contains 'AWS.Tools.Installer') {
-        # The Update-AWSToolsModule function is not yet compatible with PowerShellGet v3. If we're
-        # using PowerShellGet v3 but PowerShellGet v2 is available, then import it side-by-side.
+        # The Update-AWSToolsModule function is not yet compatible with
+        # PowerShellGet v3. If we're currently using PowerShellGet v3 but
+        # PowerShellGet v2 is available attempt to import it side-by-side.
         if (!$Script:PsGetV2) {
             $ImportSxS = Import-PsGetV2SxS
             if (!$ImportSxS) {

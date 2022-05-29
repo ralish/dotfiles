@@ -63,10 +63,9 @@ $Params = @{
 Set-PSReadLineKeyHandler @Params
 Remove-Variable -Name Params, ScriptBlock
 
-# We use the Solarized Dark colour scheme for WSL sessions under Windows
-# Terminal. Unfortunately, some of PSReadLine's default colours are near
-# invisible in conjunction with this colour scheme. Switch the affected
-# colours to something more visible.
+# We use the Solarized Dark colour scheme for WSL sessions in Windows Terminal.
+# Unfortunately, some of PSReadLine's colours are near invisible when used with
+# this colour scheme. Switch the affected colours to something more visible.
 #
 # References:
 # - https://github.com/microsoft/terminal/pull/6617
