@@ -119,7 +119,7 @@
     "markdown.extension.toc.slugifyMode": "github",
 
     // PowerShell script analysis
-    "powershell.scriptAnalysis.settingsPath": ".vscode/PSScriptAnalyzerSettings.psd1",
+    "powershell.scriptAnalysis.settingsPath": ".config/PSScriptAnalyzerSettings.psd1",
 
     // Excludes for ShellCheck linter
     "shellcheck.ignorePatterns": {
