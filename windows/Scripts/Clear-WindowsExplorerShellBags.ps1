@@ -1,3 +1,7 @@
+<#
+    Clear Windows Explorer shell bags.
+#>
+
 [CmdletBinding(SupportsShouldProcess)]
 Param()
 

@@ -1,3 +1,8 @@
+<#
+    Install .NET Framework 3.5 on Windows releases for which it's an optional
+    operating system component.
+#>
+
 [CmdletBinding()]
 Param(
     [ValidateNotNullOrEmpty()]

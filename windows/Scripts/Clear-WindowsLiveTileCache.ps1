@@ -1,3 +1,7 @@
+<#
+    Clear Windows Live Tile cache.
+#>
+
 [CmdletBinding()]
 Param()
 

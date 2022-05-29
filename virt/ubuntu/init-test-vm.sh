@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Initialize a Ubuntu VM with a configuration optimised for testing.
+
 set -e
 
 if [[ $UID -ne 0 ]]; then

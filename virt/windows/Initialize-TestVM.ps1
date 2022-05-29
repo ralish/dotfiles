@@ -1,3 +1,7 @@
+<#
+    Initialize a Windows VM with a configuration optimised for testing.
+#>
+
 [CmdletBinding(DefaultParameterSetName = 'OptOut')]
 Param(
     [Parameter(ParameterSetName = 'OptOut')]
