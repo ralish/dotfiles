@@ -302,6 +302,11 @@
         "editor.defaultFormatter": "vscode.html-language-features"
     },
 
+    "[javascript]": {
+        // Use VS Code's built-in formatter
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+
     "[json]": {
         // Use VS Code's built-in formatter
         "editor.defaultFormatter": "vscode.json-language-features"
