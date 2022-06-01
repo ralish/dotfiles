@@ -183,17 +183,19 @@ Function Resolve-ADGuid {
     }
 
     Process {
-        if ($PSCmdlet.ParameterSetName -eq 'Guid') {
-            foreach ($ADGuid in $Guid) {
-                switch ($Type) {
-                    'ExtendedRight' {
-                        $LDAPFilters.Add('(rightsGuid={0})' -f $ADGuid)
-                    }
+        if ($PSCmdlet.ParameterSetName -ne 'Guid') {
+            return
+        }
 
-                    'SchemaObject' {
-                        $HexBytes = $ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') }
-                        $LDAPFilters.Add('(schemaIDGUID=\{0})' -f ($HexBytes -join '\'))
-                    }
+        foreach ($ADGuid in $Guid) {
+            switch ($Type) {
+                'ExtendedRight' {
+                    $LDAPFilters.Add('(rightsGuid={0})' -f $ADGuid)
+                }
+
+                'SchemaObject' {
+                    $HexBytes = $ADGuid.ToByteArray() | ForEach-Object { $_.ToString('x2') }
+                    $LDAPFilters.Add('(schemaIDGUID=\{0})' -f ($HexBytes -join '\'))
                 }
             }
         }
