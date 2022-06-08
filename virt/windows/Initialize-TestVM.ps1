@@ -222,7 +222,7 @@ Function Optimize-PowerShell {
     Write-Host -ForegroundColor Green '[PowerShell] Determining modules to update ...'
     $Modules = 'PSReadLine', 'PSWinGlue', 'PSWinVitals', 'PSWindowsUpdate', 'SpeculationControl'
     $ModulesLatest = Find-Module -Name $Modules -Repository PSGallery
-    $ModulesInstall = New-Object -TypeName Collections.ArrayList
+    $ModulesInstall = New-Object -TypeName Collections.Generic.List[String]
 
     foreach ($ModuleLatest in $ModulesLatest) {
         $ModuleCurrent = Get-Module -Name $ModuleLatest.Name -ListAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1
@@ -233,7 +233,7 @@ Function Optimize-PowerShell {
         if ($ModuleLatest.Name -eq 'PSReadLine') {
             $PSReadLineOutdated = $true
         } else {
-            $null = $ModulesInstall.Add($ModuleLatest.Name)
+            $ModulesInstall.Add($ModuleLatest.Name)
         }
     }
 
@@ -706,10 +706,10 @@ Function Set-DiskCleanupProfile {
         $CategoriesParameter = $IncludeCategories
     }
 
-    $UnknownCategories = New-Object -TypeName Collections.ArrayList
+    $UnknownCategories = New-Object -TypeName Collections.Generic.List[String]
     foreach ($Category in $CategoriesParameter) {
         if ($ValidCategories -notcontains $Category) {
-            $null = $UnknownCategories.Add($Category)
+            $UnknownCategories.Add($Category)
         }
     }
 
