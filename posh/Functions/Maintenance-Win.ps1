@@ -293,7 +293,7 @@ Function Update-Windows {
         Import-Module -Name PSWindowsUpdate -ErrorAction Stop -Verbose:$false
     } catch {
         Write-Error -Message 'Unable to install Windows updates as PSWindowsUpdate module not available.'
-        return
+        return $false
     }
 
     $Results = Install-WindowsUpdate -AcceptAll:$AcceptAll -IgnoreReboot -NotTitle Silverlight
