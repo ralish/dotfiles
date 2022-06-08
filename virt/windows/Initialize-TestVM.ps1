@@ -3,6 +3,7 @@
 #>
 
 [CmdletBinding(DefaultParameterSetName = 'OptOut')]
+[OutputType([Void], [String[]])]
 Param(
     [Parameter(ParameterSetName = 'OptOut')]
     [ValidateSet(
@@ -43,6 +44,7 @@ Param(
 
 Function Optimize-DiskCleanup {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     if (!(Get-Command -Name 'cleanmgr.exe' -ErrorAction SilentlyContinue)) {
@@ -66,6 +68,7 @@ Function Optimize-DiskCleanup {
 
 Function Optimize-DotNetFramework {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     Test-DotNetPresent
@@ -127,6 +130,7 @@ Function Optimize-DotNetFramework {
 
 Function Optimize-Office365 {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     if ($Script:WindowsServerCore) {
@@ -143,6 +147,7 @@ Function Optimize-Office365 {
 
 Function Optimize-PowerShell {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     if ($PSVersionTable.PSVersion.Major -lt 5) {
@@ -265,6 +270,7 @@ Function Optimize-PowerShell {
 
 Function Optimize-WindowsComponents {
     [CmdletBinding()]
+    [OutputType([Void], [String[]])]
     Param()
 
     if ($Script:WindowsBuildNumber -ge 9200) {
@@ -287,6 +293,7 @@ Function Optimize-WindowsComponents {
 
 Function Optimize-WindowsDefender {
     [CmdletBinding()]
+    [OutputType([Void], [String[]])]
     Param()
 
     $MpCmdRun = Join-Path -Path $env:ProgramFiles -ChildPath 'Windows Defender\MpCmdRun.exe'
@@ -378,6 +385,7 @@ Function Optimize-WindowsDefender {
 
 Function Optimize-WindowsNetworkList {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     Write-Host -ForegroundColor Green '[Windows] Removing cached network list data ...'
@@ -396,6 +404,7 @@ Function Optimize-WindowsNetworkList {
 
 Function Optimize-WindowsPower {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     Write-Host -ForegroundColor Green '[Windows] Applying power settings ...'
@@ -407,6 +416,7 @@ Function Optimize-WindowsPower {
 
 Function Optimize-WindowsRestore {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     if ($Script:WindowsProductType -ne 1) {
@@ -420,6 +430,7 @@ Function Optimize-WindowsRestore {
 
 Function Optimize-WindowsSecurity {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     Write-Host -ForegroundColor Green '[Windows] Applying security policy ...'
@@ -454,6 +465,7 @@ Function Optimize-WindowsSecurity {
 
 Function Optimize-WindowsSettingsComputer {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     Write-Host -ForegroundColor Green '[Windows] Applying computer settings ...'
@@ -498,6 +510,7 @@ Function Optimize-WindowsSettingsComputer {
 
 Function Optimize-WindowsSettingsUser {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     if ($Script:WindowsServerCore) {
@@ -528,6 +541,7 @@ Function Optimize-WindowsSettingsUser {
 
 Function Optimize-WindowsUpdate {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     Write-Host -ForegroundColor Green '[Windows] Applying Windows Update settings ...'
@@ -557,6 +571,7 @@ Function Optimize-WindowsUpdate {
 
 Function Get-WindowsInfo {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     $WmiCommand = 'Get-CimInstance'
@@ -584,6 +599,7 @@ Function Get-WindowsInfo {
 
 Function Invoke-NgenTasks {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory = $true)]
         [ValidateSet('2.x', '4.x')]
@@ -616,6 +632,7 @@ Function Invoke-NgenTasks {
 
 Function Remove-DiskCleanupProfile {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [ValidateRange(0, 9999)]
         [int]$Number
@@ -679,6 +696,7 @@ Function Set-DiskCleanupProfile {
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'OptOut')]
+    [OutputType([Void])]
     Param(
         [ValidateRange(0, 9999)]
         [int]$Number,
@@ -738,6 +756,7 @@ Function Set-DiskCleanupProfile {
 
 Function Set-RegistryValue {
     [CmdletBinding(DefaultParameterSetName = 'KeyOnly')]
+    [OutputType([Void])]
     Param(
         [Parameter(ParameterSetName = 'KeyOnly', Mandatory = $true)]
         [Parameter(ParameterSetName = 'KeyValue', Mandatory = $true)]
@@ -772,6 +791,7 @@ Function Set-RegistryValue {
 
 Function Test-DotNetPresent {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     $ClrVersions = '2.0', '4.0'
@@ -793,6 +813,7 @@ Function Test-DotNetPresent {
 
 Function Test-IsAdministrator {
     [CmdletBinding()]
+    [OutputType([Boolean])]
     Param()
 
     $User = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
@@ -804,6 +825,7 @@ Function Test-IsAdministrator {
 
 Function Test-IsWindows64bit {
     [CmdletBinding()]
+    [OutputType([Boolean])]
     Param()
 
     $WmiCommand = 'Get-CimInstance'

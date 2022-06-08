@@ -42,6 +42,7 @@ if ($PWD.Path -eq "$env:SystemRoot\System32") {
 # - https://github.com/microsoft/terminal/pull/2816
 Function Repair-ConHostVT100Bug {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     # Windows Terminal has its own mitigation (since v0.5.2661.0)

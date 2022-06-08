@@ -5,6 +5,7 @@ Start-DotFilesSection -Type Functions -Name Development
 # Retrieve available type accelerators
 Function Get-TypeAccelerator {
     [CmdletBinding()]
+    [OutputType([Collections.Generic.Dictionary[String, Type]])]
     Param()
 
     [PSObject].Assembly.GetType('System.Management.Automation.TypeAccelerators')::get_Get()
@@ -13,6 +14,7 @@ Function Get-TypeAccelerator {
 # Retrieve the constructors for a given type
 Function Get-TypeConstructor {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [Type]$Type
@@ -39,6 +41,7 @@ Function Get-TypeConstructor {
 # Retrieve the methods for a given type
 Function Get-TypeMethod {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [Type]$Type
@@ -70,6 +73,7 @@ Function Get-TypeMethod {
 # Clear Docker cache
 Function Clear-DockerCache {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param()
 
     if (!(Get-Command -Name docker -ErrorAction Ignore)) {
@@ -95,6 +99,7 @@ Function Clear-DockerCache {
 # Invoke a Git command in all Git repositories
 Function Invoke-GitChildDir {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Command,
@@ -192,6 +197,8 @@ Function Invoke-GitChildDir {
 Function Invoke-GitLinter {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '')]
     [CmdletBinding()]
+    [OutputType([Void], 'Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.DiagnosticRecord[]', ParameterSetName = 'PSScriptAnalyzer')]
+    [OutputType([Void], [String[]], ParameterSetName = 'ShellCheck')]
     Param(
         [Parameter(ParameterSetName = 'PSScriptAnalyzer', Mandatory)]
         [Switch]$PSScriptAnalyzer,
@@ -301,6 +308,7 @@ Function Invoke-GitLinter {
 # Fast-forward all branches to match a branch
 Function Invoke-GitMergeAllBranches {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$SourceBranch
@@ -365,6 +373,7 @@ Function Invoke-GitMergeAllBranches {
 # Remove a subset of paths returned from git-clean
 Function Remove-GitCleanSubset {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void])]
     Param(
         [Parameter(ValueFromPipeline)]
         [String[]]$GitCleanDryRunOutput,

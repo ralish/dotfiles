@@ -16,6 +16,7 @@
 #>
 
 [CmdletBinding()]
+[OutputType([Void], [PSCustomObject[]])]
 Param(
     [Switch]$SkipGuidRefSearch
 )

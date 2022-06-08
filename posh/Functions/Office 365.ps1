@@ -17,6 +17,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.forma
 # Compare Cloud App Security policies
 Function Compare-MCASPolicy {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[][]])]
     Param(
         [Parameter(Mandatory)]
         [PSObject[]]$ReferenceObject,
@@ -97,6 +98,7 @@ Function Compare-MCASPolicy {
 # Export mailbox data for our email management spreadsheet
 Function Export-MailboxSpreadsheetData {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory)]
         [String]$Mailbox,
@@ -179,6 +181,7 @@ Function Export-MailboxSpreadsheetData {
 # Retrieve a summary of mailbox folders with associated rules
 Function Get-InboxRulesByFolders {
     [CmdletBinding()]
+    [OutputType([Void], [PSObject[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Mailbox,
@@ -247,6 +250,7 @@ Function Get-InboxRulesByFolders {
 # Retrieve a summary of sent & received totals for a mailbox
 Function Get-MailboxActivitySummary {
     [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     Param(
         [Parameter(Mandatory)]
         [String]$Mailbox,
@@ -307,6 +311,7 @@ Function Get-MailboxActivitySummary {
 # Retrieve a usage summary for an entity
 Function Get-Office365EntityUsageSummary {
     [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     Param(
         [Parameter(ParameterSetName = 'User', Mandatory)]
         [String]$UserPrincipalName,
@@ -531,6 +536,7 @@ Function Get-Office365EntityUsageSummary {
 # Retrieve a matrix of user licenses
 Function Get-Office365UserLicensingMatrix {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
     Param()
 
     Test-CommandAvailable -Name Get-MsolUser
@@ -566,6 +572,7 @@ Function Get-Office365UserLicensingMatrix {
 # Improved version of: https://github.com/OfficeDev/O365-InvestigationTooling/blob/master/DumpDelegatesandForwardingRules.ps1
 Function Get-Office365UserSecurityReport {
     [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     Param(
         [ValidateRange(1, 90)]
         [Int]$AccountInactiveDays = 30
@@ -698,6 +705,7 @@ Function Get-Office365UserSecurityReport {
 # Retrieve a report on unified groups with owner & member details
 Function Get-UnifiedGroupReport {
     [CmdletBinding()]
+    [OutputType([Void], [PSObject[]])]
     Param(
         [ValidateNotNullOrEmpty()]
         [PSObject[]]$Groups
@@ -747,6 +755,7 @@ Function Get-UnifiedGroupReport {
 # Compare Security & Compliance policies
 Function Compare-ProtectionAlert {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[][]])]
     Param(
         [Parameter(Mandatory)]
         [PSObject[]]$ReferenceObject,
@@ -802,6 +811,7 @@ Function Compare-ProtectionAlert {
 # Extract email addresses and names from Content Search results
 Function Import-ContentSearchResults {
     [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     Param(
         [Parameter(ParameterSetName = 'File', Mandatory)]
         [String[]]$CsvFile,
@@ -963,6 +973,7 @@ Function Import-ContentSearchResults {
 # Extract email addresses and names from a Content Search results entry
 Function Import-ContentSearchResultsEntry {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Field,
@@ -1060,6 +1071,7 @@ Function Import-ContentSearchResultsEntry {
 # Helper function to connect to all Office 365 services
 Function Connect-Office365Services {
     [CmdletBinding(DefaultParameterSetName = 'MFA')]
+    [OutputType([Void])]
     Param(
         [Parameter(ParameterSetName = 'MFA')]
         [ValidateNotNullOrEmpty()]
@@ -1100,6 +1112,7 @@ Function Connect-Office365Services {
 # Helper function to connect to Exchange Online
 Function Connect-ExchangeOnline {
     [CmdletBinding(DefaultParameterSetName = 'MFA')]
+    [OutputType([Void])]
     Param(
         [Parameter(ParameterSetName = 'MFA')]
         [ValidateNotNullOrEmpty()]
@@ -1160,6 +1173,7 @@ Function Connect-ExchangeOnline {
 # Helper function to connect to Centralized Deployment
 Function Connect-CentralizedDeployment {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
@@ -1179,6 +1193,7 @@ Function Connect-CentralizedDeployment {
 # Helper function to connect to Microsoft Teams
 Function Connect-MicrosoftTeams {
     [CmdletBinding()]
+    [OutputType('Microsoft.TeamsCmdlets.Powershell.Connect.Models.PSAzureContext')]
     Param(
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
@@ -1198,6 +1213,7 @@ Function Connect-MicrosoftTeams {
 # Helper function to connect to Security & Compliance Center
 Function Connect-SecurityAndComplianceCenter {
     [CmdletBinding(DefaultParameterSetName = 'MFA')]
+    [OutputType([Void])]
     Param(
         [Parameter(ParameterSetName = 'MFA')]
         [ValidateNotNullOrEmpty()]
@@ -1257,6 +1273,7 @@ Function Connect-SecurityAndComplianceCenter {
 # Helper function to connect to SharePoint Online
 Function Connect-SharePointOnline {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory)]
         [String]$TenantName,
@@ -1287,6 +1304,7 @@ Function Connect-SharePointOnline {
 # Helper function to import the weird Exchange Online v1 module
 Function Import-ExoPowershellModule {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     if (Get-Command -Name Connect-EXOPSSession -ErrorAction Ignore) {

@@ -9,6 +9,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Generic.format.p
 # Via: https://www.reddit.com/r/PowerShell/comments/5rhjsy/hex_to_byte_array_and_back/
 Function Convert-BytesToHex {
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [Byte[]]$Bytes
@@ -29,6 +30,7 @@ Function Convert-BytesToHex {
 # Via: https://www.reddit.com/r/PowerShell/comments/5rhjsy/hex_to_byte_array_and_back/
 Function Convert-HexToBytes {
     [CmdletBinding()]
+    [OutputType([Byte[]])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [String]$Hex
@@ -48,6 +50,7 @@ Function Convert-HexToBytes {
 # Convert a string from Base64 form
 Function ConvertFrom-Base64 {
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [String]$String
@@ -61,6 +64,7 @@ Function ConvertFrom-Base64 {
 # Convert a string from URL encoded form
 Function ConvertFrom-URLEncoded {
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [String]$String
@@ -74,6 +78,7 @@ Function ConvertFrom-URLEncoded {
 # Convert a string to Base64 form
 Function ConvertTo-Base64 {
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [String]$String
@@ -87,6 +92,7 @@ Function ConvertTo-Base64 {
 # Convert a text file to the given encoding
 Function ConvertTo-TextEncoding {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(ValueFromPipeline)]
         [String[]]$Path,
@@ -210,6 +216,7 @@ Function ConvertTo-TextEncoding {
 # Convert a string to URL encoded form
 Function ConvertTo-URLEncoded {
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [String]$String
@@ -223,6 +230,7 @@ Function ConvertTo-URLEncoded {
 # Determine the encoding of a text file
 Function Get-TextEncoding {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
     Param(
         [Parameter(ValueFromPipeline)]
         [String[]]$Path
@@ -341,6 +349,7 @@ Function Get-TextEncoding {
 # Create a file in each empty directory under a path
 Function Add-FileToEmptyDirectories {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String[]]$Path,
@@ -400,6 +409,7 @@ Function Add-FileToEmptyDirectories {
 # Summarize a directory by number of dirs/files and total size
 Function Get-DirectorySummary {
     [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     Param(
         [Parameter(ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
@@ -450,6 +460,7 @@ Function Get-DirectorySummary {
 # Add quotes to strings with spaces
 Function Add-QuotesToStringWithSpace {
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [String]$String,
@@ -476,6 +487,7 @@ Function Add-QuotesToStringWithSpace {
 # Format a number representing the size of some digital information
 Function Format-SizeDigital {
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [ValidateRange(0, [Double]::MaxValue)]
@@ -523,6 +535,7 @@ Function Format-SizeDigital {
 # Via: https://blogs.msdn.microsoft.com/sergey_babkins_blog/2016/12/31/how-to-pretty-print-xml-in-powershell-and-text-pipelines/
 Function Format-Xml {
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [AllowEmptyString()]
@@ -567,6 +580,7 @@ Function Format-Xml {
 Function Sort-XmlElement {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [Xml.XmlElement[]]$XmlElement,
@@ -629,6 +643,7 @@ Function Sort-XmlElement {
 
 Function Add-GroupObjectComputerProperty {
     [CmdletBinding()]
+    [OutputType([Void], [Microsoft.PowerShell.Commands.GroupInfo[]])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [AllowEmptyCollection()]
@@ -666,6 +681,7 @@ Function Add-GroupObjectComputerProperty {
 # Add an element to a Path type string
 Function Add-PathStringElement {
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [String]$Path,
@@ -743,6 +759,7 @@ Function Add-PathStringElement {
 # Remove an element from a Path type string
 Function Remove-PathStringElement {
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [String]$Path,
@@ -795,6 +812,7 @@ Function Remove-PathStringElement {
 # Remove excess separators from a Path type string
 Function Repair-PathString {
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [String]$String,

@@ -3,6 +3,7 @@
 #>
 
 [CmdletBinding()]
+[OutputType([Void])]
 Param()
 
 if (![Environment]::OSVersion.Version -eq 10) {

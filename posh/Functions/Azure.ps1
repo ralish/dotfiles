@@ -17,6 +17,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1
 # Retrieve an Azure AD authorization header
 Function Get-AzureAuthHeader {
     [CmdletBinding()]
+    [OutputType('Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult')]
     Param(
         [Parameter(Mandatory)]
         [Object]$AuthToken
@@ -52,6 +53,7 @@ Function Get-AzureAuthHeader {
 # https://docs.microsoft.com/en-au/archive/blogs/cloudlojik/connecting-to-microsoft-graph-with-a-native-app-using-powershell
 Function Get-AzureAuthToken {
     [CmdletBinding()]
+    [OutputType('Threading.Tasks.Task[Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult]')]
     Param(
         [Parameter(Mandatory)]
         [ValidateSet('AzureAdGraph', 'AzureClassic', 'AzureGallery', 'AzurePortal', 'AzureRm', 'MsGraph')]
@@ -135,6 +137,7 @@ Function Get-AzureAuthToken {
 # PowerShell by calling the undocumented Azure Portal API.
 Function Get-AzureEnterpriseApplications {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
     Param(
         [Parameter(Mandatory)]
         [Object]$AuthToken,
@@ -198,6 +201,7 @@ Function Get-AzureEnterpriseApplications {
 # Retrieve Azure AD users with disabled services
 Function Get-AzureUsersDisabledServices {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
     Param(
         [Switch]$ReturnAllUsers
     )
@@ -228,6 +232,7 @@ Function Get-AzureUsersDisabledServices {
 # Retrieve licensing summary for Azure AD users
 Function Get-AzureUsersLicensingSummary {
     [CmdletBinding()]
+    [OutputType('Microsoft.Online.Administration.User[]')]
     Param()
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
@@ -260,6 +265,7 @@ Function Get-AzureUsersLicensingSummary {
 # Helper function to connect to Azure Active Directory (AzureAD module)
 Function Connect-AzureAD {
     [CmdletBinding()]
+    [OutputType('Microsoft.Open.Azure.AD.CommonLibrary.PSAzureContext')]
     Param(
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
@@ -291,6 +297,7 @@ Function Connect-AzureAD {
 # Helper function to connect to Azure Resource Manager
 Function Connect-AzureRM {
     [CmdletBinding()]
+    [OutputType('Microsoft.Azure.Commands.Profile.Models.PSAzureProfile')]
     Param(
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
@@ -310,6 +317,7 @@ Function Connect-AzureRM {
 # Helper function to connect to Azure Active Directory (MSOnline module)
 Function Connect-MSOnline {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]

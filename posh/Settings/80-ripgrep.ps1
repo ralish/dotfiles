@@ -14,6 +14,7 @@ $env:RIPGREP_CONFIG_PATH = Join-Path -Path $HOME -ChildPath '.ripgreprc'
 
 Function Get-RipgrepCompletionPath {
     [CmdletBinding()]
+    [OutputType([Void], [IO.FileInfo])]
     Param()
 
     try {

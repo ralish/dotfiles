@@ -20,6 +20,7 @@ Function Set-AWSCredentialEnvironment {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUsePSCredentialType', '')]
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(ParameterSetName = 'AWSCredentials', Mandatory, ValueFromPipeline)]
         [Object]$Credential,
@@ -67,6 +68,7 @@ Function Set-AWSCredentialEnvironment {
 # Set the Name tag for a Route 53 hosted zone to the zone name
 Function Set-R53HostedZoneNameTag {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [Object[]]$HostedZone
@@ -100,6 +102,7 @@ Function Set-R53HostedZoneNameTag {
 # Set records on a Route 53 hosted zone for a parked domain
 Function Set-R53HostedZoneParkedRecords {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], 'Amazon.Route53.Model.ChangeInfo[]')]
     Param(
         [Parameter(Mandatory)]
         [String[]]$Domain,
@@ -335,6 +338,7 @@ Function Set-R53HostedZoneParkedRecords {
 # Set a tag on a Route 53 hosted zone
 Function Set-R53HostedZoneTag {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [Object[]]$HostedZone,
@@ -379,6 +383,7 @@ Function Set-R53HostedZoneTag {
 # Retrieve the size of each S3 bucket
 Function Get-S3BucketSize {
     [CmdletBinding()]
+    [OutputType([Void], 'Amazon.S3.Model.S3Bucket[]')]
     Param()
 
     try {

@@ -4,6 +4,7 @@ Start-DotFilesSection -Type Functions -Name Maintenance
 Function Clear-AllDevCaches {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
     [CmdletBinding(DefaultParameterSetName = 'OptOut', SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(ParameterSetName = 'OptOut')]
         [ValidateSet(
@@ -112,6 +113,7 @@ Function Clear-AllDevCaches {
 # Update everything!
 Function Update-AllTheThings {
     [CmdletBinding(DefaultParameterSetName = 'OptOut')]
+    [OutputType([PSCustomObject])]
     Param()
 
     DynamicParam {

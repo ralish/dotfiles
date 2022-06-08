@@ -12,6 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 # Update Modern Apps (Microsoft Store)
 Function Update-ModernApps {
     [CmdletBinding()]
+    [OutputType([Boolean])]
     Param()
 
     if (!(Test-IsAdministrator)) {
@@ -38,6 +39,7 @@ Function Update-ModernApps {
 # Update Microsoft Office (Click-to-Run only)
 Function Update-Office {
     [CmdletBinding()]
+    [OutputType([Void], [String])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
@@ -107,6 +109,7 @@ Function Update-Office {
 # Update Scoop & installed apps
 Function Update-Scoop {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
@@ -159,6 +162,7 @@ Function Update-Scoop {
 # https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
 Function Update-VisualStudio {
     [CmdletBinding()]
+    [OutputType([Boolean])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
@@ -281,6 +285,7 @@ Function Update-VisualStudio {
 # Update Microsoft Windows
 Function Update-Windows {
     [CmdletBinding()]
+    [OutputType([Boolean], [__ComObject[]])]
     Param(
         [Switch]$AcceptAll
     )

@@ -14,6 +14,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 # Disable presentation mode
 Function Disable-PresentationMode {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     & PresentationSettings.exe /stop
@@ -22,6 +23,7 @@ Function Disable-PresentationMode {
 # Enable presentation mode
 Function Enable-PresentationMode {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     & PresentationSettings.exe /start
@@ -34,6 +36,7 @@ Function Enable-PresentationMode {
 # Retrieve a persisted environment variable
 Function Get-EnvironmentVariable {
     [CmdletBinding()]
+    [OutputType([String], [Collections.Generic.List[PSCustomObject]])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Name,
@@ -64,6 +67,7 @@ Function Get-EnvironmentVariable {
 # Set a persisted environment variable
 Function Set-EnvironmentVariable {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory)]
         [String]$Name,
@@ -100,6 +104,7 @@ Function Set-EnvironmentVariable {
 
 # dmesg for Windows!
 Function dmesg {
+    [OutputType([Void], [Diagnostics.Eventing.Reader.EventLogRecord[]], [String[]])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$ComputerName
@@ -125,6 +130,7 @@ Function dmesg {
 # Find events by filtering against logs and providers
 Function Find-WinEvent {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
+    [OutputType([Void], [Diagnostics.Eventing.Reader.EventLogRecord[]], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String[]]$Filter,
@@ -381,6 +387,7 @@ Function Find-WinEvent {
 # Slightly improved from: https://stackoverflow.com/a/15262376/8787985
 Function Watch-EventLog {
     [CmdletBinding()]
+    [OutputType([Void], [Diagnostics.Eventing.Reader.EventLogRecord[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$LogName
@@ -404,6 +411,7 @@ Function Watch-EventLog {
 # Retrieve files with a minimum number of hard links
 Function Get-MultipleHardLinks {
     [CmdletBinding()]
+    [OutputType([Void], [IO.FileInfo[]])]
     Param(
         [Parameter(Mandatory)]
         [IO.DirectoryInfo]$Path,
@@ -426,6 +434,7 @@ Function Get-MultipleHardLinks {
 # Retrieve directories with non-inherited ACLs
 Function Get-NonInheritedACL {
     [CmdletBinding()]
+    [OutputType([Void], [IO.DirectoryInfo[]])]
     Param(
         [Parameter(Mandatory)]
         [IO.DirectoryInfo]$Path,
@@ -462,6 +471,9 @@ Function Get-NonInheritedACL {
 
 # Helper function to call MKLINK in cmd
 Function mklink {
+    [OutputType([String])]
+    Param()
+
     & $env:ComSpec /c mklink $args
 }
 
@@ -472,6 +484,7 @@ Function mklink {
 # Open the hosts file for editing
 Function Edit-Hosts {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     $StartProcessParams = @{
@@ -489,6 +502,7 @@ Function Edit-Hosts {
 # Restore connections to mapped network drives
 Function Restore-MappedNetworkDrives {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     $MappedDrives = Get-SmbMapping | Where-Object Status -EQ Unavailable
@@ -509,6 +523,8 @@ Function Restore-MappedNetworkDrives {
 # Search the registry
 Function Search-Registry {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
+    [OutputType([Void], [PSCustomObject[]], ParameterSetName = 'Default')]
+    [OutputType([Void], ParameterSetName = 'Recursion')]
     Param(
         [Parameter(Mandatory, ParameterSetName = 'Default')]
         [ValidateSet('HKCC', 'HKCR', 'HKCU', 'HKLM', 'HKPD', 'HKU')]
@@ -702,6 +718,9 @@ Function Search-Registry {
 # Convert security descriptors between different formats
 Function Convert-SecurityDescriptor {
     [CmdletBinding()]
+    [OutputType([Void], [String], [Management.ManagementBaseObject], ParameterSetName = 'Binary')]
+    [OutputType([Void], [Byte[]], [Management.ManagementBaseObject], ParameterSetName = 'SDDL')]
+    [OutputType([Void], [Byte[]], [String], ParameterSetName = 'WMI')]
     Param(
         [Parameter(ParameterSetName = 'Binary', Mandatory)]
         [Byte[]]$BinarySD,
@@ -756,6 +775,7 @@ Function Convert-SecurityDescriptor {
 Function Get-WellKnownSID {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
     [CmdletBinding()]
+    [OutputType([Security.Principal.SecurityIdentifier])]
     Param(
         [Parameter(ParameterSetName = 'NTAuthority', Mandatory)]
         [ValidateSet('Anonymous', 'Authenticated Users', 'Batch', 'Claims Valid', 'Cloud Account Authentication', 'Compound Identity Present', 'Dialup', 'Digest Authentication', 'Enterprise Domain Controllers', 'IIS User', 'Interactive', 'Local Service', 'Local System', 'Microsoft Account Authentication', 'Network Service', 'Network', 'NTLM Authentication', 'Other Organization', 'Principal Self', 'Proxy', 'Remote Interactive Logon', 'Restricted', 'SChannel Authentication', 'Service', 'Terminal Server Users', 'This Organization Certificate', 'This Organization', 'User-mode Drivers', 'Write Restricted')]
@@ -1049,6 +1069,7 @@ Function Get-WellKnownSID {
 # Test if the user has Administrator privileges
 Function Test-IsAdministrator {
     [CmdletBinding()]
+    [OutputType([Boolean])]
     Param()
 
     $User = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()

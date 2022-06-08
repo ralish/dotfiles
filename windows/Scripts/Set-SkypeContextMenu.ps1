@@ -5,6 +5,7 @@
 #Requires -RunAsAdministrator
 
 [CmdletBinding(SupportsShouldProcess)]
+[OutputType([Void])]
 Param(
     [ValidateSet('Enable', 'Disable')]
     [String]$Operation

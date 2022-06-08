@@ -5,6 +5,7 @@ Start-DotFilesSection -Type Functions -Name Environments
 # Clear NuGet cache
 Function Clear-NuGetCache {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param()
 
     if (!(Get-Command -Name nuget -ErrorAction Ignore)) {
@@ -55,6 +56,7 @@ Function Clear-NuGetCache {
 # Update .NET tools
 Function Update-DotNetTools {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
@@ -120,6 +122,7 @@ Function Update-DotNetTools {
 # Clear Go cache
 Function Clear-GoCache {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param()
 
     if (!(Get-Command -Name go -ErrorAction Ignore)) {
@@ -156,6 +159,7 @@ Function Clear-GoCache {
 # https://golang.org/cmd/go/#hdr-Environment_variables
 Function Switch-Go {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path = "$env:HOMEDRIVE\DevEnvs\Go",
@@ -226,6 +230,7 @@ Function Switch-Go {
 # Configure environment for Google (depot_tools) usage
 Function Switch-Google {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
+    [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path = ('{0}\Code\Google\depot_tools' -f $HOME),
@@ -298,6 +303,7 @@ Function Switch-Google {
 # Clear Gradle cache
 Function Clear-GradleCache {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void])]
     Param()
 
     if ($env:GRADLE_USER_HOME) {
@@ -316,6 +322,7 @@ Function Clear-GradleCache {
 # Clear Maven cache
 Function Clear-MavenCache {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void])]
     Param()
 
     if ($env:M2_HOME) {
@@ -334,6 +341,7 @@ Function Clear-MavenCache {
 # Configure environment for Java development
 Function Switch-Java {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path = "$env:HOMEDRIVE\DevEnvs\Java",
@@ -394,6 +402,7 @@ Function Switch-Java {
 # Clear npm cache
 Function Clear-NpmCache {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param()
 
     if (!(Get-Command -Name npm -ErrorAction Ignore)) {
@@ -419,6 +428,7 @@ Function Clear-NpmCache {
 # https://nodejs.org/api/cli.html#cli_environment_variables
 Function Switch-Nodejs {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path = "$env:HOMEDRIVE\DevEnvs\Nodejs",
@@ -465,6 +475,7 @@ Function Switch-Nodejs {
 # Update Node.js packages
 Function Update-NodejsPackages {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param()
 
     if (!(Get-Command -Name npm -ErrorAction Ignore)) {
@@ -495,6 +506,7 @@ Function Update-NodejsPackages {
 # https://perldoc.perl.org/perlrun.html#ENVIRONMENT
 Function Switch-Perl {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path = "$env:HOMEDRIVE\DevEnvs\Perl",
@@ -549,6 +561,7 @@ Function Switch-Perl {
 # Configure environment for PHP development
 Function Switch-PHP {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path = "$env:HOMEDRIVE\DevEnvs\PHP",
@@ -596,6 +609,7 @@ Function Switch-PHP {
 # Clear pip cache
 Function Clear-PipCache {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param()
 
     if (!(Get-Command -Name pip -ErrorAction Ignore)) {
@@ -642,6 +656,7 @@ Function Clear-PipCache {
 # https://docs.python.org/3/using/cmdline.html#environment-variables
 Function Switch-Python {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
+    [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path = "$env:HOMEDRIVE\DevEnvs\Python",
@@ -750,6 +765,7 @@ Function Switch-Python {
 # Update Python packages
 Function Update-PythonPackages {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param()
 
     if (!(Get-Command -Name pipdeptree -ErrorAction Ignore)) {
@@ -815,6 +831,7 @@ Function Update-PythonPackages {
 # Clear gem cache
 Function Clear-GemCache {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param()
 
     if (!(Get-Command -Name gem -ErrorAction Ignore)) {
@@ -849,6 +866,7 @@ Function Clear-GemCache {
 # Configure environment for Ruby development
 Function Switch-Ruby {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
+    [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path = "$env:HOMEDRIVE\DevEnvs\Ruby",
@@ -909,6 +927,7 @@ Function Switch-Ruby {
 # Update Ruby packages
 Function Update-RubyGems {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
     Param()
 
     if (!(Get-Command -Name gem -ErrorAction Ignore)) {

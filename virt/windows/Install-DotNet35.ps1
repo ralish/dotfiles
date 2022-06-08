@@ -4,6 +4,7 @@
 #>
 
 [CmdletBinding()]
+[OutputType([Void], [String[]])]
 Param(
     [ValidateNotNullOrEmpty()]
     [String]$SxsPath

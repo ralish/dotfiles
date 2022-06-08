@@ -3,6 +3,7 @@
 #>
 
 [CmdletBinding(SupportsShouldProcess)]
+[OutputType([Void])]
 Param()
 
 $RegPaths = @(

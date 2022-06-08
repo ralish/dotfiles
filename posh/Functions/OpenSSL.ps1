@@ -3,6 +3,7 @@ Start-DotFilesSection -Type Functions -Name OpenSSL
 # Convert a certificate in DER format to PEM format
 Function Convert-OpenSSLDerToPem {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory)]
         [String]$DerFile,
@@ -26,6 +27,7 @@ Function Convert-OpenSSLDerToPem {
 # Convert a certificate in PEM format to DER format
 Function Convert-OpenSSLPemToDer {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory)]
         [String]$PemFile,
@@ -49,6 +51,7 @@ Function Convert-OpenSSLPemToDer {
 # Convert a certificate in PEM format to PKCS #12 format
 Function Convert-OpenSSLPemToPkcs12 {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory)]
         [String]$PrivateKeyFile,
@@ -92,6 +95,7 @@ Function Convert-OpenSSLPemToPkcs12 {
 # Convert a certificate in PKCS #12 format to PEM format
 Function Convert-OpenSSLPkcs12ToPem {
     [CmdletBinding(DefaultParameterSetName = 'Both')]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory)]
         [String]$Pkcs12File,
@@ -135,6 +139,7 @@ Function Convert-OpenSSLPkcs12ToPem {
 # Retrieve the details of a certificate
 Function Get-OpenSSLCertificate {
     [CmdletBinding()]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Certificate,
@@ -164,6 +169,7 @@ Function Get-OpenSSLCertificate {
 # Retrieve the details of a certificate signing request
 Function Get-OpenSSLCsr {
     [CmdletBinding()]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Csr,
@@ -194,6 +200,7 @@ Function Get-OpenSSLCsr {
 # Retrieve the list of supported ECC curves
 Function Get-OpenSSLEccCurves {
     [CmdletBinding()]
+    [OutputType([Void], [String[]])]
     Param()
 
     $Params = @(
@@ -209,6 +216,7 @@ Function Get-OpenSSLEccCurves {
 # Retrieve the details of a PKCS #12 certificate
 Function Get-OpenSSLPkcs12 {
     [CmdletBinding()]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Pkcs12
@@ -228,6 +236,7 @@ Function Get-OpenSSLPkcs12 {
 # Retrieve the details of a private key
 Function Get-OpenSSLPrivateKey {
     [CmdletBinding()]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$PrivateKey
@@ -247,6 +256,7 @@ Function Get-OpenSSLPrivateKey {
 # Create a certificate signing request or self-signed certificate
 Function New-OpenSSLCertificate {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(ParameterSetName = 'Csr', Mandatory)]
         [Switch]$Csr,

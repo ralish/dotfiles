@@ -12,6 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 Function Initialize-DotFiles {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     $FinalPathAPI = @'

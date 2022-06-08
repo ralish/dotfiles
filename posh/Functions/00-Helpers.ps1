@@ -4,6 +4,7 @@
 Function Complete-DotFilesSection {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     if ($Global:DotFilesShowTimings) {
@@ -18,6 +19,7 @@ Function Complete-DotFilesSection {
 Function Get-DotFilesMessage {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory)]
         [String]$Message,
@@ -44,6 +46,7 @@ Function Get-DotFilesMessage {
 Function Get-DotFilesTiming {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
+    [OutputType([Void], [String])]
     Param(
         [Parameter(Mandatory)]
         [DateTime]$StartTime
@@ -60,6 +63,7 @@ Function Get-DotFilesTiming {
 # Remove dotfiles helper functions
 Function Remove-DotFilesHelpers {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     $Helpers = @(
@@ -79,6 +83,7 @@ Function Remove-DotFilesHelpers {
 Function Start-DotFilesSection {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
+    [OutputType([Void], [Boolean])]
     Param(
         [Parameter(Mandatory)]
         [String]$Type,
@@ -182,6 +187,7 @@ Function Start-DotFilesSection {
 # Confirm a PowerShell command is available
 Function Test-CommandAvailable {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory)]
         [String[]]$Name
@@ -198,6 +204,7 @@ Function Test-CommandAvailable {
 # Check environment matches expectations
 Function Test-EnvironmentMatch {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory)]
         [Hashtable]$Environment
@@ -240,6 +247,7 @@ Function Test-EnvironmentMatch {
 # Naive check for if we're running on Windows
 Function Test-IsWindows {
     [CmdletBinding()]
+    [OutputType([Boolean])]
     Param()
 
     if ($PSVersionTable.PSEdition -eq 'Desktop' -or $PSVersionTable.Platform -eq 'Win32NT') {
@@ -252,6 +260,7 @@ Function Test-IsWindows {
 Function Test-ModuleAvailable {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
+    [OutputType([Void], [PSModuleInfo[]])]
     Param(
         [Parameter(Mandatory)]
         [String[]]$Name,

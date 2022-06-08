@@ -6,6 +6,7 @@ Start-DotFilesSection -Type Functions -Name PowerShell
 # Via: https://gist.github.com/indented-automation/26c637fb530c4b168e62c72582534f5b
 Function Get-ArgumentCompleter {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
     Param(
         [Switch]$Native
     )
@@ -44,6 +45,7 @@ Function Get-ArgumentCompleter {
 # Update PowerShell modules & built-in help
 Function Update-PowerShell {
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void])]
     Param(
         [String[]]$PsGetV3Blacklist = @('ExchangeOnlineManagement', 'PnP.PowerShell'),
 
@@ -58,6 +60,7 @@ Function Update-PowerShell {
 
     Function Import-PsGetV2SxS {
         [CmdletBinding()]
+        [OutputType([Boolean])]
         Param()
 
         if ($Script:PsGetV2) {
@@ -271,6 +274,7 @@ Function Update-PowerShell {
 # Compare two hashtables
 Function Compare-Hashtable {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
     Param(
         [Parameter(Mandatory)]
         [Hashtable]$Reference,
@@ -335,6 +339,7 @@ Function Compare-Hashtable {
 # Via: https://blogs.technet.microsoft.com/janesays/2017/04/25/compare-all-properties-of-two-objects-in-windows-powershell/
 Function Compare-ObjectProperties {
     [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
     Param(
         [Parameter(Mandatory)]
         [PSObject]$ReferenceObject,
@@ -377,6 +382,7 @@ Function Compare-ObjectProperties {
 # Compare the properties of multiple objects against a baseline
 Function Compare-ObjectPropertiesMatrix {
     [CmdletBinding()]
+    [OutputType([Void], [Object[]])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [AllowEmptyCollection()]
@@ -457,6 +463,7 @@ Function Compare-ObjectPropertiesMatrix {
 # Reload selected PowerShell profiles
 Function Update-Profile {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [Switch]$AllUsersAllHosts,
         [Switch]$AllUsersCurrentHost,
@@ -490,6 +497,7 @@ Function Update-Profile {
 # Disable TLS certificate validation
 Function Disable-TlsCertificateValidation {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
@@ -524,6 +532,7 @@ namespace DotFiles {
 # Invoke Format-List selecting all properties
 Function fla {
     [CmdletBinding()]
+    [OutputType($null)]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [PSObject]$InputObject,
@@ -548,6 +557,7 @@ Function fla {
 # Invoke Format-Table selecting all properties
 Function fta {
     [CmdletBinding()]
+    [OutputType($null)]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [PSObject]$InputObject,
@@ -572,6 +582,7 @@ Function fta {
 # Invoke Get-Help with -Detailed
 Function ghd {
     [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     Param(
         [Parameter(Mandatory)]
         [String]$Name
@@ -583,6 +594,7 @@ Function ghd {
 # Invoke Get-Help with -Examples
 Function ghe {
     [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     Param(
         [Parameter(Mandatory)]
         [String]$Name
@@ -594,6 +606,7 @@ Function ghe {
 # Invoke Get-Help with -Full
 Function ghf {
     [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     Param(
         [Parameter(Mandatory)]
         [String]$Name

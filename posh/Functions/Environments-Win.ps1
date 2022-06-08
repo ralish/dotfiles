@@ -17,6 +17,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 # https://cygwin.com/cygwin-ug-net/setup-env.html
 Function Switch-Cygwin {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path = "$env:HOMEDRIVE\DevEnvs\Cygwin",
@@ -99,6 +100,7 @@ Function Switch-Cygwin {
 # Configure environment for Windows SDK tools
 Function Switch-WindowsSDK {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Path,

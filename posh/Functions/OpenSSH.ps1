@@ -3,6 +3,7 @@ Start-DotFilesSection -Type Functions -Name OpenSSH
 # Update OpenSSH configuration
 Function Update-OpenSSHConfig {
     [CmdletBinding()]
+    [OutputType([Void])]
     Param()
 
     if (!(Get-Command -Name ssh -ErrorAction Ignore)) {

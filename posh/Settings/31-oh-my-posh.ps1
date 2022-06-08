@@ -14,6 +14,7 @@ $OmpThemeName = 'slim'
 
 Function Get-OhMyPoshConfig {
     [CmdletBinding()]
+    [OutputType([String])]
     Param()
 
     if (!$env:POSH_THEMES_PATH) {
