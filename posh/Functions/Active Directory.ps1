@@ -234,13 +234,16 @@ Function Add-ADShadowPrincipalMember {
         [Int]$Duration,
 
         [ValidateNotNullOrEmpty()]
-        [String]$Server
+        [String]$Server,
+
+        [Switch]$PassThru
     )
 
     Test-ModuleAvailable -Name ActiveDirectory
 
     $CommonParams = @{
         ErrorAction = 'Stop'
+        PassThru    = $PassThru
     }
 
     if ($Server) {
