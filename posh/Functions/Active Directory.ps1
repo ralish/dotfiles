@@ -324,13 +324,16 @@ Function New-ADShadowPrincipal {
         [Security.Principal.SecurityIdentifier]$Sid,
 
         [ValidateNotNullOrEmpty()]
-        [String]$Server
+        [String]$Server,
+
+        [Switch]$PassThru
     )
 
     Test-ModuleAvailable -Name ActiveDirectory
 
     $CommonParams = @{
         ErrorAction = 'Stop'
+        PassThru    = $PassThru
     }
 
     if ($Server) {
