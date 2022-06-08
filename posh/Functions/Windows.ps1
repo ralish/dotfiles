@@ -383,15 +383,15 @@ Function Watch-EventLog {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory)]
-        [String]$EventLog
+        [String]$LogName
     )
 
-    $IndexOld = (Get-EventLog -LogName $EventLog -Newest 1).Index
+    $IndexOld = (Get-WinEvent -LogName $LogName -MaxEvents 1).RecordId
     do {
         Start-Sleep -Seconds 1
-        $IndexNew = (Get-EventLog -LogName $EventLog -Newest 1).Index
+        $IndexNew = (Get-WinEvent -LogName $LogName -MaxEvents 1).RecordId
         if ($IndexNew -ne $IndexOld) {
-            Get-EventLog -LogName $EventLog -Newest ($IndexNew - $IndexOld) | Sort-Object -Property Index
+            Get-WinEvent -LogName $LogName -MaxEvents ($IndexNew - $IndexOld) | Sort-Object -Property RecordId
             $IndexOld = $IndexNew
         }
     } while ($true)
