@@ -108,8 +108,6 @@ Function Update-Office {
 Function Update-Scoop {
     [CmdletBinding()]
     Param(
-        [Switch]$CaptureOutput,
-
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
@@ -128,42 +126,31 @@ Function Update-Scoop {
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
-    [String[]]$UpdateArgs = 'update', '--quiet'
+    $Result = [PSCustomObject]@{
+        UpdateScoop = $null
+        UpdateApps  = $null
+        CleanupApps = $null
+    }
+
+    [String[]]$UpdateScoopArgs = 'update', '--quiet'
     [String[]]$UpdateAppsArgs = 'update', '*', '--quiet'
-    [String[]]$CleanupArgs = 'cleanup', '-k', '*'
+    [String[]]$CleanupAppsArgs = 'cleanup', '-k', '*'
 
     Write-Progress @WriteProgressParams -Status 'Updating module & repository' -PercentComplete 1
-    Write-Verbose -Message ('Updating Scoop: scoop {0}' -f ($UpdateArgs -join ' '))
-    if ($CaptureOutput) {
-        $ScoopOutput = & scoop @UpdateArgs 6>&1
-    } else {
-        & scoop @UpdateArgs
-        Write-Host
-    }
+    Write-Verbose -Message ('Updating Scoop: scoop {0}' -f ($UpdateScoopArgs -join ' '))
+    $Result.UpdateScoop = & scoop @UpdateScoopArgs 6>&1
 
     Write-Progress @WriteProgressParams -Status 'Updating apps' -PercentComplete 20
     Write-Verbose -Message ('Updating Scoop apps: scoop {0}' -f ($UpdateAppsArgs -join ' '))
-    if ($CaptureOutput) {
-        $ScoopOutput += & scoop @UpdateAppsArgs 6>&1
-    } else {
-        & scoop @UpdateAppsArgs
-        Write-Host
-    }
+    $Result.UpdateApps = & scoop @UpdateAppsArgs 6>&1
 
     Write-Progress @WriteProgressParams -Status 'Uninstalling obsolete apps' -PercentComplete 80
-    Write-Verbose -Message ('Uninstalling obsolete Scoop apps: scoop {0}' -f ($CleanupArgs -join ' '))
-    if ($CaptureOutput) {
-        $ScoopOutput += & scoop @CleanupArgs 6>&1
-    } else {
-        & scoop @CleanupArgs
-        Write-Host
-    }
+    Write-Verbose -Message ('Uninstalling obsolete Scoop apps: scoop {0}' -f ($CleanupAppsArgs -join ' '))
+    $Result.CleanupApps = & scoop @CleanupAppsArgs 6>&1
 
     Write-Progress @WriteProgressParams -Completed
 
-    if ($CaptureOutput) {
-        return $ScoopOutput
-    }
+    return $Result
 }
 
 # Update Microsoft Visual Studio
