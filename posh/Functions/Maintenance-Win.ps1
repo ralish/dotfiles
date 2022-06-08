@@ -171,7 +171,7 @@ Function Update-VisualStudio {
     $VsInstallerExe = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
     if (!(Test-Path -LiteralPath $VsInstallerExe -PathType Leaf)) {
         Write-Error -Message 'Unable to update Visual Studio as VSInstaller not found.'
-        return
+        return $false
     }
 
     Test-ModuleAvailable -Name VSSetup
@@ -179,7 +179,7 @@ Function Update-VisualStudio {
     $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property InstallationVersion)
     if ($VsSetupInstances.Count -eq 0) {
         Write-Error -Message 'Get-VSSetupInstance returned no instances.'
-        return
+        return $false
     }
 
     $WriteProgressParams = @{
