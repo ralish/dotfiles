@@ -392,7 +392,7 @@ Function Add-FileToEmptyDirectories {
         }
 
         foreach ($FilePath in $FilesToCreate) {
-            $null = New-Item -Path $FilePath -ItemType File -Verbose
+            $null = New-Item -Path $FilePath -ItemType File
         }
     }
 }

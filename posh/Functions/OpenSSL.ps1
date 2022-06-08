@@ -215,7 +215,7 @@ Function Get-OpenSSLPkcs12 {
     )
 
     $Params = @(
-        'rsa',
+        'pkcs12',
         '-in', $Pkcs12,
         '-info'
     )

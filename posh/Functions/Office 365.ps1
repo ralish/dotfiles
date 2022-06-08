@@ -240,9 +240,8 @@ Function Get-InboxRulesByFolders {
 
     if ($ReturnUnlinkedRules) {
         return $UnlinkedRules
-    } else {
-        return $Folders
     }
+    return $Folders
 }
 
 # Retrieve a summary of sent & received totals for a mailbox
@@ -279,7 +278,7 @@ Function Get-MailboxActivitySummary {
     }
 
     Write-Progress @WriteProgressParams -Status 'Retrieving mailbox details' -PercentComplete 1
-    $ExoMailbox = Get-Mailbox -Identity $Mailbox
+    $ExoMailbox = Get-Mailbox -Identity $Mailbox -ErrorAction Stop
     $Addresses = $ExoMailbox.EmailAddresses | Where-Object { $_ -match '^smtp:' } | ForEach-Object { $_.Substring(5) }
 
     Write-Progress @WriteProgressParams -Status 'Retrieving mailbox send logs' -PercentComplete 33
@@ -1089,11 +1088,11 @@ Function Connect-Office365Services {
 
     if ($PSCmdlet.ParameterSetName -eq 'MFA') {
         Connect-SharePointOnline -TenantName $TenantName
-        Connect-MicrosoftTeams
+        $null = Connect-MicrosoftTeams
         Connect-CentralizedDeployment
     } else {
         Connect-SharePointOnline @DefaultParams -TenantName $TenantName
-        Connect-MicrosoftTeams @DefaultParams
+        $null = Connect-MicrosoftTeams @DefaultParams
         Connect-CentralizedDeployment @DefaultParams
     }
 }

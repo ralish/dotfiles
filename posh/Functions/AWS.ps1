@@ -389,11 +389,19 @@ Function Get-S3BucketSize {
     $Module | Import-Module -ErrorAction Stop -Verbose:$false
 
     try {
-        Write-Verbose -Message 'Retrieving enabled regions ...'
-        $Regions = Get-EC2Region -ErrorAction Stop -Verbose:$false
-
         Write-Verbose -Message 'Retrieving S3 buckets ...'
         $Buckets = Get-S3Bucket -ErrorAction Stop -Verbose:$false
+    } catch {
+        throw $_
+    }
+
+    if (!$Buckets) {
+        return
+    }
+
+    try {
+        Write-Verbose -Message 'Retrieving enabled regions ...'
+        $Regions = Get-EC2Region -ErrorAction Stop -Verbose:$false
     } catch {
         throw $_
     }

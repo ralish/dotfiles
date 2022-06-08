@@ -403,7 +403,7 @@ Function Compare-ObjectPropertiesMatrix {
     Process {
         foreach ($Object in $Objects) {
             if ($Object -is [Array]) {
-                Write-Warning -Message ('Skipping nested array.')
+                Write-Warning -Message 'Skipping nested array.'
                 continue
             }
 

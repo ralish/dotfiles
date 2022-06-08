@@ -319,7 +319,7 @@ Function Test-ModuleAvailable {
         }
     }
 
-    if ($PassThru -and $ModuleInfo.Count -gt 0) {
+    if ($PassThru) {
         return $ModuleInfo.ToArray()
     }
 }
