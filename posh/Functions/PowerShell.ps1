@@ -396,6 +396,8 @@ Function Compare-ObjectPropertiesMatrix {
         if (!$ReferenceObject) {
             $DiscoverReferenceObject = $true
         }
+
+        $NumProcessed = 0
     }
 
     Process {
@@ -412,22 +414,34 @@ Function Compare-ObjectPropertiesMatrix {
             }
 
             $Comparison = Compare-ObjectProperties -ReferenceObject $ReferenceObject -DifferenceObject $Object
+            $NumProcessed++
+
+            if (!$Comparison) {
+                continue
+            }
+
             foreach ($PropertyName in $Comparison.PropertyName) {
                 if ($DifferentProperties -notcontains $PropertyName) {
                     $DifferentProperties.Add($PropertyName)
                 }
             }
+
             $ComparedObjects.Add($Object)
         }
     }
 
     End {
-        if ($ComparedObjects.Count -eq 0) {
+        if (!$ReferenceObject) {
+            throw 'No reference object to compare against.'
+        }
+
+        if ($NumProcessed -eq 0) {
             throw 'No objects provided to compare against.'
         }
 
-        if (!$ReferenceObject -and !$ComparedObjects.Count -ge 2) {
-            throw 'Objects collection must have at least two items.'
+        if ($ComparedObjects.Count -eq 0) {
+            Write-Warning -Message 'Found no differences among objects.'
+            return
         }
 
         $FilteredProperties = @($DifferentProperties | Sort-Object -Unique | Where-Object { $_ -notin $IgnoredProperties })
