@@ -459,8 +459,6 @@ Function Add-QuotesToStringWithSpace {
     )
 
     Begin {
-        $Array = [Collections.Generic.List[String]]::new()
-
         switch ($Type) {
             'Single' { $Quote = "'" }
             'Double' { $Quote = '"' }
@@ -469,14 +467,9 @@ Function Add-QuotesToStringWithSpace {
 
     Process {
         if ($String.Contains(' ')) {
-            $Array.Add(('{0}{1}{0}' -f $Quote, $String))
-        } else {
-            $Array.Add($String)
+            return '{0}{1}{0}' -f $Quote, $String
         }
-    }
-
-    End {
-        return $Array.ToArray()
+        return $String
     }
 }
 
