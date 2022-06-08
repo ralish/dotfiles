@@ -6,8 +6,7 @@ Function Update-OpenSSHConfig {
     Param()
 
     if (!(Get-Command -Name ssh -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to locate ssh executable.'
-        return
+        throw 'Unable to locate ssh executable.'
     }
 
     # OpenSSH outputs its version string on stderr. When redirecting stderr to

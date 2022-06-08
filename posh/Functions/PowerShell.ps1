@@ -101,16 +101,14 @@ Function Update-PowerShell {
     } elseif ($PowerShellGet.Version.Major -ge 3) {
         $Script:PsGetV3 = $true
     } else {
-        Write-Error -Message ('PowerShellGet must be at least v2 but found: {0}' -f $PowerShellGet.Version)
-        return
+        throw 'PowerShellGet must be at least v2 but found: {0}' -f $PowerShellGet.Version
     }
     Write-Verbose -Message ('Using PowerShellGet v{0}' -f $PowerShellGet.Version)
 
     # Not all platforms have DSC support as part of PowerShell itself
     $DscSupported = Get-Command -Name Get-DscResource -ErrorAction Ignore
     if ($IncludeDscModules -and !$DscSupported) {
-        Write-Error -Message 'Unable to enumerate DSC modules as Get-DscResource command not available.'
-        return
+        throw 'Unable to enumerate DSC modules as Get-DscResource command not available.'
     }
 
     $WriteProgressParams = @{

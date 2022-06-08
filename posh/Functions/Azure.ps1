@@ -71,8 +71,7 @@ Function Get-AzureAuthToken {
     )
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'This function calls assemblies incompatible with PowerShell Core.'
-        return
+        throw 'This function calls assemblies incompatible with PowerShell Core.'
     }
 
     try {
@@ -204,8 +203,7 @@ Function Get-AzureUsersDisabledServices {
     )
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'MSOnline module is incompatible with PowerShell Core.'
-        return
+        throw 'MSOnline module is incompatible with PowerShell Core.'
     }
 
     Test-ModuleAvailable -Name MSOnline
@@ -233,8 +231,7 @@ Function Get-AzureUsersLicensingSummary {
     Param()
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'MSOnline module is incompatible with PowerShell Core.'
-        return
+        throw 'MSOnline module is incompatible with PowerShell Core.'
     }
 
     Test-ModuleAvailable -Name MSOnline
@@ -270,8 +267,7 @@ Function Connect-AzureAD {
     )
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'AzureAD module is incompatible with PowerShell Core.'
-        return
+        throw 'AzureAD module is incompatible with PowerShell Core.'
     }
 
     # Both modules may be present but the AzureAD module is newer. Often this
@@ -302,8 +298,7 @@ Function Connect-AzureRM {
     )
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'AzureRM module is incompatible with PowerShell Core.'
-        return
+        throw 'AzureRM module is incompatible with PowerShell Core.'
     }
 
     Test-ModuleAvailable -Name AzureRM
@@ -322,8 +317,7 @@ Function Connect-MSOnline {
     )
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'MSOnline module is incompatible with PowerShell Core.'
-        return
+        throw 'MSOnline module is incompatible with PowerShell Core.'
     }
 
     Test-ModuleAvailable -Name MSOnline

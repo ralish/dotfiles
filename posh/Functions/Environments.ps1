@@ -39,8 +39,7 @@ Function Clear-NuGetCache {
         }
 
         if (!$CacheFound) {
-            Write-Error -Message ('Unable to determine NuGet {0} location.' -f $KnownCaches[$Cache])
-            return
+            throw 'Unable to determine NuGet {0} location.' -f $KnownCaches[$Cache]
         }
     }
 
@@ -624,13 +623,11 @@ Function Clear-PipCache {
     }
 
     if (!$PipCacheIndex) {
-        Write-Error -Message 'Unable to determine pip package index page cache location.'
-        return
+        throw 'Unable to determine pip package index page cache location.'
     }
 
     if (!$PipCacheWheels) {
-        Write-Error -Message 'Unable to determine pip wheels cache location.'
-        return
+        throw 'Unable to determine pip wheels cache location.'
     }
 
     if ($PSCmdlet.ShouldProcess(('{0}, {1}' -f $PipCacheIndex, $PipCacheWheels), 'Clear')) {
@@ -840,8 +837,7 @@ Function Clear-GemCache {
     }
 
     if (!$GemSpecCache) {
-        Write-Error -Message 'Unable to determine gem spec cache directory.'
-        return
+        throw 'Unable to determine gem spec cache directory.'
     }
 
     if ($PSCmdlet.ShouldProcess($GemSpecCache, 'Clear')) {

@@ -214,8 +214,7 @@ Function Invoke-GitLinter {
     switch ($PSCmdlet.ParameterSetName) {
         'PSScriptAnalyzer' {
             if (!(Get-Command -Name Invoke-ScriptAnalyzer)) {
-                Write-Error -Message 'Required command is unavailable: Invoke-ScriptAnalyzer'
-                return
+                throw 'Required command is unavailable: Invoke-ScriptAnalyzer'
             }
 
             $ScriptAnalyzerParams = @{
@@ -263,14 +262,12 @@ Function Invoke-GitLinter {
 
         'ShellCheck' {
             if (!(Get-Command -Name shellcheck)) {
-                Write-Error -Message 'Required command is unavailable: shellcheck'
-                return
+                throw 'Required command is unavailable: shellcheck'
             }
 
             if ($ShebangSearch -or $ShellDirectiveSearch) {
                 if (!(Get-Command -Name rg)) {
-                    Write-Error -Message 'Required command is unavailable: rg'
-                    return
+                    throw 'Required command is unavailable: rg'
                 }
             }
 
@@ -321,8 +318,7 @@ Function Invoke-GitMergeAllBranches {
             if ($LASTEXITCODE -eq 0) {
                 $SourceBranch = 'master'
             } else {
-                Write-Error -Message 'Unable to guess source branch to merge.'
-                return
+                throw 'Unable to guess source branch to merge.'
             }
         }
         Write-Verbose -Message ('Using guessed source branch: {0}' -f $SourceBranch)
@@ -337,8 +333,7 @@ Function Invoke-GitMergeAllBranches {
     }
 
     if ($SourceBranch -notin $Branches) {
-        Write-Error -Message ('Source branch for merge not checked out: {0}' -f $SourceBranch)
-        return
+        throw 'Source branch for merge not checked out: {0}' -f $SourceBranch
     }
 
     if ($SourceBranch -ne $CurrentBranch) {

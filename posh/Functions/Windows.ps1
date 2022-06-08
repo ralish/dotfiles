@@ -274,8 +274,7 @@ Function Find-WinEvent {
     }
 
     if ($EventLogs.Count -eq 0) {
-        Write-Error -Message 'No event logs or providers matched the filter.'
-        return
+        throw 'No event logs or providers matched the filter.'
     }
 
     $WriteProgressParams = @{
@@ -498,7 +497,7 @@ Function Restore-MappedNetworkDrives {
         try {
             $null = New-SmbMapping -LocalPath $MappedDrive.LocalPath -RemotePath $MappedDrive.RemotePath -Persistent $true
         } catch {
-            Write-Error -Message ('Failed to restore mapped network drive: {0}' -f $MappedDrive.LocalPath)
+            throw 'Failed to restore mapped network drive: {0}' -f $MappedDrive.LocalPath
         }
     }
 }

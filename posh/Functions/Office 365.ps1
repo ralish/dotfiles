@@ -1121,15 +1121,13 @@ Function Connect-ExchangeOnline {
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
         if ($ExoModuleVersion -eq 1) {
-            Write-Error -Message 'ExchangeOnlineManagement v1 module is incompatible with PowerShell Core.'
-            return
+            throw 'ExchangeOnlineManagement v1 module is incompatible with PowerShell Core.'
         }
 
         $ExoModuleMinVersion = [Version]::new(2, 0, 4)
         $ExoModuleCurrentVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable -Verbose:$false | Select-Object -First 1 -ExpandProperty Version
         if ($ExoModuleCurrentVersion -lt $ExoModuleMinVersion) {
-            Write-Error -Message ('ExchangeOnlineManagement under PowerShell Core requires v{0} or newer.' -f $ExoModuleMinVersion)
-            return
+            throw 'ExchangeOnlineManagement under PowerShell Core requires v{0} or newer.' -f $ExoModuleMinVersion
         }
     }
 
@@ -1169,8 +1167,7 @@ Function Connect-CentralizedDeployment {
     )
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'O365CentralizedAddInDeployment module is incompatible with PowerShell Core.'
-        return
+        throw 'O365CentralizedAddInDeployment module is incompatible with PowerShell Core.'
     }
 
     Test-ModuleAvailable -Name O365CentralizedAddInDeployment
@@ -1189,8 +1186,7 @@ Function Connect-MicrosoftTeams {
     )
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'MicrosoftTeams module is incompatible with PowerShell Core.'
-        return
+        throw 'MicrosoftTeams module is incompatible with PowerShell Core.'
     }
 
     Test-ModuleAvailable -Name MicrosoftTeams
@@ -1218,8 +1214,7 @@ Function Connect-SecurityAndComplianceCenter {
         $ExoModuleVersion = 2
     } catch {
         if ($PSCmdlet.ParameterSetName -eq 'MFA') {
-            Write-Error -Message 'ExchangeOnlineManagement v2 module is required to connect using MFA.'
-            return
+            throw 'ExchangeOnlineManagement v2 module is required to connect using MFA.'
         }
 
         Write-Warning -Message 'ExchangeOnlineManagement v2 module is not available. Falling back to v1 ...'
@@ -1228,15 +1223,13 @@ Function Connect-SecurityAndComplianceCenter {
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
         if ($ExoModuleVersion -eq 1) {
-            Write-Error -Message 'ExchangeOnlineManagement v1 module is incompatible with PowerShell Core.'
-            return
+            throw 'ExchangeOnlineManagement v1 module is incompatible with PowerShell Core.'
         }
 
         $ExoModuleMinVersion = [Version]::new(2, 0, 4)
         $ExoModuleCurrentVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable -Verbose:$false | Select-Object -First 1 -ExpandProperty Version
         if ($ExoModuleCurrentVersion -lt $ExoModuleMinVersion) {
-            Write-Error -Message ('ExchangeOnlineManagement under PowerShell Core requires v{0} or newer.' -f $ExoModuleMinVersion)
-            return
+            throw 'ExchangeOnlineManagement under PowerShell Core requires v{0} or newer.' -f $ExoModuleMinVersion
         }
     }
 
@@ -1274,8 +1267,7 @@ Function Connect-SharePointOnline {
     )
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Error -Message 'Microsoft.Online.SharePoint.PowerShell module is incompatible with PowerShell Core.'
-        return
+        throw 'Microsoft.Online.SharePoint.PowerShell module is incompatible with PowerShell Core.'
     }
 
     Test-ModuleAvailable -Name Microsoft.Online.SharePoint.PowerShell
