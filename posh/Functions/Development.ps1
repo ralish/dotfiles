@@ -329,6 +329,7 @@ Function Invoke-GitMergeAllBranches {
                 throw 'Unable to guess source branch to merge.'
             }
         }
+
         Write-Verbose -Message ('Using guessed source branch: {0}' -f $SourceBranch)
     }
 

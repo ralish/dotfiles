@@ -11,7 +11,7 @@ Param(
     [String]$Operation,
 
     [ValidateNotNullOrEmpty()]
-    [String[]]$Extensions = @('3mf', 'bmp', 'fbx', 'gif', 'glb', 'jfif', 'jpe', 'jpeg', 'jpg', 'obj', 'ply', 'png', 'stl' , 'tif', 'tiff')
+    [String[]]$Extensions = @('3mf', 'bmp', 'fbx', 'gif', 'glb', 'jfif', 'jpe', 'jpeg', 'jpg', 'obj', 'ply', 'png', 'stl', 'tif', 'tiff')
 )
 
 if (![Environment]::OSVersion.Version -eq 10) {

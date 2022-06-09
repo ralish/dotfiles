@@ -820,6 +820,7 @@ Function Test-IsAdministrator {
     if ($User.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         return $true
     }
+
     return $false
 }
 
@@ -836,6 +837,7 @@ Function Test-IsWindows64bit {
     if ((& $WmiCommand -Class Win32_OperatingSystem -Verbose:$false).OSArchitecture -eq '64-bit') {
         return $true
     }
+
     return $false
 }
 

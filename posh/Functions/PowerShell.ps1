@@ -106,6 +106,7 @@ Function Update-PowerShell {
     } else {
         throw 'PowerShellGet must be at least v2 but found: {0}' -f $PowerShellGet.Version
     }
+
     Write-Verbose -Message ('Using PowerShellGet v{0}' -f $PowerShellGet.Version)
 
     # Not all platforms have DSC support as part of PowerShell itself

@@ -264,6 +264,7 @@ Function Add-ADShadowPrincipalMember {
 
     foreach ($Member in $Members) {
         $User = Get-ADUser @CommonParams -Filter { CN -eq $Member }
+
         if (!$User) {
             Write-Error -Message ('No AD user found for filter on CN: {0}' -f $Member)
             continue

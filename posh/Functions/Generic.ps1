@@ -129,6 +129,7 @@ Function ConvertTo-TextEncoding {
                 $EncoderParams += $false
             }
         }
+
         if ($Encoding -match '^UTF-') {
             $EncoderParams += $ByteOrderMark
         }
@@ -144,6 +145,7 @@ Function ConvertTo-TextEncoding {
                     $SourceEncoderParams += $false
                 }
             }
+
             if ($SourceEncoding -match '^UTF-') {
                 $SourceEncoderParams += $SourceByteOrderMark
             }
@@ -480,6 +482,7 @@ Function Add-QuotesToStringWithSpace {
         if ($String.Contains(' ')) {
             return '{0}{1}{0}' -f $Quote, $String
         }
+
         return $String
     }
 }

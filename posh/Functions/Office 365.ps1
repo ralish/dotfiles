@@ -244,6 +244,7 @@ Function Get-InboxRulesByFolders {
     if ($ReturnUnlinkedRules) {
         return $UnlinkedRules
     }
+
     return $Folders
 }
 
@@ -887,6 +888,7 @@ Function Import-ContentSearchResults {
         } else {
             $Data = $CsvData
         }
+
         Write-Verbose -ForegroundColor Green ('Loaded {0} entries for processing.' -f $Data.Count)
 
         $EntryNumber = 0

@@ -594,6 +594,7 @@ Function Search-Registry {
             for ($i = $RegKeys.Count - 1; $i -ne 0; $i--) {
                 $RegKeys[$i].Close()
             }
+
             return
         }
 
@@ -621,6 +622,7 @@ Function Search-Registry {
             Activity = 'Searching registry for simple match: {0}' -f $SimpleMatch
             Status   = $RegistryKey.Name
         }
+
         Write-Progress @WriteProgressParams
     }
 
@@ -1076,6 +1078,7 @@ Function Test-IsAdministrator {
     if ($User.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         return $true
     }
+
     return $false
 }
 
