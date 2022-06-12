@@ -197,8 +197,8 @@ Function Invoke-GitChildDir {
 Function Invoke-GitLinter {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '')]
     [CmdletBinding()]
-    [OutputType([Void], 'Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.DiagnosticRecord[]', ParameterSetName = 'PSScriptAnalyzer')]
-    [OutputType([Void], [String[]], ParameterSetName = 'ShellCheck')]
+    #[OutputType([Void], [Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.DiagnosticRecord[]], ParameterSetName = 'PSScriptAnalyzer')]
+    #[OutputType([Void], [String[]], ParameterSetName = 'ShellCheck')]
     Param(
         [Parameter(ParameterSetName = 'PSScriptAnalyzer', Mandatory)]
         [Switch]$PSScriptAnalyzer,

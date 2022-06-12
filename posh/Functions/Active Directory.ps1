@@ -125,7 +125,7 @@ Function Get-KerberosTokenSize {
 # Resolve various types of AD GUIDs
 Function Resolve-ADGuid {
     [CmdletBinding()]
-    [OutputType([Void], 'Microsoft.ActiveDirectory.Management.ADObject[]')]
+    #[OutputType([Void], [Microsoft.ActiveDirectory.Management.ADObject[]])]
     Param(
         [Parameter(Mandatory)]
         [ValidateSet('ExtendedRight', 'SchemaObject')]
@@ -225,7 +225,7 @@ Function Resolve-ADGuid {
 # Add members to a shadow principal
 Function Add-ADShadowPrincipalMember {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], 'Microsoft.ActiveDirectory.Management.ADObject[]')]
+    #[OutputType([Void], [Microsoft.ActiveDirectory.Management.ADObject[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Name,
@@ -321,7 +321,7 @@ Function Get-ADShadowPrincipalContainer {
 # Create a shadow principal
 Function New-ADShadowPrincipal {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], 'Microsoft.ActiveDirectory.Management.ADObject')]
+    #[OutputType([Void], [Microsoft.ActiveDirectory.Management.ADObject])]
     Param(
         [Parameter(Mandatory)]
         [String]$Name,

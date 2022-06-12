@@ -52,8 +52,9 @@ Function Get-AzureAuthHeader {
 # Connecting to Microsoft Graph with a Native App using PowerShell
 # https://docs.microsoft.com/en-au/archive/blogs/cloudlojik/connecting-to-microsoft-graph-with-a-native-app-using-powershell
 Function Get-AzureAuthToken {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '')]
     [CmdletBinding()]
-    [OutputType('Threading.Tasks.Task[Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult]')]
+    [OutputType([Threading.Tasks.Task])]
     Param(
         [Parameter(Mandatory)]
         [ValidateSet('AzureAdGraph', 'AzureClassic', 'AzureGallery', 'AzurePortal', 'AzureRm', 'MsGraph')]
@@ -232,7 +233,7 @@ Function Get-AzureUsersDisabledServices {
 # Retrieve licensing summary for Azure AD users
 Function Get-AzureUsersLicensingSummary {
     [CmdletBinding()]
-    [OutputType('Microsoft.Online.Administration.User[]')]
+    #[OutputType([Microsoft.Online.Administration.User[]])]
     Param()
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
@@ -265,7 +266,7 @@ Function Get-AzureUsersLicensingSummary {
 # Helper function to connect to Azure Active Directory (AzureAD module)
 Function Connect-AzureAD {
     [CmdletBinding()]
-    [OutputType('Microsoft.Open.Azure.AD.CommonLibrary.PSAzureContext')]
+    #[OutputType([Microsoft.Open.Azure.AD.CommonLibrary.PSAzureContext])]
     Param(
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]
@@ -297,7 +298,7 @@ Function Connect-AzureAD {
 # Helper function to connect to Azure Resource Manager
 Function Connect-AzureRM {
     [CmdletBinding()]
-    [OutputType('Microsoft.Azure.Commands.Profile.Models.PSAzureProfile')]
+    #[OutputType([Microsoft.Azure.Commands.Profile.Models.PSAzureProfile])]
     Param(
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]

@@ -1195,7 +1195,7 @@ Function Connect-CentralizedDeployment {
 # Helper function to connect to Microsoft Teams
 Function Connect-MicrosoftTeams {
     [CmdletBinding()]
-    [OutputType('Microsoft.TeamsCmdlets.Powershell.Connect.Models.PSAzureContext')]
+    #[OutputType([Microsoft.TeamsCmdlets.Powershell.Connect.Models.PSAzureContext])]
     Param(
         [ValidateNotNull()]
         [System.Management.Automation.Credential()]

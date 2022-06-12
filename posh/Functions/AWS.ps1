@@ -102,7 +102,7 @@ Function Set-R53HostedZoneNameTag {
 # Set records on a Route 53 hosted zone for a parked domain
 Function Set-R53HostedZoneParkedRecords {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], 'Amazon.Route53.Model.ChangeInfo[]')]
+    #[OutputType([Void], [Amazon.Route53.Model.ChangeInfo[]])]
     Param(
         [Parameter(Mandatory)]
         [String[]]$Domain,
@@ -383,7 +383,7 @@ Function Set-R53HostedZoneTag {
 # Retrieve the size of each S3 bucket
 Function Get-S3BucketSize {
     [CmdletBinding()]
-    [OutputType([Void], 'Amazon.S3.Model.S3Bucket[]')]
+    #[OutputType([Void], [Amazon.S3.Model.S3Bucket[]])]
     Param()
 
     try {
