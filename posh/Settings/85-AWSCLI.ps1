@@ -14,8 +14,8 @@ $env:AWS_DEFAULT_OUTPUT = 'table'
 
 # Configuring the AWS CLI - Command Completion
 # https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html
-if (Get-Command -Name aws_completer -ErrorAction Ignore) {
-    Register-ArgumentCompleter -Native -CommandName aws -ScriptBlock {
+if (Get-Command -Name 'aws_completer' -ErrorAction Ignore) {
+    Register-ArgumentCompleter -Native -CommandName 'aws' -ScriptBlock {
         Param($wordToComplete, $commandAst, $cursorPosition)
         $env:COMP_LINE = $commandAst.ToString()
         $env:COMP_POINT = $cursorPosition

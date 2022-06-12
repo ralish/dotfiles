@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type Functions -Name Environments
+Start-DotFilesSection -Type 'Functions' -Name 'Environments'
 
 #region .NET
 
@@ -8,7 +8,7 @@ Function Clear-NuGetCache {
     [OutputType([Void], [String[]])]
     Param()
 
-    if (!(Get-Command -Name nuget -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'nuget' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to clear NuGet cache as nuget command not found.'
         return
     }
@@ -62,7 +62,7 @@ Function Update-DotNetTools {
         [Int]$ProgressParentId
     )
 
-    if (!(Get-Command -Name dotnet -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'dotnet' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update .NET tools as dotnet command not found.'
         return
     }
@@ -125,7 +125,7 @@ Function Clear-GoCache {
     [OutputType([Void], [String[]])]
     Param()
 
-    if (!(Get-Command -Name go -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'go' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to clear Go caches as go command not found.'
         return
     }
@@ -290,8 +290,8 @@ Function Switch-Google {
             Set-EnvironmentVariable @EnvParams
 
         if (!$Disable) {
-            Set-EnvironmentVariable -Name DEPOT_TOOLS_WIN_TOOLCHAIN -Value $DepotToolsWinToolchain
-            Set-EnvironmentVariable -Name GYP_MSVS_VERSION -Value $VsVersion
+            Set-EnvironmentVariable -Name 'DEPOT_TOOLS_WIN_TOOLCHAIN' -Value $DepotToolsWinToolchain
+            Set-EnvironmentVariable -Name 'GYP_MSVS_VERSION' -Value $VsVersion
         }
     }
 }
@@ -390,7 +390,7 @@ Function Switch-Java {
             Set-EnvironmentVariable @EnvParams
 
         if (!$Disable) {
-            Set-EnvironmentVariable -Name JAVA_HOME -Value $JavaHome
+            Set-EnvironmentVariable -Name 'JAVA_HOME' -Value $JavaHome
         }
     }
 }
@@ -405,7 +405,7 @@ Function Clear-NpmCache {
     [OutputType([Void], [String[]])]
     Param()
 
-    if (!(Get-Command -Name npm -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'npm' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to clear npm cache as npm command not found.'
         return
     }
@@ -478,7 +478,7 @@ Function Update-NodejsPackages {
     [OutputType([Void], [String[]])]
     Param()
 
-    if (!(Get-Command -Name npm -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'npm' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update Node.js packages as npm command not found.'
         return
     }
@@ -612,7 +612,7 @@ Function Clear-PipCache {
     [OutputType([Void], [String[]])]
     Param()
 
-    if (!(Get-Command -Name pip -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'pip' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to clear pip cache as pip command not found.'
         return
     }
@@ -752,11 +752,11 @@ Function Switch-Python {
 
         if (!$Disable) {
             if ($PythonDevMode) {
-                Set-EnvironmentVariable -Name PYTHONDEVMODE -Value 1
+                Set-EnvironmentVariable -Name 'PYTHONDEVMODE' -Value 1
             }
 
             if ($Utf8Mode) {
-                Set-EnvironmentVariable -Name PYTHONUTF8 -Value 1
+                Set-EnvironmentVariable -Name 'PYTHONUTF8' -Value 1
             }
         }
     }
@@ -768,7 +768,7 @@ Function Update-PythonPackages {
     [OutputType([Void], [String[]])]
     Param()
 
-    if (!(Get-Command -Name pipdeptree -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'pipdeptree' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update Python packages as pipdeptree command not found.'
         return
     }
@@ -797,7 +797,7 @@ Function Update-PythonPackages {
         & pip @UpdateArgs @Packages
     }
 
-    if (Get-Command -Name pipx -ErrorAction Ignore) {
+    if (Get-Command -Name 'pipx' -ErrorAction Ignore) {
         if ($PSCmdlet.ShouldProcess('pipx packages', 'Update')) {
             # Outputting emojis can be problematic on Windows. This isn't as
             # big an issue as it used to be, but there's still some nasty edge
@@ -834,7 +834,7 @@ Function Clear-GemCache {
     [OutputType([Void], [String[]])]
     Param()
 
-    if (!(Get-Command -Name gem -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'gem' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to clear gem cache as gem command not found.'
         return
     }
@@ -919,7 +919,7 @@ Function Switch-Ruby {
             Set-EnvironmentVariable @EnvParams
 
         if (!$Disable) {
-            Set-EnvironmentVariable -Name RUBYOPT -Value $Options
+            Set-EnvironmentVariable -Name 'RUBYOPT' -Value $Options
         }
     }
 }
@@ -930,7 +930,7 @@ Function Update-RubyGems {
     [OutputType([Void], [String[]])]
     Param()
 
-    if (!(Get-Command -Name gem -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'gem' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update Ruby gems as gem command not found.'
         return
     }

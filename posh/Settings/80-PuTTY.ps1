@@ -10,11 +10,11 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
     return
 }
 
-Register-ArgumentCompleter -Native -CommandName plink, pscp, psftp, putty -ScriptBlock {
+Register-ArgumentCompleter -Native -CommandName 'plink', 'pscp', 'psftp', 'putty' -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
 
     try {
-        $SessionsKey = Get-Item -Path HKCU:\Software\SimonTatham\PuTTY\Sessions -ErrorAction Stop
+        $SessionsKey = Get-Item -Path 'HKCU:\Software\SimonTatham\PuTTY\Sessions' -ErrorAction Stop
     } catch {
         return
     }

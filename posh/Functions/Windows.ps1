@@ -199,7 +199,7 @@ Function Find-WinEvent {
 
     # Default to boot time as start time
     if (!$StartTime) {
-        $StartTime = (Get-CimInstance @CommonParams -ClassName Win32_OperatingSystem).LastBootUpTime
+        $StartTime = (Get-CimInstance @CommonParams -ClassName 'Win32_OperatingSystem').LastBootUpTime
     }
 
     # Configure event severity filtering
@@ -338,7 +338,7 @@ Function Find-WinEvent {
 
     Write-Progress @WriteProgressParams -Completed
 
-    $SortedEvents = $Events | Sort-Object -Property TimeCreated
+    $SortedEvents = $Events | Sort-Object -Property 'TimeCreated'
 
     if ($OutputFormat -eq 'EventLogRecord') {
         return $SortedEvents
@@ -398,7 +398,7 @@ Function Watch-EventLog {
         Start-Sleep -Seconds 1
         $IndexNew = (Get-WinEvent -LogName $LogName -MaxEvents 1).RecordId
         if ($IndexNew -ne $IndexOld) {
-            Get-WinEvent -LogName $LogName -MaxEvents ($IndexNew - $IndexOld) | Sort-Object -Property RecordId
+            Get-WinEvent -LogName $LogName -MaxEvents ($IndexNew - $IndexOld) | Sort-Object -Property 'RecordId'
             $IndexOld = $IndexNew
         }
     } while ($true)
@@ -426,7 +426,7 @@ Function Get-MultipleHardLinks {
     $Files = Get-ChildItem -Path $Path -File -Recurse:$Recurse -Force:$Force |
         Where-Object {
             $_.LinkType -eq 'HardLink' -and $_.Target.Count -ge ($MinimumHardLinks - 1)
-        } | Add-Member -MemberType ScriptProperty -Name LinkCount -Value { $this.Target.Count + 1 } -Force -PassThru
+        } | Add-Member -MemberType ScriptProperty -Name 'LinkCount' -Value { $this.Target.Count + 1 } -Force -PassThru
 
     return $Files
 }
@@ -505,7 +505,7 @@ Function Restore-MappedNetworkDrives {
     [OutputType([Void])]
     Param()
 
-    $MappedDrives = Get-SmbMapping | Where-Object Status -EQ Unavailable
+    $MappedDrives = Get-SmbMapping | Where-Object Status -EQ 'Unavailable'
     foreach ($MappedDrive in $MappedDrives) {
         Write-Verbose -Message ('Restoring mapped network drive: {0}' -f $MappedDrive.LocalPath)
         try {
@@ -946,7 +946,7 @@ Function Get-WellKnownSID {
             }
 
             if ($DomainName) {
-                Test-ModuleAvailable -Name ActiveDirectory
+                Test-ModuleAvailable -Name 'ActiveDirectory'
 
                 try {
                     $Dc = Get-ADDomainController -DomainName $DomainName -Discover -NextClosestSite -ErrorAction Stop
@@ -960,7 +960,7 @@ Function Get-WellKnownSID {
                     throw $_
                 }
 
-                $DomainIdentifier = Get-ADObject -Server $Dc.HostName.Value -Identity $RootDse.defaultNamingContext -Properties objectSid
+                $DomainIdentifier = Get-ADObject -Server $Dc.HostName.Value -Identity $RootDse.defaultNamingContext -Properties 'objectSid'
                 $SID = '{0}-{1}' -f $DomainIdentifier.objectSid.Value, $RID
             } else {
                 $LocalUsers = Get-LocalUser

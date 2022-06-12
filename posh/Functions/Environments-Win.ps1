@@ -88,7 +88,7 @@ Function Switch-Cygwin {
             Set-EnvironmentVariable @EnvParams
 
         if (!$Disable) {
-            Set-EnvironmentVariable -Name CYGWIN -Value ($CygwinCfg -join ' ')
+            Set-EnvironmentVariable -Name 'CYGWIN' -Value ($CygwinCfg -join ' ')
         }
     }
 }

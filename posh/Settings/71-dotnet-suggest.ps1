@@ -23,5 +23,5 @@ Register-ArgumentCompleter -Native -CommandName $RegisteredApps -ScriptBlock {
     }
 }
 
-Remove-Variable -Name RegisteredApps
+Remove-Variable -Name 'RegisteredApps'
 Complete-DotFilesSection

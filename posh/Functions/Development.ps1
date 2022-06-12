@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type Functions -Name Development
+Start-DotFilesSection -Type 'Functions' -Name 'Development'
 
 #region .NET
 
@@ -48,7 +48,7 @@ Function Get-TypeMethod {
     )
 
     Process {
-        $Methods = $Type.GetMethods() | Sort-Object -Property Name
+        $Methods = $Type.GetMethods() | Sort-Object -Property 'Name'
         foreach ($Method in $Methods) {
             $MethodParams = $Method.GetParameters()
             if ($MethodParams.Count -gt 0) {
@@ -76,7 +76,7 @@ Function Clear-DockerCache {
     [OutputType([Void], [String[]])]
     Param()
 
-    if (!(Get-Command -Name docker -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'docker' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to clear Docker cache as docker command not found.'
         return
     }
@@ -220,7 +220,7 @@ Function Invoke-GitLinter {
 
     switch ($PSCmdlet.ParameterSetName) {
         'PSScriptAnalyzer' {
-            if (!(Get-Command -Name Invoke-ScriptAnalyzer)) {
+            if (!(Get-Command -Name 'Invoke-ScriptAnalyzer')) {
                 throw 'Required command is unavailable: Invoke-ScriptAnalyzer'
             }
 
@@ -268,12 +268,12 @@ Function Invoke-GitLinter {
         }
 
         'ShellCheck' {
-            if (!(Get-Command -Name shellcheck)) {
+            if (!(Get-Command -Name 'shellcheck')) {
                 throw 'Required command is unavailable: shellcheck'
             }
 
             if ($ShebangSearch -or $ShellDirectiveSearch) {
-                if (!(Get-Command -Name rg)) {
+                if (!(Get-Command -Name 'rg')) {
                     throw 'Required command is unavailable: rg'
                 }
             }

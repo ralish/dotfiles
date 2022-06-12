@@ -30,13 +30,13 @@ if (!$ContextMenuKey.DllPath) {
 if ($Operation -eq 'Enable') {
     if ($PSCmdlet.ShouldProcess('Enable Skype context menu')) {
         if ($ContextMenuKey.DllPath.StartsWith('-')) {
-            Set-ItemProperty -Path $ContextMenuPath -Name DllPath -Value ('{0}' -f $ContextMenuKey.DllPath.Substring(1))
+            Set-ItemProperty -Path $ContextMenuPath -Name 'DllPath' -Value ('{0}' -f $ContextMenuKey.DllPath.Substring(1))
         }
     }
 } else {
     if ($PSCmdlet.ShouldProcess('Disable Skype context menu')) {
         if (!$ContextMenuKey.DllPath.StartsWith('-')) {
-            Set-ItemProperty -Path $ContextMenuPath -Name DllPath -Value ('-{0}' -f $ContextMenuKey.DllPath)
+            Set-ItemProperty -Path $ContextMenuPath -Name 'DllPath' -Value ('-{0}' -f $ContextMenuKey.DllPath)
         }
     }
 }

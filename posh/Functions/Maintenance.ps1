@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type Functions -Name Maintenance
+Start-DotFilesSection -Type 'Functions' -Name 'Maintenance'
 
 # Clear caches used by development environments & tooling
 Function Clear-AllDevCaches {

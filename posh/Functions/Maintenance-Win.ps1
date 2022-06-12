@@ -115,7 +115,7 @@ Function Update-Scoop {
         [Int]$ProgressParentId
     )
 
-    if (!(Get-Command -Name scoop -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'scoop' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update Scoop apps as scoop command not found.'
         return
     }
@@ -178,9 +178,9 @@ Function Update-VisualStudio {
         return $false
     }
 
-    Test-ModuleAvailable -Name VSSetup
+    Test-ModuleAvailable -Name 'VSSetup'
 
-    $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property InstallationVersion)
+    $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property 'InstallationVersion')
     if ($VsSetupInstances.Count -eq 0) {
         Write-Error -Message 'Get-VSSetupInstance returned no instances.'
         return $false
@@ -295,13 +295,13 @@ Function Update-Windows {
     }
 
     try {
-        Import-Module -Name PSWindowsUpdate -ErrorAction Stop -Verbose:$false
+        Import-Module -Name 'PSWindowsUpdate' -ErrorAction Stop -Verbose:$false
     } catch {
         Write-Error -Message 'Unable to install Windows updates as PSWindowsUpdate module not available.'
         return $false
     }
 
-    $Results = Install-WindowsUpdate -AcceptAll:$AcceptAll -IgnoreReboot -NotTitle Silverlight
+    $Results = Install-WindowsUpdate -AcceptAll:$AcceptAll -IgnoreReboot -NotTitle 'Silverlight'
     if ($Results) {
         return $Results
     }

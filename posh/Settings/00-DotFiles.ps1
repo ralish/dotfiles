@@ -85,7 +85,7 @@ public static extern uint GetFinalPathNameByHandle(
 '@
 
     if (!('DotFiles.FinalPath' -as [Type])) {
-        Add-Type -Namespace DotFiles -Name FinalPath -MemberDefinition $FinalPathAPI
+        Add-Type -Namespace 'DotFiles' -Name 'FinalPath' -MemberDefinition $FinalPathAPI
     }
 
     Write-Debug -Message (Get-DotFilesMessage -Message 'Opening handle to PowerShell profile directory ...')
@@ -115,5 +115,5 @@ public static extern uint GetFinalPathNameByHandle(
 
 Initialize-DotFiles
 
-Remove-Item -Path Function:\Initialize-DotFiles
+Remove-Item -Path 'Function:\Initialize-DotFiles'
 Complete-DotFilesSection

@@ -6,12 +6,12 @@ foreach ($Param in [Environment]::GetCommandLineArgs()) {
 }
 
 # Display verbose messages during profile load
-if (!(Get-Variable -Name DotFilesVerbose -ErrorAction Ignore)) {
+if (!(Get-Variable -Name 'DotFilesVerbose' -ErrorAction Ignore)) {
     $DotFilesVerbose = $false
 }
 
 # Display timing data during profile load (requires verbose)
-if (!(Get-Variable -Name DotFilesShowTImings -ErrorAction Ignore)) {
+if (!(Get-Variable -Name 'DotFilesShowTImings' -ErrorAction Ignore)) {
     $DotFilesShowTimings = $false
 }
 
@@ -19,7 +19,7 @@ if (!(Get-Variable -Name DotFilesShowTImings -ErrorAction Ignore)) {
 #
 # - Get-Module -ListAvailable
 #   Assume the module exists instead of checking
-if (!(Get-Variable -Name DotFilesFastLoad -ErrorAction Ignore)) {
+if (!(Get-Variable -Name 'DotFilesFastLoad' -ErrorAction Ignore)) {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     $DotFilesFastLoad = $true
 }
@@ -56,7 +56,7 @@ if (Test-Path -LiteralPath $PoshFunctionsPath -PathType Container) {
     # PowerShell <= 5.1: Using -LiteralPath breaks wildcards in -Include
     Get-ChildItem -Path $PoshFunctionsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
 }
-Remove-Variable -Name PoshFunctionsPath
+Remove-Variable -Name 'PoshFunctionsPath'
 
 # Source custom settings
 $PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
@@ -64,22 +64,22 @@ if (Test-Path -LiteralPath $PoshSettingsPath -PathType Container) {
     # PowerShell <= 5.1: Using -LiteralPath breaks wildcards in -Include
     Get-ChildItem -Path $PoshSettingsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
 }
-Remove-Variable -Name PoshSettingsPath
+Remove-Variable -Name 'PoshSettingsPath'
 
 # Update formatting data
 if ($FormatDataPaths) {
-    Start-DotFilesSection -Type Profile -Name Formatting
+    Start-DotFilesSection -Type 'Profile' -Name 'Formatting'
     Update-FormatData -PrependPath $FormatDataPaths
     Complete-DotFilesSection
 }
-Remove-Variable -Name FormatDataPaths
+Remove-Variable -Name 'FormatDataPaths'
 
 # Amend the search path to include scripts directory
 $PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
 if (Test-Path -LiteralPath $PoshScriptsPath -PathType Container) {
     $env:Path = Add-PathStringElement -Path $env:Path -Element $PoshScriptsPath -Action Prepend
 }
-Remove-Variable -Name PoshScriptsPath
+Remove-Variable -Name 'PoshScriptsPath'
 
 # Clean-up specific to running in verbose mode
 if ($DotFilesVerbose -or $VerbosePreference -eq 'Continue') {
@@ -91,11 +91,11 @@ if ($DotFilesVerbose -or $VerbosePreference -eq 'Continue') {
             SectionName = 'End'
         }
         Write-Verbose -Message (Get-DotFilesMessage @MessageParams)
-        Remove-Variable -Name DotFilesLoadStart, MessageParams
+        Remove-Variable -Name 'DotFilesLoadStart', 'MessageParams'
     }
 
     $VerbosePreference = $DotFilesVerboseOriginal
-    Remove-Variable -Name DotFilesVerboseOriginal
+    Remove-Variable -Name 'DotFilesVerboseOriginal'
 }
 
 # Clean-up profile loading functions and variables

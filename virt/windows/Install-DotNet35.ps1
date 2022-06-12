@@ -15,7 +15,7 @@ if (Get-Command -Name 'Get-WmiObject' -ErrorAction SilentlyContinue) {
     $WmiCommand = 'Get-WmiObject'
 }
 
-$Win32OpSys = & $WmiCommand -Class Win32_OperatingSystem -Verbose:$false
+$Win32OpSys = & $WmiCommand -Class 'Win32_OperatingSystem' -Verbose:$false
 $BuildNumber = [int]$Win32OpSys.BuildNumber
 
 $DismParams = [Collections.Generic.List[String]]@(

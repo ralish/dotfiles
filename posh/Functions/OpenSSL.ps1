@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type Functions -Name OpenSSL
+Start-DotFilesSection -Type 'Functions' -Name 'OpenSSL'
 
 # Convert a certificate in DER format to PEM format
 Function Convert-OpenSSLDerToPem {

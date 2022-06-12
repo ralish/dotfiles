@@ -18,4 +18,4 @@ try {
     throw 'Failed to retrieve registry key for Windows Live Tile cache.'
 }
 
-Set-ItemProperty -Path $RegPath -Name ResetCache -Value 1
+Set-ItemProperty -Path $RegPath -Name 'ResetCache' -Value 1

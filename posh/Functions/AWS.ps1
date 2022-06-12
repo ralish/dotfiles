@@ -75,7 +75,7 @@ Function Set-R53HostedZoneNameTag {
     )
 
     Begin {
-        $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
+        $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require Any -PassThru
         $Module | Import-Module -ErrorAction Stop -Verbose:$false
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
@@ -135,7 +135,7 @@ Function Set-R53HostedZoneParkedRecords {
         [String[]]$RedirectCloudFrontRecordTypes = 'A'
     )
 
-    $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
+    $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require Any -PassThru
     $Module | Import-Module -ErrorAction Stop -Verbose:$false
 
     try {
@@ -352,7 +352,7 @@ Function Set-R53HostedZoneTag {
     )
 
     Begin {
-        $Module = Test-ModuleAvailable -Name AWS.Tools.Route53, AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
+        $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require Any -PassThru
         $Module | Import-Module -ErrorAction Stop -Verbose:$false
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
@@ -387,9 +387,9 @@ Function Get-S3BucketSize {
     Param()
 
     try {
-        $Module = Test-ModuleAvailable -Name AWS.Tools.CloudWatch, AWS.Tools.EC2, AWS.Tools.S3 -PassThru
+        $Module = Test-ModuleAvailable -Name 'AWS.Tools.CloudWatch', 'AWS.Tools.EC2', 'AWS.Tools.S3' -PassThru
     } catch {
-        $Module = Test-ModuleAvailable -Name AWSPowerShell.NetCore, AWSPowerShell -Require Any -PassThru
+        $Module = Test-ModuleAvailable -Name 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require Any -PassThru
     }
     $Module | Import-Module -ErrorAction Stop -Verbose:$false
 
@@ -419,7 +419,7 @@ Function Get-S3BucketSize {
     $Metrics = @{}
     foreach ($Region in $Regions.RegionName) {
         try {
-            $Result = Get-CWMetricList -Region $Region -MetricName BucketSizeBytes -ErrorAction Stop -Verbose:$false
+            $Result = Get-CWMetricList -Region $Region -MetricName 'BucketSizeBytes' -ErrorAction Stop -Verbose:$false
         } catch {
             Write-Warning -Message ('Failed to retrieve BucketSizeBytes metrics for region: {0}' -f $Region)
             continue
@@ -457,8 +457,8 @@ Function Get-S3BucketSize {
             $BucketSize = $BucketSizeBytes | Format-SizeDigital
 
             $Bucket = $Buckets | Where-Object BucketName -EQ $BucketName
-            $Bucket | Add-Member -MemberType NoteProperty -Name BucketSizeBytes -Value $BucketSizeBytes
-            $Bucket | Add-Member -MemberType NoteProperty -Name BucketSize -Value $BucketSize
+            $Bucket | Add-Member -MemberType NoteProperty -Name 'BucketSizeBytes' -Value $BucketSizeBytes
+            $Bucket | Add-Member -MemberType NoteProperty -Name 'BucketSize' -Value $BucketSize
         }
     }
 
@@ -466,8 +466,8 @@ Function Get-S3BucketSize {
     $BucketSize = $BucketSizeBytes | Format-SizeDigital
     foreach ($Bucket in $Buckets) {
         if (!$Bucket.PSObject.Properties['BucketSize']) {
-            $Bucket | Add-Member -MemberType NoteProperty -Name BucketSizeBytes -Value $BucketSizeBytes
-            $Bucket | Add-Member -MemberType NoteProperty -Name BucketSize -Value $BucketSize
+            $Bucket | Add-Member -MemberType NoteProperty -Name 'BucketSizeBytes' -Value $BucketSizeBytes
+            $Bucket | Add-Member -MemberType NoteProperty -Name 'BucketSize' -Value $BucketSize
         }
     }
 

@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type Functions -Name PowerShell
+Start-DotFilesSection -Type 'Functions' -Name 'PowerShell'
 
 #region Internals
 
@@ -73,9 +73,9 @@ Function Update-PowerShell {
 
         Write-Verbose -Message 'Attempting to import PowerShellGet v2 side-by-side ...'
         $Script:PsGetV2AttemptedSxS = $true
-        $PowerShellGet = Get-Module -Name PowerShellGet -ListAvailable -Verbose:$false |
+        $PowerShellGet = Get-Module -Name 'PowerShellGet' -ListAvailable -Verbose:$false |
             Where-Object Version -Match '^2\.' |
-            Sort-Object -Property Version -Descending |
+            Sort-Object -Property 'Version' -Descending |
             Select-Object -First 1
 
         if ($PowerShellGet) {
@@ -93,7 +93,7 @@ Function Update-PowerShell {
         return $false
     }
 
-    $PowerShellGet = Test-ModuleAvailable -Name PowerShellGet -PassThru
+    $PowerShellGet = Test-ModuleAvailable -Name 'PowerShellGet' -PassThru
 
     $Script:PsGetV2 = $false
     $Script:PsGetV3 = $false
@@ -110,7 +110,7 @@ Function Update-PowerShell {
     Write-Verbose -Message ('Using PowerShellGet v{0}' -f $PowerShellGet.Version)
 
     # Not all platforms have DSC support as part of PowerShell itself
-    $DscSupported = Get-Command -Name Get-DscResource -ErrorAction Ignore
+    $DscSupported = Get-Command -Name 'Get-DscResource' -ErrorAction Ignore
     if ($IncludeDscModules -and !$DscSupported) {
         throw 'Unable to enumerate DSC modules as Get-DscResource command not available.'
     }
@@ -150,15 +150,15 @@ Function Update-PowerShell {
         # have the good manners to clean them up. The result is a visual mess
         # when we've got our own progress bars.
         $OriginalProgressPreference = $ProgressPreference
-        Set-Variable -Name ProgressPreference -Scope Global -Value Ignore -WhatIf:$false
+        Set-Variable -Name 'ProgressPreference' -Scope Global -Value 'Ignore' -WhatIf:$false
 
         try {
             # Get-DscResource may output various errors, most often due to
             # duplicate resources. That's often the case with, for example, the
             # PackageManagement module being available in multiple locations.
-            $DscModules = @(Get-DscResource -Module * -ErrorAction Ignore -Verbose:$false | Select-Object -ExpandProperty ModuleName -Unique)
+            $DscModules = @(Get-DscResource -Module * -ErrorAction Ignore -Verbose:$false | Select-Object -ExpandProperty 'ModuleName' -Unique)
         } finally {
-            Set-Variable -Name ProgressPreference -Scope Global -Value $OriginalProgressPreference -WhatIf:$false
+            Set-Variable -Name 'ProgressPreference' -Scope Global -Value $OriginalProgressPreference -WhatIf:$false
         }
     }
 
@@ -173,7 +173,7 @@ Function Update-PowerShell {
     # Update all modules compatible with PowerShellGet
     for ($ModuleIdx = 0; $ModuleIdx -lt $UniqueModules.Count; $ModuleIdx++) {
         $ModuleName = $UniqueModules[$ModuleIdx]
-        $Module = $InstalledModules | Where-Object Name -EQ $ModuleName | Sort-Object -Property Version | Select-Object -Last 1
+        $Module = $InstalledModules | Where-Object Name -EQ $ModuleName | Sort-Object -Property 'Version' | Select-Object -Last 1
 
         if (!$IncludeDscModules -and $DscSupported -and $ModuleName -in $DscModules) {
             Write-Verbose -Message ('Skipping DSC module: {0}' -f $ModuleName)
@@ -248,7 +248,7 @@ Function Update-PowerShell {
     Write-Progress @WriteProgressParams -Completed
 
     if (!$SkipUninstallObsolete -and $PSCmdlet.ShouldProcess('Obsolete modules', 'Uninstall')) {
-        if (Get-Command -Name Uninstall-ObsoleteModule -ErrorAction Ignore) {
+        if (Get-Command -Name 'Uninstall-ObsoleteModule' -ErrorAction Ignore) {
             if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
                 Uninstall-ObsoleteModule -ProgressParentId $WriteProgressParams['Id']
             } else {
@@ -352,8 +352,8 @@ Function Compare-ObjectProperties {
     )
 
     $ObjProps = @()
-    $ObjProps += $ReferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty Name
-    $ObjProps += $DifferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty Name
+    $ObjProps += $ReferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty 'Name'
+    $ObjProps += $DifferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty 'Name'
     $ObjProps = $ObjProps | Sort-Object | Select-Object -Unique
 
     if ($IgnoredProperties) {

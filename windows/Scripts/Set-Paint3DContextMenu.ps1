@@ -19,9 +19,9 @@ if (![Environment]::OSVersion.Version -eq 10) {
 }
 
 $RemoveHKCRDrive = $false
-if (!(Get-PSDrive -Name HKCR -ErrorAction Ignore)) {
+if (!(Get-PSDrive -Name 'HKCR' -ErrorAction Ignore)) {
     $RemoveHKCRDrive = $true
-    $null = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT -WhatIf:$false
+    $null = New-PSDrive -Name 'HKCR' -PSProvider Registry -Root HKEY_CLASSES_ROOT -WhatIf:$false
 }
 
 foreach ($Extension in $Extensions) {
@@ -37,16 +37,16 @@ foreach ($Extension in $Extensions) {
 
     if ($Operation -eq 'Enable') {
         if ($PSCmdlet.ShouldProcess($Extension, 'Enable Paint 3D extension context menu')) {
-            Remove-ItemProperty -Path $ContextMenuPath -Name LegacyDisable -ErrorAction Ignore
+            Remove-ItemProperty -Path $ContextMenuPath -Name 'LegacyDisable' -ErrorAction Ignore
         }
 
     } else {
         if ($PSCmdlet.ShouldProcess($Extension, 'Disable Paint 3D extension context menu')) {
-            Set-ItemProperty -Path $ContextMenuPath -Name LegacyDisable -Value $null
+            Set-ItemProperty -Path $ContextMenuPath -Name 'LegacyDisable' -Value $null
         }
     }
 }
 
 if ($RemoveHKCRDrive) {
-    Remove-PSDrive -Name HKCR -WhatIf:$false
+    Remove-PSDrive -Name 'HKCR' -WhatIf:$false
 }

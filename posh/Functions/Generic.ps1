@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type Functions -Name Generic
+Start-DotFilesSection -Type 'Functions' -Name 'Generic'
 
 # Load custom formatting data
 $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Generic.format.ps1xml'))
@@ -249,8 +249,8 @@ Function Get-TextEncoding {
         foreach ($Encoding in [Text.Encoding]::GetEncodings()) {
             $Preamble = $Encoding.GetEncoding().GetPreamble()
             if ($Preamble) {
-                $Encoding | Add-Member -MemberType NoteProperty -Name Preamble -Value $Preamble
-                $Encoding | Add-Member -MemberType NoteProperty -Name ByteOrderMark -Value $true
+                $Encoding | Add-Member -MemberType NoteProperty -Name 'Preamble' -Value $Preamble
+                $Encoding | Add-Member -MemberType NoteProperty -Name 'ByteOrderMark' -Value $true
                 $Encodings.Add($Encoding)
             }
         }
@@ -277,9 +277,9 @@ Function Get-TextEncoding {
 
         # Sort the array by size of each preamble
         foreach ($Encoding in $Encodings) {
-            $Encoding | Add-Member -MemberType ScriptProperty -Name PreambleSize -Value { $this.Preamble.Count }
+            $Encoding | Add-Member -MemberType ScriptProperty -Name 'PreambleSize' -Value { $this.Preamble.Count }
         }
-        $Encodings = $Encodings | Sort-Object -Property PreambleSize -Descending
+        $Encodings = $Encodings | Sort-Object -Property 'PreambleSize' -Descending
 
         # PowerShell Core uses a different parameter to return a byte stream
         $GetContentBytesParam = @{}
@@ -616,12 +616,12 @@ Function Sort-XmlElement {
                     }
                 }
 
-                $Children = @($Element.ChildNodes | Sort-Object -Property OuterXml)
+                $Children = @($Element.ChildNodes | Sort-Object -Property 'OuterXml')
             }
 
             if ($Element.HasAttributes) {
                 if ($SortAttributes) {
-                    $Attributes = @($Element.Attributes | Sort-Object -Property Name)
+                    $Attributes = @($Element.Attributes | Sort-Object -Property 'Name')
                 } else {
                     $Attributes = @($Element.Attributes)
                 }
@@ -672,7 +672,7 @@ Function Add-GroupObjectComputerProperty {
             }
 
             $Computers = ($GroupInfo.Group.PSComputerName | Sort-Object) -join ', '
-            $GroupInfo | Add-Member -Name Computer -MemberType NoteProperty -Value $Computers -PassThru -Force:$Force
+            $GroupInfo | Add-Member -Name 'Computer' -MemberType NoteProperty -Value $Computers -PassThru -Force:$Force
         }
     }
 }

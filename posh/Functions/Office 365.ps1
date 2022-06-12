@@ -44,7 +44,7 @@ Function Compare-MCASPolicy {
 
     $Results = [Collections.Generic.List[PSCustomObject]]::new()
 
-    foreach ($RefPol in ($ReferenceObject | Sort-Object -Property name)) {
+    foreach ($RefPol in ($ReferenceObject | Sort-Object -Property 'name')) {
         if (!$RefPol.ref_policy_id) {
             Write-Warning -Message ('[ID: {0}] Reference policy with no reference policy ID.' -f $RefPol._id)
             continue
@@ -75,7 +75,7 @@ Function Compare-MCASPolicy {
         }
     }
 
-    foreach ($DiffPol in ($DifferenceObject | Sort-Object -Property name)) {
+    foreach ($DiffPol in ($DifferenceObject | Sort-Object -Property 'name')) {
         if (!$DiffPol.ref_policy_id) {
             Write-Warning -Message ('[ID: {0}] Difference policy with no reference policy ID.' -f $DiffPol._id)
             continue
@@ -117,7 +117,7 @@ Function Export-MailboxSpreadsheetData {
         [String]$DescriptionTimeFormat = 'yyyy/mm/dd'
     )
 
-    Test-CommandAvailable -Name Get-Mailbox
+    Test-CommandAvailable -Name 'Get-Mailbox'
 
     if (!$Path) {
         if ((Get-Item -LiteralPath $PWD -ErrorAction Ignore) -is [IO.DirectoryInfo]) {
@@ -198,7 +198,7 @@ Function Get-InboxRulesByFolders {
         [Int]$ProgressParentId
     )
 
-    Test-CommandAvailable -Name Get-Mailbox
+    Test-CommandAvailable -Name 'Get-Mailbox'
 
     $WriteProgressParams = @{
         Activity = 'Retrieving inbox rules by folders'
@@ -211,12 +211,12 @@ Function Get-InboxRulesByFolders {
 
     Write-Progress @WriteProgressParams -Status 'Retrieving mailbox folders' -PercentComplete 1
     $Folders = Get-MailboxFolder -Identity ('{0}:\Inbox' -f $Mailbox) -MailFolderOnly -Recurse | Where-Object DefaultFolderType -NE 'Inbox'
-    $Folders | Add-Member -MemberType NoteProperty -Name Rules -Value @()
-    $Folders | Add-Member -MemberType ScriptProperty -Name RuleCount -Value { $this.Rules.Count }
+    $Folders | Add-Member -MemberType NoteProperty -Name 'Rules' -Value @()
+    $Folders | Add-Member -MemberType ScriptProperty -Name 'RuleCount' -Value { $this.Rules.Count }
 
     Write-Progress @WriteProgressParams -Status 'Retrieving mailbox rules' -PercentComplete 33
     $Rules = Get-InboxRule -DescriptionTimeZone $DescriptionTimeZone -DescriptionTimeFormat $DescriptionTimeFormat
-    $Rules | Add-Member -MemberType NoteProperty -Name LinkedToFolder -Value $false
+    $Rules | Add-Member -MemberType NoteProperty -Name 'LinkedToFolder' -Value $false
 
     Write-Progress @WriteProgressParams -Status 'Associating rules to folders' -PercentComplete 67
     foreach ($Folder in $Folders) {
@@ -234,7 +234,7 @@ Function Get-InboxRulesByFolders {
     $UnlinkedRules = $Rules | Where-Object LinkedToFolder -EQ $false
     if ($UnlinkedRules) {
         Write-Warning -Message 'The following rules could not be linked to a folder:'
-        foreach ($Rule in ($UnlinkedRules | Sort-Object -Property Name)) {
+        foreach ($Rule in ($UnlinkedRules | Sort-Object -Property 'Name')) {
             Write-Warning -Message $Rule.Name
         }
     }
@@ -263,7 +263,7 @@ Function Get-MailboxActivitySummary {
         [Int]$ProgressParentId
     )
 
-    Test-CommandAvailable -Name Get-Mailbox
+    Test-CommandAvailable -Name 'Get-Mailbox'
 
     if (!$EndDate) {
         $EndDate = Get-Date
@@ -341,7 +341,7 @@ Function Get-Office365EntityUsageSummary {
 
     Write-Verbose -Message 'Checking required modules are present ...'
     Test-ModuleAvailable -Name $Modules
-    Test-CommandAvailable -Name Get-OrganizationConfig
+    Test-CommandAvailable -Name 'Get-OrganizationConfig'
 
     if ($Type -eq 'User') {
         Write-Verbose -Message 'Checking Microsoft Online connection ...'
@@ -375,7 +375,7 @@ Function Get-Office365EntityUsageSummary {
 
     Write-Verbose -Message 'Connecting to Microsoft Graph API ...'
     try {
-        $null = Connect-MgGraph -Scopes Group.Read.All, Notes.Read.All -ErrorAction Stop
+        $null = Connect-MgGraph -Scopes 'Group.Read.All', 'Notes.Read.All' -ErrorAction Stop
     } catch {
         throw $_
     }
@@ -408,7 +408,7 @@ Function Get-Office365EntityUsageSummary {
         } else {
             $Mailbox = Get-Mailbox -Identity $ExoIdentity -GroupMailbox -ErrorAction Stop
         }
-        $Mailbox | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.PrimarySmtpAddress } -Force
+        $Mailbox | Add-Member -MemberType ScriptMethod -Name 'ToString' -Value { $this.PrimarySmtpAddress } -Force
     } catch {
         throw $_
     }
@@ -417,7 +417,7 @@ Function Get-Office365EntityUsageSummary {
     Write-Verbose -Message ('Retrieving {0} mailbox statistics ...' -f $Type)
     try {
         $MailboxStatistics = Get-MailboxStatistics -Identity $ExoIdentity -ErrorAction Stop
-        $MailboxStatistics | Add-Member -MemberType ScriptMethod -Name ToString -Value { '{0} items / {1}' -f $this.ItemCount, $this.TotalItemSize } -Force
+        $MailboxStatistics | Add-Member -MemberType ScriptMethod -Name 'ToString' -Value { '{0} items / {1}' -f $this.ItemCount, $this.TotalItemSize } -Force
     } catch {
         throw $_
     }
@@ -426,7 +426,7 @@ Function Get-Office365EntityUsageSummary {
     Write-Verbose -Message ('Retrieving {0} calendar ...' -f $Type)
     try {
         $Calendar = Get-MailboxFolderStatistics -Identity $ExoIdentity -FolderScope Calendar -ErrorAction Stop | Where-Object FolderType -EQ 'Calendar'
-        $Calendar | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.VisibleItemsInFolder } -Force
+        $Calendar | Add-Member -MemberType ScriptMethod -Name 'ToString' -Value { $this.VisibleItemsInFolder } -Force
     } catch {
         throw $_
     }
@@ -453,7 +453,7 @@ Function Get-Office365EntityUsageSummary {
         } else {
             $Site = Get-SPOSite -Identity $Group.SharePointSiteUrl -Detailed -ErrorAction Stop
         }
-        $Site | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.StorageUsageCurrent } -Force
+        $Site | Add-Member -MemberType ScriptMethod -Name 'ToString' -Value { $this.StorageUsageCurrent } -Force
     } catch {
         throw $_
     }
@@ -540,7 +540,7 @@ Function Get-Office365UserLicensingMatrix {
     [OutputType([Void], [PSCustomObject[]])]
     Param()
 
-    Test-CommandAvailable -Name Get-MsolUser
+    Test-CommandAvailable -Name 'Get-MsolUser'
 
     $Users = Get-MsolUser -All
     $Licenses = $Users.Licenses.AccountSkuId | Sort-Object -Unique | ForEach-Object { $_.Split(':')[1] }
@@ -579,7 +579,7 @@ Function Get-Office365UserSecurityReport {
         [Int]$AccountInactiveDays = 30
     )
 
-    Test-CommandAvailable -Name Get-Mailbox, Get-MsolUser
+    Test-CommandAvailable -Name 'Get-Mailbox', 'Get-MsolUser'
 
     $MailboxAuditing = [Collections.Generic.List[PSCustomObject]]::new()
     $MailboxCalendar = [Collections.Generic.List[Object]]::new()
@@ -592,11 +592,11 @@ Function Get-Office365UserSecurityReport {
     Write-Verbose -Message 'Retrieving all enabled users ...'
     $Users = Get-MsolUser -All -EnabledFilter EnabledOnly -ErrorAction Stop |
         Where-Object UserType -NE 'Guest' |
-        Sort-Object -Property UserPrincipalName |
+        Sort-Object -Property 'UserPrincipalName' |
         ForEach-Object {
-            Add-Member -InputObject $_ -MemberType NoteProperty -Name IsActive -Value $false
-            Add-Member -InputObject $_ -MemberType ScriptProperty -Name IsFederated -Value { if ($null -ne $this.ImmutableId) { $true } else { $false } }
-            Add-Member -InputObject $_ -MemberType ScriptProperty -Name StrongAuthenticationState -Value { $this.StrongAuthenticationRequirements.State }
+            Add-Member -InputObject $_ -MemberType NoteProperty -Name 'IsActive' -Value $false
+            Add-Member -InputObject $_ -MemberType ScriptProperty -Name 'IsFederated' -Value { if ($null -ne $this.ImmutableId) { $true } else { $false } }
+            Add-Member -InputObject $_ -MemberType ScriptProperty -Name 'StrongAuthenticationState' -Value { $this.StrongAuthenticationRequirements.State }
             $_.PSObject.TypeNames.Insert(0, 'Microsoft.Online.Administration.User.Security')
             $_
         }
@@ -712,7 +712,7 @@ Function Get-UnifiedGroupReport {
         [PSObject[]]$Groups
     )
 
-    Test-CommandAvailable -Name Get-UnifiedGroup
+    Test-CommandAvailable -Name 'Get-UnifiedGroup'
 
     $WriteProgressParams = @{
         Activity = 'Retrieving Unified Group report'
@@ -731,14 +731,14 @@ Function Get-UnifiedGroupReport {
         $Owners = Get-UnifiedGroupLinks -Identity $Group.Identity -LinkType Owners
         if ($Owners) {
             $AllOwners = ($Owners | Sort-Object) -join ', '
-            Add-Member -InputObject $Group -MemberType NoteProperty -Name Owners -Value $AllOwners -Force
+            Add-Member -InputObject $Group -MemberType NoteProperty -Name 'Owners' -Value $AllOwners -Force
         }
 
         Write-Progress @WriteProgressParams -CurrentOperation 'Retrieving members'
         $Members = Get-UnifiedGroupLinks -Identity $Group.Identity -LinkType Members
         if ($Members) {
             $AllMembers = ($Members | Sort-Object) -join ', '
-            Add-Member -InputObject $Group -MemberType NoteProperty -Name Members -Value $AllMembers -Force
+            Add-Member -InputObject $Group -MemberType NoteProperty -Name 'Members' -Value $AllMembers -Force
         }
 
         $GroupsDone++
@@ -772,7 +772,7 @@ Function Compare-ProtectionAlert {
 
     $Results = [Collections.Generic.List[PSCustomObject]]::new()
 
-    foreach ($RefAlert in ($ReferenceObject | Sort-Object -Property Name)) {
+    foreach ($RefAlert in ($ReferenceObject | Sort-Object -Property 'Name')) {
         $DiffAlert = $DifferenceObject | Where-Object Name -EQ $RefAlert.Name
         if (!$DiffAlert) {
             Write-Warning -Message ('[ID: {0}] Reference alert with no associated difference alert (Ref Name: {1}).' -f $RefAlert.ImmutableId, $RefAlert.Name)
@@ -798,7 +798,7 @@ Function Compare-ProtectionAlert {
         }
     }
 
-    foreach ($DiffAlert in ($DifferenceObject | Sort-Object -Property Name)) {
+    foreach ($DiffAlert in ($DifferenceObject | Sort-Object -Property 'Name')) {
         $RefAlert = $ReferenceObject | Where-Object Name -EQ $DiffAlert.Name
         if (!$RefAlert) {
             Write-Warning -Message ('[ID: {0}] Difference alert with no associated reference alert (Ref Name: {1}).' -f $DiffAlert.ImmutableId, $DiffAlert.Name)
@@ -1127,7 +1127,7 @@ Function Connect-ExchangeOnline {
     )
 
     try {
-        Test-ModuleAvailable -Name ExchangeOnlineManagement
+        Test-ModuleAvailable -Name 'ExchangeOnlineManagement'
         $ExoModuleVersion = 2
     } catch {
         Write-Warning -Message 'ExchangeOnlineManagement v2 module is not available. Falling back to v1 ...'
@@ -1140,7 +1140,7 @@ Function Connect-ExchangeOnline {
         }
 
         $ExoModuleMinVersion = [Version]::new(2, 0, 4)
-        $ExoModuleCurrentVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable -Verbose:$false | Select-Object -First 1 -ExpandProperty Version
+        $ExoModuleCurrentVersion = Get-Module -Name 'ExchangeOnlineManagement' -ListAvailable -Verbose:$false | Select-Object -First 1 -ExpandProperty 'Version'
         if ($ExoModuleCurrentVersion -lt $ExoModuleMinVersion) {
             throw 'ExchangeOnlineManagement under PowerShell Core requires v{0} or newer.' -f $ExoModuleMinVersion
         }
@@ -1166,7 +1166,7 @@ Function Connect-ExchangeOnline {
         if ($ExoModuleVersion -eq 2) {
             ExchangeOnlineManagement\Connect-ExchangeOnline -Credential $Credential -ShowBanner:$false
         } else {
-            $ExchangeOnline = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
+            $ExchangeOnline = New-PSSession -ConfigurationName 'Microsoft.Exchange' -ConnectionUri 'https://outlook.office365.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
             Import-PSSession -Session $ExchangeOnline -DisableNameChecking
         }
     }
@@ -1186,7 +1186,7 @@ Function Connect-CentralizedDeployment {
         throw 'O365CentralizedAddInDeployment module is incompatible with PowerShell Core.'
     }
 
-    Test-ModuleAvailable -Name O365CentralizedAddInDeployment
+    Test-ModuleAvailable -Name 'O365CentralizedAddInDeployment'
 
     Write-Host -ForegroundColor Green 'Connecting to Office 365 Centralized Deployment ...'
     Connect-OrganizationAddInService @PSBoundParameters
@@ -1202,7 +1202,7 @@ Function Connect-MicrosoftTeams {
         [PSCredential]$Credential
     )
 
-    Test-ModuleAvailable -Name MicrosoftTeams
+    Test-ModuleAvailable -Name 'MicrosoftTeams'
 
     Write-Host -ForegroundColor Green 'Connecting to Microsoft Teams ...'
     MicrosoftTeams\Connect-MicrosoftTeams @PSBoundParameters
@@ -1224,7 +1224,7 @@ Function Connect-SecurityAndComplianceCenter {
     )
 
     try {
-        Test-ModuleAvailable -Name ExchangeOnlineManagement
+        Test-ModuleAvailable -Name 'ExchangeOnlineManagement'
         $ExoModuleVersion = 2
     } catch {
         if ($PSCmdlet.ParameterSetName -eq 'MFA') {
@@ -1241,7 +1241,7 @@ Function Connect-SecurityAndComplianceCenter {
         }
 
         $ExoModuleMinVersion = [Version]::new(2, 0, 4)
-        $ExoModuleCurrentVersion = Get-Module -Name ExchangeOnlineManagement -ListAvailable -Verbose:$false | Select-Object -First 1 -ExpandProperty Version
+        $ExoModuleCurrentVersion = Get-Module -Name 'ExchangeOnlineManagement' -ListAvailable -Verbose:$false | Select-Object -First 1 -ExpandProperty 'Version'
         if ($ExoModuleCurrentVersion -lt $ExoModuleMinVersion) {
             throw 'ExchangeOnlineManagement under PowerShell Core requires v{0} or newer.' -f $ExoModuleMinVersion
         }
@@ -1262,7 +1262,7 @@ Function Connect-SecurityAndComplianceCenter {
         if ($ExoModuleVersion -eq 2) {
             Connect-IPPSSession -Credential $Credential
         } else {
-            $SCC = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri 'https://ps.compliance.protection.outlook.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
+            $SCC = New-PSSession -ConfigurationName 'Microsoft.Exchange' -ConnectionUri 'https://ps.compliance.protection.outlook.com/powershell-liveid/' -Credential $Credential -Authentication Basic -AllowRedirection
             Import-PSSession -Session $SCC -DisableNameChecking
         }
     }
@@ -1285,7 +1285,7 @@ Function Connect-SharePointOnline {
         throw 'Microsoft.Online.SharePoint.PowerShell module is incompatible with PowerShell Core.'
     }
 
-    Test-ModuleAvailable -Name Microsoft.Online.SharePoint.PowerShell
+    Test-ModuleAvailable -Name 'Microsoft.Online.SharePoint.PowerShell'
 
     $ConnectParams = @{
         Url = 'https://{0}-admin.sharepoint.com' -f $TenantName
@@ -1305,12 +1305,12 @@ Function Import-ExoPowershellModule {
     [OutputType([Void])]
     Param()
 
-    if (Get-Command -Name Connect-EXOPSSession -ErrorAction Ignore) {
+    if (Get-Command -Name 'Connect-EXOPSSession' -ErrorAction Ignore) {
         return
     }
 
     $ClickOnceAppsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Apps\2.0'
-    $ExoPowerShellManifest = Get-ChildItem -LiteralPath $ClickOnceAppsPath -Recurse | Where-Object Name -EQ 'Microsoft.Exchange.Management.ExoPowershellModule.manifest' | Sort-Object -Property LastWriteTime | Select-Object -Last 1
+    $ExoPowerShellManifest = Get-ChildItem -LiteralPath $ClickOnceAppsPath -Recurse | Where-Object Name -EQ 'Microsoft.Exchange.Management.ExoPowershellModule.manifest' | Sort-Object -Property 'LastWriteTime' | Select-Object -Last 1
     if (!$ExoPowerShellManifest) {
         throw 'Required module not available: Microsoft.Exchange.Management.ExoPowershellModule'
     }
@@ -1326,7 +1326,7 @@ Function Import-ExoPowershellModule {
     # Change the scope of imported functions to be global (better approach?)
     $Functions = 'Connect-EXOPSSession', 'Connect-IPPSSession', 'Test-Uri'
     foreach ($Function in $Functions) {
-        $null = New-Item -Path Function: -Name Global:$Function -Value (Get-Content -LiteralPath Function:\$Function)
+        $null = New-Item -Path 'Function:' -Name "Global:$Function" -Value (Get-Content -LiteralPath Function:\$Function)
     }
 }
 

@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type Settings -Name PowerShell
+Start-DotFilesSection -Type 'Settings' -Name 'PowerShell'
 
 # Number of elements to enumerate when displaying arrays
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
@@ -19,12 +19,12 @@ Function Out-Default {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidOverwritingBuiltInCmdlets', '')]
     Param()
 
-    $Input | Tee-Object -Variable LastObject | Microsoft.PowerShell.Core\Out-Default
+    $Input | Tee-Object -Variable 'LastObject' | Microsoft.PowerShell.Core\Out-Default
     $Global:LastObject = $LastObject
 }
 
 # Setup our custom prompt if oh-my-posh is not loaded
-if (!(Get-Command -Name oh-my-posh -ErrorAction Ignore)) {
+if (!(Get-Command -Name 'oh-my-posh' -ErrorAction Ignore)) {
     Function Prompt {
         $prompt = ''
 

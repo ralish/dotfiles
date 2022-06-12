@@ -12,7 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 }
 
 # Opt-out of telemetry
-$TelemetryStatus = Get-EnvironmentVariable -Name M365DSCTelemetryEnabled -Scope Machine
+$TelemetryStatus = Get-EnvironmentVariable -Name 'M365DSCTelemetryEnabled' -Scope Machine
 if ($TelemetryStatus -ne 'False') {
     Write-Warning -Message 'Telemetry is enabled for the Microsoft365DSC module.'
 }

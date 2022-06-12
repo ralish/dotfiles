@@ -181,7 +181,7 @@ Function Optimize-PowerShell {
 
             # There's some caching of package providers and I've yet to find a
             # way to invalidate it so we request the user restart the session.
-            if (Get-Module -Name PowerShellGet) {
+            if (Get-Module -Name 'PowerShellGet') {
                 Write-Host -ForegroundColor Cyan '[PowerShell] You must restart PowerShell to complete NuGet package provider installation.'
                 Write-Host -ForegroundColor Cyan '             Re-run this script afterwards to continue initial PowerShell configuration.'
                 return
@@ -189,17 +189,17 @@ Function Optimize-PowerShell {
         }
     }
 
-    $PSGallery = Get-PSRepository -Name PSGallery
+    $PSGallery = Get-PSRepository -Name 'PSGallery'
     if ($PSGallery.InstallationPolicy -ne 'Trusted') {
         Write-Host -ForegroundColor Green '[PowerShell] Setting PSGallery repository to trusted ...'
-        $null = Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+        $null = Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
     }
 
     Write-Host -ForegroundColor Green '[PowerShell] Checking PowerShellGet module ...'
     $PSGetOutdated = $true
-    $PSGetLoaded = Get-Module -Name PowerShellGet | Sort-Object -Property Version -Descending | Select-Object -First 1
+    $PSGetLoaded = Get-Module -Name 'PowerShellGet' | Sort-Object -Property 'Version' -Descending | Select-Object -First 1
     if ($PSGetLoaded) {
-        $PSGetLatest = Find-Module -Name PowerShellGet
+        $PSGetLatest = Find-Module -Name 'PowerShellGet'
         if ($PSGetLoaded.Version -ge $PSGetLatest.Version) {
             $PSGetOutdated = $false
         }
@@ -207,9 +207,9 @@ Function Optimize-PowerShell {
 
     if ($PSGetOutdated) {
         Write-Host -ForegroundColor Green '[PowerShell] Updating PowerShellGet module ...'
-        Install-Module -Name PowerShellGet -Force
-        Import-Module -Name PowerShellGet -Force
-        $PSGetImported = Get-Module -Name PowerShellGet | Sort-Object -Property Version -Descending | Select-Object -First 1
+        Install-Module -Name 'PowerShellGet' -Force
+        Import-Module -Name 'PowerShellGet' -Force
+        $PSGetImported = Get-Module -Name 'PowerShellGet' | Sort-Object -Property 'Version' -Descending | Select-Object -First 1
 
         # PowerShellGet loads various .NET types, and types can't be unloaded
         # (at least not easily). That can be problematic as when loading a new
@@ -226,11 +226,11 @@ Function Optimize-PowerShell {
 
     Write-Host -ForegroundColor Green '[PowerShell] Determining modules to update ...'
     $Modules = 'PSReadLine', 'PSWinGlue', 'PSWinVitals', 'PSWindowsUpdate', 'SpeculationControl'
-    $ModulesLatest = Find-Module -Name $Modules -Repository PSGallery
+    $ModulesLatest = Find-Module -Name $Modules -Repository 'PSGallery'
     $ModulesInstall = New-Object -TypeName Collections.Generic.List[String]
 
     foreach ($ModuleLatest in $ModulesLatest) {
-        $ModuleCurrent = Get-Module -Name $ModuleLatest.Name -ListAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1
+        $ModuleCurrent = Get-Module -Name $ModuleLatest.Name -ListAvailable | Sort-Object -Property 'Version' -Descending | Select-Object -First 1
         if ($ModuleCurrent.Version -ge $ModuleLatest.Version) {
             continue
         }
@@ -532,7 +532,7 @@ Function Optimize-WindowsSettingsUser {
     }
 
     # Remove volume control icon
-    $AudioSrv = Get-Service -Name AudioSrv -ErrorAction SilentlyContinue
+    $AudioSrv = Get-Service -Name 'AudioSrv' -ErrorAction SilentlyContinue
     if ($AudioSrv.Status -eq 'Stopped') {
         # Unclear how the equivalent UI setting is set
         Set-RegistryValue -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer' -Name 'HideSCAVolume' -Type DWord -Value 1
@@ -561,7 +561,7 @@ Function Optimize-WindowsUpdate {
     Set-RegistryValue -Path 'HKCU:\Software\Policies\Microsoft\MRT' -Name 'DontOfferThroughWUAU' -Type DWord -Value 1
 
     Write-Host -ForegroundColor Green '[Windows] Registering Microsoft Update ...'
-    $ServiceManager = New-Object -ComObject Microsoft.Update.ServiceManager
+    $ServiceManager = New-Object -ComObject 'Microsoft.Update.ServiceManager'
     $ServiceRegistration = $ServiceManager.AddService2('7971f918-a847-4430-9279-4a52d1efe18d', 7, '')
     $null = [Runtime.InteropServices.Marshal]::FinalReleaseComObject($ServiceRegistration)
     $null = [Runtime.InteropServices.Marshal]::FinalReleaseComObject($ServiceManager)
@@ -579,7 +579,7 @@ Function Get-WindowsInfo {
         $WmiCommand = 'Get-WmiObject'
     }
 
-    $Win32OpSys = & $WmiCommand -Class Win32_OperatingSystem -Verbose:$false
+    $Win32OpSys = & $WmiCommand -Class 'Win32_OperatingSystem' -Verbose:$false
     $Script:WindowsBuildNumber = [int]$Win32OpSys.BuildNumber
     $Script:WindowsProductType = $Win32OpSys.ProductType
 
@@ -834,7 +834,7 @@ Function Test-IsWindows64bit {
         $WmiCommand = 'Get-WmiObject'
     }
 
-    if ((& $WmiCommand -Class Win32_OperatingSystem -Verbose:$false).OSArchitecture -eq '64-bit') {
+    if ((& $WmiCommand -Class 'Win32_OperatingSystem' -Verbose:$false).OSArchitecture -eq '64-bit') {
         return $true
     }
 

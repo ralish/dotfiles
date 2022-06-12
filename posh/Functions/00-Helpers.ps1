@@ -16,7 +16,7 @@ Function Complete-DotFilesSection {
         Write-Verbose -Message (Get-DotFilesMessage -Message $Timing)
     }
 
-    Remove-Variable -Name DotFilesSection* -Scope Global
+    Remove-Variable -Name 'DotFilesSection*' -Scope Global
 }
 
 # Retrieve a formatted dotfiles message
@@ -315,7 +315,7 @@ Function Test-ModuleAvailable {
             $MissingModule = $false
 
             if ($PassThru) {
-                $ModuleInfo.Add(($ModuleAvailable | Sort-Object -Property Version -Descending | Select-Object -First 1))
+                $ModuleInfo.Add(($ModuleAvailable | Sort-Object -Property 'Version' -Descending | Select-Object -First 1))
             }
 
             if ($Require -eq 'Any') {

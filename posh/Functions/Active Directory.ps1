@@ -36,7 +36,7 @@ Function Get-KerberosTokenSize {
         [String]$Server
     )
 
-    Test-ModuleAvailable -Name ActiveDirectory
+    Test-ModuleAvailable -Name 'ActiveDirectory'
 
     $CommonParams = @{
         ErrorAction = 'Stop'
@@ -67,7 +67,7 @@ Function Get-KerberosTokenSize {
     }
 
     try {
-        $ADUser = Get-ADUser @CommonParams -Identity $User -Properties SIDHistory, TrustedForDelegation
+        $ADUser = Get-ADUser @CommonParams -Identity $User -Properties 'SIDHistory', 'TrustedForDelegation'
     } catch {
         throw $_
     }
@@ -142,7 +142,7 @@ Function Resolve-ADGuid {
     )
 
     Begin {
-        Test-ModuleAvailable -Name ActiveDirectory
+        Test-ModuleAvailable -Name 'ActiveDirectory'
 
         $CommonParams = @{
             ErrorAction = 'Stop'
@@ -242,7 +242,7 @@ Function Add-ADShadowPrincipalMember {
         [Switch]$PassThru
     )
 
-    Test-ModuleAvailable -Name ActiveDirectory
+    Test-ModuleAvailable -Name 'ActiveDirectory'
 
     $CommonParams = @{
         ErrorAction = 'Stop'
@@ -292,7 +292,7 @@ Function Get-ADShadowPrincipalContainer {
         [String]$Server
     )
 
-    Test-ModuleAvailable -Name ActiveDirectory
+    Test-ModuleAvailable -Name 'ActiveDirectory'
 
     $CommonParams = @{
         ErrorAction = 'Stop'
@@ -335,7 +335,7 @@ Function New-ADShadowPrincipal {
         [Switch]$PassThru
     )
 
-    Test-ModuleAvailable -Name ActiveDirectory
+    Test-ModuleAvailable -Name 'ActiveDirectory'
 
     $CommonParams = @{
         ErrorAction = 'Stop'
@@ -351,7 +351,7 @@ Function New-ADShadowPrincipal {
     $SidByteArray = [byte[]]::new($Sid.BinaryLength)
     $Sid.GetBinaryForm($SidByteArray, 0)
 
-    New-ADObject @CommonParams -Type msDS-ShadowPrincipal -Path $ShadowPrincipalContainer -Name $Name -OtherAttributes @{ 'msDS-ShadowPrincipalSid' = $SidByteArray }
+    New-ADObject @CommonParams -Type 'msDS-ShadowPrincipal' -Path $ShadowPrincipalContainer -Name $Name -OtherAttributes @{ 'msDS-ShadowPrincipalSid' = $SidByteArray }
 }
 
 #endregion

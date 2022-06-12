@@ -21,7 +21,7 @@ Set-PSReadLineOption -HistoryNoDuplicates
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
 # Enable command-line completion prediction (PSReadLine v2.1+)
-if ((Get-Module -Name PSReadLine).Version -ge [Version]::new('2.1.0')) {
+if ((Get-Module -Name 'PSReadLine').Version -ge [Version]::new('2.1.0')) {
     Set-PSReadLineOption -PredictionSource History
 }
 
@@ -61,7 +61,7 @@ $Params = @{
     ScriptBlock      = $ScriptBlock
 }
 Set-PSReadLineKeyHandler @Params
-Remove-Variable -Name Params, ScriptBlock
+Remove-Variable -Name 'Params', 'ScriptBlock'
 
 # We use the Solarized Dark colour scheme for WSL sessions in Windows Terminal.
 # Unfortunately, some of PSReadLine's colours are near invisible when used with

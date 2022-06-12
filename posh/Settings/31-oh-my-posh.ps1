@@ -18,7 +18,7 @@ Function Get-OhMyPoshConfig {
     Param()
 
     if (!$env:POSH_THEMES_PATH) {
-        $OmpBasePath = Split-Path -Path (Split-Path -Path (Get-Command -Name oh-my-posh).Source)
+        $OmpBasePath = Split-Path -Path (Split-Path -Path (Get-Command -Name 'oh-my-posh').Source)
         $env:POSH_THEMES_PATH = Join-Path -Path $OmpBasePath -ChildPath 'themes'
     }
 
@@ -37,13 +37,13 @@ $VerbosePreference = 'SilentlyContinue'
 
 # Restore the original $VerbosePreference setting
 $VerbosePreference = $VerboseOriginal
-Remove-Variable -Name VerboseOriginal
+Remove-Variable -Name 'VerboseOriginal'
 
 # Enable posh-git support if previously imported
-if (Get-Module -Name posh-git) {
+if (Get-Module -Name 'posh-git') {
     $env:POSH_GIT_ENABLED = $true
 }
 
-Remove-Item -Path Function:\Get-OhMyPoshConfig
-Remove-Variable -Name OmpThemeName
+Remove-Item -Path 'Function:\Get-OhMyPoshConfig'
+Remove-Variable -Name 'OmpThemeName'
 Complete-DotFilesSection

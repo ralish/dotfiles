@@ -51,13 +51,13 @@ Function Repair-ConHostVT100Bug {
     }
 
     # Bug only present in Windows builds 10586 through 19040
-    $BuildNumber = [int](Get-CimInstance -ClassName Win32_OperatingSystem -Verbose:$false).BuildNumber
+    $BuildNumber = [int](Get-CimInstance -ClassName 'Win32_OperatingSystem' -Verbose:$false).BuildNumber
     if (!($BuildNumber -ge 10586 -and $BuildNumber -lt 19041)) {
         return
     }
 
     # Bug only occurs if VirtualTerminalLevel setting is set to 1
-    $VirtualTerminalLevel = (Get-ItemProperty -LiteralPath HKCU:\Console -Name VirtualTerminalLevel -ErrorAction SilentlyContinue).VirtualTerminalLevel
+    $VirtualTerminalLevel = (Get-ItemProperty -LiteralPath 'HKCU:\Console' -Name 'VirtualTerminalLevel' -ErrorAction SilentlyContinue).VirtualTerminalLevel
     if ($VirtualTerminalLevel -ne 1) {
         return
     }
@@ -117,7 +117,7 @@ public static extern bool SetConsoleMode(
 '@
 
     if (!('DotFiles.Console' -as [Type])) {
-        Add-Type -Namespace DotFiles -Name Console -MemberDefinition $ConsoleAPI
+        Add-Type -Namespace 'DotFiles' -Name 'Console' -MemberDefinition $ConsoleAPI
     }
 
     # The STD_INPUT_HANDLE shouldn't be relevant to this issue
@@ -154,5 +154,5 @@ public static extern bool SetConsoleMode(
 
 Repair-ConHostVT100Bug
 
-Remove-Item -Path Function:\Repair-ConHostVT100Bug
+Remove-Item -Path 'Function:\Repair-ConHostVT100Bug'
 Complete-DotFilesSection

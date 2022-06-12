@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type Functions -Name OpenSSH
+Start-DotFilesSection -Type 'Functions' -Name 'OpenSSH'
 
 # Update OpenSSH configuration
 Function Update-OpenSSHConfig {
@@ -6,7 +6,7 @@ Function Update-OpenSSHConfig {
     [OutputType([Void])]
     Param()
 
-    if (!(Get-Command -Name ssh -ErrorAction Ignore)) {
+    if (!(Get-Command -Name 'ssh' -ErrorAction Ignore)) {
         throw 'Unable to locate ssh executable.'
     }
 

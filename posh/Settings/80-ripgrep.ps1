@@ -18,7 +18,7 @@ Function Get-RipgrepCompletionPath {
     Param()
 
     try {
-        $RgCommand = Get-Command -Name rg
+        $RgCommand = Get-Command -Name 'rg'
         if (!$RgCommand.Name.EndsWith('.ps1')) {
             return
         }
@@ -44,8 +44,8 @@ if (Test-IsWindows) {
     if ($RgCompletion) {
         . $RgCompletion
     }
-    Remove-Variable -Name RgCompletion
+    Remove-Variable -Name 'RgCompletion'
 }
 
-Remove-Item -Path Function:\Get-RipgrepCompletionPath
+Remove-Item -Path 'Function:\Get-RipgrepCompletionPath'
 Complete-DotFilesSection

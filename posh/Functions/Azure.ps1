@@ -211,7 +211,7 @@ Function Get-AzureUsersDisabledServices {
         throw 'MSOnline module is incompatible with PowerShell Core.'
     }
 
-    Test-ModuleAvailable -Name MSOnline
+    Test-ModuleAvailable -Name 'MSOnline'
 
     $Results = [Collections.Generic.List[PSCustomObject]]::new()
     $Users = Get-MsolUser -ErrorAction Stop | Where-Object IsLicensed
@@ -240,7 +240,7 @@ Function Get-AzureUsersLicensingSummary {
         throw 'MSOnline module is incompatible with PowerShell Core.'
     }
 
-    Test-ModuleAvailable -Name MSOnline
+    Test-ModuleAvailable -Name 'MSOnline'
 
     $Users = Get-MsolUser -ErrorAction Stop | Where-Object UserType -NE 'Guest'
 
@@ -252,7 +252,7 @@ Function Get-AzureUsersLicensingSummary {
             $LicensingSummary = [String]::Empty
         }
 
-        Add-Member -InputObject $User -MemberType NoteProperty -Name LicensingSummary -Value $LicensingSummary
+        Add-Member -InputObject $User -MemberType NoteProperty -Name 'LicensingSummary' -Value $LicensingSummary
         $User.PSObject.TypeNames.Insert(0, 'Microsoft.Online.Administration.User.Licenses')
     }
 
@@ -288,7 +288,7 @@ Function Connect-AzureAD {
         Test-ModuleAvailable -Name $ModuleNames -Require Any
     }
 
-    $Module = $CandidateModules | Sort-Object -Property Version | Select-Object -Last 1
+    $Module = $CandidateModules | Sort-Object -Property 'Version' | Select-Object -Last 1
     $ModuleName = $Module.Name
 
     Write-Host -ForegroundColor Green 'Connecting to Azure AD (v2) ...'
@@ -309,7 +309,7 @@ Function Connect-AzureRM {
         throw 'AzureRM module is incompatible with PowerShell Core.'
     }
 
-    Test-ModuleAvailable -Name AzureRM
+    Test-ModuleAvailable -Name 'AzureRM'
 
     Write-Host -ForegroundColor Green 'Connecting to Azure RM ...'
     Login-AzureRmAccount @PSBoundParameters
@@ -329,7 +329,7 @@ Function Connect-MSOnline {
         throw 'MSOnline module is incompatible with PowerShell Core.'
     }
 
-    Test-ModuleAvailable -Name MSOnline
+    Test-ModuleAvailable -Name 'MSOnline'
 
     Write-Host -ForegroundColor Green 'Connecting to Azure AD (v1) ...'
     Connect-MsolService @PSBoundParameters
