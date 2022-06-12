@@ -8,6 +8,10 @@ Function Complete-DotFilesSection {
     Param()
 
     if ($Global:DotFilesShowTimings) {
+        if ($Global:DotFilesSectionStart -isnot [DateTime]) {
+            throw 'No start time found for section timing.'
+        }
+
         $Timing = Get-DotFilesTiming -StartTime $Global:DotFilesSectionStart
         Write-Verbose -Message (Get-DotFilesMessage -Message $Timing)
     }
@@ -139,7 +143,7 @@ Function Start-DotFilesSection {
 
     if ($PwshHostName) {
         if ($Host.Name -notin $PwshHostName) {
-            Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as host is not supported: {0}' -f $Host.Name)
+            Write-Verbose -Message (Get-DotFilesMessage -Message ('Skipping as host is not supported: {0}' -f $Host.Name))
             return $false
         }
     }
@@ -219,6 +223,11 @@ Function Test-EnvironmentMatch {
 
         $EnvCurrentValue = [Environment]::GetEnvironmentVariable($EnvName)
 
+        # An empty string is an invalid environment variable value on Windows
+        if ((Test-IsWindows) -and $EnvExpectedValue -is [String] -and $EnvExpectedValue -eq [String]::Empty) {
+            throw 'Environment variable "{0}" cannot be set to an empty string on Windows.' -f $EnvName
+        }
+
         if ($EnvExpectedValue -is [Boolean]) {
             # Environment variable must not exist
             if ($EnvExpectedValue -eq $false) {
@@ -235,11 +244,12 @@ Function Test-EnvironmentMatch {
             continue
         }
 
-        # Environment variable must match provided value
-        if ($null -ne $EnvCurrentValue) {
-            throw 'Environment variable "{0}" set to "{1}" but expected "{2}".' -f $EnvName, $EnvCurrentValue, $EnvExpectedValue
-        } else {
+        if ($null -eq $EnvCurrentValue) {
             throw 'Environment variable "{0}" is not set but expected "{1}".' -f $EnvName, $EnvExpectedValue
+        }
+
+        if ($EnvExpectedValue -ne $EnvCurrentValue) {
+            throw 'Environment variable "{0}" set to "{1}" but expected "{2}".' -f $EnvName, $EnvCurrentValue, $EnvExpectedValue
         }
     }
 }
@@ -253,6 +263,7 @@ Function Test-IsWindows {
     if ($PSVersionTable.PSEdition -eq 'Desktop' -or $PSVersionTable.Platform -eq 'Win32NT') {
         return $true
     }
+
     return $false
 }
 

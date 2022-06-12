@@ -438,7 +438,7 @@ Function Switch-Nodejs {
     )
 
     if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
-        throw 'Provided Nodejs path is not a directory: {0}' -f $Path
+        throw 'Provided Node.js path is not a directory: {0}' -f $Path
     }
 
     $PathParams = @{}

@@ -963,7 +963,7 @@ Function Import-ContentSearchResults {
     }
 
     End {
-        $Results = @{
+        $Results = [PSCustomObject]@{
             Contacts   = $Contacts
             Statistics = $Statistics
         }

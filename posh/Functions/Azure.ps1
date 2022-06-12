@@ -17,7 +17,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1
 # Retrieve an Azure AD authorization header
 Function Get-AzureAuthHeader {
     [CmdletBinding()]
-    [OutputType('Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult')]
+    [OutputType([Hashtable])]
     Param(
         [Parameter(Mandatory)]
         [Object]$AuthToken
