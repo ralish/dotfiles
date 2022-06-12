@@ -228,7 +228,7 @@ Function Update-AllTheThings {
         }
 
         if ($Tasks -contains 'Scoop') {
-            Write-Progress @WriteProgressParams -Status 'Updating Scoop apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Updating Scoop' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.Scoop = Update-Scoop -ProgressParentId $WriteProgressParams['Id']
             $TasksDone++
         }

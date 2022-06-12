@@ -116,7 +116,7 @@ Function Update-Scoop {
     )
 
     if (!(Get-Command -Name 'scoop' -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to update Scoop apps as scoop command not found.'
+        Write-Error -Message 'Unable to update Scoop as scoop command not found.'
         return
     }
 
@@ -130,26 +130,26 @@ Function Update-Scoop {
     }
 
     $Result = [PSCustomObject]@{
-        UpdateScoop = $null
-        UpdateApps  = $null
-        CleanupApps = $null
+        Scoop   = $null
+        Apps    = $null
+        Cleanup = $null
     }
 
     [String[]]$UpdateScoopArgs = 'update', '--quiet'
     [String[]]$UpdateAppsArgs = 'update', '*', '--quiet'
-    [String[]]$CleanupAppsArgs = 'cleanup', '-k', '*'
+    [String[]]$CleanupArgs = 'cleanup', '*', '--cache'
 
-    Write-Progress @WriteProgressParams -Status 'Updating module & repository' -PercentComplete 1
+    Write-Progress @WriteProgressParams -Status 'Updating Scoop' -PercentComplete 1
     Write-Verbose -Message ('Updating Scoop: scoop {0}' -f ($UpdateScoopArgs -join ' '))
-    $Result.UpdateScoop = & scoop @UpdateScoopArgs 6>&1
+    $Result.Scoop = & scoop @UpdateScoopArgs 6>&1
 
     Write-Progress @WriteProgressParams -Status 'Updating apps' -PercentComplete 20
-    Write-Verbose -Message ('Updating Scoop apps: scoop {0}' -f ($UpdateAppsArgs -join ' '))
-    $Result.UpdateApps = & scoop @UpdateAppsArgs 6>&1
+    Write-Verbose -Message ('Updating apps: scoop {0}' -f ($UpdateAppsArgs -join ' '))
+    $Result.Apps = & scoop @UpdateAppsArgs 6>&1
 
-    Write-Progress @WriteProgressParams -Status 'Uninstalling obsolete apps' -PercentComplete 80
-    Write-Verbose -Message ('Uninstalling obsolete Scoop apps: scoop {0}' -f ($CleanupAppsArgs -join ' '))
-    $Result.CleanupApps = & scoop @CleanupAppsArgs 6>&1
+    Write-Progress @WriteProgressParams -Status 'Cleaning-up obsolete files' -PercentComplete 80
+    Write-Verbose -Message ('Cleaning-up obsolete files: scoop {0}' -f ($CleanupArgs -join ' '))
+    $Result.Cleanup = & scoop @CleanupArgs 6>&1
 
     Write-Progress @WriteProgressParams -Completed
 
