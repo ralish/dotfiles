@@ -1202,10 +1202,6 @@ Function Connect-MicrosoftTeams {
         [PSCredential]$Credential
     )
 
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        throw 'MicrosoftTeams module is incompatible with PowerShell Core.'
-    }
-
     Test-ModuleAvailable -Name MicrosoftTeams
 
     Write-Host -ForegroundColor Green 'Connecting to Microsoft Teams ...'
