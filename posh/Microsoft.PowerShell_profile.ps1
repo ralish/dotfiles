@@ -6,20 +6,26 @@ foreach ($Param in [Environment]::GetCommandLineArgs()) {
 }
 
 # Display verbose messages during profile load
-#$DotFilesVerbose = $true
+if (!(Get-Variable -Name DotFilesVerbose -ErrorAction Ignore)) {
+    $DotFilesVerbose = $false
+}
 
 # Display timing data during profile load (requires verbose)
-#$DotFilesShowTimings = $true
+if (!(Get-Variable -Name DotFilesShowTImings -ErrorAction Ignore)) {
+    $DotFilesShowTimings = $false
+}
 
 # Skip expensive calls for faster profile loading
 #
 # - Get-Module -ListAvailable
 #   Assume the module exists instead of checking
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-$DotFilesFastLoad = $true
+if (!(Get-Variable -Name DotFilesFastLoad -ErrorAction Ignore)) {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+    $DotFilesFastLoad = $true
+}
 
 # Enable verbose profile load
-if ($DotFilesVerbose) {
+if ($DotFilesVerbose -or $VerbosePreference -eq 'Continue') {
     # $VerbosePreference seems to have no value during profile load? Use
     # the default of SilentlyContinue when this appears to be the case.
     if ($VerbosePreference) {
@@ -76,7 +82,7 @@ if (Test-Path -LiteralPath $PoshScriptsPath -PathType Container) {
 Remove-Variable -Name PoshScriptsPath
 
 # Clean-up specific to running in verbose mode
-if ($DotFilesVerbose) {
+if ($DotFilesVerbose -or $VerbosePreference -eq 'Continue') {
     # Output total profile load time
     if ($DotFilesShowTimings) {
         $MessageParams = @{
@@ -93,5 +99,4 @@ if ($DotFilesVerbose) {
 }
 
 # Clean-up profile loading functions and variables
-Remove-Variable -Name DotFilesVerbose, DotFilesShowTimings, DotFilesFastLoad -ErrorAction Ignore
 Remove-DotFilesHelpers
