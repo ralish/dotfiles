@@ -133,6 +133,8 @@ Function Update-AllTheThings {
                 'ModernApps'
                 'Scoop'
             )
+        } else {
+            $ValidTasks += 'Homebrew'
         }
 
         $AttrValidateSet = [Management.Automation.ValidateSetAttribute]::new([String[]]$ValidTasks)
@@ -224,6 +226,12 @@ Function Update-AllTheThings {
         if ($Tasks -contains 'ModernApps') {
             Write-Progress @WriteProgressParams -Status 'Updating Microsoft Store apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.ModernApps = Update-ModernApps
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'Homebrew') {
+            Write-Progress @WriteProgressParams -Status 'Updating Homebrew' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.Homebrew = Update-Homebrew -ProgressParentId $WriteProgressParams['Id']
             $TasksDone++
         }
 
