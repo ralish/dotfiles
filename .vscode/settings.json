@@ -39,8 +39,6 @@
         "**/irssi/.irssi/*": "plain",
         // jetbrains
         "*.DotSettings": "xml",
-        // kpcli
-        "**/kpcli/bin/*": "perl",
         // less
         ".lesskey": "properties",
         // markdownlint
