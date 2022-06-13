@@ -1,0 +1,17 @@
+# Cygwin
+/cygwin/bin/
+
+# Modules
+/modules/oh-my-zsh/
+
+# PowerShell
+!/posh/Settings/
+
+# Shell app configurations
+!/sh/apps/
+
+# Stow
+/stow/
+
+# Themes
+/themes/

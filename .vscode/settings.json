@@ -4,6 +4,7 @@
     // See: https://github.com/Microsoft/vscode/issues/12805
     "files.associations": {
         // root
+        ".ignore": "ignore",
         "dot-manage": "shellscript",
         "dot-update": "shellscript",
         // bash
@@ -182,6 +183,12 @@
             "extensions": [".psqlrc"],
             "filename": true,
             "format": "svg"
+        },
+        {
+            "icon": "text",
+            "extensions": [".ignore"],
+            "filename": true,
+            "format": "svg",
         },
         {
             "icon": "vim",
