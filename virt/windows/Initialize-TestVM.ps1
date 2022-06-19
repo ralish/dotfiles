@@ -580,7 +580,7 @@ Function Get-WindowsInfo {
     }
 
     $Win32OpSys = & $WmiCommand -Class 'Win32_OperatingSystem' -Verbose:$false
-    $Script:WindowsBuildNumber = [int]$Win32OpSys.BuildNumber
+    $Script:WindowsBuildNumber = [Int]$Win32OpSys.BuildNumber
     $Script:WindowsProductType = $Win32OpSys.ProductType
 
     if (Test-Path -Path 'HKLM:\Software\WOW6432Node\Microsoft\Windows NT\CurrentVersion' -PathType Container) {
@@ -635,7 +635,7 @@ Function Remove-DiskCleanupProfile {
     [OutputType([Void])]
     Param(
         [ValidateRange(0, 9999)]
-        [int]$Number
+        [Int]$Number
     )
 
     $BasePath = 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches'
@@ -699,7 +699,7 @@ Function Set-DiskCleanupProfile {
     [OutputType([Void])]
     Param(
         [ValidateRange(0, 9999)]
-        [int]$Number,
+        [Int]$Number,
 
         [Parameter(ParameterSetName = 'OptOut')]
         [String[]]$ExcludeCategories,
@@ -777,14 +777,14 @@ Function Set-RegistryValue {
             $null = New-Item -Path $Path -Force -ErrorAction Stop
         }
     } catch {
-        throw ('Failure creating registry key: {0}' -f $Path)
+        throw 'Failure creating registry key: {0}' -f $Path
     }
 
     if ($PSCmdlet.ParameterSetName -eq 'KeyValue') {
         try {
             Set-ItemProperty @PSBoundParameters -ErrorAction Stop
         } catch {
-            throw ('Failure creating registry value "{0}" ({1}) under key: {2}' -f $Name, $Type, $Path)
+            throw 'Failure creating registry value "{0}" ({1}) under key: {2}' -f $Name, $Type, $Path
         }
     }
 }

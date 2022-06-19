@@ -51,7 +51,7 @@ Function Repair-ConHostVT100Bug {
     }
 
     # Bug only present in Windows builds 10586 through 19040
-    $BuildNumber = [int](Get-CimInstance -ClassName 'Win32_OperatingSystem' -Verbose:$false).BuildNumber
+    $BuildNumber = [Int](Get-CimInstance -ClassName 'Win32_OperatingSystem' -Verbose:$false).BuildNumber
     if (!($BuildNumber -ge 10586 -and $BuildNumber -lt 19041)) {
         return
     }
@@ -129,8 +129,8 @@ public static extern bool SetConsoleMode(
             throw [ComponentModel.Win32Exception]::new()
         }
 
-        [uint32]$ConStdMode = 0
-        if (!([DotFiles.Console]::GetConsoleMode($ConStdHandle, [ref]$ConStdMode))) {
+        [UInt]$ConStdMode = 0
+        if (!([DotFiles.Console]::GetConsoleMode($ConStdHandle, [Ref]$ConStdMode))) {
             throw [ComponentModel.Win32Exception]::new()
         }
         Write-Debug -Message (Get-DotFilesMessage -Message ('Current console output mode: {0}' -f [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode))

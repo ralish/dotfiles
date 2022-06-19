@@ -16,7 +16,7 @@ if (Get-Command -Name 'Get-WmiObject' -ErrorAction SilentlyContinue) {
 }
 
 $Win32OpSys = & $WmiCommand -Class 'Win32_OperatingSystem' -Verbose:$false
-$BuildNumber = [int]$Win32OpSys.BuildNumber
+$BuildNumber = [Int]$Win32OpSys.BuildNumber
 
 $DismParams = [Collections.Generic.List[String]]@(
     '/Online',

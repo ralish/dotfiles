@@ -742,17 +742,17 @@ Function Convert-SecurityDescriptor {
         switch ($PSCmdlet.ParameterSetName) {
             'Binary' {
                 if ($TargetType -eq 'SDDL') {
-                    return ([wmiclass]'Win32_SecurityDescriptorHelper').BinarySDToSDDL($BinarySD).SDDL
+                    return ([WmiClass]'Win32_SecurityDescriptorHelper').BinarySDToSDDL($BinarySD).SDDL
                 } elseif ($TargetType -eq 'WMI') {
-                    return ([wmiclass]'Win32_SecurityDescriptorHelper').BinarySDToWin32SD($BinarySD).Descriptor
+                    return ([WmiClass]'Win32_SecurityDescriptorHelper').BinarySDToWin32SD($BinarySD).Descriptor
                 }
             }
 
             'SDDL' {
                 if ($TargetType -eq 'Binary') {
-                    return ([wmiclass]'Win32_SecurityDescriptorHelper').SDDLToBinarySD($SddlSD).BinarySD
+                    return ([WmiClass]'Win32_SecurityDescriptorHelper').SDDLToBinarySD($SddlSD).BinarySD
                 } elseif ($TargetType -eq 'WMI') {
-                    return ([wmiclass]'Win32_SecurityDescriptorHelper').SDDLToWin32SD($SddlSD).Descriptor
+                    return ([WmiClass]'Win32_SecurityDescriptorHelper').SDDLToWin32SD($SddlSD).Descriptor
                 }
             }
 
@@ -762,9 +762,9 @@ Function Convert-SecurityDescriptor {
                 }
 
                 if ($TargetType -eq 'Binary') {
-                    return ([wmiclass]'Win32_SecurityDescriptorHelper').Win32SDToBinarySD($WmiSD).BinarySD
+                    return ([WmiClass]'Win32_SecurityDescriptorHelper').Win32SDToBinarySD($WmiSD).BinarySD
                 } elseif ($TargetType -eq 'SDDL') {
-                    return ([wmiclass]'Win32_SecurityDescriptorHelper').Win32SDToSDDL($WmiSD).SDDL
+                    return ([WmiClass]'Win32_SecurityDescriptorHelper').Win32SDToSDDL($WmiSD).SDDL
                 }
             }
         }

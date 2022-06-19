@@ -39,11 +39,11 @@ $ScriptBlock = {
 
     $Line = $null
     $Cursor = $null
-    [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$Line, [ref]$Cursor)
+    [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([Ref]$Line, [Ref]$Cursor)
 
     $SelectionStart = $null
     $SelectionLength = $null
-    [Microsoft.PowerShell.PSConsoleReadLine]::GetSelectionState([ref]$SelectionStart, [ref]$SelectionLength)
+    [Microsoft.PowerShell.PSConsoleReadLine]::GetSelectionState([Ref]$SelectionStart, [Ref]$SelectionLength)
 
     if ($SelectionStart -ne -1) {
         $SelectionText = $Line.SubString($SelectionStart, $SelectionLength)

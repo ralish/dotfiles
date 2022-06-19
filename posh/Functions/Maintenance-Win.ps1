@@ -256,7 +256,7 @@ Function Update-VisualStudio {
             # mutex is created then an updated installer is not running. We
             # avoid waiting on the mutex as it's unclear if the mutex already
             # existing may cause problems for the installer (even if unheld).
-            [Threading.Mutex]::new($false, 'DevdivInstallerUI', [ref]$VsInstallerMutexCreated).Close()
+            [Threading.Mutex]::new($false, 'DevdivInstallerUI', [Ref]$VsInstallerMutexCreated).Close()
 
             if (!$VsInstallerMutexCreated) {
                 $VsInstallerUpdated = $true

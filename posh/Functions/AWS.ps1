@@ -71,7 +71,7 @@ Function Set-R53HostedZoneNameTag {
     [OutputType([Void])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [Object[]]$HostedZone
+        [Array]$HostedZone
     )
 
     Begin {
@@ -341,7 +341,7 @@ Function Set-R53HostedZoneTag {
     [OutputType([Void])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [Object[]]$HostedZone,
+        [Array]$HostedZone,
 
         [Parameter(Mandatory)]
         [String]$Key,

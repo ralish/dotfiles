@@ -821,7 +821,7 @@ Function Import-ContentSearchResults {
         [Char]$CsvDelimiter = ',',
 
         [Parameter(ParameterSetName = 'Data', Mandatory)]
-        [Object[]]$CsvData,
+        [Array]$CsvData,
 
         [ValidateSet('From', 'To', 'Cc', 'Bcc')]
         [String[]]$ImportFields = @('From', 'To', 'Cc', 'Bcc'),

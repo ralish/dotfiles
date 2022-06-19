@@ -221,7 +221,7 @@ Function Get-AzureUsersDisabledServices {
         if ($DisabledServices -or $ReturnAllUsers) {
             $Result = [PSCustomObject]@{
                 User    = $User.DisplayName
-                Service = [Object[]]$DisabledServices.ServicePlan
+                Service = [Array]$DisabledServices.ServicePlan
             }
             $Results.Add($Result)
         }

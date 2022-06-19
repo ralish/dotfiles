@@ -383,11 +383,11 @@ Function Compare-ObjectProperties {
 # Compare the properties of multiple objects against a baseline
 Function Compare-ObjectPropertiesMatrix {
     [CmdletBinding()]
-    [OutputType([Void], [Object[]])]
+    [OutputType([Void], [PSCustomObject[]])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [AllowEmptyCollection()]
-        [Object[]]$Objects,
+        [Array]$Objects,
 
         [ValidateNotNullOrEmpty()]
         [PSObject]$ReferenceObject,
