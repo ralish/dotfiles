@@ -245,7 +245,7 @@ Function Get-TextEncoding {
         $InvalidChars = [Char[]]@(0..8 + 10..31 + 127 + 129 + 141 + 143 + 144 + 157)
 
         # Construct an array of identifiable encodings by their preamble
-        $Encodings = [Collections.Generic.List[Text.EncodingInfo]]::new()
+        $Encodings = [Collections.Generic.List[PSCustomObject]]::new()
         foreach ($Encoding in [Text.Encoding]::GetEncodings()) {
             $Preamble = $Encoding.GetEncoding().GetPreamble()
             if ($Preamble) {
