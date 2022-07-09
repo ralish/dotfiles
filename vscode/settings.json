@@ -35,7 +35,6 @@
         "project.nuget.cache": "json"
     },
     "files.autoSave": "onWindowChange",
-    "files.defaultLanguage": "${activeEditorLanguage}",
     "files.hotExit": "onExitAndWindowClose",
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
