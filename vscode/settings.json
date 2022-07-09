@@ -167,7 +167,6 @@
 
     // Extension: Python
     "python.experiments.enabled": true,
-    "python.experiments.optInto": ["pythonDeprecatePythonPath"],
     "python.languageServer": "Pylance",
     "python.linting.flake8Enabled": true,
     "python.linting.pylintCategorySeverity.refactor": "Information",
