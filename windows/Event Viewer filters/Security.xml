@@ -1,0 +1,56 @@
+<QueryList xmlns="http://schemas.microsoft.com/win/2004/08/events/eventquery">
+  <Query Id="0" Path="Security">
+    <Select Path="Security">*</Select>
+
+    <!--
+      Keywords:   Audit Success
+      Category:   Authorization Policy Change
+      Message:    Permissions on an object were changed.
+
+      Extremely high volume. Requires forensic analysis to be useful.
+    -->
+    <Suppress Path="Security">
+      *[System[EventID=4670 and band(Keywords,9007199254740992)]]
+      and
+      *[EventData[Data[@Name='ObjectType'] and Data='Token']]
+    </Suppress>
+
+    <!--
+      Keywords:   Audit Failure
+      Category:   Sensitive Privilege Use
+      Message:    A privileged service was called.
+
+      Extremely high volume. Requires forensic analysis to be useful.
+    -->
+    <Suppress Path="Security">
+      *[System[EventID=4673 and band(Keywords,4503599627370496)]]
+      and
+      *[EventData[
+        Data[@Name='Service'] and Data='-' and
+        Data[@Name='PrivilegeList'] and (Data='SeTcbPrivilege' or Data='SeLoadDriverPrivilege')
+      ]]
+    </Suppress>
+
+    <!--
+      Keywords:   Audit Success
+      Category:   Process Creation
+      Message:    A new process has been created.
+
+      Extremely high volume. Requires forensic analysis to be useful.
+    -->
+    <Suppress Path="Security">
+      *[System[EventID=4688 and band(Keywords,9007199254740992)]]
+    </Suppress>
+
+    <!--
+      Keywords:   Audit Success
+      Category:   Other Policy Change Events
+      Message:    A Windows Filtering Platform filter has been changed.
+
+      Extremely high volume. Requires forensic analysis to be useful.
+    -->
+    <Suppress Path="Security">
+      *[System[EventID=5447 and band(Keywords,9007199254740992)]]
+    </Suppress>
+  </Query>
+</QueryList>
