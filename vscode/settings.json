@@ -53,6 +53,7 @@
 
     // Workbench: Editor Management
     "workbench.editor.highlightModifiedTabs": true,
+    "workbench.editor.languageDetection": false,
 
     // Workbench: Settings Editor
     "workbench.settings.editor": "json",
