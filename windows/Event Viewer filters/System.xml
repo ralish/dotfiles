@@ -133,6 +133,19 @@
     </Suppress>
 
     <!--
+      Source:     Netwtw10
+      Level:      Informational
+      Message:    7021 - Connection telemetry fields and analysis usage
+                  7025 - Dump after return from D3 before cmd
+                  7026 - Dump after return from D3 after cmd
+
+      Events emitted by the Intel Wireless WiFi Link Driver of little to no value.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Netwtw10'] and (EventID=7021 or EventID=7025 or EventID=7026)]]
+    </Suppress>
+
+    <!--
       Source:     nhi
       Level:      Informational
       Message:    The driver entered RTD3.
