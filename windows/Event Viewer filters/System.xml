@@ -179,5 +179,16 @@
       and
       *[EventData[Data[@Name='param4'] and Data='BITS']]
     </Suppress>
+
+    <!--
+      Source:     Time-Service
+      Level:      Warning
+      Message:    NtpClient was unable to set a domain peer to use as a time source because of discovery error. NtpClient will try again in %2 minutes and double the reattempt interval thereafter. The error was: %1
+
+      Can be noisy on systems which may not always have line-of-sight to a DC.
+    -->
+    <Suppress Path="System">
+      *[System[Provider[@Name='Microsoft-Windows-Time-Service'] and EventID=129]]
+    </Suppress>
   </Query>
 </QueryList>
