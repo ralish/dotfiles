@@ -5,8 +5,8 @@
     <!--
       Sources with high volume informational events rarely of interest
 
-      PROVIDER                                    DESCRIPTION
-      Microsoft-Windows-Hyper-V-VmSwitch          Hyper-V Virtual Switch
+      PROVIDER                    DESCRIPTION
+      Hyper-V-VmSwitch            Hyper-V Virtual Switch
     -->
     <Suppress Path="System">
       *[System[

@@ -5,14 +5,14 @@
     <!--
       Sources with high volume informational events rarely of interest
 
-      PROVIDER                                    DESCRIPTION
-      ADSync                                      Azure AD Sync
-      Directory Synchronization                   Azure AD Sync DirSync
-      edgeupdate                                  Edge Update
-      gupdate                                     Google Update
-      Microsoft-Windows-RestartManager            RestartManager
-      Microsoft-Windows-Security-SPP              Software Protection Platform
-      Outlook                                     Outlook
+      PROVIDER                    DESCRIPTION
+      ADSync                      Azure AD Sync
+      Directory Synchronization   Azure AD Sync DirSync
+      edgeupdate                  Edge Update
+      gupdate                     Google Update
+      Outlook                     Outlook
+      RestartManager              RestartManager
+      Security-SPP                Software Protection Platform
     -->
     <Suppress Path="Application">
       *[System[
