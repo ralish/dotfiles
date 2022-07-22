@@ -65,6 +65,7 @@ temp/
 /fish/.config/fish/generated_completions/
 
 # Git
+/git/.gitconfig-priv
 /git-win/.git-for-windows-updater
 
 # Irssi

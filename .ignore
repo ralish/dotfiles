@@ -1,6 +1,9 @@
 # Cygwin
 /cygwin/bin/
 
+# Git
+!/git/.gitconfig-priv
+
 # Modules
 /modules/oh-my-zsh/
 

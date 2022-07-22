@@ -3,6 +3,7 @@
 	excludesFile = ~/.gitignore
 
 [include]
+	path = .gitconfig-priv
 	path = .gitconfig-win
 
 [user]

@@ -29,6 +29,7 @@
         ".editrc": "properties",
         // git
         ".gitconfig": "ini",
+        ".gitconfig-priv": "ini",
         "**/git/bin/*": "shellscript",
         // git-win
         ".git-for-windows-updater": "ini",
@@ -154,7 +155,7 @@
         },
         {
             "icon": "git",
-            "extensions": [".git-for-windows-updater", ".gitconfig-win", ".keepme"],
+            "extensions": [".git-for-windows-updater", ".gitconfig-priv", ".gitconfig-win", ".keepme"],
             "filename": true,
             "format": "svg"
         },
