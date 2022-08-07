@@ -284,8 +284,9 @@ Function Update-VisualStudio {
 
 # Update Microsoft Windows
 Function Update-Windows {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '')]
     [CmdletBinding()]
-    [OutputType([Boolean], [__ComObject[]])]
+    #[OutputType([Boolean], [PSWindowsUpdate.WindowsUpdateJob[]])]
     Param(
         [Switch]$AcceptAll
     )
