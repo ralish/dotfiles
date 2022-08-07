@@ -561,10 +561,17 @@ Function Optimize-WindowsUpdate {
     Set-RegistryValue -Path 'HKCU:\Software\Policies\Microsoft\MRT' -Name 'DontOfferThroughWUAU' -Type DWord -Value 1
 
     Write-Host -ForegroundColor Green '[Windows] Registering Microsoft Update ...'
-    $ServiceManager = New-Object -ComObject 'Microsoft.Update.ServiceManager'
-    $ServiceRegistration = $ServiceManager.AddService2('7971f918-a847-4430-9279-4a52d1efe18d', 7, '')
-    $null = [Runtime.InteropServices.Marshal]::FinalReleaseComObject($ServiceRegistration)
-    $null = [Runtime.InteropServices.Marshal]::FinalReleaseComObject($ServiceManager)
+    $ServiceManager = $null
+    $ServiceRegistration = $null
+    try {
+        $ServiceManager = New-Object -ComObject 'Microsoft.Update.ServiceManager'
+        $ServiceRegistration = $ServiceManager.AddService2('7971f918-a847-4430-9279-4a52d1efe18d', 7, '')
+    } catch {
+        Write-Error -Message $_
+    } finally {
+        if ($ServiceRegistration) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($ServiceRegistration) }
+        if ($ServiceManager) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($ServiceManager) }
+    }
 }
 
 #region Utilities
