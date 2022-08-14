@@ -24,9 +24,9 @@ Usage:
 
     Update Options:
      -a|--all                   Update all the things
+     -e|--vim                   Update Vim plug-ins
      -g|--git                   Update Git sources (default)
      -s|--stow                  Run dot-manage (default)
-    -vi|--vim                   Update Vim plug-ins
 EOF
 }
 
@@ -55,14 +55,14 @@ function parse_params() {
                 stow_update=true
                 vim_update=true
                 ;;
+            -e | --vim)
+                vim_update=true
+                ;;
             -g | --git)
                 git_update=true
                 ;;
             -s | --stow)
                 stow_update=true
-                ;;
-            -vi | --vim)
-                vim_update=true
                 ;;
             *)
                 echo "Invalid parameter was provided: $param"
