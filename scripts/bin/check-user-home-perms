@@ -62,7 +62,8 @@ function check_user_home_perms() {
 
     pretty_print "Checking permissions for $user_name ... " "$fg_green" 'true'
     local find_results find_status
-    # TODO: The Vim undo files exclusion is a massive hack ...
+    # The hard-coded exclusion of the directory for storing Vim's undo files as
+    # used in our .vimrc is a hack, but a more durable solution isn't worth it.
     # shellcheck disable=SC2311
     find_results="$(run_as_root find "$user_home" \
                         -not -path '*/.vim/undo/*' \
