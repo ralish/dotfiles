@@ -456,6 +456,35 @@ Function Optimize-WindowsSecurity {
 
     Write-Host -ForegroundColor Green '[Windows] Applying security settings ...'
 
+    # Enable SSL/TLS protocols where not enabled by default
+    $EnableTls11 = $false
+    $EnableTls12 = $false
+    if ($Script:WindowsProductType -ne 1 -and ($Script:WindowsBuildNumber -ge 6001 -and $Script:WindowsBuildNumber -le 6003)) {
+        # Windows Server 2008
+        $EnableTls11 = $true
+        $EnableTls12 = $true
+    } elseif ($Script:WindowsBuildNumber -ge 7600 -and $Script:WindowsBuildNumber -le 7601) {
+        # Windows 7 or Windows Server 2008 R2
+        $EnableTls11 = $true
+        $EnableTls12 = $true
+    }
+
+    # Enable TLS 1.1
+    if ($EnableTls11) {
+        Set-RegistryValue -Path 'HKLM:\System\CurrentControlSet\Control\SecurityProviders\SChannel\Protocols\TLS 1.1\Client' -Name 'DisabledByDefault' -Type DWord -Value 0
+        Set-RegistryValue -Path 'HKLM:\System\CurrentControlSet\Control\SecurityProviders\SChannel\Protocols\TLS 1.1\Client' -Name 'Enabled' -Type DWord -Value 1
+        Set-RegistryValue -Path 'HKLM:\System\CurrentControlSet\Control\SecurityProviders\SChannel\Protocols\TLS 1.1\Server' -Name 'DisabledByDefault' -Type DWord -Value 0
+        Set-RegistryValue -Path 'HKLM:\System\CurrentControlSet\Control\SecurityProviders\SChannel\Protocols\TLS 1.1\Server' -Name 'Enabled' -Type DWord -Value 1
+    }
+
+    # Enable TLS 1.2
+    if ($EnableTls12) {
+        Set-RegistryValue -Path 'HKLM:\System\CurrentControlSet\Control\SecurityProviders\SChannel\Protocols\TLS 1.2\Client' -Name 'DisabledByDefault' -Type DWord -Value 0
+        Set-RegistryValue -Path 'HKLM:\System\CurrentControlSet\Control\SecurityProviders\SChannel\Protocols\TLS 1.2\Client' -Name 'Enabled' -Type DWord -Value 1
+        Set-RegistryValue -Path 'HKLM:\System\CurrentControlSet\Control\SecurityProviders\SChannel\Protocols\TLS 1.2\Server' -Name 'DisabledByDefault' -Type DWord -Value 0
+        Set-RegistryValue -Path 'HKLM:\System\CurrentControlSet\Control\SecurityProviders\SChannel\Protocols\TLS 1.2\Server' -Name 'Enabled' -Type DWord -Value 1
+    }
+
     # Set WinHTTP default protocols to: TLS 1.0, TLS 1.1, TLS 1.2
     Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\WinHttp' -Name 'DefaultSecureProtocols' -Type DWord -Value 2688
     if ($Script:Wow64Present) {
