@@ -41,6 +41,10 @@
 	schannelUseSSLCAInfo = false
 
 [ssh]
+	# The only difference in Git behaviour between "plink" and "tortoiseplink"
+	# is the latter adds the "-batch" parameter to disable all interactive
+	# prompts. Plink supports this as well though, and it's actually what we
+	# want, as in some scenarios stdin doesn't get properly redirected.
 	variant = tortoiseplink
 
 # vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 noet sr
