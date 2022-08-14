@@ -24,6 +24,7 @@ Usage:
 
     Update Options:
      -a|--all                   Update all the things
+     -b|--bin                   Update binaries
      -e|--vim                   Update Vim plug-ins
      -g|--git                   Update Git sources (default)
      -s|--stow                  Run dot-manage (default)
@@ -51,9 +52,13 @@ function parse_params() {
                 no_colour=true
                 ;;
             -a | --all)
+                bin_update=true
                 git_update=true
                 stow_update=true
                 vim_update=true
+                ;;
+            -b | --bin)
+                bin_update=true
                 ;;
             -e | --vim)
                 vim_update=true
@@ -71,7 +76,10 @@ function parse_params() {
         esac
     done
 
-    if [[ -z ${git_update-} && -z ${stow_update-} && -z ${vim_update-} ]]; then
+    if [[ -z ${bin_update-} &&
+          -z ${git_update-} &&
+          -z ${stow_update-} &&
+          -z ${vim_update-} ]]; then
         default_update=true
     fi
 }
@@ -132,6 +140,12 @@ function main() {
 
     if [[ -n ${default_update-} || -n ${stow_update-} ]]; then
         "./$DOT_MANAGE"
+    fi
+
+    if [[ -n ${bin_update-} ]]; then
+        pretty_print '*** Updating binaries ...'
+        scripts/bin/dl-shellcheck || true
+        scripts/bin/dl-shfmt || true
     fi
 
     if [[ -n ${vim_update-} ]]; then
