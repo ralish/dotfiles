@@ -3,6 +3,7 @@ dotfiles
 
 [![license](https://img.shields.io/github/license/ralish/dotfiles)](https://choosealicense.com/licenses/unlicense/)
 
+- [Usage](#usage)
 - [Objectives](#objectives)
 - [Management](#management)
 - [Tested Environments](#tested-environments)
@@ -10,6 +11,43 @@ dotfiles
 - [License](#license)
 
 Here lies my own collection of *dotfiles*. In contrast to many other dotfiles collections mine are setup with slightly different objectives which reflect my occupation as a SysAdmin & DevOps engineer versus a pure developer.
+
+Usage
+-----
+
+### Unix-like
+
+On Unix-like systems the included `dot-update` and `dot-manage` scripts handle everything for you.
+
+```bash
+# Clone the repository
+git clone git@github.com:ralish/dotfiles.git
+
+# Run dot-update with all operations to:
+# - Initialise & update submodules
+# - Stow all detected components (i.e. dot-manage)
+# - Download various binaries (e.g. shellcheck)
+# - Download Vim plug-ins
+dotfiles/dot-update -a
+```
+
+### Windows
+
+On Windows systems the [PSDotFiles](https://github.com/ralish/PSDotFiles) PowerShell module is used, which provides similar functionality to [Stow](https://www.gnu.org/software/stow/).
+
+```pwsh
+# Clone the repository
+git clone git@github.com:ralish/dotfiles.git
+
+# Install PSDotFiles
+Install-Module -Name PSDotFiles -Scope CurrentUser
+
+# View detected components
+Get-DotFiles -Path dotfiles -Autodetect
+
+# Install detected components
+Install-DotFiles -Path dotfiles -Autodetect
+```
 
 Objectives
 ----------
