@@ -21,7 +21,7 @@ On Unix-like systems the included `dot-update` and `dot-manage` scripts handle e
 
 ```bash
 # Clone the repository
-git clone git@github.com:ralish/dotfiles.git
+git clone https://github.com/ralish/dotfiles.git
 
 # Run dot-update with all operations to:
 # - Initialise & update submodules
@@ -37,7 +37,7 @@ On Windows systems the [PSDotFiles](https://github.com/ralish/PSDotFiles) PowerS
 
 ```pwsh
 # Clone the repository
-git clone git@github.com:ralish/dotfiles.git
+git clone https://github.com/ralish/dotfiles.git
 
 # Install PSDotFiles
 Install-Module -Name PSDotFiles -Scope CurrentUser
