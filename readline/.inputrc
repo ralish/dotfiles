@@ -1,46 +1,60 @@
 # ------------------------------ Config Settings ------------------------------
 
-# Convert characters with the eighth bit set (incompatible with UTF-8)
-set convert-meta off
-
-# Don't clear the eighth bit of input characters (required for UTF-8)
+# Don't clear the eighth bit of input characters
+#
+# Enabling this setting is required for UTF-8 encoding.
 set input-meta on
 
-# Display characters with the eighth bit set directly (required for UTF-8)
+# Display characters with the eighth bit set directly
+#
+# Enabling this setting is required for UTF-8 encoding.
 set output-meta on
+
+# Convert characters with the eighth bit set to an ASCII key sequence
+#
+# Enabling this setting is incompatible with UTF-8 encoding.
+set convert-meta off
 
 # Handling of the terminal bell
 #
-# Valid options are:
-# - none:               Never ring the bell
-# - visible:            Ring the visible bell
-# - audible:            Ring the audible bell
+# Valid options:
+# - none            Never ring the bell
+# - visible         Ring the visible bell
+# - audible         Ring the audible bell
 set bell-style none
 
-# Attempt to bind special control characters handled by the terminal driver
+# Bind to special control characters handled by the terminal driver
 set bind-tty-special-chars on
 
-# Display completion matches using different colours to indicate file types
+# Briefly move the cursor to the opening parenthesis on entering the close
+set blink-matching-paren off
+
+# Display the common prefix of possible completions in a different colour
+$if version >= 7.0
+set colored-completion-prefix on
+$endif
+
+# Display completion matches using different colours to indicate file type
 set colored-stats on
 
-# String to insert at the beginning of the line for the insert-comment command
-set comment-begin #
+# String to insert at the beginning of the line for insert-comment command
+set comment-begin '#'
 
 # Number of screen columns used to display possible completion matches
 #
-# Note: Setting is ignored if <0 or greater than the terminal screen width.
+# Ignored if <0 or greater than the terminal screen width.
 #
-# Valid options are:
-#  0:                   Display one match per line
-# >0:                   Number of columns to use per line of matches
+# Valid options:
+# -  0              Display one match per line
+# - >0              Number of columns to use per line of matches
 set completion-display-width -1
 
-# Perform filename completion matching case-insensitively
+# Perform filename matching and completion case-insensitively
 set completion-ignore-case on
 
 # Treat hypens and underscores as interchangeable during completion
 #
-# Note: Only applies if the completion-ignore-case setting is enabled.
+# Only applies if completion-ignore-case is enabled.
 set completion-map-case on
 
 # Maximum length of the common prefix in a list of completion matches which is
@@ -48,56 +62,84 @@ set completion-map-case on
 # will be replaced with an ellipsis when displaying the possible completions.
 set completion-prefix-display-length 0
 
-# Confirm to show completion matches if the total is greater than this limit
+# Number of possible completions for which confirmation is needed to display
 #
-# Valid options are:
-# <0:                   Never prompt to display completion matches
-#  0:                   Always prompt to display completion matches
-# >0:                   Prompt if more than this number of matches
+# Valid options:
+# - <0              Never prompt to display completion matches
+# -  0              Always prompt to display completion matches
+# - >0              Prompt if more than this number of matches
 set completion-query-items 200
 
 # Disable word completion
 set disable-completion off
 
-# Default key bindings to use
-#
-# Valid options are:
-# - emacs:              Emacs-style key bindings
-# - vi:                 vi-style key bindings
-set editing-mode vi
-
 # Echo the corresponding control character for keyboard generated signals
 set echo-control-characters on
+
+# Default set of key bindings
+#
+# Valid options:
+# - emacs           Emacs-style key bindings
+# - vi              vi-style key bindings
+set editing-mode vi
+
+# String displayed immediately before the last line of the primary prompt when
+# emacs editing mode is active.
+#
+# Only applies if using emacs editing mode and show-mode-in-prompt is enabled.
+$if version >= 7.0
+set emacs-mode-string '@'
+$endif
+
+# Insert each paste into the editing buffer as a single string of characters
+$if version >= 7.0
+set enable-bracketed-paste on
+$endif
 
 # Enable the application keypad (needed to support arrow keys in some apps)
 set enable-keypad on
 
-# Attempt to enable any meta modifier key the terminal supports on input
+# Enable any meta modifier key
 set enable-meta-key on
 
 # Perform tilde expansion when attempting word completion
 set expand-tilde off
 
-# Attempt to preserve the current cursor position when browsing history
+# Preserve the current cursor position when browsing history
 set history-preserve-point off
 
 # Maximum number of history entries to retain in the history list
 #
-# Valid options are:
-# <0:                   Do not limit the number of history entries
-#  0:                   Do not retain any history
-# >0:                   Number of history entries to retain
+# Valid options:
+# - <0              Do not limit the number of history entries
+# -  0              Do not retain and delete any existing history
+# - >0              Number of history entries to retain
 set history-size -1
 
-# Don't wrap line being edited (scroll horizontally on a single line)
+# Scroll lines longer than the screen width being edited instead of wrapping
 set horizontal-scroll-mode off
+
+# String of characters to terminate an incremental search
+set isearch-terminators 'C-[ C-J'
+
+# Keymap for key binding commands
+#
+# The value of editing-mode affects the default keymap.
+#
+# Valid options:
+# - emacs-standard      Synonyms: emacs
+# - emacs-ctlx
+# - emacs-meta
+# - vi-command          Synonyms: vi, vi-move
+# - vi-insert
+#set keymap emacs
 
 # Duration to wait for further input on an ambiguous key sequence. If no
 # further input is received, the shorter but complete key sequence is used.
 #
-# Valid options are:
-# <=0:                  Wait until the key sequence is unambiguous
-# >=1:                  Duration to wait for further input (milliseconds)
+# Valid options:
+# - <=0             Wait until the key sequence is unambiguous
+# - >=1             Duration to wait for further input (milliseconds)
 set keyseq-timeout 500
 
 # Mark completed directory names with an appended slash
@@ -108,26 +150,26 @@ set mark-modified-lines off
 
 # Mark completed directory symlinks with an appended slash
 #
-# Note: Only applies if the mark-directories setting is enabled.
+# Only applies if mark-directories is enabled.
 set mark-symlinked-directories on
 
-# Automatically include hidden files when performing filename completion
+# Include hidden files without a leading "." when performing completion
 set match-hidden-files off
 
 # Display the common prefix of the possible completions (which may be empty)
 # before cycling through the completions list when performing menu completion.
 set menu-complete-display-prefix off
 
-# Show completion matches using an internal more-like pager when appropriate
+# Display completion matches using an internal more-like pager if needed
 set page-completions off
 
 # Display completion matches sorted horizontally in alphabetical order
 set print-completions-horizontally off
 
-# Undo all changes to history lines on returning from accept-line
+# Undo all changes to history lines before returning from accept-line
 set revert-all-at-newline off
 
-# List completion matches immediately when multiple completions are possible
+# List completion matches immediately when there's multiple completions
 set show-all-if-ambiguous on
 
 # List completion matches immediately when there's no common prefix
@@ -138,6 +180,22 @@ set show-mode-in-prompt off
 
 # Factor any text after the cursor position in a word into completion matching
 set skip-completed-text on
+
+# String displayed immediately before the last line of the primary prompt when
+# vi editing mode is active and in command mode.
+#
+# Only applies if using vi editing mode and show-mode-in-prompt is enabled.
+$if version >= 7.0
+set vi-cmd-mode-string '(cmd)'
+$endif
+
+# String displayed immediately before the last line of the primary prompt when
+# vi editing mode is active and in insertion mode.
+#
+# Only applies if using vi editing mode and show-mode-in-prompt is enabled.
+$if version >= 7.0
+set vi-ins-mode-string '(ins)'
+$endif
 
 # Append a character denoting a file's type when listing completion matches
 set visible-stats on
