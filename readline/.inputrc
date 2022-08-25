@@ -74,14 +74,14 @@ set completion-query-items 200
 set disable-completion off
 
 # Echo the corresponding control character for keyboard generated signals
-set echo-control-characters on
+set echo-control-characters off
 
 # Default set of key bindings
 #
 # Valid options:
 # - emacs           Emacs-style key bindings
 # - vi              vi-style key bindings
-set editing-mode vi
+set editing-mode emacs
 
 # String displayed immediately before the last line of the primary prompt when
 # emacs editing mode is active.
