@@ -14,8 +14,7 @@
         // bazaar
         "**/.bazaar/*.conf": "ini",
         // clink
-        "**/clink/clink_inputrc": "properties",
-        "**/clink/settings": "properties",
+        "**/clink/clink_settings": "properties",
         // curl
         ".curlrc": "properties",
         // cygwin

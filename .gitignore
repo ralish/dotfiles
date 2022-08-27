@@ -49,7 +49,7 @@ temp/
 /bazaar/.bazaar/lock/
 
 # Clink
-/clink/.history
+/clink/clink_history*
 
 # CPAN
 /cpan/.cpan/.lock
