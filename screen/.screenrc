@@ -1,16 +1,16 @@
-# ---------------------------------- Startup ----------------------------------
+# --------------------------------- Startup -----------------------------------
 
 # Disable the startup message
 startup_message off
 
 
-# ------------------------------- Copy & paste --------------------------------
+# ------------------------------ Copy & paste ---------------------------------
 
 # Default scrollback buffer size (lines)
 defscrollback 10000
 
 
-# ------------------------------- Message line --------------------------------
+# ------------------------------ Message line ---------------------------------
 
 # Disable usage of hardware status line
 hardstatus off
@@ -25,19 +25,19 @@ hardstatus string '%{gk}[ %{G}%H %{g}][%= %{wk}%?%-Lw%?%{=b kR}(%{W}%n*%f %t%?(%
 msgwait 2
 
 
-# -------------------------------- New window ---------------------------------
+# ------------------------------- New window ----------------------------------
 
 # Use a 256 colour terminal
 term screen-256color
 
 
-# ---------------------------------- Termcap ----------------------------------
+# --------------------------------- Termcap -----------------------------------
 
 # Don't use the alternate screen for the scrollback buffer under xterm
 termcapinfo xterm* ti@:te@
 
 
-# ----------------------------- Virtual terminal ------------------------------
+# ---------------------------- Virtual terminal -------------------------------
 
 # Enable alternate screen support
 altscreen on
@@ -55,13 +55,13 @@ truecolor on
 vbell off
 
 
-# ------------------------------- Miscellaneous -------------------------------
+# ------------------------------ Miscellaneous --------------------------------
 
 # Default to non-blocking mode
 defnonblock on
 
 
-# ------------------------------- Key bindings --------------------------------
+# ------------------------------ Key bindings ---------------------------------
 
 # Start window indexing from one
 bind c screen 1

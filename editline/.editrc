@@ -1,4 +1,4 @@
-# ------------------------------ Config Settings ------------------------------
+# ----------------------------- Config Settings -------------------------------
 
 # Enable editline functionality
 edit on
@@ -13,7 +13,7 @@ history size 1000
 history unique 1
 
 
-# ------------------------------- Key Mappings --------------------------------
+# ------------------------------ Key Mappings ---------------------------------
 
 # Set Home/End keys to jump to the beginning/end of line
 bind "\e[1~" ed-move-to-beg

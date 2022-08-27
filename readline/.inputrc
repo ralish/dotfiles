@@ -1,4 +1,4 @@
-# ------------------------------ Config Settings ------------------------------
+# ----------------------------- Config Settings -------------------------------
 
 # Don't clear the eighth bit of input characters
 #
@@ -201,7 +201,7 @@ $endif
 set visible-stats on
 
 
-# ------------------------------- Key Mappings --------------------------------
+# ------------------------------ Key Mappings ---------------------------------
 
 # Set Home/End keys to jump to the beginning/end of line
 "\e[1~": beginning-of-line

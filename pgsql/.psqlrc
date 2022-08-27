@@ -1,10 +1,10 @@
--- ************** PostgreSQL Interactive Terminal Configuration ***************
+-- ************* PostgreSQL Interactive Terminal Configuration ****************
 
 -- Enable quiet mode while we process our .psqlrc
 \set QUIET 1
 
 
--- ************************* Configuration Variables **************************
+-- ************************ Configuration Variables ***************************
 
 -- Autocomplete keywords in uppercase even if we started typing in lowercase
 \set COMP_KEYWORD_CASE upper
@@ -25,7 +25,7 @@
 \set VERBOSITY verbose
 
 
--- *************************** Query Result Output ****************************
+-- ************************** Query Result Output *****************************
 
 -- Use expanded mode if the output won't fit on the screen in normal mode
 \pset expanded auto
@@ -34,7 +34,7 @@
 \pset null '[NULL]'
 
 
--- ****************************** Meta Commands *******************************
+-- ***************************** Meta Commands ********************************
 
 -- Display how long each SQL statement took to execute in milliseconds
 \timing
