@@ -17,7 +17,7 @@ set convert-meta off
 
 # Handling of the terminal bell
 #
-# Valid options:
+# Valid values:
 # - none            Never ring the bell
 # - visible         Ring the visible bell
 # - audible         Ring the audible bell
@@ -44,7 +44,7 @@ set comment-begin '#'
 #
 # Ignored if <0 or greater than the terminal screen width.
 #
-# Valid options:
+# Valid values:
 # -  0              Display one match per line
 # - >0              Number of columns to use per line of matches
 set completion-display-width -1
@@ -64,7 +64,7 @@ set completion-prefix-display-length 0
 
 # Number of possible completions for which confirmation is needed to display
 #
-# Valid options:
+# Valid values:
 # - <0              Never prompt to display completion matches
 # -  0              Always prompt to display completion matches
 # - >0              Prompt if more than this number of matches
@@ -78,7 +78,7 @@ set echo-control-characters off
 
 # Default set of key bindings
 #
-# Valid options:
+# Valid values:
 # - emacs           Emacs-style key bindings
 # - vi              vi-style key bindings
 set editing-mode emacs
@@ -110,7 +110,7 @@ set history-preserve-point off
 
 # Maximum number of history entries to retain in the history list
 #
-# Valid options:
+# Valid values:
 # - <0              Do not limit the number of history entries
 # -  0              Do not retain and delete any existing history
 # - >0              Number of history entries to retain
@@ -126,7 +126,7 @@ set isearch-terminators 'C-[ C-J'
 #
 # The value of editing-mode affects the default keymap.
 #
-# Valid options:
+# Valid values:
 # - emacs-standard      Synonyms: emacs
 # - emacs-ctlx
 # - emacs-meta
@@ -137,7 +137,7 @@ set isearch-terminators 'C-[ C-J'
 # Duration to wait for further input on an ambiguous key sequence. If no
 # further input is received, the shorter but complete key sequence is used.
 #
-# Valid options:
+# Valid values:
 # - <=0             Wait until the key sequence is unambiguous
 # - >=1             Duration to wait for further input (milliseconds)
 set keyseq-timeout 500

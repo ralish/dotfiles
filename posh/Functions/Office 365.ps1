@@ -993,7 +993,7 @@ Function Import-ContentSearchResultsEntry {
         [Regex]$IgnoredDomains
     )
 
-    # Split a field into comma separated elements
+    # Split a field into comma-separated elements
     #
     # Each element should consist of (in order):
     # - An optional name
