@@ -99,12 +99,6 @@ The numerous people whose dotfiles served as inspiration or templates for my own
 
 I keep a record of resources I've found particularly useful [here](POSTERITY.md).
 
-Special mentions to:
-
-- [Ashe Connor](https://github.com/kivikakk)
-- [Mathias Bynens](https://github.com/mathiasbynens)
-- [Sorin Ionescu](https://github.com/sorin-ionescu)
-
 License
 -------
 
