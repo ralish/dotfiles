@@ -129,7 +129,7 @@ public static extern bool SetConsoleMode(
             throw [ComponentModel.Win32Exception]::new()
         }
 
-        [UInt]$ConStdMode = 0
+        [UInt32]$ConStdMode = 0
         if (!([DotFiles.Console]::GetConsoleMode($ConStdHandle, [Ref]$ConStdMode))) {
             throw [ComponentModel.Win32Exception]::new()
         }
