@@ -321,7 +321,10 @@
         "editor.defaultFormatter": "yzhang.markdown-all-in-one",
 
         // Trailing whitespace has special meaning
-        "files.trimTrailingWhitespace": false
+        "files.trimTrailingWhitespace": false,
+
+        // Don't restore the last editor view state
+        "workbench.editor.restoreViewState": false
     },
 
     "[python]": {

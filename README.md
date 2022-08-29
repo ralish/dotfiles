@@ -6,8 +6,8 @@ dotfiles
 - [Usage](#usage)
 - [Objectives](#objectives)
 - [Management](#management)
-- [Tested Environments](#tested-environments)
-- [Thanks To](#thanks-to)
+- [Tested environments](#tested-environments)
+- [Thanks](#thanks)
 - [License](#license)
 
 Here lies my own collection of *dotfiles*. In contrast to many other dotfiles collections mine are setup with slightly different objectives which reflect my occupation as a SysAdmin & DevOps engineer versus a pure developer.
@@ -81,7 +81,7 @@ I've settled on using [Stow](https://www.gnu.org/software/stow/) to manage my do
 - **Lightweight**  
   Stow is fast, unintrusive, and at the time of writing the script comes in at a mere ~120KB!
 
-Tested Environments
+Tested environments
 -------------------
 
 The following environments are expected to work:
@@ -92,8 +92,8 @@ The following environments are expected to work:
 - [macOS](https://www.apple.com/macos/) *(10.9 or newer)*
 - [Windows](https://www.microsoft.com/windows/) *(Windows 7/Server 2008 R2 or newer)*
 
-Thanks To
----------
+Thanks
+------
 
 The numerous people whose dotfiles served as inspiration or templates for my own.
 
