@@ -197,9 +197,13 @@ Function Invoke-GitChildDir {
 Function Invoke-GitLinter {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '')]
     [CmdletBinding()]
+    #[OutputType([Void], [String[]], ParameterSetName = 'DevSkim')]
     #[OutputType([Void], [Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.DiagnosticRecord[]], ParameterSetName = 'PSScriptAnalyzer')]
     #[OutputType([Void], [String[]], ParameterSetName = 'ShellCheck')]
     Param(
+        [Parameter(ParameterSetName = 'DevSkim', Mandatory)]
+        [Switch]$DevSkim,
+
         [Parameter(ParameterSetName = 'PSScriptAnalyzer', Mandatory)]
         [Switch]$PSScriptAnalyzer,
 
@@ -219,6 +223,27 @@ Function Invoke-GitLinter {
     )
 
     switch ($PSCmdlet.ParameterSetName) {
+        'DevSkim' {
+            if (!(Get-Command -Name 'devskim')) {
+                throw 'Required command is unavailable: devskim'
+            }
+
+            $GitOutput = git ls-files
+            if ($LASTEXITCODE -ne 0) { return }
+
+            $GitOutput | ForEach-Object {
+                if ($Exclude) {
+                    if ($_ -match $Exclude) { return }
+                }
+
+                $Item = Get-Item -LiteralPath $_ -Force
+                if ($Item.LinkType -eq 'SymbolicLink') { return }
+
+                Write-Verbose -Message ('Invoking DevSkim on: {0}' -f $_)
+                devskim analyze -o '%F:%L [%S] %R %N' $_
+            }
+        }
+
         'PSScriptAnalyzer' {
             if (!(Get-Command -Name 'Invoke-ScriptAnalyzer')) {
                 throw 'Required command is unavailable: Invoke-ScriptAnalyzer'
