@@ -83,9 +83,9 @@ Function Optimize-DotNetFramework {
         }
 
         # Let OS choose protocols
-        Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v2.0.50727' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
+        Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v2.0.50727' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1
         if ($Script:Wow64Present) {
-            Set-RegistryValue -Path 'HKLM:\Software\WOW6432Node\Microsoft\.NETFramework\v2.0.50727' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
+            Set-RegistryValue -Path 'HKLM:\Software\WOW6432Node\Microsoft\.NETFramework\v2.0.50727' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1
         }
 
         if (Test-IsWindows64bit) {
@@ -110,9 +110,9 @@ Function Optimize-DotNetFramework {
         }
 
         # Let OS choose protocols
-        Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v4.0.30319' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
+        Set-RegistryValue -Path 'HKLM:\Software\Microsoft\.NETFramework\v4.0.30319' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1
         if ($Script:Wow64Present) {
-            Set-RegistryValue -Path 'HKLM:\Software\WOW6432Node\Microsoft\.NETFramework\v4.0.30319' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1 # DevSkim: ignore DS440000
+            Set-RegistryValue -Path 'HKLM:\Software\WOW6432Node\Microsoft\.NETFramework\v4.0.30319' -Name 'SystemDefaultTlsVersions' -Type DWord -Value 1
         }
 
         if (Test-IsWindows64bit) {
