@@ -140,7 +140,6 @@
     "java.help.showReleaseNotes": false,
 
     // Extension: Language Support for Java(TM) by Red Hat
-    "java.configuration.checkProjectSettingsExclusions": false,
     "java.project.importHint": false,
 
     // Extension: markdownlint
