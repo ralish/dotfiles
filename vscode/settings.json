@@ -118,6 +118,9 @@
     "omnisharp.enableEditorConfigSupport": false,
     "omnisharp.enableRoslynAnalyzers": true,
     "omnisharp.loggingLevel": "warning",
+    // Required until OmniSharp updates the System.Memory dependency
+    // https://github.com/OmniSharp/omnisharp-vscode/issues/5352
+    "omnisharp.path": "latest",
 
     // Extension: CloudFormation Linter
     "cfnLint.validateUsingJsonSchema": true,
