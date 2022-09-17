@@ -244,5 +244,9 @@
 
     "[ssh_config]": {
         "editor.rulers": [79]
+    },
+
+    "[viml]": {
+        "editor.rulers": [79]
     }
 }
