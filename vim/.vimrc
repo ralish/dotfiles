@@ -561,11 +561,13 @@ cnoremap w!! w !sudo tee % > /dev/null
 
 
 " *****************************************************************************
-" * We'll now configure language handling and plugin settings. On minimal Vim *
-" * releases (e.g. vim.tiny) effectively none of this will work. Vim versions *
-" * without the +eval feature will skip processing of if statements and their *
-" * contents, so we wrap all subsequent configuration in an if block so that  *
-" * we preserve compatibility with these minimal Vim releases.                *
+" ***                 Language handling & plugin settings                   ***
+" ***                                                                       ***
+" *** On minimal Vim releases (e.g. tiny) effectively none of the remaining ***
+" *** configuration will work. Vim releases without the +eval feature will  ***
+" *** skip processing of if statements and their contents, so we wrap all   ***
+" *** subsequent configuration in an if block so to preserve compatibility  ***
+" *** with these Vim releases.                                              ***
 " *****************************************************************************
 if 1
 
@@ -600,6 +602,15 @@ let g:is_bash = 1
 let g:sh_fold_enabled = 1
 
 
+" ################################## YAML #####################################
+
+" Schema to use:
+" - core (default)
+" - json
+" - pyyaml
+"let g:yaml_schema = 'core'
+
+
 " ********************************* Plugins ***********************************
 " ############################ vim-plug Startup ###############################
 
@@ -610,11 +621,15 @@ call plug#begin('~/.vim/plugins')
 " ############################### Appearance ##################################
 
 " vim-airline & themes
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+if v:version >= 702
+    Plug 'vim-airline/vim-airline'
+    Plug 'vim-airline/vim-airline-themes'
+endif
 
 " Display vertical indent lines
-Plug 'Yggdroot/indentLine'
+if has('conceal')
+    Plug 'Yggdroot/indentLine'
+endif
 
 " Support ANSI escape sequences
 Plug 'powerman/vim-plugin-AnsiEsc'
@@ -622,7 +637,7 @@ Plug 'powerman/vim-plugin-AnsiEsc'
 " Relative numbering with a toggle for absolute numbering
 if v:version < 703 || v:version == 703 && !has('patch1115')
     set relativenumber
-    Plug 'jeffkreeftmeijer/vim-numbertoggle'
+    Plug 'jeffkreeftmeijer/vim-numbertoggle', { 'branch': 'legacy' }
 endif
 
 
@@ -646,8 +661,6 @@ endif
 " Solarized 8
 Plug 'lifepillar/vim-solarized8'
 
-" Tomorrow Theme
-"Plug 'chriskempson/vim-tomorrow-theme'
 
 " ############################## Functionality ################################
 
@@ -658,20 +671,25 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'dense-analysis/ale'
 
 " Improved motions handling
-Plug 'easymotion/vim-easymotion'
+if v:version >= 703
+    Plug 'easymotion/vim-easymotion'
+endif
 
 " Support EditorConfig files
-if has('python') || has('python3')
-    Plug 'editorconfig/editorconfig-vim'
-endif
+Plug 'editorconfig/editorconfig-vim'
 
 " Improved <Tab> completion
 Plug 'ervandew/supertab'
 
 " Full filesystem explorer
-Plug 'scrooloose/nerdtree'
-" Git support for NERDTree
-Plug 'Xuyuanp/nerdtree-git-plugin'
+if v:version >= 703
+    Plug 'preservim/nerdtree'
+
+    " Git support for NERDTree
+    if executable('git')
+        Plug 'Xuyuanp/nerdtree-git-plugin'
+    endif
+endif
 
 " Heuristically set buffer options
 Plug 'tpope/vim-sleuth'
@@ -680,34 +698,45 @@ Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-surround'
 
 " Advanced syntax checking
-"Plug 'vim-syntastic/syntastic'
+if v:version >= 701 || v:version == 700 && has('patch175')
+    Plug 'vim-syntastic/syntastic'
+endif
 
 
 " ############################## Integrations #################################
 
-" Git: Powerful Git wrapper
-Plug 'tpope/vim-fugitive'
+if executable('git')
+    " Git: Powerful Git wrapper
+    if v:version >= 704
+        Plug 'tpope/vim-fugitive'
+    endif
 
-" Git: Show a diff in the gutter
-if has('signs')
-    Plug 'airblade/vim-gitgutter'
+    " Git: Show a diff in the gutter
+    if has('signs') && (v:version > 703 || v:version == 703 && has('patch105'))
+        Plug 'airblade/vim-gitgutter'
+    endif
 endif
 
-" tmux: Clipboard synchronisation
-Plug 'roxma/vim-tmux-clipboard'
+if executable('tmux')
+    " tmux: Status line generator
+    Plug 'edkolev/tmuxline.vim'
 
-" tmux: Focus event handling
-if v:version > 704 || v:version == 704 && has('patch392')
-    Plug 'tmux-plugins/vim-tmux-focus-events'
+    " tmux: Focus event handling
+    if v:version > 704 || v:version == 704 && has('patch392')
+        Plug 'tmux-plugins/vim-tmux-focus-events'
+
+        " tmux: Clipboard synchronisation
+        Plug 'roxma/vim-tmux-clipboard'
+    endif
 endif
 
-" tmux: Status line generator
-Plug 'edkolev/tmuxline.vim'
 
 " ################################ Languages ##################################
 
 " CoffeeScript
-Plug 'kchmck/vim-coffee-script'
+if executable('coffee')
+    Plug 'kchmck/vim-coffee-script'
+endif
 
 " Git
 Plug 'tpope/vim-git'
@@ -721,32 +750,41 @@ Plug 'Glench/Vim-Jinja2-Syntax'
 " JSON
 Plug 'elzr/vim-json'
 
-" Markdown (simple)
+" Markdown (upstream of bundled)
 Plug 'tpope/vim-markdown'
 
-" Markdown (advanced)
-"Plug 'plasticboy/vim-markdown'
+" Markdown
+"Plug 'preservim/vim-markdown'
 
 " Nagios
-Plug 'bigbrozer/vim-nagios'
+"Plug 'bigbrozer/vim-nagios'
 
-" PowerShell
+" PowerShell (upstream of bundled)
 Plug 'PProvost/vim-ps1'
 
 " PgSQL
 Plug 'lifepillar/pgsql.vim'
 
 " Python
-Plug 'python-mode/python-mode', { 'branch': 'develop' }
+if v:version > 703
+    if has('python3') && executable('python3')
+        Plug 'python-mode/python-mode'
+    elseif has('python') && executable('python2')
+        Plug 'python-mode/python-mode', { 'branch': 'last-py2-support' }
+    endif
+endif
 
 " Salt
-Plug 'saltstack/salt-vim'
+" Archived but yet to find anything better and maintained
+Plug 'vmware-archive/salt-vim'
 
-" tmux
+" tmux (replaces built-in)
+" More feature rich and up-to-date than built-in support
 Plug 'tmux-plugins/vim-tmux'
 
-" YAML (built-in support is very slow)
-Plug 'stephpy/vim-yaml'
+" YAML (replaces built-in)
+" Less sophisticated than built-in support but much faster
+"Plug 'stephpy/vim-yaml'
 
 
 " ######################### vim-plug Initialisation ###########################
@@ -806,6 +844,14 @@ let g:pymode_lint_on_write = 0
 
 " Don't automatically regenerate rope project cache on saving changes
 let g:pymode_rope_regenerate_on_write = 0
+
+
+" ################################ salt-vim ###################################
+
+" Syntax file to use instead of performing autodetection:
+" - 0: Django (bundled with Vim)
+" - 1: Jinja
+"let g:sls_use_jinja_syntax = 1
 
 
 " ################################ syntastic ##################################
@@ -876,25 +922,49 @@ endif
 let g:jinja_syntax_html = 0
 
 
-" ########################## vim-markdown (tpope) #############################
-
-" Enable fenced code block syntax highlighting for these languages
-let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
-
-" Don't conceal markdown syntax characters
-let g:markdown_syntax_conceal = 0
-
-
-" ######################## vim-markdown (plasticboy) ##########################
+" ######################## vim-markdown (preservim) ###########################
 
 " Enable fenced code block syntax highlighting for these languages
 let g:vim_markdown_fenced_languages =
     \['bash=sh', 'c++=cpp', 'ini=dosini', 'shell=sh', 'viml=vim']
 
 
+" ########################## vim-markdown (tpope) #############################
+
+" Supported languages for fenced code block syntax highlighting
+let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
+
+" Concealing of markdown syntax characters
+let g:markdown_syntax_conceal = 0
+
+
+" ################################# vim-ps1 ###################################
+
+" PowerShell executable to use instead of performing autodetection
+"let g:ps1_makeprg_cmd = 'pwsh'
+
+" Show full exception details (e.g. CategoryInfo)
+"let g:ps1_efm_show_error_categories = 1
+
+" Disable folding of specific script elements
+"
+" Function blocks
+"let g:ps1_nofold_blocks = 1
+" Region blocks
+"let g:ps1_nofold_region = 1
+" Digital signatures
+"let g:ps1_nofold_sig = 1
+
+
+" ################################ vim-yaml ###################################
+
+" Limit spell checking to comments and strings
+"let g:yaml_limit_spell = 1
+
+
 endif
 " *****************************************************************************
-" * End of configuration of language handling and plugin settings.            *
+" ***            End of language handling and plugin settings               ***
 " *****************************************************************************
 
 " vim: syntax=vim cc=80 tw=79 ts=4 sw=4 sts=4 et sr
