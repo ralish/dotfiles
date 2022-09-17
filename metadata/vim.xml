@@ -10,4 +10,10 @@
     <InstallPath>
         <HideSymlinks>true</HideSymlinks>
     </InstallPath>
+
+    <AdditionalPaths>
+        <AdditionalPath source=".vimrc">
+            <TargetPath symlink="_vimrc" />
+        </AdditionalPath>
+    </AdditionalPaths>
 </Component>
