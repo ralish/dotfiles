@@ -1,5 +1,10 @@
-" Consult the Vim Options Documentation as a reference:
-" https://vimhelp.org/options.txt.html#options.txt
+" Useful links
+"
+" Options quick reference
+" https://vimhelp.org/quickref.txt.html#Q_op
+"
+" List of possible features
+" https://vimhelp.org/various.txt.html#%2Bfeature-list
 
 " ***************************** Initialisation ********************************
 
