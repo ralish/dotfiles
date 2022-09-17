@@ -1,7 +1,7 @@
 " Consult the Vim Options Documentation as a reference:
 " https://vimhelp.org/options.txt.html#options.txt
 
-" ****************************** Initialisation *******************************
+" ***************************** Initialisation ********************************
 
 " No vi compatibility (i.e. use Vim defaults)
 if &compatible
@@ -39,7 +39,7 @@ if has('viminfo')
 endif
 
 
-" ********************************** General **********************************
+" ********************************* General ***********************************
 
 " Optimise colours for dark backgrounds
 set background=dark
@@ -128,7 +128,7 @@ if v:version > 703 || v:version == 703 && has('patch1115')
 endif
 
 
-" ********************************* Security **********************************
+" ******************************** Security ***********************************
 
 " Use the Blowfish cipher for file encryption
 set cryptmethod=blowfish
@@ -140,7 +140,7 @@ set modeline
 set secure
 
 
-" ********************************** Viewing **********************************
+" ********************************* Viewing ***********************************
 
 " Automatically reread externally modified files if unchanged in Vim
 set autoread
@@ -151,7 +151,7 @@ if has('virtualedit')
 endif
 
 
-" ********************************** Editing **********************************
+" ********************************* Editing ***********************************
 
 " Insert a comment on <Enter> in Insert mode if in a comment
 "set formatoptions+=r
@@ -177,7 +177,7 @@ if v:version > 703 || v:version == 703 && has('patch541')
 endif
 
 
-" ********************************** Saving ***********************************
+" ********************************* Saving ************************************
 
 " Automatically write changes to a file on certain commands
 set autowrite
@@ -189,7 +189,7 @@ set confirm
 set nofsync
 
 
-" ********************************** Folding **********************************
+" ********************************* Folding ***********************************
 
 if has('folding')
     " Initial folding level on opening a new buffer
@@ -209,7 +209,7 @@ if has('folding')
 endif
 
 
-" ********************************* Indenting *********************************
+" ******************************** Indenting **********************************
 
 " Automatically indent new lines to match the previous line
 set autoindent
@@ -232,7 +232,7 @@ if has('smartindent')
 endif
 
 
-" **************************** Keyword Completion *****************************
+" *************************** Keyword Completion ******************************
 
 " Sources to scan for keyword completion
 set complete=.,t
@@ -254,7 +254,7 @@ if has('spell')
 endif
 
 
-" ******************************* Mouse Support *******************************
+" ****************************** Mouse Support ********************************
 
 if has('mouse')
     " Enable in all modes
@@ -271,7 +271,7 @@ if has('mouse')
 endif
 
 
-" ********************************* Scrolling *********************************
+" ******************************** Scrolling **********************************
 
 " Number of lines to scroll vertically
 "set scrolljump=1
@@ -286,7 +286,7 @@ set sidescroll=3
 "set sidescrolloff=3
 
 
-" ***************************** Search & Replace ******************************
+" **************************** Search & Replace *******************************
 
 " Enable the 'g' flag in ':substitute' commands by default
 set gdefault
@@ -309,7 +309,7 @@ if has('extra_search')
 endif
 
 
-" ****************************** Spell Checking *******************************
+" ***************************** Spell Checking ********************************
 
 if has('syntax')
     " Word list names to use for spell checking
@@ -317,7 +317,7 @@ if has('syntax')
 endif
 
 
-" ******************************** Tabulation *********************************
+" ******************************* Tabulation **********************************
 
 " Number of spaces that a <Tab> character in a file corresponds to (viewing)
 set tabstop=4
@@ -332,7 +332,7 @@ set expandtab
 set smarttab
 
 
-" ***************************** Window Splitting ******************************
+" **************************** Window Splitting *******************************
 
 " Don't equalise window sizes on splitting or closing
 "set noequalalways
@@ -351,7 +351,7 @@ if has('windows')
 endif
 
 
-" ********************************* Wrapping **********************************
+" ******************************** Wrapping ***********************************
 
 " Don't display lines longer than the window width on the next line
 set nowrap
@@ -379,7 +379,7 @@ if has('linebreak')
 endif
 
 
-" ******************************* Backup Files ********************************
+" ****************************** Backup Files *********************************
 
 " Disable saving a backup before overwriting a file
 set nobackup
@@ -399,7 +399,7 @@ if has('wildignore')
 endif
 
 
-" ******************************* Session Files *******************************
+" ****************************** Session Files ********************************
 
 if has('mksession')
     " Don't save or restore options and mappings
@@ -407,7 +407,7 @@ if has('mksession')
 endif
 
 
-" ******************************** Swap Files *********************************
+" ******************************* Swap Files **********************************
 
 " Enable using a swap file for the buffer
 set swapfile
@@ -422,7 +422,7 @@ set swapsync=
 set updatetime=250
 
 
-" ******************************** Undo Files *********************************
+" ******************************* Undo Files **********************************
 
 " Maximum number of changes that can be undone
 "set undolevels=1000
@@ -439,7 +439,7 @@ if has('persistent_undo')
 endif
 
 
-" ******************************** View Files *********************************
+" ******************************* View Files **********************************
 
 if has('mksession')
     " Directory for reading/writing view files
@@ -477,7 +477,7 @@ function! AsciiTextBanner(...)
 endfunction
 
 
-" ******************************* Key Mappings ********************************
+" ****************************** Key Mappings *********************************
 
 " Key to use for <Leader>
 let mapleader = '\'
@@ -551,8 +551,8 @@ cnoremap w!! w !sudo tee % > /dev/null
 " *****************************************************************************
 if 1
 
-" ***************************** Language Handling *****************************
-" ##################################### C #####################################
+" **************************** Language Handling ******************************
+" #################################### C ######################################
 
 " Highlight strings inside of comments
 let g:c_comment_strings = 1
@@ -564,13 +564,13 @@ let g:c_comment_strings = 1
 autocmd FileType gitcommit set colorcolumn=73
 
 
-" ################################### Jinja ###################################
+" ################################## Jinja ####################################
 
 " Always treat '.jinja' files as Jinja (overrides any modeline)
 autocmd BufNewFile,BufWinEnter *.jinja set filetype=jinja
 
 
-" ################################### Shell ###################################
+" ################################## Shell ####################################
 
 " Assume Bash syntax for shell files
 let g:is_bash = 1
@@ -582,14 +582,14 @@ let g:is_bash = 1
 let g:sh_fold_enabled = 1
 
 
-" ********************************** Plugins **********************************
-" ############################# vim-plug Startup ##############################
+" ********************************* Plugins ***********************************
+" ############################ vim-plug Startup ###############################
 
 " Directory where vim-plug will store plugins
 call plug#begin('~/.vim/plugins')
 
 
-" ################################ Appearance #################################
+" ############################### Appearance ##################################
 
 " vim-airline & themes
 Plug 'vim-airline/vim-airline'
@@ -608,7 +608,7 @@ if v:version < 703 || v:version == 703 && !has('patch1115')
 endif
 
 
-" ############################## Colour Schemes ###############################
+" ############################# Colour Schemes ################################
 
 " Bad Wolf
 "Plug 'sjl/badwolf'
@@ -631,8 +631,7 @@ Plug 'lifepillar/vim-solarized8'
 " Tomorrow Theme
 "Plug 'chriskempson/vim-tomorrow-theme'
 
-
-" ############################### Functionality ###############################
+" ############################## Functionality ################################
 
 " Full path fuzzy finder
 Plug 'ctrlpvim/ctrlp.vim'
@@ -666,7 +665,7 @@ Plug 'tpope/vim-surround'
 "Plug 'vim-syntastic/syntastic'
 
 
-" ############################### Integrations ################################
+" ############################## Integrations #################################
 
 " Git: Powerful Git wrapper
 Plug 'tpope/vim-fugitive'
@@ -687,8 +686,7 @@ endif
 " tmux: Status line generator
 Plug 'edkolev/tmuxline.vim'
 
-
-" ################################# Languages #################################
+" ################################ Languages ##################################
 
 " CoffeeScript
 Plug 'kchmck/vim-coffee-script'
@@ -733,14 +731,14 @@ Plug 'tmux-plugins/vim-tmux'
 Plug 'stephpy/vim-yaml'
 
 
-" ########################## vim-plug Initialisation ##########################
+" ######################### vim-plug Initialisation ###########################
 
 " Initialise the plugin system
 call plug#end()
 
 
-" ****************************** Plugin Settings ******************************
-" ############################### Colour Scheme ###############################
+" ***************************** Plugin Settings *******************************
+" ############################## Colour Scheme ################################
 
 " Disable usage of italics (not supported by PuTTY)
 let g:solarized_italics = 0
@@ -753,19 +751,19 @@ catch
 endtry
 
 
-" ############################# editorconfig-vim ##############################
+" ############################ editorconfig-vim ###############################
 
 " File path patterns to exclude
 let g:EditorConfig_exclude_patterns = ['fugitive://.*']
 
 
-" ################################### json ####################################
+" ################################## json #####################################
 
 " Don't conceal double quotes
 let g:vim_json_syntax_conceal = 0
 
 
-" ################################# nerdtree ##################################
+" ################################ nerdtree ###################################
 
 " Key mapping to toggle NERDTree
 nnoremap <C-N> :NERDTreeToggle<CR>
@@ -777,13 +775,13 @@ if exists(':NERDTree')
 endif
 
 
-" ################################### pgsql ###################################
+" ################################## pgsql ####################################
 
 " Make PostgreSQL's SQL dialect the default for '.sql' files
 let g:sql_type_default = 'pgsql'
 
 
-" ################################ python-mode ################################
+" ############################### python-mode #################################
 
 " Don't automatically run linter on saving changes
 let g:pymode_lint_on_write = 0
@@ -792,7 +790,7 @@ let g:pymode_lint_on_write = 0
 let g:pymode_rope_regenerate_on_write = 0
 
 
-" ################################# syntastic #################################
+" ################################ syntastic ##################################
 
 " Some useful shortcuts to common commands
 nnoremap <Leader>sc :SyntasticCheck<CR>
@@ -835,7 +833,7 @@ let g:syntastic_markdown_mdl_args = ''
 let g:syntastic_sh_shellcheck_args = '-x'
 
 
-" ################################ vim-airline ################################
+" ############################### vim-airline #################################
 
 " Enable Powerline symbols
 let g:airline_powerline_fonts = 1
@@ -844,7 +842,7 @@ let g:airline_powerline_fonts = 1
 let g:airline_theme = 'solarized'
 
 
-" ############################### vim-gitgutter ###############################
+" ############################## vim-gitgutter ################################
 
 " Always display the sign column
 if exists('&signcolumn')
@@ -854,13 +852,13 @@ else
 endif
 
 
-" ############################# Vim-Jinja2-Syntax #############################
+" ############################ Vim-Jinja2-Syntax ##############################
 
 " Disable HTML highlighting as usually we're not editing HTML templates
 let g:jinja_syntax_html = 0
 
 
-" ########################### vim-markdown (tpope) ############################
+" ########################## vim-markdown (tpope) #############################
 
 " Enable fenced code block syntax highlighting for these languages
 let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
@@ -869,7 +867,7 @@ let g:markdown_fenced_languages = ['bash=sh', 'python', 'sh', 'shell=sh']
 let g:markdown_syntax_conceal = 0
 
 
-" ######################### vim-markdown (plasticboy) #########################
+" ######################## vim-markdown (plasticboy) ##########################
 
 " Enable fenced code block syntax highlighting for these languages
 let g:vim_markdown_fenced_languages =
