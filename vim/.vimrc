@@ -3,38 +3,56 @@
 
 " ***************************** Initialisation ********************************
 
-" No vi compatibility (i.e. use Vim defaults)
+" Check Vim is at least v7.0. Most plugins don't support older releases and our
+" configuration is unlikely to work correctly on such ancient versions either.
+if v:version < 700
+    finish
+endif
+
+" No vi compatibility (i.e. use Vim defaults). This should be the default due
+" to the presence of our vimrc file, but there's no harm in being explicit.
 if &compatible
     set nocompatible
 endif
 
 " The above set command will be skipped if the +eval feature is missing, which
-" is the case in some minimal versions of Vim (e.g. vim.tiny). The trick below
-" will thus reset compatible *only* if the +eval feature is missing. Borrowed
-" from the defaults.vim introduced in Vim 8.
+" is the case in some minimal versions of Vim (e.g. tiny). The trick below will
+" reset compatible *only* if the +eval feature is missing.
 silent! while 0
     set nocompatible
 silent! endwhile
 
+" The defaults.vim script, introduced in Vim 7.4.2111, will only run if Vim is
+" started normally and no vimrc file is found. We can optionally run it anyway
+" by explicitly sourcing it after unsetting the "skip_defaults_vim" variable.
+"if v:version > 704 || v:version == 704 && has('patch2111')
+"    unlet! skip_defaults_vim
+"    source $VIMRUNTIME/defaults.vim
+"endif
+
 " Compatibility flags for vi-compatible behaviour
 "set cpoptions=aABceFs
 
-" Use the Bash shell instead of fish on older Vim releases
-if &shell =~# 'fish$' && (v:version < 704 ||
-                         \v:version == 704 && !has('patch276'))
+" If the fish shell is being used check at least Vim 7.4.276 is running, which
+" introduced the required support. If not, revert to the bash shell.
+if &shell =~# '/fish$' && (v:version < 704 ||
+                          \v:version == 704 && !has('patch276'))
     set shell=/bin/bash
 endif
 
 if has('multi_byte')
-    " Always use UTF-8 character encoding internally
+    " Always use UTF-8 character encoding internally. This is the default on
+    " Windows, but other platforms default to $LANG and fallback to latin1.
     set encoding=utf-8
 endif
 
 if has('viminfo')
-    " Save and restore uppercase global variables
+    " Only save and restore global variables which start with an uppercase
+    " letter and do not contain a lowercase letter.
     set viminfo^=!
 
-    " Set the path where the viminfo file is stored
+    " Name of the viminfo file and optional path. When set, this must be the
+    " final option of the viminfo setting.
     set viminfo+=n~/dotfiles/vim/.vim/.viminfo
 endif
 
