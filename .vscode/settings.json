@@ -1,7 +1,5 @@
 {
     // File paths to language mappings
-    // These cannot be workspace relative currently
-    // See: https://github.com/Microsoft/vscode/issues/12805
     "files.associations": {
         // root
         ".ignore": "ignore",
