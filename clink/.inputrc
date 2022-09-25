@@ -101,7 +101,7 @@ set history-preserve-point off
 set horizontal-scroll-mode off
 
 # String of characters to terminate an incremental search
-set isearch-terminators 'C-[ C-J'
+set isearch-terminators '\C-[\C-J'
 
 # Keymap for key binding commands
 #
