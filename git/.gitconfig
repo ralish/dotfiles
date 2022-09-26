@@ -141,7 +141,7 @@
 	cma = commit --all
 	cmv = commit --all --message
 	cmx = commit --amend
-	cmz = commit --amend --all
+	cmz = commit --amend --no-edit
 
 	co  = checkout
 	cob = checkout -b
