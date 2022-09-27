@@ -10,7 +10,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
     return
 }
 
-$CurrentVersion = (Get-Module -Name 'posh-git').Version
+$CurrentVersion = (Get-Module -Name 'posh-git' -Verbose:$false).Version
 $RequiredVersion = [Version]::new('1.0.0')
 if ($CurrentVersion -ge $RequiredVersion) {
     # Abbreviate home directory path with tilde

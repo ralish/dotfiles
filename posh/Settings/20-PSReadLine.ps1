@@ -21,7 +21,7 @@ Set-PSReadLineOption -HistoryNoDuplicates
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
 # Enable command-line completion prediction (PSReadLine v2.1+)
-if ((Get-Module -Name 'PSReadLine').Version -ge [Version]::new('2.1.0')) {
+if ((Get-Module -Name 'PSReadLine' -Verbose:$false).Version -ge [Version]::new('2.1.0')) {
     Set-PSReadLineOption -PredictionSource History
 }
 

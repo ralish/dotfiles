@@ -181,7 +181,7 @@ Function Optimize-PowerShell {
 
             # There's some caching of package providers and I've yet to find a
             # way to invalidate it so we request the user restart the session.
-            if (Get-Module -Name 'PowerShellGet') {
+            if (Get-Module -Name 'PowerShellGet' -Verbose:$false) {
                 Write-Host -ForegroundColor Cyan '[PowerShell] You must restart PowerShell to complete NuGet package provider installation.'
                 Write-Host -ForegroundColor Cyan '             Re-run this script afterwards to continue initial PowerShell configuration.'
                 return
@@ -197,7 +197,7 @@ Function Optimize-PowerShell {
 
     Write-Host -ForegroundColor Green '[PowerShell] Checking PowerShellGet module ...'
     $PSGetOutdated = $true
-    $PSGetLoaded = Get-Module -Name 'PowerShellGet' | Sort-Object -Property 'Version' -Descending | Select-Object -First 1
+    $PSGetLoaded = Get-Module -Name 'PowerShellGet' -Verbose:$false | Sort-Object -Property 'Version' -Descending | Select-Object -First 1
     if ($PSGetLoaded) {
         $PSGetLatest = Find-Module -Name 'PowerShellGet'
         if ($PSGetLoaded.Version -ge $PSGetLatest.Version) {
@@ -208,8 +208,8 @@ Function Optimize-PowerShell {
     if ($PSGetOutdated) {
         Write-Host -ForegroundColor Green '[PowerShell] Updating PowerShellGet module ...'
         Install-Module -Name 'PowerShellGet' -Force
-        Import-Module -Name 'PowerShellGet' -Force
-        $PSGetImported = Get-Module -Name 'PowerShellGet' | Sort-Object -Property 'Version' -Descending | Select-Object -First 1
+        Import-Module -Name 'PowerShellGet' -Force -Verbose:$false
+        $PSGetImported = Get-Module -Name 'PowerShellGet' -Verbose:$false | Sort-Object -Property 'Version' -Descending | Select-Object -First 1
 
         # PowerShellGet loads various .NET types, and types can't be unloaded
         # (at least not easily). That can be problematic as when loading a new
@@ -230,7 +230,7 @@ Function Optimize-PowerShell {
     $ModulesInstall = New-Object -TypeName Collections.Generic.List[String]
 
     foreach ($ModuleLatest in $ModulesLatest) {
-        $ModuleCurrent = Get-Module -Name $ModuleLatest.Name -ListAvailable | Sort-Object -Property 'Version' -Descending | Select-Object -First 1
+        $ModuleCurrent = Get-Module -Name $ModuleLatest.Name -ListAvailable -Verbose:$false | Sort-Object -Property 'Version' -Descending | Select-Object -First 1
         if ($ModuleCurrent.Version -ge $ModuleLatest.Version) {
             continue
         }
@@ -250,7 +250,7 @@ Function Optimize-PowerShell {
         }
     }
 
-    if (Get-Module -Name 'PSReadLine' -ListAvailable) {
+    if (Get-Module -Name 'PSReadLine' -ListAvailable -Verbose:$false) {
         Write-Host -ForegroundColor Green '[PowerShell] Clearing PSReadLine history ...'
         Remove-Item -Path (Get-PSReadLineOption).HistorySavePath -ErrorAction Ignore
     }

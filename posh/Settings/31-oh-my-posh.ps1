@@ -77,7 +77,7 @@ $VerbosePreference = $VerboseOriginal
 Remove-Variable -Name 'VerboseOriginal'
 
 # Enable posh-git support if previously imported
-if (Get-Module -Name 'posh-git') {
+if (Get-Module -Name 'posh-git' -Verbose:$false) {
     $env:POSH_GIT_ENABLED = $true
 }
 
