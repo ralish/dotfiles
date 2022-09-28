@@ -1,6 +1,22 @@
 <QueryList xmlns="http://schemas.microsoft.com/win/2004/08/events/eventquery">
   <Query Id="0" Path="Security">
     <Select Path="Security">*</Select>
+    <!--
+      Keywords:   Audit Success
+      Category:   Event processing
+      Message:    The event logging service encountered an error while processing an incoming event published from %3.
+
+      Useful on Windows 11 22H2 Build 521 (GA) to filter out these events when
+      Process Creation auditing is enabled. A regression causes these events to
+      not be correctly processed, and they're typically extremely high volume.
+    -->
+    <!--
+    <Suppress Path="Security">
+      *[System[EventID=1108 and band(Keywords,9007199254740992)]]
+      and
+      *[UserData[EventProcessingFailure[ErrorCode=15003 or ErrorCode=15005]]]
+    </Suppress>
+    -->
 
     <!--
       Keywords:   Audit Success
