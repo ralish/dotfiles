@@ -5,6 +5,7 @@
     // Startup
     "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
     "startOnUserLogin": false,
+    "firstWindowPreference": "defaultProfile",
     "launchMode": "maximized",
     "windowingBehavior": "useExisting",
     "initialCols": 120,
@@ -14,7 +15,8 @@
     "copyOnSelect": true,
     "copyFormatting": "none",
     "trimBlockSelection": true,
-    "wordDelimiters": " ./\\()\"'-:,.;<>~!@#$%^&*|+=[]{}~?│",
+    "trimPaste": true,
+    "wordDelimiters": " /\\()\"'-.,:;<>~!@#$%^&*|+=[]{}~?│",
     "snapToGridOnResize": true,
     "tabSwitcherMode": "inOrder",
     "focusFollowMouse": false,
@@ -29,23 +31,21 @@
     "alwaysOnTop": false,
     "tabWidthMode": "equal",
     "disableAnimations": false,
+    "alwaysShowNotificationIcon": false,
+    "minimizeToNotificationArea": false,
 
     // Rendering
     "experimental.rendering.forceFullRepaint": false,
     "experimental.rendering.software": false,
 
     // Advanced (not in UI)
-    "alwaysShowNotificationIcon": false,
     "centerOnLaunch": true,
     "confirmCloseAllTabs": false,
     "disabledProfileSources": ["Windows.Terminal.Azure"],
-    "firstWindowPreference": "defaultProfile",
     "inputServiceWarning": true,
     "largePasteWarning": true,
-    "minimizeToNotificationArea": false,
     "multiLinePasteWarning": true,
     "showAdminShield": true,
-    "trimPaste": true,
 
     // Color schemes
     "schemes": [],
@@ -71,7 +71,9 @@
         "defaults": {
             // General
             "startingDirectory": null,
+            //"icon": "\ue756",
             "tabTitle": null,
+            "elevate": false,
 
             // Appearance: Text
             "colorScheme": "Campbell",
@@ -99,7 +101,7 @@
             "useAcrylic": false,
 
             // Appearance: Window
-            "padding": "8, 8, 8, 8",
+            "padding": "8",
             "scrollbarState": "visible",
 
             // Advanced
@@ -118,7 +120,7 @@
                 "source": "Windows.Terminal.PowershellCore",
                 "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
 
-                "commandline": "pwsh.exe -NoLogo"
+                "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -NoLogo"
             },
             {
                 "name": "Windows PowerShell",
@@ -142,6 +144,15 @@
                 "closeOnExit": "always"
             },
             {
+                "name": "Ubuntu",
+                "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc",
+                "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
+
+                "startingDirectory": "/home/sdl",
+                "colorScheme": "Solarized Dark",
+                "closeOnExit": "always"
+            },
+            {
                 "name": "Kali",
                 "source": "Windows.Terminal.Wsl",
                 "guid": "{46ca431a-3a87-5fb3-83cd-11ececc031d2}",
@@ -158,37 +169,35 @@
                 "closeOnExit": "always"
             },
             {
-                "guid": "{59771b87-e259-5f7e-a309-fc31d6190dba}",
                 "name": "Developer Command Prompt for VS 2019",
                 "source": "Windows.Terminal.VisualStudio",
-                "hidden": true,
+                "guid": "{59771b87-e259-5f7e-a309-fc31d6190dba}",
 
                 "commandline": "%ComSpec% /k \"%ProgramFiles(x86)%\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\"",
                 "startingDirectory": "%USERPROFILE%",
                 "closeOnExit": "always"
             },
             {
-                "guid": "{e328694f-d477-5b27-affb-74320d074101}",
                 "name": "Developer PowerShell for VS 2019",
                 "source": "Windows.Terminal.VisualStudio",
-                "hidden": true,
+                "guid": "{e328694f-d477-5b27-affb-74320d074101}",
 
                 "commandline": "%SystemRoot%\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -NoExit -Command \"& { Import-Module \"$env:ProgramFiles\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\Microsoft.VisualStudio.DevShell.dll\"; Enter-VsDevShell 45ad4e04 }\"",
                 "startingDirectory": "%USERPROFILE%"
             },
             {
-                "guid": "{b00471e1-8900-5d14-9e92-f8542faceaed}",
                 "name": "Developer Command Prompt for VS 2022",
                 "source": "Windows.Terminal.VisualStudio",
+                "guid": "{b00471e1-8900-5d14-9e92-f8542faceaed}",
 
                 "commandline": "%ComSpec% /k \"%ProgramFiles%\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\"",
                 "startingDirectory": "%USERPROFILE%",
                 "closeOnExit": "always"
             },
             {
-                "guid": "{264e4e11-d916-5289-b8f4-b6ef5433d1d7}",
                 "name": "Developer PowerShell for VS 2022",
                 "source": "Windows.Terminal.VisualStudio",
+                "guid": "{264e4e11-d916-5289-b8f4-b6ef5433d1d7}",
 
                 "commandline": "%SystemRoot%\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -NoExit -Command \"& { Import-Module \"$env:ProgramW6432\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\Microsoft.VisualStudio.DevShell.dll\"; Enter-VsDevShell 20622545 }\"",
                 "startingDirectory": "%USERPROFILE%"
