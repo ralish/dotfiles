@@ -120,7 +120,7 @@
                 "source": "Windows.Terminal.PowershellCore",
                 "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
 
-                "commandline": "C:\\Program Files\\PowerShell\\7\\pwsh.exe -NoLogo"
+                "commandline": "%ProgramFiles%\\PowerShell\\7\\pwsh.exe -NoLogo"
             },
             {
                 "name": "Windows PowerShell",
@@ -132,6 +132,7 @@
                 "name": "Command Prompt",
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
 
+                "commandline": "%SystemRoot%\\System32\\cmd.exe",
                 "closeOnExit": "always"
             },
             {
@@ -139,6 +140,7 @@
                 "source": "Windows.Terminal.Wsl",
                 "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
 
+                "commandline": "%SystemRoot%\\System32\\wsl.exe -d Ubuntu",
                 "startingDirectory": "/home/sdl",
                 "colorScheme": "Solarized Dark",
                 "closeOnExit": "always"
@@ -148,6 +150,7 @@
                 "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc",
                 "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
 
+                "commandline": "%LocalAppData%\\Microsoft\\WindowsApps\\ubuntu.exe",
                 "colorScheme": "Solarized Dark",
                 "closeOnExit": "always"
             },
@@ -156,6 +159,7 @@
                 "source": "Windows.Terminal.Wsl",
                 "guid": "{46ca431a-3a87-5fb3-83cd-11ececc031d2}",
 
+                "commandline": "%SystemRoot%\\System32\\wsl.exe -d kali-linux",
                 "startingDirectory": "/home/sdl",
                 "colorScheme": "Solarized Dark",
                 "closeOnExit": "always"
@@ -165,6 +169,7 @@
                 "source": "Git",
                 "guid": "{2ece5bfe-50ed-5f3a-ab87-5cd4baafed2b}",
 
+                "commandline": "%ProgramFiles%\\Git\\bin\\bash.exe -i -l",
                 "closeOnExit": "always"
             },
             {
