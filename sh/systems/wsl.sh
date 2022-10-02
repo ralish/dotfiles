@@ -95,7 +95,7 @@ wsl_setup_ssh_auth_sock() {
     fi
 
     rm -f "$SSH_AUTH_SOCK"
-    (   
+    (
         setsid socat \
             UNIX-LISTEN:"$SSH_AUTH_SOCK",fork \
             EXEC:"$npiperelay -ei -s //./pipe/openssh-ssh-agent",nofork &
