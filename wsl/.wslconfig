@@ -10,11 +10,17 @@
 # Default: All processors
 processors = 6
 
-# Enable nested virtualisation on AMD64
+# Nested virtualisation support on AMD64
 #
 # Default: true
 # Support: Build 20175 (Windows 11 21H2+)
 #nestedVirtualization = true
+
+# Hardware performance counters support
+#
+# Default: true
+# Support: WSL 0.50.2
+#hardwarePerformanceCounters = true
 
 # Amount of memory to assign to the VM
 #
@@ -65,7 +71,7 @@ memory = 16GB
 # Default: true
 #localhostForwarding = true
 
-# Support for GUI applications (WSLg)
+# Support GUI applications (WSLg)
 #
 # Default: true
 # Support: Build 21364 (Windows 11 21H2+)
@@ -82,3 +88,15 @@ memory = 16GB
 # Default: false
 # Support: Build 21387 (Windows 11 21H2+)
 #debugConsole = false
+
+# Launch a shell to debug the root namespace
+#
+# Default: false
+# Support: WSL 0.51.2
+#debugShell = false
+
+# Launch WSL and distributions in Safe Mode
+#
+# Default: false
+# Support: WSL 0.66.2
+#safeMode = false
