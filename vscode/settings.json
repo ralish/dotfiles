@@ -211,6 +211,11 @@
         // Remove commented out code
         "javascript:S125": {
             "level": "off"
+        },
+
+        // Duplicate string literals
+        "python:S1192": {
+            "level": "off"
         }
     },
 
