@@ -612,6 +612,18 @@ Function ghf {
     Get-Help -Full @PSBoundParameters
 }
 
+# Retrieve FileVersionInfo from a file
+Function gvi {
+    [CmdletBinding()]
+    [OutputType([Diagnostics.FileVersionInfo])]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Path
+    )
+
+    Get-Item -Path $Path | Select-Object -ExpandProperty VersionInfo
+}
+
 #endregion
 
 Complete-DotFilesSection
