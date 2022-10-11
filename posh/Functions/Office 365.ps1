@@ -889,7 +889,7 @@ Function Import-ContentSearchResults {
             $Data = $CsvData
         }
 
-        Write-Verbose -ForegroundColor Green ('Loaded {0} entries for processing.' -f $Data.Count)
+        Write-Verbose -Message ('Loaded {0} entries for processing.' -f $Data.Count)
 
         $EntryNumber = 0
         foreach ($Entry in $Data) {
@@ -953,7 +953,7 @@ Function Import-ContentSearchResults {
             }
 
             if (($EntryNumber % 1000) -eq 0) {
-                Write-Verbose -ForegroundColor Green ('Processed {0} entries ...' -f $EntryNumber)
+                Write-Verbose -Message ('Processed {0} entries ...' -f $EntryNumber)
             }
 
             if ($EntryLimit -and $EntryNumber -eq $EntryLimit) {
@@ -999,7 +999,7 @@ Function Import-ContentSearchResultsEntry {
     # - An optional name
     # - An email address
     #
-    # This gets messy fast as the formatting of is extremely variable. The only
+    # This gets messy fast as the formatting is extremely variable. The only
     # guarantee is that distinct elements are comma-separated. However, there
     # may be commas within the name component (which itself is optional).
     $ElementRegex = '^(\S+\s+)*?\S+?@\S+?\.\S+(?=, )'
