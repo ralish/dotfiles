@@ -20,10 +20,11 @@ Set-PSReadLineOption -HistoryNoDuplicates
 # Move the cursor to end of line while cycling through history
 Set-PSReadLineOption -HistorySearchCursorMovesToEnd
 
-# Enable command-line completion prediction (PSReadLine v2.1+)
-if ((Get-Module -Name 'PSReadLine' -Verbose:$false).Version -ge [Version]::new('2.1.0')) {
-    Set-PSReadLineOption -PredictionSource History
-}
+# Command-line completion prediction sources
+#
+# PSReadLine picks a sensible default since v2.2.6
+# See: https://github.com/PowerShell/PSReadLine/pull/3351
+#Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 
 # Search the command history based on any already entered text
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
