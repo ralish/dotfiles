@@ -11,6 +11,7 @@ Param(
         'DotNetFramework',
         'Office365',
         'PowerShell',
+        'ShutdownPrep',
         'WindowsComponents',
         'WindowsDefender',
         'WindowsNetworkList',
@@ -29,6 +30,7 @@ Param(
         'DotNetFramework',
         'Office365',
         'PowerShell',
+        'ShutdownPrep',
         'WindowsComponents',
         'WindowsDefender',
         'WindowsNetworkList',
@@ -266,6 +268,32 @@ Function Optimize-PowerShell {
         Write-Host -ForegroundColor Cyan '[PowerShell] To update PSReadLine run the following from an elevated Command Prompt:'
         Write-Host -ForegroundColor Cyan '             powershell -NoProfile -NonInteractive -Command "Install-Module -Name PSReadLine -Force"'
     }
+}
+
+Function Optimize-ShutdownPrep {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
+
+    $RegKeys = @(
+        # Settings
+        'HKCU:\Software\Microsoft\Windows\CurrentVersion\ApplicationFrame\Positions\windows.immersivecontrolpanel_cw5n1h2txyewy!microsoft.windows.immersivecontrolpanel',
+        'HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\SystemAppData\windows.immersivecontrolpanel_cw5n1h2txyewy\ApplicationFrame\windows.immersivecontrolpanel_cw5n1h2txyewy!microsoft.windows.immersivecontrolpanel',
+
+        # Sysinternals
+        'HKCU:\Software\Sysinternals'
+    )
+
+    Write-Host -ForegroundColor Green '[Shutdown] Removing registry keys ...'
+    foreach ($RegKey in $RegKeys) {
+        Remove-Item -LiteralPath $RegKey -Force -ErrorAction SilentlyContinue
+    }
+
+    Write-Host -ForegroundColor Green '[Shutdown] Clearing PowerShell history ...'
+    if (Get-Command -Name 'Get-PSReadLineOption' -ErrorAction SilentlyContinue) {
+        Remove-Item -LiteralPath (Get-PSReadLineOption).HistorySavePath -ErrorAction SilentlyContinue
+    }
+    Clear-History
 }
 
 Function Optimize-WindowsComponents {
@@ -899,7 +927,8 @@ $Tasks = @(
     'PowerShell',
     'Office365',
     'DiskCleanup',
-    'WindowsNetworkList'
+    'WindowsNetworkList',
+    'ShutdownPrep'
 )
 
 foreach ($Task in $Tasks) {
