@@ -142,6 +142,9 @@
     // Extension: Language Support for Java(TM) by Red Hat
     "java.project.importHint": false,
 
+    // Extension: Lua
+    "Lua.telemetry.enable": false,
+
     // Extension: markdownlint
     "markdownlint.config": {
         // Header style
