@@ -7,12 +7,14 @@
 
       PROVIDER                    DESCRIPTION
       ADSync                      Azure AD Sync
-      Directory Synchronization   Azure AD Sync DirSync
+      Directory Synchronization   Azure AD Directory Synchronization
       edgeupdate                  Edge Update
       gupdate                     Google Update
-      Outlook                     Outlook
-      RestartManager              RestartManager
-      Security-SPP                Software Protection Platform
+      MSSQLSERVER                 Microsoft SQL Server
+      Outlook                     Microsoft Outlook
+      RestartManager              Windows Restart Manager
+      Security-SPP                Windows Software Protection Platform
+      vmauthd                     VMware Authorization Service
     -->
     <Suppress Path="Application">
       *[System[
@@ -29,7 +31,11 @@
           or
           Provider[@Name='Microsoft-Windows-Security-SPP']
           or
+          Provider[@Name='MSSQLSERVER']
+          or
           Provider[@Name='Outlook']
+          or
+          Provider[@Name='vmauthd']
         )
         and
         Level=4
