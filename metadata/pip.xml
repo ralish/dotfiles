@@ -12,6 +12,6 @@
     </InstallPath>
 
     <RenamePaths>
-        <RenamePath source="pip.conf" symlink="pip.ini" />
+        <RenamePath source="pip\pip.conf" symlink="pip\pip.ini" />
     </RenamePaths>
 </Component>
