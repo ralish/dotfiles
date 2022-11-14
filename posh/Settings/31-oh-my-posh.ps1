@@ -62,8 +62,8 @@ Function Get-OmpConfig {
 $OmpConfig = Get-OmpConfig -ThemeName $OmpThemeName
 
 # Suppress verbose output on loading
-$VerboseOriginal = $VerbosePreference
-$VerbosePreference = 'SilentlyContinue'
+$VerboseOriginal = $Global:VerbosePreference
+$Global:VerbosePreference = 'SilentlyContinue'
 
 # Load oh-my-posh
 if ($OmpConfig) {
@@ -73,7 +73,7 @@ if ($OmpConfig) {
 }
 
 # Restore the original $VerbosePreference setting
-$VerbosePreference = $VerboseOriginal
+$Global:VerbosePreference = $VerboseOriginal
 Remove-Variable -Name 'VerboseOriginal'
 
 # Enable posh-git support if previously imported

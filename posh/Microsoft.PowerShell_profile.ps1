@@ -25,16 +25,16 @@ if (!(Get-Variable -Name 'DotFilesFastLoad' -ErrorAction Ignore)) {
 }
 
 # Enable verbose profile load
-if ($DotFilesVerbose -or $VerbosePreference -eq 'Continue') {
+if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
     # $VerbosePreference seems to have no value during profile load? Use
     # the default of SilentlyContinue when this appears to be the case.
-    if ($VerbosePreference) {
-        $DotFilesVerboseOriginal = $VerbosePreference
+    if ($Global:VerbosePreference) {
+        $DotFilesVerboseOriginal = $Global:VerbosePreference
     } else {
         $DotFilesVerboseOriginal = 'SilentlyContinue'
     }
 
-    $VerbosePreference = 'Continue'
+    $Global:VerbosePreference = 'Continue'
 
     # Record start of profile load
     if ($DotFilesShowTimings) {
@@ -82,7 +82,7 @@ if (Test-Path -LiteralPath $PoshScriptsPath -PathType Container) {
 Remove-Variable -Name 'PoshScriptsPath'
 
 # Clean-up specific to running in verbose mode
-if ($DotFilesVerbose -or $VerbosePreference -eq 'Continue') {
+if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
     # Output total profile load time
     if ($DotFilesShowTimings) {
         $MessageParams = @{
@@ -94,7 +94,7 @@ if ($DotFilesVerbose -or $VerbosePreference -eq 'Continue') {
         Remove-Variable -Name 'DotFilesLoadStart', 'MessageParams'
     }
 
-    $VerbosePreference = $DotFilesVerboseOriginal
+    $Global:VerbosePreference = $DotFilesVerboseOriginal
     Remove-Variable -Name 'DotFilesVerboseOriginal'
 }
 

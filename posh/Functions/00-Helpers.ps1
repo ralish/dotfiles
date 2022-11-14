@@ -296,8 +296,8 @@ Function Test-ModuleAvailable {
             $ModuleAvailable = @(Get-Module -Name $Module -ListAvailable -Verbose:$false)
         } else {
             # Suppress verbose output on import
-            $VerboseOriginal = $VerbosePreference
-            $VerbosePreference = 'SilentlyContinue'
+            $VerboseOriginal = $Global:VerbosePreference
+            $Global:VerbosePreference = 'SilentlyContinue'
 
             try {
                 Import-Module -Name $Module -ErrorAction Stop -Verbose:$false
@@ -305,7 +305,7 @@ Function Test-ModuleAvailable {
                 throw $_
             } finally {
                 # Restore the original $VerbosePreference setting
-                $VerbosePreference = $VerboseOriginal
+                $Global:VerbosePreference = $VerboseOriginal
             }
 
             $ModuleAvailable = @(Get-Module -Name $Module -Verbose:$false)
