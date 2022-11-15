@@ -448,6 +448,10 @@ Function Clear-NpmCache {
 #
 # Environment variables
 # https://nodejs.org/api/cli.html#cli_environment_variables
+#
+# Input environment variables
+# - NPM_CONFIG_PREFIX (optional)
+#   Added to the PATH environment variable instead of the default path.
 Function Switch-Nodejs {
     [CmdletBinding()]
     [OutputType([Void])]
@@ -471,12 +475,20 @@ Function Switch-Nodejs {
         $Operation = 'Remove-PathStringElement'
     }
 
+    if ($env:NPM_CONFIG_PREFIX) {
+        if (![IO.Path]::IsPathFullyQualified($env:NPM_CONFIG_PREFIX)) {
+            throw 'NPM_CONFIG_PREFIX is set but is not a fully qualified path: {0}' -f $env:NPM_CONFIG_PREFIX
+        }
+        $GlobalNpmPath = $env:NPM_CONFIG_PREFIX
+    } else {
+        $GlobalNpmPath = Join-Path -Path $env:APPDATA -ChildPath 'npm'
+    }
+
     $Path = [IO.Path]::GetFullPath($Path)
-    $LocalNpmPath = Join-Path -Path $env:APPDATA -ChildPath 'npm'
 
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $Path |
-        & $Operation @PathParams -Element $LocalNpmPath
+        & $Operation @PathParams -Element $GlobalNpmPath
 
     if ($Persist) {
         $EnvParams = @{
@@ -488,7 +500,7 @@ Function Switch-Nodejs {
         }
 
         Get-EnvironmentVariable @EnvParams |
-            & $Operation @PathParams -Element $LocalNpmPath |
+            & $Operation @PathParams -Element $GlobalNpmPath |
             & $Operation @PathParams -Element $Path |
             Set-EnvironmentVariable @EnvParams
     }
