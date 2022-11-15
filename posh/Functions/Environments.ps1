@@ -538,6 +538,10 @@ Function Update-NodejsPackages {
 #
 # Environment variables
 # https://perldoc.perl.org/perlrun.html#ENVIRONMENT
+#
+# Input environment variables
+# - PERL5LIB (optional)
+#   Used to determine the user install path instead of the default path.
 Function Switch-Perl {
     [CmdletBinding()]
     [OutputType([Void])]
@@ -561,15 +565,61 @@ Function Switch-Perl {
         $Operation = 'Remove-PathStringElement'
     }
 
+    if ($env:PERL5LIB) {
+        if (![IO.Path]::IsPathFullyQualified($env:PERL5LIB)) {
+            throw 'PERL5LIB is set but is not a fully qualified path: {0}' -f $env:PERL5LIB
+        }
+
+        $UserBasePathElements = $env:PERL5LIB.Split([IO.Path]::DirectorySeparatorChar)
+        if ($UserBasePathElements.Count -lt 3) {
+            throw 'PERL5LIB has less path components than expected: {0}' -f $env:PERL5LIB
+        }
+
+        $UserBasePath = [String]::Join([IO.Path]::DirectorySeparatorChar, $UserBasePathElements[0..($UserBasePathElements.Count - 3)])
+
+        $UserBasePathEsc = $UserBasePath
+        if ([IO.Path]::DirectorySeparatorChar -eq '\') {
+            $UserBasePathEsc = $UserBasePath.Replace('\', '\\')
+        }
+    }
+
     $Path = [IO.Path]::GetFullPath($Path)
+    if ($env:PERL5LIB) {
+        $UserBinPath = Join-Path -Path $UserBasePath -ChildPath 'bin'
+    }
     $RootBinPath = Join-Path -Path $Path -ChildPath 'c\bin'
     $SiteBinPath = Join-Path -Path $Path -ChildPath 'perl\site\bin'
     $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
+
+    if ($env:PERL5LIB) {
+        $env:Path = $env:Path |
+            & $Operation @PathParams -Element $UserBinPath
+    }
 
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $PerlBinPath |
         & $Operation @PathParams -Element $SiteBinPath |
         & $Operation @PathParams -Element $RootBinPath
+
+    if ($env:PERL5LIB) {
+        # Extra options for Module::Build
+        if ($Disable) {
+            $env:PERL_MB_OPT = $null
+        } else {
+            $env:PERL_MB_OPT = '--install_base "{0}"' -f $UserBasePathEsc
+        }
+        Write-Host -ForegroundColor Green -NoNewline 'Set PERL_MB_OPT to: '
+        Write-Host $env:PERL_MB_OPT
+
+        # Extra options for ExtUtils::MakeMaker
+        if ($Disable) {
+            $env:PERL_MM_OPT = $null
+        } else {
+            $env:PERL_MM_OPT = 'INSTALL_BASE="{0}"' -f $UserBasePathEsc
+        }
+        Write-Host -ForegroundColor Green -NoNewline 'Set PERL_MM_OPT to: '
+        Write-Host $env:PERL_MM_OPT
+    }
 
     if ($Persist) {
         $EnvParams = @{
@@ -580,11 +630,24 @@ Function Switch-Perl {
             $PathParams['Action'] = 'Append'
         }
 
+        if ($env:PERL5LIB) {
+            Get-EnvironmentVariable @EnvParams |
+                & $Operation @PathParams -Element $UserBinPath |
+                Set-EnvironmentVariable @EnvParams
+        }
+
         Get-EnvironmentVariable @EnvParams |
             & $Operation @PathParams -Element $RootBinPath |
             & $Operation @PathParams -Element $SiteBinPath |
             & $Operation @PathParams -Element $PerlBinPath |
             Set-EnvironmentVariable @EnvParams
+
+        if (!$Disable) {
+            if ($env:PERL5LIB) {
+                Set-EnvironmentVariable -Name 'PERL_MB_OPT' -Value $env:PERL_MB_OPT
+                Set-EnvironmentVariable -Name 'PERL_MM_OPT' -Value $env:PERL_MM_OPT
+            }
+        }
     }
 }
 
