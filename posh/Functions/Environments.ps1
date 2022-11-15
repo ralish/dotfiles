@@ -190,6 +190,10 @@ Function Switch-Go {
     $GoPaths = @()
     if ($env:GOPATH) {
         foreach ($GoPath in $env:GOPATH.Split([IO.Path]::PathSeparator)) {
+            if (![IO.Path]::IsPathFullyQualified($GoPath)) {
+                Write-Warning -Message ('Skipping path in GOPATH which is not fully qualified: {0}' -f $GoPath)
+                continue
+            }
             $GoPaths += Join-Path -Path $GoPath -ChildPath 'bin'
         }
     }
@@ -315,6 +319,9 @@ Function Clear-GradleCache {
     Param()
 
     if ($env:GRADLE_USER_HOME) {
+        if (![IO.Path]::IsPathFullyQualified($env:GRADLE_USER_HOME)) {
+            throw 'GRADLE_USER_HOME is set but is not a fully qualified path: {0}' -f $env:GRADLE_USER_HOME
+        }
         $GradleCache = Join-Path -Path $env:GRADLE_USER_HOME -ChildPath 'caches'
     } else {
         $GradleCache = Join-Path -Path $HOME -ChildPath '.gradle\caches'
@@ -338,6 +345,9 @@ Function Clear-MavenCache {
     Param()
 
     if ($env:M2_HOME) {
+        if (![IO.Path]::IsPathFullyQualified($env:M2_HOME)) {
+            throw 'M2_HOME is set but is not a fully qualified path: {0}' -f $env:M2_HOME
+        }
         $MvnRepo = Join-Path -Path $env:M2_HOME -ChildPath 'repository'
     } else {
         $MvnRepo = Join-Path -Path $HOME -ChildPath '.m2\repository'
