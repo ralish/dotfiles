@@ -157,6 +157,10 @@ Function Clear-GoCache {
 #
 # Environment variables
 # https://golang.org/cmd/go/#hdr-Environment_variables
+#
+# Input environment variables
+# - GOPATH (optional)
+#   Each path is added to the PATH environment variable.
 Function Switch-Go {
     [CmdletBinding()]
     [OutputType([Void])]
@@ -301,6 +305,10 @@ Function Switch-Google {
 #region Java
 
 # Clear Gradle cache
+#
+# Input environment variables
+# - GRADLE_USER_HOME (optional)
+#   Used to determine the "caches" path instead of the default path.
 Function Clear-GradleCache {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
@@ -320,6 +328,10 @@ Function Clear-GradleCache {
 }
 
 # Clear Maven cache
+#
+# Input environment variables
+# - M2_HOME (optional)
+#   Used to determine the "repository" path instead of the default path.
 Function Clear-MavenCache {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
