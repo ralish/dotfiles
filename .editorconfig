@@ -68,6 +68,10 @@ shell_variant = posix           # shfmt: -p
 [windows/Event Viewer filters/*.{xml,xsd}]
 indent_size = 2
 
+# Windows Performance Recorder configuration
+[wpr/*.xml]
+indent_size = 2
+
 # XDG user directories locale
 [xdg-user-dir/.config/user-dirs.locale]
 insert_final_newline = false
