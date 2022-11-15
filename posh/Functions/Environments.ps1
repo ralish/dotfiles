@@ -751,6 +751,10 @@ Function Clear-PipCache {
 #
 # Environment variables
 # https://docs.python.org/3/using/cmdline.html#environment-variables
+#
+# Input environment variables
+# - PYTHONUSERBASE (optional)
+#   Used to determine the user install path instead of the default path.
 Function Switch-Python {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
@@ -804,10 +808,19 @@ Function Switch-Python {
         $Operation = 'Remove-PathStringElement'
     }
 
+    if ($env:PYTHONUSERBASE) {
+        if (![IO.Path]::IsPathFullyQualified($env:PYTHONUSERBASE)) {
+            throw 'PYTHONUSERBASE is set but is not a fully qualified path: {0}' -f $env:PYTHONUSERBASE
+        }
+        $PythonUserBase = $env:PYTHONUSERBASE
+    } else {
+        $PythonUserBase = $env:APPDATA
+    }
+
     $Path = [IO.Path]::GetFullPath($Path)
     $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
-    $LocalScriptsSharedPath = Join-Path -Path $env:APPDATA -ChildPath 'Python\Scripts'
-    $LocalScriptsVersionedPath = Join-Path -Path $env:APPDATA -ChildPath ('Python\Python{0}\Scripts' -f $StrippedVersion)
+    $LocalScriptsSharedPath = Join-Path -Path $PythonUserBase -ChildPath 'Python\Scripts'
+    $LocalScriptsVersionedPath = Join-Path -Path $PythonUserBase -ChildPath ('Python\Python{0}\Scripts' -f $StrippedVersion)
 
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $Path |
