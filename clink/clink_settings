@@ -19,7 +19,7 @@ clink.colorize_input = True
 # Valid values:
 # - bash
 # - windows
-clink.default_bindings = bash
+clink.default_bindings = windows
 
 # Display GUI window pop-ups instead of console text pop-ups
 clink.gui_popups = False
