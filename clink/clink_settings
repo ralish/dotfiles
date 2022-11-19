@@ -1,3 +1,7 @@
+# Clink configuration
+#
+# Last updated for: v1.4.0
+
 # ---------------------------------- Clink ------------------------------------
 
 # Command to run in the first CMD prompt shown after Clink is injected
@@ -21,9 +25,6 @@ clink.colorize_input = True
 # - windows
 clink.default_bindings = windows
 
-# Display GUI window pop-ups instead of console text pop-ups
-clink.gui_popups = False
-
 # Startup logo to display when Clink is injected
 #
 # Valid values:
@@ -31,6 +32,10 @@ clink.gui_popups = False
 # - short
 # - full
 clink.logo = none
+
+# Maximum number of rows the input line can use, up to the terminal height. If
+# set to zero, the limit is the terminal height.
+clink.max_input_rows = 0
 
 # Handling of CR and LF characters on paste
 #
@@ -123,7 +128,7 @@ color.description               = sgr 38;5;39
 # DOSKEY alias (also used by clink.colorize_input)
 color.doskey                    = sgr 1;38;5;75
 # Filtered completion
-color.filtered                  = sgr 38;5;2310
+color.filtered                  = sgr 38;5;231
 # File with the Hidden attribute
 color.hidden                    = sgr 38;5;160
 # File with the Read-only attribute
@@ -158,6 +163,8 @@ color.cmdsep                    = sgr 38;5;214
 color.executable                = sgr 1;38;5;33
 # Command flag
 color.flag                      = sgr 38;5;117
+# History expansions
+color.histexpand                = sgr 97;48;5;55
 # Unexpected argument
 color.unexpected                = default
 
@@ -197,6 +204,9 @@ history.shared = False
 
 # Maximum number of history lines to retain
 history.max_lines = 25000
+
+# Automatically perform history expansion on accepting a command line
+history.auto_expand = True
 
 # Save and optionally display history timestamps
 #
