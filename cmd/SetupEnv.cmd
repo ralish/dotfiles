@@ -84,12 +84,12 @@ REM ###########################################################################
 
 WHERE /Q "clink.cmd"
 IF ERRORLEVEL 0 (
-    REM Found in %PATH% (likely installed via Scoop or similar)
+    REM Found in %%PATH%% (likely installed via Scoop or similar)
     SET ClinkPath="clink.cmd"
     GOTO ClinkRun
 )
 IF EXIST "%CLINK_DIR%" (
-    REM Found via %CLINK_DIR% (set via Clink's own installer)
+    REM Found via %%CLINK_DIR%% (set via Clink's own installer)
     SET ClinkPath="%CLINK_DIR%\clink.bat"
     GOTO ClinkRun
 )
