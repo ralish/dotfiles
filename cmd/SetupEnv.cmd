@@ -1,5 +1,15 @@
 @ECHO OFF
 
+REM ###########################################################################
+REM ###                         Pre-init Checks                             ###
+REM ###########################################################################
+
+REM The intent here is to avoid running our environment setup script when CMD
+REM is not being launched interactively. There's a couple of reasons why this
+REM is desirable. One is potentially causing issues with automated invocations
+REM due to the environment changes we make. Another is performance, as this
+REM script may launch a dozen or more processes throughout its processing.
+
 REM Bail-out: MSBuild & Visual Studio
 REM Performance impact & may cause unexpected behaviour
 IF DEFINED MSBuildExtensionsPath EXIT /B
@@ -13,6 +23,38 @@ REM Bail-out: Cygwin Setup
 REM Environment changes on autorebase cause DOSKEY to crash
 IF DEFINED CYGWINROOT EXIT /B
 
+REM Remove any double quotes from the command line that was passed to CMD, as
+REM they are likely to cause problems with subsequent string comparisons.
+REM
+REM The assignment of CMDCMDLINE to _CMDCMDLINE before then assigning the
+REM result of the string substitution is deliberate. For example, running:
+REM
+REM SET _CMDCMDLINE=%%CMDCMDLINE:"=%%
+REM
+REM Will result in *both* CMDCMDLINE and _CMDCMDLINE now having the result of
+REM the string substitution, despite there being no assignment to CMDCMDLINE.
+REM This is in contrast to how every other variable behaves.
+SET _CMDCMDLINE=%CMDCMDLINE%
+SET _CMDCMDLINE=%_CMDCMDLINE:"=%
+
+REM Also remove any spaces for the same reason of causing problems with the
+REM string comparisons. This also has the benefit of removing trailing spaces.
+SET _CMDCMDLINE=%_CMDCMDLINE: =%
+
+REM The goal here is to only proceed if the command line provided to CMD ends
+REM with the CMD executable itself. This implies it's probably being called for
+REM interactive usage, rather than to run a batch script or program.
+REM
+REM FindStr would be better here as it can do a regular expression test, but it
+REM means launching a separate process, which we're trying to avoid.
+IF /I [%_CMDCMDLINE%] == [cmd] GOTO Init
+IF /I [%_CMDCMDLINE%] == [cmd.exe] GOTO Init
+IF /I [%_CMDCMDLINE:~-12%] == [System32\cmd] GOTO Init
+IF /I [%_CMDCMDLINE:~-16%] == [System32\cmd.exe] GOTO Init
+SET _CMDCMDLINE=
+EXIT /B
+
+:Init
 REM ###########################################################################
 REM ###                         Initialisation                              ###
 REM ###########################################################################
@@ -129,4 +171,5 @@ REM ###                               End                                   ###
 REM ###########################################################################
 
 REM Remove script variables
+SET _CMDCMDLINE=
 SET SetupEnvVerbose=
