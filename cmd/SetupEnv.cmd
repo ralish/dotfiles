@@ -60,8 +60,6 @@ EXIT /B
 @REM ##########################################################################
 
 @REM So that we can safely run via AutoRun without infinite recursion
-@REM Key Path: HKEY_CURRENT_USER\Software\Microsoft\Command Processor
-@REM Use something like: IF NOT DEFINED SetupEnv Path\To\SetupEnv.cmd
 SET SetupEnv=Yes
 
 @REM Uncomment to enable verbose mode
