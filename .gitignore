@@ -59,6 +59,9 @@ temp/
 /cpan/.cpan/build/
 /cpan/.cpan/sources/
 
+# Fiddler
+/fiddler/Scripts/BrowserPAC.js
+
 # fish
 /fish/.config/fish/fish_history
 /fish/.config/fish/fishd.*
