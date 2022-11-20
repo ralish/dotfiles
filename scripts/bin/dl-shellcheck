@@ -149,6 +149,7 @@ function main() {
 
     check_binary curl fatal
     check_binary jq fatal
+    check_binary xz fatal
 
     dl_shellcheck
 }
