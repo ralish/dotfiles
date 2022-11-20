@@ -153,6 +153,7 @@ Function Start-DotFilesSection {
             Test-CommandAvailable -Name $Command
         } catch {
             Write-Verbose -Message (Get-DotFilesMessage -Message $_.Exception.Message)
+            $Error.RemoveAt(0)
             return $false
         }
     }
@@ -162,6 +163,7 @@ Function Start-DotFilesSection {
             Test-EnvironmentMatch -Environment $Environment
         } catch {
             Write-Verbose -Message (Get-DotFilesMessage -Message $_.Exception.Message)
+            $Error.RemoveAt(0)
             return $false
         }
     }
