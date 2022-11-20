@@ -10,7 +10,9 @@
         <HideSymlinks>true</HideSymlinks>
     </InstallPath>
 
-    <RenamePaths>
-        <RenamePath source=".curlrc" symlink="_curlrc" />
-    </RenamePaths>
+    <AdditionalPaths>
+        <AdditionalPath source=".curlrc">
+            <TargetPath symlink="_curlrc" />
+        </AdditionalPath>
+    </AdditionalPaths>
 </Component>
