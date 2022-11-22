@@ -170,6 +170,7 @@
     // Extension: Python
     "python.experiments.enabled": true,
     "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "strict",
     "python.linting.flake8Enabled": true,
     "python.linting.pylintCategorySeverity.refactor": "Information",
     "python.pythonPath": "~/dotfiles/vscode/venv",
