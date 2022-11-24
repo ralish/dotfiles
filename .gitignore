@@ -49,6 +49,7 @@ temp/
 /bazaar/.bazaar/lock/
 
 # Clink
+/clink/clink_errorlevel*
 /clink/clink_history*
 
 # CPAN
