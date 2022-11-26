@@ -90,9 +90,6 @@
     // Features: Remote
     "remote.autoForwardPorts": false,
 
-    // Application: Update
-    "update.mode": "start",
-
     // Application: Telemetry
     "telemetry.telemetryLevel": "off",
 
