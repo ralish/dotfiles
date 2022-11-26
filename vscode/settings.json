@@ -104,6 +104,9 @@
     // Built-in extension: TypeScript and JavaScript Language Features
     "typescript.surveys.enabled": false,
 
+    // Extension: .NET Install Tool for Extension Authors
+    "dotnetAcquisitionExtension.enableTelemetry": false,
+
     // Extension: C/C++
     "C_Cpp.autoAddFileAssociations": false,
     "C_Cpp.loggingLevel": "Warning",
@@ -129,6 +132,7 @@
 
     // Extension: GitLens
     "gitlens.defaultDateStyle": "absolute",
+    "gitlens.telemetry.enabled": false,
 
     // Extension: Java Extension Pack
     "java.help.showReleaseNotes": false,
@@ -150,6 +154,9 @@
         // Trailing punctuation in header
         "MD026": { "punctuation": ".,;:!" }
     },
+
+    // Extension: PHP Intelephense
+    "intelephense.telemetry.enabled": false,
 
     // Extension: PowerShell
     "powershell.codeFormatting.autoCorrectAliases": true,
