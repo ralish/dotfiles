@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ralish/PSDotFiles/main/Metadata.xsd">
-    <IgnorePaths>
-        <IgnorePath>extensions.txt</IgnorePath>
-    </IgnorePaths>
+    <FriendlyName>Python venv</FriendlyName>
+
+    <Detection>
+        <Method>Static</Method>
+        <Availability>NeverInstall</Availability>
+    </Detection>
 </Component>

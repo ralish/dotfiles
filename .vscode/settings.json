@@ -88,8 +88,6 @@
         "**/tmux/.config/tmux/*.conf": "properties",
         // vs
         "*.vssettings": "xml",
-        // vscode
-        "venv-reqs.txt": "pip-requirements",
         // wget
         ".wgetrc": "properties",
         // wsl
@@ -103,6 +101,11 @@
         // zsh
         ".zlogout": "shellscript",
         ".zshrc": "shellscript"
+    },
+
+    // Files to hide in Explorer tree
+    "files.exclude": {
+        "**/.venv/**": true
     },
 
     // Excludes for search & quick open

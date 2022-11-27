@@ -34,8 +34,11 @@ temp/
 [._]ss[a-gi-z]
 [._]sw[a-p]
 
+# Python venv
+.venv/
+
 # Visual Studio Code
-.vscode/ipch
+.vscode/ipch/
 
 
 ##################
@@ -106,9 +109,6 @@ temp/
 
 # Visual Studio
 /vs/
-
-# Visual Studio Code
-/vscode/venv/
 
 # Web browsers
 /chrome/
