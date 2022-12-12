@@ -124,6 +124,7 @@
 
     // Extension: CMake Tools
     "cmake.configureOnOpen": false,
+    "cmake.configureOnEdit": false,
 
     // Extension: DevSkim
     "devskim.enableBestPracticeRules": true,
