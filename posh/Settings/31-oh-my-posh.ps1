@@ -10,7 +10,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 }
 
 # Name of theme to use
-$OmpThemeName = 'slim'
+$OmpThemeName = 'oh-my-posh'
 
 Function Get-OmpConfig {
     [CmdletBinding()]
@@ -19,6 +19,14 @@ Function Get-OmpConfig {
         [Parameter(Mandatory)]
         [String]$ThemeName
     )
+
+    # Check if the theme exists in our profile directory. If it does, we can
+    # immediately return and skip figuring out where the bundled themes are.
+    $OmpThemePath = Join-Path -Path (Split-Path -Path $PROFILE -Parent) -ChildPath ('{0}.omp.json' -f $ThemeName)
+    $OmpThemeFile = Get-Item -LiteralPath $OmpThemePath -ErrorAction Ignore
+    if ($OmpThemeFile -is [IO.FileInfo]) {
+        return $OmpThemePath
+    }
 
     if ($env:POSH_THEMES_PATH) {
         $OmpThemeDir = $env:POSH_THEMES_PATH
@@ -60,6 +68,9 @@ Function Get-OmpConfig {
 
 # Retrieve oh-my-posh config
 $OmpConfig = Get-OmpConfig -ThemeName $OmpThemeName
+if ($OmpConfig) {
+    Write-Verbose -Message (Get-DotFilesMessage -Message ('Using theme file: {0}' -f $OmpConfig))
+}
 
 # Suppress verbose output on loading
 $VerboseOriginal = $Global:VerbosePreference
