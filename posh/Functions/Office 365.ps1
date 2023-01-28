@@ -263,7 +263,7 @@ Function Get-MailboxActivitySummary {
         [Int]$ProgressParentId
     )
 
-    Test-CommandAvailable -Name 'Get-Mailbox'
+    Test-CommandAvailable -Name 'Get-Mailbox', 'Get-MessageTrace'
 
     if (!$EndDate) {
         $EndDate = Get-Date
