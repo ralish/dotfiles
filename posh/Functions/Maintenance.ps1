@@ -133,7 +133,7 @@ Function Update-AllTheThings {
                 'WSL'
                 'Office'
                 'VisualStudio'
-                'ModernApps'
+                'MicrosoftStore'
                 'Scoop'
             )
         } else {
@@ -190,9 +190,9 @@ Function Update-AllTheThings {
         }
 
         if (Test-IsWindows) {
-            if ($Tasks -contains 'Windows' -or $Tasks -contains 'Office' -or $Tasks -contains 'VisualStudio' -or $Tasks -contains 'ModernApps') {
+            if ($Tasks -contains 'Windows' -or $Tasks -contains 'Office' -or $Tasks -contains 'VisualStudio' -or $Tasks -contains 'MicrosoftStore') {
                 if (!(Test-IsAdministrator)) {
-                    throw 'You must have administrator privileges to perform Windows, Office, Visual Studio, or Modern Apps updates.'
+                    throw 'You must have administrator privileges to perform Windows, Office, Visual Studio, or Microsoft Store updates.'
                 }
             }
         }
@@ -232,9 +232,9 @@ Function Update-AllTheThings {
             $TasksDone++
         }
 
-        if ($Tasks -contains 'ModernApps') {
+        if ($Tasks -contains 'MicrosoftStore') {
             Write-Progress @WriteProgressParams -Status 'Microsoft Store' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.ModernApps = Update-ModernApps
+            $Results.MicrosoftStore = Update-MicrosoftStore
             $TasksDone++
         }
 

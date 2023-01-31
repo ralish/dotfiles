@@ -9,14 +9,14 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
     return
 }
 
-# Update Modern Apps (Microsoft Store)
-Function Update-ModernApps {
+# Update Microsoft Store apps
+Function Update-MicrosoftStore {
     [CmdletBinding()]
     [OutputType([Boolean])]
     Param()
 
     if (!(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to perform Modern Apps updates.'
+        throw 'You must have administrator privileges to perform Microsoft Store updates.'
     }
 
     $Namespace = 'root\CIMv2\mdm\dmmap'
@@ -29,7 +29,7 @@ Function Update-ModernApps {
 
     $Result = $true
     if ($UpdateScan.ReturnValue.Value -ne 0) {
-        Write-Error -Message ('Update of Modern Apps returned: {0}' -f $UpdateScan.ReturnValue.Value)
+        Write-Error -Message ('Update of Microsoft Store apps returned: {0}' -f $UpdateScan.ReturnValue.Value)
         $Result = $false
     }
 
