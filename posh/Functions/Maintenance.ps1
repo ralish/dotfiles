@@ -122,6 +122,7 @@ Function Update-AllTheThings {
             'DotNetTools'
             'NodejsPackages'
             'PythonPackages'
+            'QtComponents'
             'RubyGems'
             'RustToolchains'
         )
@@ -264,6 +265,12 @@ Function Update-AllTheThings {
         if ($Tasks -contains 'PythonPackages') {
             Write-Progress @WriteProgressParams -Status 'Updating Python packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.PythonPackages = Update-PythonPackages
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'QtComponents') {
+            Write-Progress @WriteProgressParams -Status 'Updating Qt components' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.QtComponents = Update-QtComponents
             $TasksDone++
         }
 

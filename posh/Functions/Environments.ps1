@@ -936,6 +936,68 @@ Function Update-PythonPackages {
 
 #endregion
 
+#region Qt
+
+# Update Qt components
+Function Update-QtComponents {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
+    Param()
+
+    DynamicParam {
+        $PathAttrCollection = [Collections.ObjectModel.Collection[Attribute]]::new()
+        $PathParamAttr = [Management.Automation.ParameterAttribute]::new()
+
+        if (Test-IsWindows) {
+            $ValidateNotNullOrEmptyAttr = [Management.Automation.ValidateNotNullOrEmptyAttribute]::new()
+            $PathAttrCollection.Add($ValidateNotNullOrEmptyAttr)
+        } else {
+            $PathParamAttr.Mandatory = $true
+        }
+
+        $PathAttrCollection.Add($PathParamAttr)
+        $PathParam = [Management.Automation.RuntimeDefinedParameter]::new(
+            'Path', [String], $PathAttrCollection
+        )
+
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
+        $RuntimeParams.Add('Path', $PathParam)
+
+        return $RuntimeParams
+    }
+
+    Begin {
+        if (!$PSBoundParameters['Path'] -and (Test-IsWindows)) {
+            $PSBoundParameters['Path'] = '{0}\DevEnvs\Qt\MaintenanceTool.exe' -f $env:HOMEDRIVE
+        }
+    }
+
+    End {
+        $QtMtName = 'MaintenanceTool'
+        if (Test-IsWindows) {
+            $QtMtName = '{0}.exe' -f $QtMtName
+        }
+
+        $QtMtPath = Get-Item -LiteralPath $PSBoundParameters['Path'] -ErrorAction Ignore
+        if ($QtMtPath -is [IO.DirectoryInfo]) {
+            $QtMtPath = Join-Path -Path $QtMtPath.FullName -ChildPath $QtMtName
+            $QtMtPath = Get-Item -LiteralPath $QtMtPath -ErrorAction Ignore
+        }
+
+        if ($QtMtPath -isnot [IO.FileInfo] -or $QtMtPath.Name -ne $QtMtName) {
+            Write-Error -Message 'Unable to update Qt components as MaintenanceTool command was not found.'
+            return
+        }
+
+        if ($PSCmdlet.ShouldProcess('Qt components', 'Update')) {
+            Write-Verbose -Message 'Updating Qt components: MaintenanceTool update'
+            & $QtMtPath update
+        }
+    }
+}
+
+#endregion
+
 #region Ruby
 
 # Clear gem cache
