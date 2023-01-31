@@ -203,85 +203,85 @@ Function Update-AllTheThings {
         }
 
         if ($Tasks -contains 'Windows') {
-            Write-Progress @WriteProgressParams -Status 'Updating Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.Windows = Update-Windows -AcceptAll
             $TasksDone++
         }
 
         if ($Tasks -contains 'WSL') {
-            Write-Progress @WriteProgressParams -Status 'Updating Windows Subsystem for Linux' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Windows Subsystem for Linux' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.WSL = Update-WSL
             $TasksDone++
         }
 
         if ($Tasks -contains 'Office') {
-            Write-Progress @WriteProgressParams -Status 'Updating Office' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Office' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.Office = Update-Office -ProgressParentId $WriteProgressParams['Id']
             $TasksDone++
         }
 
         if ($Tasks -contains 'VisualStudio') {
-            Write-Progress @WriteProgressParams -Status 'Updating Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.VisualStudio = Update-VisualStudio -ProgressParentId $WriteProgressParams['Id']
             $TasksDone++
         }
 
         if ($Tasks -contains 'PowerShell') {
-            Write-Progress @WriteProgressParams -Status 'Updating PowerShell' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'PowerShell' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.PowerShell = Update-PowerShell -ProgressParentId $WriteProgressParams['Id']
             $TasksDone++
         }
 
         if ($Tasks -contains 'ModernApps') {
-            Write-Progress @WriteProgressParams -Status 'Updating Microsoft Store apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Microsoft Store' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.ModernApps = Update-ModernApps
             $TasksDone++
         }
 
         if ($Tasks -contains 'Homebrew') {
-            Write-Progress @WriteProgressParams -Status 'Updating Homebrew' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Homebrew' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.Homebrew = Update-Homebrew -ProgressParentId $WriteProgressParams['Id']
             $TasksDone++
         }
 
         if ($Tasks -contains 'Scoop') {
-            Write-Progress @WriteProgressParams -Status 'Updating Scoop' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Scoop' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.Scoop = Update-Scoop -ProgressParentId $WriteProgressParams['Id']
             $TasksDone++
         }
 
         if ($Tasks -contains 'DotNetTools') {
-            Write-Progress @WriteProgressParams -Status 'Updating .NET tools' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status '.NET tools' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.DotNetTools = Update-DotNetTools -ProgressParentId $WriteProgressParams['Id']
             $TasksDone++
         }
 
         if ($Tasks -contains 'NodejsPackages') {
-            Write-Progress @WriteProgressParams -Status 'Updating Node.js packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Node.js packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.NodejsPackages = Update-NodejsPackages
             $TasksDone++
         }
 
         if ($Tasks -contains 'PythonPackages') {
-            Write-Progress @WriteProgressParams -Status 'Updating Python packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Python packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.PythonPackages = Update-PythonPackages
             $TasksDone++
         }
 
         if ($Tasks -contains 'QtComponents') {
-            Write-Progress @WriteProgressParams -Status 'Updating Qt components' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Qt components' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.QtComponents = Update-QtComponents
             $TasksDone++
         }
 
         if ($Tasks -contains 'RubyGems') {
-            Write-Progress @WriteProgressParams -Status 'Updating Ruby gems' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Ruby gems' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.RubyGems = Update-RubyGems
             $TasksDone++
         }
 
         if ($Tasks -contains 'RustToolchains') {
-            Write-Progress @WriteProgressParams -Status 'Updating Rust toolchains' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            Write-Progress @WriteProgressParams -Status 'Rust toolchains' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.RustToolchains = Update-RustToolchains
             $TasksDone++
         }
