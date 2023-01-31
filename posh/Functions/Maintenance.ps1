@@ -140,38 +140,38 @@ Function Update-AllTheThings {
             $ValidTasks += 'Homebrew'
         }
 
-        $AttrValidateSet = [Management.Automation.ValidateSetAttribute]::new([String[]]$ValidTasks)
+        $ValidateSetAttr = [Management.Automation.ValidateSetAttribute]::new([String[]]$ValidTasks)
 
-        $AttrParameterOptOut = [Management.Automation.ParameterAttribute]@{
+        $OptOutParamAttr = [Management.Automation.ParameterAttribute]@{
             ParameterSetName = 'OptOut'
         }
 
-        $AttrParameterOptIn = [Management.Automation.ParameterAttribute]@{
+        $OptInParamAttr = [Management.Automation.ParameterAttribute]@{
             ParameterSetName = 'OptIn'
             Mandatory        = $true
         }
 
-        $AttrCollectionOptOut = [Collections.ObjectModel.Collection[Attribute]]::new()
-        $AttrCollectionOptOut.Add($AttrParameterOptOut)
-        $AttrCollectionOptOut.Add($AttrValidateSet)
+        $OptOutAttrCollection = [Collections.ObjectModel.Collection[Attribute]]::new()
+        $OptOutAttrCollection.Add($ValidateSetAttr)
+        $OptOutAttrCollection.Add($OptOutParamAttr)
 
-        $AttrCollectionOptIn = [Collections.ObjectModel.Collection[Attribute]]::new()
-        $AttrCollectionOptIn.Add($AttrParameterOptIn)
-        $AttrCollectionOptIn.Add($AttrValidateSet)
+        $OptInAttrCollection = [Collections.ObjectModel.Collection[Attribute]]::new()
+        $OptInAttrCollection.Add($ValidateSetAttr)
+        $OptInAttrCollection.Add($OptInParamAttr)
 
-        $ParamOptOut = [Management.Automation.RuntimeDefinedParameter]::new(
-            'ExcludeTasks', [String[]], $AttrCollectionOptOut
+        $OptOutParam = [Management.Automation.RuntimeDefinedParameter]::new(
+            'ExcludeTasks', [String[]], $OptOutAttrCollection
         )
 
-        $ParamOptIn = [Management.Automation.RuntimeDefinedParameter]::new(
-            'IncludeTasks', [String[]], $AttrCollectionOptIn
+        $OptInParam = [Management.Automation.RuntimeDefinedParameter]::new(
+            'IncludeTasks', [String[]], $OptInAttrCollection
         )
 
-        $ParamDict = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
-        $ParamDict.Add('ExcludeTasks', $ParamOptOut)
-        $ParamDict.Add('IncludeTasks', $ParamOptIn)
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
+        $RuntimeParams.Add('ExcludeTasks', $OptOutParam)
+        $RuntimeParams.Add('IncludeTasks', $OptInParam)
 
-        return $ParamDict
+        return $RuntimeParams
     }
 
     End {
