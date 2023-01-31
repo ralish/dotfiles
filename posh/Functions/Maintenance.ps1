@@ -128,6 +128,7 @@ Function Update-AllTheThings {
         if (Test-IsWindows) {
             $ValidTasks += @(
                 'Windows'
+                'WSL'
                 'Office'
                 'VisualStudio'
                 'ModernApps'
@@ -202,6 +203,12 @@ Function Update-AllTheThings {
         if ($Tasks -contains 'Windows') {
             Write-Progress @WriteProgressParams -Status 'Updating Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.Windows = Update-Windows -AcceptAll
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'WSL') {
+            Write-Progress @WriteProgressParams -Status 'Updating Windows Subsystem for Linux' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.WSL = Update-WSL
             $TasksDone++
         }
 

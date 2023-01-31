@@ -310,4 +310,21 @@ Function Update-Windows {
     return $true
 }
 
+# Update Windows Subsystem for Linux
+Function Update-WSL {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
+    Param()
+
+    if (!(Get-Command -Name 'wsl' -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to update WSL as wsl command not found.'
+        return
+    }
+
+    if ($PSCmdlet.ShouldProcess('WSL', 'Update')) {
+        Write-Verbose -Message 'Updating WSL: wsl --update'
+        & wsl --update
+    }
+}
+
 Complete-DotFilesSection
