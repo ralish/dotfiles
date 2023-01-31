@@ -1074,4 +1074,25 @@ Function Update-RubyGems {
 
 #endregion
 
+#region Rust
+
+# Update Rust toolchains
+Function Update-RustToolchains {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
+    Param()
+
+    if (!(Get-Command -Name 'rustup' -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to update Rust toolchains as rustup command not found.'
+        return
+    }
+
+    if ($PSCmdlet.ShouldProcess('Rust toolchains', 'Update')) {
+        Write-Verbose -Message 'Updating Rust toolchains: rustup update'
+        & rustup update
+    }
+}
+
+#endregion
+
 Complete-DotFilesSection

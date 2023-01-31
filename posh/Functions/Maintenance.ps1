@@ -123,6 +123,7 @@ Function Update-AllTheThings {
             'NodejsPackages'
             'PythonPackages'
             'RubyGems'
+            'RustToolchains'
         )
 
         if (Test-IsWindows) {
@@ -269,6 +270,12 @@ Function Update-AllTheThings {
         if ($Tasks -contains 'RubyGems') {
             Write-Progress @WriteProgressParams -Status 'Updating Ruby gems' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.RubyGems = Update-RubyGems
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'RustToolchains') {
+            Write-Progress @WriteProgressParams -Status 'Updating Rust toolchains' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.RustToolchains = Update-RustToolchains
             $TasksDone++
         }
 
