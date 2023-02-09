@@ -1,4 +1,4 @@
-' Macro for changing font type in Microsoft Outlook
+' Change font for selected text to Consolas
 ' https://superuser.com/a/757514
 Sub SetCodeFont()
     On Error Resume Next
@@ -10,21 +10,19 @@ Sub SetCodeFont()
     Dim wdSelection As Word.Selection
 
     Set oItem = Application.ActiveInspector.CurrentItem
-    If Not oItem Is Nothing Then
-        If oItem.Class = olMail Then
-            Set olInspector = oItem.GetInspector
-            If olInspector.EditorType = olEditorWord Then
-                Set wdDocument = olInspector.WordEditor
-                Set wdApplication = wdDocument.Application
-                Set wdSelection = wdApplication.Selection
-                wdSelection.Font.Name = "Consolas"
-            End If
-        End If
+    If oItem Is Nothing Or oItem.Class <> olMail Then
+        ' No object or it's not a mail item
+        Exit Sub
     End If
 
-    Set wdSelection = Nothing
-    Set wdApplication = Nothing
-    Set wdDocument = Nothing
-    Set olInspector = Nothing
-    Set oItem = Nothing
+    Set olInspector = oItem.GetInspector
+    If olInspector.EditorType <> olEditorWord Then
+        ' Mail item editor is not Micosoft Word
+        Exit Sub
+    End If
+
+    Set wdDocument = olInspector.WordEditor
+    Set wdApplication = wdDocument.Application
+    Set wdSelection = wdApplication.Selection
+    wdSelection.Font.Name = "Consolas"
 End Sub
