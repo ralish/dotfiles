@@ -96,6 +96,7 @@
     // Built-in extension: Git
     "git.autoStash": true,
     "git.enableSmartCommit": true,
+    "git.openRepositoryInParentFolders": "never",
     "git.timeline.date": "authored",
 
     // Built-in extension: PHP Language Features
