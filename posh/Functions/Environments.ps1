@@ -231,6 +231,39 @@ Function Switch-Go {
     }
 }
 
+# Update Go executables
+Function Update-GoExecutables {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
+    Param()
+
+    if (!(Get-Command -Name 'gup' -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to update Go executables as gup command not found.'
+        return
+    }
+
+    $GupExecName = 'gup'
+    if (Test-IsWindows) {
+        $GupExecName = '{0}.exe' -f $GupExecName
+    }
+
+    $GupOperation = 'update'
+    if (!$PSCmdlet.ShouldProcess('gup', 'Update')) {
+        $GupOperation = 'check'
+    }
+
+    Write-Verbose -Message ('Updating gup: gup {0} {1}' -f $GupOperation, $GupExecName)
+    & gup $GupOperation $GupExecName
+
+    $GupOperation = 'update'
+    if (!$PSCmdlet.ShouldProcess('Go executables', 'Update')) {
+        $GupOperation = 'check'
+    }
+
+    Write-Verbose -Message ('Updating Go executables: gup {0}' -f $GupOperation)
+    & gup $GupOperation
+}
+
 #endregion
 
 #region Google

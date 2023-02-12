@@ -120,6 +120,7 @@ Function Update-AllTheThings {
         $ValidTasks = @(
             'PowerShell'
             'DotNetTools'
+            'GoExecutables'
             'NodejsPackages'
             'PythonPackages'
             'QtComponents'
@@ -253,6 +254,12 @@ Function Update-AllTheThings {
         if ($Tasks -contains 'DotNetTools') {
             Write-Progress @WriteProgressParams -Status '.NET tools' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.DotNetTools = Update-DotNetTools -ProgressParentId $WriteProgressParams['Id']
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'GoExecutables') {
+            Write-Progress @WriteProgressParams -Status 'Go executables' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.GoExecutables = Update-GoExecutables -ProgressParentId $WriteProgressParams['Id']
             $TasksDone++
         }
 
