@@ -268,8 +268,8 @@ Function Update-GoExecutables {
 
 #region Google
 
-# Configure environment for Google (depot_tools) usage
-Function Switch-Google {
+# Configure environment for Google depot_tools usage
+Function Switch-GoogleDepotTools {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
