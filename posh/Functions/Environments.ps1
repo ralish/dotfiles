@@ -231,7 +231,7 @@ Function Switch-Go {
     }
 }
 
-# Update Go executables
+# Update Go executable packages installed by "go install"
 Function Update-GoExecutables {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
@@ -1129,7 +1129,7 @@ Function Switch-Ruby {
     }
 }
 
-# Update Ruby packages
+# Update Ruby gems
 Function Update-RubyGems {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
