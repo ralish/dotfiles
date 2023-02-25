@@ -545,7 +545,9 @@ Function Format-Xml {
         [String[]]$Xml,
 
         [ValidateRange(0, 8)]
-        [Int]$IndentSize = 4
+        [Int]$IndentSize = 4,
+
+        [Switch]$OmitXmlDeclaration
     )
 
     Begin {
@@ -566,6 +568,7 @@ Function Format-Xml {
             $XmlWriterSettings.Indent = $true
             $XmlWriterSettings.IndentChars = [String]::new(' ', $IndentSize)
         }
+        $XmlWriterSettings.OmitXmlDeclaration = $OmitXmlDeclaration.ToBool()
         $XmlWriter = [Xml.XmlWriter]::Create($StringWriter, $XmlWriterSettings)
 
         $XmlDoc = [Xml.XmlDocument]::new()
