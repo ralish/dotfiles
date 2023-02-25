@@ -47,6 +47,7 @@ Function Update-PowerShell {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(
+        [Regex]$ExcludedModuleRegex = '^(Az|Microsoft\.Graph|VMware)(|\..+)',
         [String[]]$PsGetV3Blacklist = @('ExchangeOnlineManagement', 'PnP.PowerShell'),
 
         [Switch]$IncludeDscModules,
@@ -175,6 +176,11 @@ Function Update-PowerShell {
         $ModuleName = $UniqueModules[$ModuleIdx]
         $Module = $InstalledModules | Where-Object Name -EQ $ModuleName | Sort-Object -Property 'Version' | Select-Object -Last 1
 
+        if ($ModuleName -match $ExcludedModuleRegex) {
+            Write-Verbose -Message ('Skipping excluded module: {0}' -f $ModuleName)
+            continue
+        }
+
         if (!$IncludeDscModules -and $DscSupported -and $ModuleName -in $DscModules) {
             Write-Verbose -Message ('Skipping DSC module: {0}' -f $ModuleName)
             continue
@@ -223,7 +229,7 @@ Function Update-PowerShell {
     }
 
     # The modular AWS Tools for PowerShell has its own mechanism
-    if ($UniqueModules -contains 'AWS.Tools.Installer') {
+    if ($UniqueModules -contains 'AWS.Tools.Installer' -and 'AWS.Tools.Installer' -notmatch $ExcludedModuleRegex) {
         # The Update-AWSToolsModule function is not yet compatible with
         # PowerShellGet v3. If we're currently using PowerShellGet v3 but
         # PowerShellGet v2 is available attempt to import it side-by-side.
