@@ -1,6 +1,6 @@
-# Below files have encodings which Git doesn't natively understand (typically
-# UTF-16). Use a filter to send them through iconv so they can be processed.
-#*.reg                                      filter=file-encoding
+# Files to convert to a different encoding on checkout/commit
+*.rdp                                       working-tree-encoding=UTF-16LE-BOM
+*.reg                                       working-tree-encoding=UTF-16LE-BOM
 
 # Script files should always be LF terminated
 *.sh                            text        eol=lf
