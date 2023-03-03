@@ -259,7 +259,7 @@ Function Update-AllTheThings {
 
         if ($Tasks -contains 'GoExecutables') {
             Write-Progress @WriteProgressParams -Status 'Go executables' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.GoExecutables = Update-GoExecutables -ProgressParentId $WriteProgressParams['Id']
+            $Results.GoExecutables = Update-GoExecutables
             $TasksDone++
         }
 
