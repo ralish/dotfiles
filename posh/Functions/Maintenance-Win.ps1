@@ -290,7 +290,7 @@ Function Update-VisualStudio {
 # Update Microsoft Windows
 Function Update-Windows {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '')]
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     #[OutputType([Boolean], [PSWindowsUpdate.WindowsUpdateJob[]])]
     Param(
         [Switch]$AcceptAll
@@ -307,7 +307,13 @@ Function Update-Windows {
         return $false
     }
 
-    $Results = Install-WindowsUpdate -AcceptAll:$AcceptAll -IgnoreReboot -NotTitle 'Silverlight'
+    $Results = $false
+    if ($WhatIfPreference) {
+        $Results = Get-WindowsUpdate -AcceptAll:$AcceptAll -IgnoreReboot -NotTitle 'Silverlight'
+    } elseif ($PSCmdlet.ShouldProcess('Windows', 'Update')) {
+        $Results = Install-WindowsUpdate -AcceptAll:$AcceptAll -IgnoreReboot -NotTitle 'Silverlight'
+    }
+
     if ($Results) {
         return $Results
     }
