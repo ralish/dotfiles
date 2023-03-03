@@ -975,7 +975,9 @@ Function Update-PythonPackages {
 Function Update-QtComponents {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
-    Param()
+    Param(
+        [String[]]$AutoAnswer = 'AssociateCommonFiletypes=No'
+    )
 
     DynamicParam {
         $PathAttrCollection = [Collections.ObjectModel.Collection[Attribute]]::new()
@@ -1022,9 +1024,14 @@ Function Update-QtComponents {
             return
         }
 
+        $QtMtArgs = 'update', '--accept-licenses', '--confirm-command'
+        if ($AutoAnswer) {
+            $QtMtArgs += '--auto-answer', ($AutoAnswer -join ',')
+        }
+
         if ($PSCmdlet.ShouldProcess('Qt components', 'Update')) {
             Write-Verbose -Message 'Updating Qt components: MaintenanceTool update'
-            & $QtMtPath update
+            & $QtMtPath @QtMtArgs
         }
     }
 }
