@@ -124,7 +124,7 @@ function dl_shellcheck() {
         script_exit "[shellcheck] Unable to find release for kernel & machine hardware: $latest_contains" 1
     fi
 
-    pretty_print "[shellcheck] Updating to v$latest_ver ..."
+    pretty_print "[shellcheck] Updating v$current_ver to v$latest_ver ..."
     if ! [[ -d $SHCHK_DST_DIR ]]; then
         mkdir "$SHCHK_DST_DIR"
     fi
