@@ -11,12 +11,21 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 
 # Update Microsoft Store apps
 Function Update-MicrosoftStore {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Boolean])]
     Param()
 
     if (!(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to perform Microsoft Store updates.'
+        $Message = 'You must have administrator privileges to perform Microsoft Store updates.'
+        if ($WhatIfPreference) {
+            Write-Warning -Message $Message
+        } else {
+            throw $Message
+        }
+    }
+
+    if (!$PSCmdlet.ShouldProcess('Microsoft Store', 'Update')) {
+        return
     }
 
     $Namespace = 'root\CIMv2\mdm\dmmap'
