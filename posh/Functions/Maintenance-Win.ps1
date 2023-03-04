@@ -47,7 +47,7 @@ Function Update-MicrosoftStore {
 
 # Update Microsoft Office (Click-to-Run only)
 Function Update-Office {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
@@ -55,7 +55,12 @@ Function Update-Office {
     )
 
     if (!(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to perform Office updates.'
+        $Message = 'You must have administrator privileges to perform Office updates.'
+        if ($WhatIfPreference) {
+            Write-Warning -Message $Message
+        } else {
+            throw $Message
+        }
     }
 
     $OfficeC2RClient = Join-Path -Path $env:ProgramFiles -ChildPath 'Common Files\Microsoft Shared\ClickToRun\OfficeC2RClient.exe'
@@ -64,8 +69,12 @@ Function Update-Office {
         return
     }
 
+    if (!$PSCmdlet.ShouldProcess('Office', 'Update')) {
+        return
+    }
+
     $WriteProgressParams = @{
-        Activity = 'Updating Office 365'
+        Activity = 'Updating Office'
     }
 
     if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
