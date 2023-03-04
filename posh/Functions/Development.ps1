@@ -370,7 +370,7 @@ Function Invoke-GitMergeAllBranches {
         throw 'Source branch for merge not checked out: {0}' -f $SourceBranch
     }
 
-    if ($SourceBranch -ne $CurrentBranch) {
+    if (($SourceBranch -ne $CurrentBranch) -and !$WhatIfPreference) {
         git checkout $SourceBranch
         if ($LASTEXITCODE -ne 0) { return }
         Write-Host
@@ -391,8 +391,8 @@ Function Invoke-GitMergeAllBranches {
         }
     }
 
-    if ($PSCmdlet.ShouldProcess($SourceBranch, 'Checkout')) {
-        git checkout $SourceBranch
+    if (!$WhatIfPreference) {
+        git checkout $CurrentBranch
     }
 }
 
