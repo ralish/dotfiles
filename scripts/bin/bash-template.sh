@@ -43,6 +43,7 @@ function script_trap_err() {
         # failed before we even called cron_init(). This can happen if bad
         # parameters were passed to the script so we bailed out very early.
         if [[ -n ${script_output-} ]]; then
+            # shellcheck disable=SC2312
             printf 'Script Output:\n\n%s' "$(cat "$script_output")"
         else
             printf 'Script Output:          None (failed before log init)\n'
@@ -349,6 +350,7 @@ function check_superuser() {
     if [[ $EUID -eq 0 ]]; then
         superuser=true
     elif [[ -z ${1-} ]]; then
+        # shellcheck disable=SC2310
         if check_binary sudo; then
             verbose_print 'Sudo: Updating cached credentials ...'
             if ! sudo -v; then
