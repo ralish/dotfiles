@@ -184,7 +184,7 @@ Function Update-Scoop {
 # Use command-line parameters to install, update, and manage Visual Studio
 # https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
 Function Update-VisualStudio {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Boolean])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
@@ -192,7 +192,12 @@ Function Update-VisualStudio {
     )
 
     if (!(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to perform Visual Studio updates.'
+        $Message = 'You must have administrator privileges to perform Visual Studio updates.'
+        if ($WhatIfPreference) {
+            Write-Warning -Message $Message
+        } else {
+            throw $Message
+        }
     }
 
     $VsInstallerExe = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
@@ -207,6 +212,10 @@ Function Update-VisualStudio {
     if ($VsSetupInstances.Count -eq 0) {
         Write-Error -Message 'Get-VSSetupInstance returned no instances.'
         return $false
+    }
+
+    if (!$PSCmdlet.ShouldProcess('Visual Studio', 'Update')) {
+        return
     }
 
     $WriteProgressParams = @{
