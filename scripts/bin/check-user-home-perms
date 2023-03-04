@@ -95,7 +95,7 @@ function main() {
     script_init "$@"
     colour_init
 
-    # shellcheck disable=SC2119
+    # shellcheck disable=SC2119,SC2310
     if ! check_superuser; then
         script_exit 'Superuser access (via root or sudo) is required.' 1
     fi
