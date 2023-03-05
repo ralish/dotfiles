@@ -126,7 +126,6 @@ Function Update-AllTheThings {
             'GoExecutables'
             'NodejsPackages'
             'PythonPackages'
-            'QtComponents'
             'RubyGems'
             'RustToolchains'
         )
@@ -139,6 +138,7 @@ Function Update-AllTheThings {
                 'VisualStudio'
                 'MicrosoftStore'
                 'Scoop'
+                'QtComponents'
             )
         } else {
             $ValidTasks += 'Homebrew'
