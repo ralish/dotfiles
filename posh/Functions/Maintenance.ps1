@@ -202,6 +202,8 @@ Function Update-AllTheThings {
             }
         }
 
+        Write-Verbose -Message ('Running updates for: {0}' -f ($Tasks -join ', '))
+
         $WriteProgressParams = @{
             Id       = 0
             Activity = 'Updating all the things'
