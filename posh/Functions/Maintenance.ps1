@@ -56,6 +56,8 @@ Function Clear-AllDevCaches {
         }
     }
 
+    Write-Verbose -Message ('Clearing caches for: {0}' -f ($Tasks -join ', '))
+
     $WriteProgressParams = @{
         Id       = 0
         Activity = 'Clearing caches for development environments & tooling'
