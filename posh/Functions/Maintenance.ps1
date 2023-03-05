@@ -112,7 +112,8 @@ Function Clear-AllDevCaches {
 
 # Update everything!
 Function Update-AllTheThings {
-    [CmdletBinding(DefaultParameterSetName = 'OptOut')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
+    [CmdletBinding(DefaultParameterSetName = 'OptOut', SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param()
 
@@ -192,7 +193,8 @@ Function Update-AllTheThings {
 
         if (Test-IsWindows) {
             if ($Tasks -contains 'Windows' -or $Tasks -contains 'Office' -or $Tasks -contains 'VisualStudio' -or $Tasks -contains 'MicrosoftStore') {
-                if (!(Test-IsAdministrator)) {
+                $IsAdministrator = Test-IsAdministrator
+                if (!$IsAdministrator -and !$WhatIfPreference) {
                     throw 'You must have administrator privileges to perform Windows, Office, Visual Studio, or Microsoft Store updates.'
                 }
             }
@@ -205,7 +207,14 @@ Function Update-AllTheThings {
 
         if ($Tasks -contains 'Windows') {
             Write-Progress @WriteProgressParams -Status 'Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.Windows = Update-Windows -AcceptAll
+
+            if ($IsAdministrator) {
+                $Results.Windows = Update-Windows -AcceptAll
+            } else {
+                # Only for -WhatIf without administrator privileges
+                Write-Warning -Message 'Retrieving available Windows Updates requires administrator privileges.'
+            }
+
             $TasksDone++
         }
 
