@@ -39,7 +39,7 @@ Function Update-Homebrew {
     }
 
     [String[]]$UpdateArgs = 'update'
-    [String[]]$UpgradeArgs = 'upgrade', '--greedy'
+    [String[]]$UpgradeArgs = 'upgrade'
     [String[]]$CleanupArgs = 'cleanup', '-s'
     if ($WhatIfPreference) {
         $UpgradeArgs += '--dry-run'
