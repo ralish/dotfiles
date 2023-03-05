@@ -111,6 +111,7 @@
     // Excludes for search & quick open
     "search.exclude": {
         "**/modules/oh-my-zsh/**": true,
+        "**/posh/Help/**": true,
         "**/posh/Modules/**": true,
         "**/pwsh/**": true,
         "**/zsh/.oh-my-zsh/**": true
