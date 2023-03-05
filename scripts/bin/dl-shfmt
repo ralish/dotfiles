@@ -130,7 +130,11 @@ function dl_shfmt() {
         script_exit "[shfmt] Unable to find release for kernel & machine hardware: $latest_contains" 1
     fi
 
-    pretty_print "[shfmt] Updating v$current_ver to v$latest_ver ..."
+    if [[ -n ${current_ver-} ]]; then
+        pretty_print "[shfmt] Updating v$current_ver to v$latest_ver ..."
+    else
+        pretty_print "[shfmt] Installing v$latest_ver ..."
+    fi
     curl --create-dirs -sSL -o "$SHFMT_DST" "$latest_url"
     chmod +x "$SHFMT_DST"
 }
