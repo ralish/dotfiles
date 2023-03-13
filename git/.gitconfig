@@ -60,6 +60,7 @@
 
 [pull]
 	ff = only
+	rebase = true
 
 [push]
 	default = simple
