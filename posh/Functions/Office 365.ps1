@@ -546,7 +546,7 @@ Function Get-Office365UserLicensingMatrix {
     $Licenses = $Users.Licenses.AccountSkuId | Sort-Object -Unique | ForEach-Object { $_.Split(':')[1] }
 
     $Matrix = [Collections.Generic.List[PSCustomObject]]::new()
-    $MatrixEntry = [PSCustomObject]@{ UserPrincipalName = '' }
+    $MatrixEntry = [PSCustomObject]@{ UserPrincipalName = [String]::Empty }
     foreach ($License in $Licenses) {
         $MatrixEntry | Add-Member -MemberType NoteProperty -Name $License -Value $false
     }
