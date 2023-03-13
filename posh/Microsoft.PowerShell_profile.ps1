@@ -5,6 +5,18 @@ foreach ($Param in [Environment]::GetCommandLineArgs()) {
     }
 }
 
+# Skip loading profile if we appear to be running in certain environments
+$DotFilesSkipEnvVars = @(
+    'MSBuildExtensionsPath' # MSBuild
+    'VisualStudioVersion'   # Visual Studio
+)
+foreach ($EnvVar in $DotFilesSkipEnvVars) {
+    if (Test-Path -Path Env:\$EnvVar) {
+        return
+    }
+}
+Remove-Variable -Name 'DotFilesSkipEnvVars'
+
 # Display verbose messages during profile load
 if (!(Get-Variable -Name 'DotFilesVerbose' -ErrorAction Ignore)) {
     $DotFilesVerbose = $false
