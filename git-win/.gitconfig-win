@@ -22,7 +22,8 @@
 
 [credential]
 	# Use Git Credential Manager Core
-	helper = manager-core
+	# https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/configuration.md
+	helper = manager
 	# Disable usage of WIA (Kerberos/NTLM)
 	allowWindowsAuth = false
 
