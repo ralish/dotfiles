@@ -58,6 +58,23 @@ Function Update-OpenSSHConfig {
     }
 
     $Template = Get-Content -LiteralPath $TemplateFile
+
+    # OpenSSH for Windows (which is not the same as OpenSSH Portable) doesn't
+    # support the sntrup761x25519-sha512@openssh.com key exchange algorithm.
+    # Until it does, we have to remove any usage of it in our configuration
+    # template or SSH will complain about an unsupported KEX algorithm. This
+    # hack is written to ensure we don't remove it when/if support is added.
+    #
+    # See: https://github.com/PowerShell/Win32-OpenSSH/issues/1927
+    $SupportedKexAlgorithms = & ssh -Q kex
+    if ($SupportedKexAlgorithms -notcontains 'sntrup761x25519-sha512@openssh.com') {
+        for ($i = 0; $i -lt $Template.Count; $i++) {
+            if ($Template[$i] -match '^\s*KexAlgorithms\s+\S+') {
+                $Template[$i] = $Template[$i] -replace 'sntrup761x25519-sha512@openssh\.com,?'
+            }
+        }
+    }
+
     Add-Content -LiteralPath $ConfigFile -Value $Template[0..($Template.Count - 1)]
 }
 
