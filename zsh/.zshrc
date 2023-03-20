@@ -1,94 +1,38 @@
 #!/usr/bin/env zsh
 
-# Path to oh-my-zsh configuration
-ZSH="$HOME/.oh-my-zsh"
+# Load our Oh My Zsh configuration
+source "$HOME/dotfiles/zsh/oh-my-zsh.zsh"
 
-# Path to our common shell configuration
-SHCFG="$HOME/dotfiles/sh/common.sh"
+# Load our common shell configuration
+#
+# By default Zsh does *not* perform field splitting on unquoted parameter
+# expansions. Temporarily enable this behaviour for compatibility with our
+# common shell configuration, which relies on the "typical" shell behaviour.
+setopt shwordsplit
+source "$HOME/dotfiles/sh/common.sh"
+unsetopt shwordsplit
 
-# Name of the oh-my-zsh theme to load
-if [[ -d $ZSH/custom/themes/powerlevel10k ]]; then
-    ZSH_THEME="powerlevel10k/powerlevel10k"
-else
-    ZSH_THEME="agnoster"
-fi
-
-# Enable case-sensitive completion
-CASE_SENSITIVE="true"
-
-# Disable automatic update checks
-DISABLE_AUTO_UPDATE="true"
-
-# How often auto-update checks occur
-# export UPDATE_ZSH_DAYS=13
-
-# Disable colors in ls
-# DISABLE_LS_COLORS="true"
-
-# Disable autosetting terminal title
-# DISABLE_AUTO_TITLE="true"
-
-# Disable command autocorrection
-DISABLE_CORRECTION="true"
-
-# Display red dots while waiting
-COMPLETION_WAITING_DOTS="true"
-
-# Disable marking untracked files under VCS as dirty
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Which plugins would you like to load?
-plugins=(colored-man-pages gitfast ripgrep shrink-path)
-
-# Add custom zsh completions to fpath
-if [[ -d $HOME/.local/share/zsh/site-functions ]]; then
-    fpath=($HOME/.local/share/zsh/site-functions $fpath)
-fi
-
-# Actually load oh-my-zsh with our settings
-source "$ZSH/oh-my-zsh.sh"
-
-# Disable the auto_cd option enabled by oh-my-zsh
+# Disable automatic "cd" to a directory of the same name if the input does not
+# match a normal command (disabled by default but enabled by Oh My Zsh).
 unsetopt auto_cd
 
 # Disable terminal beep on errors
 unsetopt beep
 
-# Load our common shell configuration
-#
-# By default zsh does *not* perform field splitting on unquoted parameter
-# expansions. We temporarily enable this option for compatibility with our
-# common shell configuration as most shells default to this behaviour.
-setopt shwordsplit
-source "$SHCFG"
-unsetopt shwordsplit
-
-# Create a zkbd compatible hash populating it via the terminfo array
+# Create a zkbd compatible hash
 typeset -g -A key
-key[Insert]=${terminfo[kich1]}
-key[Delete]=${terminfo[kdch1]}
-key[Home]=${terminfo[home]}
-key[End]=${terminfo[kend]}
-key[PageUp]=${terminfo[kpp]}
-key[PageDown]=${terminfo[knp]}
-key[Up]=${terminfo[kcuu1]}
-key[Down]=${terminfo[kcud1]}
-key[Left]=${terminfo[kcub1]}
-key[Right]=${terminfo[kcuf1]}
+key[Insert]="${terminfo[kich1]}"
+key[Delete]="${terminfo[kdch1]}"
+key[Home]="${terminfo[home]}"
+key[End]="${terminfo[kend]}"
+key[PageUp]="${terminfo[kpp]}"
+key[PageDown]="${terminfo[knp]}"
+key[Up]="${terminfo[kcuu1]}"
+key[Down]="${terminfo[kcud1]}"
+key[Left]="${terminfo[kcub1]}"
+key[Right]="${terminfo[kcuf1]}"
 
-# Set Insert/Delete keys to insert/delete chars on line
-[[ -n ${key[Insert]} ]] && bindkey "${key[Insert]}" overwrite-mode
-[[ -n ${key[Delete]} ]] && bindkey "${key[Delete]}" delete-char
-
-# Set Home/End keys to jump to beginning/end of line
-[[ -n ${key[Home]} ]] && bindkey "${key[Home]}" beginning-of-line
-[[ -n ${key[End]} ]] && bindkey "${key[End]}" end-of-line
-
-# Use any entered text as the prefix for searching command history
-[[ -n ${key[Up]} ]] && bindkey "${key[Up]}" history-search-backward
-[[ -n ${key[Down]} ]] && bindkey "${key[Down]}" history-search-forward
-
-# Set Ctrl+Left-arrow/Ctrl+Right-arrow to move to adjacent word
+# Set Ctrl+Left/Right arrow to move to adjacent word
 bindkey "\e[D" backward-word
 bindkey "\e[C" forward-word
 bindkey "\e[1;2D" backward-word
@@ -96,61 +40,54 @@ bindkey "\e[1;2C" forward-word
 bindkey "\e[1;5D" backward-word
 bindkey "\e[1;5C" forward-word
 
-# Make sure the terminal is in application mode when zle is active
+# Set Insert/Delete to insert/delete characters on line
+[[ -n ${key[Insert]} ]] && bindkey "${key[Insert]}" overwrite-mode
+[[ -n ${key[Delete]} ]] && bindkey "${key[Delete]}" delete-char
+
+# Set Home/End to jump to beginning/end of line
+[[ -n ${key[Home]} ]] && bindkey "${key[Home]}" beginning-of-line
+[[ -n ${key[End]} ]] && bindkey "${key[End]}" end-of-line
+
+# Use entered text as prefix for searching command history
+[[ -n ${key[Up]} ]] && bindkey "${key[Up]}" history-search-backward
+[[ -n ${key[Down]} ]] && bindkey "${key[Down]}" history-search-forward
+
+# Ensure terminal is in application mode when zle is active
 if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
-    function zle-line-init () {
+    function zle-line-init() {
         printf '%s' "${terminfo[smkx]}"
     }
-    function zle-line-finish () {
+
+    function zle-line-finish() {
         printf '%s' "${terminfo[rmkx]}"
     }
+
     zle -N zle-line-init
     zle -N zle-line-finish
 fi
 
-# Configure online help for zsh
+# Configure online help
 alias run-help &> /dev/null
 autoload run-help
-if [ -d "/usr/share/zsh/help" ]; then
-    HELPDIR="/usr/share/zsh/help"
-elif [ -d "/usr/local/share/zsh/help" ]; then
-    HELPDIR="/usr/local/share/zsh/help"
+if [[ -d /usr/local/share/zsh/help ]]; then
+    HELPDIR='/usr/local/share/zsh/help'
+elif [[ -d /usr/share/zsh/help ]]; then
+    HELPDIR='/usr/share/zsh/help'
 fi
 
-# Load virtualenvwrapper if it is present
-if [ -f /etc/bash_completion.d/virtualenvwrapper ]; then
-    export WORKON_HOME="$HOME/.virtualenvs"
-    source /etc/bash_completion.d/virtualenvwrapper
+# Add custom completions
+if [[ -d $HOME/.local/share/zsh/site-functions ]]; then
+    fpath=($HOME/.local/share/zsh/site-functions $fpath)
 fi
 
-# Include any custom functions
+# Source custom functions
 zsh_functions_dir="$dotfiles/sh/functions"
-if [ -d "$zsh_functions_dir" ]; then
+if [[ -d $zsh_functions_dir ]]; then
     for zsh_function in $zsh_functions_dir/*.zsh; do
-        [ -e "$zsh_function" ] || break
+        [[ -e $zsh_function ]] || break
         . "$zsh_function"
     done
 fi
-unset zsh_function zsh_functions_dir
-
-# Theme customisations
-case $ZSH_THEME in
-    agnoster)
-        # Hide this user in the prompt
-        DEFAULT_USER="sdl"
-
-        # Shrink the current path
-        prompt_dir() {
-            prompt_segment blue black "$(shrink_path -l -t)"
-        }
-        ;;
-    powerlevel10k/powerlevel10k)
-        [[ ! -f $HOME/.p10k.zsh ]] || source "$HOME/.p10k.zsh"
-        ;;
-esac
-
-# Useful aliases
-alias gita='git-repo-invoke'
-alias gits='git-repo-summary'
+unset zsh_functions_dir zsh_function
 
 # vim: syntax=zsh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

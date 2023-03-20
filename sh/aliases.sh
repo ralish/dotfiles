@@ -12,4 +12,8 @@ if [ -n "$LS_COLORS" ] || [ -n "$LSCOLORS" ]; then
     alias fgrep='fgrep --color=auto'
 fi
 
+# Git functions
+alias gita='git-repo-invoke'
+alias gits='git-repo-summary'
+
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
