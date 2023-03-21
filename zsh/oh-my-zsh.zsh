@@ -124,8 +124,12 @@ source "$ZSH/oh-my-zsh.sh"
 
 case $ZSH_THEME in
     agnoster)
-        # Hide this user in the prompt
-        DEFAULT_USER='sdl'
+        # Hide our user account in the prompt
+        if [[ $USER = samuel.leslie ]]; then
+            DEFAULT_USER='samuel.leslie'
+        else
+            DEFAULT_USER='sdl'
+        fi
 
         # Shrink the current path
         prompt_dir() {
