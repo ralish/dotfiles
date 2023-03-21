@@ -9,6 +9,7 @@
         ".bash_history": "shellscript",
         ".bash_logout": "shellscript",
         ".bashrc": "shellscript",
+        ".profile": "shellscript",
         // bazaar
         "**/.bazaar/*.conf": "ini",
         // clink
