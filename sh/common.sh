@@ -58,9 +58,15 @@ if [ -d "$sh_apps_dir" ]; then
 fi
 unset sh_app sh_apps_dir
 
-# Add any local bin directory to our PATH
+# Add any ~/bin directory to our PATH
 if [ -d "$HOME/bin" ]; then
     build_path "$HOME/bin" "$PATH"
+    export PATH="$build_path"
+fi
+
+# Add any ~/.local/bin directory to our PATH
+if [ -d "$HOME/.local/bin" ]; then
+    build_path "$HOME/.local/bin" "$PATH"
     export PATH="$build_path"
 fi
 
