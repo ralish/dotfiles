@@ -17,7 +17,8 @@
 if [ -n "$BASH_VERSION" ]; then
     # Source .bashrc if it exists
     if [ -f "$HOME/.bashrc" ]; then
-	. "$HOME/.bashrc"
+        # shellcheck source=sh/profile.sh
+        . "$HOME/.bashrc"
     fi
 fi
 
