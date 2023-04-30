@@ -1,12 +1,17 @@
-# Add the script directory to the search path for source statements
-source-path=SCRIPTDIR
+# ShellCheck settings
+#
+# Last reviewed release: v0.9.0
 
-# Enable all checks (inc. optional)
+# List of optional checks to enable
 enable=all
 
-# Disable some checks
+# List of checks to disable
 #
-# SC2250    require-variable-braces         optional
+# Check ID          Symbolic name                   Type
+# SC2250            require-variable-braces         optional
 disable=SC2250
+
+# Add the script directory to the search path for source statements
+source-path=SCRIPTDIR
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
