@@ -288,7 +288,13 @@ Function Invoke-GitLinter {
                 }
 
                 Write-Verbose -Message ('Invoking PSScriptAnalyzer on: {0}' -f $_)
-                Invoke-ScriptAnalyzer -Path $_ @ScriptAnalyzerParams
+                Invoke-ScriptAnalyzer -Path $_ @ScriptAnalyzerParams | Where-Object {
+                    # HACK: The statement alignment rule does horrible things
+                    # to the PSScriptAnalyzer hashtable, but the suppression
+                    # facility doesn't work for ".psd1" files.
+                    $_.ScriptName -ne 'PSScriptAnalyzerSettings.psd1' -and
+                    $_.RuleName -ne 'PSAlignAssignmentStatement'
+                }
             }
         }
 
