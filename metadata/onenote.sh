@@ -1,1 +1,0 @@
-templates/ignore.sh
