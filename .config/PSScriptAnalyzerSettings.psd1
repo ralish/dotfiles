@@ -1,18 +1,22 @@
+# PSScriptAnalyzer settings
+#
+# Last reviewed release: v1.21.0
+
 @{
     IncludeRules = @('*')
 
     ExcludeRules = @(
         'PSAvoidUsingInvokeExpression',
         'PSAvoidUsingWriteHost',
-        # Broken with child scopes pending fix (GH PR #1489)
+        # Broken with child scopes pending fix (GH #1472)
         'PSReviewUnusedParameter',
         'PSUseShouldProcessForStateChangingFunctions',
         'PSUseSingularNouns'
     )
 
-    Rules        = @{
+    Rules = @{
         # Compatibility rules
-        PSUseCompatibleSyntax      = @{
+        PSUseCompatibleSyntax = @{
             Enable         = $true
             # Only major versions from v3.0 are supported
             TargetVersions = @('5.0', '7.0')
@@ -24,30 +28,35 @@
             CheckHashtable = $true
         }
 
-        PSAvoidLongLines           = @{
+        PSAvoidLongLines = @{
             Enable            = $false
-            MaximumLineLength = 120
+            MaximumLineLength = 119
         }
 
-        PSAvoidUsingCmdletAliases  = @{
+        PSAvoidUsingCmdletAliases = @{
             allowlist = @('%', '?')
         }
 
-        PSPlaceCloseBrace          = @{
+        PSAvoidUsingPositionalParameters = @{
+            Enable           = $true
+            CommandAllowList = @('az')
+        }
+
+        PSPlaceCloseBrace = @{
             Enable             = $true
             IgnoreOneLineBlock = $true
             NewLineAfter       = $false
             NoEmptyLineBefore  = $false
         }
 
-        PSPlaceOpenBrace           = @{
+        PSPlaceOpenBrace = @{
             Enable             = $true
             IgnoreOneLineBlock = $true
             NewLineAfter       = $true
             OnSameLine         = $true
         }
 
-        PSProvideCommentHelp       = @{
+        PSProvideCommentHelp = @{
             Enable                  = $true
             BlockComment            = $true
             ExportedOnly            = $true
@@ -62,7 +71,7 @@
             PipelineIndentation = 'IncreaseIndentationForFirstPipeline'
         }
 
-        PSUseConsistentWhitespace  = @{
+        PSUseConsistentWhitespace = @{
             Enable                                  = $true
             CheckInnerBrace                         = $true
             CheckOpenBrace                          = $true

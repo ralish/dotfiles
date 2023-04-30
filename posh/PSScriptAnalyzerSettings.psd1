@@ -1,36 +1,41 @@
+# PSScriptAnalyzer settings
+#
+# Last reviewed release: v1.21.0
+
 @{
     IncludeRules = @('*')
 
     ExcludeRules = @(
-        # Broken with child scopes pending fix (GH PR #1489)
+        # Broken with child scopes pending fix (GH #1472)
         'PSReviewUnusedParameter',
         'PSUseOutputTypeCorrectly'
     )
 
-    Rules        = @{
+    Rules = @{
         # Compatibility rules
         PSAvoidOverwritingBuiltInCmdlets = @{
+            Enable            = $false
             PowerShellVersion = @()
         }
 
-        PSUseCompatibleCmdlets           = @{
+        PSUseCompatibleCmdlets = @{
             compatibility = @()
         }
 
-        PSUseCompatibleCommands          = @{
+        PSUseCompatibleCommands = @{
             Enable         = $false
             ProfileDirPath = ''
             TargetProfiles = @()
             IgnoreCommands = @()
         }
 
-        PSUseCompatibleSyntax            = @{
+        PSUseCompatibleSyntax = @{
             Enable         = $false
             # Only major versions from v3.0 are supported
             TargetVersions = @()
         }
 
-        PSUseCompatibleTypes             = @{
+        PSUseCompatibleTypes = @{
             Enable         = $false
             ProfileDirPath = ''
             TargetProfiles = @()
@@ -38,35 +43,40 @@
         }
 
         # General rules
-        PSAlignAssignmentStatement       = @{
+        PSAlignAssignmentStatement = @{
             Enable         = $true
             CheckHashtable = $true
         }
 
-        PSAvoidLongLines                 = @{
+        PSAvoidLongLines = @{
             Enable            = $false
-            MaximumLineLength = 120
+            MaximumLineLength = 119
         }
 
-        PSAvoidUsingCmdletAliases        = @{
+        PSAvoidUsingCmdletAliases = @{
             allowlist = @()
         }
 
-        PSPlaceCloseBrace                = @{
+        PSAvoidUsingPositionalParameters = @{
+            Enable           = $true
+            CommandAllowList = @('az')
+        }
+
+        PSPlaceCloseBrace = @{
             Enable             = $true
             IgnoreOneLineBlock = $true
             NewLineAfter       = $false
             NoEmptyLineBefore  = $false
         }
 
-        PSPlaceOpenBrace                 = @{
+        PSPlaceOpenBrace = @{
             Enable             = $true
             IgnoreOneLineBlock = $true
             NewLineAfter       = $true
             OnSameLine         = $true
         }
 
-        PSProvideCommentHelp             = @{
+        PSProvideCommentHelp = @{
             Enable                  = $true
             BlockComment            = $true
             ExportedOnly            = $true
@@ -74,14 +84,14 @@
             VSCodeSnippetCorrection = $false
         }
 
-        PSUseConsistentIndentation       = @{
+        PSUseConsistentIndentation = @{
             Enable              = $true
             IndentationSize     = 4
             Kind                = 'space'
             PipelineIndentation = 'IncreaseIndentationForFirstPipeline'
         }
 
-        PSUseConsistentWhitespace        = @{
+        PSUseConsistentWhitespace = @{
             Enable                                  = $true
             CheckInnerBrace                         = $true
             CheckOpenBrace                          = $true
