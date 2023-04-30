@@ -64,8 +64,8 @@ switch_case_indent = true       # shfmt: -ci
 [{.mk-sbuild.rc,.quiltrc,user-dirs.dirs}]
 shell_variant = posix           # shfmt: -p
 
-# Windows Event Viewer filters
-[windows/Event Viewer filters/*.{xml,xsd}]
+# Windows Event Viewer filter
+[windows/Event Viewer/*.{xml,xsd}]
 indent_size = 2
 
 # Windows Performance Recorder configuration
