@@ -10,7 +10,6 @@
 .bashrc                         text        eol=lf
 .mk-sbuild.rc                   text        eol=lf
 .quiltrc                        text        eol=lf
-.shellcheckrc                   text        eol=lf
 .startxwinrc                    text        eol=lf
 .zshrc                          text        eol=lf
 user-dirs.dirs                  text        eol=lf

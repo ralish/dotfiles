@@ -20,9 +20,17 @@ indent_size = 2
 [*.md]
 trim_trailing_whitespace = false
 
+# Windows Registry
+[*.reg]
+indent_size = 2
+
 # XML documents & schemas
-[*.{xml,xsd,ps1xml}]
+[*.{xml,xsd}]
 insert_final_newline = false
+
+# ConEmu configuration
+[conemu/*.xml]
+indent_style = tab
 
 # Fiddler scripts
 [fiddler/Scripts/*.{cs,js}]
@@ -33,7 +41,11 @@ insert_final_newline = false
 [.gitconfig*]
 indent_style = tab
 
-# JetBrains DotPeek configuration
+# irssi configuration
+[irssi/.irssi/*]
+indent_size = 2
+
+# JetBrains configuration
 [*.DotSettings]
 indent_style = tab
 insert_final_newline = false
@@ -42,12 +54,24 @@ insert_final_newline = false
 [jetbrains/**/*.xml]
 indent_size = 2
 
+# Onetastic file
+[*.onetastic]
+insert_final_newline = false
+
+# PowerShell XML file
+[*.ps1xml]
+insert_final_newline = false
+
 # Shell scripts
-[{*.sh,.bashrc,.mk-sbuild.rc,.quiltrc,user-dirs.dirs}]
+[{*.sh,*.bash,.bashrc,.mk-sbuild.rc,.quiltrc,.startxwinrc,user-dirs.dirs}]
 max_line_length = 79
 keep_padding = true             # shfmt: -kp
 space_redirects = true          # shfmt: -sr
 switch_case_indent = true       # shfmt: -ci
+
+# Shell scripts: POSIX
+[{.mk-sbuild.rc,.quiltrc,.startxwinrc,user-dirs.dirs}]
+shell_variant = posix           # shfmt: -p
 
 # Shell scripts: bin/
 #
@@ -60,9 +84,9 @@ keep_padding = true             # shfmt: -kp
 space_redirects = true          # shfmt: -sr
 switch_case_indent = true       # shfmt: -ci
 
-# Shell scripts: POSIX
-[{.mk-sbuild.rc,.quiltrc,user-dirs.dirs}]
-shell_variant = posix           # shfmt: -p
+# Visual Studio configuration
+[*.vssettings]
+insert_final_newline = false
 
 # Windows Event Viewer filter
 [windows/Event Viewer/*.{xml,xsd}]
@@ -80,3 +104,5 @@ insert_final_newline = false
 # XDG user directories locale
 [xdg-user-dir/.config/user-dirs.locale]
 insert_final_newline = false
+
+# vim: syntax=dosini cc=80 tw=79 ts=4 sw=4 sts=4 et sr

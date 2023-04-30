@@ -25,6 +25,9 @@ ehthumbs_vista.db
 tmp/
 temp/
 
+# Python
+/.venv/
+
 # Vim
 .netrwhist
 [._]*.s[a-v][a-z]
@@ -33,12 +36,6 @@ temp/
 [._]s[a-rt-v][a-z]
 [._]ss[a-gi-z]
 [._]sw[a-p]
-
-# Python venv
-.venv/
-
-# Visual Studio Code
-.vscode/ipch/
 
 
 ##################
@@ -99,7 +96,6 @@ temp/
 /subversion/.subversion/auth/
 
 # Vim
-/vim/.vim/.netrwhist
 /vim/.vim/.viminfo
 /vim/.vim/backup/
 /vim/.vim/plugins/
@@ -116,5 +112,8 @@ temp/
 /firefox/
 /msie/
 /safari/
+
+# Visual Studio Code
+/.vscode/ipch/
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
