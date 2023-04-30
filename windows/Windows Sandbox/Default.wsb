@@ -1,0 +1,42 @@
+<!--
+  Windows Sandbox configuration
+  https://learn.microsoft.com/en-us/windows/security/threat-protection/windows-sandbox/windows-sandbox-configure-using-wsb-file
+-->
+
+<Configuration>
+  <!-- Default: No limit -->
+  <!-- <MemoryInMB></MemoryInMB> -->
+
+  <!-- Default: Disabled -->
+  <vGPU>Default</vGPU>
+  <!-- Default: Enabled -->
+  <Networking>Default</Networking>
+  <!-- Default: Enabled -->
+  <AudioInput>Default</AudioInput>
+  <!-- Default: Disabled -->
+  <VideoInput>Default</VideoInput>
+  <!-- Default: Disabled -->
+  <ProtectedClient>Default</ProtectedClient>
+  <!-- Default: Disabled -->
+  <PrinterRedirection>Default</PrinterRedirection>
+  <!-- Default: Enabled -->
+  <ClipboardRedirection>Default</ClipboardRedirection>
+
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>C:\Program Files (x86)\Sysinternals</HostFolder>
+      <SandboxFolder>C:\Program Files (x86)\Sysinternals</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+
+    <MappedFolder>
+      <HostFolder>C:\Users\SDL\Code\Personal\dotfiles\windows\Windows Sandbox</HostFolder>
+      <SandboxFolder>C:\Users\WDAGUtilityAccount\Desktop\Host\Windows Sandbox</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+
+  <LogonCommand>
+    <Command>cmd /c &quot;C:\Users\WDAGUtilityAccount\Desktop\Host\Windows Sandbox\Initialize.cmd&quot;</Command>
+  </LogonCommand>
+</Configuration>

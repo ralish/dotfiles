@@ -91,6 +91,8 @@
         "*.vssettings": "xml",
         // wget
         ".wgetrc": "properties",
+        // windows/Windows Sandbox
+        "*.wsb": "xml",
         // wsl
         ".wslconfig": "ini",
         "wsl.conf": "ini",

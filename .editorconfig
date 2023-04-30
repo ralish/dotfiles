@@ -72,6 +72,11 @@ indent_size = 2
 [windows/Windows Performance Recorder/*.xml]
 indent_size = 2
 
+# Windows Sandbox configuration
+[*.wsb]
+indent_size = 2
+insert_final_newline = false
+
 # XDG user directories locale
 [xdg-user-dir/.config/user-dirs.locale]
 insert_final_newline = false
