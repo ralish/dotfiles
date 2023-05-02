@@ -12,8 +12,7 @@ if command -v dotnet > /dev/null; then
     # shellcheck disable=SC2154
     export PATH="$build_path"
 
-    # Command completion
-    # https://docs.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete
+    # Additional setup for specific shells
     # shellcheck disable=SC2154
     if [ -n "$BASH" ]; then
         # shellcheck source=/dev/null
