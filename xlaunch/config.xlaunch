@@ -1,21 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    |========================|
+    | X server configuration |
+    |========================|
+
+    Display (integer) [:<display>]
+    The unique display identifier to use given as a positive integer or zero.
+    Alternatively, "-1" will use the next available display identifier.
+
+    WindowMode (string)
+    Configures how the X server will display programs:
+    - MultiWindow [-multiwindow]
+      Launches the X server in the background, with each program displayed as
+      an individual window on the native Windows desktop. This option is not
+      compatible with using XDMCP.
+    - Fullscreen [-fullscreen]
+      Launches the X server fullscreen.
+    - Windowed
+      Launches the X server in its own window.
+    - Nodecoration [-nodecoration]
+      Launches the X server in its own window with no titlebar.
+
+    XDMCPBroadcast (boolean) [-broadcast]
+    Enables XDMCP and broadcasts BroadcastQuery packets to the network. The
+    first responding display manager will be chosen for the session. Only
+    applies if ClientMode is set to XDMCP.
+
+    XDMCPIndirect (boolean) [-indirect | -query]
+    Enables XDMCP and sends IndirectQuery packets to the host specified by
+    XDMCPHost. If disabled, instead sends Query packets. Only applies if
+    ClientMode is set to XDMCP and XDMCPBroadcast is disabled.
+
+    XDMCPHost (string) [<hostname>]
+    The hostname to send Query or IndirectQuery packets to. Only applies if
+    ClientMode is set to XDMCP and XDMCPBroadcast is disabled.
+
+    XDMCPTerminate (boolean) [-terminate]
+    Terminate the server instead of resetting when the XDMCP sessions ends.
+    Only applies if ClientMode is set to XDMCP.
+
+    Clipboard (boolean) [-clipboard | -noclipboard]
+    Start the integrated clipboard manager.
+
+    Wgl (boolean) [-wgl | -nowgl]
+    Use hardware-accelerated OpenGL rendering. You should also export the
+    LIBGL_ALWAYS_INDIRECT environment variable.
+
+    DisableAC (boolean) [-ac]
+    Disables host-based access control. This enables access by any host, and
+    permits any host to modify the access control list. Use extreme caution!
+
+    ExtraParams (string) [<params>]
+    Extra parameters provided to the X server.
+
+
+    |========================|
+    | X client configuration |
+    |========================|
+
+    ClientMode (string)
+    Configures how X clients will be started:
+    - NoClient
+      Does not start any initial clients (you can start them later).
+    - StartProgram
+      Starts a local or remote program as indicated by LocalClient.
+    - XDMCP
+      Starts a remote XDMCP session. This option is not compatible with an X
+      server running in MultiWindow mode.
+
+    LocalClient (boolean)
+    If enabled, indicates a local program specified by LocalProgram will be
+    launched after starting the X client. If disabled, a remote program will be
+    launched as specified by RemoteProgram and its associated settings.
+
+    LocalProgram (string)
+    Command to run to start a program on the local computer after launching the
+    X client. Only applies if ClientMode is set to StartProgram and LocalClient
+    is enabled.
+
+    RemoteProgram (string)
+    Command to run to start a program on a remote computer after launching the
+    X client. Only applies if ClientMode is set to StartProgram and LocalClient
+    is disabled.
+
+    RemoteHost (string)
+    Address of the remote computer. Only applies when using RemoteProgram.
+
+    RemoteUser (string)
+    Username on the remote computer. Only applies when using RemoteProgram.
+
+    RemoteProtocol (string)
+    Protocol for the remote computer. Only applies when using RemoteProgram.
+    Valid options are "rsh" and "ssh".
+
+    SSHKeyChain (boolean)
+    Use keychain to contact ssh-agent for login to the remote computer. Only
+    applies when RemoteProtocol is set to "ssh".
+
+    SSHTerminal (boolean)
+    Launch the SSH connection via a terminal. This is required for interactive
+    authentication. Only applies when RemoteProtocol is set to "ssh".
+
+    ExtraSSH (string)
+    Extra parameters for the SSH client. Only applies when RemoteProtocol is
+    set to "ssh".
+-->
 <XLaunch
-    WindowMode="MultiWindow"
-    ClientMode="NoClient"
-    LocalClient="False"
     Display="-1"
-    LocalProgram="xcalc"
-    RemoteProgram="xterm"
-    RemotePassword=""
-    PrivateKey=""
-    RemoteHost=""
-    RemoteUser=""
-    XDMCPHost=""
+    WindowMode="MultiWindow"
     XDMCPBroadcast="False"
     XDMCPIndirect="False"
+    XDMCPHost=""
+    XDMCPTerminate="False"
     Clipboard="True"
-    ClipboardPrimary="True"
-    ExtraParams=""
     Wgl="True"
     DisableAC="False"
-    XDMCPTerminate="False"/>
+    ExtraParams=""
+    ClientMode="NoClient"
+    LocalClient="True"
+    LocalProgram="xterm"
+    RemoteProgram="xterm"
+    RemoteHost=""
+    RemoteUser=""
+    RemoteProtocol=""
+    SSHKeyChain="False"
+    SSHTerminal="True"
+    ExtraSSH="" />
