@@ -368,14 +368,15 @@ namespace Fiddler
             Before returning the response headers to a client and reading the
             response body from the server.
 
-            Note if a session has response streaming enabled, the OnBeforeResponse
-            function is called *after* the response was returned to the client. If
-            disabling response streaming is desired, this function is the place to
-            do it (bBufferResponse = true). This may be required if the response
-            headers suggest tampering with the response body may be necessary.
+            If a session has response streaming enabled, the OnBeforeResponse
+            function is called *after* the response was returned to the client.
+            If disabling response streaming is desired, this function is the
+            place to do it (bBufferResponse = true). This may be required if
+            the response headers suggest tampering with the response body may
+            be necessary.
 
-            As the response body has not yet been read from the server note that
-            the responseBodyBytes property is not available in this function.
+            As the response body has not yet been read from the server note
+            that the responseBodyBytes property is not available.
         */
         public static void OnPeekAtResponseHeaders(Session session)
         {
@@ -416,7 +417,7 @@ namespace Fiddler
             }
         }
 
-        // Before returning the server response to the client (excluding errors)
+        // Before returning server response to the client (excluding errors)
         public static void OnBeforeResponse(Session session)
         {
             if (ruleHide304s && session.responseCode == 304)
