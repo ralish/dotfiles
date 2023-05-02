@@ -1,6 +1,6 @@
 $DotFilesSection = @{
     Type    = 'Settings'
-    Name    = '.NET Core'
+    Name    = '.NET'
     Command = @('dotnet')
 }
 
@@ -12,8 +12,8 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 # Opt-out of telemetry
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = 'true'
 
-# How to enable TAB completion for the .NET Core CLI
-# https://docs.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete
+# How to enable tab completion for the .NET CLI
+# https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#powershell
 Register-ArgumentCompleter -Native -CommandName 'dotnet' -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
     dotnet complete --position $cursorPosition $commandAst.ToString() | ForEach-Object {
