@@ -44,8 +44,7 @@
     "workbench.enableExperiments": false,
     "workbench.startupEditor": "readme",
     "workbench.editorAssociations": {
-        "git-rebase-todo": "default",
-        "*.ipynb": "jupyter-notebook"
+        "git-rebase-todo": "default"
     },
 
     // Workbench: Appearance
@@ -93,59 +92,108 @@
     // Application: Telemetry
     "telemetry.telemetryLevel": "off",
 
-    // Built-in extension: Git
+
+    // ##################################################
+    // ###             Built-in extensions            ###
+    // ##################################################
+
+    // Git
     "git.autoStash": true,
     "git.enableSmartCommit": true,
     "git.openRepositoryInParentFolders": "never",
     "git.timeline.date": "authored",
 
-    // Built-in extension: PHP Language Features
+    // PHP Language Features
     "php.validate.executablePath": "C:\\DevEnvs\\PHP\\php.exe",
 
-    // Built-in extension: TypeScript and JavaScript Language Features
+    // TypeScript and JavaScript Language Features
     "typescript.surveys.enabled": false,
 
-    // Extension: .NET Install Tool for Extension Authors
+
+    // ##################################################
+    // ###                 Extensions                 ###
+    // ##################################################
+
+    // .NET Install Tool for Extension Authors
     "dotnetAcquisitionExtension.enableTelemetry": false,
 
-    // Extension: C/C++
+    // AsciiDoc
+    "asciidoc.useWorkspaceRoot": true,
+
+    // Azure Repos
+    "azureRepos.autoFetch.enabled": false,
+
+    // C/C++
     "C_Cpp.autoAddFileAssociations": false,
     "C_Cpp.loggingLevel": "Warning",
 
-    // Extension: C#
+    // C#
     "csharp.suppressHiddenDiagnostics": false,
     // Disabled due to conflict with Visual Studio
-    // https://github.com/OmniSharp/omnisharp-roslyn/issues/2230
+    // See: https://github.com/OmniSharp/omnisharp-roslyn/issues/2230
     "omnisharp.enableEditorConfigSupport": false,
     "omnisharp.enableRoslynAnalyzers": true,
     "omnisharp.loggingLevel": "warning",
 
-    // Extension: CloudFormation Linter
+    // CloudFormation Linter
+    "cfnLint.format.singleQuote": true,
     "cfnLint.validateUsingJsonSchema": true,
 
-    // Extension: CMake Tools
+    // CMake Tools
     "cmake.configureOnOpen": false,
     "cmake.configureOnEdit": false,
 
-    // Extension: DevSkim
+    // Debugger for Java
+    "java.silentNotification": true,
+
+    // Dev Containers
+    "dotfiles.repository": "ralish/dotfiles",
+    "dotfiles.installCommand": "dot-update -a",
+    "dev.containers.copyGitConfig": false,
+    "dev.containers.logLevel": "info",
+
+    // DevSkim
     "devskim.enableBestPracticeRules": true,
     "devskim.enableManualReviewRules": true,
     "devskim.removeFindingsOnClose": true,
+    "devskim.suppressionCommentPlacement": "line above finding",
+    "devskim.suppressionDurationInDays": 0,
 
-    // Extension: GitLens
+    // Doxygen Documentation Generator
+    "doxdocgen.generic.useGitUserName": true,
+    "doxdocgen.generic.useGitUserEmail": true,
+
+    // Extension Pack for Java
+    "java.help.showReleaseNotes": false,
+
+    // Flow Language Support
+    "flow.logLevel": "warn",
+
+    // GitHub Repositories
+    "githubRepositories.autoFetch.enabled": false,
+    "githubRepositories.indexing.verboseDownloadNotification": false,
+
+    // GitLens
     "gitlens.defaultDateStyle": "absolute",
     "gitlens.telemetry.enabled": false,
 
-    // Extension: Java Extension Pack
-    "java.help.showReleaseNotes": false,
+    // IntelliCode
+    "vsintellicode.features.python.deepLearning": "enabled",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
 
-    // Extension: Language Support for Java(TM) by Red Hat
+    // IntelliCode API Usage Examples
+    "intellicodeApiExamples.loggingLevel": "WARN",
+
+    // isort
+    "isort.logLevel": "warn",
+
+    // Language Support for Java
     "java.project.importHint": false,
 
-    // Extension: Lua
-    "Lua.telemetry.enable": false,
+    // Lua
+    "Lua.codeLens.enable": true,
 
-    // Extension: markdownlint
+    // markdownlint
     "markdownlint.config": {
         // Header style
         "MD003": { "style": "setext_with_atx" },
@@ -157,63 +205,89 @@
         "MD026": { "punctuation": ".,;:!" }
     },
 
-    // Extension: PHP Intelephense
+    // Maven for Java
+    "maven.view": "hierarchical",
+    "maven.showInExplorerContextMenu": false,
+
+    // MinifyAll
+    "MinifyAll.openMinifiedDocument": false,
+    "MinifyAll.disableCodeContextMenu": true,
+    "MinifyAll.disableFileExplorerContextMenu": true,
+
+    // NSIS
+    "nsis.showOutputView": "On Warnings & Errors",
+
+    // PHP Intelephense
     "intelephense.telemetry.enabled": false,
 
-    // Extension: PowerShell
+    // PostgreSQL
+    "pgsql.applyLocalization": true,
+    "pgsql.format.keywordCasing": "uppercase",
+
+    // PowerShell
+    "powershell.promptToUpdatePowerShell": false,
+    "powershell.integratedConsole.showOnStartup": false,
+    "powershell.integratedConsole.suppressStartupBanner": true,
     "powershell.codeFormatting.autoCorrectAliases": true,
+    "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
     "powershell.codeFormatting.newLineAfterCloseBrace": false,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
+    "powershell.codeFormatting.useConstantStrings": true,
     "powershell.codeFormatting.useCorrectCasing": true,
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
-    "powershell.integratedConsole.forceClearScrollbackBuffer": true,
-    "powershell.integratedConsole.showOnStartup": false,
-    "powershell.integratedConsole.suppressStartupBanner": true,
     "powershell.pester.useLegacyCodeLens": false,
-    "powershell.scriptAnalysis.settingsPath": "C:\\Users\\SDL\\dotfiles\\posh\\PSScriptAnalyzerSettings.psd1",
+    "powershell.scriptAnalysis.settingsPath": "${env:DOTFILES}/posh/PSScriptAnalyzerSettings.psd1",
 
-    // Extension: Python
-    "python.experiments.enabled": true,
-    "python.languageServer": "Pylance",
-    "python.analysis.typeCheckingMode": "strict",
-    "python.linting.flake8Enabled": true,
-    "python.linting.pylintCategorySeverity.refactor": "Information",
-    "python.pythonPath": "${env:DOTFILES}/.venv",
-    "python.defaultInterpreterPath": "${env:DOTFILES}/.venv",
+    // Prettier
+    "prettier.endOfLine": "auto",
+    "prettier.singleQuote": true,
 
-    // Extension: Red Hat Commons
+    // Project Manager for Java
+    "java.dependency.packagePresentation": "hierarchical",
+
+    // Pylance
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.completeFunctionParens": true,
+    "python.analysis.logLevel": "Warning",
+
+    // Python
+    "python.experiments.enabled": false,
+
+    // Red Hat (multiple extensions)
     "redhat.telemetry.enabled": false,
 
-    // Extension: Remote - Containers
-    "dotfiles.installCommand": "dot-update -a",
-    "dotfiles.repository": "ralish/dotfiles",
-
-    // Extension: Remote - SSH
+    // Remote - SSH
     "remote.SSH.defaultExtensions": [
+        // Select Line Status Bar
         "tomoki1207.selectline-statusbar"
     ],
 
-    // Extension: Remote - WSL
-    "remote.WSL.useShellEnvironment": false,
+    // Remote - Tunnels
+    "remote.tunnels.alwaysUpdateCLI": true,
 
-    // Extension: Select Line Status Bar
+    // Remote Explorer
+    "remote-explorer.foldersSortOrder": "alphabetical",
+
+    // Select Line Status Bar
     "selectline.alignment": "right",
     "selectline.displayFormat": "%d lines",
     "selectline.statusbarPriority": 200,
 
-    // Extension: shell-format
+    // shell-format
     "shellformat.useEditorConfig": true,
 
-    // Extension: ShellCheck
+    // ShellCheck
+    "shellcheck.executablePath": "shellcheck",
     "shellcheck.customArgs": [
-        // Permit following source directives
+        // Follow source directives
         "-x"
     ],
     "shellcheck.useWorkspaceRootAsCwd": true,
+    "shellcheck.disableVersionCheck": true,
+    "shellcheck.logLevel": "warn",
 
-    // Extension: SonarLint
-    "sonarlint.disableTelemetry": true,
+    // SonarLint
     "sonarlint.rules": {
         // Remove commented out code
         "javascript:S125": {
@@ -225,12 +299,9 @@
             "level": "off"
         }
     },
+    "sonarlint.disableTelemetry": true,
 
-    // Extension: Visual Studio IntelliCode
-    "vsintellicode.features.python.deepLearning": "enabled",
-    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
-
-    // Extension: vscode-icons
+    // vscode-icons
     "vsicons.associations.files": [
         {
             "icon": "git",
@@ -259,79 +330,53 @@
     ],
     "vsicons.dontShowNewVersionMessage": true,
 
-    // Extension: XML
+    // WSL
+    "remote.WSL.useShellEnvironment": false,
+
+    // XML
     "xml.codeLens.enabled": true,
     "xml.validation.resolveExternalEntities": true,
 
-    // Extension: XML Tools
+    // XML Tools
     "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
     "xmlTools.removeCommentsOnMinify": true,
 
-    // Extension: YAML
+    // YAML
     "yaml.format.singleQuote": true,
-    // Present due to limitations in the CloudFormation Linter extension. See:
-    // https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/issues/213
-    "yaml.customTags": [
-        "!And",
-        "!And sequence",
-        "!If",
-        "!If sequence",
-        "!Not",
-        "!Not sequence",
-        "!Equals",
-        "!Equals sequence",
-        "!Or",
-        "!Or sequence",
-        "!FindInMap",
-        "!FindInMap sequence",
-        "!Base64",
-        "!Join",
-        "!Join sequence",
-        "!Cidr",
-        "!Ref",
-        "!Sub",
-        "!Sub sequence",
-        "!GetAtt",
-        "!GetAZs",
-        "!ImportValue",
-        "!ImportValue sequence",
-        "!Select",
-        "!Select sequence",
-        "!Split",
-        "!Split sequence"
-    ],
-    // Present due to limitations in the CloudFormation Linter extension. See:
-    // https://github.com/aws-cloudformation/cfn-lint-visual-studio-code/issues/214
-    "yaml.validate": false,
+
+
+    // ##################################################
+    // ###           Language customisations          ###
+    // ##################################################
 
     "[git-commit]": {
-        // Configure Rewrap extension
+        // Rewrap extension
         "rewrap.autoWrap.enabled": true,
         "rewrap.wrappingColumn": 72
     },
 
     "[html]": {
-        // Use VS Code's built-in formatter
+        // Use built-in formatter
         "editor.defaultFormatter": "vscode.html-language-features"
     },
 
     "[javascript]": {
-        // Use VS Code's built-in formatter
+        // Use built-in formatter
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
 
     "[json]": {
-        // Use VS Code's built-in formatter
+        // Use built-in formatter
         "editor.defaultFormatter": "vscode.json-language-features"
     },
 
     "[jsonc]": {
-        // Use VS Code's built-in formatter
+        // Use built-in formatter
         "editor.defaultFormatter": "vscode.json-language-features"
     },
 
     "[markdown]": {
-        // Use Markdown All in One extension for formatting
+        // Use Markdown All in One extension formatter
         "editor.defaultFormatter": "yzhang.markdown-all-in-one",
 
         // Trailing whitespace has special meaning
@@ -349,12 +394,12 @@
     },
 
     "[xml]": {
-        // Use Red Hat XML extension for formatting
+        // Use Red Hat XML extension formatter
         "editor.defaultFormatter": "redhat.vscode-xml"
     },
 
     "[yaml]": {
-        // Use Red Hat YAML extension for formatting
+        // Use Red Hat YAML extension formatter
         "editor.defaultFormatter": "redhat.vscode-yaml"
     }
 }
