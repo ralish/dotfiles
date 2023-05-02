@@ -9,19 +9,24 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
     return
 }
 
-# dotnet-suggest
-# https://github.com/dotnet/command-line-api/blob/main/docs/dotnet-suggest.md
+# Tab completion for System.CommandLine
+# https://learn.microsoft.com/en-us/dotnet/standard/commandline/tab-completion
 $env:DOTNET_SUGGEST_SCRIPT_VERSION = '1.0.2'
 
-$RegisteredApps = (dotnet-suggest list | Out-String).Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries)
+# Determine the list of apps registered for suggestions and exclude the .NET
+# CLI (dotnet) as it has its own built-in support.
+$RegisteredAppsRaw = (dotnet-suggest list) | Out-String
+$RegisteredAppsSplit = $RegisteredAppsRaw.Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries)
+$RegisteredApps = $RegisteredAppsSplit | Where-Object { $_ -ne 'dotnet' }
+
 Register-ArgumentCompleter -Native -CommandName $RegisteredApps -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
-    $CommandPath = (Get-Command -Name $commandAst.CommandElements[0]).Source
-    $CommandArgs = $CommandAst.Extent.ToString().Replace('"', '\"')
-    dotnet-suggest get -e $CommandPath --position $cursorPosition -- $CommandArgs | ForEach-Object {
+    $Local:CommandPath = (Get-Command -Name $commandAst.CommandElements[0]).Source
+    $Local:CommandArgs = $CommandAst.Extent.ToString().Replace('"', '\"')
+    dotnet-suggest get -e $Local:CommandPath --position $cursorPosition -- $Local:CommandArgs | ForEach-Object {
         [Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
     }
 }
 
-Remove-Variable -Name 'RegisteredApps'
+Remove-Variable -Name 'RegisteredApps', 'RegisteredAppsRaw', 'RegisteredAppsSplit'
 Complete-DotFilesSection
