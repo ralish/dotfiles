@@ -343,6 +343,7 @@ Function Update-Windows {
         return $false
     }
 
+    # TODO: PSWindowsUpdate seems to return three copies of all results?
     $Results = $false
     if ($WhatIfPreference) {
         $Results = Get-WindowsUpdate -AcceptAll:$AcceptAll -IgnoreReboot -NotTitle 'Silverlight'
