@@ -1031,7 +1031,11 @@ Function Update-QtComponents {
 
         if ($PSCmdlet.ShouldProcess('Qt components', 'Update')) {
             Write-Verbose -Message 'Updating Qt components: MaintenanceTool update'
-            & $QtMtPath @QtMtArgs
+            & $QtMtPath @QtMtArgs | Where-Object {
+                # HACK: Suppress useless output from what is presumably a bug
+                # in the code responsible for calculating the update progress.
+                $_ -notmatch 'The fraction is outside from possible value'
+            }
         }
     }
 }
