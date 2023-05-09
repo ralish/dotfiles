@@ -163,7 +163,12 @@
         },
         {
             "icon": "git",
-            "extensions": [".git-for-windows-updater", ".gitconfig-priv", ".gitconfig-win", ".keepme"],
+            "extensions": [
+                ".git-for-windows-updater",
+                ".gitconfig-priv",
+                ".gitconfig-win",
+                ".keepme"
+            ],
             "filename": true,
             "format": "svg"
         },
@@ -199,7 +204,12 @@
         },
         {
             "icon": "text",
-            "extensions": [".bash_history", ".ignore", "clink_history", "user-dirs.locale"],
+            "extensions": [
+                ".bash_history",
+                ".ignore",
+                "clink_history",
+                "user-dirs.locale"
+            ],
             "filename": true,
             "format": "svg"
         },
