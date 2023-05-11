@@ -61,6 +61,16 @@ echo '[apt] Removing package indexes ...'
 rm -rf /var/lib/apt/lists
 mkdir -p /var/lib/apt/lists/partial
 
+if command -v snap > /dev/null; then
+    echo '[snap] Disabling automatic updates ...'
+    snap refresh --hold
+    echo
+
+    echo '[snap] Updating all snaps ...'
+    snap refresh
+    echo
+fi
+
 if [[ -f /etc/sudoers ]]; then
     echo '[sudo] Disabling password prompts ...'
     sed -i 's/^root[[:blank:]].*/root    ALL=(ALL) NOPASSWD: ALL/' /etc/sudoers
