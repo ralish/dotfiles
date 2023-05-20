@@ -37,6 +37,9 @@ temp/
 [._]ss[a-gi-z]
 [._]sw[a-p]
 
+# Visual Studio Code
+/.vscode/ipch/
+
 
 ##################
 ### Components ###
@@ -112,8 +115,5 @@ temp/
 /firefox/
 /msie/
 /safari/
-
-# Visual Studio Code
-/.vscode/ipch/
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
