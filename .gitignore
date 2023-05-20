@@ -25,6 +25,11 @@ ehthumbs_vista.db
 tmp/
 temp/
 
+# Office
+~$*.doc*
+~$*.ppt*
+~$*.xls*
+
 # Python
 /.venv/
 
