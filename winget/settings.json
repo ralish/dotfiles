@@ -1,11 +1,28 @@
 {
+    /*
+     * Windows Package Manager (WinGet) settings
+     *
+     * Last reviewed release: v1.4.10173
+     * Default file path: %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json
+     */
+
     "$schema": "https://aka.ms/winget-settings.schema.json",
 
-    "installBehavior": {
-        "preferences": {
-            "locale": ["en-AU", "en-GB", "en-US"],
-            "scope": "user"
-        }
+    "interactivity": {
+        "disable": false
+    },
+
+    "logging": {
+        "level": "info"
+    },
+
+    "network": {
+        "downloader": "default",
+        "doProgressTimeoutInSeconds": 60
+    },
+
+    "source": {
+        "autoUpdateIntervalInMinutes": 5
     },
 
     "telemetry": {
@@ -13,6 +30,22 @@
     },
 
     "visual": {
+        "anonymizeDisplayedPaths": true,
         "progressBar": "accent"
+    },
+
+    "installBehavior": {
+        "disableInstallNotes": false,
+        "ignoreWarnings": false,
+
+        "preferences": {
+            "architectures": ["x64", "x86", "neutral"],
+            "locale": ["en-AU", "en-GB", "en-US"],
+            "scope": "user"
+        }
+    },
+
+    "uninstallBehavior": {
+        "purgePortablePackage": false
     }
 }
