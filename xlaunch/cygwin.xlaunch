@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
+    XLaunch configuration for Cygwin/X
+    Last reviewed release: v20160530-1
+
     |========================|
     | X server configuration |
     |========================|
@@ -52,7 +55,6 @@
 
     ExtraParams (string) [<params>]
     Extra parameters provided to the X server.
-
 
     |========================|
     | X client configuration |
