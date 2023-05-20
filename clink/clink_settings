@@ -1,6 +1,6 @@
 # Clink configuration
 #
-# Last reviewed release: v1.4.0
+# Last reviewed release: v1.4.24
 
 # ---------------------------------- Clink ------------------------------------
 
@@ -208,6 +208,10 @@ history.max_lines = 25000
 # Automatically perform history expansion on accepting a command line
 history.auto_expand = True
 
+# If the text at the cursor is subject to history expansion, show a preview of
+# the expanded result below the input line.
+history.show_preview = True
+
 # Save and optionally display history timestamps
 #
 # Valid values:
@@ -274,6 +278,9 @@ lua.break_on_traceback = False
 
 # -------------------------------- Matching -----------------------------------
 
+# Expand abbreviated paths before performing completion
+match.expand_abbrev = True
+
 # Expand environment variables in a word before performing completion
 match.expand_envvars = True
 
@@ -329,6 +336,14 @@ match.wild = True
 
 # Adjust the cursor shape and visibility for certain events
 terminal.adjust_cursor_style = True
+
+# Indicates if the terminal draws emoji using coloured double width characters
+#
+# Valid values:
+# - auto
+# - emulate
+# - native
+terminal.color_emoji = auto
 
 # Generate special key sequences for Ctrl+Tab, Ctrl+I, Ctrl+M, and Ctrl+[ to
 # enables binding them separately from the Backspace, Tab, Enter, or Esc keys.
