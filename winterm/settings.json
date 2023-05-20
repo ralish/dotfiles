@@ -1,4 +1,11 @@
 {
+    /*
+     * Windows Terminal settings
+     *
+     * Last reviewed release: v1.16.10262.0
+     * Default file path: %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
+     */
+
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
 
@@ -21,11 +28,13 @@
     "tabSwitcherMode": "inOrder",
     "focusFollowMouse": false,
     "experimental.detectURLs": true,
+    "confirmCloseAllTabs": false,
 
     // Appearance
     "theme": "dark",
-    "alwaysShowTabs": true,
+    "newTabPosition": "afterLastTab",
     "showTabsInTitlebar": true,
+    "alwaysShowTabs": true,
     "useAcrylicInTabRow": false,
     "showTerminalTitleInTitlebar": false,
     "alwaysOnTop": false,
@@ -33,22 +42,14 @@
     "disableAnimations": false,
     "alwaysShowNotificationIcon": false,
     "minimizeToNotificationArea": false,
+    "autoHideWindow": false,
+
+    // Color schemes
+    "schemes": [],
 
     // Rendering
     "experimental.rendering.forceFullRepaint": false,
     "experimental.rendering.software": false,
-
-    // Advanced (not in UI)
-    "centerOnLaunch": true,
-    "confirmCloseAllTabs": false,
-    "disabledProfileSources": ["Windows.Terminal.Azure"],
-    "inputServiceWarning": true,
-    "largePasteWarning": true,
-    "multiLinePasteWarning": true,
-    "showAdminShield": true,
-
-    // Color schemes
-    "schemes": [],
 
     // Actions
     "actions": [
@@ -66,12 +67,19 @@
         }
     ],
 
+    // Advanced (not in UI)
+    "centerOnLaunch": true,
+    "disabledProfileSources": ["Windows.Terminal.Azure"],
+    "inputServiceWarning": true,
+    "largePasteWarning": true,
+    "multiLinePasteWarning": true,
+    "showAdminShield": true,
+
     // Profiles
     "profiles": {
         "defaults": {
             // General
             "startingDirectory": null,
-            //"icon": "\ue756",
             "tabTitle": null,
             "elevate": false,
 
@@ -83,6 +91,7 @@
                 "weight": "normal"
             },
             "experimental.retroTerminalEffect": false,
+            "adjustIndistinguishableColors": "never",
 
             // Appearance: Cursor
             "cursorShape": "bar",
@@ -91,7 +100,7 @@
             "backgroundImage": null,
             "backgroundImageStretchMode": "uniformToFill",
             "backgroundImageAlignment": "center",
-            "backgroundImageOpacity": 1,
+            "backgroundImageOpacity": 1.0,
 
             // Appearance: Text Formatting
             "intenseTextStyle": "bright",
@@ -111,7 +120,8 @@
             "snapOnInput": true,
             "historySize": 10000,
             "closeOnExit": "graceful",
-            "bellStyle": "none"
+            "bellStyle": "none",
+            "useAtlasEngine": true
         },
 
         "list": [
@@ -151,6 +161,7 @@
                 "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
 
                 "commandline": "%LocalAppData%\\Microsoft\\WindowsApps\\ubuntu.exe",
+                "startingDirectory": "/home/sdl",
                 "colorScheme": "Solarized Dark",
                 "closeOnExit": "always"
             },
