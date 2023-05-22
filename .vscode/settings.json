@@ -27,6 +27,7 @@
         ".gitconfig": "ini",
         ".gitconfig-priv": "ini",
         "**/git/bin/*": "shellscript",
+        "**/git/hooks/*": "shellscript",
         // git-win
         ".git-for-windows-updater": "ini",
         ".gitconfig-win": "ini",

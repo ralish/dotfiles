@@ -6,5 +6,6 @@
 
     <IgnorePaths>
         <IgnorePath>bin</IgnorePath>
+        <IgnorePath>hooks</IgnorePath>
     </IgnorePaths>
 </Component>

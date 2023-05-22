@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+DOTFILES_DIR="$(git rev-parse --show-toplevel)"
+OPENSSH_BASH="$DOTFILES_DIR/openssh/bin/update-openssh-config"
+OPENSSH_POSH="$DOTFILES_DIR/posh/Functions/OpenSSH.ps1"
+
+if [[ ${OS-} == 'Windows_NT' ]]; then
+    read -r -d '' posh_cmd << EOF
+        Function Start-DotFilesSection {};
+        Function Complete-DotFilesSection {};
+        New-Item -Path Variable:\DotFilesPath -Value "$DOTFILES_DIR" | Out-Null;
+        . "$OPENSSH_POSH";
+        Update-OpenSSHConfig
+EOF
+
+    if command -v pwsh > /dev/null; then
+        posh_bin='pwsh'
+    elif command -v powershell > /dev/null; then
+        posh_bin='powershell'
+    else
+        echo 'Skipping updating OpenSSH config as PowerShell not found.'
+        exit
+    fi
+
+    echo "Updating OpenSSH config ($posh_bin) ..."
+    echo "$posh_cmd" | $posh_bin -NoLogo -NonInteractive -Command -
+else
+    echo "Updating OpenSSH config (bash) ..."
+    "$OPENSSH_BASH"
+fi
+
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
