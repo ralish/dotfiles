@@ -36,4 +36,4 @@ function _dotnet_suggest_bash_register() {
 _dotnet_suggest_bash_register
 unset -f _dotnet_suggest_bash_register
 
-# vim: syntax=bash cc=80 tw=79 ts=4 sw=4 sts=4 et sr
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

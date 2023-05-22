@@ -12,7 +12,7 @@ fi
 # less can read lesskey source from version 582 (deprecating lesskey)
 # shellcheck disable=SC2312
 less_version=$(less -V | grep -Eo '^less \S+' | grep -Eo '[0-9]+')
-if (( less_version >= 582 )); then
+if ((less_version >= 582)); then
     exit "$DETECTION_SUCCESS"
 fi
 

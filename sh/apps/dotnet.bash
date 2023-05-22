@@ -14,4 +14,4 @@ function _dotnet_cli_bash_complete() {
 
 complete -F _dotnet_cli_bash_complete dotnet
 
-# vim: syntax=bash cc=80 tw=79 ts=4 sw=4 sts=4 et sr
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
