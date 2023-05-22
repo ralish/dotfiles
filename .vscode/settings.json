@@ -52,6 +52,7 @@
         "**/.ssh/includes/*": "ssh_config",
         "**/.ssh/keys/*": "plain",
         "**/.ssh/templates/*": "ssh_config",
+        "**/openssh/bin/*": "shellscript",
         // openssl
         "**/openssl/*.cnf": "ini",
         // pgsql

@@ -10,4 +10,8 @@
     <InstallPath>
         <HideSymlinks>true</HideSymlinks>
     </InstallPath>
+
+    <IgnorePaths>
+        <IgnorePath>bin</IgnorePath>
+    </IgnorePaths>
 </Component>

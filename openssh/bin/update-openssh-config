@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+
+# Generate OpenSSH configuration
+
+# A better class of script...
+set -o errexit          # Exit on most errors (see the manual)
+set -o errtrace         # Make sure any error trap is inherited
+set -o nounset          # Disallow expansion of unset variables
+set -o pipefail         # Use last non-zero exit code in a pipeline
+#set -o xtrace          # Trace the execution of the script (debug)
+
+# DESC: Usage help
+# ARGS: None
+# OUTS: None
+function script_usage() {
+    cat << EOF
+Usage:
+     -h|--help                  Displays this help
+     -v|--verbose               Displays verbose output
+    -nc|--no-colour             Disables colour output
+EOF
+}
+
+# DESC: Parameter parser
+# ARGS: $@ (optional): Arguments provided to the script
+# OUTS: Variables indicating command-line parameters and options
+function parse_params() {
+    local param
+
+    while [[ $# -gt 0 ]]; do
+        param="$1"
+        shift
+        case $param in
+            -h | --help)
+                script_usage
+                exit 0
+                ;;
+            -v | --verbose)
+                verbose=true
+                ;;
+            -nc | --no-colour)
+                no_colour=true
+                ;;
+            *)
+                echo "Invalid parameter was provided: $param"
+                exit 1
+                ;;
+        esac
+    done
+}
+
+# DESC: Find some important paths we need before script_init() is called
+# ARGS: None
+# OUTS: $script_real_path: The full canonicalized path to the script
+#       $script_real_dir: The canonicalized directory path of the script
+#       $script_real_name: The canonicalized file name of the script
+#       $dotfiles_path: The dotfiles directory path
+#       $dotfiles_name: The dotfiles directory name
+# shellcheck disable=SC2034
+function early_init() {
+    # Determine the physical directory this script resides in. This approach is
+    # necessarily clumsy as simple methods like "readlink -f" and "realpath"
+    # are not platform independent. We have to work on Linux, BSD, OS X, etc...
+    script_real_path="$(perl -MCwd -le 'print Cwd::abs_path(shift)' "${BASH_SOURCE[0]}")"
+    script_real_dir="$(dirname "$script_real_path")"
+    script_real_name="$(basename "$script_real_path")"
+    readonly script_real_path script_real_dir script_real_name
+
+    # Dotfiles directory path & name
+    dotfiles_path="$(cd -P "$script_real_dir/../../" && pwd)"
+    dotfiles_name="$(basename "$dotfiles_path")"
+    readonly dotfiles_path dotfiles_name
+}
+
+# DESC: Set variables containing required OpenSSH metadata
+# ARGS: None
+# OUTS: $openssh_dir:       OpenSSH base directory
+#       $openssh_cfg:       OpenSSH config file
+#       $openssh_cfg_tmp:   OpenSSH temporary config file
+#       $openssh_includes:  OpenSSH config includes directory
+#       $openssh_templates: OpenSSH config templates directory
+#       $openssh_banner:    OpenSSH config banner file
+#       $new_directives[]:  OpenSSH directives introduced by version
+function openssh_metadata() {
+    # Paths to OpenSSH files and directories under dotfiles
+    readonly openssh_dir="$dotfiles_path/openssh/.ssh"
+    readonly openssh_cfg="$openssh_dir/config"
+    readonly openssh_cfg_tmp="$openssh_cfg.tmp"
+    readonly openssh_includes="$openssh_dir/includes"
+    readonly openssh_templates="$openssh_dir/templates"
+    readonly openssh_banner="$openssh_templates/banner"
+
+    # Directives introduced in a given OpenSSH version. We need this to filter
+    # out unsupported directives when used in an included configuration.
+    declare -g -A new_directives
+    new_directives['91']='RequiredRSASize'
+}
+
+# DESC: Check for a supported OpenSSH version
+# ARGS: None
+# OUTS: $ssh_version:   OpenSSH version with dot removed
+#       $ssh_template:  OpenSSH config template
+function openssh_check_version() {
+    local ssh_version_raw ssh_version_num
+    ssh_version_raw="$(ssh -V 2>&1)"
+    ssh_version_num="$(echo "$ssh_version_raw" | grep -Eo '^[A-Za-z_]+[0-9]\.[0-9]' | grep -Eo '[0-9]\.[0-9]' || true)"
+    if [[ -z $ssh_version_num ]]; then
+        script_exit "Failed to extract version: $ssh_version_raw" 2
+    fi
+
+    ssh_version="${ssh_version_num//./}"
+    ssh_template="$(printf '%s/ssh_config.%s' "$openssh_templates" "$ssh_version")"
+    readonly ssh_version ssh_template
+
+    if ! [[ -f $ssh_template ]]; then
+        script_exit "Unsupported OpenSSH version: $ssh_version_num" 1
+    fi
+}
+
+# DESC: Build OpenSSH configuration
+# ARGS: None
+# OUTS: None
+function openssh_build_config() {
+    shopt -s nullglob
+
+    # Build the configuration
+    echo -n > "$openssh_cfg_tmp"
+    chmod 0600 "$openssh_cfg_tmp"
+    head -n -1 "$openssh_banner" >> "$openssh_cfg_tmp"
+    for include in "$openssh_includes"/*; do
+        head -n -1 "$include" >> "$openssh_cfg_tmp"
+        echo >> "$openssh_cfg_tmp"
+    done
+    cat "$ssh_template" >> "$openssh_cfg_tmp"
+
+    # Remove unsupported configuration directives
+    for directives_ver in "${!new_directives[@]}"; do
+        if ((ssh_version < directives_ver)); then
+            # shellcheck disable=SC2068
+            for directive in ${new_directives[@]}; do
+                # TODO: Handle any previous comment and subsequent new-line
+                # shellcheck disable=SC1087
+                sed -i "/^[[:blank:]]*$directive[[:blank:]]\+[^[:blank:]]\+/d" "$openssh_cfg_tmp"
+            done
+        fi
+    done
+
+    # Move the generated configuration into place
+    mv "$openssh_cfg_tmp" "$openssh_cfg"
+}
+
+# DESC: Main control flow
+# ARGS: $@ (optional): Arguments provided to the script
+# OUTS: None
+function main() {
+    early_init
+
+    # shellcheck source=scripts/bin/bash-template.sh
+    source "$dotfiles_path/scripts/bin/bash-template.sh"
+
+    trap script_trap_err ERR
+    trap script_trap_exit EXIT
+
+    script_init "$@"
+    parse_params "$@"
+    colour_init
+
+    check_binary ssh fatal
+    check_binary sed fatal
+
+    openssh_metadata
+    openssh_check_version
+    openssh_build_config
+}
+
+main "$@"
+
+# vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
