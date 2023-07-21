@@ -147,6 +147,7 @@ function main() {
         scripts/bin/dl-shellcheck || true
         scripts/bin/dl-shfmt || true
 
+        # shellcheck disable=SC2310
         if check_binary docker; then
             scripts/bin/dl-hadolint
         fi
