@@ -2,7 +2,7 @@
     /*
      * Windows Terminal settings
      *
-     * Last reviewed release: v1.16.10262.0
+     * Last reviewed release: v1.17.11461.0
      * Default file path: %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
      */
 
@@ -13,10 +13,12 @@
     "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
     "startOnUserLogin": false,
     "firstWindowPreference": "defaultProfile",
-    "launchMode": "maximized",
-    "windowingBehavior": "useExisting",
+    "windowingBehavior": "useNew",
     "initialCols": 120,
     "initialRows": 30,
+    "launchMode": "maximized",
+    "initialPosition": ",",
+    "centerOnLaunch": true,
 
     // Interaction
     "copyOnSelect": true,
@@ -31,7 +33,10 @@
     "confirmCloseAllTabs": false,
 
     // Appearance
-    "theme": "dark",
+    "theme": {
+        "dark": "dark",
+        "light": "light"
+    },
     "newTabPosition": "afterLastTab",
     "showTabsInTitlebar": true,
     "alwaysShowTabs": true,
@@ -68,12 +73,34 @@
     ],
 
     // Advanced (not in UI)
-    "centerOnLaunch": true,
-    "disabledProfileSources": ["Windows.Terminal.Azure"],
+    "disabledProfileSources": [
+        "Windows.Terminal.Azure"
+    ],
     "inputServiceWarning": true,
     "largePasteWarning": true,
     "multiLinePasteWarning": true,
     "showAdminShield": true,
+    "experimental.enableColorSelection": false,
+    "experimental.input.forceVT": false,
+    "experimental.useBackgroundImageForWindow": false,
+
+    // New Tab Menu (not in UI)
+    "newTabMenu": [
+        {
+            "type": "remainingProfiles"
+        },
+        {
+            "type": "folder",
+            "name": "Visual Studio",
+            "icon": "ms-appx:///ProfileIcons/{550ce7b8-d500-50ad-8a1a-c400c3262db3}.png",
+            "entries": [
+                {
+                    "type": "matchProfiles",
+                    "source": "Windows.Terminal.VisualStudio"
+                }
+            ]
+        }
+    ],
 
     // Profiles
     "profiles": {
@@ -84,7 +111,10 @@
             "elevate": false,
 
             // Appearance: Text
-            "colorScheme": "Campbell",
+            "colorScheme": {
+                "dark": "Campbell",
+                "light": "Campbell"
+            },
             "font": {
                 "face": "Hack NF",
                 "size": 10,
@@ -130,38 +160,43 @@
                 "source": "Windows.Terminal.PowershellCore",
                 "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
 
-                "commandline": "%ProgramFiles%\\PowerShell\\7\\pwsh.exe -NoLogo"
+                "commandline": "\"%ProgramFiles%\\PowerShell\\7\\pwsh.exe\" -NoLogo"
             },
             {
                 "name": "Windows PowerShell",
-                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}", // User default
 
                 "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoLogo"
             },
             {
                 "name": "Command Prompt",
-                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}", // User default
 
-                "commandline": "%SystemRoot%\\System32\\cmd.exe",
+                "commandline": "%SystemRoot%\\System32\\cmd.exe /K \"%DOTFILES%\\cmd\\SetupEnv.cmd\"",
                 "closeOnExit": "always"
             },
             {
                 "name": "Ubuntu",
                 "source": "Windows.Terminal.Wsl",
                 "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+                "hidden": true,
 
-                "commandline": "%SystemRoot%\\System32\\wsl.exe -d Ubuntu",
                 "startingDirectory": "/home/sdl",
-                "colorScheme": "Solarized Dark",
+                "colorScheme": {
+                    "dark": "Solarized Dark",
+                    "light": "Solarized Light"
+                },
                 "closeOnExit": "always"
             },
             {
                 "name": "Ubuntu",
-                "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc",
+                "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc", // Fragment
                 "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
 
-                "commandline": "%LocalAppData%\\Microsoft\\WindowsApps\\ubuntu.exe",
-                "colorScheme": "Solarized Dark",
+                "colorScheme": {
+                    "dark": "Solarized Dark",
+                    "light": "Solarized Light"
+                },
                 "closeOnExit": "always"
             },
             {
@@ -169,52 +204,63 @@
                 "source": "Windows.Terminal.Wsl",
                 "guid": "{46ca431a-3a87-5fb3-83cd-11ececc031d2}",
 
-                "commandline": "%SystemRoot%\\System32\\wsl.exe -d kali-linux",
                 "startingDirectory": "/home/sdl",
-                "colorScheme": "Solarized Dark",
+                "colorScheme": {
+                    "dark": "Solarized Dark",
+                    "light": "Solarized Light"
+                },
                 "closeOnExit": "always"
             },
             {
                 "name": "Git Bash",
-                "source": "Git",
+                "source": "Git", // Fragment
                 "guid": "{2ece5bfe-50ed-5f3a-ab87-5cd4baafed2b}",
 
-                "commandline": "%ProgramFiles%\\Git\\bin\\bash.exe -i -l",
                 "closeOnExit": "always"
             },
             {
-                "name": "Developer Command Prompt for VS 2019",
+                "name": "VS 2019 - Cmd",
                 "source": "Windows.Terminal.VisualStudio",
-                "guid": "{59771b87-e259-5f7e-a309-fc31d6190dba}",
+                // Tied to the VS instance ID which is unique to an install
+                "guid": "{03c598fc-f2c0-5201-b431-c37bd3f33dd7}",
+                "hidden": false,
 
-                "commandline": "%ComSpec% /k \"%ProgramFiles(x86)%\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\VsDevCmd.bat\"",
                 "startingDirectory": "%USERPROFILE%",
                 "closeOnExit": "always"
             },
             {
-                "name": "Developer PowerShell for VS 2019",
+                "name": "VS 2019 - PowerShell",
                 "source": "Windows.Terminal.VisualStudio",
-                "guid": "{e328694f-d477-5b27-affb-74320d074101}",
+                // Tied to the VS instance ID which is unique to an install
+                "guid": "{1410e166-3e23-5b6f-82c1-4a5ce508d89d}",
+                "hidden": false,
 
-                "commandline": "%SystemRoot%\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -NoExit -Command \"& { Import-Module \"$env:ProgramFiles\\Microsoft Visual Studio\\2019\\Professional\\Common7\\Tools\\Microsoft.VisualStudio.DevShell.dll\"; Enter-VsDevShell 45ad4e04 }\"",
                 "startingDirectory": "%USERPROFILE%"
             },
             {
-                "name": "Developer Command Prompt for VS 2022",
+                "name": "VS 2022 - Cmd",
                 "source": "Windows.Terminal.VisualStudio",
-                "guid": "{b00471e1-8900-5d14-9e92-f8542faceaed}",
+                // Tied to the VS instance ID which is unique to an install
+                "guid": "{fcc17ad9-8454-5ce9-a23a-da26afb17c58}",
+                "hidden": false,
 
-                "commandline": "%ComSpec% /k \"%ProgramFiles%\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\VsDevCmd.bat\"",
                 "startingDirectory": "%USERPROFILE%",
                 "closeOnExit": "always"
             },
             {
-                "name": "Developer PowerShell for VS 2022",
+                "name": "VS 2022 - PowerShell",
                 "source": "Windows.Terminal.VisualStudio",
-                "guid": "{264e4e11-d916-5289-b8f4-b6ef5433d1d7}",
+                // Tied to the VS instance ID which is unique to an install
+                "guid": "{7b70a87b-8ccd-569a-833f-e8e5f164ceab}",
+                "hidden": false,
 
-                "commandline": "%SystemRoot%\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe -NoExit -Command \"& { Import-Module \"$env:ProgramW6432\\Microsoft Visual Studio\\2022\\Professional\\Common7\\Tools\\Microsoft.VisualStudio.DevShell.dll\"; Enter-VsDevShell 20622545 }\"",
                 "startingDirectory": "%USERPROFILE%"
+            },
+            {
+                "name": "Visual Studio Debug Console",
+                "source": "VSDebugConsole", // Fragment
+                "guid": "{16208362-94fc-5b1f-a491-5b2624d5ab56}",
+                "hidden": true
             }
         ]
     }
