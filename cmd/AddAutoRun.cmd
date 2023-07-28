@@ -15,5 +15,5 @@ IF [%DOTFILES%] == [] (
 REG ADD "HKCU\Software\Microsoft\Command Processor" ^
     /v AutoRun ^
     /t REG_EXPAND_SZ ^
-    /d "IF NOT DEFINED SetupEnv ""%%DOTFILES%%\cmd\SetupEnv.cmd""" ^
+    /d """%%DOTFILES%%\cmd\SetupEnv.cmd""" ^
     /f
