@@ -20,7 +20,7 @@ IF /I "%CD%" == "%SystemRoot%\System32" (
 @REM ##########################################################################
 
 WHERE /Q "clink.cmd"
-IF ERRORLEVEL 0 (
+IF NOT ERRORLEVEL 1 (
     @REM Found in %%PATH%% (likely installed via Scoop or similar)
     SET ClinkPath="clink.cmd"
     GOTO ClinkRun
