@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="SimpleValueType">
+    <xs:restriction base="xs:unsignedShort">
+      <xs:minInclusive value="1"></xs:minInclusive>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="KeyboardShortcutType">
+    <xs:attribute name="WinKey" type="xs:boolean" use="required" />
+    <xs:attribute name="CtrlKey" type="xs:boolean" use="required" />
+    <xs:attribute name="ShiftKey" type="xs:boolean" use="required" />
+    <xs:attribute name="AltKey" type="xs:boolean" use="required" />
+    <xs:attribute name="CharKey" type="xs:string" use="required" />
+    <xs:attribute name="VirtualKeyCode" type="xs:unsignedShort" use="required" />
+  </xs:complexType>
+  <xs:element name="WindowsPerformanceRecorder">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Configuration">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="MaxProfilesToStart">
+                <xs:complexType>
+                  <xs:attribute name="Value" type="SimpleValueType" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="QueryRuntimePropertiesInterval">
+                <xs:complexType>
+                  <xs:attribute name="Value" type="SimpleValueType" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="SaveRecordingKeyboardShortcut" type="KeyboardShortcutType" />
+              <xs:element name="SaveWaypointsKeyboardShortcut" type="KeyboardShortcutType" />
+              <xs:element name="FireEventKeyboardShortcut" type="KeyboardShortcutType" />
+              <xs:element name="NGenPdbsCachePath">
+                <xs:complexType>
+                  <xs:attribute name="Value" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="Version" type="xs:decimal" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

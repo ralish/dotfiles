@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<WindowsPerformanceRecorder Version="1.0">
+<!--
+  Windows Performance Recorder configuration
+  https://learn.microsoft.com/en-us/windows-hardware/test/wpt/windows-performance-recorder
+
+  Last reviewed release: Windows 11 22H2
+
+  The XML schema is included in wpr.exe as an RCData resource.
+-->
+<WindowsPerformanceRecorder Version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="wpr.config.xsd">
   <Configuration>
     <MaxProfilesToStart Value="64" />
     <QueryRuntimePropertiesInterval Value="1000" />
