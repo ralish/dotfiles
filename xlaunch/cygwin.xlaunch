@@ -3,6 +3,11 @@
     XLaunch configuration for Cygwin/X
     Last reviewed release: v20160530-1
 
+    There's no XML schema seemingly available so the supported settings have
+    been determined from the documentation and inspecting the source. Note as
+    well that the schema available from StraightRunning is not compatible as
+    it's for a different release (fork?) of XLaunch.
+
     |========================|
     | X server configuration |
     |========================|
