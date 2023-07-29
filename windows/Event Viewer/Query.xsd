@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Sourced from the Windows SDK: Include\<version>\um\eventlogquery.xsd -->
 <xs:schema targetNamespace="http://schemas.microsoft.com/win/2004/08/events/eventquery" elementFormDefault="qualified" xmlns="http://schemas.microsoft.com/win/2004/08/events/eventquery" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:complexType name="QueryType">
     <xs:choice maxOccurs="unbounded">
