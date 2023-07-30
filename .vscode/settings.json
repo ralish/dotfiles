@@ -105,7 +105,7 @@
 
     // Files to hide in Explorer tree
     "files.exclude": {
-        "**/.venv/**": true,
+        "**/.venv": true,
         "**/~$*.doc*": true,
         "**/~$*.ppt*": true,
         "**/~$*.xls*": true
