@@ -16,6 +16,7 @@
 
 [advice]
 	addEmptyPathspec = false
+	addIgnoredFile = false
 	statusHints = false
 
 [apply]
