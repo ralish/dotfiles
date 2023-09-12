@@ -39,6 +39,7 @@ foreach ($GuidService in $GuidServices) {
         Guid    = $ServiceGuid
         Path    = $ServicePath
         Status  = 'Unknown'
+        Details = [String]::Empty
         Matches = $null
     }
     $Results.Add($ServiceInfo)
@@ -47,18 +48,31 @@ foreach ($GuidService in $GuidServices) {
     try {
         $TcpipParamsKey = Get-Item -Path $TcpipParamsPath -ErrorAction Stop
     } catch {
-        $ServiceInfo.Status = 'Tcpip registry key missing'
+        $ServiceInfo.Details = 'Tcpip registry key missing'
         continue
+    }
+
+    $EnableDHCP = $TcpipParamsKey.GetValue('EnableDHCP')
+    if ($null -ne $EnableDHCP) {
+        if ($EnableDHCP -eq 1) {
+            $ServiceInfo.Status = 'OK'
+            $ServiceInfo.Details = 'Interface is using DHCP'
+            continue
+        }
+
+        if ($EnableDHCP -ne 0) {
+            Write-Warning -Message ('[{0}] Unexpected value for EnableDHCP: {1}' -f $ServiceGuid, $EnableDHCP)
+        }
     }
 
     $IPAddresses = $TcpipParamsKey.GetValue('IPAddress')
     if ($null -eq $IPAddresses) {
-        $ServiceInfo.Status = 'IPAddress registry value missing'
+        $ServiceInfo.Details = 'IPAddress registry value missing'
         continue
     }
 
     if ($IPAddresses[0].Count -eq 0) {
-        $ServiceInfo.Status = 'IPAddress registry value empty'
+        $ServiceInfo.Details = 'IPAddress registry value empty'
         continue
     }
 
@@ -71,11 +85,13 @@ foreach ($GuidService in $GuidServices) {
     }
 
     if ($IPAddressNotPresent) {
-        $ServiceInfo.Status = 'IP address not present: {0}' -f $IPAddressNotPresent
+        $ServiceInfo.Status = 'Orphaned'
+        $ServiceInfo.Details = 'IP address not present: {0}' -f $IPAddressNotPresent
         continue
     }
 
     $ServiceInfo.Status = 'OK'
+    $ServiceInfo.Details = 'All static IPs present ({0} total)' -f $IPAddresses[0].Count
 }
 
 if (!$SkipGuidRefSearch) {
