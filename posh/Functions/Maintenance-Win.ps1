@@ -48,7 +48,7 @@ Function Update-MicrosoftStore {
 # Update Microsoft Office (Click-to-Run only)
 Function Update-Office {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [String])]
+    [OutputType([Void], [PSCustomObject])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
@@ -69,10 +69,6 @@ Function Update-Office {
         return
     }
 
-    if (!$PSCmdlet.ShouldProcess('Office', 'Update')) {
-        return
-    }
-
     $WriteProgressParams = @{
         Activity = 'Updating Office'
     }
@@ -82,14 +78,35 @@ Function Update-Office {
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
+    $Result = [PSCustomObject]@{
+        Status          = $null
+        Version         = $null
+        PreviousVersion = $null
+        Updated         = $false
+    }
+
+    $OfficeRegPath = 'HKLM:\Software\Microsoft\Office\ClickToRun'
+    $OfficeRegKey = Get-Item -LiteralPath $OfficeRegPath
+
+    $ConfigRegPath = Join-Path -Path $OfficeRegPath -ChildPath 'Configuration'
+    $ConfigRegKey = Get-Item -LiteralPath $ConfigRegPath
+
+    $RawVersion = $ConfigRegKey.GetValue('VersionToReport')
+    $Version = $null
+    if (![Version]::TryParse($RawVersion, [ref]$Version)) {
+        $Version = $RawVersion
+    }
+    $Result.PreviousVersion = $Version
+
+    if (!$PSCmdlet.ShouldProcess('Office', 'Update')) {
+        return $Result
+    }
+
     Write-Progress @WriteProgressParams
     & $OfficeC2RClient /update user updatepromptuser=True
     Start-Sleep -Seconds 3
 
     do {
-        $OfficeRegPath = 'HKLM:\Software\Microsoft\Office\ClickToRun'
-        $OfficeRegKey = Get-Item -LiteralPath $OfficeRegPath
-
         $ExecutingScenario = $OfficeRegKey.GetValue('ExecutingScenario')
         if ($ExecutingScenario) {
             Write-Progress @WriteProgressParams -Status ('Executing scenario: {0}' -f $ExecutingScenario)
@@ -118,10 +135,23 @@ Function Update-Office {
         Start-Sleep -Seconds 5
     } while ($true)
 
+    $RawVersion = $ConfigRegKey.GetValue('VersionToReport')
+    $Version = $null
+    if (![Version]::TryParse($RawVersion, [ref]$Version)) {
+        $Version = $RawVersion
+    }
+    $Result.Version = $Version
+
+    if ($Result.Version -ne $Result.PreviousVersion) {
+        $Result.Updated = $true
+    }
+
+    $Result.Status = $LastScenarioResult
+
     Write-Verbose -Message ('Office update finished {0} scenario with result: {1}' -f $LastScenario, $LastScenarioResult)
     Write-Progress @WriteProgressParams -Completed
 
-    return $LastScenarioResult
+    return $Result
 }
 
 # Update Scoop & installed apps
