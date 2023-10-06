@@ -224,7 +224,7 @@ Function Update-Scoop {
 # https://docs.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
 Function Update-VisualStudio {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Boolean])]
+    [OutputType([Void], [PSCustomObject])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
@@ -242,7 +242,7 @@ Function Update-VisualStudio {
     $VsInstallerExe = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
     if (!(Test-Path -LiteralPath $VsInstallerExe -PathType Leaf)) {
         Write-Error -Message 'Unable to update Visual Studio as VSInstaller not found.'
-        return $false
+        return
     }
 
     Test-ModuleAvailable -Name 'VSSetup'
@@ -250,10 +250,6 @@ Function Update-VisualStudio {
     $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property 'InstallationVersion')
     if ($VsSetupInstances.Count -eq 0) {
         Write-Error -Message 'Get-VSSetupInstance returned no instances.'
-        return $false
-    }
-
-    if (!$PSCmdlet.ShouldProcess('Visual Studio', 'Update')) {
         return
     }
 
@@ -266,8 +262,20 @@ Function Update-VisualStudio {
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
-    # Set to false if an unexpected exit code is returned for any update
-    $VsInstallerStatus = $true
+    $Result = [PSCustomObject]@{
+        # Set to false if an unexpected exit code is returned for any update
+        Status           = $true
+        Versions         = @()
+        PreviousVersions = $VsSetupInstances
+        Updated          = $false
+    }
+
+    $VersionToString = { $this.InstallationVersion }
+    $Result.PreviousVersions | Add-Member -MemberType ScriptMethod -Name ToString -Value $VersionToString -Force
+
+    if (!$PSCmdlet.ShouldProcess('Visual Studio', 'Update')) {
+        return $Result
+    }
 
     for ($Idx = 0; $Idx -lt $VsSetupInstances.Count; $Idx++) {
         $VsSetupInstance = $VsSetupInstances[$Idx]
@@ -343,14 +351,26 @@ Function Update-VisualStudio {
             0 { }
             Default {
                 Write-Error -Message ('Update of {0} returned exit code: {1}' -f $VsDisplayName, $VsInstaller.ExitCode)
-                $VsInstallerStatus = $false
+                $Result.Status = $false
             }
+        }
+    }
+
+    $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property 'InstallationVersion')
+    $Result.Versions = $VsSetupInstances
+    $Result.Versions | Add-Member -MemberType ScriptMethod -Name ToString -Value $VersionToString -Force
+
+    foreach ($UpdatedInstance in $VsSetupInstances) {
+        $PreviousInstance = $Result.PreviousVersions | Where-Object InstanceId -EQ $UpdatedInstance.InstanceId
+        if ($PreviousInstance.InstallationVersion -ne $UpdatedInstance.InstallationVersion) {
+            $Result.Updated = $true
+            break
         }
     }
 
     Write-Progress @WriteProgressParams -Completed
 
-    return $VsInstallerStatus
+    return $Result
 }
 
 # Update Microsoft Windows
