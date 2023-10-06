@@ -391,18 +391,96 @@ Function Update-Windows {
 # Update Windows Subsystem for Linux
 Function Update-WSL {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [String[]])]
+    [OutputType([Void], [PSCustomObject])]
     Param()
+
+    Function Get-WslVersion {
+        [CmdletBinding()]
+        [OutputType([PSCustomObject])]
+        Param()
+
+        $Result = [PSCustomObject]@{}
+        $DefaultOutputEncoding = [Console]::OutputEncoding
+
+        try {
+            [Console]::OutputEncoding = [Text.Encoding]::Unicode
+            $WslVersion = & wsl --version
+
+            foreach ($Line in $WslVersion) {
+                if ([String]::IsNullOrWhiteSpace($Line)) {
+                    continue
+                }
+
+                if ($Line -notmatch '^([A-Za-z0-9]+) version: (.+)') {
+                    Write-Warning -Message ('Unable to parse line in version output: {0}' -f $Line)
+                    continue
+                }
+
+                $Component = $Matches[1]
+                $RawVersion = $Matches[2]
+
+                $Version = $null
+                if (![Version]::TryParse($RawVersion, [ref]$Version)) {
+                    $Version = $RawVersion
+                }
+
+                $Result | Add-Member -MemberType NoteProperty -Name $Component -Value $Version
+            }
+        } finally {
+            [Console]::OutputEncoding = $DefaultOutputEncoding
+        }
+
+        if ($Result.PSObject.Properties.Name -contains 'WSL') {
+            $Result | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.WSL } -Force
+        } else {
+            Write-Warning -Message 'No WSL version identified in version output.'
+        }
+
+        return $Result
+    }
 
     if (!(Get-Command -Name 'wsl' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update WSL as wsl command not found.'
         return
     }
 
-    if ($PSCmdlet.ShouldProcess('WSL', 'Update')) {
-        Write-Verbose -Message 'Updating WSL: wsl --update'
-        & wsl --update
+    $Result = [PSCustomObject]@{
+        Status          = $null
+        Version         = $null
+        PreviousVersion = $null
+        Updated         = $false
     }
+
+    $Result.PreviousVersion = Get-WslVersion
+
+    if (!$PSCmdlet.ShouldProcess('WSL', 'Update')) {
+        return $Result
+    }
+
+    $DefaultOutputEncoding = [Console]::OutputEncoding
+    try {
+        Write-Verbose -Message 'Updating WSL: wsl --update'
+        [Console]::OutputEncoding = [Text.Encoding]::Unicode
+        $Result.Status = & wsl --update
+    } finally {
+        [Console]::OutputEncoding = $DefaultOutputEncoding
+    }
+
+    $Result.Version = Get-WslVersion
+
+    foreach ($Component in $Result.Version.PSObject.Properties.Name) {
+        if ($Component -notin $Result.PreviousVersion.PSObject.Properties.Name) {
+            $Result.Updated = $true
+            break
+        }
+
+        if ($Result.Version.$Component -ne $Result.PreviousVersion.$Component) {
+            $Result.Updated = $true
+            break
+        }
+    }
+
+    return $Result
 }
 
 Complete-DotFilesSection
