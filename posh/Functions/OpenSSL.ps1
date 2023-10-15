@@ -267,8 +267,29 @@ Function New-OpenSSLCertificate {
         [Parameter(Mandatory)]
         [String]$Name,
 
-        [ValidateNotNullOrEmpty()]
+        [ValidateLength(1, 64)]
         [String]$CommonName,
+
+        [ValidateLength(1, 64)]
+        [String]$EmailAddress,
+
+        [ValidateLength(1, 64)]
+        [String]$OrganisationalUnit,
+
+        [ValidateLength(1, 64)]
+        [String]$Organisation,
+
+        [ValidateLength(1, 64)]
+        [String]$City,
+
+        [ValidateLength(1, 64)]
+        [String]$State,
+
+        [ValidatePattern('^[A-Z]{2}$', Options = 'None')]
+        [String]$Country,
+
+        [String[]]$AdditionalDomains,
+        [IPAddress[]]$IPAddresses,
 
         [Switch]$NoMatchingSAN,
 
@@ -311,13 +332,66 @@ Function New-OpenSSLCertificate {
         )
     )
 
+    $Subjects = [Collections.Generic.List[String]]::new()
+    $SANs = [Collections.Generic.List[String]]::new()
+
+    if ($EmailAddress) {
+        $Subjects.Add(('emailAddress={0}' -f $EmailAddress))
+    }
+
     if ($CommonName) {
-        $Subject = '/CN={0}' -f $CommonName
+        $Subjects.Add(('commonName={0}' -f $CommonName))
+        if (!$NoMatchingSAN) {
+            $SANs.Add(('DNS:{0}' -f $CommonName))
+        }
+    } else {
+        Write-Warning -Message 'No Common Name (CN) was specified so a matching SAN will not be added.'
+    }
+
+    if ($OrganisationalUnit) {
+        $Subjects.Add(('organizationalUnitName={0}' -f $OrganisationalUnit))
+    }
+
+    if ($Organisation) {
+        $Subjects.Add(('organizationName={0}' -f $Organisation))
+    }
+
+    if ($City) {
+        $Subjects.Add(('localityName={0}' -f $City))
+    }
+
+    if ($State) {
+        $Subjects.Add(('stateOrProvinceName={0}' -f $State))
+    }
+
+    if ($Country) {
+        $Subjects.Add(('countryName={0}' -f $Country))
+    }
+
+    if ($AdditionalDomains.Count -gt 0) {
+        foreach ($Domain in $AdditionalDomains) {
+            $SANs.Add(('DNS:{0}' -f $Domain))
+        }
+    }
+
+    if ($IPAddresses.Count -gt 0) {
+        foreach ($IPAddress in $IPAddresses) {
+            if ($IPAddress.AddressFamily -ne [Net.Sockets.AddressFamily]::InterNetwork) {
+                Write-Error -Message ('Provided IP address is not IPv4: {0}' -f $IPAddress)
+                return
+            }
+
+            $SANs.Add(('IP:{0}' -f $IPAddress))
+        }
+    }
+
+    if ($Subjects.Count -gt 0) {
+        $Subject = '/{0}' -f ($Subjects -join '/')
         $Params.Add('-subj')
         $Params.Add($Subject)
 
-        if (!$NoMatchingSAN) {
-            $SAN = 'subjectAltName = DNS:{0}' -f $CommonName
+        if ($SANs.Count -gt 0) {
+            $SAN = 'subjectAltName = {0}' -f ($SANs -join ', ')
             $Params.Add('-addext')
             $Params.Add($SAN)
         }
