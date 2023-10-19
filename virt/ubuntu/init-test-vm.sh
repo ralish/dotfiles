@@ -37,6 +37,13 @@ apt-get -y dist-upgrade
 echo
 
 # shellcheck disable=SC2312
+if ! dpkg -l | grep debsums > /dev/null; then
+    echo '[apt] Installing debsums ...'
+    apt-get -y install debsums
+    echo
+fi
+
+# shellcheck disable=SC2312
 if ! dpkg -l | grep openssh-server > /dev/null; then
     echo '[apt] Installing OpenSSH server ...'
     apt-get -y install openssh-server
