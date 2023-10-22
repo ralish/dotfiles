@@ -750,20 +750,41 @@ Function Clear-PipCache {
     [String[]]$GetArgs = 'cache', 'info'
     [String[]]$ClearArgs = 'cache', 'purge', '-qqq'
 
+    $PipVersionRaw = (& pip --version) -join [String]::Empty
+    if ($PipVersionRaw -notmatch '^pip ([0-9]+\.[0-9]+(\.[0-9]+)?)') {
+        throw 'Unable to determine pip package version.'
+    }
+
+    $PipVersion = [Version]$Matches[1]
+    $PipSupportsCacheIndexV2 = $PipVersion -ge '23.3'
+
     Write-Verbose -Message ('Determining pip cache path: pip {0}' -f ($GetArgs -join ' '))
     $PipCacheInfo = & pip @GetArgs
 
-    $PipCacheIndex = $null
-    $PipCacheWheels = $null
+    $PipCachePaths = [Collections.Generic.List[String]]::new()
+    $PipCacheIndex = $false
+    $PipCacheWheels = $false
+    $PipCacheIndexV2 = !$PipSupportsCacheIndexV2
 
     foreach ($Line in $PipCacheInfo) {
-        if ($PipCacheIndex -and $PipCacheWheels) {
-            break
-        } elseif (!$PipCacheIndex -and $Line -match 'Package index page cache location: (.*)') {
-            $PipCacheIndex = $Matches[1]
-        } elseif (!$PipCacheWheels -and $Line -match 'Wheels location: (.*)') {
-            $PipCacheWheels = $Matches[1]
+        if ($Line -match '^Package index page cache location(?: \(older pips\))?: (.*)') {
+            $PipCacheIndex = $true
+        } elseif ($Line -match '^Locally built wheels location: (.*)') {
+            $PipCacheWheels = $true
+        } elseif ($PipSupportsCacheIndexV2 -and $Line -match '^Package index page cache location \(pip v23\.3\+\): (.*)') {
+            $PipCacheIndexV2 = $true
+        } else {
+            continue
         }
+
+        $PipCachePaths.Add($Matches[1])
+        if ($PipCacheIndex -and $PipCacheWheels -and $PipCacheIndexV2) {
+            break
+        }
+    }
+
+    if (!$PipCacheIndexV2) {
+        throw 'Unable to determine pip package index page cache v2 location.'
     }
 
     if (!$PipCacheIndex) {
@@ -774,7 +795,7 @@ Function Clear-PipCache {
         throw 'Unable to determine pip wheels cache location.'
     }
 
-    if ($PSCmdlet.ShouldProcess(('{0}, {1}' -f $PipCacheIndex, $PipCacheWheels), 'Clear')) {
+    if ($PSCmdlet.ShouldProcess($PipCachePaths -join ', ', 'Clear')) {
         Write-Verbose -Message ('Clearing pip cache: pip {0}' -f ($ClearArgs -join ' '))
         & pip @ClearArgs
     }
