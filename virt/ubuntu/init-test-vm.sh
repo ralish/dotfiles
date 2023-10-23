@@ -36,29 +36,40 @@ echo '[apt] Installing package updates ...'
 apt-get -y dist-upgrade
 echo
 
-# shellcheck disable=SC2312
-if ! dpkg -l | grep debsums > /dev/null; then
-    echo '[apt] Installing debsums ...'
-    apt-get -y install debsums
-    echo
-fi
+function install_if_available() {
+    if [[ $# -lt 1 ]]; then
+        script_exit 'Missing required argument to install_if_available()!' 2
+    fi
 
-# shellcheck disable=SC2312
-if ! dpkg -l | grep openssh-server > /dev/null; then
-    echo '[apt] Installing OpenSSH server ...'
-    apt-get -y install openssh-server
-    echo
-fi
+    # Check if the package is already installed
+    local pkg_name="$1"
+    if dpkg -s "$pkg_name" > /dev/null 2>&1; then
+        return
+    fi
 
-# shellcheck disable=SC2312
-if ! dpkg -l | grep vim > /dev/null; then
-    echo '[apt] Installing Vim ...'
-    apt-get -y install vim
-    echo
-fi
+    # Check if the package is available to install. Simply using "apt-cache
+    # show $pkg_name" is insufficient as it may return success if the package
+    # is referenced by other packages but has no installation candidate.
+    local pkg_regex pkg_exists
+    pkg_regex="$(printf '^%s$' "$1")"
+    pkg_exists="$(apt-cache search --names-only "$pkg_regex")"
+    if [[ -z $pkg_exists ]]; then
+        echo "[apt] Unable to find package: $pkg_name"
+        return
+    fi
 
+    echo "[apt] Installing $pkg_name ..."
+    apt-get -y install "$pkg_name"
+    echo
+}
+
+install_if_available debsums
+install_if_available openssh-server
+install_if_available vim
+
+# Suppress error as ancient versions of APT don't support this command
 echo '[apt] Removing stale dependencies ...'
-apt-get -y autoremove
+apt-get -y autoremove || true
 echo
 
 echo '[apt] Cleaning local repository ...'
