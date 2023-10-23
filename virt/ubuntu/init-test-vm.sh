@@ -17,7 +17,7 @@ fi
 
 echo '[apt] Switching to local mirror ... '
 ubuntu_release="$(lsb_release -s -r)"
-ubuntu_release_year="${ubuntu_release:0:2}"
+ubuntu_release_year="$(echo "$ubuntu_release" | grep -o -E '^[0-9]+')"
 if ((ubuntu_release_year >= 14)); then
     sed -i 's/http:\/\/\([a-z]\{2\}\.\)\?\(archive\.ubuntu\.com\)/http:\/\/au\.\2/' /etc/apt/sources.list
 else
