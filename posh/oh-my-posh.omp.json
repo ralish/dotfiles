@@ -75,7 +75,7 @@
                         "{{ if gt .Behind 0 }}#8A4FFF{{ end }}"
                     ],
                     "background": "#2f2f2f",
-                    "template": "<#7a7a7a>\ue0b1 </>{{ .UpstreamIcon }}{{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }}<#E84855> \uf044 {{ .Working.String }}</>{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}<#2FDA4E> \uf046 {{ .Staging.String }}</>{{ end }}{{ if gt .StashCount 0 }} \uf692 {{ .StashCount }}{{ end }} ",
+                    "template": "<#7a7a7a>\ue0b1 </>{{ .UpstreamIcon }}{{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }}<#E84855> \uf044 {{ .Working.String }}</>{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}<#2FDA4E> \uf046 {{ .Staging.String }}</>{{ end }}{{ if gt .StashCount 0 }} \ueb4b {{ .StashCount }}{{ end }} ",
                     "properties": {
                         "fetch_status": true,
                         "fetch_stash_count": true,
@@ -129,7 +129,7 @@
                     "trailing_diamond": "\u2593\ue0c6",
                     "foreground": "#fafafa",
                     "background": "#2f2f2f",
-                    "template": " {{ .CurrentDate | date .Format }}<#007ACC> \uf64f </>",
+                    "template": " {{ .CurrentDate | date .Format }}<#007ACC> \ue641 </>",
                     "properties": {
                         "time_format": "15:04:05"
                     }
@@ -170,13 +170,13 @@
                     }
                 },
                 {
-                    "type": "exit",
+                    "type": "status",
                     "style": "plain",
                     "foreground": "#9FD356",
                     "foreground_templates": [
                         "{{ if gt .Code 0 }}#E84855{{ end }}"
                     ],
-                    "template": " \uf705 {{ if gt .Code 0 }}{{ .Code }}{{ end }} ",
+                    "template": " \uea9f {{ if gt .Code 0 }}{{ .Code }}{{ end }} ",
                     "properties": {
                         "always_enabled": true
                     }
