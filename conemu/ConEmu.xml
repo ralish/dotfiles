@@ -102,8 +102,8 @@
 			<value name="Multi.SplitWidth" type="hex" data="04"/>
 			<value name="Multi.SplitHeight" type="hex" data="04"/>
 			<value name="KeyboardHooks" type="hex" data="01"/>
-			<value name="FontName" type="string" data="Hack NF"/>
-			<value name="FontName2" type="string" data="Hack NF"/>
+			<value name="FontName" type="string" data="Hack Nerd Font"/>
+			<value name="FontName2" type="string" data="Hack Nerd Font"/>
 			<value name="FontAutoSize" type="hex" data="00"/>
 			<value name="FontSize" type="ulong" data="18"/>
 			<value name="FontSizeX" type="ulong" data="0"/>
