@@ -80,8 +80,9 @@ rm -rf /var/lib/apt/lists
 mkdir -p /var/lib/apt/lists/partial
 
 if command -v snap > /dev/null; then
+    # Suppress error as only recent versions of snapd support this command
     echo '[snap] Disabling automatic updates ...'
-    snap refresh --hold
+    snap refresh --hold || true
     echo
 
     echo '[snap] Updating all snaps ...'
