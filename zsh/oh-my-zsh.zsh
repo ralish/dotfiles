@@ -37,7 +37,7 @@ fi
 # --------------------------------- Plugins -----------------------------------
 
 # Array of plugins to load
-plugins=(colored-man-pages gitfast ripgrep shrink-path)
+plugins=(colored-man-pages gitfast ripgrep shrink-path zsh-autosuggestions)
 
 
 # ------------------------------- Completion ----------------------------------

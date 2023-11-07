@@ -1,3 +1,6 @@
 [submodule "oh-my-zsh"]
 	path = modules/oh-my-zsh
 	url = https://github.com/ohmyzsh/ohmyzsh.git
+[submodule "zsh-autosuggestions"]
+	path = modules/zsh-autosuggestions
+	url = https://github.com/zsh-users/zsh-autosuggestions.git
