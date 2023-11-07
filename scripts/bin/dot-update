@@ -134,8 +134,8 @@ function main() {
 
         git fetch
         git merge --ff-only
-        git submodule init
-        git submodule update
+        git submodule sync
+        git submodule update --init
     fi
 
     if [[ -n ${default_update-} || -n ${stow_update-} ]]; then
