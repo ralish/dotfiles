@@ -35,7 +35,7 @@
     </MappedFolder>
 
     <MappedFolder>
-      <HostFolder>C:\Users\SDL\Code\Personal\dotfiles\windows\Windows Sandbox</HostFolder>
+      <HostFolder>C:\Users\SDL\Dotfiles\windows\Windows Sandbox</HostFolder>
       <SandboxFolder>C:\Users\WDAGUtilityAccount\Desktop\Host\Windows Sandbox</SandboxFolder>
       <ReadOnly>true</ReadOnly>
     </MappedFolder>
