@@ -4,7 +4,7 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 # Custom files
-ZSH_CUSTOM="${XDG_CONFIG_HOME:-$HOME/.config}/oh-my-zsh"
+ZSH_CUSTOM="$HOME/dotfiles/zsh/oh-my-zsh"
 
 # Cache files
 ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/oh-my-zsh"
