@@ -105,16 +105,32 @@ function early_init() {
     source "$dotfiles_path/$META_DIR/templates/common.sh"
 }
 
-# DESC: Create some directories in advance so stow doesn't symlink them
+# DESC: Create the given directories including any intermediate paths
 # ARGS: $@ (required): Directories to be created
 # OUTS: None
-function create_dirs() {
+function create_dir() {
     while [[ $# -gt 0 ]]; do
         if [[ ! -d $1 ]]; then
             mkdir -p "$1"
         fi
         shift
     done
+}
+
+# DESC: Create specific directories in advance so stow doesn't symlink them
+# ARGS: None
+# OUTS: None
+function create_dirs() {
+    create_dir "$HOME/.config"
+    create_dir "$HOME/.local/share"
+
+    for section in $(seq 1 8); do
+        create_dir "$HOME/share/man/man$section"
+    done
+
+    if command -v perl > /dev/null; then
+        create_dir "$HOME/share/perl"
+    fi
 }
 
 # DESC: Quick, simple & dirty sorting of arguments
@@ -303,12 +319,7 @@ function main() {
         return
     fi
 
-    create_dirs "$HOME/.config"
-    create_dirs "$HOME/.local/share"
-    create_dirs "$HOME/share/perl"
-    for section in $(seq 1 8); do
-        create_dirs "$HOME/share/man/man$section"
-    done
+    create_dirs
 
     # shellcheck disable=SC2249
     case $stow_method in
