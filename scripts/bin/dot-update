@@ -157,6 +157,7 @@ function main() {
         pretty_print '*** Updating Vim plug-ins ...'
         check_binary 'vim' 'fatal'
         vim +PlugUpdate +qall
+        vim +PlugClean +qall
     fi
 }
 
