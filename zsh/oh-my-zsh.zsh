@@ -141,4 +141,18 @@ case $ZSH_THEME in
         ;;
 esac
 
+# ----------------------------- Plugin Settings -------------------------------
+# =========================== zsh-autosuggestions =============================
+
+plugin='zsh-autosuggestions'
+if (($plugins[(Ie)$plugin])); then
+    # Colour to use when highlighting suggestions
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=250'
+fi
+
+
+# -------------------------------- Clean-up -----------------------------------
+
+unset plugin
+
 # vim: syntax=zsh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
