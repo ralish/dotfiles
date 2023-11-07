@@ -40,7 +40,7 @@
     "files.trimTrailingWhitespace": true,
 
     // Workbench
-    "workbench.editor.untitled.hint": "hidden",
+    "workbench.editor.empty.hint": "hidden",
     "workbench.enableExperiments": false,
     "workbench.startupEditor": "readme",
     "workbench.editorAssociations": {
@@ -118,7 +118,7 @@
     "dotnetAcquisitionExtension.enableTelemetry": false,
 
     // AsciiDoc
-    "asciidoc.useWorkspaceRoot": true,
+    "asciidoc.useWorkspaceRootAsBaseDirectory": true,
 
     // Azure Repos
     "azureRepos.autoFetch.enabled": false,
