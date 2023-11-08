@@ -769,7 +769,7 @@ Function Clear-PipCache {
     foreach ($Line in $PipCacheInfo) {
         if ($Line -match '^Package index page cache location(?: \(older pips\))?: (.*)') {
             $PipCacheIndex = $true
-        } elseif ($Line -match '^Locally built wheels location: (.*)') {
+        } elseif ($Line -match '^(?:Locally built )?wheels location: (.*)') {
             $PipCacheWheels = $true
         } elseif ($PipSupportsCacheIndexV2 -and $Line -match '^Package index page cache location \(pip v23\.3\+\): (.*)') {
             $PipCacheIndexV2 = $true
