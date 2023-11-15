@@ -718,7 +718,7 @@ if executable('git')
 
     " Git: Show a diff in the gutter
     if has('signs') && (v:version > 703 || v:version == 703 && has('patch105'))
-        Plug 'airblade/vim-gitgutter'
+        Plug 'airblade/vim-gitgutter', { 'branch': 'main' }
     endif
 endif
 
