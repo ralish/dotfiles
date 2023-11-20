@@ -32,10 +32,17 @@ if ((Get-PSReadLineOption).PredictionSource -ne 'HistoryAndPlugin') {
     return
 }
 
+# Suppress verbose output on import
+$VerboseOriginal = $Global:VerbosePreference
+$Global:VerbosePreference = 'SilentlyContinue'
+
 try {
     Import-Module -Name 'Az.Tools.Predictor' -ErrorAction Stop -Verbose:$false
 } catch {
     Write-Warning -Message (Get-DotFilesMessage -Message 'Failed to import Az.Tools.Predictor module.')
+} finally {
+    # Restore the original $VerbosePreference setting
+    $Global:VerbosePreference = $VerboseOriginal
 }
 
 Complete-DotFilesSection
