@@ -17,7 +17,13 @@ $env:DOTNET_SUGGEST_SCRIPT_VERSION = '1.0.2'
 # CLI (dotnet) as it has its own built-in support.
 $RegisteredAppsRaw = (dotnet-suggest list) | Out-String
 $RegisteredAppsSplit = $RegisteredAppsRaw.Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries)
-$RegisteredApps = $RegisteredAppsSplit | Where-Object { $_ -ne 'dotnet' }
+$RegisteredApps = $RegisteredAppsSplit | Where-Object {
+    # dotnet has its own argument completion support
+    $_ -ne 'dotnet' -and
+    # Almost always "dotnet <x>" aliases which don't work anyway
+    # https://github.com/dotnet/command-line-api/issues/2302
+    $_ -notmatch ' '
+}
 
 Register-ArgumentCompleter -Native -CommandName $RegisteredApps -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
