@@ -2,7 +2,7 @@
     /*
      * Windows Terminal settings
      *
-     * Last reviewed release: v1.17.11461.0
+     * Last reviewed release: v1.18.2822.0
      * Default file path: %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
      */
 
@@ -83,6 +83,7 @@
     "experimental.enableColorSelection": false,
     "experimental.input.forceVT": false,
     "experimental.useBackgroundImageForWindow": false,
+    "compatibility.isolatedMode": false,
 
     // New Tab Menu (not in UI)
     "newTabMenu": [
@@ -151,7 +152,8 @@
             "historySize": 10000,
             "closeOnExit": "graceful",
             "bellStyle": "none",
-            "useAtlasEngine": true
+            "useAtlasEngine": true,
+            "compatibility.reloadEnvironmentVariables": true
         },
 
         "list": [
