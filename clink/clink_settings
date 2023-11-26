@@ -1,6 +1,6 @@
 # Clink configuration
 #
-# Last reviewed release: v1.4.24
+# Last reviewed release: v1.5.16
 
 # ---------------------------------- Clink ------------------------------------
 
@@ -11,7 +11,13 @@
 clink.autostart = nul
 
 # Periodically check for updates
-clink.autoupdate = False
+#
+# Valid values:
+# - off
+# - check
+# - prompt
+# - auto
+clink.autoupdate = off
 # Interval between update checks (days)
 clink.update_interval = 5
 
@@ -58,9 +64,6 @@ clink.promptfilter = True
 # Display suggested commands
 autosuggest.enable = True
 
-# Generate suggestions asynchronously
-autosuggest.async = True
-
 # Strategy for choosing suggestions
 #
 # Multiple strategies are attempted in listed order (space-separated).
@@ -70,6 +73,12 @@ autosuggest.async = True
 # - history
 # - match_prev_cmd
 autosuggest.strategy = match_prev_cmd history completion
+
+# Generate suggestions asynchronously
+autosuggest.async = True
+
+# Display usage hints to make features more discoverable
+autosuggest.hint = True
 
 # Use original capitalisation of suggestions
 autosuggest.original_case = True
@@ -341,8 +350,8 @@ terminal.adjust_cursor_style = True
 #
 # Valid values:
 # - auto
-# - emulate
-# - native
+# - off
+# - on
 terminal.color_emoji = auto
 
 # Generate special key sequences for Ctrl+Tab, Ctrl+I, Ctrl+M, and Ctrl+[ to
@@ -379,6 +388,9 @@ terminal.mouse_input = auto
 # Send a literal escape character on pressing Esc
 terminal.raw_esc = False
 
+# Lists show scrollbars using extended Unicode box drawing characters
+terminal.scrollbars = True
+
 # Support the Windows Ctrl+Alt substitute for AltGr
 terminal.use_altgr_substitute = False
 
@@ -387,6 +399,13 @@ terminal.use_altgr_substitute = False
 
 # Log all terminal input and output
 debug.log_terminal = False
+
+# Handling of duplicate entries when updating the directory history
+#
+# Valid values:
+# - add
+# - erase_prev
+directores.dupe_mode = add
 
 # Enhanced DOSKEY macro expansion and word quoting
 doskey.enhanced = True
