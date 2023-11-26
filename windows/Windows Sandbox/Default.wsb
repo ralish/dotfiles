@@ -1,8 +1,8 @@
 <!--
   Windows Sandbox configuration
-  https://learn.microsoft.com/en-us/windows/security/threat-protection/windows-sandbox/windows-sandbox-configure-using-wsb-file
+  https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file
 
-  Last reviewed release: Windows 11 22H2
+  Last reviewed release: Windows 11 23H2
 
   Initial support from Windows Build 18342 (Windows 10 1903+)
 
