@@ -16,7 +16,8 @@ if command -v aws > /dev/null; then
         fi
     fi
 
-    unset dotnet_bin
+    # Output format
+    export AWS_DEFAULT_OUTPUT='table'
 fi
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
