@@ -19,10 +19,6 @@ Function Get-RipgrepCompletionPath {
 
     try {
         $RgCommand = Get-Command -Name 'rg'
-        if (!$RgCommand.Name.EndsWith('.ps1')) {
-            return
-        }
-
         $RgScriptPath = Get-Item -LiteralPath $RgCommand.Path
         if (!$RgScriptPath.Directory.Name -eq 'shims') {
             return
