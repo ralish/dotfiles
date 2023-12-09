@@ -274,7 +274,7 @@ Function Switch-GoogleDepotTools {
     [OutputType([Void])]
     Param(
         [ValidateNotNullOrEmpty()]
-        [String]$Path = ('{0}\Code\Google\depot_tools' -f $HOME),
+        [String]$Path,
 
         [Parameter(ParameterSetName = 'Enable', Mandatory)]
         [String]$VsVersion,
@@ -284,6 +284,10 @@ Function Switch-GoogleDepotTools {
         [Parameter(ParameterSetName = 'Disable')]
         [Switch]$Disable
     )
+
+    if (!$PSBoundParameters['Path']) {
+        $Path = Join-Path -Path $Code -ChildPath 'Google\depot_tools'
+    }
 
     if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
         throw 'Provided depot_tools path is not a directory: {0}' -f $Path
