@@ -240,7 +240,7 @@ Function Invoke-GitLinter {
                 if ($Item.LinkType -eq 'SymbolicLink') { return }
 
                 Write-Verbose -Message ('Invoking DevSkim on: {0}' -f $_)
-                devskim analyze -o '%F:%L [%S] %R %N' $_
+                devskim analyze -I $_ -o '%F:%L [%S] %R %N'
             }
         }
 
