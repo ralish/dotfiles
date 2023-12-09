@@ -389,7 +389,7 @@
     "[python]": {
         "editor.codeActionsOnSave": {
             // Organise imports with isort
-            "source.organizeImports": true
+            "source.organizeImports": "explicit"
         }
     },
 
