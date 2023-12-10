@@ -1,12 +1,12 @@
 {
     "default": true,
-    // Header style
+    // Heading style
     "MD003": { "style": "setext_with_atx" },
     // Trailing spaces
     "MD009": { "br_spaces": 2 },
     // Line length
     "MD013": false,
-    // Trailing punctuation in header
+    // Trailing punctuation in heading
     "MD026": { "punctuation": ".,;:!" }
 }
 
