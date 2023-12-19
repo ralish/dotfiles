@@ -372,27 +372,24 @@ Function Clear-GradleCache {
 }
 
 # Clear Maven cache
-#
-# Input environment variables
-# - M2_HOME (optional)
-#   Used to determine the "repository" path instead of the default path.
 Function Clear-MavenCache {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param()
 
-    if ($env:M2_HOME) {
-        if (![IO.Path]::IsPathFullyQualified($env:M2_HOME)) {
-            throw 'M2_HOME is set but is not a fully qualified path: {0}' -f $env:M2_HOME
-        }
-        $MvnRepo = Join-Path -Path $env:M2_HOME -ChildPath 'repository'
-    } else {
-        $MvnRepo = Join-Path -Path $HOME -ChildPath '.m2\repository'
+    if (!(Get-Command -Name 'mvn' -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to clear Maven cache as mvn command not found.'
+        return
     }
 
-    if (Test-Path -Path $MvnRepo -PathType Container) {
-        if ($PSCmdlet.ShouldProcess($MvnRepo, 'Clear')) {
-            Remove-Item -Path "$MvnRepo\*" -Recurse -Verbose:$false
+    [String[]]$GetArgs = 'help:evaluate', '-q', '-Dexpression=settings.localRepository', '-DforceStdout'
+
+    Write-Verbose -Message ('Determining mvn cache path: mvn {0}' -f ($GetArgs -join ' '))
+    $MvnCache = & mvn @GetArgs
+
+    if (Test-Path -Path $MvnCache -PathType Container) {
+        if ($PSCmdlet.ShouldProcess($MvnCache, 'Clear')) {
+            Remove-Item -Path "$MvnCache\*" -Recurse -Verbose:$false
         }
     }
 }
