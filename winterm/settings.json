@@ -195,6 +195,10 @@
                 "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc", // Fragment
                 "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
 
+                // Setting startingDirectory results in the following error:
+                // error 2147942667 (0x8007010b) when launching `ubuntu.exe'
+                // Could not access starting directory "/home/sdl"
+                //"startingDirectory": "/home/sdl",
                 "colorScheme": {
                     "dark": "Solarized Dark",
                     "light": "Solarized Light"
@@ -218,6 +222,7 @@
                 "source": "Git", // Fragment
                 "guid": "{2ece5bfe-50ed-5f3a-ab87-5cd4baafed2b}",
 
+                "startingDirectory": "%USERPROFILE%",
                 "closeOnExit": "always"
             },
             {
