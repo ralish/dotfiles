@@ -270,6 +270,10 @@
         "editor.rulers": [79]
     },
 
+    "[perl]": {
+        "editor.rulers": [79]
+    },
+
     "[powershell]": {
         "editor.formatOnSave": true,
         "editor.rulers": [79]

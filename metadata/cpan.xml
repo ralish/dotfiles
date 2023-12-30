@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ralish/PSDotFiles/main/Metadata.xsd">
+    <FriendlyName>CPAN</FriendlyName>
+    <BasePath>.cpan</BasePath>
+
+    <Detection>
+        <Method>FindInPath</Method>
+    </Detection>
+
+    <InstallPath>
+        <SpecialFolder>UserProfile</SpecialFolder>
+        <Destination>.cpan</Destination>
+    </InstallPath>
+
+    <IgnorePaths>
+        <IgnorePath>CPAN\MyConfig.pm~</IgnorePath>
+        <IgnorePath>CPAN\MyConfig-Nix.pm</IgnorePath>
+        <IgnorePath>CPAN\MyConfig-Win.pm</IgnorePath>
+    </IgnorePaths>
+</Component>

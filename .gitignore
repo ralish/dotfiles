@@ -63,9 +63,13 @@ temp/
 # CPAN
 /cpan/.cpan/.lock
 /cpan/.cpan/FTPstats.yml
-/cpan/.cpan/histfile
 /cpan/.cpan/Metadata
+/cpan/.cpan/cpandb.sql
+/cpan/.cpan/cpan_sqlite_log*
+/cpan/.cpan/histfile
+/cpan/.cpan/CPAN/MyConfig.pm
 /cpan/.cpan/build/
+/cpan/.cpan/prefs/
 /cpan/.cpan/sources/
 
 # Fiddler
