@@ -89,7 +89,7 @@ switch_case_indent = true       # shfmt: -ci
 insert_final_newline = false
 
 # Windows Event Viewer filter
-[windows/Event Viewer/*.{xml,xsd}]
+[windows/Event Viewer/**.{xml,xsd}]
 indent_size = 2
 
 # Windows Performance Recorder configuration

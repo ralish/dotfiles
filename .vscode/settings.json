@@ -235,7 +235,7 @@
     // XML schema file associations
     "xml.fileAssociations": [
         {
-            "pattern": "**/windows/Event Viewer/*.xml",
+            "pattern": "**/windows/Event Viewer/**.xml",
             "systemId": "windows/Event Viewer/Query.xsd"
         }
     ],
