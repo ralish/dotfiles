@@ -13,6 +13,7 @@
 
     // Text Editor: Diff Editor
     "diffEditor.ignoreTrimWhitespace": false,
+    "diffEditor.maxComputationTime": 0,
 
     // Text Editor: Find
     "editor.find.autoFindInSelection": "multiline",
