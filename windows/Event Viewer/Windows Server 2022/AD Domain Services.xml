@@ -1,0 +1,31 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name>AD Domain Services</Name>
+      <Description>System events for Active Directory Domain Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <!-- Role: Active Directory Domain Services -->
+          <Select Path="Active Directory Web Services">*[System[Provider[@Name='ADWS']]]</Select>
+          <Select Path="Directory Service">*[System[Provider[@Name='Microsoft-Windows-ActiveDirectory_DomainService']]]</Select>
+          <Select Path="Directory Service">*[System[Provider[@Name='NTDS ISAM']]]</Select>
+
+          <!-- Role: DNS Server -->
+          <Select Path="DNS Server">*[System[Provider[@Name='Microsoft-Windows-DNS-Server-Service']]]</Select>
+
+          <!-- Role service: DFS Replication (File and Storage Services) -->
+          <Select Path="DFS Replication">*[System[Provider[@Name='DFS Replication']]]</Select>
+          <Select Path="DFS Replication">*[System[Provider[@Name='DFSR']]]</Select>
+
+          <!-- Legacy: File Replication Service -->
+          <Select Path="File Replication Service">*[System[Provider[@Name='File Replication Service']]]</Select>
+          <Select Path="File Replication Service">*[System[Provider[@Name='NtFrs']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

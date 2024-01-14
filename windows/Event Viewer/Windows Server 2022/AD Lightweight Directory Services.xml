@@ -1,0 +1,34 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name>AD Lightweight Directory Services</Name>
+      <Description>System events for Active Directory Lightweight Directory Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] API']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] Backup']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] Database']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] General']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] Inter-site Messaging']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] ISAM']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] KCC']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] LDAP']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] MAPI']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] Replication']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] RPC Client']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] RPC Server']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] SAM']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] Schema']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] Scripting']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] SDPROP']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] Security']]]</Select>
+          <Select Path="ADAM (%instance%)">*[System[Provider[@Name='ADAM [%instance%] Setup']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

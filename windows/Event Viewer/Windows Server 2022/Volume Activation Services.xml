@@ -1,0 +1,18 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name>Volume Activation Services</Name>
+      <Description>System events for Volume Activation Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="Application">*[System[(EventID=12291 or EventID=12293 or EventID=12294)]]</Select>
+          <Select Path="Key Management Service">*[System[(EventID=12290)]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

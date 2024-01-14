@@ -5,16 +5,19 @@
     </QueryParams>
     <QueryNode>
       <Name>Remote Access</Name>
-      <Description>System events for Remote Access role</Description>
+      <Description>System events for Remote Access</Description>
       <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
       <QueryList>
         <Query>
-          <Select Path="System">*[System[Provider[@Name='RemoteAccess']]]</Select>
-          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-RasSstp']]]</Select>
-          <Select Path="AD FS/Admin">*[System[Provider[@Name='AD FS']]]</Select>
-          <Select Path="Microsoft-Windows-WebApplicationProxy/Admin">*[System[Provider[@Name='Microsoft-Windows-WebApplicationProxy']]]</Select>
+          <!-- Role service: DirectAccess and VPN (RAS) -->
           <Select Path="Microsoft-Windows-RemoteAccess-MgmtClient/Admin">*[System[Provider[@Name='Microsoft-Windows-RemoteAccess-MgmtClient']]]</Select>
           <Select Path="Microsoft-Windows-RemoteAccess-RemoteAccessServer/Admin">*[System[Provider[@Name='Microsoft-Windows-RemoteAccess-RemoteAccessServer']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-RasSstp']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='RemoteAccess']]]</Select>
+
+          <!-- Role service: Web Application Proxy -->
+          <Select Path="AD FS/Admin">*[System[Provider[@Name='AD FS']]]</Select>
+          <Select Path="Microsoft-Windows-WebApplicationProxy/Admin">*[System[Provider[@Name='Microsoft-Windows-WebApplicationProxy']]]</Select>
         </Query>
       </QueryList>
     </QueryNode>

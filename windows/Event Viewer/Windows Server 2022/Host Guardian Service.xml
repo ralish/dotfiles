@@ -4,13 +4,13 @@
       <UserQuery />
     </QueryParams>
     <QueryNode>
-      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-436">Host Guardian Service</Name>
-      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-437">System events for Host Guardian Service</Description>
+      <Name>Host Guardian Service</Name>
+      <Description>System events for Host Guardian Service</Description>
       <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
       <QueryList>
         <Query>
-          <Select Path="Microsoft-Windows-RemoteAttestationService/Operational">*[System[Provider[@Name='Microsoft-Windows-RemoteAttestationService']]]</Select>
           <Select Path="Microsoft-Windows-RemoteAttestationService/Admin">*[System[Provider[@Name='Microsoft-Windows-RemoteAttestationService']]]</Select>
+          <Select Path="Microsoft-Windows-RemoteAttestationService/Operational">*[System[Provider[@Name='Microsoft-Windows-RemoteAttestationService']]]</Select>
         </Query>
       </QueryList>
     </QueryNode>

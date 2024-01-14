@@ -1,0 +1,27 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name>Print and Document Services</Name>
+      <Description>System events for Print and Document Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <!-- Role service: Print Server -->
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-PrintBRM']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-SpoolerTCPMon']]]</Select>
+          <Select Path="Microsoft-Windows-PrintService/Admin">*[System[Provider[@Name='Microsoft-Windows-PrintService']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-PrintBRM']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-SpoolerTCPMon']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Print']]]</Select>
+
+          <!-- Role service: LPD Service -->
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-Spooler-LPDSVC']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-Spooler-LPDSVC']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

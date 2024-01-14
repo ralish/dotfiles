@@ -4,12 +4,12 @@
       <UserQuery />
     </QueryParams>
     <QueryNode>
-      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-406">DHCP Server</Name>
-      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-407">System events for DHCP Server</Description>
+      <Name>Windows Server Update Services</Name>
+      <Description>System events for Windows Server Update Services</Description>
       <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
       <QueryList>
         <Query>
-          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-DHCP-Server']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='Windows Server Update Services']]]</Select>
         </Query>
       </QueryList>
     </QueryNode>

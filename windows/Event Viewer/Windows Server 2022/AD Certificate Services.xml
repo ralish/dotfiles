@@ -1,0 +1,32 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name>AD Certificate Services</Name>
+      <Description>System events for Active Directory Certificate Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <!-- Role service: Certification Authority -->
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-CertificationAuthority']]]</Select>
+
+          <!-- Role service: Certificate Enrollment Policy Web Service -->
+          <Select Path="Microsoft-Windows-EnrollmentPolicyWebService/Admin">*[System[Provider[@Name='Microsoft-Windows-EnrollmentPolicyWebService']]]</Select>
+
+          <!-- Role service: Certificate Enrollment Web Service -->
+          <Select Path="Microsoft-Windows-EnrollmentWebService/Admin">*[System[Provider[@Name='Microsoft-Windows-EnrollmentWebService']]]</Select>
+
+          <!-- Role service: Network Device Enrollment Service -->
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-NetworkDeviceEnrollmentService']]]</Select>
+
+          <!-- Role service: Online Responder -->
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-OnlineResponder']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-OnlineResponderRevocationProvider']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-OnlineResponderWebProxy']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

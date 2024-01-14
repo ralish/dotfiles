@@ -5,20 +5,20 @@
     </QueryParams>
     <QueryNode>
       <Name>Network Controller</Name>
-      <Description>Events for Network Controller role</Description>
+      <Description>System events for Network Controller</Description>
       <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
       <QueryList>
         <Query>
-          <Select Path="Microsoft-Windows-NetworkController-Framework/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-Framework']]]</Select>
           <Select Path="Microsoft-Windows-NetworkController-FirewallService/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-FirewallService']]]</Select>
+          <Select Path="Microsoft-Windows-NetworkController-Framework/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-Framework']]]</Select>
           <Select Path="Microsoft-Windows-NetworkController-GatewayManager/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-GatewayManager']]]</Select>
-          <!--<Select Path="Microsoft-Windows-NetworkController-Monitoring/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-Monitoring']]]</Select>-->
-          <!--<Select Path="Microsoft-Windows-NetworkController-Monitoring-Alerts/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-Monitoring-Alerts']]]</Select>-->
-          <!--<Select Path="Microsoft-Windows-NetworkController-SDNDisc/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-SDNDisc']]]</Select>-->
+          <Select Path="Microsoft-Windows-NetworkController-Monitoring/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-Monitoring']]]</Select>
+          <Select Path="Microsoft-Windows-NetworkController-Monitoring-Alerts/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-Monitoring-Alerts']]]</Select>
+          <Select Path="Microsoft-Windows-NetworkController-SDNDisc/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-SDNDisc']]]</Select>
           <Select Path="Microsoft-Windows-NetworkController-SDNFNM/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-SDNFNM']]]</Select>
           <Select Path="Microsoft-Windows-NetworkController-ServiceInsertion/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-ServiceInsertion']]]</Select>
-          <Select Path="Microsoft-Windows-NetworkController-VSwitchService/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-VSwitchService']]]</Select>
           <Select Path="Microsoft-Windows-NetworkController-Update/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-Update']]]</Select>
+          <Select Path="Microsoft-Windows-NetworkController-VSwitchService/Admin">*[System[Provider[@Name='Microsoft-Windows-NetworkController-VSwitchService']]]</Select>
         </Query>
       </QueryList>
     </QueryNode>

@@ -4,8 +4,8 @@
       <UserQuery />
     </QueryParams>
     <QueryNode>
-      <Name ResourceId="%WINDIR%\ADFS\Microsoft.IdentityServer.NativeResources.dll,-113">Active Directory Federation Services</Name>
-      <Description ResourceId="%WINDIR%\ADFS\Microsoft.IdentityServer.NativeResources.dll,-114">System events for Active Directory Federation Services</Description>
+      <Name>AD Federation Services</Name>
+      <Description>System events for Active Directory Federation Services</Description>
       <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
       <QueryList>
         <Query>

@@ -4,13 +4,13 @@
       <UserQuery />
     </QueryParams>
     <QueryNode>
-      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-414">Network Policy and Access Services</Name>
-      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-415">System events for Network Policy and Access Services</Description>
+      <Name>Network Policy and Access Services</Name>
+      <Description>System events for Network Policy and Access Services</Description>
       <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
       <QueryList>
         <Query>
-          <Select Path="System">*[System[Provider[@Name='NPS']]]</Select>
           <Select Path="Security">*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and Task = 12552]]</Select>
+          <Select Path="System">*[System[Provider[@Name='NPS']]]</Select>
         </Query>
       </QueryList>
     </QueryNode>

@@ -4,8 +4,8 @@
       <UserQuery />
     </QueryParams>
     <QueryNode>
-      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-408">DNS Server</Name>
-      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-409">System events for DNS Server</Description>
+      <Name>DNS Server</Name>
+      <Description>System events for DNS Server</Description>
       <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
       <QueryList>
         <Query>
