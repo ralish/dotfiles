@@ -1,0 +1,18 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-436">Device Health Attestation Service</Name>
+      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-437">System events for Device Health Attestation Service</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="Microsoft-Windows-DeviceHealthAttestation/Operational">*[System[Provider[@Name='Microsoft-Windows-DeviceHealthAttestation']]]</Select>
+          <Select Path="Microsoft-Windows-DeviceHealthAttestation/Admin">*[System[Provider[@Name='Microsoft-Windows-DeviceHealthAttestation']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

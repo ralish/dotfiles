@@ -1,0 +1,26 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-418">Terminal Services</Name>
+      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-419">System events for Terminal Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TerminalServices-RemoteConnectionManager']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TerminalServices-SessionBroker-Client']]]</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-PnPDevices/Admin">*[System[Provider[@Name='Microsoft-Windows-TerminalServices-PnPDevices']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TerminalServices-SessionBroker']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TermServLicensing']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TerminalServices-Licensing']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='TermServLicensing']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='RDWebAccess']]]</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-Gateway/Admin">*[System[Provider[@Name='Microsoft-Windows-TerminalServices-Gateway']]]</Select>
+          <Select Path="Microsoft-Windows-RemoteApp and Desktop Connection Management/Admin">*[System[Provider[@Name='Microsoft-Windows-RemoteApp and Desktop Connection Management']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

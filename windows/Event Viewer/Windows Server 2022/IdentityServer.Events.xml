@@ -1,0 +1,18 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name ResourceId="%WINDIR%\ADFS\Microsoft.IdentityServer.NativeResources.dll,-113">Active Directory Federation Services</Name>
+      <Description ResourceId="%WINDIR%\ADFS\Microsoft.IdentityServer.NativeResources.dll,-114">System events for Active Directory Federation Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="AD FS/Admin">*[System[Provider[@Name='AD FS']]]</Select>
+          <Select Path="DRS/Admin">*[System[Provider[@Name='Device Registration Service']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

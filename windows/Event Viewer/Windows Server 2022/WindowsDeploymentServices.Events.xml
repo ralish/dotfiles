@@ -1,0 +1,24 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-424">Windows Deployment Services</Name>
+      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-425">System events for Windows Deployment Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="Application">*[System[Provider[@Name='BINLSVC']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='WDSPXE']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='WDSTFTP']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='WDSServer']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='WdsMcServer']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='WDSIMGSRV']]]</Select>
+          <Select Path="Microsoft-Windows-Deployment-Services-Diagnostics/Operational">*[System[Provider[@Name='Microsoft-Windows-Deployment-Services-Diagnostics']]]</Select>
+          <Select Path="Microsoft-Windows-Deployment-Services-Diagnostics/Admin">*[System[Provider[@Name='Microsoft-Windows-Deployment-Services-Diagnostics']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

@@ -1,0 +1,44 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-418">Remote Desktop Services</Name>
+      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-419">System events for Remote Desktop Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="Microsoft-Rdms-UI/Admin">*</Select>
+          <Select Path="Microsoft-Rdms-UI/Operational">*</Select>
+          <Select Path="Remote-Desktop-Management-Service/Admin">*</Select>
+          <Select Path="Remote-Desktop-Management-Service/Operational">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-SessionBroker-Client/Admin">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-SessionBroker-Client/Operational">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-RemoteConnectionManager/Admin">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-RemoteConnectionManager/Operational">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-PnPDevices/Admin">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-PnPDevices/Operational">*</Select>
+          <Select Path="Microsoft-Windows-RemoteApp and Desktop Connections/Admin">*</Select>
+          <Select Path="Microsoft-Windows-RemoteApp and Desktop Connection Management/Admin">*</Select>
+          <Select Path="Microsoft-Windows-RemoteApp and Desktop Connection Management/Operational">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-SessionBroker/Admin">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-SessionBroker/Operational">*</Select>
+	  <Select Path="Microsoft-Windows-TerminalServices-TSV-VmHostAgent/Operational">*</Select>
+	  <Select Path="Microsoft-Windows-TerminalServices-TSV-VmHostAgent/Admin">*</Select>
+	  <Select Path="Microsoft-Windows-TerminalServices-ServerUSBDevices/Operational">*</Select>
+	  <Select Path="Microsoft-Windows-TerminalServices-ServerUSBDevices/Admin">*</Select>
+	  <Select Path="Microsoft-Windows-TerminalServices-LocalSessionManager/Operational">*</Select>
+	  <Select Path="Microsoft-Windows-TerminalServices-LocalSessionManager/Admin">*</Select>
+	  <Select Path="Microsoft-Windows-TerminalServices-ClientUSBDevices/Operational">*</Select>
+	  <Select Path="Microsoft-Windows-TerminalServices-ClientUSBDevices/Admin">*</Select>
+	  <Select Path="Microsoft-Windows-TerminalServices-RDPClient/Operational">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-Licensing/Admin">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-Licensing/Operational">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-Gateway/Admin">*</Select>
+          <Select Path="Microsoft-Windows-TerminalServices-Gateway/Operational">*</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

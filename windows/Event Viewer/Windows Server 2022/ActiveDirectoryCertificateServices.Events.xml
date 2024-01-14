@@ -1,0 +1,23 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-400">Active Directory Certificate Services</Name>
+      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-401">System events for Active Directory Certificate Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-CertificationAuthority']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-NetworkDeviceEnrollmentService']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-OnlineResponderWebProxy']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-OnlineResponder']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-OnlineResponderRevocationProvider']]]</Select>
+          <Select Path="Microsoft-Windows-EnrollmentPolicyWebService/Admin">*[System[Provider[@Name='Microsoft-Windows-EnrollmentPolicyWebService']]]</Select>
+          <Select Path="Microsoft-Windows-EnrollmentWebService/Admin">*[System[Provider[@Name='Microsoft-Windows-EnrollmentWebService']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

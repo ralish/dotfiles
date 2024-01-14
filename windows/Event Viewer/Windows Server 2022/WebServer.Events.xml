@@ -1,0 +1,26 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-422">Web Server</Name>
+      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-423">System events for Web Server</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-IIS-APPHOSTSVC']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-IIS-FTP']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-IIS-IisMetabaseAudit']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-IIS-IISReset']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-IIS-W3SVC']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-IIS-W3SVC-PerfCounters']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-IIS-W3SVC-WP']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-IIS-WMSVC']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-WAS']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-WAS-ListenerAdapter']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

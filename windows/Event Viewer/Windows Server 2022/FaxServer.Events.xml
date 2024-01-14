@@ -1,0 +1,18 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-410">Fax Server</Name>
+      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-411">System events for Fax Server</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="System">*[System[Provider[@Name='faxevent_messages']]]</Select>
+          <Select Path="Application">*[System[Provider[@Name='Microsoft Fax']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

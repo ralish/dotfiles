@@ -1,0 +1,124 @@
+<!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
+<ViewerConfig>
+    <QueryConfig>
+        <QueryParams>
+            <UserQuery />
+        </QueryParams>
+        <QueryNode>
+            <Name ResourceId="%windir%\system32\svrmgrnc.dll,-412">File Server</Name>
+            <Description ResourceId="%windir%\system32\svrmgrnc.dll,-413">System events for File Server</Description>
+            <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+            <QueryList>
+                <Query>
+                    <!-- FS Role optional components BEGIN -->
+                    <!-- FSRM events BEGIN -->
+                    <Select Path="System">*[System[Provider[@Name='DataScrn']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='Quota']]]</Select>
+                    <Select Path="Application">*[System[Provider[@Name='SrmSvc']]]</Select>
+                    <Select Path="Application">*[System[Provider[@Name='SrmReports']]]</Select>
+                    <!-- FSRM events END -->
+
+                    <!-- DFS Namespaces events BEGIN -->
+                    <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-DfsSvc']]]</Select>
+                    <!-- DFS Namespaces events END -->
+
+                    <!-- DFS Replication events BEGIN -->
+                    <Select Path="DFS Replication">*[System[Provider[@Name='DFS Replication']]]</Select>
+                    <Select Path="DFS Replication">*[System[Provider[@Name='DFSR']]]</Select>
+                    <!-- DFS Replication events END -->
+
+                    <!-- NTFRS events BEGIN -->
+                    <Select Path="File Replication Service">*[System[Provider[@Name='File Replication Service']]]</Select>
+                    <Select Path="File Replication Service">*[System[Provider[@Name='NtFrs']]]</Select>
+                    <!-- NTFRS events END -->
+
+                    <!-- NFS events BEGIN -->
+                    <Select Path="Microsoft-Windows-ServicesForNFS-Portmapper/Admin">*[System[Provider[@Name='NfsServer' or @Name='Portmap' or @Name='Microsoft-Windows-ServicesForNFS-NFSServerService' or @Name='Microsoft-Windows-ServicesForNFS-Portmapper' or @Name='Microsoft-Windows-ServicesForNFS-Server']]]</Select>
+                    <Select Path="Microsoft-Windows-ServicesForNFS-Server/Admin">*[System[Provider[@Name='NfsServer' or @Name='Portmap' or @Name='Microsoft-Windows-ServicesForNFS-NFSServerService' or @Name='Microsoft-Windows-ServicesForNFS-Portmapper' or @Name='Microsoft-Windows-ServicesForNFS-Server']]]</Select>
+                    <Select Path="Microsoft-Windows-ServicesForNFS-Server/Analytic">*[System[Provider[@Name='NfsServer' or @Name='Portmap' or @Name='Microsoft-Windows-ServicesForNFS-NFSServerService' or @Name='Microsoft-Windows-ServicesForNFS-Portmapper' or @Name='Microsoft-Windows-ServicesForNFS-Server']]]</Select>
+                    <Select Path="Microsoft-Windows-ServicesForNFS-Server/IdentityMapping">*[System[Provider[@Name='NfsServer' or @Name='Portmap' or @Name='Microsoft-Windows-ServicesForNFS-NFSServerService' or @Name='Microsoft-Windows-ServicesForNFS-Portmapper' or @Name='Microsoft-Windows-ServicesForNFS-Server']]]</Select>
+                    <Select Path="Microsoft-Windows-ServicesForNFS-Server/Notifications">*[System[Provider[@Name='NfsServer' or @Name='Portmap' or @Name='Microsoft-Windows-ServicesForNFS-NFSServerService' or @Name='Microsoft-Windows-ServicesForNFS-Portmapper' or @Name='Microsoft-Windows-ServicesForNFS-Server']]]</Select>
+                    <Select Path="Microsoft-Windows-ServicesForNFS-Server/Operational">*[System[Provider[@Name='NfsServer' or @Name='Portmap' or @Name='Microsoft-Windows-ServicesForNFS-NFSServerService' or @Name='Microsoft-Windows-ServicesForNFS-Portmapper' or @Name='Microsoft-Windows-ServicesForNFS-Server']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='NfsServer' or @Name='Portmap' or @Name='Microsoft-Windows-ServicesForNFS-NFSServerService' or @Name='Microsoft-Windows-ServicesForNFS-Portmapper' or @Name='Microsoft-Windows-ServicesForNFS-Server']]]</Select>
+                    <Select Path="Application">*[System[Provider[@Name='NfsSvc']]]</Select>
+                    <!-- NFS events END -->
+
+                    <!-- SIS events BEGIN -->
+                    <Select Path="System">*[System[Provider[@Name='SIS']]]</Select>
+                    <Select Path="Application">*[System[Provider[@Name='Groveler']]]</Select>
+                    <!-- SIS events END -->
+
+                    <!-- Content Indexing events BEGIN -->
+                    <Select Path="Application">*[System[Provider[@Name='Ci']]]</Select>
+                    <!-- Content Indexing events END -->
+
+                    <!-- Windows Search events BEGIN -->
+                    <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-Search']]]</Select>
+                    <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-Search-ProfileNotify']]]</Select>
+                    <!-- Windows Search events END -->
+                    <!-- FS Role optional components END -->
+
+                    <!-- Core components important for FS Role BEGIN -->
+                    <!-- VDS, VolMgr events BEGIN -->
+                    <Select Path="System">*[System[Provider[@Name='partmgr']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='volmgr']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='Virtual Disk Service']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='VDS Basic Provider 1.0']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='VDS Dynamic Provider 2.0']]]</Select>
+                    <!-- VDS, VolMgr events END -->
+
+                    <!-- VSS, VolSnap events BEGIN -->
+                    <Select Path="System">*[System[Provider[@Name='Volsnap']]]</Select>
+                    <Select Path="Application">*[System[Provider[@Name='VSS']]]</Select>
+                    <!-- VSS, VolSnap events END -->
+
+                    <!-- NTFS, TxF, UDF, FAT, exFAT events BEGIN -->
+                    <Select Path="System">*[System[Provider[@Name='Ntfs']]]</Select>
+                    <!-- NTFS, TxF, UDF, FAT, exFAT events END -->
+
+                    <!-- SMB events BEGIN -->
+                    <Select Path="Microsoft-Windows-ResumeKeyFilter/Analytic">*[System[Provider[@Name='Microsoft-Windows-ResumeKeyFilter' or @Name='Microsoft-Windows-SMBClient' or @Name='Microsoft-Windows-SmbServer' or @Name='Microsoft-Windows-SMBWitnessClient' or @Name='Microsoft-Windows-SMBWitnessService']]]</Select>
+                    <Select Path="Microsoft-Windows-ResumeKeyFilter/Operational">*[System[Provider[@Name='Microsoft-Windows-ResumeKeyFilter' or @Name='Microsoft-Windows-SMBClient' or @Name='Microsoft-Windows-SmbServer' or @Name='Microsoft-Windows-SMBWitnessClient' or @Name='Microsoft-Windows-SMBWitnessService']]]</Select>
+                    <Select Path="Microsoft-Windows-ResumeKeyFilter/Performance">*[System[Provider[@Name='Microsoft-Windows-ResumeKeyFilter' or @Name='Microsoft-Windows-SMBClient' or @Name='Microsoft-Windows-SmbServer' or @Name='Microsoft-Windows-SMBWitnessClient' or @Name='Microsoft-Windows-SMBWitnessService']]]</Select>
+                    <Select Path="Microsoft-Windows-SMBClient/HelperClassDiagnostic">*[System[Provider[@Name='Microsoft-Windows-ResumeKeyFilter' or @Name='Microsoft-Windows-SMBClient' or @Name='Microsoft-Windows-SmbServer' or @Name='Microsoft-Windows-SMBWitnessClient' or @Name='Microsoft-Windows-SMBWitnessService']]]</Select>
+                    <Select Path="Microsoft-Windows-SMBClient/ObjectStateDiagnostic">*[System[Provider[@Name='Microsoft-Windows-ResumeKeyFilter' or @Name='Microsoft-Windows-SMBClient' or @Name='Microsoft-Windows-SmbServer' or @Name='Microsoft-Windows-SMBWitnessClient' or @Name='Microsoft-Windows-SMBWitnessService']]]</Select>
+                    <Select Path="Microsoft-Windows-SMBClient/Operational">*[System[Provider[@Name='Microsoft-Windows-ResumeKeyFilter' or @Name='Microsoft-Windows-SMBClient' or @Name='Microsoft-Windows-SmbServer' or @Name='Microsoft-Windows-SMBWitnessClient' or @Name='Microsoft-Windows-SMBWitnessService']]]</Select>
+                    <Select Path="WitnessClientAdmin">*[System[Provider[@Name='Microsoft-Windows-ResumeKeyFilter' or @Name='Microsoft-Windows-SMBClient' or @Name='Microsoft-Windows-SmbServer' or @Name='Microsoft-Windows-SMBWitnessClient' or @Name='Microsoft-Windows-SMBWitnessService']]]</Select>
+                    <Select Path="WitnessServiceAdmin">*[System[Provider[@Name='Microsoft-Windows-ResumeKeyFilter' or @Name='Microsoft-Windows-SMBClient' or @Name='Microsoft-Windows-SmbServer' or @Name='Microsoft-Windows-SMBWitnessClient' or @Name='Microsoft-Windows-SMBWitnessService']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='mrxsmb']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='Srv']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='Srv2']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='Workstation']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='Server']]]</Select>
+                    <!-- SMB events END -->
+
+                    <!-- Defrag events BEGIN -->
+                    <Select Path="Application">*[System[Provider[@Name='Microsoft-Windows-Defrag']]]</Select>
+                    <!-- Defrag events END -->
+
+                    <!-- CHKDSK events BEGIN -->
+                    <Select Path="Application">*[System[Provider[@Name='Chkdsk']]]</Select>
+                    <!-- CHKDSK events END -->
+
+                    <!-- Cluster events BEGIN -->
+                    <Select Path="Microsoft-Windows-FailoverClustering/Operational">*[System[Provider[@Name='Microsoft-Windows-FailoverClustering']]]</Select>
+                    <Select Path="Microsoft-Windows-FailoverClustering/Performance-CSV">*[System[Provider[@Name='Microsoft-Windows-FailoverClustering']]]</Select>
+                    <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-FailoverClustering']]]</Select>
+                    <!-- Cluster events END -->
+
+                    <!-- iSCSI events BEGIN -->
+                    <Select Path="Microsoft-Windows-iSCSITarget-Service/Admin">*[System[Provider[@Name='Microsoft-Windows-iSCSITarget-Service']]]</Select>
+                    <Select Path="Microsoft-Windows-iSCSITarget-Service/Diagnostic">*[System[Provider[@Name='Microsoft-Windows-iSCSITarget-Service']]]</Select>
+                    <Select Path="Microsoft-Windows-iSCSITarget-Service/Operational">*[System[Provider[@Name='Microsoft-Windows-iSCSITarget-Service']]]</Select>
+                    <!-- iSCSI events BEGIN -->
+
+                    <!-- Work Folders events BEGIN -->
+                    <Select Path="Microsoft-Windows-SyncShare/Operational">*[System[Provider[@Name='Microsoft-Windows-SyncShare']]]</Select>
+                    <!-- Work Folders events END -->
+
+                    <!-- Core components important for FS Role END -->
+                </Query>
+            </QueryList>
+        </QueryNode>
+    </QueryConfig>
+</ViewerConfig>

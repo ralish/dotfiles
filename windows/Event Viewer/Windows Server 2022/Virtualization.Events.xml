@@ -1,0 +1,26 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name ResourceId="%windir%\system32\vmms.exe,-30">Hyper-V Services</Name>
+      <Description ResourceId="%windir%\system32\vmms.exe,-31">System events for Hyper-V Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-Hyper-V-Hypervisor']]]</Select>
+          <Select Path="Microsoft-Windows-Hyper-V-Config-Admin">*</Select>
+          <Select Path="Microsoft-Windows-Hyper-V-High-Availability-Admin">*</Select>
+          <Select Path="Microsoft-Windows-Hyper-V-Hypervisor-Admin">*</Select>
+          <Select Path="Microsoft-Windows-Hyper-V-Integration-Admin">*</Select>
+          <Select Path="Microsoft-Windows-Hyper-V-VID-Admin">*</Select>
+          <Select Path="Microsoft-Windows-Hyper-V-VMMS-Admin">*</Select>
+          <Select Path="Microsoft-Windows-Hyper-V-VMMS-Networking">*</Select>
+          <Select Path="Microsoft-Windows-Hyper-V-VMMS-Storage">*</Select>
+          <Select Path="Microsoft-Windows-Hyper-V-Worker-Admin">*</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

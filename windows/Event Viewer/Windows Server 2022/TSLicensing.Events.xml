@@ -1,0 +1,16 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <QueryList>
+        <Query>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TermServLicensing']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-TerminalServices-Licensing']]]</Select>
+          <Select Path="System">*[System[Provider[@Name='TermServLicensing']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

@@ -1,0 +1,17 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name ResourceId="%windir%\system32\svrmgrnc.dll,-404">Active Directory Rights Management Services</Name>
+      <Description ResourceId="%windir%\system32\svrmgrnc.dll,-405">System events for Active Directory Rights Management Services</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="Application">*[System[Provider[@Name='Active Directory Rights Management Services']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>

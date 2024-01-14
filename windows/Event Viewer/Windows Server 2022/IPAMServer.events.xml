@@ -1,0 +1,19 @@
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name ResourceId="%windir%\system32\ipamres.dll,-119">IP Address Management(IPAM) Server</Name>
+      <Description ResourceId="%windir%\system32\ipamres.dll,-128">Admin and Operational events for IP Address Management Server</Description>
+      <SuppressQueryExecutionErrors>1</SuppressQueryExecutionErrors>
+      <QueryList>
+        <Query>
+          <Select Path="System">*[System[Provider[@Name='Microsoft-Windows-IPAM']]]</Select>
+          <Select Path="Microsoft-Windows-IPAM/Admin">*[System[Provider[@Name='Microsoft-Windows-IPAM']]]</Select>
+          <Select Path="Microsoft-Windows-IPAM/Operational">*[System[Provider[@Name='Microsoft-Windows-IPAM']]]</Select>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>
