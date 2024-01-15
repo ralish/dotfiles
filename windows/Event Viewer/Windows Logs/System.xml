@@ -1,207 +1,218 @@
-<QueryList xmlns="http://schemas.microsoft.com/win/2004/08/events/eventquery">
-  <Query Id="0" Path="System">
-    <Select Path="System">*</Select>
+<ViewerConfig>
+  <QueryConfig>
+    <QueryParams>
+      <UserQuery />
+    </QueryParams>
+    <QueryNode>
+      <Name>System</Name>
+      <Description>System log with low value events filtered out</Description>
+      <QueryList>
+        <Query Id="0" Path="System">
+          <Select Path="System">*</Select>
 
-    <!--
-      Sources with high volume informational events rarely of interest
+          <!--
+            Sources with high volume informational events rarely of interest
 
-      PROVIDER                    DESCRIPTION
-      Hyper-V-VmSwitch            Hyper-V Virtual Switch
-    -->
-    <Suppress Path="System">
-      *[System[
-        (
-          Provider[@Name='Microsoft-Windows-Hyper-V-VmSwitch']
-        )
-        and
-        Level=4
-      ]]
-    </Suppress>
+            PROVIDER                    DESCRIPTION
+            Hyper-V-VmSwitch            Hyper-V Virtual Switch
+          -->
+          <Suppress Path="System">
+            *[System[
+              (
+                Provider[@Name='Microsoft-Windows-Hyper-V-VmSwitch']
+              )
+              and
+              Level=4
+            ]]
+          </Suppress>
 
-    <!--
-      Source:     DHCPv6-Client
-      Level:      Information
-      Message:    DHCPv6 client service stop is almost done.DHCP Context Ref count is %1
+          <!--
+            Source:     DHCPv6-Client
+            Level:      Information
+            Message:    DHCPv6 client service stop is almost done.DHCP Context Ref count is %1
 
-      Rarely of interest and emitted multiple times on shutdown.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-DHCPv6-Client'] and EventID=51057]]
-    </Suppress>
+            Rarely of interest and emitted multiple times on shutdown.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Microsoft-Windows-DHCPv6-Client'] and EventID=51057]]
+          </Suppress>
 
-    <!--
-      Source:     DistributedCOM
-      Level:      Warning
-      Message:    The %1 permission settings do not grant %2 %3 permission for the COM Server application with CLSID %4 and APPID %5 to the user %6\%7 SID (%8) from address %9 running in the application container %10 SID (%11). This security permission can be modified using the Component Services administrative tool.
+          <!--
+            Source:     DistributedCOM
+            Level:      Warning
+            Message:    The %1 permission settings do not grant %2 %3 permission for the COM Server application with CLSID %4 and APPID %5 to the user %6\%7 SID (%8) from address %9 running in the application container %10 SID (%11). This security permission can be modified using the Component Services administrative tool.
 
-      DCOM event ID 10016 is logged in Windows
-      https://docs.microsoft.com/en-us/troubleshoot/windows-client/application-management/event-10016-logged-when-accessing-dcom
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-DistributedCOM'] and EventID=10016]]
-    </Suppress>
+            DCOM event ID 10016 is logged in Windows
+            https://docs.microsoft.com/en-us/troubleshoot/windows-client/application-management/event-10016-logged-when-accessing-dcom
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Microsoft-Windows-DistributedCOM'] and EventID=10016]]
+          </Suppress>
 
-    <!--
-      Source:     DriverFrameworks-UserMode
-      Level:      Information
-      Message:    UMDF reflector is unable to connect to service control manager (SCM). This is expected during boot, when SCM has not started yet. Will retry when it starts.
+          <!--
+            Source:     DriverFrameworks-UserMode
+            Level:      Information
+            Message:    UMDF reflector is unable to connect to service control manager (SCM). This is expected during boot, when SCM has not started yet. Will retry when it starts.
 
-      Rarely of interest and emitted multiple times on startup.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-DriverFrameworks-UserMode'] and EventID=10118]]
-    </Suppress>
+            Rarely of interest and emitted multiple times on startup.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Microsoft-Windows-DriverFrameworks-UserMode'] and EventID=10118]]
+          </Suppress>
 
-    <!--
-      Source:     GroupPolicy
-      Level:      Warning
-      Message:    Windows failed to apply the MDM Policy settings. MDM Policy settings might have its own log file. Please click on the "More information" link.
-      ErrorCode:  0x8018000a (MENROLL_E_DEVICE_ALREADY_ENROLLED)
+          <!--
+            Source:     GroupPolicy
+            Level:      Warning
+            Message:    Windows failed to apply the MDM Policy settings. MDM Policy settings might have its own log file. Please click on the "More information" link.
+            ErrorCode:  0x8018000a (MENROLL_E_DEVICE_ALREADY_ENROLLED)
 
-      Windows failed to apply the MDM Policy settings error when running gpupdate /force on hybrid Azure AD-joined devices
-      https://docs.microsoft.com/en-us/troubleshoot/mem/intune/windows-failed-to-apply-mdm-policy
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1085]]
-      and
-      *[EventData[
-        Data[@Name='ExtensionName'] and Data='MDM Policy' and
-        Data[@Name='ErrorCode'] and Data=2149056522
-      ]]
-    </Suppress>
+            Windows failed to apply the MDM Policy settings error when running gpupdate /force on hybrid Azure AD-joined devices
+            https://docs.microsoft.com/en-us/troubleshoot/mem/intune/windows-failed-to-apply-mdm-policy
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1085]]
+            and
+            *[EventData[
+              Data[@Name='ExtensionName'] and Data='MDM Policy' and
+              Data[@Name='ErrorCode'] and Data=2149056522
+            ]]
+          </Suppress>
 
-    <!--
-      Source:     GroupPolicy
-      Level:      Information
-      Message:    The Group Policy settings for the computer were processed successfully. There were no changes detected since the last successful processing of Group Policy.
+          <!--
+            Source:     GroupPolicy
+            Level:      Information
+            Message:    The Group Policy settings for the computer were processed successfully. There were no changes detected since the last successful processing of Group Policy.
 
-      Rarely of interest as it's effectively a NOP.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1500]]
-    </Suppress>
+            Rarely of interest as it's effectively a NOP.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1500]]
+          </Suppress>
 
-    <!--
-      Source:     GroupPolicy
-      Level:      Information
-      Message:    The Group Policy settings for the user were processed successfully. There were no changes detected since the last successful processing of Group Policy.
+          <!--
+            Source:     GroupPolicy
+            Level:      Information
+            Message:    The Group Policy settings for the user were processed successfully. There were no changes detected since the last successful processing of Group Policy.
 
-      Rarely of interest as it's effectively a NOP.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1501]]
-    </Suppress>
+            Rarely of interest as it's effectively a NOP.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1501]]
+          </Suppress>
 
-    <!--
-      Source:     Kernel-General
-      Level:      Information
-      Message:    The access history in hive %2 was cleared updating %3 keys and creating %4 modified pages.
+          <!--
+            Source:     Kernel-General
+            Level:      Information
+            Message:    The access history in hive %2 was cleared updating %3 keys and creating %4 modified pages.
 
-      Rarely of interest and often high volume.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-Kernel-General'] and EventID=16]]
-    </Suppress>
+            Rarely of interest and often high volume.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Microsoft-Windows-Kernel-General'] and EventID=16]]
+          </Suppress>
 
-    <!--
-      Source:     Kernel-PnP
-      Level:      Warning
-      Message:    The driver \Driver\WudfRd failed to load for the device %2.
-      Status:     0xc0000365 (STATUS_FAILED_DRIVER_ENTRY)
+          <!--
+            Source:     Kernel-PnP
+            Level:      Warning
+            Message:    The driver \Driver\WudfRd failed to load for the device %2.
+            Status:     0xc0000365 (STATUS_FAILED_DRIVER_ENTRY)
 
-      Event ID 219 is logged when a device is plugged into a Windows-based system
-      https://docs.microsoft.com/en-us/troubleshoot/windows-client/deployment/event-id-219-when-device-plugged-in-windows-system
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-Kernel-PnP'] and EventID=219]]
-      and
-      *[EventData[
-        Data[@Name='FailureName'] and Data='\Driver\WudfRd' and
-        Data[@Name='Status'] and Data=3221226341
-      ]]
-    </Suppress>
+            Event ID 219 is logged when a device is plugged into a Windows-based system
+            https://docs.microsoft.com/en-us/troubleshoot/windows-client/deployment/event-id-219-when-device-plugged-in-windows-system
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Microsoft-Windows-Kernel-PnP'] and EventID=219]]
+            and
+            *[EventData[
+              Data[@Name='FailureName'] and Data='\Driver\WudfRd' and
+              Data[@Name='Status'] and Data=3221226341
+            ]]
+          </Suppress>
 
-    <!--
-      Source:     Netwtw10
-      Level:      Warning
-      Message:    6062 - Lso was triggered
+          <!--
+            Source:     Netwtw10
+            Level:      Warning
+            Message:    6062 - Lso was triggered
 
-      Emitted by the Intel Wireless WiFi Link Driver. Presumably refers to Large Send Offload and seems to occur on various connection events.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Netwtw10'] and EventID=6062]]
-    </Suppress>
+            Emitted by the Intel Wireless WiFi Link Driver. Presumably refers to Large Send Offload and seems to occur on various connection events.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Netwtw10'] and EventID=6062]]
+          </Suppress>
 
-    <!--
-      Source:     Netwtw10
-      Level:      Informational
-      Message:    7021 - Connection telemetry fields and analysis usage
-                  7025 - Dump after return from D3 before cmd
-                  7026 - Dump after return from D3 after cmd
+          <!--
+            Source:     Netwtw10
+            Level:      Informational
+            Message:    7021 - Connection telemetry fields and analysis usage
+                        7025 - Dump after return from D3 before cmd
+                        7026 - Dump after return from D3 after cmd
 
-      Events emitted by the Intel Wireless WiFi Link Driver of little to no value.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Netwtw10'] and (EventID=7021 or EventID=7025 or EventID=7026)]]
-    </Suppress>
+            Events emitted by the Intel Wireless WiFi Link Driver of little to no value.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Netwtw10'] and (EventID=7021 or EventID=7025 or EventID=7026)]]
+          </Suppress>
 
-    <!--
-      Source:     nhi
-      Level:      Informational
-      Message:    The driver entered RTD3.
-                  All the connected devices will be removed from driver's internal state, so it is expected that DeviceDisconnected events will happen.
+          <!--
+            Source:     nhi
+            Level:      Informational
+            Message:    The driver entered RTD3.
+                        All the connected devices will be removed from driver's internal state, so it is expected that DeviceDisconnected events will happen.
 
-      Emitted by the Intel Thunderbolt Bus Driver. Rarely of interest and often high volume. Paired with Event ID 9008.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='nhi'] and EventID=9007]]
-    </Suppress>
+            Emitted by the Intel Thunderbolt Bus Driver. Rarely of interest and often high volume. Paired with Event ID 9008.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='nhi'] and EventID=9007]]
+          </Suppress>
 
-    <!--
-      Source:     nhi
-      Level:      Informational
-      Message:    Driver exit RTD3.
-                  All the connected devices will now cause DeviceConnected events.
+          <!--
+            Source:     nhi
+            Level:      Informational
+            Message:    Driver exit RTD3.
+                        All the connected devices will now cause DeviceConnected events.
 
-      Emitted by the Intel Thunderbolt Bus Driver. Rarely of interest and often high volume. Paired with Event ID 9007.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='nhi'] and EventID=9008]]
-    </Suppress>
+            Emitted by the Intel Thunderbolt Bus Driver. Rarely of interest and often high volume. Paired with Event ID 9007.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='nhi'] and EventID=9008]]
+          </Suppress>
 
-    <!--
-      Source:     Service Control Manager
-      Level:      Information
-      Message:    The %1 service entered the %2 state.
+          <!--
+            Source:     Service Control Manager
+            Level:      Information
+            Message:    The %1 service entered the %2 state.
 
-      Rarely of interest and often high volume, particularly on server SKUs.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Service Control Manager'] and EventID=7036]]
-    </Suppress>
+            Rarely of interest and often high volume, particularly on server SKUs.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Service Control Manager'] and EventID=7036]]
+          </Suppress>
 
-    <!--
-      Source:     Service Control Manager
-      Level:      Information
-      Message:    The start type of the BITS service was changed from %2 to %3.
+          <!--
+            Source:     Service Control Manager
+            Level:      Information
+            Message:    The start type of the BITS service was changed from %2 to %3.
 
-      The Background Intelligent Transfer Service often changes its start type.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Service Control Manager'] and EventID=7040]]
-      and
-      *[EventData[Data[@Name='param4'] and Data='BITS']]
-    </Suppress>
+            The Background Intelligent Transfer Service often changes its start type.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Service Control Manager'] and EventID=7040]]
+            and
+            *[EventData[Data[@Name='param4'] and Data='BITS']]
+          </Suppress>
 
-    <!--
-      Source:     Time-Service
-      Level:      Warning
-      Message:    NtpClient was unable to set a domain peer to use as a time source because of discovery error. NtpClient will try again in %2 minutes and double the reattempt interval thereafter. The error was: %1
+          <!--
+            Source:     Time-Service
+            Level:      Warning
+            Message:    NtpClient was unable to set a domain peer to use as a time source because of discovery error. NtpClient will try again in %2 minutes and double the reattempt interval thereafter. The error was: %1
 
-      Can be noisy on systems which may not always have line-of-sight to a DC.
-    -->
-    <Suppress Path="System">
-      *[System[Provider[@Name='Microsoft-Windows-Time-Service'] and EventID=129]]
-    </Suppress>
-  </Query>
-</QueryList>
+            Can be noisy on systems which may not always have line-of-sight to a DC.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='Microsoft-Windows-Time-Service'] and EventID=129]]
+          </Suppress>
+        </Query>
+      </QueryList>
+    </QueryNode>
+  </QueryConfig>
+</ViewerConfig>
