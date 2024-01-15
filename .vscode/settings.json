@@ -236,7 +236,7 @@
     "xml.fileAssociations": [
         {
             "pattern": "**/windows/Event Viewer/**.xml",
-            "systemId": "windows/Event Viewer/Query.xsd"
+            "systemId": "windows/Event Viewer/Schemas/Viewer.xsd"
         }
     ],
 

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Derived from custom views as no schema is publicly available -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:include schemaLocation="Query.xsd" />
+
+  <xs:complexType name="UserQueryType" />
+
+  <xs:complexType name="QueryParamsType">
+    <xs:sequence>
+      <xs:element name="UserQuery" type="UserQueryType" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="QueryNameType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="ResourceId" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="QueryDescriptionType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="ResourceId" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="QueryNodeType">
+    <xs:sequence>
+      <xs:element name="Name" type="QueryNameType" />
+      <xs:element name="Description" type="QueryDescriptionType" />
+      <xs:element name="SuppressQueryExecutionErrors" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="QueryList" type="QueryListType" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="QueryConfigType">
+    <xs:sequence>
+      <xs:element name="QueryParams" type="QueryParamsType" />
+      <xs:element name="QueryNode" type="QueryNodeType" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ViewerConfigType">
+    <xs:sequence>
+      <xs:element name="QueryConfig" type="QueryConfigType" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="ViewerConfig" type="ViewerConfigType" />
+
+</xs:schema>
