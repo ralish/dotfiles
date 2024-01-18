@@ -19,9 +19,6 @@
 	addIgnoredFile = false
 	statusHints = false
 
-[apply]
-	whitespace = fix
-
 [branch]
 	autoSetupMerge = always
 	autoSetupRebase = always
