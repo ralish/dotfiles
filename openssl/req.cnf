@@ -18,21 +18,21 @@ x509_extensions                     = req_ext
 
 
 [ req_dn ]
-# CN=
+#CN=
 commonName                          = Common Name
 commonName_max                      = 64
-# E=
+#emailAddress=
 emailAddress                        = Email Address
 emailAddress_max                    = 64
-# OU=
+#OU=
 organizationalUnitName              = Organisational Unit
-# O=
+#O=
 organizationName                    = Organisation
-# L=
+#L=
 localityName                        = Locality/Suburb
-# ST=
+#ST=
 stateOrProvinceName                 = State/Territory/Province
-# C=
+#C=
 countryName                         = Country (2 letter code)
 countryName_min                     = 2
 countryName_max                     = 2
