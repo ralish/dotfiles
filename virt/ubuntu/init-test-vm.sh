@@ -37,10 +37,6 @@ apt-get -y dist-upgrade
 echo
 
 function install_if_available() {
-    if [[ $# -lt 1 ]]; then
-        script_exit 'Missing required argument to install_if_available()!' 2
-    fi
-
     # Check if the package is already installed
     local pkg_name="$1"
     if dpkg -s "$pkg_name" > /dev/null 2>&1; then
