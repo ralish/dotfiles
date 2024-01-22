@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Initialize a Ubuntu VM with a configuration optimised for testing.
+# Initialize a Debian or Ubuntu VM with a configuration optimised for testing.
 
 set -e
 
@@ -9,20 +9,22 @@ if [[ $UID -ne 0 ]]; then
     exit 1
 fi
 
-lsb_release_id="$(lsb_release -s -i)"
-if [[ $lsb_release_id != Ubuntu ]]; then
-    echo 'This script is only for Ubuntu systems.'
+lsb_release_id="$(lsb_release -s -i 2> /dev/null)"
+if ! [[ $lsb_release_id =~ Debian|Ubuntu ]]; then
+    echo 'This script is only for Debian and Ubuntu systems.'
     exit 1
 fi
 
-echo '[apt] Switching to local mirror ... '
-ubuntu_release="$(lsb_release -s -r)"
-ubuntu_release_year="$(echo "$ubuntu_release" | grep -o -E '^[0-9]+')"
-if ((ubuntu_release_year >= 14)); then
-    sed -i 's/http:\/\/\([a-z]\{2\}\.\)\?\(archive\.ubuntu\.com\)/http:\/\/au\.\2/' /etc/apt/sources.list
-else
-    sed -i 's/http:\/\/\([a-z]\{2\}\.\)\?archive\.ubuntu\.com/http:\/\/old-releases.ubuntu.com/' /etc/apt/sources.list
-    sed -i 's/http:\/\/security\.ubuntu\.com/http:\/\/old-releases.ubuntu.com/' /etc/apt/sources.list
+if [[ $lsb_release_id == 'Ubuntu' ]]; then
+    echo '[apt] Switching to local mirror ... '
+    ubuntu_release="$(lsb_release -s -r)"
+    ubuntu_release_year="$(echo "$ubuntu_release" | grep -o -E '^[0-9]+')"
+    if ((ubuntu_release_year >= 14)); then
+        sed -i 's/http:\/\/\([a-z]\{2\}\.\)\?\(archive\.ubuntu\.com\)/http:\/\/au\.\2/' /etc/apt/sources.list
+    else
+        sed -i 's/http:\/\/\([a-z]\{2\}\.\)\?archive\.ubuntu\.com/http:\/\/old-releases.ubuntu.com/' /etc/apt/sources.list
+        sed -i 's/http:\/\/security\.ubuntu\.com/http:\/\/old-releases.ubuntu.com/' /etc/apt/sources.list
+    fi
 fi
 
 echo '[apt] Disabling automatic updates ...'
@@ -61,6 +63,7 @@ function install_if_available() {
 
 install_if_available debsums
 install_if_available openssh-server
+install_if_available sudo
 install_if_available vim
 
 # Suppress error as ancient versions of APT don't support this command
