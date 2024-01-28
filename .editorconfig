@@ -41,19 +41,6 @@ insert_final_newline = false
 [.gitconfig*]
 indent_style = tab
 
-# irssi configuration
-[irssi/.irssi/*]
-indent_size = 2
-
-# JetBrains configuration
-[*.DotSettings]
-indent_style = tab
-insert_final_newline = false
-
-# JetBrains IDE configuration
-[jetbrains/**/*.xml]
-indent_size = 2
-
 # Onetastic file
 [*.onetastic]
 insert_final_newline = false
@@ -83,10 +70,6 @@ max_line_length = 79
 keep_padding = true             # shfmt: -kp
 space_redirects = true          # shfmt: -sr
 switch_case_indent = true       # shfmt: -ci
-
-# Visual Studio configuration
-[*.vssettings]
-insert_final_newline = false
 
 # Windows Event Viewer filter
 [windows/Event Viewer/**.{xml,xsd}]

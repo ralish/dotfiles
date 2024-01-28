@@ -33,10 +33,6 @@
         ".gitconfig-win": "ini",
         // htop
         "htoprc": "properties",
-        // irssi
-        "**/irssi/.irssi/*": "plain",
-        // jetbrains
-        "*.DotSettings": "xml",
         // less
         ".lesskey": "properties",
         // markdownlint
@@ -62,8 +58,6 @@
         "pip.conf": "ini",
         // prettier
         ".prettierrc": "json",
-        // putty
-        "**/putty/Sessions/*.json": "jsonc",
         // quilt
         ".quiltrc": "shellscript",
         // readline
@@ -84,8 +78,6 @@
         // subversion
         "**/.subversion/config": "ini",
         "**/.subversion/servers": "ini",
-        // vs
-        "*.vssettings": "xml",
         // wget
         ".wgetrc": "properties",
         // windows/Windows Sandbox
