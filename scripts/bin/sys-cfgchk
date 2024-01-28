@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Search for new/old configuration file backups by dpkg or ucf
+# Search for configuration file backups
 
 # A better class of script...
 set -o errexit          # Exit on most errors (see the manual)
@@ -44,11 +44,6 @@ function parse_params() {
 
 parse_params "$@"
 
-if ! dpkg -S /usr/bin/dpkg > /dev/null 2>&1; then
-    echo 'This script is for Debian based systems.'
-    exit 1
-fi
-
 if [[ $UID -ne 0 && -z $quiet ]]; then
     echo -e 'Warning: Running without root privileges may give incomplete results!\n'
 fi
@@ -65,15 +60,42 @@ if [[ -n $quiet ]]; then
     exec 4>&2 2> /dev/null
 fi
 
-search_results=$(find "$search_path" -name '*.old*' -or \
-                                     -name '*.dpkg-dist*' -or \
-                                     -name '*.dpkg-new*' -or \
-                                     -name '*.dpkg-old*' -or \
-                                     -name '*.ucf-dist*' -or \
-                                     -name '*.ucf-new*' -or \
-                                     -name '*.ucf-old*' -or \
-                                     -name '*.distUpgrade' ||
-                                        true)
+file_exts=(
+    # Generic
+    'backup'
+    'bak'
+    'old'
+    'orig'
+
+    # do-release-upgrade
+    'distUpgrade'
+
+    # dpkg
+    'dpkg-dist'
+    'dpkg-new'
+    'dpkg-old'
+
+    # rpm
+    'rpmnew'
+    'rpmsave'
+
+    # ucf
+    'ucf-dist'
+    'ucf-new'
+    'ucf-old'
+)
+
+find_args=()
+
+for file_ext in "${file_exts[@]}"; do
+    if [[ ${#find_args[@]} -gt 0 ]]; then
+        find_args+=('-or')
+    fi
+
+    find_args+=('-name' "*.$file_ext*")
+done
+
+search_results=$(find "$search_path" "${find_args[@]}" || true)
 
 if [[ -n $quiet ]]; then
     exec 2>&4 4> /dev/null
