@@ -1,0 +1,42 @@
+# Core
+pip
+setuptools
+wheel
+
+# Debugging
+debugpy
+
+# Documentation
+doc8
+docutils
+esbonio
+restructuredtext-lint
+rstcheck
+
+# Formatters
+autopep8
+black
+yapf
+
+# Linters
+flake8
+isort
+mypy
+pycodestyle
+pydocstyle
+pylint
+
+# Packaging
+check-manifest
+pyroma
+
+# Security
+bandit
+safety
+
+# Testing
+pytest
+tox
+
+# Utilities
+pipdeptree
