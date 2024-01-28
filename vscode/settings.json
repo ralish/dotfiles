@@ -143,6 +143,7 @@
     // CMake Tools
     "cmake.configureOnOpen": false,
     "cmake.configureOnEdit": false,
+    "cmake.showOptionsMovedNotification": false,
 
     // Debugger for Java
     "java.silentNotification": true,
@@ -177,6 +178,9 @@
     // GitLens
     "gitlens.defaultDateStyle": "absolute",
     "gitlens.telemetry.enabled": false,
+
+    // Go
+    "go.survey.prompt": false,
 
     // IntelliCode
     "vsintellicode.features.python.deepLearning": "enabled",
