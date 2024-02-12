@@ -124,6 +124,9 @@
     // AsciiDoc
     "asciidoc.useWorkspaceRootAsBaseDirectory": true,
 
+    // AWS Toolkit
+    "aws.telemetry": false,
+
     // Azure Repos
     "azureRepos.autoFetch.enabled": false,
 
