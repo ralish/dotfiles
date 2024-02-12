@@ -59,6 +59,9 @@
     "workbench.settings.editor": "json",
     "workbench.settings.enableNaturalLanguageSearch": false,
 
+    // Window
+    "window.confirmSaveUntitledWorkspace": false,
+
     // Window: New Window
     "window.newWindowDimensions": "inherit",
 
