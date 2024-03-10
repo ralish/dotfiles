@@ -1,10 +1,11 @@
 # Clink Readline configuration
 #
-# Last reviewed release: v1.5.16
+# Last reviewed release: v1.6.8
 
 # ----------------------------- Config Settings -------------------------------
 
 # The following settings are removed as they do not apply to Clink:
+# - active-region-end-color
 # - bind-tty-special-chars
 # - completion-map-case
 # - convert-meta
@@ -22,6 +23,12 @@
 # - history-point-at-end-of-anchored-search
 # - menu-complete-wraparound
 # - search-ignore-case
+
+# Terminal escape sequence which sets the text colour and background when
+# displaying the text in the active region.
+#
+# Only applies if enable-active-region is enabled.
+set active-region-start-color '\e[0;7m'
 
 # Handling of the terminal bell
 #
@@ -88,6 +95,10 @@ set editing-mode emacs
 #
 # Only applies if using emacs editing mode and show-mode-in-prompt is enabled.
 set emacs-mode-string '@'
+
+# Allow certain commands to designate the "region" as active, where the region
+# is the text between a saved cursor position and the current cursor position.
+set enable-active-region on
 
 # Insert each paste into the editing buffer as a single string of characters
 set enable-bracketed-paste on

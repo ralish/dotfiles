@@ -1,6 +1,6 @@
 # Clink configuration
 #
-# Last reviewed release: v1.5.16
+# Last reviewed release: v1.6.8
 
 # ---------------------------------- Clink ------------------------------------
 
@@ -287,6 +287,9 @@ lua.break_on_traceback = False
 
 # -------------------------------- Matching -----------------------------------
 
+# Colour definitions for displaying match completions
+#match.coloring_rules =
+
 # Expand abbreviated paths before performing completion
 match.expand_abbrev = True
 
@@ -417,6 +420,13 @@ files.system = False
 
 # Refresh the prompt asynchronously
 prompt.async = True
+# When to add or remove blank lines before the prompt
+#
+# Valid values:
+# - normal
+# - compact
+# - sparse
+prompt.spacing = normal
 # When to collapse previous prompts
 #
 # Valid values:
