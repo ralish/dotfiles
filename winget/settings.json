@@ -2,7 +2,7 @@
     /*
      * Windows Package Manager (WinGet) settings
      *
-     * Last reviewed release: v1.6.3133
+     * Last reviewed release: v1.7.10582
      * Default file path: %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json
      */
 
@@ -13,7 +13,8 @@
     },
 
     "logging": {
-        "level": "info"
+        "level": "info",
+        "channels": ["default"]
     },
 
     "network": {
@@ -37,6 +38,7 @@
     "installBehavior": {
         "disableInstallNotes": false,
         "skipDependencies": false,
+        "maxResumes": 3,
 
         "preferences": {
             "architectures": ["x64", "x86", "neutral"],
