@@ -1,6 +1,6 @@
 # Windows Subsystem for Linux (WSL) global settings
 #
-# Last reviewed release: v2.0.9
+# Last reviewed release: v2.0.14
 # Default file path: %USERPROFILE%\.wslconfig
 #
 # Initial support from Windows Build 18945 (Windows 10 2004+)
