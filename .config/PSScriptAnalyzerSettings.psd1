@@ -1,11 +1,12 @@
 # PSScriptAnalyzer settings
 #
-# Last reviewed release: v1.21.0
+# Last reviewed release: v1.22.0
 
 @{
     IncludeRules = @('*')
 
     ExcludeRules = @(
+        'PSAvoidLongLines',
         'PSAvoidUsingInvokeExpression',
         'PSAvoidUsingWriteHost',
         # Broken with child scopes pending fix (GH #1472)
@@ -18,7 +19,6 @@
         # Compatibility rules
         PSUseCompatibleSyntax = @{
             Enable         = $true
-            # Only major versions from v3.0 are supported
             TargetVersions = @('5.0', '7.0')
         }
 
@@ -28,18 +28,8 @@
             CheckHashtable = $true
         }
 
-        PSAvoidLongLines = @{
-            Enable            = $false
-            MaximumLineLength = 119
-        }
-
         PSAvoidUsingCmdletAliases = @{
             allowlist = @('%', '?')
-        }
-
-        PSAvoidUsingPositionalParameters = @{
-            Enable           = $true
-            CommandAllowList = @('az')
         }
 
         PSPlaceCloseBrace = @{
