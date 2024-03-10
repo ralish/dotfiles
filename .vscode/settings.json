@@ -25,12 +25,11 @@
         ".editrc": "properties",
         // git
         ".gitconfig": "ini",
-        ".gitconfig-priv": "ini",
+        ".gitconfig-*": "ini",
         "**/git/bin/*": "shellscript",
         "**/git/hooks/*": "shellscript",
         // git-win
         ".git-for-windows-updater": "ini",
-        ".gitconfig-win": "ini",
         // htop
         "htoprc": "properties",
         // less

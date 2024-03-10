@@ -50,7 +50,7 @@
 
 [merge]
 	log = true
-	conflictStyle = diff3
+	conflictStyle = zdiff3
 	defaultToUpstream = true
 
 [oh-my-zsh]
@@ -58,11 +58,9 @@
 
 [pull]
 	ff = only
-	rebase = true
 
 [push]
-	default = simple
-	autoSetupRemote = true
+	default = current
 	followTags = true
 
 [rebase]

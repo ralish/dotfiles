@@ -11,7 +11,7 @@
 	longpaths = true
 	# Don't checkout paths which may cause problems on NTFS
 	protectNTFS = true
-	# Don't print non-ASCII file names in quoted octal notation
+	# Don't quote "unusual" characters when outputting paths
 	quotePath = off
 	# Enable symlink support (needs SeCreateSymbolicLinkPrivilege)
 	symlinks = true
