@@ -1,0 +1,18 @@
+[core]
+	pager = delta
+
+[delta]
+	line-numbers = true
+	navigate = true
+	side-by-side = true
+
+[diff]
+	colorMoved = default
+
+[interactive]
+	diffFilter = delta --color-only
+
+[merge]
+	conflictStyle = diff3
+
+# vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 noet sr

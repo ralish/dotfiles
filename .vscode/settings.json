@@ -161,6 +161,7 @@
             "icon": "git",
             "extensions": [
                 ".git-for-windows-updater",
+                ".gitconfig-delta",
                 ".gitconfig-priv",
                 ".gitconfig-win",
                 ".keepme"

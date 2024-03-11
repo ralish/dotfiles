@@ -4,6 +4,7 @@
 
 [include]
 	path = .gitconfig-priv
+	path = .gitconfig-delta
 	path = .gitconfig-win
 
 [user]
