@@ -6,10 +6,8 @@
     IncludeRules = @('*')
 
     ExcludeRules = @(
-        'PSAvoidLongLines',
         'PSAvoidUsingInvokeExpression',
         'PSAvoidUsingWriteHost',
-        # Broken with child scopes pending fix (GH #1472)
         'PSReviewUnusedParameter',
         'PSUseShouldProcessForStateChangingFunctions',
         'PSUseSingularNouns'
@@ -30,6 +28,11 @@
 
         PSAvoidUsingCmdletAliases = @{
             allowlist = @('%', '?')
+        }
+
+        PSAvoidUsingPositionalParameters = @{
+            Enable           = $true
+            CommandAllowList = @()
         }
 
         PSPlaceCloseBrace = @{

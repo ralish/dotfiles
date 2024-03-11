@@ -5,11 +5,7 @@
 @{
     IncludeRules = @('*')
 
-    ExcludeRules = @(
-        # Broken with child scopes pending fix (GH #1472)
-        'PSReviewUnusedParameter',
-        'PSUseOutputTypeCorrectly'
-    )
+    ExcludeRules = @()
 
     Rules = @{
         # Compatibility rules
