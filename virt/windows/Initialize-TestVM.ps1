@@ -286,7 +286,7 @@ Function Optimize-ShutdownPrep {
 
     Write-Host -ForegroundColor Green '[Shutdown] Removing registry keys ...'
     foreach ($RegKey in $RegKeys) {
-        Remove-Item -LiteralPath $RegKey -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath $RegKey -Recurse -ErrorAction SilentlyContinue
     }
 
     Write-Host -ForegroundColor Green '[Shutdown] Clearing PowerShell history ...'
