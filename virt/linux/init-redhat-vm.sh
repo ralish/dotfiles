@@ -15,6 +15,19 @@ if [[ -z $rh_release ]]; then
     exit 1
 fi
 
+function yum_install() {
+    local pkg_name="$1"
+
+    # shellcheck disable=SC2312
+    if ! rpm -qa | grep "$pkg_name" > /dev/null; then
+        return
+    fi
+
+    echo "[yum] Installing $pkg_name ..."
+    yum -y install "$pkg_name"
+    echo
+}
+
 echo '[yum] Updating package indexes ...'
 set +e
 yum check-update
@@ -30,19 +43,8 @@ elif [[ $yum_rc -ne 0 ]]; then
 fi
 echo
 
-# shellcheck disable=SC2312
-if ! rpm -qa | grep openssh-server > /dev/null; then
-    echo '[yum] Installing OpenSSH server ...'
-    yum -y install openssh-server
-    echo
-fi
-
-# shellcheck disable=SC2312
-if ! rpm -qa | grep vim > /dev/null; then
-    echo '[yum] Installing Vim ...'
-    yum -y install vim-minimal
-    echo
-fi
+yum_install openssh-server
+yum_install vim-minimal
 
 echo '[yum] Removing stale dependencies ...'
 yum -y autoremove

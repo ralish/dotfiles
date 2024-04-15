@@ -15,6 +15,28 @@ if ! [[ $lsb_release_id =~ Debian|Ubuntu ]]; then
     exit 1
 fi
 
+function apt_install() {
+    local pkg_name="$1"
+
+    if dpkg -s "$pkg_name" > /dev/null 2>&1; then
+        return
+    fi
+
+    # Check if the package is available to install. Simply using "apt-cache
+    # show $pkg_name" is insufficient as it may return success if the package
+    # is referenced by other packages but has no installation candidate.
+    local pkg_exists
+    pkg_exists="$(apt-cache search --names-only "^$pkg_name$")"
+    if [[ -z $pkg_exists ]]; then
+        echo "[apt] Unable to find package: $pkg_name"
+        return
+    fi
+
+    echo "[apt] Installing $pkg_name ..."
+    apt-get -y install "$pkg_name"
+    echo
+}
+
 if [[ $lsb_release_id == 'Ubuntu' ]]; then
     echo '[apt] Switching to local mirror ... '
     ubuntu_release="$(lsb_release -s -r)"
@@ -38,35 +60,12 @@ echo '[apt] Installing package updates ...'
 apt-get -y dist-upgrade
 echo
 
-function install_if_available() {
-    # Check if the package is already installed
-    local pkg_name="$1"
-    if dpkg -s "$pkg_name" > /dev/null 2>&1; then
-        return
-    fi
+apt_install debsums
+apt_install openssh-server
+apt_install sudo
+apt_install vim
 
-    # Check if the package is available to install. Simply using "apt-cache
-    # show $pkg_name" is insufficient as it may return success if the package
-    # is referenced by other packages but has no installation candidate.
-    local pkg_regex pkg_exists
-    pkg_regex="$(printf '^%s$' "$1")"
-    pkg_exists="$(apt-cache search --names-only "$pkg_regex")"
-    if [[ -z $pkg_exists ]]; then
-        echo "[apt] Unable to find package: $pkg_name"
-        return
-    fi
-
-    echo "[apt] Installing $pkg_name ..."
-    apt-get -y install "$pkg_name"
-    echo
-}
-
-install_if_available debsums
-install_if_available openssh-server
-install_if_available sudo
-install_if_available vim
-
-# Suppress error as ancient versions of APT don't support this command
+# Suppress any error as ancient APT versions do not have this command
 echo '[apt] Removing stale dependencies ...'
 apt-get -y autoremove || true
 echo
@@ -79,7 +78,7 @@ rm -rf /var/lib/apt/lists
 mkdir -p /var/lib/apt/lists/partial
 
 if command -v snap > /dev/null; then
-    # Suppress error as only recent versions of snapd support this command
+    # Suppress any error as only recent snapd versions have this command
     echo '[snap] Disabling automatic updates ...'
     snap refresh --hold || true
     echo

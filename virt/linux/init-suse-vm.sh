@@ -9,11 +9,23 @@ if [[ $UID -ne 0 ]]; then
     exit 1
 fi
 
-suse_release="$(grep -E 'SUSE' /etc/os-release || true)"
+suse_release="$(grep 'SUSE' /etc/os-release || true)"
 if [[ -z $suse_release ]]; then
     echo 'This script is only for SUSE systems.'
     exit 1
 fi
+
+function zypper_install() {
+    local pkg_name="$1"
+
+    if ! zypper search -i "$pkg_name" > /dev/null; then
+        return
+    fi
+
+    echo "[zypper] Installing $pkg_name ..."
+    zypper install -y "$pkg_name"
+    echo
+}
 
 echo '[zypper] Updating package indexes ...'
 zypper refresh
@@ -23,21 +35,12 @@ echo '[zypper] Installing package updates ...'
 zypper update -y
 echo
 
-if ! zypper search -i openssh-server > /dev/null; then
-    echo '[zypper] Installing OpenSSH server ...'
-    zypper install -y openssh-server
-    echo
-fi
+zypper_install openssh-server
+zypper_install vim
 
-if ! zypper search -i vim > /dev/null; then
-    echo '[zypper] Installing Vim ...'
-    zypper install -y vim
-    echo
-fi
-
-#echo '[zypper] Cleaning local repository ...'
-#zypper clean -a
-#echo
+echo '[zypper] Cleaning local repository ...'
+zypper clean -a
+echo
 
 if [[ -f /etc/sudoers ]]; then
     if [[ -z $SUDO_USER ]]; then
