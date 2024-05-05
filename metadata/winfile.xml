@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ralish/PSDotFiles/main/Metadata.xsd">
+    <FriendlyName>WinFile</FriendlyName>
+
+    <Detection>
+        <Method>FindInPath</Method>
+    </Detection>
+
+    <InstallPath>
+        <SpecialFolder>ApplicationData</SpecialFolder>
+        <Destination>Microsoft\Winfile</Destination>
+    </InstallPath>
+
+    <IgnorePaths>
+        <IgnorePath>DEFAULTS.INI</IgnorePath>
+    </IgnorePaths>
+</Component>
