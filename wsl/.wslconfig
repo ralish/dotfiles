@@ -1,21 +1,40 @@
-# Windows Subsystem for Linux (WSL) global settings
+# Windows Subsystem for Linux 2 (WSL 2) global settings
 #
-# Last reviewed release: v2.0.14
+# Last reviewed release: v2.2.4
 # Default file path: %USERPROFILE%\.wslconfig
 #
 # Initial support from Windows Build 18945 (Windows 10 2004+)
 
+#################################################
+###           Undocumented settings           ###
+#################################################
+
+# SECTION       NAME                    TYPE        Default     Introduced
+# wsl2          defaultVhdSize          str         Unknown     2.0.5
+# wsl2          earlyBootLogging        Unknown     Unknown     At least 2.0.0
+# wsl2          hostFileSystemAccess    bool        true        At least 2.0.0
+# wsl2          ipv6                    bool        false       At least 2.0.0
+# wsl2          kernelBootTimeout       int         30000       At least 2.0.0
+# wsl2          kernelDebugPort         int         0           At least 2.0.0
+# wsl2          kernelModules           bool        true        2.1.0
+# wsl2          mountDeviceTimeout      int         5000        At least 2.0.0
+# wsl2          systemDistro            str         Unknown     At least 2.0.0
+# wsl2          virtio                  bool        false       At least 2.0.0
+# wsl2          virtio9p                bool        true        At least 2.0.0
+# wsl2          virtiofs                bool        false       At least 2.0.0
+# wsl2          vmSwitch                str         Unknown     At least 2.0.0
+
+
 [wsl2]
+#################################################
+###                    CPU                    ###
+#################################################
+
 # Number of processors to assign to the VM
 #
 # Default: (All processors)
+# Support: Build 18945 (Windows 10 2004+)
 processors = 6
-
-# Nested virtualisation support on AMD64
-#
-# Default: true
-# Support: Build 20175 (Windows 11 21H2+)
-#nestedVirtualization = true
 
 # Hardware performance counters support
 #
@@ -23,11 +42,23 @@ processors = 6
 # Support: WSL 0.50.2
 #hardwarePerformanceCounters = true
 
+# Nested virtualisation support on AMD64
+#
+# Default: true
+# Support: Build 20175 (Windows 11 21H2+)
+#nestedVirtualization = true
+
+#################################################
+###                  Memory                   ###
+#################################################
+
 # Amount of memory to assign to the VM
 #
 # Default differs by Windows build:
 #  < 20175: 80% of total memory
-# >= 20175: 50% of total memory or 8GB (whichever is less)
+# >= 20175: 50% of total memory
+#
+# Support: Build 18945 (Windows 10 2004+)
 memory = 16GB
 
 # Amount of swap space to add to the VM
@@ -35,17 +66,20 @@ memory = 16GB
 # Setting to 0 disables adding a swap file.
 #
 # Default: (25% of total memory rounded-up to the nearest GB)
+# Support: Build 18945 (Windows 10 2004+)
 #swap = 0
 
 # Absolute Windows path to the swap VHDX file
 #
 # Default: %USERPROFILE%\\AppData\\Local\\Temp\\swap.vhdx
+# Support: Build 18945 (Windows 10 2004+)
 #swapFile = %USERPROFILE%\\AppData\\Local\\Temp\\swap.vhdx
 
 # Free memory page reporting
 #
 # Default: true
 # Support: Build 19013 (Windows 10 2004+)
+# Removed: WSL 1.1.7
 #pageReporting = true
 
 # Idle threshold for memory compaction
@@ -54,13 +88,39 @@ memory = 16GB
 #
 # Default: 1
 # Support: Build 19013 (Windows 10 2004+)
+# Removed: Unknown (at least since WSL 2.0.0)
 #idleThreshold = 1
+
+#################################################
+###                    GPU                    ###
+#################################################
+
+# GPU acceleration support [UNDOCUMENTED]
+#
+# Default: true
+# Support: Unknown (at least since WSL 2.0.0)
+#gpuSupport = true
+
+# Use GPU libraries packaged with WSL [UNDOCUMENTED]
+#
+# Only applies when "gpuSupport" is "true".
+#
+# Default: true
+# Support: Unknown (at least since WSL 2.0.0)
+#packagedGpuLibs = true
+
+#################################################
+###                  Network                  ###
+#################################################
 
 # Networking mode
 #
 # Valid values:
+# - none            Undocumented
+# - bridged         Undocumented
 # - mirrored        Use the host's network
 # - nat             Network Address Translation
+# - virtioproxy     Undocumented
 #
 # Experimental prior to WSL 2.0.5.
 #
@@ -68,45 +128,92 @@ memory = 16GB
 # Support: WSL 2.0.0 & Build 22621.2359 (Windows 11 22H2+)
 #networkingMode = nat
 
-# Apply Windows Firewall rules to WSL container processes
+# MAC address to assign to network interface [UNDOCUMENTED]
 #
-# Experimental prior to WSL 2.0.5.
-#
-# Default: false
-# Support: WSL 2.0.0 & Build 22621.2359 (Windows 11 22H2+)
-#firewall = false
+# Default: (auto-assigned)
+# Support: Unknown (at least since WSL 2.0.0)
+#macAddress =
 
 # Permit access from the host to listening ports in the VM
 #
+# Only applies when "networkingMode" is "nat".
+#
 # Default: true
+# Support: Build 18945 (Windows 10 2004+)
 #localhostForwarding = true
+
+# Assign network interface address using DHCP [UNDOCUMENTED]
+#
+# Default: true
+# Support: Unknown (at least since WSL 2.0.0)
+#dhcp = true
+
+# Timeout for DHCP offer response from server (milliseconds) [UNDOCUMENTED]
+#
+# Only applies when "dhcp" is "true".
+#
+# Default: 5000
+# Support: Unknown (at least since WSL 2.0.0)
+#dhcpTimeout = 5000
+
+# Configure distributions to use the host's NAT interface for DNS. If disabled,
+# the DNS servers configured on the host are mirrored into the distribution.
+#
+# Only applies when "networkingMode" is "nat".
+#
+# Default: true
+# Support: WSL 2.0.0
+#dnsProxy = true
 
 # Tunnel DNS requests to Windows
 #
 # Experimental prior to WSL 2.0.5.
 #
-# Default: false
+# Default differs by WSL version:
+#  < 2.1.0: false
+# >= 2.1.0: true
+#
 # Support: WSL 2.0.0 & Build 22621.2359 (Windows 11 22H2+)
-#dnsTunneling = false
+#dnsTunneling = true
 
 # Use Windows HTTP proxy settings
 #
 # Experimental prior to WSL 2.0.5.
 #
-# Default: false
+# Default: true
 # Support: WSL 2.0.0 & Windows 11 22H2+
-#autoProxy = false
+#autoProxy = true
+
+# Apply Windows Firewall rules to WSL container processes
+#
+# Experimental prior to WSL 2.0.5.
+#
+# Default: true
+# Support: WSL 2.0.0 & Build 22621.2359 (Windows 11 22H2+)
+#firewall = true
+
+#################################################
+###               Linux kernel                ###
+#################################################
 
 # Absolute Windows path to the Linux kernel image
 #
-# Default: %SystemRoot%\\System32\\lxss\\tools\\kernel
-#kernel = %SystemRoot%\\System32\\lxss\\tools\\kernel
+# Default differs by WSL release type:
+# - Inbox: %SystemRoot%\\System32\\lxss\\tools\\kernel
+# - Store: %ProgramFiles%\\WSL\\tools\\kernel
+#
+# Support: Build 18945 (Windows 10 2004+)
+#kernel =
 
 # Additional kernel command line arguments
 #
 # Default: (blank)
 # Support: Build 18995 (Windows 10 2004+)
 #kernelCommandLine =
+
+#################################################
+###               Miscellaneous               ###
+#################################################
 
 # Support GUI applications (WSLg)
 #
@@ -120,17 +227,15 @@ memory = 16GB
 # Support: Build 20190 (Windows 11 21H2+)
 #vmIdleTimeout = 60000
 
-# Show kernel log output on WSL distro start
+# Telemetry [UNDOCUMENTED]
 #
-# Default: false
-# Support: Build 21387 (Windows 11 21H2+)
-#debugConsole = false
+# Default: true
+# Support: Unknown (at least since WSL 2.0.0)
+telemetry = false
 
-# Launch a shell to debug the root namespace
-#
-# Default: false
-# Support: WSL 0.51.2
-#debugShell = false
+#################################################
+###                 Debugging                 ###
+#################################################
 
 # Launch WSL and distributions in Safe Mode
 #
@@ -138,7 +243,30 @@ memory = 16GB
 # Support: WSL 0.66.2
 #safeMode = false
 
+# Launch a shell to debug the root namespace
+#
+# Default: false
+# Support: WSL 0.51.2
+#debugShell = false
+
+# Show kernel log output on WSL distro start
+#
+# Default: false
+# Support: Build 21387 (Windows 11 21H2+)
+#debugConsole = false
+
+# Log kernel log output on WSL distro start
+#
+# Default: (unset)
+# Support: Unknown (at least since WSL 2.0.0)
+#debugConsoleLogFile =
+
+
 [experimental]
+#################################################
+###                  Memory                   ###
+#################################################
+
 # Automatically release cached memory on CPU idle
 #
 # Valid values:
@@ -148,9 +276,36 @@ memory = 16GB
 #
 # Boolean prior to WSL 2.0.0.
 #
-# Default: disabled
+# Default differs by WSL version:
+#  < 2.1.3: false / disabled
+# >= 2.1.3: dropcache
+#
 # Support: WSL 1.3.10
-autoMemoryReclaim = gradual
+#autoMemoryReclaim = dropcache
+
+#################################################
+###                  Storage                  ###
+#################################################
+
+# Create new VHDs as sparse files
+#
+# Default: false
+# Support: WSL 2.0.0
+#sparseVhd = false
+
+#################################################
+###                  Network                  ###
+#################################################
+
+# Permit network connections to WSL from the host, or from WSL to the host, by
+# using an IP address assigned to the host. This is in addition to the loopback
+# address which is controlled by the "localhostForwarding" setting.
+#
+# Only applies when "networkingMode" is "mirrored".
+#
+# Default: false
+# Support: WSL 2.0.0 & Build 22621.2359 (Windows 11 22H2+)
+#hostAddressLoopback = false
 
 # Ports to permit applications running under WSL to bind to when the port is
 # already in-use by a Windows application. In this case, the port bound by the
@@ -163,23 +318,13 @@ autoMemoryReclaim = gradual
 # Support: WSL 2.0.0 & Build 22621.2359 (Windows 11 22H2+)
 #ignoredPorts =
 
-# Permit network connections to WSL from the host, or from WSL to the host, by
-# using an IP address assigned to the host. This is in addition to the loopback
-# address which is controlled by the "localhostForwarding" setting.
-#
-# Only applies when "networkingMode" is "mirrored".
-#
-# Default: false
-# Support: WSL 2.0.0 & Build 22621.2359 (Windows 11 22H2+)
-#hostAddressLoopback = false
-
-# Use the Windows DNS cache when resolving names
+# IP address used for tunneling of DNS requests to Windows
 #
 # Only applies when "dnsTunneling" is enabled.
 #
-# Default: true
-# Support: WSL 2.0.0 & Build 22621.2359 (Windows 11 22H2+)
-#useWindowsDnsCache = false
+# Default: 10.255.255.255
+# Support: WSL 2.2.1 & Build 22621.2359 (Windows 11 22H2+)
+#dnsTunnelingIpAddress = 10.255.255.255
 
 # Extract the DNS query from requests and ignore unknown records
 #
@@ -189,16 +334,18 @@ autoMemoryReclaim = gradual
 # Support: WSL 2.0.0 & Build 22621.2359 (Windows 11 22H2+)
 #bestEffortDnsParsing = false
 
+# Use the Windows DNS cache when resolving names
+#
+# Only applies when "dnsTunneling" is enabled.
+#
+# Default: false
+# Support: WSL 2.0.0 & Build 22621.2359 (Windows 11 22H2+)
+#useWindowsDnsCache = false
+
 # Duration to wait for retrieving HTTP proxy on WSL container start (ms)
 #
 # Only applies when "autoProxy" is enabled.
 #
-# Default: false
+# Default: 1000
 # Support: WSL 2.0.0 & Windows 11 22H2+
 #initialAutoProxyTimeout = 1000
-
-# Create new VHDs as sparse files
-#
-# Default: false
-# Support: WSL 2.0.0
-#sparseVhd = false
