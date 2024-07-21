@@ -51,8 +51,8 @@ wsl_setup_ssh_auth_sock() {
     # Approach #1: WSLENV
     if [ -n "$WSL_NPIPERELAY_PATH" ]; then
         npiperelay="$WSL_NPIPERELAY_PATH"
-        if ! [ -x "$npiperelay" ]; then
-            echo "[WSL] Skipping SSH_AUTH_SOCK setup as WSL_NPIPERELAY_PATH does not resolve to an executable: $npiperelay"
+        if ! [ -x "$npiperelay" ] || [ -d "$npiperelay" ]; then
+            echo "[WSL] Skipping SSH_AUTH_SOCK setup as WSL_NPIPERELAY_PATH does not resolve to an executable file: $npiperelay"
             return
         fi
     else
