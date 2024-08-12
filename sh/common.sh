@@ -27,6 +27,10 @@ sh_dir="$dotfiles/sh"
 # shellcheck source=sh/source.sh
 . "$sh_dir/source.sh"
 
+# Console Do Not Track (DNT)
+# https://consoledonottrack.com/
+export DO_NOT_TRACK=1
+
 # Operating system and environment specific configuration
 kernel_name="$(uname -s)"
 sh_systems_dir="$sh_dir/systems"
