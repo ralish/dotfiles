@@ -1,6 +1,6 @@
 # shellcheck shell=sh
 
-# dotnet configuration
+# .NET CLI configuration
 if command -v dotnet > /dev/null; then
     dotnet_bin="$HOME/.dotnet/tools"
 

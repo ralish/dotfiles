@@ -1,6 +1,6 @@
 # shellcheck shell=sh
 
-# cargo configuration
+# Cargo configuration
 cargo_path="${CARGO_HOME:-$HOME/.cargo}"
 cargo_bin="$cargo_path/bin"
 

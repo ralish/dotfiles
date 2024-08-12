@@ -1,6 +1,6 @@
 # shellcheck shell=sh
 
-# aws configuration
+# AWS CLI configuration
 if command -v aws > /dev/null; then
     # Command completion
     # https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html

@@ -1,6 +1,6 @@
 # shellcheck shell=sh
 
-# git configuration
+# Git configuration
 if command -v git > /dev/null; then
     # Handy aliases to switch to the root of the repository
     alias git-repo-root='cd "$(git rev-parse --show-toplevel)"'
