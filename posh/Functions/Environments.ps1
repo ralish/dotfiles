@@ -67,15 +67,6 @@ Function Update-DotNetTools {
         return
     }
 
-    $WriteProgressParams = @{
-        Activity = 'Updating .NET tools'
-    }
-
-    if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
-        $WriteProgressParams['ParentId'] = $ProgressParentId
-        $WriteProgressParams['Id'] = $ProgressParentId + 1
-    }
-
     [String[]]$ListArgs = 'tool', 'list', '--global'
     [String[]]$UpdateArgs = 'tool', 'update', '--global'
 
@@ -86,26 +77,48 @@ Function Update-DotNetTools {
     }
     $env:DOTNET_NOLOGO = 'true'
 
-    Write-Progress @WriteProgressParams -Status 'Enumerating .NET tools' -PercentComplete 1
-    Write-Verbose -Message ('Enumerating .NET tools: dotnet {0}' -f ($ListArgs -join ' '))
-    $Tools = [Collections.Generic.List[String]]::new()
-    & dotnet @ListArgs | ForEach-Object {
-        if ($_ -notmatch '^(Package Id|-)' -and $_ -match '^(\S+)') {
-            $Tools.Add($Matches[1])
+    # .NET 8.0.400 added the "--all" parameter to update all tools. For earlier
+    # versions, we have to enumerate the installed tools and perform an update
+    # on each individually.
+    #
+    # HACK: Deliberately disabled by requiring version 10.0.0 as it's broken:
+    # https://github.com/dotnet/sdk/issues/42598
+    $CliVersion = [Version](& dotnet --version)
+    if ($CliVersion -ge '10.0.0') {
+        $UpdateArgs += '--all'
+        Write-Verbose -Message ('Updating .NET tools: dotnet {0}' -f ($UpdateArgs -join ' '))
+        & dotnet @UpdateArgs
+    } else {
+        $WriteProgressParams = @{
+            Activity = 'Updating .NET tools'
         }
-    }
 
-    $ToolsUpdated = 0
-    foreach ($Tool in $Tools) {
-        Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $Tool) -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
-        if ($PSCmdlet.ShouldProcess($Tool, 'Update')) {
-            Write-Verbose -Message ('Updating {0}: dotnet {1} {0}' -f $Tool, ($UpdateArgs -join ' '))
-            & dotnet @UpdateArgs $Tool
-            $ToolsUpdated++
+        if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+            $WriteProgressParams['ParentId'] = $ProgressParentId
+            $WriteProgressParams['Id'] = $ProgressParentId + 1
         }
-    }
 
-    Write-Progress @WriteProgressParams -Completed
+        Write-Progress @WriteProgressParams -Status 'Enumerating .NET tools' -PercentComplete 1
+        Write-Verbose -Message ('Enumerating .NET tools: dotnet {0}' -f ($ListArgs -join ' '))
+        $Tools = [Collections.Generic.List[String]]::new()
+        & dotnet @ListArgs | ForEach-Object {
+            if ($_ -notmatch '^(Package Id|-)' -and $_ -match '^(\S+)') {
+                $Tools.Add($Matches[1])
+            }
+        }
+
+        $ToolsUpdated = 0
+        foreach ($Tool in $Tools) {
+            Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $Tool) -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
+            if ($PSCmdlet.ShouldProcess($Tool, 'Update')) {
+                Write-Verbose -Message ('Updating {0}: dotnet {1} {0}' -f $Tool, ($UpdateArgs -join ' '))
+                & dotnet @UpdateArgs $Tool
+                $ToolsUpdated++
+            }
+        }
+
+        Write-Progress @WriteProgressParams -Completed
+    }
 
     # Restore the original value of the DOTNET_NOLOGO environment variable
     if ($OriginalNoLogo) {
