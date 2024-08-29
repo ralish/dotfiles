@@ -2,6 +2,13 @@
 
 # npm configuration
 if command -v npm > /dev/null; then
+    # nvm is incompatible with setting NPM_CONFIG_PREFIX, while the rest of
+    # this configuration will often cause confusing behaviour. In short, if
+    # we're going to use nvm it's best to avoid applying npm configuration.
+    if command -v nvm > /dev/null; then
+        return
+    fi
+
     npm_global_root="$(npm root -g)"
     npm_global_man="$npm_global_root/npm/man"
 
