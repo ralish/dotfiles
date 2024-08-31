@@ -1,39 +1,35 @@
 # shellcheck shell=bash
 
-# Tab completion for System.CommandLine
-# https://learn.microsoft.com/en-us/dotnet/standard/commandline/tab-completion
-export DOTNET_SUGGEST_SCRIPT_VERSION='1.0.2'
+# dotnet-suggest-shim.bash
+# https://github.com/dotnet/command-line-api/blob/main/src/System.CommandLine.Suggest/dotnet-suggest-shim.bash
 
 function _dotnet_suggest_bash_complete() {
-    local cmd_path comp_line_escaped completions
+    local cmd_path completions suggestions word
 
     cmd_path="$(type -p "${COMP_WORDS[0]}")"
-    comp_line_escaped="${COMP_LINE//\"/\\\"}"
-    completions="$(dotnet-suggest get --executable "$cmd_path" --position "$COMP_POINT" -- "$comp_line_escaped")"
+    completions="$(dotnet-suggest get --executable "$cmd_path" --position "$COMP_POINT" -- "$COMP_LINE")"
 
+    word="${COMP_WORDS[COMP_CWORD]}"
     local IFS=$'\n'
     # shellcheck disable=SC2207
-    local suggestions=($(compgen -W "$completions"))
+    suggestions=($(compgen -W "$completions" -- "$word"))
 
-    if [[ ${#suggestions[@]} == 1 ]]; then
-        local number="${suggestions[0]/%\ */}"
-        COMPREPLY=("$number")
-    else
-        for i in "${!suggestions[@]}"; do
-            suggestions[i]="$(printf '%*s' "-$COLUMNS" "${suggestions[$i]}")"
-        done
+    for i in "${!suggestions[@]}"; do
+        suggestions[i]="$(printf '%q' "${suggestions[$i]}")"
+    done
 
-        COMPREPLY=("${suggestions[@]}")
+    COMPREPLY=("${suggestions[@]}")
+}
+
+function _dotnet_suggest_bash_register_complete() {
+    if command -v dotnet-suggest &> /dev/null; then
+        local IFS=$'\n'
+        # shellcheck disable=SC2046,SC2312
+        complete -F _dotnet_suggest_bash_complete $(dotnet-suggest list)
     fi
 }
 
-function _dotnet_suggest_bash_register() {
-    local IFS=$'\n'
-    # shellcheck disable=SC2046,SC2312
-    complete -F _dotnet_suggest_bash_complete $(dotnet-suggest list)
-}
-
-_dotnet_suggest_bash_register
-unset -f _dotnet_suggest_bash_register
+_dotnet_suggest_bash_register_complete
+export DOTNET_SUGGEST_SCRIPT_VERSION='1.0.3'
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

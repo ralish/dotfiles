@@ -1,10 +1,18 @@
 # shellcheck shell=sh
 
 # nvm configuration
-nvm_dir="${NVM_DIR:-$HOME/.nvm}"
-nvm_script="$nvm_dir/nvm.sh"
-nvm_completion="$nvm_dir/bash_completion"
 
+# Install directory
+nvm_dir="$NVM_DIR"
+if [ -z "$nvm_dir" ]; then
+    if [ -n "$XDG_CONFIG_HOME" ]; then
+        nvm_dir="${XDG_CONFIG_HOME}/nvm"
+    else
+        nvm_dir="${HOME}/.nvm"
+    fi
+fi
+
+nvm_script="${nvm_dir}/nvm.sh"
 if [ -s "$nvm_script" ]; then
     export NVM_DIR="$nvm_dir"
 
@@ -17,9 +25,10 @@ if [ -s "$nvm_script" ]; then
     # shellcheck source=/dev/null
     . "$nvm_script"
 
+    nvm_completion="${nvm_dir}/bash_completion"
     if [ -s "$nvm_completion" ]; then
         # shellcheck source=/dev/null
-        . "$nvm_script"
+        . "$nvm_completion"
     fi
 fi
 

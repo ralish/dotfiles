@@ -4,7 +4,8 @@
 if command -v pip > /dev/null ||
     command -v pip2 > /dev/null ||
     command -v pip3 > /dev/null; then
-    # If pip binary isn't present add an alias to newest Python runtime pip
+    # If pip (without numeric suffix) isn't present alias it to the pip for the
+    # latest available Python runtime.
     if ! command -v pip > /dev/null; then
         if command -v pip3 > /dev/null; then
             alias pip='pip3'
@@ -13,15 +14,8 @@ if command -v pip > /dev/null ||
         fi
     fi
 
-    # Disable the pip version check if any Salt packages are installed. With
-    # Salt we typically will be running an older pip version due to frequent
-    # incompatible changes introduced upstream which Salt needs to handle.
-    if command -v salt-call > /dev/null; then
-        export PIP_DISABLE_PIP_VERSION_CHECK=true
-    fi
-
     # Add local bin directory to PATH (for --user)
-    build_path "$HOME/.local/bin" "$PATH"
+    build_path "${HOME}/.local/bin" "$PATH"
     # shellcheck disable=SC2154
     export PATH="$build_path"
 fi

@@ -2,14 +2,15 @@
 
 # dotnet-suggest configuration
 if command -v dotnet-suggest > /dev/null; then
-    # Additional setup for specific shells
+    # Tab completion for System.CommandLine
+    # https://learn.microsoft.com/en-us/dotnet/standard/commandline/tab-completion
     # shellcheck disable=SC2154
     if [ -n "$BASH" ]; then
         # shellcheck source=/dev/null
-        . "$sh_dir/apps/dotnet-suggest.bash"
+        . "${sh_dir}/apps/dotnet-suggest.bash"
     elif [ -n "$ZSH_NAME" ]; then
         # shellcheck source=/dev/null
-        . "$sh_dir/apps/dotnet-suggest.zsh"
+        . "${sh_dir}/apps/dotnet-suggest.zsh"
     fi
 fi
 

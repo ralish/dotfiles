@@ -2,7 +2,7 @@
 
 # cruft configuration
 if command -v cruft > /dev/null; then
-    # Ignore several paths we almost never care about
+    # Ignore paths that are rarely relevant
     alias cruft='cruft --ignore "/dev /home /proc /run /snap /sys /tmp /usr/share/dotnet/sdk/NuGetFallbackFolder /var/cache/salt /var/cache/uptrack /var/lib/docker /var/lib/lxcfs"'
 fi
 

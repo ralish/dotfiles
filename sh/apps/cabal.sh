@@ -2,7 +2,7 @@
 
 # Cabal configuration
 if command -v cabal > /dev/null; then
-    cabal_bin="$HOME/.cabal/bin"
+    cabal_bin="${HOME}/.cabal/bin"
 
     # Add local bin directory to PATH
     build_path "$cabal_bin" "$PATH"

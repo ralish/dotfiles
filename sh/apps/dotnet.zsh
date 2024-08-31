@@ -1,5 +1,3 @@
-# How to enable tab completion for the .NET CLI
-# https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete#zsh
 _dotnet_cli_zsh_complete() {
     local completions=("$(dotnet complete "$words")")
 
@@ -8,7 +6,7 @@ _dotnet_cli_zsh_complete() {
         return
     fi
 
-    # This is not a variable assignment, don't remove spaces!
+    # This is not a variable assignment, don't remove the spaces!
     _values = "${(ps:\n:)completions}"
 }
 

@@ -2,7 +2,7 @@
 
 # Git configuration
 if command -v git > /dev/null; then
-    # Handy aliases to switch to the root of the repository
+    # Switch to or retrieve the root of the repository
     alias git-repo-root='cd "$(git rev-parse --show-toplevel)"'
     alias grr='git-repo-root'
 fi

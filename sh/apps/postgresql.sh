@@ -2,7 +2,7 @@
 
 # PostgreSQL configuration
 if command -v psql > /dev/null; then
-    # Connect to the postgres database by default
+    # Default database to connect to
     export PGDATABASE='postgres'
 fi
 

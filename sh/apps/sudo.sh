@@ -3,7 +3,7 @@
 # sudo configuration
 if command -v sudo > /dev/null; then
     # Enables expansion of the subsequent command if it's an alias
-    # See: https://askubuntu.com/questions/22037/aliases-not-available-when-using-sudo
+    # See: https://askubuntu.com/a/22043/1602916
     alias sudo='sudo '
 fi
 

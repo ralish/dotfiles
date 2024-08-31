@@ -1,12 +1,15 @@
 # shellcheck shell=sh
 
 # pyenv configuration
-if [ -d "$HOME/.pyenv" ]; then
-    export PYENV_ROOT="$HOME/.pyenv"
+pyenv_root="${PYENV_ROOT:-${HOME}/.pyenv}"
 
-    if [ -d "$PYENV_ROOT/bin" ]; then
+if [ -d "pyenv_root" ]; then
+    export PYENV_ROOT="$pyenv_root"
+    pyenv_bin="${pyenv_root}/bin"
+
+    if [ -d "$pyenv_bin" ]; then
         # Add bin directory to PATH
-        build_path "$PYENV_ROOT/bin" "$PATH"
+        build_path "$pyenv_bin" "$PATH"
         # shellcheck disable=SC2154
         export PATH="$build_path"
     fi
@@ -17,11 +20,13 @@ if [ -d "$HOME/.pyenv" ]; then
         eval "$(pyenv init -)"
 
         # Initialise pyenv-virtualenv
-        if [ -x "$PYENV_ROOT/plugins/pyenv-virtualenv/bin/pyenv-virtualenv" ]; then
+        if [ -x "${pyenv_root}/plugins/pyenv-virtualenv/bin/pyenv-virtualenv" ]; then
             # shellcheck disable=SC2312
             eval "$(pyenv virtualenv-init -)"
         fi
     fi
 fi
+
+unset pyenv_root
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

@@ -2,24 +2,25 @@
 
 # .NET CLI configuration
 if command -v dotnet > /dev/null; then
-    dotnet_bin="$HOME/.dotnet/tools"
+    dotnet_bin="${HOME}/.dotnet/tools"
 
     # Opt-out of telemetry
     export DOTNET_CLI_TELEMETRY_OPTOUT=true
 
-    # Add global tools to our PATH
+    # Add global tools to PATH
     build_path "$dotnet_bin" "$PATH"
     # shellcheck disable=SC2154
     export PATH="$build_path"
 
-    # Additional setup for specific shells
+    # How to enable tab completion for the .NET CLI
+    # https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete
     # shellcheck disable=SC2154
     if [ -n "$BASH" ]; then
         # shellcheck source=/dev/null
-        . "$sh_dir/apps/dotnet.bash"
+        . "${sh_dir}/apps/dotnet.bash"
     elif [ -n "$ZSH_NAME" ]; then
         # shellcheck source=/dev/null
-        . "$sh_dir/apps/dotnet.zsh"
+        . "${sh_dir}/apps/dotnet.zsh"
     fi
 
     unset dotnet_bin
