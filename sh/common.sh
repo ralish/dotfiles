@@ -51,6 +51,20 @@ elif [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
 fi
 unset kernel_name sh_systems_dir
 
+# Source in secrets that may be referenced by apps
+unset dotfiles_secrets
+sh_secrets_file="$sh_dir/secrets.sh"
+if [ -f "$sh_secrets_file" ]; then
+    dotfiles_secrets=true
+
+    # shellcheck source=sh/secrets.sh
+    . "$sh_secrets_file"
+
+    # Make the secrets accessible as variables
+    set-dotfiles-secret-vars
+fi
+unset sh_secrets_file
+
 # Additional configuration for various applications
 sh_apps_dir="$sh_dir/apps"
 if [ -d "$sh_apps_dir" ]; then
@@ -61,6 +75,12 @@ if [ -d "$sh_apps_dir" ]; then
     done
 fi
 unset sh_app sh_apps_dir
+
+# Remove the secret variables (if loaded)
+if [ -n "$dotfiles_secrets" ]; then
+    unset-dotfiles-secret-vars
+fi
+unset dotfiles_secrets
 
 # Add any ~/bin directory to our PATH
 if [ -d "$HOME/bin" ]; then

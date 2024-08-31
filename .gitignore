@@ -100,6 +100,9 @@ temp/
 /posh/Settings/
 /pwsh/.config/powershell/
 
+# Shell secrets
+/sh/secrets.sh
+
 # Shell app configurations
 /sh/apps/
 
