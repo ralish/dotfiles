@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # Turborepo configuration
-if command -v turbo > /dev/null; then
+if df_app_load 'Turborepo [turbo]' 'command -v turbo > /dev/null'; then
     # Opt-out of telemetry
     export TURBO_TELEMETRY_DISABLED=1
 fi

@@ -4,7 +4,7 @@
 cargo_path="${CARGO_HOME:-${HOME}/.cargo}"
 cargo_bin="${cargo_path}/bin"
 
-if [ -d "$cargo_bin" ]; then
+if df_app_load 'Cargo [cargo]' "[ -d \"$cargo_bin\" ]"; then
     # Add local bin directory to PATH
     build_path "$cargo_bin" "$PATH"
     # shellcheck disable=SC2154

@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # AzCopy configuration
-if command -v azcopy > /dev/null; then
+if df_app_load 'AzCopy [azcopy]' 'command -v azcopy > /dev/null'; then
     # Disable logging to syslog
     export AZCOPY_DISABLE_SYSLOG=true
 fi

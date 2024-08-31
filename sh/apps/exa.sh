@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # exa configuration
-if command -v exa > /dev/null; then
+if df_app_load 'exa' 'command -v exa > /dev/null'; then
     alias l='exa --binary'
 
     alias la='exa --binary --all'

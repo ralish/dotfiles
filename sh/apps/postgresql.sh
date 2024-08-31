@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # PostgreSQL configuration
-if command -v psql > /dev/null; then
+if df_app_load 'PostgreSQL [psql]' 'command -v psql > /dev/null'; then
     # Default database to connect to
     export PGDATABASE='postgres'
 fi

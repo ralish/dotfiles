@@ -1,9 +1,9 @@
 # shellcheck shell=sh
 
 # pip configuration
-if command -v pip > /dev/null ||
-    command -v pip2 > /dev/null ||
-    command -v pip3 > /dev/null; then
+if df_app_load 'pip' 'command -v pip > /dev/null ||
+                      command -v pip2 > /dev/null ||
+                      command -v pip3 > /dev/null'; then
     # If pip (without numeric suffix) isn't present alias it to the pip for the
     # latest available Python runtime.
     if ! command -v pip > /dev/null; then

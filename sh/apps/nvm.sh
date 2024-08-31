@@ -13,7 +13,7 @@ if [ -z "$nvm_dir" ]; then
 fi
 
 nvm_script="${nvm_dir}/nvm.sh"
-if [ -s "$nvm_script" ]; then
+if df_app_load 'nvm' "[ -s \"$nvm_script\" ]"; then
     export NVM_DIR="$nvm_dir"
 
     # nvm is incompatible with NPM_CONFIG_PREFIX:

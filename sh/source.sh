@@ -84,4 +84,40 @@ build_path() {
     unset first_path second_path prioritise_first
 }
 
+# DESC: Evaluates a command and logs if the app config will be loaded
+# ARGS: $1 (required): Name of the application (for log output)
+#       $2 (required): Command to evaluate to determine if config shoud load
+# OUTS: None
+# NOTE: Logging only occurs if the DOTFILES_LOG variable is true.
+df_app_load() {
+    if [ $# -ne 2 ]; then
+        printf "Invalid arguments passed to df_app_load()!"
+        exit 2
+    fi
+
+    if eval "$2"; then
+        df_log "[dotfiles] Load app configuration: $1"
+        return 0
+    fi
+
+    df_log "[dotfiles] Skip app configuration: $1"
+    return 1
+}
+
+# DESC: Outputs a log entry to stdout
+# ARGS: $1 (required): Message to log
+# OUTS: None
+# NOTE: Logging only occurs if the DOTFILES_LOG variable is true.
+df_log() {
+    if [ $# -ne 1 ]; then
+        printf "Invalid arguments passed to df_log()!"
+        exit 2
+    fi
+
+    # shellcheck disable=SC2154
+    if [ "$DOTFILES_LOG" = 'true' ]; then
+        echo "$1"
+    fi
+}
+
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

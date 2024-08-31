@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # npm configuration
-if command -v npm > /dev/null; then
+if df_app_load 'npm' 'command -v npm > /dev/null'; then
     # nvm is incompatible with setting NPM_CONFIG_PREFIX, while the rest of
     # this configuration will often cause confusing behaviour. In short, if
     # we're going to use nvm it's best to avoid applying npm configuration.

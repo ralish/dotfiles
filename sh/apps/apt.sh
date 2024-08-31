@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # APT configuration
-if command -v apt-get > /dev/null; then
+if df_app_load 'APT [apt]' 'command -v apt-get > /dev/null'; then
     # Show configuration files which have been modified from the defaults
     # Via: https://serverfault.com/a/90401/850629
     # shellcheck disable=SC2142,SC2154

@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # Perl configuration
-if command -v perl > /dev/null; then
+if df_app_load 'Perl [perl]' 'command -v perl > /dev/null'; then
     perl5_dir="${HOME}/perl5"
 
     # Setup local Perl environment

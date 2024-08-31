@@ -9,6 +9,9 @@ EDITOR_PRIORITY='vim vi nano pico'
 # Locations to prefix to PATH (colon-separated)
 EXTRA_PATHS=''
 
+# Set to true to enable log output during loading
+DOTFILES_LOG="${DOTFILES_LOG:-false}"
+
 # -----------------------------------------------------------------------------
 
 # Guess the dotfiles directory if $dotfiles wasn't set

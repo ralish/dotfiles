@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # dotnet-suggest configuration
-if command -v dotnet-suggest > /dev/null; then
+if df_app_load 'dotnet-suggest' 'command -v dotnet-suggest > /dev/null'; then
     # Tab completion for System.CommandLine
     # https://learn.microsoft.com/en-us/dotnet/standard/commandline/tab-completion
     # shellcheck disable=SC2154

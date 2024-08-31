@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # cruft configuration
-if command -v cruft > /dev/null; then
+if df_app_load 'cruft' 'command -v cruft > /dev/null'; then
     # Ignore paths that are rarely relevant
     alias cruft='cruft --ignore "/dev /home /proc /run /snap /sys /tmp /usr/share/dotnet/sdk/NuGetFallbackFolder /var/cache/salt /var/cache/uptrack /var/lib/docker /var/lib/lxcfs"'
 fi

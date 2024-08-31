@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # dircolors configuration
-if command -v dircolors > /dev/null; then
+if df_app_load 'dircolors' 'command -v dircolors > /dev/null'; then
     if [ -r "${HOME}/.dircolors" ]; then
         # Use our custom configuration
         # shellcheck disable=SC2312

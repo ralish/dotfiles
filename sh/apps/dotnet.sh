@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # .NET CLI configuration
-if command -v dotnet > /dev/null; then
+if df_app_load '.NET CLI [dotnet]' 'command -v dotnet > /dev/null'; then
     dotnet_bin="${HOME}/.dotnet/tools"
 
     # Opt-out of telemetry

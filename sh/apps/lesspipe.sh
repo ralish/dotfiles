@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # lesspipe configuration
-if command -v lesspipe > /dev/null; then
+if df_app_load 'lesspipe' 'command -v lesspipe > /dev/null'; then
     # Setup for handling non-text input
     # shellcheck disable=SC2312
     eval "$(lesspipe)"

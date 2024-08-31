@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # Go configuration
-if [ -d "/usr/local/go/bin" ]; then
+if df_app_load 'Go [go]' "[ -d \"/usr/local/go/bin\" ]"; then
     go_global="/usr/local/go"
     go_local="${HOME}/go"
 

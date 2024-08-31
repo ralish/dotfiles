@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # vcpkg configuration
-if command -v vcpkg > /dev/null; then
+if df_app_load 'vcpkg' 'command -v vcpkg > /dev/null'; then
     # Opt-out of telemetry
     export VCPKG_DISABLE_METRICS=true
 fi
