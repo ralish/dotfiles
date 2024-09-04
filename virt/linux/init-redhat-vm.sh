@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# Initialize a RHEL or Fedora VM with a configuration optimised for testing.
+# Initialize a RHEL, Rocky Linux, or Fedora VM with a configuration optimised
+# for testing.
 
 set -e
 
@@ -9,7 +10,7 @@ if [[ $UID -ne 0 ]]; then
     exit 1
 fi
 
-rh_release="$(grep -E '^(Red Hat|Fedora)' /etc/redhat-release || true)"
+rh_release="$(grep -E '^(Red Hat|Rocky|Fedora)' /etc/redhat-release || true)"
 if [[ -z $rh_release ]]; then
     echo 'This script is only for Red Hat and Fedora systems.'
     exit 1
