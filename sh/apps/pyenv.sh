@@ -3,7 +3,7 @@
 # pyenv configuration
 pyenv_root="${PYENV_ROOT:-${HOME}/.pyenv}"
 
-if df_app_load 'pyenv' "[ -d \"pyenv_root\" ]"; then
+if df_app_load 'pyenv' "[ -d \"$pyenv_root\" ]"; then
     export PYENV_ROOT="$pyenv_root"
     pyenv_bin="${pyenv_root}/bin"
 
