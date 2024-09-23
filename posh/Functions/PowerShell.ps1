@@ -310,7 +310,14 @@ Function Update-PowerShell {
     if ($Script:PsGetV3) {
         $InstalledModules = Get-PSResource -Verbose:$false
     } else {
+        # Suppress verbose output on loading
+        $VerboseOriginal = $Global:VerbosePreference
+        $VerbosePreference = 'SilentlyContinue'
+
         $InstalledModules = Get-InstalledModule -Verbose:$false
+
+        # Restore the original $VerbosePreference setting
+        $VerbosePreference = $VerboseOriginal
     }
 
     # Get-PSResource returns all module versions while Get-InstalledModule only
