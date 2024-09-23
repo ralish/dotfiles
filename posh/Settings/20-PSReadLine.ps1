@@ -64,6 +64,11 @@ $Params = @{
 Set-PSReadLineKeyHandler @Params
 Remove-Variable -Name 'Params', 'ScriptBlock'
 
+if (!(Test-IsWindows)) {
+    # The default for non-Windows platforms is Emacs
+    Set-PSReadLineOption -EditMode Vi
+}
+
 # We use the Solarized Dark colour scheme for WSL sessions in Windows Terminal.
 # Unfortunately, some of PSReadLine's colours are near invisible when used with
 # this colour scheme. Switch the affected colours to something more visible.
