@@ -946,36 +946,45 @@ Function Update-PythonPackages {
     [OutputType([Void], [String[]])]
     Param()
 
-    if (!(Get-Command -Name 'pipdeptree' -ErrorAction Ignore)) {
+    $UpdatePipPackages = $false
+    if (!(Get-Command -Name 'pip' -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to update Python packages as pip command not found.'
+    } elseif (!(Get-Command -Name 'pipdeptree' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update Python packages as pipdeptree command not found.'
-        return
+    } elseif (!((Test-IsWindows) -or ![String]::IsNullOrWhiteSpace($env:VIRTUAL_ENV))) {
+        Write-Warning -Message 'Skipping update of Python packages as not in a virtualenv.'
+    } else {
+        $UpdatePipPackages = $true
     }
 
-    [String[]]$UpdateArgs = 'install', '--no-python-version-warning', '--upgrade', '--upgrade-strategy', 'eager'
-    [String[]]$PipUpdateArgs = '-m', 'pip', 'install', '--no-python-version-warning', '--upgrade'
-    [String[]]$PipxUpdateArgs = 'upgrade-all'
+    if ($UpdatePipPackages) {
+        [String[]]$UpdateArgs = 'install', '--no-python-version-warning', '--upgrade', '--upgrade-strategy', 'eager'
+        [String[]]$PipUpdateArgs = '-m', 'pip', 'install', '--no-python-version-warning', '--upgrade'
 
-    if ($PSCmdlet.ShouldProcess('pip', 'Update')) {
-        Write-Verbose -Message ('Updating pip: python {0} pip' -f ($PipUpdateArgs -join ' '))
-        & python @PipUpdateArgs pip
-    }
+        if ($PSCmdlet.ShouldProcess('pip', 'Update')) {
+            Write-Verbose -Message ('Updating pip: python {0} pip' -f ($PipUpdateArgs -join ' '))
+            & python @PipUpdateArgs pip
+        }
 
-    Write-Verbose -Message 'Enumerating Python packages: pipdeptree'
-    $Packages = [Collections.Generic.List[String]]::new()
-    $PackageRegex = [Regex]::new('^(\S+)==')
-    & pipdeptree | ForEach-Object {
-        $Package = $PackageRegex.Match($_)
-        if ($Package.Success) {
-            $Packages.Add($Package.Groups[1].Value)
+        Write-Verbose -Message 'Enumerating Python packages: pipdeptree'
+        $Packages = [Collections.Generic.List[String]]::new()
+        $PackageRegex = [Regex]::new('^(\S+)==')
+        & pipdeptree | ForEach-Object {
+            $Package = $PackageRegex.Match($_)
+            if ($Package.Success) {
+                $Packages.Add($Package.Groups[1].Value)
+            }
+        }
+
+        if ($PSCmdlet.ShouldProcess('Python packages', 'Update')) {
+            Write-Verbose -Message ('Updating Python packages: pip {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
+            & pip @UpdateArgs @Packages
         }
     }
 
-    if ($PSCmdlet.ShouldProcess('Python packages', 'Update')) {
-        Write-Verbose -Message ('Updating Python packages: pip {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
-        & pip @UpdateArgs @Packages
-    }
-
     if (Get-Command -Name 'pipx' -ErrorAction Ignore) {
+        [String[]]$PipxUpdateArgs = 'upgrade-all'
+
         if ($PSCmdlet.ShouldProcess('pipx packages', 'Update')) {
             # Outputting emojis can be problematic on Windows. This isn't as
             # big an issue as it used to be, but there's still some nasty edge
