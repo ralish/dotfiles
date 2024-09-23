@@ -1190,6 +1190,11 @@ Function Update-RubyGems {
     [OutputType([Void], [String[]])]
     Param()
 
+    if (!(Test-IsWindows)) {
+        Write-Warning -Message 'Updating Ruby gems is currently only supported on Windows.'
+        return
+    }
+
     if (!(Get-Command -Name 'gem' -ErrorAction Ignore)) {
         Write-Error -Message 'Unable to update Ruby gems as gem command not found.'
         return
