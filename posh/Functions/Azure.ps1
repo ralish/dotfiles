@@ -44,13 +44,13 @@ Function Get-AzureAuthHeader {
 # Retrieve an Azure AD authentication token
 #
 # Working with Azure REST APIs from Powershell - Getting page and block blob information from ARM based storage account sample script
-# https://docs.microsoft.com/en-au/archive/blogs/paulomarques/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script
+# https://learn.microsoft.com/en-au/archive/blogs/paulomarques/working-with-azure-rest-apis-from-powershell-getting-page-and-block-blob-information-from-arm-based-storage-account-sample-script
 #
 # Using PowerShell to Connect to Microsoft Graph API
-# https://docs.microsoft.com/en-au/archive/blogs/cloudlojik/using-powershell-to-connect-to-microsoft-graph-api
+# https://learn.microsoft.com/en-au/archive/blogs/cloudlojik/using-powershell-to-connect-to-microsoft-graph-api
 #
 # Connecting to Microsoft Graph with a Native App using PowerShell
-# https://docs.microsoft.com/en-au/archive/blogs/cloudlojik/connecting-to-microsoft-graph-with-a-native-app-using-powershell
+# https://learn.microsoft.com/en-au/archive/blogs/cloudlojik/connecting-to-microsoft-graph-with-a-native-app-using-powershell
 Function Get-AzureAuthToken {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '')]
     [CmdletBinding()]

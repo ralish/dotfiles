@@ -43,7 +43,7 @@
             Message:    The %1 permission settings do not grant %2 %3 permission for the COM Server application with CLSID %4 and APPID %5 to the user %6\%7 SID (%8) from address %9 running in the application container %10 SID (%11). This security permission can be modified using the Component Services administrative tool.
 
             DCOM event ID 10016 is logged in Windows
-            https://docs.microsoft.com/en-us/troubleshoot/windows-client/application-management/event-10016-logged-when-accessing-dcom
+            https://learn.microsoft.com/en-us/troubleshoot/windows-client/application-management/event-10016-logged-when-accessing-dcom
           -->
           <Suppress Path="System">
             *[System[Provider[@Name='Microsoft-Windows-DistributedCOM'] and EventID=10016]]
@@ -67,7 +67,7 @@
             ErrorCode:  0x8018000a (MENROLL_E_DEVICE_ALREADY_ENROLLED)
 
             Windows failed to apply the MDM Policy settings error when running gpupdate /force on hybrid Azure AD-joined devices
-            https://docs.microsoft.com/en-us/troubleshoot/mem/intune/windows-failed-to-apply-mdm-policy
+            https://learn.microsoft.com/en-us/troubleshoot/mem/intune/windows-failed-to-apply-mdm-policy
           -->
           <Suppress Path="System">
             *[System[Provider[@Name='Microsoft-Windows-GroupPolicy'] and EventID=1085]]
@@ -118,7 +118,7 @@
             Status:     0xc0000365 (STATUS_FAILED_DRIVER_ENTRY)
 
             Event ID 219 is logged when a device is plugged into a Windows-based system
-            https://docs.microsoft.com/en-us/troubleshoot/windows-client/deployment/event-id-219-when-device-plugged-in-windows-system
+            https://learn.microsoft.com/en-us/troubleshoot/windows-client/deployment/event-id-219-when-device-plugged-in-windows-system
           -->
           <Suppress Path="System">
             *[System[Provider[@Name='Microsoft-Windows-Kernel-PnP'] and EventID=219]]

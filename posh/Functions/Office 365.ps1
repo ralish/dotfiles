@@ -471,7 +471,7 @@ Function Get-Office365EntityUsageSummary {
     }
 
     # OneNote
-    # https://docs.microsoft.com/en-us/graph/api/resources/onenote-api-overview?view=graph-rest-1.0
+    # https://learn.microsoft.com/en-us/graph/api/resources/onenote-api-overview?view=graph-rest-1.0
     Write-Verbose -Message ('Retrieving {0} notebooks ...' -f $Type)
     try {
         if ($Type -eq 'User') {
@@ -488,7 +488,7 @@ Function Get-Office365EntityUsageSummary {
     }
 
     # Planner
-    # https://docs.microsoft.com/en-us/graph/api/resources/planner-overview?view=graph-rest-1.0
+    # https://learn.microsoft.com/en-us/graph/api/resources/planner-overview?view=graph-rest-1.0
     if ($Type -eq 'Group') {
         Write-Verbose -Message ('Retrieving {0} plans ...' -f $Type)
         try {
