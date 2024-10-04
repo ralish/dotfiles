@@ -9,6 +9,79 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
     return
 }
 
+# Update Google Chrome
+Function Update-GoogleChrome {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [PSCustomObject])]
+    Param()
+
+    if (!(Test-IsAdministrator)) {
+        $Message = 'You must have administrator privileges to perform Chrome updates.'
+        if ($WhatIfPreference) {
+            Write-Warning -Message $Message
+        } else {
+            throw $Message
+        }
+    }
+
+    if ([Environment]::Is64BitOperatingSystem) {
+        $ProgramFiles = ${env:ProgramFiles(x86)}
+    } else {
+        $ProgramFiles = $env:ProgramFiles
+    }
+
+    $GoogleUpdatePath = Join-Path -Path $ProgramFiles -ChildPath 'Google\Update\GoogleUpdate.exe'
+    if (!(Test-Path -LiteralPath $GoogleUpdatePath -PathType Leaf)) {
+        Write-Error -Message 'Unable to install Chrome updates as Google Update not found.'
+        return
+    }
+
+    $GoogleUpdateArgs = @(
+        '/silent',
+        '/install',
+        # GUID corresponds to Stable channel
+        'appguid={8A69D345-D564-463C-AFF1-A69D9E530F96}&appname=Google%20Chrome&needsadmin=True'
+    )
+
+    $Result = [PSCustomObject]@{
+        Status          = $true
+        Version         = $null
+        PreviousVersion = $null
+        Updated         = $false
+    }
+
+    # Deliberately using $env:ProgramFiles as Chrome uses the 64-bit path on
+    # 64-bit systems while Google Update will always uses the 32-bit path.
+    $ChromePath = Join-Path -Path $env:ProgramFiles -ChildPath 'Google\Chrome\Application\chrome.exe'
+
+    try {
+        $Chrome = Get-Item -LiteralPath $ChromePath -ErrorAction Stop
+        $Result.PreviousVersion = $Chrome.VersionInfo.ProductVersion
+    } catch {
+        $Result.PreviousVersion = 'None found'
+    }
+
+    if (!$PSCmdlet.ShouldProcess('Google Chrome', 'Update')) {
+        return
+    }
+
+    $GoogleUpdate = Start-Process -FilePath $GoogleUpdatePath -ArgumentList $GoogleUpdateArgs -PassThru -Wait
+
+    if ($GoogleUpdate.ExitCode -ne 0) {
+        Write-Error -Message ('Google Update returned exit code: {0}' -f $GoogleUpdate.ExitCode)
+        $Result.Status = $false
+    }
+
+    try {
+        $Chrome = Get-Item -LiteralPath $ChromePath -ErrorAction Stop
+        $Result.Version = $Chrome.VersionInfo.ProductVersion
+    } catch {
+        $Result.Version = 'None found'
+    }
+
+    return $Result
+}
+
 # Update Microsoft Edge
 #
 # Deploy Microsoft Edge with Windows 10 updates
