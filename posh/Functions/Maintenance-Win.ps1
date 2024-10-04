@@ -27,7 +27,13 @@ Function Update-MicrosoftEdge {
         }
     }
 
-    $EdgeUpdatePath = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe'
+    if ([Environment]::Is64BitOperatingSystem) {
+        $ProgramFiles = ${env:ProgramFiles(x86)}
+    } else {
+        $ProgramFiles = $env:ProgramFiles
+    }
+
+    $EdgeUpdatePath = Join-Path -Path $ProgramFiles -ChildPath 'Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe'
     if (!(Test-Path -LiteralPath $EdgeUpdatePath -PathType Leaf)) {
         Write-Error -Message 'Unable to install Edge updates as Edge Update not found.'
         return
@@ -47,7 +53,7 @@ Function Update-MicrosoftEdge {
         Updated         = $false
     }
 
-    $EdgePath = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft\Edge\Application\msedge.exe'
+    $EdgePath = Join-Path -Path $ProgramFiles -ChildPath 'Microsoft\Edge\Application\msedge.exe'
 
     try {
         $Edge = Get-Item -LiteralPath $EdgePath -ErrorAction Stop
@@ -307,7 +313,13 @@ Function Update-VisualStudio {
         }
     }
 
-    $VsInstallerExe = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
+    if ([Environment]::Is64BitOperatingSystem) {
+        $ProgramFiles = ${env:ProgramFiles(x86)}
+    } else {
+        $ProgramFiles = $env:ProgramFiles
+    }
+
+    $VsInstallerExe = Join-Path -Path $ProgramFiles -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
     if (!(Test-Path -LiteralPath $VsInstallerExe -PathType Leaf)) {
         Write-Error -Message 'Unable to update Visual Studio as VSInstaller not found.'
         return
