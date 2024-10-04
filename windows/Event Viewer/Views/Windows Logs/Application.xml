@@ -83,7 +83,7 @@
             Data:       Com Call Wrapper Unmarshal Class 4.0
 
             Microsoft-Windows-COMRuntime error on your OMS agents
-            https://docs.microsoft.com/en-us/archive/blogs/msoms/microsoft-windows-comruntime-error-on-your-oms-agents
+            https://learn.microsoft.com/en-us/archive/blogs/msoms/microsoft-windows-comruntime-error-on-your-oms-agents
           -->
           <Suppress Path="Application">
             *[System[Provider[@Name='Microsoft-Windows-COMRuntime'] and EventID=10031]]
