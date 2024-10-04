@@ -9,6 +9,74 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
     return
 }
 
+# Update Microsoft Edge
+#
+# Deploy Microsoft Edge with Windows 10 updates
+# https://learn.microsoft.com/en-au/deployedge/deploy-edge-with-windows-10-updates
+Function Update-MicrosoftEdge {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [PSCustomObject])]
+    Param()
+
+    if (!(Test-IsAdministrator)) {
+        $Message = 'You must have administrator privileges to perform Edge updates.'
+        if ($WhatIfPreference) {
+            Write-Warning -Message $Message
+        } else {
+            throw $Message
+        }
+    }
+
+    $EdgeUpdatePath = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe'
+    if (!(Test-Path -LiteralPath $EdgeUpdatePath -PathType Leaf)) {
+        Write-Error -Message 'Unable to install Edge updates as Edge Update not found.'
+        return
+    }
+
+    $EdgeUpdateArgs = @(
+        '/silent',
+        '/install',
+        # GUID corresponds to Stable channel
+        'appguid={56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}&appname=Microsoft%20Edge&needsadmin=True'
+    )
+
+    $Result = [PSCustomObject]@{
+        Status          = $true
+        Version         = $null
+        PreviousVersion = $null
+        Updated         = $false
+    }
+
+    $EdgePath = Join-Path -Path ${env:ProgramFiles(x86)} -ChildPath 'Microsoft\Edge\Application\msedge.exe'
+
+    try {
+        $Edge = Get-Item -LiteralPath $EdgePath -ErrorAction Stop
+        $Result.PreviousVersion = $Edge.VersionInfo.ProductVersion
+    } catch {
+        $Result.PreviousVersion = 'None found'
+    }
+
+    if (!$PSCmdlet.ShouldProcess('Microsoft Edge', 'Update')) {
+        return
+    }
+
+    $EdgeUpdate = Start-Process -FilePath $EdgeUpdatePath -ArgumentList $EdgeUpdateArgs -PassThru -Wait
+
+    if ($EdgeUpdate.ExitCode -ne 0) {
+        Write-Error -Message ('Edge Update returned exit code: {0}' -f $EdgeUpdate.ExitCode)
+        $Result.Status = $false
+    }
+
+    try {
+        $Edge = Get-Item -LiteralPath $EdgePath -ErrorAction Stop
+        $Result.Version = $Edge.VersionInfo.ProductVersion
+    } catch {
+        $Result.Version = 'None found'
+    }
+
+    return $Result
+}
+
 # Update Microsoft Store apps
 Function Update-MicrosoftStore {
     [CmdletBinding(SupportsShouldProcess)]
