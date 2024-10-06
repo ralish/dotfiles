@@ -1,6 +1,6 @@
 # Windows Subsystem for Linux 2 (WSL 2) global settings
 #
-# Last reviewed release: v2.2.4
+# Last reviewed release: v2.3.24
 # Default file path: %USERPROFILE%\.wslconfig
 #
 # Initial support from Windows Build 18945 (Windows 10 2004+)
@@ -10,7 +10,6 @@
 #################################################
 
 # SECTION       NAME                    TYPE        Default     Introduced
-# wsl2          defaultVhdSize          str         Unknown     2.0.5
 # wsl2          earlyBootLogging        Unknown     Unknown     At least 2.0.0
 # wsl2          hostFileSystemAccess    bool        true        At least 2.0.0
 # wsl2          ipv6                    bool        false       At least 2.0.0
@@ -18,7 +17,6 @@
 # wsl2          kernelDebugPort         int         0           At least 2.0.0
 # wsl2          kernelModules           bool        true        2.1.0
 # wsl2          mountDeviceTimeout      int         5000        At least 2.0.0
-# wsl2          systemDistro            str         Unknown     At least 2.0.0
 # wsl2          virtio                  bool        false       At least 2.0.0
 # wsl2          virtio9p                bool        true        At least 2.0.0
 # wsl2          virtiofs                bool        false       At least 2.0.0
@@ -215,11 +213,23 @@ memory = 16GB
 ###               Miscellaneous               ###
 #################################################
 
+# Default Linux distribution VHD size
+#
+# Default: 1TB
+# Support: WSL 2.0.5
+#defaultVhdSize = 1TB
+
 # Support GUI applications (WSLg)
 #
 # Default: true
 # Support: Build 21364 (Windows 11 21H2+)
 #guiApplications = true
+
+# Absolute Windows path to the system distribution VHD
+#
+# Default: %ProgramFiles%\\WSL\\system.vhd
+# Support: Unknown (at least since WSL 2.0.0)
+#systemDistro = %ProgramFiles%\\WSL\\system.vhd
 
 # Idle timeout for stopping the VM (ms)
 #
@@ -340,6 +350,7 @@ telemetry = false
 #
 # Default: false
 # Support: WSL 2.0.0 & Build 22621.2359 (Windows 11 22H2+)
+# Removed: WSL 2.3.22
 #useWindowsDnsCache = false
 
 # Duration to wait for retrieving HTTP proxy on WSL container start (ms)
