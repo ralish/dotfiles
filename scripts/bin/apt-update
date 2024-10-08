@@ -37,8 +37,8 @@ function early_init() {
 function main() {
     early_init
 
-    # shellcheck source=scripts/bin/bash-template.sh
-    source "$script_real_dir/bash-template.sh"
+    # shellcheck source=scripts/lib/bash-template.sh
+    source "$dotfiles_path/scripts/lib/bash-template.sh"
 
     trap script_trap_err ERR
     trap script_trap_exit EXIT
