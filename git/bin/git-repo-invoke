@@ -132,7 +132,7 @@ function check_is_git_repo() {
 function git_repo_invoke() {
     local base_dir="$1"
 
-    (
+    (   
         cd -- "$base_dir"
         if git rev-parse --git-dir > /dev/null 2>&1; then
             local repo_name
@@ -158,8 +158,8 @@ function git_repo_invoke() {
 function main() {
     early_init
 
-    # shellcheck source=scripts/bin/bash-template.sh
-    source "$dotfiles_path/scripts/bin/bash-template.sh"
+    # shellcheck source=scripts/lib/bash-template.sh
+    source "$dotfiles_path/scripts/lib/bash-template.sh"
 
     trap script_trap_err ERR
     trap script_trap_exit EXIT
