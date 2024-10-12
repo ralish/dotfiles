@@ -231,6 +231,11 @@
     // NSIS
     "nsis.showOutputView": "On Warnings & Errors",
 
+    // OPA
+    "opa.languageServers": [
+        "regal"
+    ],
+
     // PHP Intelephense
     "intelephense.telemetry.enabled": false,
 
