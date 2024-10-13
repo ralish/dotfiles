@@ -34,6 +34,9 @@ Function Optimize-VMwareVirtualMachine {
             }
         }
 
+        # Never recurse into these directories
+        $NoRecurseDirs.Add((Join-Path -Path $Dir.FullName -ChildPath 'caches'))
+
         # Check if directory has a single VM
         $VmxFiles = @(Get-ChildItem -LiteralPath $Dir.FullName -File | Where-Object Extension -EQ '.vmx' )
         if ($VmxFiles.Count -eq 0) {
