@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# pipefail is enabled in the sourcing script
+# shellcheck disable=SC2312
+
 # Application name
 readonly APP_NAME="shfmt"
 # Local installation path
