@@ -88,8 +88,8 @@ function dl_yq() {
     if ! [[ -d $APP_DST_DIR ]]; then
         mkdir "$APP_DST_DIR"
     fi
-    curl -sSL "$latest_url" | tar -x -z -C "$APP_DST_DIR" --strip-components=1 --wildcards "*/APP_$latest_contains"
-    mv "$APP_DST_DIR/APP_$latest_contains" "$APP_DST"
+    curl -sSL "$latest_url" | tar -x -z -C "$APP_DST_DIR" --strip-components=1 --wildcards "./${APP_NAME}_${latest_contains}"
+    mv "$APP_DST_DIR/${APP_NAME}_${latest_contains}" "$APP_DST"
     chmod +x "$APP_DST"
 }
 
