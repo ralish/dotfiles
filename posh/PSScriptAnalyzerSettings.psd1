@@ -1,6 +1,6 @@
 # PSScriptAnalyzer settings
 #
-# Last reviewed release: v1.22.0
+# Last reviewed release: v1.23.0
 
 @{
     IncludeRules = @('*')
