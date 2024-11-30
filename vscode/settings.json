@@ -120,7 +120,7 @@
     // ###                 Extensions                 ###
     // ##################################################
 
-    // .NET Install Tool for Extension Authors
+    // .NET Install Tool
     "dotnetAcquisitionExtension.enableTelemetry": false,
 
     // AsciiDoc
@@ -131,6 +131,9 @@
 
     // Azure Repos
     "azureRepos.autoFetch.enabled": false,
+
+    // Azure Resources
+    "azureResourceGroups.deleteConfirmation": "ClickButton",
 
     // C/C++
     "C_Cpp.autoAddFileAssociations": false,
@@ -157,10 +160,11 @@
     "java.silentNotification": true,
 
     // Dev Containers
-    "dotfiles.repository": "ralish/dotfiles",
-    "dotfiles.installCommand": "dot-update -a",
     "dev.containers.copyGitConfig": false,
     "dev.containers.logLevel": "info",
+    "dotfiles.installCommand": "dot-update -a",
+    "dotfiles.repository": "ralish/dotfiles",
+    "dotfiles.targetPath": "~/dotfiles",
 
     // DevSkim
     "devskim.enableBestPracticeRules": true,
@@ -288,6 +292,12 @@
     // Remote Explorer
     "remote-explorer.foldersSortOrder": "alphabetical",
 
+    // Remote Repositories
+    "remoteHub.commitDirectlyWarning": "auto",
+    "remoteHub.richNavigation.enabled": true,
+    "remoteHub.staging.smart": false,
+    "remoteHub.switchToCreatedBranch": "always",
+
     // Select Line Status Bar
     "selectline.alignment": "right",
     "selectline.displayFormat": "%d lines",
@@ -362,6 +372,7 @@
 
     // YAML
     "yaml.format.singleQuote": true,
+    "yaml.trace.server": "messages",
 
 
     // ##################################################
