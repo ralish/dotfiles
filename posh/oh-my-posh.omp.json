@@ -1,12 +1,12 @@
 {
     "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
-    "version": 2,
+    "version": 3,
     "final_space": true,
     "console_title_template": "{{if .Root}}root :: {{end}}{{.Shell}} :: {{.Folder}}",
     "transient_prompt": {
         "foreground": "#7a7a7a",
         "background": "transparent",
-        "template": " ~#@\u276f "
+        "template": " ~#@❯ "
     },
     "blocks": [
         {
@@ -21,6 +21,7 @@
                     "background": "#2f2f2f",
                     "template": " {{ if .WSL }}\ue712 on {{ end }}{{ .Icon }}<#7a7a7a> \ue0b1</>",
                     "properties": {
+                        "cache_duration": "none",
                         "alpine": "\uf300",
                         "arch": "\uf303",
                         "centos": "\uf304",
@@ -43,14 +44,20 @@
                     "style": "diamond",
                     "foreground": "#fafafa",
                     "background": "#2f2f2f",
-                    "template": " {{ if ne .Env.POSH_SESSION_DEFAULT_USER .UserName }}<#77f5d6>{{ .UserName }}</><#7a7a7a>@</>{{ end }}<#2EEFBF>{{ .HostName }}</><#7a7a7a> \ue0b1</>"
+                    "template": " {{ if ne .Env.POSH_SESSION_DEFAULT_USER .UserName }}<#77f5d6>{{ .UserName }}</><#7a7a7a>@</>{{ end }}<#2EEFBF>{{ .HostName }}</><#7a7a7a> \ue0b1</>",
+                    "properties": {
+                        "cache_duration": "none"
+                    }
                 },
                 {
                     "type": "root",
                     "style": "diamond",
                     "foreground": "#ffff66",
                     "background": "#2f2f2f",
-                    "template": " \uf0e7<#7a7a7a> \ue0b1</>"
+                    "template": " \uf0e7<#7a7a7a> \ue0b1</>",
+                    "properties": {
+                        "cache_duration": "none"
+                    }
                 },
                 {
                     "type": "path",
@@ -59,6 +66,7 @@
                     "background": "#2f2f2f",
                     "template": "<#f2f200> \ue5ff </>{{ .Path }} ",
                     "properties": {
+                        "cache_duration": "none",
                         "folder_separator_icon": "<#B5B2C2>\ue0bf </>",
                         "home_icon": "\uf015",
                         "folder_icon": "<#B5B2C2>\ue5fe </>",
@@ -77,6 +85,7 @@
                     "background": "#2f2f2f",
                     "template": "<#7a7a7a>\ue0b1 </>{{ .UpstreamIcon }}{{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }}<#E84855> \uf044 {{ .Working.String }}</>{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}<#2FDA4E> \uf046 {{ .Staging.String }}</>{{ end }}{{ if gt .StashCount 0 }} \ueb4b {{ .StashCount }}{{ end }} ",
                     "properties": {
+                        "cache_duration": "none",
                         "fetch_status": true,
                         "fetch_stash_count": true,
                         "fetch_upstream_icon": true
@@ -87,7 +96,10 @@
                     "style": "diamond",
                     "trailing_diamond": "\ue0b0",
                     "foreground": "#fafafa",
-                    "background": "#2f2f2f"
+                    "background": "#2f2f2f",
+                    "properties": {
+                        "cache_duration": "none"
+                    }
                 }
             ]
         },
@@ -100,28 +112,40 @@
                     "style": "diamond",
                     "leading_diamond": "\ue0b2",
                     "foreground": "#fafafa",
-                    "background": "#2f2f2f"
+                    "background": "#2f2f2f",
+                    "properties": {
+                        "cache_duration": "none"
+                    }
                 },
                 {
                     "type": "node",
                     "style": "diamond",
                     "foreground": "#6CA35E",
                     "background": "#2f2f2f",
-                    "template": " \ue718 {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }}<#7a7a7a> \ue0b3</>"
+                    "template": " \ue718 {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }}<#7a7a7a> \ue0b3</>",
+                    "properties": {
+                        "cache_duration": "none"
+                    }
                 },
                 {
                     "type": "python",
                     "style": "diamond",
                     "foreground": "#96E072",
                     "background": "#2f2f2f",
-                    "template": " \ue235 {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{ .Venv }} {{ end }}{{ .Full }}{{ end }}<#7a7a7a> \ue0b3</>"
+                    "template": " \ue235 {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{ .Venv }} {{ end }}{{ .Full }}{{ end }}<#7a7a7a> \ue0b3</>",
+                    "properties": {
+                        "cache_duration": "none"
+                    }
                 },
                 {
                     "type": "dotnet",
                     "style": "diamond",
                     "foreground": "#3891A6",
                     "background": "#2f2f2f",
-                    "template": " \ue77f {{ if .Unsupported }}\uf071{{ else }}{{ .Full }}{{ end }}<#7a7a7a> \ue0b3</>"
+                    "template": " \ue77f {{ if .Unsupported }}\uf071{{ else }}{{ .Full }}{{ end }}<#7a7a7a> \ue0b3</>",
+                    "properties": {
+                        "cache_duration": "none"
+                    }
                 },
                 {
                     "type": "time",
@@ -131,6 +155,7 @@
                     "background": "#2f2f2f",
                     "template": " {{ .CurrentDate | date .Format }}<#007ACC> \ue641 </>",
                     "properties": {
+                        "cache_duration": "none",
                         "time_format": "15:04:05"
                     }
                 }
@@ -145,7 +170,10 @@
                     "type": "text",
                     "style": "plain",
                     "foreground": "#7a7a7a",
-                    "template": "~#@\u276f"
+                    "template": "~#@❯",
+                    "properties": {
+                        "cache_duration": "none"
+                    }
                 }
             ]
         },
@@ -157,7 +185,10 @@
                     "type": "text",
                     "style": "plain",
                     "foreground": "#7a7a7a",
-                    "template": " \u276e "
+                    "template": " ❮ ",
+                    "properties": {
+                        "cache_duration": "none"
+                    }
                 },
                 {
                     "type": "executiontime",
@@ -165,6 +196,7 @@
                     "foreground": "#FFCE5C",
                     "template": " {{ .FormattedMs }}<#fafafa> \uf252 </>",
                     "properties": {
+                        "cache_duration": "none",
                         "threshold": 500,
                         "style": "roundrock"
                     }
@@ -178,7 +210,8 @@
                     ],
                     "template": " \uea9f {{ if gt .Code 0 }}{{ .Code }}{{ end }} ",
                     "properties": {
-                        "always_enabled": true
+                        "always_enabled": true,
+                        "cache_duration": "none"
                     }
                 }
             ]
