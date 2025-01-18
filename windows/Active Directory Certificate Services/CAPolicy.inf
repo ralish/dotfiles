@@ -1,0 +1,117 @@
+; CAPolicy.inf syntax
+; https://learn.microsoft.com/en-us/windows-server/networking/core-network-guide/cncg/server-certs/prepare-the-capolicy-inf-file
+
+[Version]
+Signature = "$Windows NT$"
+
+[Strings]
+; Supported OIDs can be found in wincrypt.h
+
+; Extensions
+;
+; Key usage
+szOID_KEY_USAGE                     = 2.5.29.15
+; Basic constraints
+szOID_BASIC_CONSTRAINTS2            = 2.5.29.19
+; AD CS: CA version
+szOID_CERTSRV_CA_VERSION            = 1.3.6.1.4.1.311.21.1
+; AD CS: Previous CA certificate hash
+szOID_CERTSRV_PREVIOUS_CERT_HASH    = 1.3.6.1.4.1.311.21.2
+; AD CS: Cross CA version
+szOID_CERTSRV_CROSSCA_VERSION       = 1.3.6.1.4.1.311.21.22
+
+
+[Certsrv_Server]
+; Certificate Services server configuration
+
+; Length of the renewed root CA certificate private key. The key size can be
+; increased or decreased (e.g. downgrade from 4096-bit to 2048-bit).
+;RenewalKeyLength = 4096
+
+; Validity period of the renewed root CA certificate
+;
+; RenewalValidityPeriod values: Hours, Days, Weeks, Months, Years
+;RenewalValidityPeriod = Years
+;RenewalValidityPeriodUnits = 25
+
+; Certificate signature format
+;
+; When enabled, uses the PKCS#1 v2.1 signature format with separate OIDs used
+; to specify the hash algorithm and the asymmetric algorithm. For certificates
+; using RSA the RSA-PSS algorithm is used instead of the PKCS#1 v1.5 algorithm.
+AlternateSignatureAlgorithm = 0
+
+; Use UTF-8 encoding for supported RDNs in Subject and Issuer DNs. This is a
+; non-default configuration and may result in software compatibility issues.
+;ForceUTF8 = 1
+
+; Validity period for base CRLs (can be changed post-deployment)
+;
+; CRLPeriod values: Hours, Days, Weeks, Months, Years
+CRLPeriod = Weeks
+CRLPeriodUnits = 26
+
+; Validity period for delta CRLs (can be changed post-deployment)
+;
+; CRLDeltaPeriod values: Hours, Days, Weeks, Months, Years
+;
+; Setting CRLDeltaPeriodUnits to zero disables publishing of delta CRLs. This
+; is typically desired for offline and root CAs where the volume of issued
+; certificates is sufficiently low that delta CRLs add minimal value.
+CRLDeltaPeriod = Days
+CRLDeltaPeriodUnits = 0
+
+; Load default certificate templates (Enterprise CAs only)
+;
+; When disabled, a default set of templates will not be enabled for issuance on
+; the newly deployed CA. This ensures no certificates will be issued before the
+; desired certificate templates are explicitly enabled on the CA.
+LoadDefaultTemplates = 0
+
+
+[Extensions]
+; Mark the Key Usage extension as critical
+Critical = %szOID_KEY_USAGE%
+
+; Remove the AD CS: CA Version extension
+;%szOID_CERTSRV_CA_VERSION% =
+
+
+[CRLDistributionPoint]
+; CRL Distribution Point (CDP)
+;
+; Configures the CDP extension in root CA certificates. Configuration of the
+; CDP extension for issued certificates is performed separately after root CA
+; deployment and can be changed at any point during the operation of the CA.
+;
+; Multiple URLs are specified by supplying multiple "URL" keys in the section,
+; with the following URL schemes being supported:
+; - FILE (UNC path)
+; - HTTP (*not* HTTPS)
+; - LDAP
+;
+; This section should typically be left empty or omitted entirely as revocation
+; checking isn't performed for root CA certificates, making the inclusion of a
+; CDP extension superfluous.
+
+;URL = ""
+
+
+[AuthorityInformationAccess]
+; Authority Information Access (AIA)
+;
+; Configures the AIA extension in root CA certificates. Configuration of the
+; AIA extension for issued certificates is performed separately after root CA
+; deployment and can be changed at any point during the operation of the CA.
+;
+; Multiple URLs are specified by supplying multiple "URL" keys in the section,
+; with the following URL schemes being supported:
+; - FILE (UNC path)
+; - FTP
+; - HTTP (*not* HTTPS)
+; - LDAP
+;
+; This section should typically be left empty or omitted entirely as a root CA
+; implicitly has no higher authority for which information can be supplied.
+
+;URL = ""
