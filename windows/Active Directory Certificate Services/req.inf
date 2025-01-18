@@ -1,10 +1,10 @@
-# ADCS certificate request template
-#
-# Create a new request:
-# certreq -New -?
-#
-# Submit a request to a Windows ADCS CA:
-# certreq -Submit -?
+; AD CS certificate request template
+;
+; Create a new request:
+; certreq -New -?
+;
+; Submit a request to a Windows AD CS CA:
+; certreq -Submit -?
 
 [Version]
 Signature = "$Windows NT$"
