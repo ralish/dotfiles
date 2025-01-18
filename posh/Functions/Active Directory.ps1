@@ -246,7 +246,6 @@ Function Add-ADShadowPrincipalMember {
 
     $CommonParams = @{
         ErrorAction = 'Stop'
-        PassThru    = $PassThru
     }
 
     if ($Server) {
@@ -279,7 +278,7 @@ Function Add-ADShadowPrincipalMember {
             $MemberValue = $User.DistinguishedName
         }
 
-        Set-ADObject @CommonParams -Identity $ShadowPrincipal -Add @{ member = $MemberValue }
+        Set-ADObject @CommonParams -Identity $ShadowPrincipal -Add @{ member = $MemberValue } -PassThru:$PassThru
     }
 }
 
@@ -339,7 +338,6 @@ Function New-ADShadowPrincipal {
 
     $CommonParams = @{
         ErrorAction = 'Stop'
-        PassThru    = $PassThru
     }
 
     if ($Server) {
@@ -351,7 +349,7 @@ Function New-ADShadowPrincipal {
     $SidByteArray = [byte[]]::new($Sid.BinaryLength)
     $Sid.GetBinaryForm($SidByteArray, 0)
 
-    New-ADObject @CommonParams -Type 'msDS-ShadowPrincipal' -Path $ShadowPrincipalContainer -Name $Name -OtherAttributes @{ 'msDS-ShadowPrincipalSid' = $SidByteArray }
+    New-ADObject @CommonParams -Type 'msDS-ShadowPrincipal' -Path $ShadowPrincipalContainer -Name $Name -OtherAttributes @{ 'msDS-ShadowPrincipalSid' = $SidByteArray } -PassThru:$PassThru
 }
 
 #endregion
