@@ -98,6 +98,13 @@ fi
 if [[ -f /etc/update-manager/release-upgrades ]]; then
     echo '[update-manager] Disabling release upgrade prompts ...'
     sed -i 's/^Prompt=lts$/Prompt=never/' /etc/update-manager/release-upgrades
+
+    # Remove any cached release upgrade prompt
+    if ((ubuntu_release_year >= 13)); then
+        cat /dev/null > /var/lib/ubuntu-release-upgrader/release-upgrade-available
+    else
+        cat /dev/null > /var/lib/update-notifier/release-upgrade-available
+    fi
 fi
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
