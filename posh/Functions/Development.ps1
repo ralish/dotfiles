@@ -224,9 +224,7 @@ Function Invoke-GitLinter {
 
     switch ($PSCmdlet.ParameterSetName) {
         'DevSkim' {
-            if (!(Get-Command -Name 'devskim')) {
-                throw 'Required command is unavailable: devskim'
-            }
+            Test-CommandAvailable -Name 'devskim'
 
             $GitOutput = git ls-files
             if ($LASTEXITCODE -ne 0) { return }
@@ -245,9 +243,7 @@ Function Invoke-GitLinter {
         }
 
         'PSScriptAnalyzer' {
-            if (!(Get-Command -Name 'Invoke-ScriptAnalyzer')) {
-                throw 'Required command is unavailable: Invoke-ScriptAnalyzer'
-            }
+            Test-CommandAvailable -Name 'Invoke-ScriptAnalyzer'
 
             $ScriptAnalyzerParams = @{
                 Verbose = $false
@@ -299,14 +295,10 @@ Function Invoke-GitLinter {
         }
 
         'ShellCheck' {
-            if (!(Get-Command -Name 'shellcheck')) {
-                throw 'Required command is unavailable: shellcheck'
-            }
+            Test-CommandAvailable -Name 'shellcheck'
 
             if ($ShebangSearch -or $ShellDirectiveSearch) {
-                if (!(Get-Command -Name 'rg')) {
-                    throw 'Required command is unavailable: rg'
-                }
+                Test-CommandAvailable -Name 'rg'
             }
 
             $GitOutput = git ls-files
