@@ -45,7 +45,7 @@ AlternateSignatureAlgorithm = 0
 ; non-default configuration and may result in software compatibility issues.
 ;ForceUTF8 = 1
 
-; Validity period for base CRLs (can be changed post-deployment)
+; Validity period for CRLs (can be changed post-deployment)
 ;
 ; CRLPeriod values: Hours, Days, Weeks, Months, Years
 CRLPeriod = Weeks
@@ -70,15 +70,48 @@ LoadDefaultTemplates = 0
 
 
 [Extensions]
-; Mark the Key Usage extension as critical
+; Extensions configuration
+
+; Set the Key Usage extension as critical
+;
+; Although the default value for the extension is fine, we need to set it
+; explicitly for the subsequent Critical setting to be respected. The value is
+; the Base64 encoded ASN.1 TLV bytes, which when decoded gives the following:
+;
+; BYTE      MEANING             DESCRIPTION
+; 0x03      TLV Tag             ASN.1 BIT STRING
+; 0x02      TLV Length          Number of content bytes
+; 0x01      Unused bits         Number of unused bits in the final byte
+; 0x86      Key usage bits      Cert Signing, CRL Signing, Digital Signature
+%szOID_KEY_USAGE% = AwIBhg==
 Critical = %szOID_KEY_USAGE%
 
 ; Remove the AD CS: CA Version extension
 ;%szOID_CERTSRV_CA_VERSION% =
 
 
+[AuthorityInformationAccess]
+; Authority Information Access (AIA) configuration
+;
+; Configures the AIA extension in root CA certificates. Configuration of the
+; AIA extension for issued certificates is performed separately after root CA
+; deployment and can be changed at any point during the operation of the CA.
+;
+; Multiple URLs are specified by supplying multiple "URL" keys in the section,
+; with the following URL schemes being supported:
+; - FILE (UNC path)
+; - FTP
+; - HTTP (*not* HTTPS)
+; - LDAP
+;
+; This section should typically be left empty or omitted entirely as a root CA
+; implicitly has no higher authority for which information can be supplied.
+
+;URL = ""
+
+
 [CRLDistributionPoint]
-; CRL Distribution Point (CDP)
+; CRL Distribution Point (CDP) configuration
 ;
 ; Configures the CDP extension in root CA certificates. Configuration of the
 ; CDP extension for issued certificates is performed separately after root CA
@@ -97,21 +130,29 @@ Critical = %szOID_KEY_USAGE%
 ;URL = ""
 
 
-[AuthorityInformationAccess]
-; Authority Information Access (AIA)
+[EnhancedKeyUsageExtension]
+; Enhanced Key Usage (EKU) extension configuration
 ;
-; Configures the AIA extension in root CA certificates. Configuration of the
-; AIA extension for issued certificates is performed separately after root CA
-; deployment and can be changed at any point during the operation of the CA.
+; The absence of the EKU extension means the certificate is valid for any use.
+; This is typically desired for a root CA, and sometimes for intermediate CAs,
+; but should rarely be the case for end-entity certificates. When present in a
+; CA certificate the usage constraints apply to all issued certificates.
 ;
-; Multiple URLs are specified by supplying multiple "URL" keys in the section,
-; with the following URL schemes being supported:
-; - FILE (UNC path)
-; - FTP
-; - HTTP (*not* HTTPS)
-; - LDAP
-;
-; This section should typically be left empty or omitted entirely as a root CA
-; implicitly has no higher authority for which information can be supplied.
+; Each OID to include must be set as the value of an individual OID key. The
+; extension can be marked critical by setting the Critical key to the value
+; "Yes" or "No" as desired.
 
-;URL = ""
+;OID = 1.2.3.4
+;Critical = Yes
+
+
+[PolicyStatementExtension]
+; List of policy statements (comma-separated)
+;
+; Each policy statement must be defined in a section of the same name with an
+; OID key and one or more Notice or URL keys. The latter two keys contain the
+; policy statement text or URL where it can be found, respectively. Multiple
+; Notice or URL keys can be provided in a single policy statement, including
+; both types within the same policy statement.
+
+;Policies = ""
