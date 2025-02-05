@@ -320,6 +320,73 @@ Function Get-OpenSSLPkcs12 {
 
 #endregion
 
+#region Certificate retrieval
+
+# Retrieve a certificate from a SSL/TLS server
+# https://docs.openssl.org/master/man1/openssl-s_client/
+Function Get-OpenSSLServerCertificate {
+    [CmdletBinding()]
+    [OutputType([String])]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Hostname,
+
+        [UInt16]$Port = 443,
+
+        [ValidateSet('IPv4Only', 'IPv6Only')]
+        [String]$IpVersion,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$ServerName,
+
+        [ValidateSet(
+            'FTP', 'IMAP', 'IRC', 'LDAP', 'LMTP', 'MySQL', 'NNTP', 'POP3',
+            'Postgres', 'Sieve', 'SMTP', 'XMPP', 'XmppServer'
+        )]
+        [String]$StartTls,
+
+        [Switch]$KeepStdinOpen
+    )
+
+    $Params = @(
+        's_client',
+        '-connect', ('{0}:{1}' -f $Hostname, $Port)
+    )
+
+    if ($IpVersion) {
+        if ($IpVersion -eq 'IPv4Only') {
+            $Params.Add('-4')
+        } else {
+            $Params.Add('-6')
+        }
+    }
+
+    if ($ServerName) {
+        $Params.Add('-servername')
+        $Params.Add($ServerName)
+    }
+
+    if ($StartTls) {
+        $Params.Add('-starttls')
+        $Params.Add($StartTls.ToLower())
+    }
+
+    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
+    Write-Host ('openssl {0}' -f (($Params | Add-QuotesToStringWithSpace) -join ' '))
+
+    # The s_client command keeps the connection open in anticipation of further
+    # commands. Piping $null will effectively close standard input, gracefully
+    # closing the connection after it's established.
+    if ($KeepStdinOpen) {
+        & openssl @Params
+    } else {
+        $null | & openssl @Params
+    }
+}
+
+
+#endregion
+
 #region Conversion operations
 
 # Convert a certificate in DER format to PEM format
