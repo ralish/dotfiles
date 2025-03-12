@@ -958,8 +958,19 @@ Function Update-PythonPackages {
     }
 
     if ($UpdatePipPackages) {
-        [String[]]$UpdateArgs = 'install', '--no-python-version-warning', '--upgrade', '--upgrade-strategy', 'eager'
-        [String[]]$PipUpdateArgs = '-m', 'pip', 'install', '--no-python-version-warning', '--upgrade'
+        [String[]]$UpdateArgs = 'install', '--upgrade', '--upgrade-strategy', 'eager'
+        [String[]]$PipUpdateArgs = '-m', 'pip', 'install', '--upgrade'
+
+        $PipVersionRaw = (& pip --version) -join [String]::Empty
+        if ($PipVersionRaw -notmatch '^pip ([0-9]+\.[0-9]+(\.[0-9]+)?)') {
+            throw 'Unable to determine pip package version.'
+        }
+
+        $PipVersion = [Version]$Matches[1]
+        if ($PipVersion -lt '25.0') {
+            $UpdateArgs += '--no-python-version-warning'
+            $PipUpdateArgs += '--no-python-version-warning'
+        }
 
         if ($PSCmdlet.ShouldProcess('pip', 'Update')) {
             Write-Verbose -Message ('Updating pip: python {0} pip' -f ($PipUpdateArgs -join ' '))
