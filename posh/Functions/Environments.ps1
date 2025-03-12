@@ -77,14 +77,14 @@ Function Update-DotNetTools {
     }
     $env:DOTNET_NOLOGO = 'true'
 
-    # .NET 8.0.400 added the "--all" parameter to update all tools. For earlier
-    # versions, we have to enumerate the installed tools and perform an update
-    # on each individually.
-    #
-    # HACK: Deliberately disabled by requiring version 10.0.0 as it's broken:
+    # .NET 8.0.400 added the "--all" parameter to update all tools, but it was
+    # effectively broken until the 8.0.403 release. For details see the issue:
     # https://github.com/dotnet/sdk/issues/42598
+    #
+    # For earlier releases we enumerate the installed tools and update each
+    # individually.
     $CliVersion = [Version](& dotnet --version)
-    if ($CliVersion -ge '10.0.0') {
+    if ($CliVersion -ge '8.0.403') {
         $UpdateArgs += '--all'
         Write-Verbose -Message ('Updating .NET tools: dotnet {0}' -f ($UpdateArgs -join ' '))
         & dotnet @UpdateArgs
