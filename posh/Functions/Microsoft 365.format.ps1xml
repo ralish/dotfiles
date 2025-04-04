@@ -109,9 +109,9 @@
             </TableControl>
         </View>
         <View>
-            <Name>Microsoft.Office365.EntityUsageSummary.Group</Name>
+            <Name>Microsoft.M365.EntityUsageSummary.Group</Name>
             <ViewSelectedBy>
-                <TypeName>Microsoft.Office365.EntityUsageSummary.Group</TypeName>
+                <TypeName>Microsoft.M365.EntityUsageSummary.Group</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableHeaders>
@@ -197,9 +197,9 @@
             </TableControl>
         </View>
         <View>
-            <Name>Microsoft.Office365.EntityUsageSummary.User</Name>
+            <Name>Microsoft.M365.EntityUsageSummary.User</Name>
             <ViewSelectedBy>
-                <TypeName>Microsoft.Office365.EntityUsageSummary.User</TypeName>
+                <TypeName>Microsoft.M365.EntityUsageSummary.User</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableHeaders>

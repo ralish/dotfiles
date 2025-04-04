@@ -9,7 +9,7 @@ Param(
     [ValidateSet(
         'DiskCleanup',
         'DotNetFramework',
-        'Office365',
+        'Microsoft365',
         'PowerShell',
         'ShutdownPrep',
         'WindowsComponents',
@@ -28,7 +28,7 @@ Param(
     [ValidateSet(
         'DiskCleanup',
         'DotNetFramework',
-        'Office365',
+        'Microsoft365',
         'PowerShell',
         'ShutdownPrep',
         'WindowsComponents',
@@ -130,17 +130,17 @@ Function Optimize-DotNetFramework {
     }
 }
 
-Function Optimize-Office365 {
+Function Optimize-Microsoft365 {
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
 
     if ($Script:WindowsServerCore) {
-        Write-Host -ForegroundColor Yellow '[Office 365] Skipping as unsupported on Windows Server Core.'
+        Write-Host -ForegroundColor Yellow '[Microsoft 365] Skipping as unsupported on Windows Server Core.'
         return
     }
 
-    Write-Host -ForegroundColor Green '[Office 365] Applying settings ...'
+    Write-Host -ForegroundColor Green '[Microsoft 365] Applying settings ...'
 
     # Disable automatic updates
     Set-RegistryValue -Path 'HKLM:\Software\Microsoft\Office\ClickToRun\Configuration' -Name 'UpdatesEnabled' -Type String -Value 'False'
@@ -925,7 +925,7 @@ $Tasks = @(
     'WindowsComponents',
     'DotNetFramework',
     'PowerShell',
-    'Office365',
+    'Microsoft365',
     'DiskCleanup',
     'WindowsNetworkList',
     'ShutdownPrep'

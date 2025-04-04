@@ -1,6 +1,6 @@
 $DotFilesSection = @{
     Type     = 'Functions'
-    Name     = 'Office 365'
+    Name     = 'Microsoft 365'
     Platform = 'Windows'
 }
 
@@ -10,7 +10,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 }
 
 # Load custom formatting data
-$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Office 365.format.ps1xml'))
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Microsoft 365.format.ps1xml'))
 
 #region Cloud App Security
 
@@ -310,7 +310,7 @@ Function Get-MailboxActivitySummary {
 #region Reporting
 
 # Retrieve a usage summary for an entity
-Function Get-Office365EntityUsageSummary {
+Function Get-Microsoft365EntityUsageSummary {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     Param(
@@ -511,7 +511,7 @@ Function Get-Office365EntityUsageSummary {
                 NotebookSections  = $NotebookSections
                 NotebookPages     = $NotebookPages
             }
-            $Summary.PSObject.TypeNames.Insert(0, 'Microsoft.Office365.EntityUsageSummary.User')
+            $Summary.PSObject.TypeNames.Insert(0, 'Microsoft.M365.EntityUsageSummary.User')
         }
 
         'Group' {
@@ -527,7 +527,7 @@ Function Get-Office365EntityUsageSummary {
                 NotebookPages     = $NotebookPages
                 Plans             = $Plans
             }
-            $Summary.PSObject.TypeNames.Insert(0, 'Microsoft.Office365.EntityUsageSummary.Group')
+            $Summary.PSObject.TypeNames.Insert(0, 'Microsoft.M365.EntityUsageSummary.Group')
         }
     }
 
@@ -535,7 +535,7 @@ Function Get-Office365EntityUsageSummary {
 }
 
 # Retrieve a matrix of user licenses
-Function Get-Office365UserLicensingMatrix {
+Function Get-Microsoft365UserLicensingMatrix {
     [CmdletBinding()]
     [OutputType([Void], [PSCustomObject[]])]
     Param()
@@ -571,7 +571,7 @@ Function Get-Office365UserLicensingMatrix {
 
 # Retrieve a security report for all users
 # Improved version of: https://github.com/OfficeDev/O365-InvestigationTooling/blob/master/DumpDelegatesandForwardingRules.ps1
-Function Get-Office365UserSecurityReport {
+Function Get-Microsoft365UserSecurityReport {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     Param(
@@ -719,7 +719,7 @@ Function Get-UnifiedGroupReport {
     }
 
     if (!$Groups) {
-        Write-Progress @WriteProgressParams -Status 'Retrieving Office 365 groups' -PercentComplete 1
+        Write-Progress @WriteProgressParams -Status 'Retrieving Microsoft 365 groups' -PercentComplete 1
         $Groups = Get-UnifiedGroup
     }
 
@@ -1070,8 +1070,8 @@ Function Import-ContentSearchResultsEntry {
 
 #region Service connection helpers
 
-# Helper function to connect to all Office 365 services
-Function Connect-Office365Services {
+# Helper function to connect to all Microsoft 365 services
+Function Connect-Microsoft365Services {
     [CmdletBinding(DefaultParameterSetName = 'MFA')]
     [OutputType([Void])]
     Param(
@@ -1188,7 +1188,7 @@ Function Connect-CentralizedDeployment {
 
     Test-ModuleAvailable -Name 'O365CentralizedAddInDeployment'
 
-    Write-Host -ForegroundColor Green 'Connecting to Office 365 Centralized Deployment ...'
+    Write-Host -ForegroundColor Green 'Connecting to Microsoft 365 Centralized Deployment ...'
     Connect-OrganizationAddInService @PSBoundParameters
 }
 
