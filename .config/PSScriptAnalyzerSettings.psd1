@@ -1,6 +1,6 @@
 # PSScriptAnalyzer settings
 #
-# Last reviewed release: v1.23.0
+# Last reviewed release: v1.24.0
 
 @{
     IncludeRules = @('*')
@@ -75,6 +75,13 @@
             CheckPipeForRedundantWhitespace         = $true
             CheckSeparator                          = $true
             IgnoreAssignmentOperatorInsideHashTable = $true
+        }
+
+        PSUseCorrectCasing = @{
+            Enable        = $true
+            CheckCommands = $true
+            CheckKeyword  = $false
+            CheckOperator = $true
         }
     }
 }
