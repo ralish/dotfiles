@@ -277,7 +277,7 @@ Function Get-OpenSSLPkcs12 {
             'AES128', 'AES192', 'AES256',
             'ARIA128', 'ARIA192', 'ARIA256',
             'CAMELLIA128', 'CAMELLIA192', 'CAMELLIA256',
-            'DES', 'DES3',
+            'DES', 'DES3', # DevSkim: ignore DS106863
             'IDEA'
         )]
         [String]$PrivateKeyEncryption,
@@ -536,7 +536,7 @@ Function Convert-OpenSSLPkcs12ToPem {
             'AES128', 'AES192', 'AES256',
             'ARIA128', 'ARIA192', 'ARIA256',
             'CAMELLIA128', 'CAMELLIA192', 'CAMELLIA256',
-            'DES', 'DES3',
+            'DES', 'DES3', # DevSkim: ignore DS106863
             'IDEA'
         )]
         [String]$PrivateKeyEncryption,

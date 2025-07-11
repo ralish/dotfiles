@@ -78,9 +78,9 @@ $Global:VerbosePreference = 'SilentlyContinue'
 
 # Load oh-my-posh
 if ($OmpConfig) {
-    & oh-my-posh init pwsh --config $OmpConfig | Invoke-Expression
+    & oh-my-posh init pwsh --config $OmpConfig | Invoke-Expression # DevSkim: ignore DS104456
 } else {
-    & oh-my-posh init pwsh | Invoke-Expression
+    & oh-my-posh init pwsh | Invoke-Expression # DevSkim: ignore DS104456
 }
 
 # Restore the original $VerbosePreference setting
