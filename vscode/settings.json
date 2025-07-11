@@ -253,11 +253,12 @@
     "powershell.integratedConsole.suppressStartupBanner": true,
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
-    "powershell.codeFormatting.newLineAfterCloseBrace": false,
+    "powershell.codeFormatting.newLineAfterCloseBrace": false, // Stylistic preference
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
     "powershell.codeFormatting.useConstantStrings": true,
-    "powershell.codeFormatting.useCorrectCasing": true,
+    "powershell.codeFormatting.useCorrectCasing": false, // Extremely opinionated and often wrong
+    "powershell.codeFormatting.whitespaceAroundOperator": true,
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
     "powershell.pester.useLegacyCodeLens": false,
     "powershell.scriptAnalysis.settingsPath": "${env:DOTFILES}/posh/PSScriptAnalyzerSettings.psd1",
