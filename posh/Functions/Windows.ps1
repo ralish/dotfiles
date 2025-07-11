@@ -167,7 +167,7 @@ Function Find-WinEvent {
         Write-Warning -Message 'Some event logs may be inaccessible without administrator privileges.'
     }
 
-    $Events = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogRecord]]::new()
+    $WinEvents = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogRecord]]::new()
     $EventLogs = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogConfiguration]]::new()
     $SkippedLogs = [Collections.Generic.List[String]]::new()
     $ProviderLogs = @{}
@@ -215,7 +215,7 @@ Function Find-WinEvent {
     # Retrieve matching event logs
     $EventLogsToAdd = Get-WinEvent @CommonParams -ListLog $Filter -Force:$Force -ErrorAction Ignore | Where-Object {
         # Explicitly excluded logs
-        $_.LogName -NotIn $ExcludedLogs -and
+        $_.LogName -notin $ExcludedLogs -and
         # No records (must test both!)
         $_.RecordCount -ne 0 -and
         $null -ne $_.RecordCount -and
@@ -319,8 +319,8 @@ Function Find-WinEvent {
 
         try {
             $FoundEvents = Get-WinEvent @CommonParams @EventParams -ErrorAction Stop
-            foreach ($Event in $FoundEvents) {
-                $Events.Add($Event)
+            foreach ($WinEvent in $FoundEvents) {
+                $WinEvents.Add($WinEvent)
             }
         } catch {
             $Ex = $_
@@ -338,23 +338,23 @@ Function Find-WinEvent {
 
     Write-Progress @WriteProgressParams -Completed
 
-    $SortedEvents = $Events | Sort-Object -Property 'TimeCreated'
+    $SortedEvents = $WinEvents | Sort-Object -Property 'TimeCreated'
 
     if ($OutputFormat -eq 'EventLogRecord') {
         return $SortedEvents
     }
 
-    $Events = [Collections.Generic.List[String]]::new()
+    $WinEvents = [Collections.Generic.List[String]]::new()
     $DateFormat = 'yyyy/MM/dd hh:mm:ss tt'
     $StringSplitOptions = [StringSplitOptions]::RemoveEmptyEntries -bor [StringSplitOptions]::TrimEntries
     $PrefixWhitespace = ' ' * ('[{0}] {1,-8} -> ' -f (Get-Date).ToString($DateFormat), $EventLevelToName[0]).Length
     $MultilinePrefix = '{0}{1}' -f [Environment]::NewLine, $PrefixWhitespace
 
-    foreach ($Event in $SortedEvents) {
-        $Time = $Event.TimeCreated.ToString($DateFormat)
-        $Level = $EventLevelToName[$Event.Level].ToUpper()
-        $Provider = $Event.ProviderName
-        $Message = $Event.Message
+    foreach ($WinEvent in $SortedEvents) {
+        $Time = $WinEvent.TimeCreated.ToString($DateFormat)
+        $Level = $EventLevelToName[$WinEvent.Level].ToUpper()
+        $Provider = $WinEvent.ProviderName
+        $Message = $WinEvent.Message
 
         $ReplaceChars = [Char[]]@(
             # Left-to-right mark
@@ -365,7 +365,7 @@ Function Find-WinEvent {
             $Message = $Message.Replace([String]$Char, [String]::Empty)
         }
 
-        if ($Event.Message) {
+        if ($WinEvent.Message) {
             $Message = $Message.Split("`r`n", $StringSplitOptions).Split("`n", $StringSplitOptions)
         } else {
             $Message = [String]::Empty
@@ -377,10 +377,10 @@ Function Find-WinEvent {
             $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, ($Message -join $MultilinePrefix)
         }
 
-        $Events.Add($Text)
+        $WinEvents.Add($Text)
     }
 
-    return $Events.ToArray()
+    return $WinEvents.ToArray()
 }
 
 # Watch an Event Log (similar to Unix "tail")
