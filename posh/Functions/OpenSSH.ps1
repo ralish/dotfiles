@@ -97,11 +97,19 @@ Function Update-OpenSSHConfig {
             foreach ($Directive in $NewDirectives[$DirectivesVersion]) {
                 $ConfigNew = [Collections.Generic.List[String]]::new()
 
-                # TODO: Handle any previous comment and subsequent newline
                 for ($i = 0; $i -lt $ConfigCur.Count; $i++) {
                     if ($ConfigCur[$i] -notmatch "^\s*$Directive\s+\S+") {
                         $ConfigNew.Add($ConfigCur[$i])
+                        continue
                     }
+
+                    # Matched a line to be excluded; walk backwards to remove
+                    # comments and new lines which to pertain to the directive.
+                    for ($LastValidLine = $i - 1; $LastValidLine -ge 0; $LastValidLine--) {
+                        if ($ConfigCur[$LastValidLine] -notmatch '^\s*(#.*)?$') { break }
+                    }
+
+                    $ConfigNew = $ConfigNew.Slice(0, $LastValidLine + 1)
                 }
 
                 $ConfigCur.Clear()
