@@ -1,24 +1,53 @@
 [core]
-	# Use CRLF line endings for text files
+	# Default: false
+	#
+	# Checkout Windows-style (CRLF) line endings in the working directory and
+	# commit Unix-style (LF) line endings. Equivalent to setting the `text`
+	# attribute to `auto` on all files and the `core.eol` setting to `crlf`.
 	autocrlf = true
-	# Use Visual Studio Code as our editor
+	# Default: unset
+	#
+	# Command used to launch an editor by relevant commands. The GIT_EDITOR
+	# environment variable takes precedence over this setting. If unset, uses
+	# the VISUAL environment variable for dumb terminals, otherwise the EDITOR
+	# environment variable. If all else fails, defaults to the `vi` editor.
 	editor = \"$LOCALAPPDATA\\Programs\\Microsoft VS Code\\bin\\code\" --wait
-	# Enable additional caching of file system
+	# Default: false
+	# Windows only setting
+	#
+	# Enable additional caching of file system data for some operations.
 	fscache = true
-	# Only mark the .git directory as hidden
-	hideDotFiles = dotGitOnly
-	# Enable long path (>260 chars) support
+	# Default: dotGitOnly
+	# Windows only setting
+	#
+	# Set the .git directory as hidden but no other files starting with a dot.
+	#hideDotFiles = dotGitOnly
+	# Default: false
+	# Windows only setting
+	#
+	# Enable long path (>260 characters) support for built-in Git commands.
 	longpaths = true
-	# Don't checkout paths which may cause problems on NTFS
-	protectNTFS = true
-	# Don't quote "unusual" characters when outputting paths
-	quotePath = off
-	# Enable symlink support (needs SeCreateSymbolicLinkPrivilege)
+	# Default: true on Windows
+	#
+	# Do not checkout paths which would cause problems with NTFS filesystems.
+	#protectNTFS = true
+	# Default: true
+	#
+	# Don't escape bytes with values larger than 0x80 when outputting paths.
+	quotePath = false
+	# Default: false on Windows
+	#
+	# Use native symlinks instead of plain text files containing the link text.
+	# On Windows, users must have the SeCreateSymbolicLinkPrivilege privilege.
+	# git-clone & git-init will probe and set locally on repository creation.
 	symlinks = true
-	# Enable the built-in file system monitor daemon
-	#useBuiltinFSMonitor = true
-	# Potential whitespace problems which git diff should highlight
-	whitespace = blank-at-eol,space-before-tab,blank-at-eof,cr-at-eol
+	# Default: false
+	# Windows only setting
+	#
+	# Enable WSL compatibility mode, which will set NTFS extended attributes so
+	# that the executable flag can be read from WSL. The `metadata` option must
+	# be enabled for the DrvFs volume in WSL for the NTFS EAs to be respected.
+	#WSLCompat = false
 
 [credential]
 	# Use Git Credential Manager Core
@@ -30,9 +59,6 @@
 [diff]
 	tool = vscode
 
-[difftool "vscode"]
-	cmd = \"$LOCALAPPDATA\\Programs\\Microsoft VS Code\\Code.exe\" --wait --diff \"$LOCAL\" \"$REMOTE\"
-
 [http]
 	# Use the SChannel backend for SSL connections
 	sslBackend = schannel
@@ -42,10 +68,13 @@
 	schannelUseSSLCAInfo = false
 
 [ssh]
-	# The only difference in Git behaviour between "plink" and "tortoiseplink"
-	# is the latter adds the "-batch" parameter to disable all interactive
+	# The only difference in Git behaviour between `plink` and `tortoiseplink`
+	# is the latter adds the `-batch` parameter to disable all interactive
 	# prompts. Plink supports this as well though, and it's actually what we
 	# want, as in some scenarios stdin doesn't get properly redirected.
 	variant = ssh
+
+[difftool "vscode"]
+	cmd = \"$LOCALAPPDATA\\Programs\\Microsoft VS Code\\Code.exe\" --wait --diff \"$LOCAL\" \"$REMOTE\"
 
 # vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 noet sr

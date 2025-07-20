@@ -1,11 +1,5 @@
-[core]
-	attributesFile = ~/.gitattributes
-	excludesFile = ~/.gitignore
-
-[include]
-	path = .gitconfig-priv
-	path = .gitconfig-delta
-	path = .gitconfig-win
+# Since Git 2.19 all configuration options can be listed with:
+# git help --config
 
 [user]
 	name = Samuel D. Leslie
@@ -15,70 +9,477 @@
 [github]
 	user = ralish
 
+[core]
+	attributesFile = ~/.gitattributes
+	excludesFile = ~/.gitignore
+
 [advice]
+	# Invoked `git add` without a pathspec parameter
 	addEmptyPathspec = false
+	# Attempted to add an ignored file to the index
 	addIgnoredFile = false
+	# Directions on how to proceed in various commands
 	statusHints = false
 
-[branch]
-	autoSetupMerge = always
-	autoSetupRebase = always
-
 [color]
-	interactive = auto
+	# Default value for many other `color` settings which control usage per
+	# command family (unless overridden through the `--color` option):
+	# - false / never
+	#   Never use colour
+	# - true / auto (default since Git 1.8.4)
+	#   Use colour if the output is to a terminal
+	# - always
+	#   Always use colour with output not intended for machine consumption
 	ui = auto
+	# Usage of colour in interactive prompts and displays:
+	# - false / never
+	#   Never use colour
+	# - true / auto
+	#   Use colour if the output is to a terminal
+	#
+	# If unset, uses the value of `color.ui`.
+	#interactive = auto
+	# Use colour with `auto` modes when the output is to a pager
+	#pager = true
 
+[column]
+	# Configures whether supported commands should output in columns. This
+	# setting takes a list of tokens separated by spaces or commas:
+	#
+	# Feature control
+	# - never       Never show in columns (default)
+	# - always      Always show in columns
+	# - auto        Show in columns if the output is to a terminal
+	#
+	# Column layout
+	# - plain       Show in one column
+	# - column      Fill columns before rows (default)
+	# - row         Fill rows before columns
+	#
+	# Layout options
+	# - dense       Use unequal sized columns for greater space efficiency
+	# - nodense     Use equally sized columns (default)
+	ui = auto,column,nodense
+
+[versionsort]
+	# When using version sort, determines the sorting order of versions which
+	# differ by suffix. The order of suffixes in the configuration determines
+	# the sorting order of matching tags.
+	suffix = -alpha
+	suffix = -beta
+	suffix = -pre
+	suffix = -rc
+
+# git-add
+# https://git-scm.com/docs/git-add
+[add]
+	# --[no-]ignore-errors
+	#
+	# Continue adding any remaining files when some files cannot be added due
+	# to indexing errors. The command will still exit with a non-zero status.
+	ignoreErrors = true
+
+# git-branch
+# https://git-scm.com/docs/git-branch
+[branch]
+	# -t / --[no-]track[=<value>]
+	# Default: true
+	#
+	# Setup the tracking configuration of new branches so that `git pull` will
+	# merge from the starting point branch:
+	# - false       No automatic setup
+	# - true        If the starting point is a remote-tracking branch
+	# - always      Always perform automatic setup
+	# - simple      As per `true`, but only if the new branch has the same name
+	#               as the remote branch.
+	# - inherit     Copy the tracking configuration from the starting point
+	autoSetupMerge = always
+	# Setup new branches so that `git pull` will rebase instead of merge:
+	# - never       No automatic setup (default)
+	# - local       Only for tracked branches of other local branches
+	# - remote      Only for tracked branches of remote-tracking branches
+	# - always      Always perform automatic setup
+	autoSetupRebase = always
+	# --[no-]sort <key>
+	# Default: refname
+	#
+	# Sort ordering of branches. See `git for-each-ref` for supported keys.
+	sort = -committerdate
+
+# git-checkout
+# https://git-scm.com/docs/git-checkout
+[checkout]
+	# Number of parallel works to use when updating the working tree. If zero,
+	# the number of CPU cores will be used. The default is one. In general,
+	# more workers will give better performance with SSDs but the default
+	# sequential execution is often better with HDDs or systems which have a
+	# small number of CPU cores.
+	#workers = 1
+
+# git-commit
+# https://git-scm.com/docs/git-commit
+[commit]
+	# -v / --[no-]verbose
+	#
+	# Show unified diff between the HEAD commit and what would be committed at
+	# the bottom of the commit message.
+	#verbose = false
+	# -S / --[no-]gpg-sign[=<key-id>]
+	#
+	# Sign commits with GPG
+	#gpgSign = false
+
+# git-diff
+# https://git-scm.com/docs/git-diff
 [diff]
+	# --diff-algorithm <value> / --minimal / --patience / --histogram
+	# Default: myers
+	#
+	# Algorithm to use for generating diffs:
+	# - myers       Use the Myers diff algorithm. Generates a "greedy" diff.
+	#               The value `default` is a synonym for this algorithm.
+	# - minimal     Use the Myers diff algorith, but spend extra time to
+	#               produce the smallest possible diff.
+	# - patience    Use the patience diff algorithm
+	# - histogram   Extends the patience diff algorithm to support low-
+	#               occurrence common elements.
 	algorithm = histogram
-	compactionHeuristic = true
-	indentHeuristic = true
+	# -U<n> / --unified=<n>
+	# Default: 3
+	#
+	# Number of lines of context in generated diffs
+	#context = 3
+	# Use a prefix pair specific to what is being compared instead of the
+	# standard `a/` and `b/`.
 	mnemonicPrefix = true
+	# --[no-]color-moved[=<value>]
+	# Default: no
+	#
+	# Behaviour for coloring moved lines of code differently:
+	# - no / false      Moved lines are not highlighted
+	# - plain           Lines of moved text are highlighted
+	# - blocks          Blocks of moved text of at least 20 alphanumeric
+	#                   characters are detected greedily and highlighted.
+	# - zebra / true    As per `blocks`, but with an additional alternate
+	#                   colour to indicate that a new block was detected.
+	# - dimmed-zebra    As per `zebra`, but with additional dimming of
+	#                   uninteresting parts of moved code. The bordering lines
+	#                   of two adjacent blocks are considered interesting.
+	colorMoved = zebra
+	# --[no-]indent-heuristic
+	# Default: true (since Git 2.14)
+	#
+	# Attempt to shift diff hunk boundaries to make patches easier to read
+	indentHeuristic = true
+	# -M[<n>] / --find-renames[=<n>]
+	# Default: true
+	#
+	# Behaviour for detecting renames:
+	# - false           Rename detection is disabled
+	# - true            Basic rename detection is enabled
+	# - copy / copies   As per `true`, but also detect copies
 	renames = copies
+	# --submodule[=<format>]
+	# Default: short
+	#
+	# Format to use for outputting differences in submodules:
+	# - short       Only show the names of the commits
+	# - log         List the commits like `git submodule summary` does
+	# - diff        Show an inline diff of the changes to the submodule
+	#submodule = short
 
+# git-fetch
+# https://git-scm.com/docs/git-fetch
 [fetch]
+	# -j <n> / --[no-]jobs <n>
+	# Default: 1
+	#
+	# Number of parallel children to use for fetching remotes and submodules.
+	# If set to 0 the number of online CPUs will be used, which may be
+	# excessive on higher-end systems. If `submodule.fetchJobs` is set, this
+	# setting only controls the number of remotes to fetch in parallel.
+	parallel = 4
+	# --[no-]all
+	#
+	# Attempt to update all available remotes
+	all = true
+	# -p / --[no-]prune
+	#
+	# Before fetching, remove any remote-tracking references that no longer
+	# exist on the remote.
 	prune = true
+	# -P / --[no-]prune-tags
+	#
+	# Before fetching, removes any local tags that no longer exist on the
+	# remote. Only applies if `--prune` is enabled.
+	pruneTags = true
+	# --[no-]recurse-submodules[=<value>]
+	#
+	# Behaviour for fetching submodule changes:
+	# - false       Never fetch changes to submodules
+	# - on-demand   Only fetch changes to submodules for which the referenced
+	#               commit has changed in the superproject.
+	# - true        Always recursively fetch changes to submodules
+	#
+	# The default is `on-demand`, or the value of `submodule.recurse` if set.
+	#recurseSubmodules = on-demand
 
+# git-help
+# https://git-scm.com/docs/git-help
 [help]
-	autoCorrect = 0
+	# Controls how Git offers to correct invalid commands when a single valid
+	# similar command is identified as a candidate for automatic correction:
+	# - 0, false, off, no, show (default)
+	#   Show the suggested command
+	# - 1, true, on, yes, immediate
+	#   Run the suggested command immediately
+	# - > 1
+	#   Run the suggested command after the given number of deciseconds
+	# - never
+	#   Do not show any suggested command
+	# - prompt
+	#   Show the suggested command and prompt for confirmation to run it
+	#autoCorrect = false
 
+# git-init
+# https://git-scm.com/docs/git-init
 [init]
+	# -b / --[no-]initial-branch <name>
+	# Default: master
+	#
+	# Default branch name when initialising a new repository
 	defaultBranch = main
 
+# git-log
+# https://git-scm.com/docs/git-log
 [log]
+	# --[no-]abbrev-commit
+	#
+	# Instead of showing the full 40-byte hexadecimal commit object name, show
+	# only a prefix long enough to identify objects uniquely. An integer can be
+	# provided instead of a boolean which sets the minimum prefix length.
 	abbrevCommit = true
+	# --follow
+	#
+	# Continue listing the history of a file beyond renames. Only applies when
+	# specifying a single file.
 	follow = true
+	# --[no-]mailmap / --[no-]use-mailmap
+	# Default: true (since Git 2.23)
+	#
+	# Use mailmap files to map author and committer names and email addresses
+	# to their canonical real names and email addresses.
 	mailmap = true
+	# --show-signature
+	#
+	# Checks the validity of a signed commit by passing the signature to `gpg
+	# --verify` and showing the output.
+	#showSignature = false
 
+# git-merge
+# https://git-scm.com/docs/git-merge
 [merge]
-	log = true
+	# Style in which conflicted hunks are written out upon merge:
+	# - merge       Shows the conflicting text (default)
+	# - diff3       As per `merge`, but also shows the original text
+	# - zdiff3      As per `diff3`, but removes matching lines in the conflict
+	#               region when they appear near the beginning or end of the
+	#               conflict region. Only available since Git 2.35.
 	conflictStyle = zdiff3
+	# If called without any commit argument, merge the upstream branches
+	# configured for the current branch. Defaults to true since Git 2.1.
 	defaultToUpstream = true
+	# Behaviour for detecting directory renames, which affects merge handling
+	# of files added to a directory on one side when the directory was renamed
+	# on the other:
+	# - false       Directory rename detection is disabled, and new files will
+	#               remain in the existing directory.
+	# - true        Directory rename detection is enabled, and new files will
+	#               be moved into the renamed directory.
+	# - conflict    A conflict will be reported for affected paths (default)
+	#
+	# Ignored if rename rename detection is disabled (per `merge.renames` or
+	# `diff.renames`).
+	directoryRenames = true
+	# --[no-]log[=<n>]
+	# Default: false
+	#
+	# Populate the commit log message with the specified number of one-line
+	# descriptions from the commits being merged. If provided as a boolean
+	# value, `false` is a synonym for zero and `true` is a synonym for 20.
+	log = true
+	# --[no-]autostash
+	#
+	# Automatically create a temporary stash entry before beginning a merge and
+	# apply it after the merge is completed.
+	#autoStash = false
+	# --[no-]verify-signatures
+	#
+	# Verify the tip commit of the branch being merged is signed by a valid key
+	#verifySignatures = false
+
+# git-pull
+# https://git-scm.com/docs/git-pull
+[pull]
+	# --[no-]ff / --ff-only
+	# Default: true
+	#
+	# Behaviour for merging into the current branch after fetching changes:
+	# - false       Always create a merge commit, even if the merge could be
+	#               resolved as a fast-forward. Equivalent to `--no-ff`.
+	# - true        Resolve the merge as a fast-forward if possible, otherwise
+	#               create a merge commit. Equivalent to `--ff`.
+	# - only        Only merge if resolved as a fast-foward, otherwise abort
+	#               the merge. Equivalent to `--ff-only`.
+	ff = only
+	# -r / --[no-]rebase[=<value>]
+	# Default: false
+	#
+	# Behaviour for rebasing the current branch after fetching changes:
+	# - false       Merge the upstream branch into the current branch
+	# - true        Rebase the current branch onto the upstream branch
+	# - merges      As per `true`, but rebase using `--rebase-merges` so that
+	#               local merge commits are included in the rebase.
+	# - interactive As per `true`, but perform the rebase interactively
+	#rebase = false
+
+# git-push
+# https://git-scm.com/docs/git-push
+[push]
+	# Default action when no refspec is given:
+	# - nothing     Error out if no refspec is given
+	# - current     Push the current branch to update a branch with the same
+	#               name on the receiving end.
+	# - upstream    Push the current branch back to the branch whose changes
+	#               are usually integrated into the current branch.
+	# - simple      Push the current branch with the same name on the remote.
+	#               Unlike `current`, the branch must exist on the remote.
+	# - matching    Push all branches having the same name on the remote.
+	#
+	# The default is `simple` since Git 2.0, and `matching` for prior versions.
+	default = current
+	# Assume `--set-upstream` on default push when no upstream tracking exists
+	# for the current branch. Only applies for the `simple`, `upstream`, and
+	# `current` default push actions.
+	autoSetupRemote = true
+	# --[no-]follow-tags
+	#
+	# Push annotated tags in refs/tags that are missing from the remote, but
+	# are pointing at commits that are reachable from the refs being pushed.
+	followTags = true
+	# --[no-]recurse-submodules <value>
+	#
+	# Ensures all submodule commits referenced by the revisions to be pushed
+	# are available on a remote-tracking branch:
+	# - no          Disables submodule checks
+	# - check       Verifies all submodule commits changed in the revisions to
+	#               be pushed are available on at least one remote of the
+	#               submodule. If any commits are missing the push is aborted.
+	# - on-demand   All submodules that changed in the revisions to be pushed
+	#               will also be pushed. If all necessary revisions could not
+	#               be pushed then the push will be aborted.
+	# - only        Only pushes all submodules but not the superproject
+	#
+	# The default is `no`, or `on-demand` if `submodule.recurse` is enabled.
+	recurseSubmodules = check
+	# --[no-]signed[=<value>]
+	#
+	# Sign the push request with GPG. Can be a boolean value or the string
+	# `if-asked`, which performs signing only if the server supports it.
+	#gpgSign = false
+
+# git-rebase
+# https://git-scm.com/docs/git-rebase
+[rebase]
+	# -n / --[no-]stat
+	#
+	# Show a diffstat of what changed upstream since the last rebase
+	stat = true
+	# --[no-]autosquash
+	#
+	# Automatically squash commits with specially formatted messages into
+	# previous commits being rebased.
+	autoSquash = true
+	# --[no-]autostash
+	#
+	# Automatically create a temporary stash entry before beginning a rebase
+	# and apply it after the rebase is completed.
+	autoStash = true
+	# --[no-]update-refs
+	#
+	# Automatically force-update branches that point to commits being rebased.
+	# Branches checked out in a worktree will not be updated.
+	updateRefs = true
+	# Handling of commits which are removed (i.e. line deleted instead of the
+	# commit being marked as dropped) during an interactive rebase:
+	# - ignore      No checks (default)
+	# - warn        Output a warning but proceed with the rebase
+	# - error       Output a warning and stop the rebase
+	missingCommitsCheck = warn
+
+# git-rerere
+# https://git-scm.com/docs/git-rerere
+[rerere]
+	# Record resolved conflicts so identical conflict hunks can be resolved
+	# automatically if they're encountered again.
+	enabled = true
+	# --[no-]rerere-autoupdate
+	#
+	# Update the index with the resulting contents after cleanly resolving
+	# conflicts using previously recorded resolutions.
+	autoUpdate = true
+
+# git-status
+# https://git-scm.com/docs/git-status
+[status]
+	# -s / --[no-]short
+	#
+	# Display output in short format
+	short = true
+	# -b / --[no-]branch
+	#
+	# Display branch and tracking info in short format
+	branch = true
+	# --[no-]show-stash
+	#
+	# Display number of stashed entries (only in non-short format)
+	showStash = true
+	# Display submodule summary with commit summary for modified submodules
+	submoduleSummary = true
+
+# git-submodule
+# https://git-scm.com/docs/git-submodule
+[submodule]
+	# -j <n> / --jobs <n>
+	# Default: 1
+	#
+	# Number of submodules to retrieve in parallel. If set to 0 the number of
+	# online CPUs will be used, which may be excessive on higher-end systems.
+	fetchJobs = 4
+	# Controls if `--recurse-submodules` is enabled by default for supported
+	# Git commands. May cause issues with commands currently lacking support.
+	#recurse = false
+
+# git-tag
+# https://git-scm.com/docs/git-tag
+[tag]
+	# --[no-]sort <key>
+	# Default: refname
+	#
+	# Sort ordering of tags. See `git for-each-ref` for supported keys.
+	sort = version:refname
+	# -s / --[no-]sign
+	#
+	# Sign tags using GPG
+	#gpgSign = false
+	# Sign annotated tags using GPG
+	#forceSignAnnotated = false
 
 [oh-my-zsh]
 	hide-status = 0
 
-[pull]
-	ff = only
-
-[push]
-	default = current
-	followTags = true
-
-[rebase]
-	autoSquash = true
-	autoStash = true
-	missingCommitsCheck = warn
-
-[rerere]
-	enabled = true
-	autoUpdate = true
-
-[status]
-	showStash = true
-	submoduleSummary = true
-
-[submodule]
-	fetchJobs = 4
+[credential "https://dev.azure.com"]
+	useHttpPath = true
 
 [diff "utf-16"]
 	textconv = "iconv -f utf-16 -t utf-8"
@@ -263,5 +664,10 @@
 	tv  = tag --verify
 
 	up  = "!git remote update --prune && git merge --ff-only @{u}"
+
+[include]
+	path = .gitconfig-win
+	path = .gitconfig-delta
+	path = .gitconfig-priv
 
 # vim: syntax=gitconfig cc=80 tw=79 ts=4 sw=4 sts=4 noet sr
