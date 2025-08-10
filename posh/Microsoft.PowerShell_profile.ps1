@@ -23,17 +23,8 @@ if (!(Get-Variable -Name 'DotFilesVerbose' -ErrorAction Ignore)) {
 }
 
 # Display timing data during profile load (requires verbose)
-if (!(Get-Variable -Name 'DotFilesShowTImings' -ErrorAction Ignore)) {
+if (!(Get-Variable -Name 'DotFilesShowTimings' -ErrorAction Ignore)) {
     $DotFilesShowTimings = $false
-}
-
-# Skip expensive calls for faster profile loading
-#
-# - Get-Module -ListAvailable
-#   Assume the module exists instead of checking
-if (!(Get-Variable -Name 'DotFilesFastLoad' -ErrorAction Ignore)) {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-    $DotFilesFastLoad = $true
 }
 
 # Enable verbose profile load
@@ -54,6 +45,15 @@ if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
     }
 }
 
+# Skip expensive calls for faster profile loading
+#
+# - Get-Module -ListAvailable
+#   Assume the module exists instead of checking
+if (!(Get-Variable -Name 'DotFilesFastLoad' -ErrorAction Ignore)) {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+    $DotFilesFastLoad = $true
+}
+
 # Array of paths containing additional formatting data
 #
 # Calling Update-FormatData is *very* expensive. To improve profile load
@@ -64,18 +64,14 @@ $FormatDataPaths = [Collections.Generic.List[String]]::new()
 
 # Source custom functions
 $PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
-if (Test-Path -LiteralPath $PoshFunctionsPath -PathType Container) {
-    # PowerShell <= 5.1: Using -LiteralPath breaks wildcards in -Include
-    Get-ChildItem -Path $PoshFunctionsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
-}
+# PowerShell <= 5.1: Using -LiteralPath breaks wildcards in -Include
+Get-ChildItem -Path $PoshFunctionsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
 Remove-Variable -Name 'PoshFunctionsPath'
 
 # Source custom settings
 $PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
-if (Test-Path -LiteralPath $PoshSettingsPath -PathType Container) {
-    # PowerShell <= 5.1: Using -LiteralPath breaks wildcards in -Include
-    Get-ChildItem -Path $PoshSettingsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
-}
+# PowerShell <= 5.1: Using -LiteralPath breaks wildcards in -Include
+Get-ChildItem -Path $PoshSettingsPath -File -Recurse -Include '*.ps1' | ForEach-Object { . $_.FullName }
 Remove-Variable -Name 'PoshSettingsPath'
 
 # Update formatting data

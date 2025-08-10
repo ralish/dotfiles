@@ -53,7 +53,10 @@ Function Get-DotFilesTiming {
     [OutputType([Void], [String])]
     Param(
         [Parameter(Mandatory)]
-        [DateTime]$StartTime
+        [DateTime]$StartTime,
+
+        [ValidateRange(0, [Int]::MaxValue)]
+        [Int]$SlowThresholdMs = 100
     )
 
     if (!$Global:DotFilesShowTimings) {
@@ -61,7 +64,13 @@ Function Get-DotFilesTiming {
     }
 
     $ElapsedTime = (Get-Date) - $StartTime
-    return 'Elapsed time: {0} ms' -f [Int]($ElapsedTime.TotalMilliseconds)
+    $Timing = 'Elapsed time: {0} ms' -f [Int]($ElapsedTime.TotalMilliseconds)
+
+    if ($ElapsedTime.TotalMilliseconds -ge $SlowThresholdMs) {
+        $Timing += ' [SLOW]'
+    }
+
+    return $Timing
 }
 
 # Remove dotfiles helper functions
