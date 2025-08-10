@@ -11,6 +11,10 @@
         <HideSymlinks>true</HideSymlinks>
     </InstallPath>
 
+    <!--
+        This should also include .vim -> vimfiles but directories aren't yet
+        supported in PSDotFiles for AdditionalPaths.
+    -->
     <AdditionalPaths>
         <AdditionalPath source=".vimrc">
             <TargetPath symlink="_vimrc" />
