@@ -1,23 +1,36 @@
 {
+    /*
+     * Visual Studio Code settings
+     *
+     * Last reviewed release: v1.103.0
+     * Default file path: %APPDATA%\Code\User\settings.json
+     */
+
     // Text Editor
     "editor.dragAndDrop": false,
     "editor.emptySelectionClipboard": false,
-    "editor.parameterHints.cycle": true,
-    "editor.renderControlCharacters": true,
+    "editor.mouseWheelZoom": true,
     "editor.renderWhitespace": "boundary",
+    "editor.showFoldingControls": "always",
+    "editor.smoothScrolling": true,
+    "editor.trimWhitespaceOnDelete": true,
+    "editor.unicodeHighlight.includeComments": true,
+    "editor.unicodeHighlight.nonBasicASCII": true,
     "editor.wrappingIndent": "indent",
 
     // Text Editor: Cursor
     "editor.cursorBlinking": "phase",
+    "editor.cursorSmoothCaretAnimation": "explicit",
     "editor.cursorStyle": "line-thin",
+
+    // Text Editor: Find
+    "editor.find.addExtraSpaceOnTop": false,
+    "editor.find.autoFindInSelection": "multiline",
+    "editor.find.seedSearchStringFromSelection": "selection",
 
     // Text Editor: Diff Editor
     "diffEditor.ignoreTrimWhitespace": false,
-    "diffEditor.maxComputationTime": 0,
-
-    // Text Editor: Find
-    "editor.find.autoFindInSelection": "multiline",
-    "editor.find.seedSearchStringFromSelection": "never",
+    "diffEditor.maxComputationTime": 10000,
 
     // Text Editor: Minimap
     "editor.minimap.showSlider": "always",
@@ -25,39 +38,53 @@
 
     // Text Editor: Suggestions
     "editor.acceptSuggestionOnEnter": "smart",
-    "editor.suggestSelection": "first",
 
     // Text Editor: Files
     "files.associations": {
-        // Configuration files (usually INI syntax)
+        // Configuration files in INI format
         "*.cnf": "ini",
         "*.inf": "ini",
         // NuGet restore cache files
         "project.nuget.cache": "json"
     },
     "files.autoSave": "onWindowChange",
+    "files.enableTrash": false,
     "files.hotExit": "onExitAndWindowClose",
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
 
     // Workbench
-    "workbench.editor.empty.hint": "hidden",
-    "workbench.enableExperiments": false,
-    "workbench.startupEditor": "readme",
     "workbench.editorAssociations": {
+        // Disable GitLens interactive rebase editor
         "git-rebase-todo": "default"
     },
+    "workbench.enableExperiments": false,
+    "workbench.list.smoothScrolling": true,
+    "workbench.navigationControl.enabled": false,
+    "workbench.startupEditor": "readme",
 
     // Workbench: Appearance
     "workbench.iconTheme": "vscode-icons",
+    "workbench.view.alwaysShowHeaderActions": true,
 
     // Workbench: Editor Management
+    "workbench.editor.alwaysShowEditorActions": true,
+    "workbench.editor.empty.hint": "hidden",
     "workbench.editor.highlightModifiedTabs": true,
     "workbench.editor.languageDetection": false,
+    "workbench.editor.pinnedTabsOnSeparateRow": true,
+    "workbench.editor.preventPinnedEditorClose": "never",
+    "workbench.editor.revealIfOpen": true,
 
     // Workbench: Settings Editor
     "workbench.settings.editor": "json",
     "workbench.settings.enableNaturalLanguageSearch": false,
+
+    // Workbench: Zen Mode
+    "zenMode.centerLayout": false,
+    "zenMode.hideLineNumbers": false,
+    "zenMode.hideStatusBar": false,
+    "zenMode.restore": false,
 
     // Window
     "window.confirmSaveUntitledWorkspace": false,
@@ -73,48 +100,106 @@
 
     // Features: Search
     "search.collapseResults": "auto",
+    "search.seedOnFocus": true,
     "search.smartCase": true,
 
+    // Features: Debug
+    "debug.confirmOnExit": "always",
+    "debug.console.acceptSuggestionOnEnter": "on",
+    "debug.hideLauncherWhileDebugging": true,
+    "debug.saveBeforeStart": "nonUntitledEditorsInActiveGroup",
+    "debug.showBreakpointsInOverviewRuler": true,
+    "debug.showVariableTypes": true,
+
     // Features: Terminal
+    "terminal.explorerKind": "both",
     "terminal.integrated.copyOnSelection": true,
+    "terminal.integrated.cursorBlinking": true,
     "terminal.integrated.cursorStyle": "line",
+    "terminal.integrated.cursorStyleInactive": "underline",
     "terminal.integrated.fontFamily": "Hack Nerd Font",
+    "terminal.integrated.fontLigatures.enabled": true,
     "terminal.integrated.fontSize": 12,
+    "terminal.integrated.hideOnLastClosed": false,
     "terminal.integrated.hideOnStartup": "whenEmpty",
+    "terminal.integrated.initialHint": false,
+    "terminal.integrated.mouseWheelZoom": true,
+    "terminal.integrated.persistentSessionReviveProcess": "never",
     "terminal.integrated.rightClickBehavior": "paste",
-    "terminal.integrated.defaultProfile.windows": "PowerShell",
-    "terminal.integrated.profiles.windows": {
-        "PowerShell": {
-            "source": "PowerShell",
-            "icon": "terminal-powershell",
-            "args": ["-NoLogo"]
-        }
-    },
+    "terminal.integrated.smoothScrolling": true,
+    "terminal.integrated.tabs.showActions": "always",
+    "terminal.sourceControlRepositoriesKind": "both",
 
     // Features: Remote
     "remote.autoForwardPorts": false,
 
+    // Features: Notebook
+    "notebook.codeActionsOnSave": {
+        "notebook.source.fixAll.ruff": "explicit",
+        "notebook.source.organizeImports.ruff": "explicit"
+    },
+    "notebook.consolidatedRunButton": true,
+    "notebook.defaultFormatter": "charliermarsh.ruff",
+    "notebook.formatOnSave.enabled": true,
+    "notebook.inlineValues": "auto",
+    "notebook.lineNumbers": "on",
+    "interactiveWindow.showExecutionHint": false,
+
+    // Features: Chat
+    "inlineChat.holdToSpeech": false,
+
     // Application: Telemetry
+    "telemetry.feedback.enabled": false,
     "telemetry.telemetryLevel": "off",
 
+    // Security: Workspace
+    "security.workspace.trust.startupPrompt": "always",
 
     // ##################################################
     // ###             Built-in extensions            ###
     // ##################################################
 
+    // CSS: CSS
+    "css.format.spaceAroundSelectorSeparator": true,
+    // CSS: LESS
+    "less.format.spaceAroundSelectorSeparator": true,
+    // CSS: SCSS (Sass)
+    "scss.format.spaceAroundSelectorSeparator": true,
+
     // Git
+    "git.allowForcePush": true,
+    "git.allowNoVerifyCommit": true,
+    "git.alwaysShowStagedChangesResourceGroup": true,
+    "git.autoRepositoryDetection": false,
     "git.autoStash": true,
+    "git.blame.editorDecoration.enabled": false, // Handled by GitLens
+    "git.blame.statusBarItem.enabled": false, // Handled by GitLens
     "git.confirmSync": false,
     "git.enableSmartCommit": true,
+    "git.fetchOnPull": true,
     "git.openRepositoryInParentFolders": "never",
+    "git.pruneOnFetch": true,
+    "git.rebaseWhenSync": true,
+    "git.replaceTagsWhenPull": true,
+    "git.smartCommitChanges": "tracked",
+    "git.suggestSmartCommit": false,
     "git.timeline.date": "authored",
+    "git.untrackedChanges": "separate",
 
-    // PHP Language Features
+    // JSON
+    "json.format.keepLines": true,
+    "json.maxItemsComputed": 10000,
+
+    // Markdown
+    "markdown.updateLinksOnFileMove.enabled": "prompt",
+    "markdown.validate.enabled": true,
+
+    // PHP
     "php.validate.executablePath": "C:\\DevEnvs\\PHP\\php.exe",
 
-    // TypeScript and JavaScript Language Features
-    "typescript.surveys.enabled": false,
-
+    // TypeScript and JavaScript: Formatting
+    "javascript.format.semicolons": "remove",
+    "typescript.format.semicolons": "remove",
 
     // ##################################################
     // ###                 Extensions                 ###
@@ -123,8 +208,26 @@
     // .NET Install Tool
     "dotnetAcquisitionExtension.enableTelemetry": false,
 
-    // AsciiDoc
-    "asciidoc.useWorkspaceRootAsBaseDirectory": true,
+    // AHK++ (AutoHotkey Plus Plus)
+    "AHK++.v1.formatter": {
+        "allowedNumberOfEmptyLines": 2,
+        "trimExtraSpaces": true
+    },
+    "AHK++.v2.formatter": {
+        "preserveNewlines": false,
+        "switchCaseAlignment": true,
+        "symbolWithSameCase": true
+    },
+    "AHK++.v2.general": {
+        "completeFunctionCalls": true
+    },
+    "AHK++.v2.warn": {
+        "callWithoutParentheses": "On",
+        "localSameAsGlobal": true
+    },
+
+    // autopep8
+    "autopep8.importStrategy": "fromEnvironment",
 
     // AWS Toolkit
     "aws.telemetry": false,
@@ -134,18 +237,63 @@
 
     // Azure Resources
     "azureResourceGroups.deleteConfirmation": "ClickButton",
+    "azureResourceGroups.enableChatStandIn": false,
+    "azureResourceGroups.showHiddenTypes": true,
 
-    // C/C++
+    // Black Formatter
+    "black-formatter.importStrategy": "fromEnvironment",
+
+    // C/C++: IntelliSense
+    "C_Cpp.autocompleteAddParentheses": true,
+    "C_Cpp.workspaceParsingPriority": "high",
+    // C/C++: Formatting
+    "C_Cpp.vcFormat.indent.caseLabels": true,
+    "C_Cpp.vcFormat.indent.namespaceContents": false,
+    "C_Cpp.vcFormat.newLine.beforeCatch": false,
+    "C_Cpp.vcFormat.newLine.beforeElse": false,
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.block": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.function": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.lambda": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.namespace": "sameLine",
+    "C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "sameLine",
+    "C_Cpp.vcFormat.newLine.closeBraceSameLine.emptyFunction": true,
+    "C_Cpp.vcFormat.newLine.closeBraceSameLine.emptyType": true,
+    // C/C++: Resource Management
+    /*
+     * Default path varies by platform:
+     * - Linux: ${XDG_CACHE_HOME:-$HOME/.cache}/vscode-cpp-tools
+     * - macOS: $HOME/Library/Caches/vscode-cpptools
+     * - Windows: %LocalAppData%/Microsoft/vscode-cpptools
+     */
+    //"C_Cpp.intelliSenseCachePath": "D:/Cache/VS Code/cpp-tools"
+    // C/C++: Miscellanous
     "C_Cpp.autoAddFileAssociations": false,
     "C_Cpp.loggingLevel": "Warning",
 
-    // C#
+    // C#: Text Editor
+    "dotnet.formatting.organizeImportsOnFormat": true,
+    // C#: Debugger
+    /*
+     * Default path varies by platform:
+     * - Windows: %TEMP%/SymbolCache
+     * - Linux & macOS: $HOME/.dotnet/symbolcache
+     */
+    //"csharp.debug.symbolOptions.cachePath": "D:/Symbols/Cache",
+    "csharp.debug.symbolOptions.searchMicrosoftSymbolServer": true,
+    "csharp.debug.symbolOptions.searchNuGetOrgSymbolServer": true,
+    // C#: OmniSharp
     "csharp.suppressHiddenDiagnostics": false,
-    // Disabled due to conflict with Visual Studio
-    // See: https://github.com/OmniSharp/omnisharp-roslyn/issues/2230
-    "omnisharp.enableEditorConfigSupport": false,
-    "omnisharp.enableRoslynAnalyzers": true,
-    "omnisharp.loggingLevel": "warning",
+    /*
+     * EditorConfig support may conflict with Visual Studio if running
+     * See: https://github.com/OmniSharp/omnisharp-roslyn/issues/2230
+     */
+    //"omnisharp.enableEditorConfigSupport": false,
+    "omnisharp.sdkIncludePrereleases": false,
+
+    // C# Dev Kit
+    "dotnet.automaticallyCreateSolutionInWorkspace": false,
+    "dotnet.testWindow.enableTestExplorerDiff": true,
+    "dotnet.testWindow.useTestingPlatformProtocol": true,
 
     // CloudFormation Linter
     "cfnLint.format.singleQuote": true,
@@ -153,115 +301,166 @@
 
     // CMake Tools
     "cmake.configureOnOpen": false,
-    "cmake.configureOnEdit": false,
-    "cmake.showOptionsMovedNotification": false,
+    "cmake.options.statusBarVisibility": "visible",
+
+    // Container Tools
+    "containers.containers.sortBy": "Label",
+    "containers.contexts.showInStatusBar": true,
+    "containers.images.sortBy": "Label",
+    "containers.networks.sortBy": "Label",
+    "containers.volumes.sortBy": "Label",
 
     // Debugger for Java
+    "java.debug.settings.showStaticVariables": true,
     "java.silentNotification": true,
 
     // Dev Containers
     "dev.containers.copyGitConfig": false,
+    "dev.containers.forwardWSLServices": false,
     "dev.containers.logLevel": "info",
+    "dev.containers.mountWaylandSocket": false,
+    "dev.containers.optimisticallyLaunchDocker": false,
     "dotfiles.installCommand": "dot-update -a",
     "dotfiles.repository": "ralish/dotfiles",
     "dotfiles.targetPath": "~/dotfiles",
 
-    // DevSkim
-    "devskim.enableBestPracticeRules": true,
-    "devskim.enableManualReviewRules": true,
-    "devskim.removeFindingsOnClose": true,
-    "devskim.suppressionCommentPlacement": "line above finding",
-    "devskim.suppressionDurationInDays": 0,
+    // DevSkim: Rules
+    "MS-CST-E.vscode-devskim.rules.enableBestPracticeSeverityRules": true,
+    "MS-CST-E.vscode-devskim.rules.enableManualReviewSeverityRules": true,
+    // DevSkim: Suppressions
+    "MS-CST-E.vscode-devskim.suppressions.suppressionDurationInDays": 0,
 
-    // Doxygen Documentation Generator
-    "doxdocgen.generic.useGitUserName": true,
-    "doxdocgen.generic.useGitUserEmail": true,
+    // EditorConfig
+    "editorconfig.showMenuEntry": false,
+
+    // ESLint
+    "eslint.format.enable": true,
+    "eslint.lintTask.enable": true,
+
+    // Even Better TOML
+    "evenBetterToml.formatter.alignComments": true,
+    "evenBetterToml.formatter.alignEntries": true,
+    "evenBetterToml.formatter.allowedBlankLines": 2,
+    "evenBetterToml.formatter.columnWidth": 80,
 
     // Extension Pack for Java
     "java.help.showReleaseNotes": false,
 
-    // Flow Language Support
-    "flow.logLevel": "warn",
+    // Flake8
+    "flake8.importStrategy": "fromEnvironment",
+
+    // GitHub Copilot
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false
+    },
+
+    // GitHub Pull Requests
+    "githubIssues.issueBranchTitle": "issue${issueNumber}",
+    "githubIssues.useBranchForIssues": "prompt",
+    "githubPullRequests.defaultCreateOption": "create",
 
     // GitHub Repositories
     "githubRepositories.autoFetch.enabled": false,
     "githubRepositories.indexing.verboseDownloadNotification": false,
 
-    // GitLens
+    // GitLens: General
+    "gitlens.showWhatsNewAfterUpgrades": false,
+    "gitlens.plusFeatures.enabled": false,
+    // GitLens: Commit Graph
+    "gitlens.graph.layout": "editor",
+    "gitlens.graph.commitOrdering": "author-date",
+    "gitlens.graph.dimMergeCommits": true,
+    // GitLens: Launchpad
     "gitlens.launchpad.indicator.enabled": false,
+    "gitlens.launchpad.indicator.label": "counts",
+    // GitLens: AI
+    "gitlens.ai.enabled": false,
+    // GitLens: Date & Times
     "gitlens.defaultDateStyle": "absolute",
+    // GitLens: Advanced
     "gitlens.telemetry.enabled": false,
 
     // Go
     "go.survey.prompt": false,
+    "go.testExplorer.packageDisplayMode": "nested",
 
-    // IntelliCode
-    "vsintellicode.features.python.deepLearning": "enabled",
-    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    // Gradle
+    "gradle.showStoppedDaemons": true,
 
-    // IntelliCode API Usage Examples
-    "intellicodeApiExamples.loggingLevel": "WARN",
+    // HTML CSS Support
+    "css.autoValidation": "Always",
 
     // isort
-    "isort.logLevel": "warn",
+    "isort.importStrategy": "fromEnvironment",
 
-    // Language Support for Java
-    "java.project.importHint": false,
+    // Kubernetes
+    "vscode-kubernetes.log-viewer.timestamp": true,
 
     // Lua
     "Lua.codeLens.enable": true,
 
-    // markdownlint
-    "markdownlint.config": {
-        // Header style
-        "MD003": { "style": "setext_with_atx" },
-        // Trailing spaces
-        "MD009": { "br_spaces": 2 },
-        // Line length
-        "MD013": false,
-        // Trailing punctuation in header
-        "MD026": { "punctuation": ".,;:!" }
-    },
+    // Language Support for Java: Project Import/Update
+    "java.project.encoding": "warning",
+    // Language Support for Java: Build
+    "java.autobuild.enabled": false,
+    // Language Support for Java: Code Completion
+    "java.completion.chain.enabled": true,
+    "java.completion.matchCase": "off",
+    "java.signatureHelp.description.enabled": true,
+    // Language Support for Java: Code Generation
+    "java.codeGeneration.useBlocks": true,
+    // Language Support for Java: Code Action
+    "java.saveActions.organizeImports": true,
+    // Language Support for Java: Code Navigation
+    "java.referencesCodeLens.enabled": true,
+    "java.implementationCodeLens": "all",
 
-    // Maven for Java
-    "maven.view": "hierarchical",
+    // Markdown All in One
+    "markdown.extension.toc.levels": "1..3",
+    "markdown.extension.print.theme": "dark",
+    "markdown.extension.showActionButtons": true,
+
+    // Maven
     "maven.showInExplorerContextMenu": false,
+    "maven.view": "hierarchical",
 
     // MinifyAll
-    "MinifyAll.openMinifiedDocument": false,
     "MinifyAll.disableCodeContextMenu": true,
     "MinifyAll.disableFileExplorerContextMenu": true,
+    "MinifyAll.openMinifiedDocument": false,
+    "MinifyAll.PrefixOfNewMinifiedFiles": ".min",
 
-    // NSIS
-    "nsis.showOutputView": "On Warnings & Errors",
-
-    // OPA
-    "opa.languageServers": [
-        "regal"
-    ],
+    // Mypy Type Checker
+    "mypy-type-checker.importStrategy": "fromEnvironment",
 
     // PHP Intelephense
+    "intelephense.codeLens.implementations.enable": true,
+    "intelephense.codeLens.overrides.enable": true,
+    "intelephense.codeLens.parent.enable": true,
+    "intelephense.codeLens.references.enable": true,
+    "intelephense.codeLens.usages.enable": true,
     "intelephense.telemetry.enabled": false,
 
-    // PostgreSQL
-    "pgsql.applyLocalization": true,
-    "pgsql.format.keywordCasing": "uppercase",
-
-    // PowerShell
+    // PowerShell: Interface
     "powershell.promptToUpdatePowerShell": false,
-    "powershell.integratedConsole.showOnStartup": false,
-    "powershell.integratedConsole.suppressStartupBanner": true,
+    // PowerShell: Formatting
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
-    "powershell.codeFormatting.newLineAfterCloseBrace": false, // Stylistic preference
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+    "powershell.codeFormatting.preset": "OTBS",
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
     "powershell.codeFormatting.useConstantStrings": true,
-    "powershell.codeFormatting.useCorrectCasing": false, // Extremely opinionated and often wrong
-    "powershell.codeFormatting.whitespaceAroundOperator": true,
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
-    "powershell.pester.useLegacyCodeLens": false,
+    // PowerShell: Editor Services
     "powershell.scriptAnalysis.settingsPath": "${env:DOTFILES}/posh/PSScriptAnalyzerSettings.psd1",
+    // PowerShell: Pester
+    "powershell.pester.useLegacyCodeLens": false,
+    // PowerShell: Terminal
+    "powershell.integratedConsole.showOnStartup": false,
+    "powershell.integratedConsole.suppressStartupBanner": true,
 
     // Prettier
     "prettier.endOfLine": "auto",
@@ -271,14 +470,28 @@
     "java.dependency.packagePresentation": "hierarchical",
 
     // Pylance
-    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoFormatStrings": true,
     "python.analysis.completeFunctionParens": true,
-    "python.analysis.logLevel": "Warning",
+    "python.analysis.languageServerMode": "default",
+    "python.analysis.typeCheckingMode": "standard",
+    "python.analysis.typeEvaluation.deprecateTypingAliases": true,
+    "python.analysis.typeEvaluation.disableBytesTypePromotions": true,
+    "python.analysis.typeEvaluation.enableReachabilityAnalysis": true,
+
+    // Pylint
+    "pylint.importStrategy": "fromEnvironment",
 
     // Python
     "python.experiments.enabled": false,
+    "python.useEnvironmentsExtension": true,
 
-    // Red Hat (multiple extensions)
+    // Rainbow CSV
+    "rainbow_csv.virtual_alignment_mode": "manual",
+    "rainbow_csv.virtual_alignment_char": "space",
+    "rainbow_csv.csv_lint_detect_trailing_spaces": true,
+    "rainbow_csv.rbql_with_headers_by_default": true,
+
+    // Red Hat (shared by Red Hat extensions)
     "redhat.telemetry.enabled": false,
 
     // Remote - SSH
@@ -286,6 +499,8 @@
         // Select Line Status Bar
         "tomoki1207.selectline-statusbar"
     ],
+    "remote.SSH.experimental.chat": false,
+    "remote.SSH.suppressWindowsSshWarning": true,
 
     // Remote - Tunnels
     "remote.tunnels.alwaysUpdateCLI": true,
@@ -296,8 +511,12 @@
     // Remote Repositories
     "remoteHub.commitDirectlyWarning": "auto",
     "remoteHub.richNavigation.enabled": true,
-    "remoteHub.staging.smart": false,
     "remoteHub.switchToCreatedBranch": "always",
+
+    // Ruff
+    "ruff.configurationPreference": "filesystemFirst",
+    "ruff.format.preview": true,
+    "ruff.lint.preview": true,
 
     // Select Line Status Bar
     "selectline.alignment": "right",
@@ -308,28 +527,17 @@
     "shellformat.useEditorConfig": true,
 
     // ShellCheck
-    "shellcheck.executablePath": "shellcheck",
     "shellcheck.customArgs": [
         // Follow source directives
         "-x"
     ],
-    "shellcheck.useWorkspaceRootAsCwd": true,
     "shellcheck.disableVersionCheck": true,
-    "shellcheck.logLevel": "warn",
+    "shellcheck.executablePath": "shellcheck",
+    "shellcheck.useWorkspaceRootAsCwd": true,
 
-    // SonarLint
-    "sonarlint.rules": {
-        // Remove commented out code
-        "javascript:S125": {
-            "level": "off"
-        },
-
-        // Duplicate string literals
-        "python:S1192": {
-            "level": "off"
-        }
-    },
-    "sonarlint.disableTelemetry": true,
+    // Version Lens
+    "versionlens.suggestions.showOnStartup": true,
+    "versionlens.suggestions.showSuggestionsStats": true,
 
     // vscode-icons
     "vsicons.associations.files": [
@@ -365,49 +573,41 @@
 
     // XML
     "xml.codeLens.enabled": true,
-    "xml.validation.resolveExternalEntities": true,
-
-    // XML Tools
-    "xmlTools.enforcePrettySelfClosingTagOnFormat": true,
-    "xmlTools.removeCommentsOnMinify": true,
+    "xml.format.emptyElements": "collapse",
+    "xml.format.enforceQuoteStyle": "preferred",
 
     // YAML
     "yaml.format.singleQuote": true,
-    "yaml.trace.server": "messages",
-
+    "yaml.maxItemsComputed": 10000,
 
     // ##################################################
     // ###           Language customisations          ###
     // ##################################################
 
+    "[csv]": {
+        // Rainbow CSV: For virtual alignment mode
+        "editor.inlayHints.maximumLength": 0
+    },
+
     "[git-commit]": {
-        // Rewrap extension
+        // Wrap commit messages
         "rewrap.autoWrap.enabled": true,
         "rewrap.wrappingColumn": 72
     },
 
     "[html]": {
-        // Use built-in formatter
         "editor.defaultFormatter": "vscode.html-language-features"
     },
 
-    "[javascript]": {
-        // Use built-in formatter
+    "[javascript][typescript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
 
-    "[json]": {
-        // Use built-in formatter
-        "editor.defaultFormatter": "vscode.json-language-features"
-    },
-
-    "[jsonc]": {
-        // Use built-in formatter
+    "[json][jsonc]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
 
     "[markdown]": {
-        // Use Markdown All in One extension formatter
         "editor.defaultFormatter": "yzhang.markdown-all-in-one",
 
         // Trailing whitespace has special meaning
@@ -417,20 +617,30 @@
         "workbench.editor.restoreViewState": false
     },
 
+    "[powershell]": {
+        "editor.defaultFormatter": "ms-vscode.powershell"
+    },
+
     "[python]": {
-        "editor.codeActionsOnSave": {
-            // Organise imports with isort
-            "source.organizeImports": "explicit"
-        }
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+
+    "[shellscript]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+
+    "[toml]": {
+        "editor.defaultFormatter": "tamasfe.even-better-toml"
     },
 
     "[xml]": {
-        // Use Red Hat XML extension formatter
-        "editor.defaultFormatter": "redhat.vscode-xml"
+        "editor.defaultFormatter": "redhat.vscode-xml",
+
+        // XML: For automatic tag renaming
+        "editor.linkedEditing": true
     },
 
     "[yaml]": {
-        // Use Red Hat YAML extension formatter
         "editor.defaultFormatter": "redhat.vscode-yaml"
     }
 }
