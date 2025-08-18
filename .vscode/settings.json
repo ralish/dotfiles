@@ -250,17 +250,29 @@
     },
 
     "[javascript]": {
+        "editor.rulers": [79],
+
         "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+
+    "[json][jsonc]": {
+        "editor.rulers": [79],
+
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+
+    "[markdown]": {
+        "editor.defaultFormatter": "yzhang.markdown-all-in-one",
         "editor.formatOnSave": true,
-        "editor.rulers": [79]
-    },
 
-    "[json]": {
-        "editor.rulers": [79]
-    },
+        "editor.codeActionsOnSave": {
+            "source.fixAll.markdownlint": "explicit"
+        },
 
-    "[jsonc]": {
-        "editor.rulers": [79]
+        // Trailing whitespace has special meaning
+        "files.trimTrailingWhitespace": false
     },
 
     "[perl]": {
@@ -268,8 +280,10 @@
     },
 
     "[powershell]": {
-        "editor.formatOnSave": true,
-        "editor.rulers": [79]
+        "editor.rulers": [79],
+
+        "editor.defaultFormatter": "ms-vscode.powershell",
+        "editor.formatOnSave": true
     },
 
     "[properties]": {
@@ -277,8 +291,14 @@
     },
 
     "[shellscript]": {
+        "editor.rulers": [79],
+
+        "editor.defaultFormatter": "foxundermoon.shell-format",
         "editor.formatOnSave": true,
-        "editor.rulers": [79]
+
+        "editor.codeActionsOnSave": {
+            "source.fixAll.shellcheck": "explicit"
+        }
     },
 
     "[sql]": {
