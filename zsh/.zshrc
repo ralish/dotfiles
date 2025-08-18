@@ -32,6 +32,9 @@ key[Down]="${terminfo[kcud1]}"
 key[Left]="${terminfo[kcub1]}"
 key[Right]="${terminfo[kcuf1]}"
 
+# Set Ctrl+Backspace to delete previous word
+bindkey '^H' backward-kill-word
+
 # Set Ctrl+Left/Right arrow to move to adjacent word
 bindkey "\e[D" backward-word
 bindkey "\e[C" forward-word
