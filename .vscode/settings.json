@@ -77,6 +77,8 @@
         // subversion
         "**/.subversion/config": "ini",
         "**/.subversion/servers": "ini",
+        // vscode
+        "**/vscode/*.json": "jsonc",
         // wget
         ".wgetrc": "properties",
         // windows/Windows Sandbox
