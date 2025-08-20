@@ -1,5 +1,11 @@
 [
-    // Close window on Ctrl+W when there's nothing open
+    /*
+     * Visual Studio Code keybindings
+     *
+     * Default file path: %APPDATA%\Code\User\keybindings.json
+     */
+
+    // Close window if there's nothing open
     {
         "key": "ctrl+w",
         "command": "workbench.action.closeWindow",
