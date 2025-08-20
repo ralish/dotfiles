@@ -2,7 +2,7 @@
     /*
      * Windows Terminal settings
      *
-     * Last reviewed release: v1.19.10573.0
+     * Last reviewed release: v1.22.12111.0
      * Default file path: %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
      */
 
@@ -11,13 +11,14 @@
 
     // Startup
     "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
-    "startOnUserLogin": false,
+    "language": "", // Default
+    "defaultInputScope": "default",
     "firstWindowPreference": "defaultProfile",
     "windowingBehavior": "useNew",
     "initialCols": 120,
     "initialRows": 30,
     "launchMode": "maximized",
-    "initialPosition": ",",
+    "initialPosition": ",", // Let Windows decide
     "centerOnLaunch": true,
 
     // Interaction
@@ -25,7 +26,7 @@
     "copyFormatting": "none",
     "trimBlockSelection": true,
     "trimPaste": true,
-    "wordDelimiters": " /\\()\"'-.,:;<>~!@#$%^&*|+=[]{}~?│",
+    "wordDelimiters": " /\\()\"'-.,:;<>~!@#$%^&*|+=[]{}~?\u2502",
     "snapToGridOnResize": true,
     "tabSwitcherMode": "inOrder",
     "focusFollowMouse": false,
@@ -49,41 +50,49 @@
     "minimizeToNotificationArea": false,
     "autoHideWindow": false,
 
+    // Themes (not in UI)
+    "themes": [],
+
     // Color schemes
     "schemes": [],
 
     // Rendering
-    "experimental.rendering.forceFullRepaint": false,
-    "experimental.rendering.software": false,
+    "rendering.graphicsAPI": "automatic",
+    "rendering.disablePartialInvalidation": false,
+    "rendering.software": false,
+
+    // Compatibility
+    "compatibility.allowHeadless": false,
+    "compatibility.textMeasurement": "graphemes",
 
     // Actions
-    "actions": [
+    "actions": [],
+    "keybindings": [
         {
-            "keys": "ctrl+shift+f",
-            "command": "find"
+            "id": "Terminal.CopyToClipboard",
+            "keys": "ctrl+c"
         },
         {
-            "keys": "alt+shift+d",
-            "command": {
-                "action": "splitPane",
-                "split": "auto",
-                "splitMode": "duplicate"
-            }
+            "id": "Terminal.PasteFromClipboard",
+            "keys": "ctrl+v"
+        },
+        {
+            "id": "Terminal.DuplicatePaneAuto",
+            "keys": "alt+shift+d"
         }
     ],
 
     // Advanced (not in UI)
-    "disabledProfileSources": [
-        "Windows.Terminal.Azure"
-    ],
+    "disabledProfileSources": ["Windows.Terminal.Azure"],
     "inputServiceWarning": true,
     "largePasteWarning": true,
     "multiLinePasteWarning": true,
     "showAdminShield": true,
-    "experimental.enableColorSelection": false,
-    "experimental.input.forceVT": false,
-    "experimental.useBackgroundImageForWindow": false,
+    "startupActions": "", // None
+    "compatibility.enableUnfocusedAcrylic": true,
     "compatibility.isolatedMode": false,
+    "experimental.enableColorSelection": false,
+    "experimental.useBackgroundImageForWindow": false,
 
     // New Tab Menu (not in UI)
     "newTabMenu": [
@@ -107,8 +116,8 @@
     "profiles": {
         "defaults": {
             // General
-            "startingDirectory": null,
-            "tabTitle": null,
+            "startingDirectory": null, // Use parent process directory
+            "tabTitle": null, // Use profile name as tab title
             "elevate": false,
 
             // Appearance: Text
@@ -119,7 +128,9 @@
             "font": {
                 "face": "Hack Nerd Font",
                 "size": 10,
-                "weight": "normal"
+                "weight": "normal",
+                "builtinGlyphs": true,
+                "colorGlyphs": true
             },
             "experimental.retroTerminalEffect": false,
             "adjustIndistinguishableColors": "never",
@@ -128,10 +139,10 @@
             "cursorShape": "bar",
 
             // Appearance: Background image
-            "backgroundImage": null,
+            "backgroundImage": null, // No background image
             "backgroundImageStretchMode": "uniformToFill",
             "backgroundImageAlignment": "center",
-            "backgroundImageOpacity": 1.0,
+            "backgroundImageOpacity": 1,
 
             // Appearance: Text Formatting
             "intenseTextStyle": "bright",
@@ -144,16 +155,26 @@
             "padding": "8",
             "scrollbarState": "visible",
 
-            // Advanced
+            // Terminal Emulation
             "suppressApplicationTitle": false,
+            "compatibility.input.forceVT": false,
+            "compatibility.allowDECRQCRA": false,
+            "compatibility.allowOSC52": true,
+            "answerbackMessage": null, // Empty
+
+            // Advanced
             "antialiasingMode": "grayscale",
             "altGrAliasing": true,
             "snapOnInput": true,
             "historySize": 10000,
             "closeOnExit": "graceful",
             "bellStyle": "none",
-            "useAtlasEngine": true,
-            "compatibility.reloadEnvironmentVariables": true
+            "experimental.rightClickContextMenu": false,
+            "showMarksOnScrollbar": false,
+            "autoMarkPrompts": true,
+            "compatibility.reloadEnvironmentVariables": true,
+            "experimental.repositionCursorWithMouse": false,
+            "pathTranslationStyle": "none"
         },
 
         "list": [
@@ -175,19 +196,6 @@
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}", // User default
 
                 "commandline": "%SystemRoot%\\System32\\cmd.exe /K \"%DOTFILES%\\cmd\\SetupEnv.cmd\"",
-                "closeOnExit": "always"
-            },
-            {
-                "name": "Ubuntu",
-                "source": "Windows.Terminal.Wsl",
-                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
-                "hidden": true,
-
-                "startingDirectory": "/home/sdl",
-                "colorScheme": {
-                    "dark": "Solarized Dark",
-                    "light": "Solarized Light"
-                },
                 "closeOnExit": "always"
             },
             {
