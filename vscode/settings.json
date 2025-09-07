@@ -587,7 +587,7 @@
     // ###           Language customisations          ###
     // ##################################################
 
-    "[csv]": {
+    "[dynamic csv]": {
         // Rainbow CSV: For virtual alignment mode
         "editor.inlayHints.maximumLength": 0
     },
