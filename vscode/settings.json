@@ -578,6 +578,7 @@
     "xml.codeLens.enabled": true,
     "xml.format.emptyElements": "collapse",
     "xml.format.enforceQuoteStyle": "preferred",
+    "xml.symbols.maxItemsComputed": 10000,
 
     // YAML
     "yaml.format.singleQuote": true,
