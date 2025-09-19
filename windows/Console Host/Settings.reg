@@ -54,3 +54,11 @@ Windows Registry Editor Version 5.00
 "WindowAlpha"=dword:000000f4
 "WindowSize"=dword:00320050
 "WordDelimiters"=" "
+
+[-HKEY_CURRENT_USER\Console\%SystemRoot%_System32_WindowsPowerShell_v1.0_powershell.exe]
+
+[-HKEY_CURRENT_USER\Console\%SystemRoot%_SysWOW64_WindowsPowerShell_v1.0_powershell.exe]
+
+[-HKEY_CURRENT_USER\Console\Git Bash]
+
+[-HKEY_CURRENT_USER\Console\Git CMD]
