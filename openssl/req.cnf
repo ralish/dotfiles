@@ -16,7 +16,6 @@ distinguished_name                  = req_dn
 req_extensions                      = req_ext
 x509_extensions                     = req_ext
 
-
 [ req_dn ]
 #CN=
 commonName                          = Common Name
@@ -36,7 +35,6 @@ stateOrProvinceName                 = State/Territory/Province
 countryName                         = Country (2 letter code)
 countryName_min                     = 2
 countryName_max                     = 2
-
 
 [ req_ext ]
 # Basic Constraints
@@ -66,7 +64,6 @@ keyUsage                            = dataEncipherment, keyEncipherment
 
 # Subject Alternative Name
 #subjectAltName                      = @req_san
-
 
 [ req_san ]
 # Types:

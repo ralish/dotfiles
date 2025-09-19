@@ -20,7 +20,6 @@ szOID_CERTSRV_PREVIOUS_CERT_HASH    = 1.3.6.1.4.1.311.21.2
 ; AD CS: Cross CA version
 szOID_CERTSRV_CROSSCA_VERSION       = 1.3.6.1.4.1.311.21.22
 
-
 [Certsrv_Server]
 ; Certificate Services server configuration
 
@@ -68,7 +67,6 @@ CRLDeltaPeriodUnits = 0
 ; desired certificate templates are explicitly enabled on the CA.
 LoadDefaultTemplates = 0
 
-
 [Extensions]
 ; Extensions configuration
 
@@ -89,7 +87,6 @@ Critical = %szOID_KEY_USAGE%
 ; Remove the AD CS: CA Version extension
 ;%szOID_CERTSRV_CA_VERSION% =
 
-
 [AuthorityInformationAccess]
 ; Authority Information Access (AIA) configuration
 ;
@@ -108,7 +105,6 @@ Critical = %szOID_KEY_USAGE%
 ; implicitly has no higher authority for which information can be supplied.
 
 ;URL = ""
-
 
 [CRLDistributionPoint]
 ; CRL Distribution Point (CDP) configuration
@@ -129,7 +125,6 @@ Critical = %szOID_KEY_USAGE%
 
 ;URL = ""
 
-
 [EnhancedKeyUsageExtension]
 ; Enhanced Key Usage (EKU) extension configuration
 ;
@@ -144,7 +139,6 @@ Critical = %szOID_KEY_USAGE%
 
 ;OID = 1.2.3.4
 ;Critical = Yes
-
 
 [PolicyStatementExtension]
 ; List of policy statements (comma-separated)

@@ -22,7 +22,6 @@ set -g __fish_git_prompt_color_invalidstate red
 set -g __fish_git_prompt_color_untrackedfiles $fish_color_normal
 set -g __fish_git_prompt_color_cleanstate green bold
 
-
 function fish_prompt --description 'Write out the prompt'
 
 	set -l last_status $status

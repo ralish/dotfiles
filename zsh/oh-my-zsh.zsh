@@ -12,7 +12,6 @@ ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/oh-my-zsh"
 # Completion cache
 ZSH_COMPDUMP="$ZSH_CACHE_DIR/zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
 
-
 # ---------------------------------- Theme ------------------------------------
 
 # Name of theme to load or "random" to load a random theme
@@ -33,12 +32,10 @@ fi
 # Random theme: Suppress startup message indicating the chosen theme
 #ZSH_THEME_RANDOM_QUIET='true'
 
-
 # --------------------------------- Plugins -----------------------------------
 
 # Array of plugins to load
 plugins=(colored-man-pages gitfast ripgrep shrink-path zsh-autosuggestions)
-
 
 # ------------------------------- Completion ----------------------------------
 
@@ -56,7 +53,6 @@ CASE_SENSITIVE='true'
 #
 # NOTE: Case-sensitive completion must be disabled.
 #HYPHEN_INSENSITIVE='true'
-
 
 # --------------------------------- Library -----------------------------------
 
@@ -82,12 +78,10 @@ CASE_SENSITIVE='true'
 # - (custom)            Directly passed to omz_history as "-t" argument
 #HIST_STAMPS=''
 
-
 # ---------------------------------- Title ------------------------------------
 
 # Disable setting the terminal title based on the running command
 #DISABLE_AUTO_TITLE='true'
-
 
 # --------------------------------- Updates -----------------------------------
 
@@ -102,12 +96,10 @@ zstyle ':omz:update' mode disabled
 # Frequency of update checks (days)
 #zstyle ':omz:update' frequency 13
 
-
 # ----------------------------- Initialisation --------------------------------
 
 # Load Oh My Zsh
 source "$ZSH/oh-my-zsh.sh"
-
 
 # -------------------------------- Post-init ----------------------------------
 
@@ -118,7 +110,6 @@ source "$ZSH/oh-my-zsh.sh"
 
 # Default terminal tab title when not running a command
 #ZSH_THEME_TERM_TAB_TITLE_IDLE='%15<..<%~%<<'
-
 
 # -------------------------- Theme Customisations -----------------------------
 
@@ -149,7 +140,6 @@ if (($plugins[(Ie)$plugin])); then
     # Colour to use when highlighting suggestions
     ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=250'
 fi
-
 
 # -------------------------------- Clean-up -----------------------------------
 

@@ -58,7 +58,6 @@ clink.paste_crlf = crlf
 # Prompt filtering by Lua scripts
 clink.promptfilter = True
 
-
 # -------------------------- Automatic suggestions ----------------------------
 
 # Display suggested commands
@@ -83,7 +82,6 @@ autosuggest.hint = True
 # Use original capitalisation of suggestions
 autosuggest.original_case = True
 
-
 # ---------------------------- Command Processor ------------------------------
 
 # If set, the text to replace the "Administrator: " console title prefix
@@ -104,7 +102,6 @@ cmd.get_errorlevel = True
 cmd.altf4_exits = True
 # Exit on receiving Ctrl+D on an empty line
 cmd.ctrld_exits = False
-
 
 # --------------------------------- Colours -----------------------------------
 
@@ -177,7 +174,6 @@ color.histexpand                = sgr 97;48;5;55
 # Unexpected argument
 color.unexpected                = default
 
-
 # ------------------------------- Executables ---------------------------------
 
 # Match executables when completing the first word of a line
@@ -201,7 +197,6 @@ exec.path = True
 
 # If the line begins with whitespace perform normal file matching
 exec.space_prefix = True
-
 
 # --------------------------------- History -----------------------------------
 
@@ -262,7 +257,6 @@ history.dont_add_to_history_cmds = exit history
 # Ignore lines which begin with whitespace when adding to history
 history.ignore_space = True
 
-
 # ----------------------------------- Lua -------------------------------------
 
 # Value to append to package.path
@@ -283,7 +277,6 @@ lua.debug = False
 lua.break_on_error = False
 # Break into the debugger on traceback()
 lua.break_on_traceback = False
-
 
 # -------------------------------- Matching -----------------------------------
 
@@ -343,7 +336,6 @@ match.translate_slashes = system
 # of the completion commands.
 match.wild = True
 
-
 # -------------------------------- Terminal -----------------------------------
 
 # Adjust the cursor shape and visibility for certain events
@@ -396,7 +388,6 @@ terminal.scrollbars = True
 
 # Support the Windows Ctrl+Alt substitute for AltGr
 terminal.use_altgr_substitute = False
-
 
 # ------------------------------ Miscellaneous --------------------------------
 

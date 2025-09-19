@@ -384,7 +384,6 @@ Function Get-OpenSSLServerCertificate {
     }
 }
 
-
 #endregion
 
 #region Conversion operations

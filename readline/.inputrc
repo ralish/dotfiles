@@ -200,7 +200,6 @@ $endif
 # Append a character denoting a file's type when listing completion matches
 set visible-stats on
 
-
 # ------------------------------ Key Mappings ---------------------------------
 
 # Set Home/End keys to jump to the beginning/end of line

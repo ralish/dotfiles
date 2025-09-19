@@ -3,7 +3,6 @@
 -- Enable quiet mode while we process our .psqlrc
 \set QUIET 1
 
-
 -- ************************ Configuration Variables ***************************
 
 -- Autocomplete keywords in uppercase even if we started typing in lowercase
@@ -24,7 +23,6 @@
 -- Verbose error reports
 \set VERBOSITY verbose
 
-
 -- ************************** Query Result Output *****************************
 
 -- Use expanded mode if the output won't fit on the screen in normal mode
@@ -32,7 +30,6 @@
 
 -- Print null values as '[NULL]' instead of the default of an empty string
 \pset null '[NULL]'
-
 
 -- ***************************** Meta Commands ********************************
 

@@ -54,7 +54,6 @@ Function Optimize-DiskCleanup {
         return
     }
 
-
     Write-Host -ForegroundColor Green '[Windows] Running Disk Cleanup ...'
     $ExcludeCategories = @(
         'DownloadsFolder',

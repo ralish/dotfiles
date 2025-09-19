@@ -12,7 +12,6 @@ history size 1000
 # Only keep unique history entries
 history unique 1
 
-
 # ------------------------------ Key Mappings ---------------------------------
 
 # Set Home/End keys to jump to the beginning/end of line

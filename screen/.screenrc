@@ -3,12 +3,10 @@
 # Disable the startup message
 startup_message off
 
-
 # ------------------------------ Copy & paste ---------------------------------
 
 # Default scrollback buffer size (lines)
 defscrollback 10000
-
 
 # ------------------------------ Message line ---------------------------------
 
@@ -24,18 +22,15 @@ hardstatus string '%{gk}[ %{G}%H %{g}][%= %{wk}%?%-Lw%?%{=b kR}(%{W}%n*%f %t%?(%
 # Time messages are displayed (secs)
 msgwait 2
 
-
 # ------------------------------- New window ----------------------------------
 
 # Use a 256 colour terminal
 term screen-256color
 
-
 # --------------------------------- Termcap -----------------------------------
 
 # Don't use the alternate screen for the scrollback buffer under xterm
 termcapinfo xterm* ti@:te@
-
 
 # ---------------------------- Virtual terminal -------------------------------
 
@@ -54,12 +49,10 @@ truecolor on
 # Disable the visual bell
 vbell off
 
-
 # ------------------------------ Miscellaneous --------------------------------
 
 # Default to non-blocking mode
 defnonblock on
-
 
 # ------------------------------ Key bindings ---------------------------------
 

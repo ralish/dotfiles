@@ -17,7 +17,6 @@ logs/
 tmp/
 temp/
 
-
 #########################
 ### Operating Systems ###
 #########################
@@ -49,7 +48,6 @@ ehthumbs.db
 ehthumbs_vista.db
 [Tt]humbs.db
 
-
 ###############
 ### Editors ###
 ###############
@@ -69,7 +67,6 @@ ehthumbs_vista.db
 
 # Visual Studio Code
 .vscode/ipch
-
 
 ###################
 ### Build Tools ###
