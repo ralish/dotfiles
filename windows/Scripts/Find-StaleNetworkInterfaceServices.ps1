@@ -76,17 +76,16 @@ foreach ($GuidService in $GuidServices) {
         continue
     }
 
-    $IPAddressNotPresent = $false
+    $MissingIPAddresses = @()
     foreach ($IPAddress in $IPAddresses[0]) {
         if ($IPAddress -notin $NetIPAddresses.IPAddress) {
-            $IPAddressNotPresent = $IPAddress
-            break
+            $MissingIPAddresses += $IPAddress
         }
     }
 
-    if ($IPAddressNotPresent) {
+    if ($MissingIPAddresses.Count -ne 0) {
         $ServiceInfo.Status = 'Orphaned'
-        $ServiceInfo.Details = 'IP address not present: {0}' -f $IPAddressNotPresent
+        $ServiceInfo.Details = 'IP address(es) not present: {0}' -f [String]::Join(',', $MissingIPAddresses)
         continue
     }
 
@@ -94,14 +93,10 @@ foreach ($GuidService in $GuidServices) {
     $ServiceInfo.Details = 'All static IPs present ({0} total)' -f $IPAddresses[0].Count
 }
 
-if (!$SkipGuidRefSearch) {
-    return $Results
-}
+if ($SkipGuidRefSearch) { return $Results }
 
 foreach ($GuidService in $Results) {
-    if ($GuidService.Status -eq 'OK') {
-        continue
-    }
+    if ($GuidService.Status -eq 'OK') { continue }
 
     $SearchParams = @{
         Hive        = 'HKLM'

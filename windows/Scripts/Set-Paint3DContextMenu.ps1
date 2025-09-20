@@ -15,13 +15,13 @@ Param(
 )
 
 if (![Environment]::OSVersion.Version -eq 10) {
-    throw 'Script is only valid for Windows 10.'
+    throw 'Script is only valid for Windows 10 or later.'
 }
 
 $RemoveHKCRDrive = $false
 if (!(Get-PSDrive -Name 'HKCR' -ErrorAction Ignore)) {
     $RemoveHKCRDrive = $true
-    $null = New-PSDrive -Name 'HKCR' -PSProvider Registry -Root HKEY_CLASSES_ROOT -WhatIf:$false
+    $null = New-PSDrive -Name 'HKCR' -PSProvider 'Registry' -Root 'HKEY_CLASSES_ROOT' -WhatIf:$false
 }
 
 foreach ($Extension in $Extensions) {

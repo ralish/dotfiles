@@ -12,7 +12,7 @@ Param(
 )
 
 if (![Environment]::OSVersion.Version -eq 10) {
-    throw 'Script is only valid for Windows 10.'
+    throw 'Script is only valid for Windows 10 or later.'
 }
 
 $ContextMenuPath = 'HKLM:\Software\Classes\PackagedCom\Package\Microsoft.SkypeApp_*\Class\{776DBC8D-7347-478C-8D71-791E12EF49D8}'
@@ -30,7 +30,7 @@ if (!$ContextMenuKey.DllPath) {
 if ($Operation -eq 'Enable') {
     if ($PSCmdlet.ShouldProcess('Enable Skype context menu')) {
         if ($ContextMenuKey.DllPath.StartsWith('-')) {
-            Set-ItemProperty -Path $ContextMenuPath -Name 'DllPath' -Value ('{0}' -f $ContextMenuKey.DllPath.Substring(1))
+            Set-ItemProperty -Path $ContextMenuPath -Name 'DllPath' -Value $ContextMenuKey.DllPath.Substring(1)
         }
     }
 } else {
