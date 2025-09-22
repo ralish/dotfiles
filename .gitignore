@@ -79,6 +79,9 @@ temp/
 /fish/.config/fish/fishd.*
 /fish/.config/fish/generated_completions/
 
+# Ghidra
+/ghidra/
+
 # Git
 /git/.gitconfig-priv
 /git-win/.git-for-windows-updater
