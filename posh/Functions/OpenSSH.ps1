@@ -31,7 +31,7 @@ Function Update-OpenSSHConfig {
         $Error.RemoveAt(0)
     }
 
-    if ($VersionRaw -match '^OpenSSH\S+([0-9]\.[0-9])') {
+    if ($VersionRaw -match '^OpenSSH\S+([1-9][0-9]?\.[0-9])') {
         $Version = $Matches[1]
         Write-Verbose -Message ('Found OpenSSH version: {0}' -f $Version)
     } else {

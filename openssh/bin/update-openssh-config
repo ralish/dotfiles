@@ -103,7 +103,7 @@ function openssh_metadata() {
 function openssh_check_version() {
     local ssh_version_raw ssh_version_num
     ssh_version_raw="$(ssh -V 2>&1)"
-    ssh_version_num="$(echo "$ssh_version_raw" | grep -Eo '^[A-Za-z_]+[0-9]\.[0-9]' | grep -Eo '[0-9]\.[0-9]' || true)"
+    ssh_version_num="$(echo "$ssh_version_raw" | grep -Eo '^[A-Za-z_]+[1-9][0-9]?\.[0-9]' | grep -Eo '[1-9][0-9]?\.[0-9]' || true)"
     if [[ -z $ssh_version_num ]]; then
         script_exit "Failed to extract version: $ssh_version_raw" 2
     fi
