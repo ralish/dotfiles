@@ -175,11 +175,6 @@
             "format": "svg"
         },
         {
-            "icon": "db",
-            "extensions": ["sdb"],
-            "format": "svg"
-        },
-        {
             "icon": "git",
             "extensions": [
                 ".git-for-windows-updater",
