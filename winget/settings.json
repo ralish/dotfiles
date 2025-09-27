@@ -2,10 +2,11 @@
     /*
      * Windows Package Manager (WinGet) settings
      *
-     * Last reviewed release: v1.7.10582
+     * Last reviewed release: v1.11.430
      * Default file path: %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json
      */
 
+    "$help": "https://aka.ms/winget-settings",
     "$schema": "https://aka.ms/winget-settings.schema.json",
 
     "interactivity": {
@@ -23,7 +24,7 @@
     },
 
     "source": {
-        "autoUpdateIntervalInMinutes": 5
+        "autoUpdateIntervalInMinutes": 15
     },
 
     "telemetry": {
@@ -32,19 +33,31 @@
 
     "visual": {
         "anonymizeDisplayedPaths": true,
+        "enableSixels": true,
         "progressBar": "accent"
     },
 
+    "downloadBehavior": {
+        "defaultDownloadDirectory": "%USERPROFILE%/Downloads/WinGet/"
+    },
+
     "installBehavior": {
+        "archiveExtractionMethod": "shellApi",
         "disableInstallNotes": false,
-        "skipDependencies": false,
         "maxResumes": 3,
+        "skipDependencies": false,
+
+        "portablePackageMachineRoot": "%PROGRAMFILES%/WinGet/Packages/",
+        "portablePackageUserRoot": "%LOCALAPPDATA%/Microsoft/WinGet/Packages/",
 
         "preferences": {
-            "architectures": ["x64", "x86", "neutral"],
             "locale": ["en-AU", "en-GB", "en-US"],
             "scope": "user"
         }
+    },
+
+    "configureBehavior": {
+        "defaultModuleRoot": "%LOCALAPPDATA%/Microsoft/WinGet/Configuration/Modules/"
     },
 
     "uninstallBehavior": {
