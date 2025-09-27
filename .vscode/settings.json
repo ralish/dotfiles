@@ -1,5 +1,8 @@
 {
     // File paths to language mappings
+    //
+    // Associations to the "plaintext" type are generally for hinting the
+    // vscode-icons extension as to the preferred icon.
     "files.associations": {
         // root
         ".ignore": "ignore",
@@ -12,6 +15,7 @@
         // bazaar
         "**/.bazaar/*.conf": "ini",
         // clink
+        "clink_history*": "plaintext",
         "clink_settings": "properties",
         // curl
         ".curlrc": "properties",
@@ -19,19 +23,26 @@
         ".startxwinrc": "shellscript",
         // dig
         ".digrc": "properties",
-        // dircolors
-        ".dircolors": "plain",
         // editline
         ".editrc": "properties",
         // git
+        ".gitattributes": "properties",
         ".gitconfig": "ini",
         ".gitconfig-*": "ini",
+        ".gitignore": "ignore",
+        ".gitmodules": "ini",
         "**/git/bin/*": "shellscript",
         "**/git/hooks/*": "shellscript",
         // git-win
         ".git-for-windows-updater": "ini",
         // htop
         "htoprc": "properties",
+        // irssi
+        "**/irssi/.irssi/*": "plaintext",
+        // jetbrains
+        "*.DotSettings": "xml",
+        // kpcli
+        "**/kpcli/bin/*": "perl",
         // less
         ".lesskey": "properties",
         // markdownlint
@@ -42,11 +53,10 @@
         ".npmrc": "properties",
         // openssh
         "**/.ssh/config": "ssh_config",
-        "**/.ssh/known_hosts": "plain",
-        "**/.ssh/known_hosts.old": "plain",
-        "**/.ssh/hosts/*": "plain",
+        "**/.ssh/known_hosts": "plaintext",
+        "**/.ssh/known_hosts.old": "plaintext",
+        "**/.ssh/hosts/*": "plaintext",
         "**/.ssh/includes/*": "ssh_config",
-        "**/.ssh/keys/*": "plain",
         "**/.ssh/templates/*": "ssh_config",
         "**/openssh/bin/*": "shellscript",
         // openssl
@@ -56,6 +66,7 @@
         // pip
         "pip.conf": "ini",
         // prettier
+        ".prettierignore": "ignore",
         ".prettierrc": "json",
         // quilt
         ".quiltrc": "shellscript",
@@ -72,7 +83,7 @@
         // shellcheck
         ".shellcheckrc": "properties",
         // stow
-        ".stow-local-ignore": "plain",
+        ".stow-local-ignore": "plaintext",
         "**/stow/bin/*": "perl",
         // subversion
         "**/.subversion/config": "ini",
@@ -83,12 +94,16 @@
         ".wgetrc": "properties",
         // windows/Windows Sandbox
         "*.wsb": "xml",
+        // winget
+        "**/winget/settings.json": "jsonc",
+        // winterm
+        "**/winterm/settings.json": "jsonc",
         // wsl
         ".wslconfig": "ini",
         "wsl.conf": "ini",
         // xdg-user-dir
         "user-dirs.dirs": "shellscript",
-        "user-dirs.locale": "plain",
+        "user-dirs.locale": "plaintext",
         // xlaunch
         "*.xlaunch": "xml",
         // zsh
@@ -111,7 +126,8 @@
         "**/dotfiles/posh/Modules/**": true,
         "**/dotfiles/pwsh/**": true,
         "**/dotfiles/vim/.vim/**": true,
-        "**/dotfiles/zsh/.oh-my-zsh/**": true
+        "**/dotfiles/zsh/.oh-my-zsh/**": true,
+        "**/dotfiles/zsh/oh-my-zsh/**": true
     },
 
     // Markdown table of contents generation
@@ -137,9 +153,8 @@
     "vsicons.presets.foldersAllDefaultIcon": true,
     "vsicons.associations.files": [
         {
-            "icon": "bazaar",
-            "extensions": ["bazaar.conf"],
-            "filename": true,
+            "icon": "binary",
+            "extensions": ["ocb", "pmf"],
             "format": "svg"
         },
         {
@@ -149,15 +164,19 @@
             "format": "svg"
         },
         {
-            "icon": "binary",
-            "extensions": ["pmf"],
-            "filename": false,
+            "icon": "config",
+            "extensions": ["prf"],
+            "format": "svg"
+        },
+        {
+            "icon": "config",
+            "extensions": [".dircolors"],
+            "filename": true,
             "format": "svg"
         },
         {
             "icon": "db",
             "extensions": ["sdb"],
-            "filename": false,
             "format": "svg"
         },
         {
@@ -166,16 +185,26 @@
                 ".git-for-windows-updater",
                 ".gitconfig-delta",
                 ".gitconfig-priv",
-                ".gitconfig-win",
-                ".keepme"
+                ".gitconfig-win"
             ],
+            "filename": true,
+            "format": "svg"
+        },
+        {
+            "icon": "java",
+            "extensions": ["java_home.save"],
             "filename": true,
             "format": "svg"
         },
         {
             "icon": "key",
             "extensions": ["pub"],
-            "filename": false,
+            "format": "svg"
+        },
+        {
+            "icon": "log",
+            "extensions": [".bash_history", "clink_history"],
+            "filename": true,
             "format": "svg"
         },
         {
@@ -187,7 +216,6 @@
         {
             "icon": "onenote",
             "extensions": ["onetastic"],
-            "filename": false,
             "format": "svg"
         },
         {
@@ -204,19 +232,8 @@
         },
         {
             "icon": "text",
-            "extensions": [
-                ".bash_history",
-                ".ignore",
-                "clink_history",
-                "user-dirs.locale"
-            ],
+            "extensions": [".ignore", ".keepme"],
             "filename": true,
-            "format": "svg"
-        },
-        {
-            "icon": "vim",
-            "extensions": ["vim"],
-            "filename": false,
             "format": "svg"
         },
         {
@@ -232,6 +249,10 @@
         {
             "pattern": "**/windows/Event Viewer/**.xml",
             "systemId": "windows/Event Viewer/Schemas/Viewer.xsd"
+        },
+        {
+            "pattern": "**/windows/Windows Performance Recorder/*.xml",
+            "systemId": "windows/Windows Performance Recorder/wpr.config.xsd"
         }
     ],
 
