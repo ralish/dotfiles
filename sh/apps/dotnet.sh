@@ -13,7 +13,7 @@ if df_app_load '.NET CLI [dotnet]' 'command -v dotnet > /dev/null'; then
     export PATH="$build_path"
 
     # How to enable tab completion for the .NET CLI
-    # https://learn.microsoft.com/en-us/dotnet/core/tools/enable-tab-autocomplete
+    # https://learn.microsoft.com/en-au/dotnet/core/tools/enable-tab-autocomplete
     # shellcheck disable=SC2154
     if [ -n "$BASH" ]; then
         # shellcheck source=/dev/null

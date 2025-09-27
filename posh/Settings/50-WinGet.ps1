@@ -10,7 +10,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 }
 
 # Tab completion (winget)
-# https://learn.microsoft.com/en-us/windows/package-manager/winget/tab-completion
+# https://learn.microsoft.com/en-au/windows/package-manager/winget/tab-completion
 Register-ArgumentCompleter -Native -CommandName 'winget' -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
     [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [Text.UTF8Encoding]::new()

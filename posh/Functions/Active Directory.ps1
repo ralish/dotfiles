@@ -18,7 +18,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory
 # Estimate the Kerberos token size for a user
 #
 # Problems with Kerberos authentication when a user belongs to many groups
-# https://learn.microsoft.com/en-AU/troubleshoot/windows-server/windows-security/kerberos-authentication-problems-if-user-belongs-to-groups
+# https://learn.microsoft.com/en-au/troubleshoot/windows-server/windows-security/kerberos-authentication-problems-if-user-belongs-to-groups
 Function Get-KerberosTokenSize {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]

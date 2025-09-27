@@ -535,7 +535,7 @@ Function Format-SizeDigital {
 }
 
 # Beautify XML strings
-# Via: https://blogs.msdn.microsoft.com/sergey_babkins_blog/2016/12/31/how-to-pretty-print-xml-in-powershell-and-text-pipelines/
+# Via: https://learn.microsoft.com/en-au/archive/blogs/sergey_babkins_blog/how-to-pretty-print-xml-in-powershell-and-text-pipelines
 Function Format-Xml {
     [CmdletBinding()]
     [OutputType([String])]

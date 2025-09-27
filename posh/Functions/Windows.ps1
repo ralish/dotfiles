@@ -178,7 +178,7 @@ Function Find-WinEvent {
     }
 
     # EventLevel Enum
-    # https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.tracing.eventlevel
+    # https://learn.microsoft.com/en-au/dotnet/api/system.diagnostics.tracing.eventlevel
     $EventLevelToInt = @{
         Any      = 0
         Critical = 1

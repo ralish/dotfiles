@@ -3,7 +3,7 @@
 # dotnet-suggest configuration
 if df_app_load 'dotnet-suggest' 'command -v dotnet-suggest > /dev/null'; then
     # Tab completion for System.CommandLine
-    # https://learn.microsoft.com/en-us/dotnet/standard/commandline/tab-completion
+    # https://learn.microsoft.com/en-au/dotnet/standard/commandline/how-to-enable-tab-completion
     # shellcheck disable=SC2154
     if [ -n "$BASH" ]; then
         # shellcheck source=/dev/null

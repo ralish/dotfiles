@@ -368,7 +368,7 @@ Function Update-Scoop {
 # Update Microsoft Visual Studio
 #
 # Use command-line parameters to install, update, and manage Visual Studio
-# https://learn.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio
+# https://learn.microsoft.com/en-au/visualstudio/install/use-command-line-parameters-to-install-visual-studio
 Function Update-VisualStudio {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [PSCustomObject])]

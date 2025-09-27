@@ -11,7 +11,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 }
 
 # Intelligent context-aware command completion with Az Predictor
-# https://learn.microsoft.com/en-us/powershell/azure/az-predictor
+# https://learn.microsoft.com/en-au/powershell/azure/az-predictor
 if ($PSVersionTable.PSVersion -lt [Version]::new('7.2')) {
     Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as PowerShell is not v7.2 or later.')
     return

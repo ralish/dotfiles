@@ -1,5 +1,5 @@
 ; CAPolicy.inf syntax
-; https://learn.microsoft.com/en-us/windows-server/networking/core-network-guide/cncg/server-certs/prepare-the-capolicy-inf-file
+; https://learn.microsoft.com/en-au/windows-server/networking/core-network-guide/cncg/server-certs/prepare-the-capolicy-inf-file
 
 [Version]
 Signature = "$Windows NT$"

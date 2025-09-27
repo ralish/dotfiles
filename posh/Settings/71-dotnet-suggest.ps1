@@ -10,7 +10,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 }
 
 # Tab completion for System.CommandLine
-# https://learn.microsoft.com/en-us/dotnet/standard/commandline/tab-completion
+# https://learn.microsoft.com/en-au/dotnet/standard/commandline/how-to-enable-tab-completion
 $env:DOTNET_SUGGEST_SCRIPT_VERSION = '1.0.2'
 
 # Determine the list of apps registered for suggestions and exclude the .NET

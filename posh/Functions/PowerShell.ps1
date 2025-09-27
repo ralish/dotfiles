@@ -527,7 +527,7 @@ Function Compare-Hashtable {
 }
 
 # Compare the properties of two objects
-# Via: https://blogs.technet.microsoft.com/janesays/2017/04/25/compare-all-properties-of-two-objects-in-windows-powershell/
+# Via: https://learn.microsoft.com/en-au/archive/blogs/janesays/compare-all-properties-of-two-objects-in-windows-powershell
 Function Compare-ObjectProperties {
     [CmdletBinding()]
     [OutputType([Void], [PSCustomObject[]])]
