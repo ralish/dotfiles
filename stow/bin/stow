@@ -31,7 +31,7 @@ stow [ options ] package ...
 
 =head1 DESCRIPTION
 
-This manual page describes GNU Stow 2.3.1.  This is not the
+This manual page describes GNU Stow 2.4.1.  This is not the
 definitive documentation for Stow; for that, see the accompanying info
 manual, e.g. by typing C<info stow>.
 
@@ -134,6 +134,8 @@ C<-D>).
 =item -n
 
 =item --no
+
+=item --simulate
 
 Do not perform any operations that modify the filesystem; merely show
 what would happen.
@@ -458,6 +460,7 @@ require 5.006_001;
 use POSIX qw(getcwd);
 use Getopt::Long qw(GetOptionsFromArray);
 use Scalar::Util qw(reftype);
+use Text::ParseWords qw(shellwords);
 
 use lib "$ENV{HOME}/dotfiles/stow/share/perl";
 use Stow;
@@ -472,7 +475,6 @@ sub main {
     my ($options, $pkgs_to_unstow, $pkgs_to_stow) = process_options();
 
     my $stow = new Stow(%$options);
-    # current dir is now the target directory
 
     $stow->plan_unstow(@$pkgs_to_unstow);
     $stow->plan_stow  (@$pkgs_to_stow);
@@ -580,19 +582,19 @@ sub parse_options {
         'ignore=s' =>
         sub {
             my $regex = $_[1];
-            push @{$options{ignore}}, qr($regex\z);
+            push @{$options{ignore}}, qr{($regex)\z};
         },
 
         'override=s' =>
         sub {
             my $regex = $_[1];
-            push @{$options{override}}, qr(\A$regex);
+            push @{$options{override}}, qr{\A($regex)};
         },
 
         'defer=s' =>
         sub {
             my $regex = $_[1];
-            push @{$options{defer}}, qr(\A$regex);
+            push @{$options{defer}}, qr{\A($regex)};
         },
 
         # a little craziness so we can do different actions on the same line:
@@ -682,7 +684,7 @@ sub get_config_file_options {
                 or die "Could not open $file for reading\n";
             while (my $line = <$FILE>){
                 chomp $line;
-                push @defaults, split " ", $line;
+                push @defaults, shellwords($line);
             }
             close $FILE or die "Could not close open file: $file\n";
         }
@@ -821,6 +823,8 @@ OPTIONS:
                           if the file is already stowed to another package
     --adopt               (Use with care!)  Import existing files into stow package
                           from target.  Please read docs before using.
+    --dotfiles            Enables special handling for dotfiles that are
+                          Stow packages that start with "dot-" and not "."
     -p, --compat          Use legacy algorithm for unstowing
 
     -n, --no, --simulate  Do not actually make any filesystem changes
@@ -833,7 +837,7 @@ Report bugs to: bug-stow\@gnu.org
 Stow home page: <http://www.gnu.org/software/stow/>
 General help using GNU software: <http://www.gnu.org/gethelp/>
 EOT
-    exit defined $msg ? 1 : 0;
+    exit (defined $msg ? 1 : 0);
 }
 
 sub version {
@@ -845,6 +849,5 @@ sub version {
 
 # Local variables:
 # mode: perl
-# cperl-indent-level: 4
 # end:
 # vim: ft=perl
