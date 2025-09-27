@@ -76,7 +76,7 @@ switch_case_indent = true       # shfmt: -ci
 indent_size = 2
 
 # Windows Performance Recorder configuration
-[windows/Windows Performance Recorder/*.xml]
+[windows/Windows Performance Recorder/*.{xml,xsd}]
 indent_size = 2
 
 # Windows Sandbox configuration
