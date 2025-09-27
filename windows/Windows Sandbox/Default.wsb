@@ -2,9 +2,9 @@
   Windows Sandbox configuration
   https://learn.microsoft.com/en-au/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file
 
-  Last reviewed release: Windows 11 23H2
+  Last reviewed release: Windows 11 24H2
 
-  Initial support from Windows Build 18342 (Windows 10 1903+)
+  Initial support from Windows 10 1903
 
   No XML schema appears to be publicly available.
 -->
@@ -29,19 +29,20 @@
 
   <MappedFolders>
     <MappedFolder>
-      <HostFolder>C:\Program Files (x86)\Sysinternals</HostFolder>
-      <SandboxFolder>C:\Program Files (x86)\Sysinternals</SandboxFolder>
+      <HostFolder>%ProgramFiles(x86)%\Sysinternals</HostFolder>
+      <SandboxFolder>%ProgramFiles(x86)%\Sysinternals</SandboxFolder>
       <ReadOnly>true</ReadOnly>
     </MappedFolder>
 
     <MappedFolder>
-      <HostFolder>C:\Users\SDL\Dotfiles\windows\Windows Sandbox</HostFolder>
-      <SandboxFolder>C:\Users\WDAGUtilityAccount\Desktop\Host\Windows Sandbox</SandboxFolder>
+      <HostFolder>%DOTFILES%\windows\Windows Sandbox</HostFolder>
+      <SandboxFolder>%USERPROFILE%\Desktop\Host\Windows Sandbox</SandboxFolder>
       <ReadOnly>true</ReadOnly>
     </MappedFolder>
   </MappedFolders>
 
   <LogonCommand>
+    <!-- Environment variables aren't supported -->
     <Command>cmd /c &quot;C:\Users\WDAGUtilityAccount\Desktop\Host\Windows Sandbox\Initialize.cmd&quot;</Command>
   </LogonCommand>
 </Configuration>
