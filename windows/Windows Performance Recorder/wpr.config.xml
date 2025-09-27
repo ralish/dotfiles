@@ -3,7 +3,7 @@
   Windows Performance Recorder configuration
   https://learn.microsoft.com/en-au/windows-hardware/test/wpt/windows-performance-recorder
 
-  Last reviewed release: Windows 11 23H2
+  Last reviewed release: Windows 11 24H2
 
   The XML schema is included in wpr.exe as an RCData resource.
 -->
