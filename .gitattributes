@@ -22,6 +22,8 @@ scripts/bin/*                   text        eol=lf
 # Override Linguist detected language for certain files
 .vscode/*.json                  linguist-language=jsonc
 vscode/*.json                   linguist-language=jsonc
+winget/*.json                   linguist-language=jsonc
+winterm/*.json                  linguist-language=jsonc
 
 # Exclude vendored code from Linguist language detection
 stow/*                          linguist-vendored
