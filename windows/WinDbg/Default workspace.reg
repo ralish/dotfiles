@@ -1,5 +1,9 @@
 Windows Registry Editor Version 5.00
 
+; WinDbg workspace configuration
+;
+; Last reviewed release: v10.0.26100.4948
+
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windbg\Workspaces]
 "Default"=hex:57,44,57,53,01,00,00,00,44,00,00,00,10,00,04,00,01,00,00,00,00,\
   00,00,00,0a,00,00,00,10,00,04,00,10,00,00,00,00,00,00,00,3d,00,00,00,10,00,\
