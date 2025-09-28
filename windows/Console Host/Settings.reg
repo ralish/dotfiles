@@ -1,7 +1,68 @@
 Windows Registry Editor Version 5.00
 
+; Console Host (ConHost) configuration
+; https://devblogs.microsoft.com/commandline/understanding-windows-console-host-settings/
+;
+; Last reviewed release: v10.0.26100.6584
+
 [HKEY_CURRENT_USER\Console]
-"AllowAltF4Close"=dword:00000001
+; *** Options ***
+; Cursor Size
+"CursorSize"=dword:00000019
+; Display Options
+;
+; Removed in Windows Vista / Windows Server 2008.
+;"FullScreen"=dword:00000000
+; Command History: Buffer Size
+"HistoryBufferSize"=dword:000000fa
+; Command History: Number of Buffers
+"NumberOfHistoryBuffers"=dword:00000004
+; Command History: Discard Old Duplicates
+"HistoryNoDup"=dword:00000001
+; Edit Options: QuickEdit Mode
+"QuickEdit"=dword:00000001
+; Edit Options: Insert Mode
+"InsertMode"=dword:00000001
+; Edit Options: Enable Ctrl key shortcuts [v2 only]
+"CtrlKeyShortcutsDisabled"=dword:00000000
+; Edit Options: Filter clipboard contents on paste [v2 only]
+"FilterOnPaste"=dword:00000001
+; Edit Options: Use Ctrl+Shift+C/V as Copy/Paste [v2 only]
+"InterceptCopyPaste"=dword:00000000
+; Text Selection: Enable line wrapping selection [v2 only]
+"LineSelection"=dword:00000001
+; Text Selection: Extended text selection keys [v2 only]
+;
+; This is a global setting (cannot be set per-profile).
+"ExtendedEditKey"=dword:00000001
+; Use legacy console [v2 only]
+;
+; This is a global setting (cannot be set per-profile).
+"ForceV2"=dword:00000001
+
+; *** Font ***
+; Font
+"FaceName"="Hack Nerd Font Mono"
+; Font (GDI)
+"FontFamily"=dword:00000036
+; Size
+"FontSize"=dword:00100000
+; Weight (GDI)
+"FontWeight"=dword:00000190
+
+; *** Layout ***
+; Screen Buffer Size: Width/Height
+"ScreenBufferSize"=dword:0bb80050
+; Screen Buffer Size: Wrap text output on resize [v2 only]
+"LineWrap"=dword:00000001
+; Window Size: Width/Height
+"WindowSize"=dword:00320050
+; Window Position: Left/Top
+;
+; Absence of setting enables "Let system position window".
+;"WindowPosition"=dword:00840084
+
+; *** Colours ***
 "ColorTable00"=dword:00362b00
 "ColorTable01"=dword:007f5618
 "ColorTable02"=dword:0000665a
@@ -18,42 +79,54 @@ Windows Registry Editor Version 5.00
 "ColorTable13"=dword:008236d3
 "ColorTable14"=dword:000089b5
 "ColorTable15"=dword:00e3f6fd
-"CtrlKeyShortcutsDisabled"=dword:00000000
-"CurrentPage"=dword:00000000
-"CursorColor"=dword:ffffffff
-"CursorSize"=dword:00000019
-"CursorType"=dword:00000002
-"DefaultBackground"=dword:ffffffff
-"DefaultForeground"=dword:ffffffff
-"EnableColorSelection"=dword:00000001
-"ExtendedEditKey"=dword:00000001
-"ExtendedEditKeyCustom"=dword:00000000
-"FaceName"="Hack Nerd Font"
-"FilterOnPaste"=dword:00000001
-"FontFamily"=dword:00000036
-"FontSize"=dword:00100000
-"FontWeight"=dword:00000190
-"ForceV2"=dword:00000001
-"FullScreen"=dword:00000000
-"HistoryBufferSize"=dword:000000fa
-"HistoryNoDup"=dword:00000001
-"InsertMode"=dword:00000001
-"InterceptCopyPaste"=dword:00000000
-"LineSelection"=dword:00000001
-"LineWrap"=dword:00000001
-"LoadConIme"=dword:00000000
-"NumberOfHistoryBuffers"=dword:00000004
-"PopupColors"=dword:00000070
-"QuickEdit"=dword:00000001
-"ScreenBufferSize"=dword:0bb80050
-"ScreenColors"=dword:00000007
-"ScrollScale"=dword:00000001
-"TerminalScrolling"=dword:00000001
-"TrimLeadingZeros"=dword:00000000
-"VirtualTerminalLevel"=dword:00000001
+; Opacity [v2 only]
 "WindowAlpha"=dword:000000f4
-"WindowSize"=dword:00320050
-"WordDelimiters"=" "
+
+; *** Terminal ***
+; Use Separate Foreground [v2 only]
+"DefaultForeground"=dword:ffffffff
+; Use Separate Background [v2 only]
+"DefaultBackground"=dword:ffffffff
+; Cursor Shape [v2 only]
+"CursorType"=dword:00000001
+; Cursor Colours [v2 only]
+"CursorColor"=dword:ffffffff
+; Terminal Scrolling: Disable Scroll-Forward [v2 only]
+"TerminalScrolling"=dword:00000001
+
+; *** Not in UI ***
+; Allow closing the window with Alt+F4 [v2 only]
+"AllowAltF4Close"=dword:00000001
+; Default codepage
+;
+; If unset, the default is the OEM codepage.
+;"CodePage"=dword:00000352
+; Copy coloured HTML and RTF to the clipboard [v2 only]
+;
+; If enabled, this is in addition to the usual plain text.
+"CopyColor"=dword:00000000
+; Default properties page
+;"CurrentPage"=dword:00000000
+; Allow colourisation of selection
+"EnableColorSelection"=dword:00000001
+; Load the Console Input Method Editor (IME)
+"LoadConIme"=dword:00000000
+; Popup window foreground/background colours
+"PopupColors"=dword:00000070
+; Default foreground/background colours
+"ScreenColors"=dword:00000007
+; Number of lines to scroll with Shift+Scroll-wheel
+"ScrollScale"=dword:00000001
+; Remove leading zeroes from strings on copy
+"TrimLeadingZeros"=dword:00000000
+; Use the new Atlas engine (Direct2D & DirectWrite) [v2 only]
+;
+; If unset, uses the old GDI engine.
+"UseDx"=dword:00000001
+; Level of Virtual Terminal support [v2 only]
+"VirtualTerminalLevel"=dword:00000001
+; List of characters considered as delimiting words
+"WordDelimiters"=" /\\()\"'-.,:;<>~!@#$%^&*|+=[]{}~?│"
 
 [-HKEY_CURRENT_USER\Console\%SystemRoot%_System32_WindowsPowerShell_v1.0_powershell.exe]
 
