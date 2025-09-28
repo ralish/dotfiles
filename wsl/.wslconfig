@@ -3,8 +3,7 @@
 #
 # Last reviewed release: v2.6.1
 # Default file path: %USERPROFILE%\.wslconfig
-#
-# Initial support from Windows 10 2004
+# Initial support: Windows 10 2004
 
 [general]
 # Absolute path to directory to install distributions [UNDOCUMENTED]

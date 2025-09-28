@@ -1,4 +1,5 @@
 ; AD CS certificate request template
+; https://learn.microsoft.com/en-au/windows-server/administration/windows-commands/certreq_1
 ;
 ; Create a new request:
 ; certreq -New -?
