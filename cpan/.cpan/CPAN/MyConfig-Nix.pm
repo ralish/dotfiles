@@ -1,4 +1,10 @@
-# Assuming a Debian distribution, you may want to install:
+# CPAN
+# https://perldoc.perl.org/CPAN
+#
+# Last reviewed release: 2.38
+# Default file path: ~/.cpan/CPAN/MyConfig.pm
+#
+# Assuming a Debian distribution you may want to install:
 # - libcpan-distnameinfo-perl (CPAN::DistnameInfo)
 # - liblog-log4perl-perl (Log::Log4perl)
 # - libmodule-build-perl (Module::Build)
@@ -7,66 +13,90 @@
 # - libyaml-libyaml-perl (YAML::XS)
 
 $CPAN::Config = {
+    # List of modules to skip loading (via CPAN::has_inst())
+    'dontload_list' => [],
+    # List of enabled plugins (see CPAN::Plugin)
+    'plugin_list' => [],
+
     # Build & cache directory
-    'cpan_home' => qq[$ENV{HOME}/.cpan],
+    'cpan_home'         => qq[$ENV{HOME}/.cpan],
     # Source directory
     'keep_source_where' => qq[$ENV{HOME}/.cpan/sources],
+    # Patches directory
+    'patches_dir'       => q[],
     # Build directory
-    'build_dir' => qq[$ENV{HOME}/.cpan/build],
+    'build_dir'         => qq[$ENV{HOME}/.cpan/build],
     # Preferences directory
-    'prefs_dir' => qq[$ENV{HOME}/.cpan/prefs],
+    'prefs_dir'         => qq[$ENV{HOME}/.cpan/prefs],
 
     # Paths to external programs
+    #
+    # Entries marked "space" use a Perl module when set to a space.
     'applypatch' => q[/usr/bin/applypatch],
-    'bzip2' => q[/usr/bin/bzip2],
-    'curl' => q[/usr/bin/curl],
-    'gpg' => q[/usr/bin/gpg],
-    'gzip' => q[/usr/bin/gzip],
-    'make' => q[/usr/bin/make],
-    'pager' => q[less],
-    'patch' => q[/usr/bin/patch],
-    'shell' => q[/bin/zsh],
-    'tar' => q[/usr/bin/tar],
-    'unzip' => q[/usr/bin/unzip],
-    'wget' => q[/usr/bin/wget],
+    'bzip2'      => q[/usr/bin/bzip2], # space
+    'curl'       => q[/usr/bin/curl],
+    'gpg'        => q[/usr/bin/gpg],
+    'gpg'        => q[],
+    'gzip'       => q[/usr/bin/gzip], # space
+    'lynx'       => q[],
+    'make'       => q[/usr/bin/make],
+    'ncftp'      => q[],
+    'ncftpget'   => q[],
+    'pager'      => q[/usr/bin/less],
+    'patch'      => q[/usr/bin/patch],
+    'shell'      => q[/usr/bin/zsh],
+    'tar'        => q[/usr/bin/tar], # space
+    'unzip'      => q[/usr/bin/unzip],
+    'wget'       => q[/usr/bin/wget],
 
-    # Prefer external tar command (instead of Archive::Tar)
+    # Character to use for quoting external commands
+    #
+    # Defaults to a single quote on all platforms except Windows, which uses a
+    # double quote. Setting it to a space will disable quoting (bad idea!).
+    #'commands_quote' => q[],
+    # Prefer external "tar" command (instead of Archive::Tar)
     'prefer_external_tar' => q[1],
 
-    # Proxy configuration
-    'ftp_proxy' => q[],
-    'http_proxy' => q[],
-    'no_proxy' => q[],
+    # Username and optional password for CPAN server
+    'username' => q[],
+    'password' => q[],
 
     # Always use FTP passive mode
     'ftp_passive' => q[1],
+    # Duration to retain download statistics (days)
+    'ftpstats_period' => q[14],
+    # Number of items to keep in the download statistics
+    'ftpstats_size' => q[99],
 
-    # List of plugins and arguments
-    'plugin_list' => [],
+    # Address of HTTP and/or FTP proxy
+    'http_proxy' => q[],
+    'ftp_proxy' => q[],
+    # List of addresses to bypass proxy (comma-separated)
+    'no_proxy' => q[],
+    # Username and optional password for proxy server
+    'proxy_user' => q[],
+    'proxy_pass' => q[],
 
     # Suppress startup greeting message
     'inhibit_startup_message' => q[0],
 
     # Automatically save configuration changes
     #
-    # Note: Enabling will result in CPAN removing all comments, formatting, and
-    #       ordering of statements whenever it saves an updated configuration.
+    # Enabling will result in CPAN removing all comments, formatting, and
+    # ordering of statements on saving the configuration.
     'auto_commit' => q[0],
 
     # Terminal uses ISO-8859-1 character set (aka. Latin-1)
     #
-    # Note: Disabling is equivalent to enabling UTF-8.
+    # Disabling is equivalent to enabling UTF-8.
     'term_is_latin' => q[0],
-
-    # Display the current command number in the prompt
-    'commandnumber_in_prompt' => q[0],
 
     # Enable terminal ornaments (requires Term::ReadLine)
     'term_ornaments' => q[1],
 
     # Enable colourised terminal output (requires Term::ANSIColor)
     #
-    # Note: Windows requires Win32::Console::ANSI.
+    # Windows also requires Win32::Console::ANSI.
     'colorize_output' => q[0],
     # Colour for normal output
     'colorize_print' => q[bold green],
@@ -74,6 +104,9 @@ $CPAN::Config = {
     'colorize_warn' => q[bold red],
     # Colour for debugging messages
     'colorize_debug' => q[black on_cyan],
+
+    # Display the current command number in the prompt
+    'commandnumber_in_prompt' => q[0],
 
     # Path to the history file (requires Term::ReadLine)
     'histfile' => qq[$ENV{HOME}/.cpan/histfile],
@@ -85,10 +118,22 @@ $CPAN::Config = {
     'connect_to_internet_ok' => q[1],
     # List of CPAN mirrors to use
     'urllist' => [q[https://www.cpan.org/]],
-    # Always use the official CPAN site for downloads. HTTPS will be preferenced
-    # with HTTP fallback if it cannot be used (e.g. missing dependencies). Usage
-    # of HTTP will emit a warning. Enabling this option will ignore any urllist.
+    # Randomize the mirror selected from "urllist"
+    'randomize_urllist' => q[0],
+    # Use external "ping" command when automatically selecting mirrors
+    'urllist_ping_external' => q[0],
+    # Increase output verbosity when automatically selecting mirrors
+    'urllist_ping_verbose' => q[0],
+    # Always use the official CPAN site for downloads
+    #
+    # HTTPS will be preferenced with fallback to HTTP if it cannot be used
+    # (e.g. missing dependencies), in which case a warning will be emitted.
+    # Enabling this option will ignore any "urllist".
     'pushy_https' => q[1],
+
+    # List of CPAN WAIT servers to use
+    'wait_list' => [],
+
     # Validity period of downloaded indexes (days)
     'index_expire' => q[1],
 
@@ -126,19 +171,19 @@ $CPAN::Config = {
     'makepl_arg' => q[INSTALLDIRS=site],
     # Arguments to pass to "make"
     'make_arg' => q[],
-    # "make" command to run when running "make install"
+    # Command to run instead of "make" when running "make install"
     'make_install_make_command' => q[/usr/bin/make],
     # Arguments to pass to "make install"
-    'make_install_arg' => q[],
+    'make_install_arg' => q[UNINST=1],
 
     # Arguments to pass to Build.pl
     'mbuildpl_arg' => q[--installdirs site],
     # Arguments to pass to "./Build"
     'mbuild_arg' => q[],
-    # "./Build" command to run when running "./Build install"
+    # Command to run instead of "./Build" when running "./Build install"
     'mbuild_install_build_command' => q[./Build],
     # Arguments to pass to "./Build install"
-    'mbuild_install_arg' => q[],
+    'mbuild_install_arg' => q[--uninst=1],
 
     # Generate test reports (requires CPAN::Reporter)
     'test_report' => q[0],
@@ -147,9 +192,9 @@ $CPAN::Config = {
 
     # Permit installation of outdated distributions
     #
-    # Note: Any option other than "yes" requires CPAN::DistnameInfo.
-    #
     # Valid options: yes, no, ask/yes, ask/no
+    #
+    # Any option other than "yes" requires CPAN::DistnameInfo.
     'allow_installing_outdated_dists' => q[ask/no],
     # Permit installation of module downgrades
     #
@@ -197,7 +242,7 @@ $CPAN::Config = {
 
     # Cache metadata (requires Storable)
     #
-    # Note: Not used when use_sqlite is on and SQLite is running.
+    # Not used when "use_sqlite" is enabled and SQLite is running.
     'cache_metadata' => q[1],
     # Cache metadata with SQLite (requires CPAN::SQLite)
     'use_sqlite' => q[1],
@@ -224,7 +269,7 @@ $CPAN::Config = {
     # - none              Quiet
     # - v                 List of added directories
     'perl5lib_verbosity' => q[none],
-    # Verbosity level when using the tar command
+    # Verbosity level when using the "tar" command
     #
     # Valid options:
     # - none              Quiet
