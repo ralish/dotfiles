@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code settings
      *
-     * Last reviewed release: v1.103.1
+     * Last reviewed release: v1.104.2
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
@@ -64,6 +64,7 @@
     "workbench.enableExperiments": false,
     "workbench.list.smoothScrolling": true,
     "workbench.navigationControl.enabled": false,
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
     "workbench.startupEditor": "readme",
 
     // Workbench: Appearance
@@ -82,6 +83,7 @@
     // Workbench: Settings Editor
     "workbench.settings.editor": "json",
     "workbench.settings.enableNaturalLanguageSearch": false,
+    "workbench.settings.showAISearchToggle": false,
 
     // Workbench: Zen Mode
     "zenMode.centerLayout": false,
@@ -149,6 +151,8 @@
     "interactiveWindow.showExecutionHint": false,
 
     // Features: Chat
+    "chat.agent.thinkingStyle": "collapsedPreview",
+    "chat.tools.terminal.enableAutoApprove": false,
     "inlineChat.holdToSpeech": false,
 
     // Application: Telemetry
@@ -272,6 +276,7 @@
     // C/C++: Miscellanous
     "C_Cpp.autoAddFileAssociations": false,
     "C_Cpp.loggingLevel": "Warning",
+    "C_Cpp.windowsErrorReportingMode": "disabled",
 
     // C#: Text Editor
     "dotnet.formatting.organizeImportsOnFormat": true,
@@ -379,6 +384,8 @@
     // GitLens: Launchpad
     "gitlens.launchpad.indicator.enabled": false,
     "gitlens.launchpad.indicator.label": "counts",
+    // GitLens: Terminal
+    "gitlens.gitkraken.mcp.autoEnabled": false,
     // GitLens: AI
     "gitlens.ai.enabled": false,
     // GitLens: Date & Times

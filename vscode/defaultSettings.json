@@ -44,7 +44,7 @@
     // Enable diagnostic data to be collected. This helps us to better understand how Visual Studio Code is performing and where improvements need to be made. [Read more](https://go.microsoft.com/fwlink/?LinkId=521839) about what we collect and our privacy statement.
     "telemetry.enableTelemetry": true,
 
-    // Enable feedback mechanisms such as the issue reporter, surveys, and feedback options in features like Copilot Chat.
+    // Enable feedback mechanisms such as the issue reporter, surveys, and other feedback options.
     "telemetry.feedback.enabled": true,
 
     //
@@ -475,6 +475,7 @@
     //  - eamodio.gitlens: Supercharge Git within VS Code — Visualize code authorship at a glance via Git blame annotations and CodeLens, seamlessly navigate and explore Git repositories, gain valuable insights via rich visualizations and powerful comparison commands, and so much more
     //  - vscode.grunt: Extension to add Grunt capabilities to VS Code.
     //  - vscode.gulp: Extension to add Gulp capabilities to VSCode.
+    //  - exiasr.hadolint: Integrates hadolint, a Dockerfile linter, into VS Code.
     //  - ms-vscode.hexeditor: Allows viewing and editing files in a hex editor
     //  - VisualStudioExptTeam.intellicode-api-usage-examples: See relevant code examples from GitHub for over 100K different APIs right in your editor.
     //  - vscode.ipynb: Provides basic support for opening and reading Jupyter's .ipynb notebook files
@@ -485,6 +486,7 @@
     //  - vscode.media-preview: Provides VS Code's built-in previews for images, audio, and video
     //  - vscode.merge-conflict: Highlighting and commands for inline merge conflicts.
     //  - vscode.microsoft-authentication: Microsoft authentication provider
+    //  - vscjava.migrate-java-to-azure: Upgrade and migrate your Java applications to Azure
     //  - vscode.npm: Extension to add task support for npm scripts.
     //  - xdebug.php-debug: Debug support for PHP with Xdebug
     //  - esbenp.prettier-vscode: Code formatter using prettier
@@ -510,8 +512,8 @@
     //  - vscode-icons-team.vscode-icons: Icons for Visual Studio Code
     //  - vscjava.vscode-java-dependency: Manage Java projects in Visual Studio Code
     //  - vscjava.vscode-java-test: Run and debug JUnit or TestNG test cases.
+    //  - vscjava.vscode-java-upgrade: Upgrade Java project with GitHub Copilot
     //  - ms-vscode.vscode-js-profile-table: Text visualizer for profiles taken from the JavaScript debugger
-    //  - ms-kubernetes-tools.vscode-kubernetes-tools: Develop, deploy and debug Kubernetes applications
     //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - GitHub.vscode-pull-request-github: Pull Request and Issue Provider for GitHub
     //  - ms-python.vscode-python-envs: Provides a unified python environment experience
@@ -597,6 +599,7 @@
     //  - eamodio.gitlens: Supercharge Git within VS Code — Visualize code authorship at a glance via Git blame annotations and CodeLens, seamlessly navigate and explore Git repositories, gain valuable insights via rich visualizations and powerful comparison commands, and so much more
     //  - vscode.grunt: Extension to add Grunt capabilities to VS Code.
     //  - vscode.gulp: Extension to add Gulp capabilities to VSCode.
+    //  - exiasr.hadolint: Integrates hadolint, a Dockerfile linter, into VS Code.
     //  - ms-vscode.hexeditor: Allows viewing and editing files in a hex editor
     //  - VisualStudioExptTeam.intellicode-api-usage-examples: See relevant code examples from GitHub for over 100K different APIs right in your editor.
     //  - vscode.ipynb: Provides basic support for opening and reading Jupyter's .ipynb notebook files
@@ -607,6 +610,7 @@
     //  - vscode.media-preview: Provides VS Code's built-in previews for images, audio, and video
     //  - vscode.merge-conflict: Highlighting and commands for inline merge conflicts.
     //  - vscode.microsoft-authentication: Microsoft authentication provider
+    //  - vscjava.migrate-java-to-azure: Upgrade and migrate your Java applications to Azure
     //  - vscode.npm: Extension to add task support for npm scripts.
     //  - xdebug.php-debug: Debug support for PHP with Xdebug
     //  - vscode.references-view: Reference Search results as separate, stable view in the sidebar
@@ -629,8 +633,8 @@
     //  - vscode-icons-team.vscode-icons: Icons for Visual Studio Code
     //  - vscjava.vscode-java-dependency: Manage Java projects in Visual Studio Code
     //  - vscjava.vscode-java-test: Run and debug JUnit or TestNG test cases.
+    //  - vscjava.vscode-java-upgrade: Upgrade Java project with GitHub Copilot
     //  - ms-vscode.vscode-js-profile-table: Text visualizer for profiles taken from the JavaScript debugger
-    //  - ms-kubernetes-tools.vscode-kubernetes-tools: Develop, deploy and debug Kubernetes applications
     //  - GitHub.vscode-pull-request-github: Pull Request and Issue Provider for GitHub
     //  - ms-python.vscode-python-envs: Provides a unified python environment experience
     //  - VisualStudioExptTeam.vscodeintellicode: AI-assisted development
@@ -920,14 +924,17 @@
     // Controls whether to automatically show inline suggestions in the editor.
     "editor.inlineSuggest.enabled": true,
 
+    // Controls whether to show inline suggestions when there is a suggest conflict.
+    "editor.inlineSuggest.experimental.showOnSuggestConflict": "never",
+
     // Suppresses inline completions for specified extension IDs -- comma separated.
     "editor.inlineSuggest.experimental.suppressInlineSuggestions": "",
 
-    // Controls whether to trigger a command when the inline suggestion provider changes.
-    "editor.inlineSuggest.experimental.triggerCommandOnProviderChange": false,
-
     // Controls the font family of the inline suggestions.
     "editor.inlineSuggest.fontFamily": "default",
+
+    // Controls the minimal delay in milliseconds after which inline suggestions are shown after typing.
+    "editor.inlineSuggest.minShowDelay": 0,
 
     // Controls when to show the inline suggestion toolbar.
     //  - always: Show the inline suggestion toolbar whenever an inline suggestion is shown.
@@ -940,6 +947,9 @@
 
     // Controls whether to show syntax highlighting for inline suggestions in the editor.
     "editor.inlineSuggest.syntaxHighlightingEnabled": true,
+
+    // Controls whether to trigger a command when the inline suggestion provider changes.
+    "editor.inlineSuggest.triggerCommandOnProviderChange": true,
 
     // Insert spaces when pressing `Tab`. This setting is overridden based on the file contents when `editor.detectIndentation` is on.
     "editor.insertSpaces": true,
@@ -1135,7 +1145,7 @@
     // Controls if the editor should render the current line highlight only when the editor is focused.
     "editor.renderLineHighlightOnlyWhenFocus": false,
 
-    // Whether to render rich screen reader content when the `editor.editContext` is enabled.
+    // Whether to render rich screen reader content when the `editor.editContext` setting is enabled.
     "editor.renderRichScreenReaderContent": false,
 
     // Controls how the editor should render whitespace characters.
@@ -1801,6 +1811,7 @@
         "workflowStudio.asl": false,
         "gitlens.rebase": false,
         "decompiled.javaClass": false,
+        "migrate.java.formulaEditor": false,
         "java.formatterSettingsEditor": false,
         "workbench.input.interactive": false,
         "mainThreadWebview-markdown.preview": false,
@@ -1955,6 +1966,9 @@
     // Controls whether opened editors should show with an icon or not. This requires a file icon theme to be enabled as well.
     "workbench.editor.showIcons": true,
 
+    // When enabled, will show the tab index. This value is ignored when `workbench.editor.showTabs` is not set to `multiple`.
+    "workbench.editor.showTabIndex": false,
+
     // Controls whether opened editors should show as individual tabs, one single large tab or if the title area should not be shown.
     //  - multiple: Each editor is displayed as a tab in the editor title area.
     //  - single: The active editor is displayed as a single large tab in the editor title area.
@@ -2000,6 +2014,12 @@
     //  - default: The default size.
     //  - large: Increases the size, so it can be grabbed more easily with the mouse.
     "workbench.editor.titleScrollbarSizing": "default",
+
+    // Controls the visibility of the scrollbars used for tabs and breadcrumbs in the editor title area.
+    //  - auto: The horizontal scrollbar will be visible only when necessary.
+    //  - visible: The horizontal scrollbar will always be visible.
+    //  - hidden: The horizontal scrollbar will always be hidden.
+    "workbench.editor.titleScrollbarVisibility": "auto",
 
     // Controls the format of the label for an untitled editor.
     //  - content: The name of the untitled file is derived from the contents of its first line unless it has an associated file path. It will fallback to the name in case the line is empty or contains no word characters.
@@ -2169,13 +2189,13 @@
     // Controls the feedback area size in pixels of the dragging area in between views/editors. Set it to a larger value if you feel it's hard to resize views using the mouse.
     "workbench.sash.size": 4,
 
-    // Controls the default visibility of the secondary side bar in workspaces or empty windows opened for the first time.
+    // Controls the default visibility of the secondary side bar in workspaces or empty windows that are opened for the first time.
     //  - hidden: The secondary side bar is hidden by default.
     //  - visibleInWorkspace: The secondary side bar is visible by default if a workspace is opened.
     //  - visible: The secondary side bar is visible by default.
     //  - maximizedInWorkspace: The secondary side bar is visible and maximized by default if a workspace is opened.
     //  - maximized: The secondary side bar is visible and maximized by default.
-    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "workbench.secondarySideBar.defaultVisibility": "visibleInWorkspace",
 
     // Controls whether activity items in the secondary side bar title are shown as label or icon. This setting only has an effect when `workbench.activityBar.location` is not set to `top`.
     "workbench.secondarySideBar.showLabels": true,
@@ -2203,7 +2223,7 @@
     "workbench.settings.settingsSearchTocBehavior": "filter",
 
     // Controls whether the AI search results toggle is shown in the search bar in the Settings editor after doing a search and once AI search results are available.
-    "workbench.settings.showAISearchToggle": false,
+    "workbench.settings.showAISearchToggle": true,
 
     // Controls whether to use the split JSON editor when editing settings as JSON.
     "workbench.settings.useSplitJSON": false,
@@ -2401,7 +2421,13 @@
     // If enabled, will automatically change to high contrast theme if the OS is using a high contrast theme. The high contrast theme to use is specified by `workbench.preferredHighContrastColorTheme#` and `#workbench.preferredHighContrastLightColorTheme`.
     "window.autoDetectHighContrast": true,
 
-    // Controls the border color of the window. Set to `default` to respect Windows settings, `off` to disable or to a specific color in Hex, RGB, RGBA, HSL, HSLA format. This requires Windows to have the 'Show accent color on title bars and window borders' enabled and is ignored when `window.titleBarStyle` is set to `native`.
+    // Controls the border color of the window:
+    // - `default`: respect color theme settings, fallback to Windows settings
+    // - `system`: respect Windows settings only
+    // - `off`: disable border colors
+    // - `<color>`: specific color in Hex, RGB, RGBA, HSL, HSLA format
+    //
+    // Use `workbench.colorCustomizations#` to set different colors for active and inactive windows. This setting is ignored when `#window.titleBarStyle` is set to `native`.
     "window.border": "default",
 
     // Controls whether closing the last editor should also close the window. This setting only applies for windows that do not show folders.
@@ -2718,7 +2744,7 @@
     "dotnet.projects.enableAutomaticRestore": true,
 
     // Enables the preview "file-based programs" (dotnet run app.cs) experience.
-    "dotnet.projects.enableFileBasedPrograms": false,
+    "dotnet.projects.enableFileBasedPrograms": true,
 
     // Allows overriding the folder path for built in components of the language server (for example, override the .roslynDevKit path in the extension directory to use locally built components)
     "dotnet.server.componentPaths": {},
@@ -2748,7 +2774,7 @@
     "dotnet.server.waitForDebugger": false,
 
     // Enable Razor cohosting.
-    "razor.languageServer.cohostingEnabled": false,
+    "razor.languageServer.cohostingEnabled": true,
 
     // Specifies whether to wait for debug attach when launching the language server.
     "razor.languageServer.debug": false,
@@ -2894,7 +2920,13 @@
         "*.jsx": "${capture}.js",
         "*.tsx": "${capture}.ts",
         "tsconfig.json": "tsconfig.*.json",
-        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock"
+        "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock",
+        "*.cs": "${capture}.designer.cs,${capture}.g.cs,${capture}.generated.cs,${capture}.run.json,${capture}.settings.json,${capture}.settings.*.json",
+        "*.csproj": "${capture}.csproj.user",
+        "*.json": "${capture}.Development.json",
+        "*.cshtml": "${capture}.cshtml.cs,${capture}.cshtml.css",
+        "*.razor": "${capture}.razor.cs,${capture}.razor.css",
+        "*.xaml": "${capture}.xaml.cs"
     },
 
     // Controls which naming strategy to use when giving a new name to a duplicated Explorer item on paste.
@@ -4197,6 +4229,9 @@
     // Sets the module system for the program. See more: https://www.typescriptlang.org/tsconfig#module.
     "js/ts.implicitProjectConfig.module": "ESNext",
 
+    // Enable/disable [strict mode](https://www.typescriptlang.org/tsconfig#strict) in JavaScript and TypeScript files that are not part of a project. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
+    "js/ts.implicitProjectConfig.strict": true,
+
     // Enable/disable [strict function types](https://www.typescriptlang.org/tsconfig#strictFunctionTypes) in JavaScript and TypeScript files that are not part of a project. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
     "js/ts.implicitProjectConfig.strictFunctionTypes": true,
 
@@ -4204,7 +4239,7 @@
     "js/ts.implicitProjectConfig.strictNullChecks": true,
 
     // Set target JavaScript language version for emitted JavaScript and include library declarations. See more: https://www.typescriptlang.org/tsconfig#target.
-    "js/ts.implicitProjectConfig.target": "ES2022",
+    "js/ts.implicitProjectConfig.target": "ES2024",
 
     // Enable/disable automatic closing of JSX tags.
     "typescript.autoClosingTags": true,
@@ -5215,6 +5250,7 @@
     //  - all: Shows all branches
     //  - smart: Shows only relevant branches
     //  - current: Shows only the current branch
+    //  - favorited: Shows only favorited branches
     "gitlens.graph.branchesVisibility": "all",
 
     // Specifies the order by which commits will be shown on the _Commit Graph_
@@ -5265,8 +5301,11 @@
     // Specifies whether to show a minimap of commit activity above the _Commit Graph_
     "gitlens.graph.minimap.enabled": true,
 
-    // Specifies whether to allow selecting multiple commits in the _Commit Graph_
-    "gitlens.graph.multiselect": true,
+    // Specifies whether to allow selecting multiple commits and whether to restrict the selection topologically in the _Commit Graph_
+    //  - false: Disallows selecting multiple commits
+    //  - true: Allows selecting multiple commits without restriction
+    //  - topological: Allows selecting multiple commits topologically
+    "gitlens.graph.multiselect": "topological",
 
     // Specifies whether to only follow the first parent when showing commits on the _Commit Graph_
     "gitlens.graph.onlyFollowFirstParent": false,
@@ -5673,6 +5712,7 @@
     //  - eamodio.gitlens: Supercharge Git within VS Code — Visualize code authorship at a glance via Git blame annotations and CodeLens, seamlessly navigate and explore Git repositories, gain valuable insights via rich visualizations and powerful comparison commands, and so much more
     //  - vscode.grunt: Extension to add Grunt capabilities to VS Code.
     //  - vscode.gulp: Extension to add Gulp capabilities to VSCode.
+    //  - exiasr.hadolint: Integrates hadolint, a Dockerfile linter, into VS Code.
     //  - ms-vscode.hexeditor: Allows viewing and editing files in a hex editor
     //  - VisualStudioExptTeam.intellicode-api-usage-examples: See relevant code examples from GitHub for over 100K different APIs right in your editor.
     //  - vscode.ipynb: Provides basic support for opening and reading Jupyter's .ipynb notebook files
@@ -5683,6 +5723,7 @@
     //  - vscode.media-preview: Provides VS Code's built-in previews for images, audio, and video
     //  - vscode.merge-conflict: Highlighting and commands for inline merge conflicts.
     //  - vscode.microsoft-authentication: Microsoft authentication provider
+    //  - vscjava.migrate-java-to-azure: Upgrade and migrate your Java applications to Azure
     //  - vscode.npm: Extension to add task support for npm scripts.
     //  - xdebug.php-debug: Debug support for PHP with Xdebug
     //  - vscode.references-view: Reference Search results as separate, stable view in the sidebar
@@ -5705,8 +5746,8 @@
     //  - vscode-icons-team.vscode-icons: Icons for Visual Studio Code
     //  - vscjava.vscode-java-dependency: Manage Java projects in Visual Studio Code
     //  - vscjava.vscode-java-test: Run and debug JUnit or TestNG test cases.
+    //  - vscjava.vscode-java-upgrade: Upgrade Java project with GitHub Copilot
     //  - ms-vscode.vscode-js-profile-table: Text visualizer for profiles taken from the JavaScript debugger
-    //  - ms-kubernetes-tools.vscode-kubernetes-tools: Develop, deploy and debug Kubernetes applications
     //  - GitHub.vscode-pull-request-github: Pull Request and Issue Provider for GitHub
     //  - ms-python.vscode-python-envs: Provides a unified python environment experience
     //  - VisualStudioExptTeam.vscodeintellicode: AI-assisted development
@@ -5988,7 +6029,7 @@
     //
     // Set to `true` to automatically approve commands, `false` to always require explicit approval or `null` to unset the value.
     //
-    // Note that these commands and regular expressions are evaluated for every _sub-command_ within the full _command line_, so `foo && bar` for example will need both `foo` and `bar` to match a `true` entry and must not match a `false` entry in order to auto approve. Inline commands are also detected so `echo $(rm file)` will need both `echo $(rm file)` and `rm file` to pass.
+    // Note that these commands and regular expressions are evaluated for every _sub-command_ within the full _command line_, so `foo && bar` for example will need both `foo` and `bar` to match a `true` entry and must not match a `false` entry in order to auto approve. Inline commands such as `$(foo)` (command sustitution) or `<(foo)` (process substitution) are currently blocked by default via broad rules that detect these patterns.
     //
     // An object can be used to match against the full command line instead of matching sub-commands and inline commands, for example `{ approve: false, matchCommandLine: true }`. In order to be auto approved _both_ the sub-command and command line must not be explicitly denied, then _either_ all sub-commands or command line needs to be approved.
     //
@@ -5997,24 +6038,118 @@
     // |---|---|
     // | `"mkdir": true` | Allow all commands starting with `mkdir`
     // | `"npm run build": true` | Allow all commands starting with `npm run build`
-    // | `"/^git (status\|show\b.*)$/": true` | Allow `git status` and all commands starting with `git show`
-    // | `"/^Get-ChildItem\b/i": true` | will allow `Get-ChildItem` commands regardless of casing
+    // | `"bin/test.sh": true` | Allow all commands that match the path `bin/test.sh` (`bin\test.sh`, `./bin/test.sh`, etc.)
+    // | `"/^git (status\|show\\b.*)$/": true` | Allow `git status` and all commands starting with `git show`
+    // | `"/^Get-ChildItem\\b/i": true` | will allow `Get-ChildItem` commands regardless of casing
     // | `"/.*/": true` | Allow all commands (denied commands still require approval)
     // | `"rm": false` | Require explicit approval for all commands starting with `rm`
-    // | `"/.ps1/i": { approve: false, matchCommandLine: true }` | Require explicit approval for any _command line_ that contains `".ps1"` regardless of casing
+    // | `"/\\.ps1/i": { approve: false, matchCommandLine: true }` | Require explicit approval for any _command line_ that contains `".ps1"` regardless of casing
     // | `"rm": null` | Unset the default `false` value for `rm`
     "chat.tools.terminal.autoApprove": {
+        "cd": true,
+        "echo": true,
+        "ls": true,
+        "pwd": true,
+        "cat": true,
+        "head": true,
+        "tail": true,
+        "findstr": true,
+        "wc": true,
+        "tr": true,
+        "cut": true,
+        "cmp": true,
+        "which": true,
+        "basename": true,
+        "dirname": true,
+        "realpath": true,
+        "readlink": true,
+        "stat": true,
+        "file": true,
+        "du": true,
+        "df": true,
+        "sleep": true,
+        "git status": true,
+        "git log": true,
+        "git show": true,
+        "git diff": true,
+        "Get-ChildItem": true,
+        "Get-Content": true,
+        "Get-Date": true,
+        "Get-Random": true,
+        "Get-Location": true,
+        "Write-Host": true,
+        "Write-Output": true,
+        "Split-Path": true,
+        "Join-Path": true,
+        "Start-Sleep": true,
+        "Where-Object": true,
+        "/^Select-[a-z0-9]/i": true,
+        "/^Measure-[a-z0-9]/i": true,
+        "/^Compare-[a-z0-9]/i": true,
+        "/^Format-[a-z0-9]/i": true,
+        "/^Sort-[a-z0-9]/i": true,
+        "column": true,
+        "/^column\\b.*-c\\s+[0-9]{4,}/": false,
+        "date": true,
+        "/^date\\b.*(-s|--set)\\b/": false,
+        "find": true,
+        "/^find\\b.*-(delete|exec|execdir|fprint|fprintf|fls|ok|okdir)\\b/": false,
+        "grep": true,
+        "/^grep\\b.*-(f|P)\\b/": false,
+        "sort": true,
+        "/^sort\\b.*-(o|S)\\b/": false,
+        "tree": true,
+        "/^tree\\b.*-o\\b/": false,
+        "/\\(.+\\)/": {
+            "approve": false,
+            "matchCommandLine": true
+        },
+        "/\\{.+\\}/": {
+            "approve": false,
+            "matchCommandLine": true
+        },
+        "/`.+`/": {
+            "approve": false,
+            "matchCommandLine": true
+        },
         "rm": false,
         "rmdir": false,
         "del": false,
+        "Remove-Item": false,
+        "ri": false,
+        "rd": false,
+        "erase": false,
+        "dd": false,
         "kill": false,
+        "ps": false,
+        "top": false,
+        "Stop-Process": false,
+        "spps": false,
+        "taskkill": false,
+        "taskkill.exe": false,
         "curl": false,
         "wget": false,
-        "eval": false,
+        "Invoke-RestMethod": false,
+        "Invoke-WebRequest": false,
+        "irm": false,
+        "iwr": false,
         "chmod": false,
         "chown": false,
-        "/^Remove-Item\\b/i": false
+        "Set-ItemProperty": false,
+        "sp": false,
+        "Set-Acl": false,
+        "jq": false,
+        "xargs": false,
+        "eval": false,
+        "Invoke-Expression": false,
+        "iex": false
     },
+
+    // Controls whether to allow auto approval in the run in terminal tool.
+    "chat.tools.terminal.enableAutoApprove": true,
+
+    // Configures the duration in milliseconds to wait for shell integration to be detected when the run in terminal tool launches a new terminal. Set to `0` to wait the minimum time, the default value `-1` means the wait time is variable based on the value of `terminal.integrated.shellIntegration.enabled` and whether it's a remote window. A large value can be useful if your shell starts very slowly and a low value if you're intentionally not using shell integration.
+    "chat.tools.terminal.shellIntegrationTimeout": -1,
 
     // Use `chat.tools.terminal.autoApprove` instead
     //
@@ -6205,6 +6340,7 @@
     // - workbench.action.terminal.moveToTerminalPanel
     // - workbench.action.terminal.new
     // - workbench.action.terminal.newInActiveWorkspace
+    // - workbench.action.terminal.newInNewWindow
     // - workbench.action.terminal.paste
     // - workbench.action.terminal.pasteSelection
     // - workbench.action.terminal.requestCompletions
@@ -6308,6 +6444,9 @@
     //  - Ubuntu (WSL): $(terminal-ubuntu) Ubuntu (WSL)
     // - path: C:\WINDOWS\System32\wsl.exe
     // - args: ['-d','Ubuntu']
+    //  - kali-linux (WSL): $(terminal-linux) kali-linux (WSL)
+    // - path: C:\WINDOWS\System32\wsl.exe
+    // - args: ['-d','kali-linux']
     //  - JavaScript Debug Terminal: $($(debug)) JavaScript Debug Terminal
     // - extensionIdentifier: ms-vscode.js-debug
     //  - Azure Cloud Shell (Bash): $($(azure)) Azure Cloud Shell (Bash)
@@ -6722,7 +6861,7 @@
     "terminal.integrated.splitCwd": "inherited",
 
     // Shows the current command at the top of the terminal. This feature requires [shell integration](https://code.visualstudio.com/docs/terminal/shell-integration) to be activated. See `terminal.integrated.shellIntegration.enabled`.
-    "terminal.integrated.stickyScroll.enabled": false,
+    "terminal.integrated.stickyScroll.enabled": true,
 
     // Defines the maximum number of sticky lines to show. Sticky scroll lines will never exceed 40% of the viewport regardless of this setting.
     "terminal.integrated.stickyScroll.maxLineCount": 5,
@@ -6734,8 +6873,6 @@
     "terminal.integrated.suggest.cdPath": "absolute",
 
     // Enables terminal intellisense suggestions (preview) for supported shells (PowerShell v7+, zsh, bash, fish) when `terminal.integrated.shellIntegration.enabled` is set to `true`.
-    //
-    // If shell integration is installed manually, `VSCODE_SUGGEST` needs to be set to `1` before calling the shell integration script.
     "terminal.integrated.suggest.enabled": false,
 
     // Controls whether the shell's inline suggestion should be detected and how it is scored.
@@ -7401,6 +7538,9 @@
     //  - edit-sparkle: $(edit-sparkle)
     //  - copilot-snooze: $(copilot-snooze)
     //  - send-to-remote-agent: $(send-to-remote-agent)
+    //  - comment-discussion-sparkle: $(comment-discussion-sparkle)
+    //  - chat-sparkle-warning: $(chat-sparkle-warning)
+    //  - chat-sparkle-error: $(chat-sparkle-error)
     //  - dialog-error: $(dialog-error)
     //  - dialog-warning: $(dialog-warning)
     //  - dialog-info: $(dialog-info)
@@ -7562,7 +7702,7 @@
 
     // Providers are enabled by default. Omit them by setting the id of the provider to `false`.
     "terminal.integrated.suggest.providers": {
-        "core:pwsh-shell-integration": false,
+        "lsp": false,
         "terminal-suggest": true
     },
 
@@ -8781,6 +8921,9 @@
     // Specifies whether to enable experimental integration with the GitKraken CLI
     "gitlens.gitkraken.cli.integration.enabled": false,
 
+    // Specifies whether to automatically install and enable the GitKraken MCP. This only applies to VS Code 1.101 and later.
+    "gitlens.gitkraken.mcp.autoEnabled": true,
+
     // Specifies whether to use VS Code as Git's `core.editor` for Gitlens terminal commands
     "gitlens.terminal.overrideGitEditor": true,
 
@@ -8796,6 +8939,9 @@
     // Specifies whether to enable GitLens' AI-powered features
     "gitlens.ai.enabled": true,
 
+    // Specifies whether to enable the experimental version of the commit composer
+    "gitlens.ai.experimental.composer.enabled": false,
+
     // Specifies custom instructions to provide to the AI provider when generating a summary of changes
     "gitlens.ai.explainChanges.customInstructions": null,
 
@@ -8804,6 +8950,9 @@
 
     // Specifies custom instructions to provide to the AI provider when generating a commit message
     "gitlens.ai.generateCommitMessage.customInstructions": null,
+
+    // Specifies custom instructions to provide to the AI provider when generating commits
+    "gitlens.ai.generateCommits.customInstructions": null,
 
     // Specifies custom instructions to provide to the AI provider when generating a cloud patch title and description
     "gitlens.ai.generateCreateCloudPatch.customInstructions": null,
@@ -8934,7 +9083,8 @@
             "worktree": true
         },
         "scm": {
-            "graph": true
+            "graph": true,
+            "visualHistory": true
         },
         "scmRepositoryInline": {
             "generateCommitMessage": true,
@@ -8944,8 +9094,9 @@
         "scmRepository": {
             "authors": true,
             "generateCommitMessage": true,
+            "graph": true,
             "patch": true,
-            "graph": false
+            "visualHistory": true
         },
         "scmGroupInline": {
             "stash": true
@@ -9448,11 +9599,18 @@
         }
     },
 
-    // Enable agent mode for Copilot Chat. When this is enabled, agent mode can be activated via the dropdown in the view.
+    // Enable agent mode for chat. When this is enabled, agent mode can be activated via the dropdown in the view.
     "chat.agent.enabled": true,
 
-    // The maximum number of requests to allow Copilot to use per-turn in agent mode. When the limit is reached, Copilot will ask the user to confirm that it should continue.
+    // The maximum number of requests to allow per-turn in agent mode. When the limit is reached, will ask to confirm to continue.
     "chat.agent.maxRequests": 25,
+
+    // Controls how thinking is rendered.
+    //  - collapsed: Thinking parts will be collapsed by default.
+    //  - collapsedPreview: Thinking parts will be expanded first, then collapse once we reach a part that is not thinking.
+    //  - expanded: Thinking parts will be expanded by default.
+    //  - none: Do not show the thinking
+    "chat.agent.thinkingStyle": "collapsed",
 
     // Controls where to show the agent sessions menu.
     "chat.agentSessionsViewLocation": "disabled",
@@ -9463,11 +9621,14 @@
     // Controls whether to show chat checkpoint file changes.
     "chat.checkpoints.showFileChanges": false,
 
-    // Controls whether the command center shows a menu for actions to control Copilot (requires `window.commandCenter`).
+    // Controls whether the command center shows a menu for actions to control chat (requires `window.commandCenter`).
     "chat.commandCenter.enabled": true,
 
     // Enables chat participant autodetection for panel chat.
     "chat.detectParticipant.enabled": true,
+
+    // Disable and hide built-in AI features provided by GitHub Copilot, including chat, code completions and next edit suggestions.
+    "chat.disableAIFeatures": false,
 
     // Delay after which changes made by chat are automatically accepted. Values are in seconds, `0` means disabled and `100` seconds is the maximum.
     "chat.editing.autoAcceptDelay": 0,
@@ -9497,10 +9658,13 @@
     "chat.editRequests": "inline",
 
     // Enable the new Edits mode that is based on tool-calling. When this is enabled, models that don't support tool-calling are unavailable for Edits mode.
-    "chat.edits2.enabled": true,
+    "chat.edits2.enabled": false,
 
     // Shows a modified empty chat state with hints in the input placeholder text.
     "chat.emptyChatState.enabled": true,
+
+    // Show recent chat history on the empty chat state.
+    "chat.emptyState.history.enabled": false,
 
     // This setting is deprecated. Please use `chat.detectParticipant.enabled` instead.
     // Enables chat participant autodetection for panel chat.
@@ -9508,6 +9672,12 @@
 
     // Enable using tools contributed by third-party extensions.
     "chat.extensionTools.enabled": true,
+
+    // Controls the font family in chat messages.
+    "chat.fontFamily": "default",
+
+    // Controls the font size in pixels in chat messages.
+    "chat.fontSize": 13,
 
     // Enables automatically using the active editor as chat context for specified chat locations.
     "chat.implicitContext.enabled": {
@@ -9524,8 +9694,14 @@
         ".github/instructions": true
     },
 
-    // Enable math rendering in chat responses using Katex.
-    "chat.math.enabled": false,
+    // Enable math rendering in chat responses using KaTeX.
+    "chat.math.enabled": true,
+
+    // Controls access to Model Context Protocol servers.
+    //  - none: No access to MCP servers.
+    //  - registry: Only allow access to MCP servers from the registry.
+    //  - all: Allow access to any MCP server.
+    "chat.mcp.access": "all",
 
     // Enables NuGet packages for AI-assisted MCP server installation. Used to install MCP servers by name from the central registry for .NET packages (NuGet.org).
     "chat.mcp.assisted.nuget.enabled": false,
@@ -9536,11 +9712,13 @@
     //  - newAndOutdated: Automatically start new and outdated MCP servers that are not yet running.
     "chat.mcp.autostart": "never",
 
-    // Configures discovery of Model Context Protocol servers on the machine. It may be set to `true` or `false` to disable or enable all sources, and an mapping sources you wish to enable.
-    "chat.mcp.discovery.enabled": true,
-
-    // Enables integration with Model Context Protocol servers to provide additional tools and functionality.
-    "chat.mcp.enabled": true,
+    // Configures discovery of Model Context Protocol servers from configuration from various other applications.
+    "chat.mcp.discovery.enabled": {
+        "claude-desktop": false,
+        "windsurf": false,
+        "cursor-global": false,
+        "cursor-workspace": false
+    },
 
     // Configures which models are exposed to MCP servers for sampling (making model requests in the background). This setting can be edited in a graphical way under the `MCP: List Servers` command.
     "chat.mcp.serverSampling": {},
@@ -9552,7 +9730,7 @@
         ".github/chatmodes": true
     },
 
-    // Controls whether the Copilot window should notify the user when a confirmation is needed while the window is not in focus. This includes a window badge as well as notification toast.
+    // Controls whether a chat session should notify the user when a confirmation is needed while the window is not in focus. This includes a window badge as well as notification toast.
     "chat.notifyWindowOnConfirmation": true,
 
     // Enable reusable prompt (`*.prompt.md`) and instruction files (`*.instructions.md`) in Chat sessions. [Learn More](https://aka.ms/vscode-ghcp-prompt-snippets).
@@ -9564,6 +9742,9 @@
     "chat.promptFilesLocations": {
         ".github/prompts": true
     },
+
+    // Configure which prompt files to recommend in the chat welcome view. Each key is a prompt file name, and the value can be `true` to always recommend, `false` to never recommend, or a [when clause](https://aka.ms/vscode-when-clause) expression like `resourceExtname == .js` or `resourceLangId == markdown`.
+    "chat.promptFilesRecommendations": {},
 
     // Controls whether related files should be rendered in the chat input.
     "chat.renderRelatedFiles": false,
@@ -9580,21 +9761,39 @@
     // Control variations of the sign-in dialog.
     "chat.setup.signInDialogVariant": "default",
 
-    // Enables todo lists in chat. This tool allows you to use todo lists in chat.
+    // Controls whether session descriptions are displayed on a second row in the Chat Sessions view.
+    "chat.showAgentSessionsViewDescription": true,
+
+    // Enables todo lists in chat, which the agent uses as a tool for planning, progress tracking, and context management for complex development workflows.
     "chat.todoListTool.enabled": false,
 
-    // Controls whether tool use should be automatically approved.
-    //
-    // Allows _all_ tools to run automatically without user confirmation, overriding any tool-specific settings such as terminal auto-approval.
-    //
-    // Use with caution: carefully review selected tools and be extra wary of possible sources of prompt injection!
-    "chat.tools.autoApprove": false,
+    // When enabled, the todo tool operates in write-only mode, requiring the agent to remember todos in context.
+    "chat.todoListTool.writeOnly": false,
 
-    // Use the new Quick Tree-based tools picker instead of the Quick Pick-based one. Provides better hierarchical organization of tools and tool sets with collapsible sections, improved visual hierarchy, and native tree interactions.
-    "chat.tools.useTreePicker": true,
+    // Controls whether edits made by chat are automatically approved. The default is to approve all edits except those made to certain files which have the potential to cause immediate unintended side-effects, such as `**/.vscode/*.json`.
+    //
+    // Files are matched against the glob patterns in the order they are specified.
+    "chat.tools.edits.autoApprove": {
+        "**/*": true,
+        "**/.vscode/*.json": false,
+        "**/.git/**": false,
+        "**/{package.json,package-lock.json,server.xml,build.rs,web.config,.gitattributes,.env}": false,
+        "**/*.{csproj,fsproj,vbproj}": false
+    },
+
+    // Global auto approve also known as "YOLO mode" disables manual approval completely for _all tools in all workspaces_, allowing the agent to act fully autonomously. This is extremely dangerous and is *never* recommended, even containerized environments like [Codespaces](https://github.com/features/codespaces) and [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) have user keys forwarded into the container that could be compromised.
+    //
+    // **This feature disables [critical security protections](https://code.visualstudio.com/docs/copilot/security) and makes it much easier for an attacker to compromise the machine.**
+    "chat.tools.global.autoApprove": false,
 
     // Controls whether the input of the chat should be restored when an undo request is made. The input will be filled with the text of the request that was restored.
     "chat.undoRequests.restoreInput": true,
+
+    // Controls whether instructions from `AGENTS.MD` file found in a workspace roots are added to all chat requests.
+    "chat.useAgentsMdFile": true,
+
+    // Controls whether the 'Delegate to coding agent' button uses the new chat sessions API.
+    "chat.useChatSessionsForCloudButton": false,
 
     // Enables storing chat sessions on disk instead of in the storage service. Enabling this does a one-time per-workspace migration of existing sessions to the new format.
     "chat.useFileStorage": true,
@@ -10405,6 +10604,9 @@
     // Controls whether to show the GitHub avatar of the commit author in various hovers (ex: Git blame, Timeline, Source Control Graph, etc.)
     "github.showAvatar": true,
 
+    // When true, uses Electron's built-in fetch function for HTTP requests. When false, uses the Node.js global fetch function. This setting only applies when running in the Electron environment. **Note:** A restart is required for this setting to take effect.
+    "github-authentication.useElectronFetch": true,
+
     // The URI for your GHE.com or GitHub Enterprise Server instance.
     //
     // Examples:
@@ -10467,8 +10669,9 @@
 
     // The authentication implementation to use for signing in with a Microsoft account.
     //
-    // *NOTE: The `classic` implementation is deprecated and will be removed, along with this setting, in a future release. If only the `classic` implementation works for you, please [open an issue](command:workbench.action.openIssueReporter) and explain what you are trying to log in to.*
+    // *NOTE: The `classic` implementation is deprecated and will be removed in a future release. If the `msal` implementation does not work for you, please [open an issue](command:workbench.action.openIssueReporter) and explain what you are trying to log in to.*
     //  - msal: Use the Microsoft Authentication Library (MSAL) to sign in with a Microsoft account.
+    //  - msal-no-broker: Use the Microsoft Authentication Library (MSAL) to sign in with a Microsoft account using a browser. This is useful if you are having issues with the native broker.
     //  - classic: (deprecated) Use the classic authentication flow to sign in with a Microsoft account.
     "microsoft-authentication.implementation": "msal",
 
@@ -11028,6 +11231,11 @@
     // **This setting is not supported by the native server.**
     "ruff.format.args": [],
 
+    // The backend to use for formatting.
+    //  - internal: Use Ruff's built-in formatter.
+    //  - uv: Use uv for formatting (requires uv >= 0.8.13)
+    "ruff.format.backend": "internal",
+
     // Enable [preview mode](https://docs.astral.sh/ruff/settings/#format_preview) for the formatter; enables unstable formatting.
     //
     // **This setting is used only by the native server.**
@@ -11467,6 +11675,18 @@
     // This extension will process files in `node_modules`.
     "prettier.withNodeModules": false,
 
+    // A list of supported hadolint CLI options
+    "hadolint.cliOptions": ["--no-color"],
+
+    // Path to hadolint executable. Windows user, make sure you escape the back slash in the path, e.g, C:\\path\to\\hadolint\\excutable
+    "hadolint.hadolintPath": "hadolint",
+
+    // Controls the maximum number of problems produced by the server.
+    "hadolint.maxNumberOfProblems": 100,
+
+    // Set the default output level of hadolint message.
+    "hadolint.outputLevel": "warning",
+
     // the trigger effect  on the language
     "shellformat.effectLanguages": [
         "shellscript",
@@ -11507,9 +11727,6 @@
 
     // Automatically fix diagnostics for edited files.
     "github.copilot.chat.agent.autoFix": true,
-
-    // Configures whether Copilot Edits can run workspace tasks in agent mode.
-    "github.copilot.chat.agent.runTasks": true,
 
     // Controls whether code instructions from `.github/copilot-instructions.md` are added to Copilot requests.
     //
@@ -11552,6 +11769,9 @@
     // Controls if Copilot commands are shown as Code Actions when available
     "github.copilot.editor.enableCodeActions": true,
 
+    // Whether to allow whitespace-only changes be proposed by next edit suggestions (NES).
+    "github.copilot.nextEditSuggestions.allowWhitespaceOnlyChanges": true,
+
     // Whether to enable next edit suggestions (NES).
     //
     // NES can propose a next edit based on your recent changes. [Learn more](https://aka.ms/vscode-nes) about next edit suggestions.
@@ -11572,9 +11792,8 @@
     // Whether the `copilot-debug` command is enabled in the terminal.
     "github.copilot.chat.copilotDebugCommand.enabled": true,
 
-    // This setting is deprecated in favor of `github.copilot.chat.codesearch.enabled`.
-    //
-    "github.copilot.chat.edits.codesearch.enabled": false,
+    // Enables the code review agent.
+    "github.copilot.chat.reviewAgent.enabled": true,
 
     // Enables code review on current selection.
     "github.copilot.chat.reviewSelection.enabled": true,
@@ -11596,6 +11815,9 @@
     // Enables the thinking tool that allows Copilot to think deeply about your request before generating a response in agent mode.
     "github.copilot.chat.agent.thinkingTool": false,
 
+    // Enables an experimental alternate prompt for GPT models instead of the default prompt.
+    "github.copilot.chat.alternateGptPrompt.enabled": false,
+
     // Configure custom Azure OpenAI models. Each key should be a unique model ID, and the value should be an object with model configuration including name, url, toolCalling, vision, maxInputTokens, and maxOutputTokens properties.
     "github.copilot.chat.azureModels": {},
 
@@ -11616,11 +11838,11 @@
     // Note: Keep your instructions short and precise. Poor instructions can degrade Copilot's quality and performance.
     "github.copilot.chat.commitMessageGeneration.instructions": [],
 
+    // Configure custom OpenAI-compatible models. Each key should be a unique model ID, and the value should be an object with model configuration including name, url, toolCalling, vision, maxInputTokens, and maxOutputTokens properties.
+    "github.copilot.chat.customOAIModels": {},
+
     // When making inline chat request whether to include recently viewed and edited files with Copilot requests.
     "github.copilot.chat.editor.temporalContext.enabled": false,
-
-    // Whether to enable the new notebook tool in Copilot Edits.
-    "github.copilot.chat.edits.newNotebook.enabled": true,
 
     // Whether to suggest source files from test files for the Copilot Edits working set.
     "github.copilot.chat.edits.suggestRelatedFilesForTests": true,
@@ -11631,11 +11853,14 @@
     // When making edits request whether to include recently viewed and edited files with Copilot requests.
     "github.copilot.chat.edits.temporalContext.enabled": false,
 
-    // Enables retrying after a filtered response. If enabled, Copilot Chat will retry the request after a content filter blocks the response.
-    "github.copilot.chat.enableRetryAfterFilteredResponse": false,
-
     // Show 'Generate tests' code lens for symbols that are not covered by current test coverage information.
     "github.copilot.chat.generateTests.codeLens": false,
+
+    // Specifies an experimental alternate prompt to use for GPT-5 models.
+    "github.copilot.chat.gpt5AlternatePrompt": "default",
+
+    // Specifies an experimental alternate prompt to use for Grok Code models.
+    "github.copilot.chat.grokCodeAlternatePrompt": "default",
 
     // Enables the TypeScript language context provider for /fix commands
     "github.copilot.chat.languageContext.fix.typescript.enabled": false,
@@ -11655,6 +11880,9 @@
     // Whether to enable new agentic workspace creation.
     "github.copilot.chat.newWorkspaceCreation.enabled": true,
 
+    // Controls whether to use an enhanced approach for generating next edit suggestions in notebook cells.
+    "github.copilot.chat.notebook.enhancedNextEditSuggestions.enabled": false,
+
     // Controls whether the currently executing cell is revealed into the viewport upon execution from Copilot.
     "github.copilot.chat.notebook.followCellExecution.enabled": false,
 
@@ -11665,6 +11893,12 @@
     //
     // Note: Keep your instructions short and precise. Poor instructions can degrade Copilot's quality and performance.
     "github.copilot.chat.pullRequestDescriptionGeneration.instructions": [],
+
+    // Sets the reasoning effort used for the Responses API. Requires `github.copilot.chat.useResponsesApi`.
+    "github.copilot.chat.responsesApiReasoningEffort": "default",
+
+    // Sets the reasoning summary style used for the Responses API. Requires `github.copilot.chat.useResponsesApi`.
+    "github.copilot.chat.responsesApiReasoningSummary": "detailed",
 
     // Enables the `/setupTests` intent and prompting in `/tests` generation.
     "github.copilot.chat.setupTests.enabled": true,
@@ -11680,6 +11914,11 @@
     //
     // Note: Keep your instructions short and precise. Poor instructions can degrade Copilot's quality and performance.
     "github.copilot.chat.testGeneration.instructions": [],
+
+    // Use the Responses API instead of the Chat Completions API when supported. Enables reasoning and reasoning summaries.
+    //
+    // **Note**: This is an experimental feature that is not yet activated for all users.
+    "github.copilot.chat.useResponsesApi": false,
 
     // This setting defines the tool count over which virtual tools should be used. Virtual tools group similar sets of tools together and they allow the model to activate them on-demand. Certain tool groups will optimistically be pre-activated. We are actively developing this feature and you experience degraded tool calling once the threshold is hit.
     //
@@ -11783,7 +12022,7 @@
     "githubIssues.ignoreUserCompletionTrigger": [],
 
     // Advanced settings for the name of the branch that is created when you start working on an issue.
-    // - `${user}` will be replace with the currently logged in username
+    // - `${user}` will be replaced with the currently logged in username
     // - `${issueNumber}` will be replaced with the current issue number
     // - `${sanitizedIssueTitle}` will be replaced with the issue title, with all spaces and unsupported characters (https://git-scm.com/docs/git-check-ref-format) removed. For lowercase, use `${sanitizedLowercaseIssueTitle}`
     "githubIssues.issueBranchTitle": "${user}/issue${issueNumber}",
@@ -11908,6 +12147,9 @@
     // Prevents branches that are associated with a pull request from being automatically detected. This will prevent review mode from being entered on these branches.
     "githubPullRequests.ignoredPullRequestBranches": [],
 
+    // Prevents repositories that are submodules from being managed by the GitHub Pull Requests extension.
+    "githubPullRequests.ignoreSubmodules": false,
+
     // The setting `githubPullRequests.includeRemotes` has been deprecated. Use `githubPullRequests.remotes` to configure what remotes are shown.
     // By default we only support remotes created by users. If you want to see pull requests from remotes this extension created for pull requests, change this setting to 'all'.
     "githubPullRequests.includeRemotes": "default",
@@ -11936,10 +12178,10 @@
     //  - checkoutDefaultBranchAndCopy: Checkout the default branch of the repository and copy a link to the pull request to the clipboard
     "githubPullRequests.postCreate": "openOverview",
 
-    // Pull changes from the remote when a PR branch is checked out locally. Changes are detected when the PR is manually refreshed and during periodic background updates.
-    //  - prompt: Prompt to pull a PR branch when changes are detected in the PR.
-    //  - never: Never pull a PR branch when changes are detected in the PR.
-    //  - always: Always pull a PR branch when changes are detected in the PR. When `"git.autoStash": true` this will instead `prompt` to prevent unexpected file changes.
+    // Pull changes from the remote when a pull request branch is checked out locally. Changes are detected when the pull request is manually refreshed and during periodic background updates.
+    //  - prompt: Prompt to pull a pull request branch when changes are detected in the pull request.
+    //  - never: Never pull a pull request branch when changes are detected in the pull request.
+    //  - always: Always pull a pull request branch when changes are detected in the pull request. When `"git.autoStash": true` this will instead `prompt` to prevent unexpected file changes.
     "githubPullRequests.pullBranch": "prompt",
 
     // Controls whether the pull request branch is pulled before checkout. Can also be set to additionally merge updates from the base branch.
@@ -11964,18 +12206,36 @@
     //  - ask: Ask which of the above methods to use
     "githubPullRequests.pullRequestTitle": "ask",
 
-    // Push the "from" branch when creating a PR and the "from" branch is not available on the remote.
-    //  - prompt: Prompt to push the branch when creating a PR and the "from" branch is not available on the remote.
-    //  - always: Always push the branch when creating a PR and the "from" branch is not available on the remote.
+    // Push the "from" branch when creating a pull request and the "from" branch is not available on the remote.
+    //  - prompt: Prompt to push the branch when creating a pull request and the "from" branch is not available on the remote.
+    //  - always: Always push the branch when creating a pull request and the "from" branch is not available on the remote.
     "githubPullRequests.pushBranch": "prompt",
 
-    // Specifies what queries should be used in the GitHub Pull Requests tree. All queries are made against **the currently opened repos**. Each query object has a `label` that will be shown in the tree and a search `query` using [GitHub search syntax](https://help.github.com/en/articles/understanding-the-search-syntax). The following variables can be used:
-    //  - `${user}` will resolve to the currently logged in user
-    //  - `${owner}` will resolve to the owner of the current repository, ex. `microsoft` in `microsoft/vscode`
-    //  - `${repository}` will resolve to the repository name, ex. `vscode` in `microsoft/vscode`
-    //  - `${today-Nd}`, where `N` is the number of days ago, will resolve to a date, ex. `2025-01-04`.
+    // Specifies what queries should be used in the GitHub Pull Requests tree. All queries are made against **the currently opened repos**. Each query object has a `label` that will be shown in the tree and a search `query` using [GitHub search syntax](https://help.github.com/en/articles/understanding-the-search-syntax). By default these queries define the categories "Copilot on My Behalf", "Local Pull Request Branches", "Waiting For My Review", "Assigned To Me" and "Created By Me". If you want to preserve these, make sure they are still in the array when you modify the setting.
     //
-    //  By default these queries define the categories "Waiting For My Review", "Assigned To Me" and "Created By Me". If you want to preserve these, make sure they are still in the array when you modify the setting.
+    // **Variables available:**
+    //  - `${user}` - currently logged in user
+    //  - `${owner}` - repository owner, ex. `microsoft` in `microsoft/vscode`
+    //  - `${repository}` - repository name, ex. `vscode` in `microsoft/vscode`
+    //  - `${today-Nd}` - date N days ago, ex. `${today-7d}` becomes `2025-01-04`
+    //
+    // **Example custom queries:**
+    // ```json
+    // "githubPullRequests.queries": [
+    //   {
+    //     "label": "Waiting For My Review",
+    //     "query": "is:open review-requested:${user}"
+    //   },
+    //   {
+    //     "label": "Mentioned Me",
+    //     "query": "is:open mentions:${user}"
+    //   },
+    //   {
+    //     "label": "Recent Activity",
+    //     "query": "is:open updated:>${today-7d}"
+    //   }
+    // ]
+    // ```
     "githubPullRequests.queries": [
         {
             "label": "Copilot on My Behalf",
@@ -12198,6 +12458,22 @@
     // ```
     //
     "go.inlayHints.functionTypeParameters": false,
+
+    // `"ignoredError"` inlay hints for implicitly discarded errors:
+    // ```go
+    // 	f.Close() // ignore error
+    // ```
+    // This check inserts an `// ignore error` hint following any
+    // statement that is a function call whose error result is
+    // implicitly ignored.
+    //
+    // To suppress the hint, write an actual comment containing
+    // "ignore error" following the call statement, or explictly
+    // assign the result to a blank variable. A handful of common
+    // functions such as `fmt.Println` are excluded from the
+    // check.
+    //
+    "go.inlayHints.ignoredError": false,
 
     // `"parameterNames"` controls inlay hints for parameter names:
     // ```go
@@ -12602,9 +12878,6 @@
     // Additional directories containing referenced AHK files, separate from the [script library folders](https://www.autohotkey.com/docs/v2/Scripts.htm#lib).
     "AHK++.v2.workingDirectories": [],
 
-    // If enabled, aligned content is copied to a new scratch file to keep the original file without modifications (unless the original is itself an untitled scratch document).
-    "rainbow_csv.align_in_scratch_file": false,
-
     // Enable automatic content-based separator autodetection for the specified list of separators (multicharacter separators are supported).
     "rainbow_csv.autodetect_separators": ["TAB", ",", ";", "|"],
 
@@ -12719,6 +12992,14 @@
         {
             "label": "Compose Down",
             "template": "${composeCommand} ${configurationFile} down"
+        }
+    ],
+
+    // Command templates for compose down (subset) commands.
+    "containers.commands.composeDownSubset": [
+        {
+            "label": "Compose Down",
+            "template": "${composeCommand} ${profileList} ${configurationFile} down ${serviceList}"
         }
     ],
 
@@ -12935,12 +13216,6 @@
     // Disable checks for projects with compatible target frameworks. This may cause unstable or broken test behavior. Use at your own risk.
     "dotnet.testWindow.skipTargetFrameworkCompatibilityCheck": false,
 
-    // Sets the verbosity of logging in the 'C# DevKit - Test Explorer' output window
-    //  - minimal: Show minimal details in 'C# devkit - Test Explorer' output window.
-    //  - diagnostic: Show diagnostic information in 'C# devkit - Test Explorer' output window.
-    //  - trace: Includes Platform logs.
-    "dotnet.testWindow.testExplorerVerbosity": "minimal",
-
     // Enables projects that are using Microsoft.Testing.Platform to communicate via Microsoft.Testing.Platform server protocol instead of using VSTest Translation Layer protocol. See https://aka.ms/mtp-overview for more information.
     "dotnet.testWindow.useTestingPlatformProtocol": false,
 
@@ -12998,86 +13273,6 @@
 
     // Provide inline completions when GitHub Copilot is also enabled. This setting does not affect starred IntelliSense completion items. This is not recommended because the two extensions will often suggest different completions in the same location, but only one completion can be shown.
     "intellicode-completions-cdk.runAlongsideCopilot": false,
-
-    // Kubernetes configuration
-    "vs-kubernetes": {
-        "vs-kubernetes.namespace": "",
-        "vs-kubernetes.kubectl-path": "",
-        "vs-kubernetes.helm-path": "",
-        "vs-kubernetes.minikube-path": "",
-        "vs-kubernetes.kubectlVersioning": "user-provided",
-        "vs-kubernetes.outputFormat": "yaml",
-        "vs-kubernetes.kubeconfig": "",
-        "vs-kubernetes.knownKubeconfigs": [],
-        "vs-kubernetes.autoCleanupOnDebugTerminate": false,
-        "vs-kubernetes.nodejs-autodetect-remote-root": true,
-        "vs-kubernetes.nodejs-remote-root": "",
-        "vs-kubernetes.nodejs-debug-port": 9229,
-        "vs-kubernetes.dotnet-vsdbg-path": "~/vsdbg/vsdbg",
-        "vs-kubernetes.local-tunnel-debug-provider": "",
-        "checkForMinikubeUpgrade": true,
-        "imageBuildTool": "Docker"
-    },
-
-    // File path to a helm binary. (You can override this on a per-OS basis if required).
-    "vscode-kubernetes.helm-path": "",
-
-    // File path to a helm binary.
-    "vscode-kubernetes.helm-path-linux": "",
-
-    // File path to a helm binary.
-    "vscode-kubernetes.helm-path-mac": "",
-
-    // File path to a helm binary.
-    "vscode-kubernetes.helm-path-windows": "",
-
-    // File path to a kubectl binary. (You can override this on a per-OS basis if required).
-    "vscode-kubernetes.kubectl-path": "",
-
-    // File path to a kubectl binary.
-    "vscode-kubernetes.kubectl-path-linux": "",
-
-    // File path to a kubectl binary.
-    "vscode-kubernetes.kubectl-path-mac": "",
-
-    // File path to a kubectl binary.
-    "vscode-kubernetes.kubectl-path-windows": "",
-
-    // Set to true to automatically begin fetching logs once the log viewer is opened using the default settings.
-    "vscode-kubernetes.log-viewer.autorun": false,
-
-    // Where to display logs, defaults to the dedicated Webview.
-    "vscode-kubernetes.log-viewer.destination": "Webview",
-
-    // Set to true to follow logs by default in the log viewer.
-    "vscode-kubernetes.log-viewer.follow": false,
-
-    // How far back to fetch logs from in seconds by default. Set to -1 for all logs.
-    "vscode-kubernetes.log-viewer.since": -1,
-
-    // The number of recent logs to display by default in the log viewer. Set to -1 for all log lines.
-    "vscode-kubernetes.log-viewer.tail": -1,
-
-    // Set to true to show timestamps by default in the log viewer.
-    "vscode-kubernetes.log-viewer.timestamp": false,
-
-    // Set to true to wrap lines by default in the log viewer.
-    "vscode-kubernetes.log-viewer.wrap": false,
-
-    // File path to a minikube binary. (You can override this on a per-OS basis if required).
-    "vscode-kubernetes.minikube-path": "",
-
-    // File path to a minikube binary.
-    "vscode-kubernetes.minikube-path-linux": "",
-
-    // File path to a minikube binary.
-    "vscode-kubernetes.minikube-path-mac": "",
-
-    // File path to a minikube binary.
-    "vscode-kubernetes.minikube-path-windows": "",
-
-    // Image prefix for docker images ie 'docker.io/brendanburns'
-    "vsdocker.imageUser": null,
 
     // Arguments passed to autopep8 to format Python files. Each argument should be provided as a separate string in the array.
     //  Example:
@@ -13417,7 +13612,7 @@
     "python.terminal.launchArgs": [],
 
     // Enable [shell integration](https://code.visualstudio.com/docs/terminal/shell-integration) for the terminals running python. Shell integration enhances the terminal experience by enabling command decorations, run recent command, improving accessibility among other things. Note: PyREPL (available in Python 3.13+) is automatically disabled when shell integration is enabled to avoid cursor indentation issues.
-    "python.terminal.shellIntegration.enabled": false,
+    "python.terminal.shellIntegration.enabled": true,
 
     // Enable auto run test discovery when saving a test file.
     "python.testing.autoTestDiscoverOnSaveEnabled": true,
@@ -13458,15 +13653,15 @@
     // Path to folder with a list of Virtual Environments (e.g. ~/.pyenv, ~/Envs, ~/.virtualenvs).
     "python.venvPath": "",
 
-    // Enable/disable AI assistance to show copilot-generated summaries in the hover tooltip.
-    "python.analysis.addHoverSummaries": false,
-
     // Enable/disable AI-assisted code actions. Requires the Copilot Chat extension to be enabled.
     "python.analysis.aiCodeActions": {
         "implementAbstractClasses": true,
         "generateSymbol": true,
         "convertFormatString": true
     },
+
+    // Enable/disable AI assistance to show copilot-generated summaries in the hover tooltip. This feature requires a GitHub Copilot Pro or Pro+ subscription.
+    "python.analysis.aiHoverSummaries": false,
 
     // When typing a `{` in a string, automatically prefix the string with an `f`.
     "python.analysis.autoFormatStrings": false,
@@ -13517,9 +13712,6 @@
 
     // Enable/disable color picker in the editor for '#RRGGBB' and '#RRGGBBAA' strings.
     "python.analysis.enableColorPicker": true,
-
-    // Enable/disable experimental context. For internal use only, may cause Pylance to stop working.
-    "python.analysis.enableCompactContext": false,
 
     // Enable support for editable installs of packages as described in [PEP 660](https://peps.python.org/pep-0660/) when using Python 3.13 and higher.
     //
@@ -13708,12 +13900,7 @@
     // Path to directory containing custom type stub files.
     "python.analysis.stubPath": "typings",
 
-    // Enable/disable support for all Python documents. This enables Pylance intellisense in other documents, like the terminal or diff views.
-    //
-    // [Experimental]. For internal use only, may cause Pylance to stop working.
-    "python.analysis.supportAllPythonDocuments": false,
-
-    // Enable/disable support for docstring generation. In a blank docstring, use `Ctrl+Space` to generate a docstring.
+    // Enable/disable reStructuredText docstring generation. Templates appear after typing opening triple quotes or via code action inside empty docstrings.
     "python.analysis.supportDocstringTemplate": false,
 
     // Enable/disable support for reStructuredText in docstrings.
@@ -13786,16 +13973,17 @@
     //  could be inferred to be of type `set[Any]` or `set[int | str | float]`. If this setting is true, it will use the latter (stricter) type. The default value for this setting is `false`.
     "python.analysis.typeEvaluation.strictSetInference": false,
 
+    // Arguments to pass to the type server. For internal use only, may cause Pylance to stop working.
+    "python.analysis.typeServerArguments": [],
+
+    // Path to a custom type server. For internal use only, may cause Pylance to stop working.
+    "python.analysis.typeServerExecutable": "",
+
     // Paths to look for typeshed modules.
     "python.analysis.typeshedPaths": [],
 
     // Use library implementations to extract type information when type stub is not present.
     "python.analysis.useLibraryCodeForTypes": true,
-
-    // Enable/disable support for pulling diagnostics from Pylance (instead of Pylance pushing them).
-    //
-    // [Experimental], may cause diagnostics to not appear.
-    "python.analysis.usePullDiagnostics": true,
 
     // Maximum number of user files to index in the workspace. Indexing files is a performance-intensive task. Please use this setting to limit the number of files you want us to index. If you enter -1, we will index all files.
     "python.analysis.userFileIndexingLimit": 2000,
@@ -13813,6 +14001,8 @@
     //
     // Utilizing Shell Startup requires changes to the shell script file and is only enabled for the following shells: zsh, fsh, pwsh, bash, cmd. When set to `command`, any shell can be activated.
     //
+    // This setting takes precedence over the legacy `python.terminal.activateEnvironment` setting. If this setting is not explicitly set and `python.terminal.activateEnvironment` is set to false, this setting will automatically be set to `off` to preserve your preference.
+    //
     // This setting applies only when terminals are created, so you will need to restart your terminals for it to take effect.
     //
     // To revert changes made during shellStartup, run `Python Envs: Revert Shell Startup Script Changes`.
@@ -13823,6 +14013,9 @@
 
     // Whether to show the 'Activate' button in the terminal menu
     "python-envs.terminal.showActivateButton": false,
+
+    // Controls whether environment variables from .env files and python.envFile setting are injected into terminals.
+    "python.terminal.useEnvFile": false,
 
     // Controls whether a Docker volume should be used to cache the VS Code server and extensions.
     "dev.containers.cacheVolume": true,
@@ -13853,6 +14046,9 @@
 
     // WSL distro to use when not reopening a WSL folder. The default is to use the default WSL distro (see `wsl -l`). This setting has no effect when `dev.containers.executeInWSL` is not enabled or on other platforms than Windows.
     "dev.containers.executeInWSLDistro": "",
+
+    // **Experimental:** Enable support for attaching to Apple Containerization containers. Requires the `container` command to be available on macOS.
+    "dev.containers.experimentalAppleContainerSupport": false,
 
     // Controls whether an experimental devcontainer-lock.json should be written. This functionality is experimental and may change in the future.
     "dev.containers.experimentalLockfile": false,
@@ -14070,6 +14266,9 @@
 
     // If set, the WSL extension will download the latest server build in the background. It does this for all WSL platforms that were used in the last 2 weeks.
     "remote.WSL.downloadInBackground": true,
+
+    // If set, the WSL extension will not use a script to start the server in WSL. This is an experimental feature to allow running in distros that have interop disabled.
+    "remote.WSL.experimental.scriptLessStartup": false,
 
     // If set, polling is used for file watching inside WSL1. Polling can be CPU intensive but fixes the WSL1 issue that folders can not be renamed when watched. This option requires restart to take effect.
     "remote.WSL.fileWatcher.polling": false,
@@ -15000,6 +15199,9 @@
     // Enable integration services for the [vcpkg dependency manager](https://aka.ms/vcpkg/).
     "C_Cpp.vcpkg.enabled": true,
 
+    // If `disabled`, Windows Error Reporting will be disabled. If `default`, Windows Error Reporting will be enabled, but it becomes disabled after the first crash in the current session. Changing the setting doesn't affect currently running IntelliSense processes.
+    "C_Cpp.windowsErrorReportingMode": "default",
+
     // The number of bytes per row to show in the editor.
     "hexeditor.columnWidth": 16,
 
@@ -15408,11 +15610,14 @@
     //  - promptIfBehind: Display a prompt when there are incoming changes as well as uncommitted changes
     "remoteHub.uncommittedChangesOnEntry": "promptIfBehind",
 
-    // Always update the VS Code CLI if there is an update available.
-    "remote.tunnels.alwaysUpdateCLI": false,
+    // Always update the VS Code CLI if there is an update available. Set to 'never' to disable CLI updates.
+    "remote.tunnels.alwaysUpdateCLI": null,
 
     // List of extensions that should be installed automatically on all tunnel hosts.
     "remote.tunnels.defaultExtensions": [],
+
+    //
+    "remote.tunnels.tunnelCredentialCommand": null,
 
     // Specifies how long (in minutes) version suggestions will be cached. Setting the duration to 0 will disable caching.
     "versionlens.caching.duration": 3,
@@ -15980,6 +16185,9 @@
 
     // Use single quotes instead of double quotes
     "yaml.format.singleQuote": false,
+
+    // Specify if trailing commas should be used in JSON-like segments of the YAML
+    "yaml.format.trailingComma": true,
 
     // Enable/disable hover feature
     "yaml.hover": true,
@@ -16620,6 +16828,16 @@
     // Run IntelliCode Completions and GitHub Copilot at the same time, if both extensions are enabled. This is not recommended because the two extensions will often suggest different completions in the same location, but only one completion can be shown.
     "intellicodeCompletions.runAlongsideCopilot": false,
 
+    // Enable tools over MCP server.
+    "appmod.enableMcpServer": false,
+
+    // Enable verbose logging for the extension. This will log more information to the **Output** tab and may help with troubleshooting issues.
+    "appmod.enableVerboseLogging": true,
+
+    // **Deprecated**. Please use `appmod.enableVerboseLogging` instead.
+    // Enable verbose logging for the extension. This will log more information to the **Output** tab and may help with troubleshooting issues.
+    "migrateJava.enableVerboseLogging": true,
+
     // Allow to run tasks in parallel, each running will create a new terminal. This configuration will override `gradle.reuseTerminals` and always create new task terminals when running or debugging a task.
     "gradle.allowParallelRun": false,
 
@@ -16752,6 +16970,9 @@
     // Synchronize Java Projects explorer with changes
     "java.dependency.autoRefresh": true,
 
+    // Show reminders when your Java runtimes or dependencies need an upgrade.
+    "java.dependency.enableDependencyCheckup": true,
+
     // Package presentation mode: flat or hierarchical
     "java.dependency.packagePresentation": "flat",
 
@@ -16789,6 +17010,19 @@
 
     // Specify the name of the default test configuration.
     "java.test.defaultConfig": "",
+
+    // The timeout in seconds for a command to complete.
+    "appModernization.commandTimeout": 3600,
+
+    // Controls whether to show a quick pick dialog to ask user to pick a solution (when available) when there are required configuration invalid. If set to false, VSCode Copilot Agent is required to handle the invalidation.
+    "appModernization.javaUpgrade.enableQuickPick": false,
+
+    // Controls how uncommitted changes should be handled (A clean working tree without uncommitted changes is required to modernize (migrate/upgrade) a project).
+    //  - Always Ask: Prompt user for a decision on how to handle uncommitted changes
+    //  - Always Stash: Stash (temporarily store) all uncommitted changes for later retrieval
+    //  - Always Commit: Commit all uncommitted changes to the current branch.
+    //  - Always Discard: Discard all uncommitted changes (warning: discard action is irreversible).
+    "appModernization.uncommittedChangesAction": "Always Stash",
 
     // Specify whether to show diagnostics for conflict dependencies.
     "maven.dependency.enableConflictDiagnostics": "true",
