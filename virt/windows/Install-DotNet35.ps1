@@ -3,7 +3,7 @@
     operating system component.
 #>
 
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess)]
 [OutputType([Void], [String[]])]
 Param(
     [ValidateNotNullOrEmpty()]
@@ -33,4 +33,6 @@ if ($BuildNumber -ge 9200) {
     $DismParams.Add('/All')
 }
 
-Start-Process -FilePath 'dism.exe' -ArgumentList $DismParams -NoNewWindow -Wait
+if ($PSCmdlet.ShouldProcess('dism.exe {0}' -f ($DismParams -join ' '), 'Start')) {
+    Start-Process -FilePath 'dism.exe' -ArgumentList $DismParams -NoNewWindow -Wait
+}
