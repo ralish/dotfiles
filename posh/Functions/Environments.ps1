@@ -622,7 +622,7 @@ Function Switch-Perl {
             throw 'PERL5LIB has less path components than expected: {0}' -f $env:PERL5LIB
         }
 
-        $UserBasePath = [String]::Join([IO.Path]::DirectorySeparatorChar, $UserBasePathElements[0..($UserBasePathElements.Count - 3)])
+        $UserBasePath = $UserBasePathElements[0..($UserBasePathElements.Count - 3)] -join [IO.Path]::DirectorySeparatorChar
 
         $UserBasePathEsc = $UserBasePath
         if ([IO.Path]::DirectorySeparatorChar -eq '\') {

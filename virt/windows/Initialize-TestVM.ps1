@@ -797,7 +797,7 @@ Function Set-DiskCleanupProfile {
 
     $UnknownCategories.Sort()
     if ($UnknownCategories.Count -gt 0) {
-        Write-Warning -Message ('Some Disk Cleanup categories will be ignored: {0}' -f [String]::Join(', ', $UnknownCategories.ToArray()))
+        Write-Warning -Message ('Some Disk Cleanup categories will be ignored: {0}' -f ($UnknownCategories.ToArray() -join ', '))
     }
 
     if ($PSCmdlet.ParameterSetName -eq 'OptOut') {

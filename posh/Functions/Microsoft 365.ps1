@@ -1012,7 +1012,7 @@ Function Import-ContentSearchResultsEntry {
 
     $Results = [Collections.Generic.List[PSCustomObject]]::new()
     $Elements = [Collections.Generic.List[String]]::new()
-    $Entry = $Entry.Replace('"', [String]::Empty)
+    $Entry = $Entry -replace '"'
 
     do {
         if ($Entry -match $ElementRegex) {

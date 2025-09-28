@@ -89,7 +89,7 @@ Function Set-R53HostedZoneNameTag {
                 continue
             }
 
-            $ResourceId = $Zone.Id.Replace('/hostedzone/', [String]::Empty)
+            $ResourceId = $Zone.Id -replace '/hostedzone/'
             $Tag.Value = $Zone.Name.TrimEnd('.')
 
             if ($PSCmdlet.ShouldProcess($Tag.Value, 'Set Name tag')) {
@@ -367,7 +367,7 @@ Function Set-R53HostedZoneTag {
                 continue
             }
 
-            $ResourceId = $Zone.Id.Replace('/hostedzone/', [String]::Empty)
+            $ResourceId = $Zone.Id -replace '/hostedzone/'
 
             if ($PSCmdlet.ShouldProcess($Zone.Name.TrimEnd('.'), 'Set {0} tag' -f $Tag.Key)) {
                 Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType hostedzone -AddTag $Tag

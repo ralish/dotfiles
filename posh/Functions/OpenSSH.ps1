@@ -40,7 +40,7 @@ Function Update-OpenSSHConfig {
 
     $BaseDir = Join-Path -Path $DotFilesPath -ChildPath 'openssh/.ssh'
     $TemplatesDir = Join-Path -Path $BaseDir -ChildPath 'templates'
-    $TemplateFile = Join-Path -Path $TemplatesDir -ChildPath ('ssh_config.{0}' -f $Version.Replace('.', [String]::Empty))
+    $TemplateFile = Join-Path -Path $TemplatesDir -ChildPath ('ssh_config.{0}' -f ($Version -replace '\.'))
 
     if (!(Test-Path -LiteralPath $TemplateFile)) {
         Write-Error -Message ('No configuration template for OpenSSH version: {0}' -f $Version)

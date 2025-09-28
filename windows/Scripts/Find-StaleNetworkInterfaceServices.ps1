@@ -85,7 +85,7 @@ foreach ($GuidService in $GuidServices) {
 
     if ($MissingIPAddresses.Count -ne 0) {
         $ServiceInfo.Status = 'Orphaned'
-        $ServiceInfo.Details = 'IP address(es) not present: {0}' -f [String]::Join(',', $MissingIPAddresses)
+        $ServiceInfo.Details = 'IP address(es) not present: {0}' -f ($MissingIPAddresses -join ',')
         continue
     }
 
