@@ -595,15 +595,32 @@
     // ###           Language customisations          ###
     // ##################################################
 
+    "[dockercompose]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml",
+        "editor.tabSize": 2,
+        "editor.autoIndent": "advanced",
+        "editor.insertSpaces": true,
+        "editor.rulers": [79],
+        "editor.quickSuggestions": {
+            "other": "on",
+            "comments": "off",
+            "strings": "on"
+        }
+    },
+
     "[dynamic csv]": {
         // Rainbow CSV: For virtual alignment mode
         "editor.inlayHints.maximumLength": 0
     },
 
     "[git-commit]": {
-        // Wrap commit messages
+        // Rewrap Revived: Wrap commit messages
         "rewrap.autoWrap.enabled": true,
         "rewrap.wrappingColumn": 72
+    },
+
+    "[github-actions-workflow]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
     },
 
     "[html]": {
