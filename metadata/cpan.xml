@@ -11,10 +11,4 @@
         <SpecialFolder>UserProfile</SpecialFolder>
         <Destination>.cpan</Destination>
     </InstallPath>
-
-    <IgnorePaths>
-        <IgnorePath>CPAN\MyConfig.pm~</IgnorePath>
-        <IgnorePath>CPAN\MyConfig-Nix.pm</IgnorePath>
-        <IgnorePath>CPAN\MyConfig-Win.pm</IgnorePath>
-    </IgnorePaths>
 </Component>

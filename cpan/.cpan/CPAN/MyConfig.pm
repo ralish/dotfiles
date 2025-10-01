@@ -4,13 +4,20 @@
 # Last reviewed release: 2.38
 # Default file path: ~/.cpan/CPAN/MyConfig.pm
 #
-# Assuming a Debian distribution you may want to install:
+# On Debian you may want to install:
 # - libcpan-distnameinfo-perl (CPAN::DistnameInfo)
 # - liblog-log4perl-perl (Log::Log4perl)
 # - libmodule-build-perl (Module::Build)
 # - libmodule-signature-perl (Module::Signature)
 # - libterm-readline-gnu-perl (Term:ReadLine::Gnu)
 # - libyaml-libyaml-perl (YAML::XS)
+#
+# On Strawberry Perl you may want to install:
+# - Log::Log4perl
+# - Module::Signature
+
+# Are we running on Windows?
+my $IsWin = $^O eq "MSWin32" ? 1 : 0;
 
 $CPAN::Config = {
     # List of modules to skip loading (via CPAN::has_inst())
@@ -19,35 +26,36 @@ $CPAN::Config = {
     'plugin_list' => [],
 
     # Build & cache directory
-    'cpan_home'         => qq[$ENV{HOME}/.cpan],
+    'cpan_home'         => $IsWin ? q[D:\\Cache\\CPAN] : qq[$ENV{HOME}/.cpan],
     # Source directory
-    'keep_source_where' => qq[$ENV{HOME}/.cpan/sources],
+    'keep_source_where' => $IsWin ? q[D:\\Cache\\CPAN\\sources] : qq[$ENV{HOME}/.cpan/sources],
     # Patches directory
     'patches_dir'       => q[],
     # Build directory
-    'build_dir'         => qq[$ENV{HOME}/.cpan/build],
+    'build_dir'         => $IsWin ? q[D:\\Cache\\CPAN\\build] : qq[$ENV{HOME}/.cpan/build],
     # Preferences directory
-    'prefs_dir'         => qq[$ENV{HOME}/.cpan/prefs],
+    'prefs_dir'         => $IsWin ? qq[$ENV{USERPROFILE}\\.cpan\\prefs] : qq[$ENV{HOME}/.cpan/prefs],
 
     # Paths to external programs
     #
     # Entries marked "space" use a Perl module when set to a space.
-    'applypatch' => q[/usr/bin/applypatch],
-    'bzip2'      => q[/usr/bin/bzip2], # space
-    'curl'       => q[/usr/bin/curl],
-    'gpg'        => q[/usr/bin/gpg],
+    'applypatch' => $IsWin ? q[] : q[/usr/bin/applypatch],
+    'bzip2'      => $IsWin ? q[ ] : q[/usr/bin/bzip2], # space
+    'curl'       => $IsWin ? qq[$ENV{SystemRoot}\\System32\\curl.exe] : q[/usr/bin/curl],
+    'ftp'        => $IsWin ? qq[$ENV{SystemRoot}\\System32\\ftp.exe] : q[/usr/bin/ftp],
+    'gpg'        => $IsWin ? q[] : q[/usr/bin/gpg],
     'gpg'        => q[],
-    'gzip'       => q[/usr/bin/gzip], # space
+    'gzip'       => $IsWin ? q[ ] : q[/usr/bin/gzip], # space
     'lynx'       => q[],
-    'make'       => q[/usr/bin/make],
+    'make'       => $IsWin ? q[C:\\DevEnvs\\Perl\\c\\bin\\gmake.exe] : q[/usr/bin/make],
     'ncftp'      => q[],
     'ncftpget'   => q[],
-    'pager'      => q[/usr/bin/less],
-    'patch'      => q[/usr/bin/patch],
-    'shell'      => q[/usr/bin/zsh],
-    'tar'        => q[/usr/bin/tar], # space
-    'unzip'      => q[/usr/bin/unzip],
-    'wget'       => q[/usr/bin/wget],
+    'pager'      => $IsWin ? qq[$ENV{SystemRoot}\\System32\\more.com] : q[/usr/bin/less],
+    'patch'      => $IsWin ? q[C:\\DevEnvs\\Perl\\c\\bin\\patch.exe] : q[/usr/bin/patch],
+    'shell'      => $IsWin ? qq[$ENV{SystemRoot}\\System32\\cmd.exe] : q[/usr/bin/zsh],
+    'tar'        => $IsWin ? qq[$ENV{SystemRoot}\\System32\\tar.exe] : q[/usr/bin/tar], # space
+    'unzip'      => $IsWin ? q[] : q[/usr/bin/unzip],
+    'wget'       => $IsWin ? q[] : q[/usr/bin/wget],
 
     # Character to use for quoting external commands
     #
@@ -55,7 +63,7 @@ $CPAN::Config = {
     # double quote. Setting it to a space will disable quoting (bad idea!).
     #'commands_quote' => q[],
     # Prefer external "tar" command (instead of Archive::Tar)
-    'prefer_external_tar' => q[1],
+    'prefer_external_tar' => $IsWin ? q[0] : q[1],
 
     # Username and optional password for CPAN server
     'username' => q[],
@@ -97,7 +105,7 @@ $CPAN::Config = {
     # Enable colourised terminal output (requires Term::ANSIColor)
     #
     # Windows also requires Win32::Console::ANSI.
-    'colorize_output' => q[0],
+    'colorize_output' => $IsWin ? q[1] : q[0],
     # Colour for normal output
     'colorize_print' => q[bold green],
     # Colour for warnings
@@ -109,7 +117,7 @@ $CPAN::Config = {
     'commandnumber_in_prompt' => q[0],
 
     # Path to the history file (requires Term::ReadLine)
-    'histfile' => qq[$ENV{HOME}/.cpan/histfile],
+    'histfile' => $IsWin ? qq[$ENV{USERPROFILE}\\.cpan\\histfile] : qq[$ENV{HOME}/.cpan/histfile],
     # Maximum number of commands in the history
     'histsize' => q[1000],
 
@@ -117,7 +125,10 @@ $CPAN::Config = {
     # default sites without asking (the default is to ask once per session).
     'connect_to_internet_ok' => q[1],
     # List of CPAN mirrors to use
-    'urllist' => [q[https://www.cpan.org/]],
+    'urllist' => [
+        $IsWin ? q[https://cpan.strawberryperl.com/] : (),
+        q[https://www.cpan.org/]
+    ],
     # Randomize the mirror selected from "urllist"
     'randomize_urllist' => q[0],
     # Use external "ping" command when automatically selecting mirrors
@@ -168,20 +179,20 @@ $CPAN::Config = {
     'prefer_installer' => q[MB],
 
     # Arguments to pass to Makefile.pl
-    'makepl_arg' => q[INSTALLDIRS=site],
+    'makepl_arg' => $IsWin ? q[] : q[INSTALLDIRS=site],
     # Arguments to pass to "make"
-    'make_arg' => q[],
+    'make_arg' => $IsWin ? qq[-j$ENV{NUMBER_OF_PROCESSORS}] : q[],
     # Command to run instead of "make" when running "make install"
-    'make_install_make_command' => q[/usr/bin/make],
+    'make_install_make_command' => $IsWin ? q[C:\\DevEnvs\\Perl\\c\\bin\\gmake.exe] : q[/usr/bin/make],
     # Arguments to pass to "make install"
     'make_install_arg' => q[UNINST=1],
 
     # Arguments to pass to Build.pl
-    'mbuildpl_arg' => q[--installdirs site],
+    'mbuildpl_arg' => $IsWin ? q[] : q[--installdirs site],
     # Arguments to pass to "./Build"
     'mbuild_arg' => q[],
     # Command to run instead of "./Build" when running "./Build install"
-    'mbuild_install_build_command' => q[./Build],
+    'mbuild_install_build_command' => $IsWin ? q[] : q[./Build],
     # Arguments to pass to "./Build install"
     'mbuild_install_arg' => q[--uninst=1],
 
