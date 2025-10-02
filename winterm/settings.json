@@ -2,7 +2,7 @@
     /*
      * Windows Terminal settings
      *
-     * Last reviewed release: v1.22.12111.0
+     * Last reviewed release: v1.23.12681.0
      * Default file path: %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
      */
 
@@ -11,7 +11,7 @@
 
     // Startup
     "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
-    "language": "", // Default
+    "language": null, // Default
     "defaultInputScope": "default",
     "firstWindowPreference": "defaultProfile",
     "windowingBehavior": "useNew",
@@ -31,7 +31,13 @@
     "tabSwitcherMode": "inOrder",
     "focusFollowMouse": false,
     "experimental.detectURLs": true,
-    "confirmCloseAllTabs": false,
+    "searchWebDefaultQueryUrl": "https://kagi.com/search?q=%22%s%22",
+    "experimental.enableColorSelection": false,
+    // Interaction: Warnings
+    "warning.confirmCloseAllTabs": false,
+    "warning.inputService": true,
+    "warning.largePaste": true,
+    "warning.multiLinePaste": true,
 
     // Appearance
     "theme": {
@@ -41,6 +47,7 @@
     "newTabPosition": "afterLastTab",
     "showTabsInTitlebar": true,
     "alwaysShowTabs": true,
+    "showTabsFullscreen": true,
     "useAcrylicInTabRow": false,
     "showTerminalTitleInTitlebar": false,
     "alwaysOnTop": false,
@@ -49,6 +56,8 @@
     "alwaysShowNotificationIcon": false,
     "minimizeToNotificationArea": false,
     "autoHideWindow": false,
+    "showAdminShield": true,
+    "compatibility.enableUnfocusedAcrylic": true,
 
     // Themes (not in UI)
     "themes": [],
@@ -82,19 +91,7 @@
         }
     ],
 
-    // Advanced (not in UI)
-    "disabledProfileSources": ["Windows.Terminal.Azure"],
-    "inputServiceWarning": true,
-    "largePasteWarning": true,
-    "multiLinePasteWarning": true,
-    "showAdminShield": true,
-    "startupActions": "", // None
-    "compatibility.enableUnfocusedAcrylic": true,
-    "compatibility.isolatedMode": false,
-    "experimental.enableColorSelection": false,
-    "experimental.useBackgroundImageForWindow": false,
-
-    // New Tab Menu (not in UI)
+    // New Tab Menu
     "newTabMenu": [
         {
             "type": "remainingProfiles"
@@ -103,20 +100,32 @@
             "type": "folder",
             "name": "Visual Studio",
             "icon": "ms-appx:///ProfileIcons/{550ce7b8-d500-50ad-8a1a-c400c3262db3}.png",
+
+            "allowEmpty": false,
+            "inline": "never",
+
             "entries": [
                 {
                     "type": "matchProfiles",
-                    "source": "Windows.Terminal.VisualStudio"
+                    "name": null,
+                    "source": "Windows.Terminal.VisualStudio",
+                    "commandline": null
                 }
             ]
         }
     ],
+
+    // Advanced (not in UI)
+    "disabledProfileSources": ["Windows.Terminal.Azure"],
+    "startupActions": "", // None
+    "experimental.useBackgroundImageForWindow": false,
 
     // Profiles
     "profiles": {
         "defaults": {
             // General
             "startingDirectory": null, // Use parent process directory
+            "icon": null, // Use profile default
             "tabTitle": null, // Use profile name as tab title
             "elevate": false,
 
@@ -128,6 +137,8 @@
             "font": {
                 "face": "Hack Nerd Font",
                 "size": 10,
+                "cellHeight": "1.2",
+                "cellWidth": "0.6",
                 "weight": "normal",
                 "builtinGlyphs": true,
                 "colorGlyphs": true
@@ -137,6 +148,7 @@
 
             // Appearance: Cursor
             "cursorShape": "bar",
+            "cursorColor": null, // Use scheme color
 
             // Appearance: Background image
             "backgroundImage": null, // No background image
@@ -169,11 +181,13 @@
             "historySize": 10000,
             "closeOnExit": "graceful",
             "bellStyle": "none",
+            "bellSound": [], // Default system sound
             "experimental.rightClickContextMenu": false,
             "showMarksOnScrollbar": false,
             "autoMarkPrompts": true,
             "compatibility.reloadEnvironmentVariables": true,
             "experimental.repositionCursorWithMouse": false,
+            "experimental.rainbowSuggestions": false,
             "pathTranslationStyle": "none"
         },
 
