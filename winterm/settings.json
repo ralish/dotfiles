@@ -195,83 +195,58 @@
             {
                 "name": "PowerShell",
                 "source": "Windows.Terminal.PowershellCore",
-                "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+                "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}", // Default GUID
 
                 "commandline": "\"%ProgramFiles%\\PowerShell\\7\\pwsh.exe\" -NoLogo"
             },
             {
                 "name": "Windows PowerShell",
-                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}", // User default
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}", // Default GUID
 
                 "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -NoLogo"
             },
             {
                 "name": "Command Prompt",
-                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}", // User default
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}", // Default GUID
 
                 "commandline": "%SystemRoot%\\System32\\cmd.exe /K \"%DOTFILES%\\cmd\\SetupEnv.cmd\"",
                 "closeOnExit": "always"
             },
             {
                 "name": "Ubuntu",
-                "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc", // Fragment
-                "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
+                "source": "Microsoft.WSL",
+                "guid": "{404e3e45-12b4-52d4-b4d3-3ac5ce1be6c4}", // Fragment
+                "icon": "C:\\Users\\SDL\\AppData\\Local\\wsl\\{e4cc4b43-79b0-4ad8-9a0a-e77e0087d6cc}\\shortcut.ico",
 
-                // Setting startingDirectory results in the following error:
-                // error 2147942667 (0x8007010b) when launching `ubuntu.exe'
-                // Could not access starting directory "/home/sdl"
-                //"startingDirectory": "/home/sdl",
-                "colorScheme": {
-                    "dark": "Solarized Dark",
-                    "light": "Solarized Light"
-                },
-                "closeOnExit": "always"
+                "colorScheme": "Solarized Dark",
+                "closeOnExit": "always",
+                "pathTranslationStyle": "wsl"
             },
             {
                 "name": "Kali",
-                "source": "Windows.Terminal.Wsl",
-                "guid": "{46ca431a-3a87-5fb3-83cd-11ececc031d2}",
+                "source": "Microsoft.WSL",
+                "guid": "{e959e6bb-4c4e-5a69-9d53-3db3f3aa8b0c}", // Fragment
+                "icon": "C:\\Users\\SDL\\AppData\\Local\\wsl\\{69bb8890-15be-4771-b17d-45dcd5d9fdaa}\\shortcut.ico",
 
-                "startingDirectory": "/home/sdl",
-                "colorScheme": {
-                    "dark": "Solarized Dark",
-                    "light": "Solarized Light"
-                },
-                "closeOnExit": "always"
+                "colorScheme": "Solarized Dark",
+                "closeOnExit": "always",
+                "pathTranslationStyle": "wsl"
             },
             {
                 "name": "Git Bash",
-                "source": "Git", // Fragment
                 "guid": "{2ece5bfe-50ed-5f3a-ab87-5cd4baafed2b}",
+                "icon": "%ProgramFiles%\\Git\\mingw64\\share\\git\\git-for-windows.ico",
 
+                "commandline": "\"%ProgramFiles%\\Git\\usr\\bin\\bash.exe\" --login -i",
                 "startingDirectory": "%USERPROFILE%",
-                "closeOnExit": "always"
-            },
-            {
-                "name": "VS 2019 - Cmd",
-                "source": "Windows.Terminal.VisualStudio",
-                // Tied to the VS instance ID which is unique to an install
-                "guid": "{03c598fc-f2c0-5201-b431-c37bd3f33dd7}",
-                "hidden": false,
-
-                "startingDirectory": "%USERPROFILE%",
-                "closeOnExit": "always"
-            },
-            {
-                "name": "VS 2019 - PowerShell",
-                "source": "Windows.Terminal.VisualStudio",
-                // Tied to the VS instance ID which is unique to an install
-                "guid": "{1410e166-3e23-5b6f-82c1-4a5ce508d89d}",
-                "hidden": false,
-
-                "startingDirectory": "%USERPROFILE%"
+                "closeOnExit": "always",
+                "pathTranslationStyle": "msys2"
             },
             {
                 "name": "VS 2022 - Cmd",
                 "source": "Windows.Terminal.VisualStudio",
-                // Tied to the VS instance ID which is unique to an install
-                "guid": "{fcc17ad9-8454-5ce9-a23a-da26afb17c58}",
-                "hidden": false,
+                // Generated from VS instance ID which is unique to an install
+                "guid": "{e4f46973-af4f-50c0-8df9-c34da3cb2ab0}",
 
                 "startingDirectory": "%USERPROFILE%",
                 "closeOnExit": "always"
@@ -279,9 +254,8 @@
             {
                 "name": "VS 2022 - PowerShell",
                 "source": "Windows.Terminal.VisualStudio",
-                // Tied to the VS instance ID which is unique to an install
-                "guid": "{7b70a87b-8ccd-569a-833f-e8e5f164ceab}",
-                "hidden": false,
+                // Generated from VS instance ID which is unique to an install
+                "guid": "{e91d5944-ba47-594e-8846-4817f0674508}",
 
                 "startingDirectory": "%USERPROFILE%"
             },
