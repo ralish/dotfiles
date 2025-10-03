@@ -486,7 +486,6 @@
     //  - vscode.media-preview: Provides VS Code's built-in previews for images, audio, and video
     //  - vscode.merge-conflict: Highlighting and commands for inline merge conflicts.
     //  - vscode.microsoft-authentication: Microsoft authentication provider
-    //  - vscjava.migrate-java-to-azure: Upgrade and migrate your Java applications to Azure
     //  - vscode.npm: Extension to add task support for npm scripts.
     //  - xdebug.php-debug: Debug support for PHP with Xdebug
     //  - esbenp.prettier-vscode: Code formatter using prettier
@@ -512,7 +511,6 @@
     //  - vscode-icons-team.vscode-icons: Icons for Visual Studio Code
     //  - vscjava.vscode-java-dependency: Manage Java projects in Visual Studio Code
     //  - vscjava.vscode-java-test: Run and debug JUnit or TestNG test cases.
-    //  - vscjava.vscode-java-upgrade: Upgrade Java project with GitHub Copilot
     //  - ms-vscode.vscode-js-profile-table: Text visualizer for profiles taken from the JavaScript debugger
     //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - GitHub.vscode-pull-request-github: Pull Request and Issue Provider for GitHub
@@ -610,7 +608,6 @@
     //  - vscode.media-preview: Provides VS Code's built-in previews for images, audio, and video
     //  - vscode.merge-conflict: Highlighting and commands for inline merge conflicts.
     //  - vscode.microsoft-authentication: Microsoft authentication provider
-    //  - vscjava.migrate-java-to-azure: Upgrade and migrate your Java applications to Azure
     //  - vscode.npm: Extension to add task support for npm scripts.
     //  - xdebug.php-debug: Debug support for PHP with Xdebug
     //  - vscode.references-view: Reference Search results as separate, stable view in the sidebar
@@ -633,7 +630,6 @@
     //  - vscode-icons-team.vscode-icons: Icons for Visual Studio Code
     //  - vscjava.vscode-java-dependency: Manage Java projects in Visual Studio Code
     //  - vscjava.vscode-java-test: Run and debug JUnit or TestNG test cases.
-    //  - vscjava.vscode-java-upgrade: Upgrade Java project with GitHub Copilot
     //  - ms-vscode.vscode-js-profile-table: Text visualizer for profiles taken from the JavaScript debugger
     //  - GitHub.vscode-pull-request-github: Pull Request and Issue Provider for GitHub
     //  - ms-python.vscode-python-envs: Provides a unified python environment experience
@@ -1811,7 +1807,6 @@
         "workflowStudio.asl": false,
         "gitlens.rebase": false,
         "decompiled.javaClass": false,
-        "migrate.java.formulaEditor": false,
         "java.formatterSettingsEditor": false,
         "workbench.input.interactive": false,
         "mainThreadWebview-markdown.preview": false,
@@ -3165,7 +3160,7 @@
     // "java.jdt.ls.java.home":"C:\\Program Files\\Java\\jdk-21.0_5"
     "java.jdt.ls.java.home": null,
 
-    // [Experimental] Specify whether to enable Javac-based compilation in the language server. Requires running this extension with Java 24
+    // [Experimental] Specify whether to enable Javac-based compilation in the language server. Requires running this extension with Java 25
     "java.jdt.ls.javac.enabled": "off",
 
     // Whether to load lombok processors from project classpath
@@ -5723,7 +5718,6 @@
     //  - vscode.media-preview: Provides VS Code's built-in previews for images, audio, and video
     //  - vscode.merge-conflict: Highlighting and commands for inline merge conflicts.
     //  - vscode.microsoft-authentication: Microsoft authentication provider
-    //  - vscjava.migrate-java-to-azure: Upgrade and migrate your Java applications to Azure
     //  - vscode.npm: Extension to add task support for npm scripts.
     //  - xdebug.php-debug: Debug support for PHP with Xdebug
     //  - vscode.references-view: Reference Search results as separate, stable view in the sidebar
@@ -5746,7 +5740,6 @@
     //  - vscode-icons-team.vscode-icons: Icons for Visual Studio Code
     //  - vscjava.vscode-java-dependency: Manage Java projects in Visual Studio Code
     //  - vscjava.vscode-java-test: Run and debug JUnit or TestNG test cases.
-    //  - vscjava.vscode-java-upgrade: Upgrade Java project with GitHub Copilot
     //  - ms-vscode.vscode-js-profile-table: Text visualizer for profiles taken from the JavaScript debugger
     //  - GitHub.vscode-pull-request-github: Pull Request and Issue Provider for GitHub
     //  - ms-python.vscode-python-envs: Provides a unified python environment experience
@@ -6444,9 +6437,9 @@
     //  - Ubuntu (WSL): $(terminal-ubuntu) Ubuntu (WSL)
     // - path: C:\WINDOWS\System32\wsl.exe
     // - args: ['-d','Ubuntu']
-    //  - kali-linux (WSL): $(terminal-linux) kali-linux (WSL)
+    //  - Kali (WSL): $(terminal-linux) Kali (WSL)
     // - path: C:\WINDOWS\System32\wsl.exe
-    // - args: ['-d','kali-linux']
+    // - args: ['-d','Kali']
     //  - JavaScript Debug Terminal: $($(debug)) JavaScript Debug Terminal
     // - extensionIdentifier: ms-vscode.js-debug
     //  - Azure Cloud Shell (Bash): $($(azure)) Azure Cloud Shell (Bash)
@@ -7702,8 +7695,7 @@
 
     // Providers are enabled by default. Omit them by setting the id of the provider to `false`.
     "terminal.integrated.suggest.providers": {
-        "lsp": false,
-        "terminal-suggest": true
+        "lsp": false
     },
 
     // Specifies whether to try to collapse the opened worktrees into a single (common) repository in the views when possible
@@ -8176,6 +8168,14 @@
     //  - `(from, to)` - Methods with two parameters named as 'from' and 'to'.
     //  - `(arg*)` - Methods with one parameter whose name starts with 'arg'.
     "java.inlayHints.parameterNames.exclusions": [],
+
+    // Enable/disable inlay hints for implicit variable types:
+    // ```java
+    //
+    // var foo /* :Path */ = Path.of("foo");
+    //
+    // ```
+    "java.inlayHints.variableTypes.enabled": false,
 
     // Include getter, setter and builder/constructor when finding references.
     "java.references.includeAccessors": true,
@@ -16828,16 +16828,6 @@
     // Run IntelliCode Completions and GitHub Copilot at the same time, if both extensions are enabled. This is not recommended because the two extensions will often suggest different completions in the same location, but only one completion can be shown.
     "intellicodeCompletions.runAlongsideCopilot": false,
 
-    // Enable tools over MCP server.
-    "appmod.enableMcpServer": false,
-
-    // Enable verbose logging for the extension. This will log more information to the **Output** tab and may help with troubleshooting issues.
-    "appmod.enableVerboseLogging": true,
-
-    // **Deprecated**. Please use `appmod.enableVerboseLogging` instead.
-    // Enable verbose logging for the extension. This will log more information to the **Output** tab and may help with troubleshooting issues.
-    "migrateJava.enableVerboseLogging": true,
-
     // Allow to run tasks in parallel, each running will create a new terminal. This configuration will override `gradle.reuseTerminals` and always create new task terminals when running or debugging a task.
     "gradle.allowParallelRun": false,
 
@@ -17010,19 +17000,6 @@
 
     // Specify the name of the default test configuration.
     "java.test.defaultConfig": "",
-
-    // The timeout in seconds for a command to complete.
-    "appModernization.commandTimeout": 3600,
-
-    // Controls whether to show a quick pick dialog to ask user to pick a solution (when available) when there are required configuration invalid. If set to false, VSCode Copilot Agent is required to handle the invalidation.
-    "appModernization.javaUpgrade.enableQuickPick": false,
-
-    // Controls how uncommitted changes should be handled (A clean working tree without uncommitted changes is required to modernize (migrate/upgrade) a project).
-    //  - Always Ask: Prompt user for a decision on how to handle uncommitted changes
-    //  - Always Stash: Stash (temporarily store) all uncommitted changes for later retrieval
-    //  - Always Commit: Commit all uncommitted changes to the current branch.
-    //  - Always Discard: Discard all uncommitted changes (warning: discard action is irreversible).
-    "appModernization.uncommittedChangesAction": "Always Stash",
 
     // Specify whether to show diagnostics for conflict dependencies.
     "maven.dependency.enableConflictDiagnostics": "true",
