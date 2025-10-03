@@ -9,6 +9,7 @@
       <QueryList>
         <Query Id="0" Path="Security">
           <Select Path="Security">*</Select>
+
           <!--
             Keywords:   Audit Success
             Category:   Event processing
@@ -76,6 +77,7 @@
           <Suppress Path="Security">
             *[System[EventID=5447 and band(Keywords,9007199254740992)]]
           </Suppress>
+
         </Query>
       </QueryList>
     </QueryNode>

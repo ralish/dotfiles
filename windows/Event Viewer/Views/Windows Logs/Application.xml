@@ -157,6 +157,7 @@
             and
             *[EventData[Data='APPCRASH' and Data='mmc.exe' and Data='GPOAdmin.dll' and Data='c0000005']]
           </Suppress>
+
         </Query>
       </QueryList>
     </QueryNode>
