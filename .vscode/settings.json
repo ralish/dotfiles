@@ -4,6 +4,8 @@
     // Associations to the "plaintext" type are generally for hinting the
     // vscode-icons extension as to the preferred icon.
     "files.associations": {
+        // generic
+        "VERSION": "plaintext",
         // root
         ".ignore": "ignore",
         "dot-manage": "shellscript",
