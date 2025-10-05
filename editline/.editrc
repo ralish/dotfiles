@@ -1,25 +1,36 @@
-# ----------------------------- Config Settings -------------------------------
+# Editline configuration
+#
+# Last reviewed release: v20250104
+# Default file path in order of preference:
+# - Value of EDITRC environment variable
+# - ~/.editrc
+
+# -------------------------------- Settings -----------------------------------
 
 # Enable editline functionality
 edit on
 
-# Use vi-style key bindings
-bind -v
-
 # Maximum number of history entries
-history size 1000
+history size 1024
 
 # Only keep unique history entries
 history unique 1
 
-# ------------------------------ Key Mappings ---------------------------------
+# ------------------------------ Key bindings ---------------------------------
+
+# Default key bindings
+#
+# Valid options:
+# -e    Emacs-style
+# -v    vi-style
+bind -e
 
 # Set Home/End keys to jump to the beginning/end of line
 bind "\e[1~" ed-move-to-beg
 bind "\e[4~" ed-move-to-end
 
 # Set Insert/Delete keys to insert/delete characters
-bind "\e[2~" ed-quoted-insert
+bind "\e[2~" em-toggle-overwrite
 bind "\e[3~" ed-delete-next-char
 
 # Set Up/Down arrow keys to perform a command history prefix search
@@ -27,6 +38,8 @@ bind "\e[A" ed-search-prev-history
 bind "\e[B" ed-search-next-history
 
 # Set Ctrl+Left/Right arrow keys to move to the adjacent word
+bind "\eOD" ed-prev-word
+bind "\eOC" em-next-word
 bind "\e[1;5D" ed-prev-word
 bind "\e[1;5C" em-next-word
 
