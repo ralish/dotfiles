@@ -16,23 +16,23 @@ Signature = "$Windows NT$"
 ; Extensions
 ;
 ; Subject alternative name
-szOID_SUBJECT_ALT_NAME2     = 2.5.29.17
+szOID_SUBJECT_ALT_NAME2  = 2.5.29.17
 ; Basic constraints
-szOID_BASIC_CONSTRAINTS2    = 2.5.29.19
+szOID_BASIC_CONSTRAINTS2 = 2.5.29.19
 ; Enhanced key usage
-szOID_ENHANCED_KEY_USAGE    = 2.5.29.37
+szOID_ENHANCED_KEY_USAGE = 2.5.29.37
 
 ; EKUs
 ;
 ; Server authentication
 ; KeyUsage: DIGITAL_SIGNATURE | KEY_AGREEMENT | KEY_ENCIPHERMENT
-szOID_PKIX_KP_SERVER_AUTH   = 1.3.6.1.5.5.7.3.1
+szOID_PKIX_KP_SERVER_AUTH  = 1.3.6.1.5.5.7.3.1
 ; Client authentication
 ; KeyUsage: DIGITAL_SIGNATURE
-szOID_PKIX_KP_CLIENT_AUTH   = 1.3.6.1.5.5.7.3.2
+szOID_PKIX_KP_CLIENT_AUTH  = 1.3.6.1.5.5.7.3.2
 ; Code-signing
 ; KeyUsage: DIGITAL_SIGNATURE
-szOID_PKIX_KP_CODE_SIGNING  = 1.3.6.1.5.5.7.3.3
+szOID_PKIX_KP_CODE_SIGNING = 1.3.6.1.5.5.7.3.3
 
 [NewRequest]
 ; Request type
@@ -109,49 +109,49 @@ szOID_PKIX_KP_CODE_SIGNING  = 1.3.6.1.5.5.7.3.3
 ;
 ; Hexadecimal value or symbolic values joined by a pipe.
 ;
-; Valid values:
-; - 0x1         AT_KEYEXCHANGE                      Key-exchange (encryption)
-; - 0x2         AT_SIGNATURE                        Signature
+; BYTE      SYMBOL                              DESCRIPTION
+; 0x1       AT_KEYEXCHANGE                      Key-exchange (encryption)
+; 0x2       AT_SIGNATURE                        Signature
 ;KeySpec = "AT_KEYEXCHANGE | AT_SIGNATURE"
 
 ; Key usage
 ;
 ; Hexadecimal value or symbolic values joined by a pipe.
 ;
-; Valid values:
-; - 0x1         CERT_ENCIPHER_ONLY_KEY_USAGE        Encipher only
-; - 0x2         CERT_CRL_SIGN_KEY_USAGE             CRL signing
-; - 0x2         CERT_OFFLINE_CRL_SIGN_KEY_USAGE     Offline CRL signing
-; - 0x4         CERT_KEY_CERT_SIGN_KEY_USAGE        Key certificate signing
-; - 0x8         CERT_KEY_AGREEMENT_KEY_USAGE        Key agreement
-; - 0x10        CERT_DATA_ENCIPHERMENT_KEY_USAGE    Data encipherment
-; - 0x20        CERT_KEY_ENCIPHERMENT_KEY_USAGE     Key encipherment
-; - 0x40        CERT_NON_REPUDIATION_KEY_USAGE      Non-repudiation
-; - 0x80        CERT_DIGITAL_SIGNATURE_KEY_USAGE    Digital signature
-; - 0x8000      CERT_DECIPHER_ONLY_KEY_USAGE        Decipher only
+; BYTE      SYMBOL                              DESCRIPTION
+; 0x1       CERT_ENCIPHER_ONLY_KEY_USAGE        Encipher only
+; 0x2       CERT_CRL_SIGN_KEY_USAGE             CRL signing
+; 0x2       CERT_OFFLINE_CRL_SIGN_KEY_USAGE     Offline CRL signing
+; 0x4       CERT_KEY_CERT_SIGN_KEY_USAGE        Key certificate signing
+; 0x8       CERT_KEY_AGREEMENT_KEY_USAGE        Key agreement
+; 0x10      CERT_DATA_ENCIPHERMENT_KEY_USAGE    Data encipherment
+; 0x20      CERT_KEY_ENCIPHERMENT_KEY_USAGE     Key encipherment
+; 0x40      CERT_NON_REPUDIATION_KEY_USAGE      Non-repudiation
+; 0x80      CERT_DIGITAL_SIGNATURE_KEY_USAGE    Digital signature
+; 0x8000    CERT_DECIPHER_ONLY_KEY_USAGE        Decipher only
 ;KeyUsage = "CERT_DIGITAL_SIGNATURE_KEY_USAGE | CERT_KEY_ENCIPHERMENT_KEY_USAGE"
 
 ; Key usage properties
 ;
 ; Hexadecimal value or symbolic values joined by a pipe.
 ;
-; Valid values:
-; - 0x1         NCRYPT_ALLOW_DECRYPT_FLAG           Decryption
-; - 0x2         NCRYPT_ALLOW_SIGNING_FLAG           Signing
-; - 0x4         NCRYPT_ALLOW_KEY_AGREEMENT_FLAG     Key agreement
-; - 0x8         NCRYPT_ALLOW_KEY_IMPORT_FLAG        Undocumented
-; - 0xFFFFFF    NCRYPT_ALLOW_ALL_USAGES             Any purpose
+; BYTE      SYMBOL                              DESCRIPTION
+; 0x1       NCRYPT_ALLOW_DECRYPT_FLAG           Decryption
+; 0x2       NCRYPT_ALLOW_SIGNING_FLAG           Signing
+; 0x4       NCRYPT_ALLOW_KEY_AGREEMENT_FLAG     Key agreement
+; 0x8       NCRYPT_ALLOW_KEY_IMPORT_FLAG        Undocumented
+; 0xFFFFFF  NCRYPT_ALLOW_ALL_USAGES             Any purpose
 ;KeyUsageProperty = "NCRYPT_ALLOW_DECRYPT_FLAG | NCRYPT_ALLOW_SIGNING_FLAG"
 
 ; Level of protection for private key
 ;
 ; Hexadecimal value or symbolic values joined by a pipe.
 ;
-; Valid values:
-; - 0x1     NCRYPT_UI_PROTECT_KEY_FLAG                  Show strong key UI
-; - 0x2     NCRYPT_UI_FORCE_HIGH_PROTECTION_FLAG        Force high protection
-; - 0x4     NCRYPT_UI_FINGERPRINT_PROTECTION_FLAG       Undocumented
-; - 0x8     NCRYPT_UI_APPCONTAINER_ACCESS_MEDIUM_FLAG   Undocumented
+; BYTE      SYMBOL                                      DESCRIPTION
+; 0x1       NCRYPT_UI_PROTECT_KEY_FLAG                  Show strong key UI
+; 0x2       NCRYPT_UI_FORCE_HIGH_PROTECTION_FLAG        Force high protection
+; 0x4       NCRYPT_UI_FINGERPRINT_PROTECTION_FLAG       Undocumented
+; 0x8       NCRYPT_UI_APPCONTAINER_ACCESS_MEDIUM_FLAG   Undocumented
 ;KeyProtection
 
 ; Create key material in the machine's security context

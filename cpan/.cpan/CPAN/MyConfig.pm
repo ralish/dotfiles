@@ -4,7 +4,7 @@
 # Last reviewed release: 2.38
 # Default file path: ~/.cpan/CPAN/MyConfig.pm
 #
-# On Debian you may want to install:
+# On Debian (or derived) distributions you may want to install:
 # - libcpan-distnameinfo-perl (CPAN::DistnameInfo)
 # - liblog-log4perl-perl (Log::Log4perl)
 # - libmodule-build-perl (Module::Build)
@@ -12,7 +12,7 @@
 # - libterm-readline-gnu-perl (Term:ReadLine::Gnu)
 # - libyaml-libyaml-perl (YAML::XS)
 #
-# On Strawberry Perl you may want to install:
+# On Windows using Strawberry Perl you may want to install:
 # - Log::Log4perl
 # - Module::Signature
 
@@ -90,8 +90,8 @@ $CPAN::Config = {
 
     # Automatically save configuration changes
     #
-    # Enabling will result in CPAN removing all comments, formatting, and
-    # ordering of statements on saving the configuration.
+    # Be aware that CPAN will remove all comments, formatting, and ordering of
+    # statements when saving the configuration.
     'auto_commit' => q[0],
 
     # Terminal uses ISO-8859-1 character set (aka. Latin-1)
@@ -150,14 +150,14 @@ $CPAN::Config = {
 
     # Policy for handling build prerequisites
     #
-    # Valid options:
-    # - follow            Automatically build
-    # - ask               Ask for confirmation
-    # - ignore            Ignore dependencies
+    # Valid values:
+    # - follow      Automatically build
+    # - ask         Ask for confirmation
+    # - ignore      Ignore dependencies
     'prerequisites_policy' => q[follow],
     # Policy for installing build_requires modules
     #
-    # Valid options: yes, no, ask/yes, ask/no
+    # Valid values: yes, no, ask/yes, ask/no
     'build_requires_install_policy' => q[ask/no],
     # Include recommended module dependencies
     'recommends_policy' => q[1],
@@ -172,10 +172,10 @@ $CPAN::Config = {
 
     # Preferred installer module
     #
-    # Valid options:
-    # - EUMM              ExtUtils::MakeMaker (Makefile.pl)
-    # - MB                Module::Build (Build.pl)
-    # - RAND              Randomised
+    # Valid values:
+    # - EUMM        ExtUtils::MakeMaker (Makefile.pl)
+    # - MB          Module::Build (Build.pl)
+    # - RAND        Randomised
     'prefer_installer' => q[MB],
 
     # Arguments to pass to Makefile.pl
@@ -203,13 +203,13 @@ $CPAN::Config = {
 
     # Permit installation of outdated distributions
     #
-    # Valid options: yes, no, ask/yes, ask/no
+    # Valid values: yes, no, ask/yes, ask/no
     #
     # Any option other than "yes" requires CPAN::DistnameInfo.
     'allow_installing_outdated_dists' => q[ask/no],
     # Permit installation of module downgrades
     #
-    # Valid options: yes, no, ask/yes, ask/no
+    # Valid values: yes, no, ask/yes, ask/no
     'allow_installing_module_downgrades' => q[ask/no],
 
     # Store build state for reuse between sessions
@@ -227,19 +227,19 @@ $CPAN::Config = {
 
     # Method for obtaining the current working directory
     #
-    # Valid options:
-    # - cwd               Cwd::cwd
-    # - getcwd            Cwd::getcwd
-    # - fastcwd           Cwd::fastcwd
-    # - getdcwd           Cwd::getdcwd
+    # Valid values:
+    # - cwd             Cwd::cwd
+    # - getcwd          Cwd::getcwd
+    # - fastcwd         Cwd::fastcwd
+    # - getdcwd         Cwd::getdcwd
     'getcwd' => q[cwd],
 
     # Preferred YAML implementation
     #
-    # Valid options:
+    # Valid values:
     # - YAML
-    # - YAML::Syck        Requires a C compiler
-    # - YAML::XS          Requires a C compiler
+    # - YAML::Syck      Requires a C compiler
+    # - YAML::XS        Requires a C compiler
     'yaml_module' => q[YAML::XS],
     # Permit deserialising code in YAML
     'yaml_load_code' => q[0],
@@ -262,30 +262,30 @@ $CPAN::Config = {
     'build_cache' => q[250],
     # When to perform cache scanning
     #
-    # Valid options:
-    # - atstart           On starting CPAN
-    # - atexit            On exiting CPAN
-    # - never             Never scan
+    # Valid values:
+    # - atstart     On starting CPAN
+    # - atexit      On exiting CPAN
+    # - never       Never scan
     'scan_cache' => q[atstart],
 
     # Report loading of modules
     #
-    # Valid options:
-    # - none              Quiet
-    # - v                 Module name and version
+    # Valid values:
+    # - none        Quiet
+    # - v           Module name and version
     'load_module_verbosity' => q[v],
     # Report extending of @INC via PERL5LIB
     #
-    # Valid options:
-    # - none              Quiet
-    # - v                 List of added directories
+    # Valid values:
+    # - none        Quiet
+    # - v           List of added directories
     'perl5lib_verbosity' => q[none],
     # Verbosity level when using the "tar" command
     #
-    # Valid options:
-    # - none              Quiet
-    # - v                 File names
-    # - vv                Full listing
+    # Valid values:
+    # - none        Quiet
+    # - v           File names
+    # - vv          Full listing
     'tar_verbosity' => q[none],
 };
 1;

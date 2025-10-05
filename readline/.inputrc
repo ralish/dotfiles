@@ -35,7 +35,7 @@ set output-meta on
 # automatically disabled if the locale contains characters whose encoding
 # requires the eighth bit to be set. This setting is dependent on the LC_CTYPE
 # environment variable and may change if the locale changes. Key bindings may
-# also be affected when enabled (see the "force-meta-prefix" setting).
+# also be affected when enabled; see the "force-meta-prefix" setting.
 set convert-meta off
 
 # Convert binding key sequences to meta-prefixed escape sequences
@@ -51,7 +51,7 @@ $endif
 
 # Disable word completion
 #
-# If enabled, completion characters are inserted as if mapped to "self-insert".
+# If enabled, completion characters are mapped to the "self-insert" command.
 set disable-completion off
 
 # Display the common prefix of possible completions using a different colour

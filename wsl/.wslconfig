@@ -382,7 +382,7 @@ telemetry = false
 
 # Launch WSL and distributions in Safe Mode
 #
-# When enabled, multiple configuration settings are overridden to be disabled.
+# If enabled, multiple configuration settings are overridden to be disabled.
 #
 # Default: false
 # Support: WSL 0.66.2
