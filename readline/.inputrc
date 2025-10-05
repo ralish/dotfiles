@@ -1,206 +1,273 @@
-# ----------------------------- Config Settings -------------------------------
-
-# Don't clear the eighth bit of input characters
+# Readline configuration
 #
-# Enabling this setting is required for UTF-8 encoding.
+# Last reviewed release: 8.3
+# Default file path in order of preference:
+# - Value of INPUTRC environment variable
+# - ~/.inputrc
+# - /etc/inputrc
+
+# -------------------------------- Encoding -----------------------------------
+
+# Enable 8-bit input (required for UTF-8)
+#
+# If enabled, the eighth bit of input characters will not be cleared regardless
+# of what the terminal claims it can support. The default is disabled, but the
+# setting will be automatically enabled if the locale contains characters whose
+# encoding requires the eighth bit to be set. This setting is dependent on the
+# LC_CTYPE environment variable and may change if the locale changes.
+#
+# The name "meta-flag" is an alias for this setting.
 set input-meta on
 
-# Display characters with the eighth bit set directly
+# Enable 8-bit output (required for UTF-8)
 #
-# Enabling this setting is required for UTF-8 encoding.
+# If enabled, characters with the eighth bit set will be displayed directly
+# instead of as a meta-prefixed escape sequence. The default is disabled, but
+# the setting will be automatically enabled if the locale contains characters
+# whose encoding requires the eighth bit to be set. This setting is dependent
+# on the LC_CTYPE environment variable and may change if the locale changes.
 set output-meta on
 
-# Convert characters with the eighth bit set to an ASCII key sequence
+# Enable 8-bit conversion (incompatible with UTF-8)
 #
-# Enabling this setting is incompatible with UTF-8 encoding.
+# If enabled, characters with the eighth bit set will be converted to a meta-
+# prefixed escape sequence. The default is enabled, but the setting will be
+# automatically disabled if the locale contains characters whose encoding
+# requires the eighth bit to be set. This setting is dependent on the LC_CTYPE
+# environment variable and may change if the locale changes. Key bindings may
+# also be affected when enabled (see the "force-meta-prefix" setting).
 set convert-meta off
 
-# Handling of the terminal bell
+# Convert binding key sequences to meta-prefixed escape sequences
 #
-# Valid values:
-# - none            Never ring the bell
-# - visible         Ring the visible bell
-# - audible         Ring the audible bell
-set bell-style none
-
-# Bind to special control characters handled by the terminal driver
-set bind-tty-special-chars on
-
-# Briefly move the cursor to the opening parenthesis on entering the close
-set blink-matching-paren off
-
-# Display the common prefix of possible completions in a different colour
-$if version >= 7.0
-set colored-completion-prefix on
+# If enabled, binding key sequences containing a meta key are always converted
+# to meta-prefixed escape sequences. If disabled, this behaviour is enabled if
+# the "convert-meta" setting is enabled.
+$if version >= 8.3
+set force-meta-prefix off
 $endif
 
-# Display completion matches using different colours to indicate file type
+# ------------------------------- Completion ----------------------------------
+
+# Disable word completion
+#
+# If enabled, completion characters are inserted as if mapped to "self-insert".
+set disable-completion off
+
+# Display the common prefix of possible completions using a different colour
+#
+# Colour definitions are taken from the LS_COLORS environment variable.
+set colored-completion-prefix on
+
+# Display possible completions using different colours to indicate file type
+#
+# Colour definitions are taken from the LS_COLORS environment variable.
 set colored-stats on
 
-# String to insert at the beginning of the line for insert-comment command
-set comment-begin '#'
-
-# Number of screen columns used to display possible completion matches
+# Number of screen columns used to display possible completions
 #
-# Ignored if <0 or greater than the terminal screen width.
+# Ignored if less than zero or greater than the terminal screen width.
 #
 # Valid values:
-# -  0              Display one match per line
-# - >0              Number of columns to use per line of matches
+# -  0      Display one match per line
+# - >0      Number of screen columns per line
 set completion-display-width -1
 
 # Perform filename matching and completion case-insensitively
 set completion-ignore-case on
 
-# Treat hypens and underscores as interchangeable during completion
+# Treat hypens and underscores as equal for filename matching and completion
 #
-# Only applies if completion-ignore-case is enabled.
+# Only applies when "completion-ignore-case" is enabled.
 set completion-map-case on
 
-# Maximum length of the common prefix in a list of completion matches which is
-# displayed without modification. If >0, common prefixes longer than this value
-# will be replaced with an ellipsis when displaying the possible completions.
+# Maximum number of characters in the common prefix of possible completions to
+# display without modification.
+#
+# If greater than zero, common prefixes longer than this value will be replaced
+# with an ellipsis. If filenames are being completed and a completion begins
+# with a period, three underscores will be used instead of an ellipsis.
 set completion-prefix-display-length 0
 
-# Number of possible completions for which confirmation is needed to display
+# Maximum number of possible completions to display without prompting the user
+# for comfirmation.
 #
 # Valid values:
-# - <0              Never prompt to display completion matches
-# -  0              Always prompt to display completion matches
-# - >0              Prompt if more than this number of matches
+# - <=0     Never prompt to display completions
+# - >=1     Number of completions which triggers a confirmation prompt
 set completion-query-items 200
 
-# Disable word completion
-set disable-completion off
+# Perform tilde expansion when performing word completion
+set expand-tilde off
 
-# Echo the corresponding control character for keyboard generated signals
-set echo-control-characters off
+# Display completed directory names with an appended slash
+set mark-directories on
+
+# Display completed directory symlinks with an appended slash
+#
+# Only applies when "mark-directories" is enabled.
+set mark-symlinked-directories on
+
+# When performing filename matching, include hidden files without requiring the
+# leading "." to be included in the filename.
+set match-hidden-files off
+
+# When performing menu completion, display the common prefix of possible
+# completions before cycling through the completions list.
+set menu-complete-display-prefix off
+
+# Display possible completions using an internal more(1)-like pager
+set page-completions off
+
+# Display possible completions with matches sorted horizontally
+set print-completions-horizontally off
+
+# When there is more than one possible completion, display the completions
+# immediately instead of ringing the terminal bell.
+set show-all-if-ambiguous on
+
+# When there is more than one possible completion and no partial completion,
+# display the completions immediately instead of ringing the terminal bell.
+set show-all-if-unmodified on
+
+# Factor text after the cursor position in a word into completion matching,
+# avoiding duplicating the portion of the word following the cursor.
+set skip-completed-text on
+
+# Append a character denoting a file's type when listing possible completions
+set visible-stats on
+
+# --------------------------------- Editing -----------------------------------
 
 # Default set of key bindings
 #
 # Valid values:
-# - emacs           Emacs-style key bindings
-# - vi              vi-style key bindings
+# - emacs
+# - vi
 set editing-mode emacs
 
-# String displayed immediately before the last line of the primary prompt when
-# emacs editing mode is active.
-#
-# Only applies if using emacs editing mode and show-mode-in-prompt is enabled.
-$if version >= 7.0
-set emacs-mode-string '@'
-$endif
-
-# Insert each paste into the editing buffer as a single string of characters
-$if version >= 7.0
-set enable-bracketed-paste on
-$endif
-
-# Enable the application keypad (needed to support arrow keys in some apps)
-set enable-keypad on
-
-# Enable any meta modifier key
-set enable-meta-key on
-
-# Perform tilde expansion when attempting word completion
-set expand-tilde off
-
-# Preserve the current cursor position when browsing history
-set history-preserve-point off
-
-# Maximum number of history entries to retain in the history list
+# Keymap for key binding commands
 #
 # Valid values:
-# - <0              Do not limit the number of history entries
-# -  0              Do not retain and delete any existing history
-# - >0              Number of history entries to retain
-set history-size -1
+# - emacs-standard
+#   Synonyms: emacs
+# - emacs-ctlx
+# - emacs-meta
+# - vi-command
+#   Synonyms: vi, vi-move
+# - vi-insert
+set keymap emacs
+
+# Handling of the terminal bell
+#
+# Valid values:
+# - none        Never ring the bell
+# - visible     Ring the visible bell
+# - audible     Ring the audible bell
+set bell-style none
+
+# Bind control characters handled by terminal driver to Readline equivalents
+set bind-tty-special-chars on
+
+# Briefly move the cursor to the opening parenthesis on closing
+set blink-matching-paren off
+
+# String to insert at the beginning of a line by the "insert-comment" command
+set comment-begin #
+
+# Echo a corresponding control character for keyboard generated signals
+set echo-control-characters off
+
+# Insert each paste into the editing buffer as a single string of characters,
+# instead of treating each character as if it was read from the keyboard.
+set enable-bracketed-paste on
+
+# Enable the application keypad (needed to support arrow keys on some systems)
+set enable-keypad on
+
+# Enable any meta modifier key the terminal claims to support
+set enable-meta-key on
 
 # Scroll lines longer than the screen width being edited instead of wrapping
 set horizontal-scroll-mode off
 
-# String of characters to terminate an incremental search
-set isearch-terminators '\C-[\C-J'
-
-# Keymap for key binding commands
-#
-# The value of editing-mode affects the default keymap.
-#
-# Valid values:
-# - emacs-standard      Synonyms: emacs
-# - emacs-ctlx
-# - emacs-meta
-# - vi-command          Synonyms: vi, vi-move
-# - vi-insert
-#set keymap emacs
-
 # Duration to wait for further input on an ambiguous key sequence. If no
-# further input is received, the shorter but complete key sequence is used.
+# further input is received the shorter but complete key sequence is used.
 #
 # Valid values:
-# - <=0             Wait until the key sequence is unambiguous
-# - >=1             Duration to wait for further input (milliseconds)
+# - <=0     Wait until the key sequence is unambiguous
+# - >=1     Duration to wait for further input (milliseconds)
 set keyseq-timeout 500
 
-# Mark completed directory names with an appended slash
-set mark-directories on
+# Use the visible bell if available instead of ringing the terminal bell
+prefer-visible-bell off
 
-# Mark modified history lines with a prepended asterisk
-set mark-modified-lines off
-
-# Mark completed directory symlinks with an appended slash
-#
-# Only applies if mark-directories is enabled.
-set mark-symlinked-directories on
-
-# Include hidden files without a leading "." when performing completion
-set match-hidden-files off
-
-# Display the common prefix of the possible completions (which may be empty)
-# before cycling through the completions list when performing menu completion.
-set menu-complete-display-prefix off
-
-# Display completion matches using an internal more-like pager if needed
-set page-completions off
-
-# Display completion matches sorted horizontally in alphabetical order
-set print-completions-horizontally off
-
-# Undo all changes to history lines before returning from accept-line
-set revert-all-at-newline off
-
-# List completion matches immediately when there's multiple completions
-set show-all-if-ambiguous on
-
-# List completion matches immediately when there's no common prefix
-set show-all-if-unmodified on
-
-# Add a character to the begining of the prompt showing the editing mode
+# Add a string to the begining of the prompt indicating the editing mode
 set show-mode-in-prompt off
 
-# Factor any text after the cursor position in a word into completion matching
-set skip-completed-text on
+# String displayed immediately before the last line of the primary prompt when
+# emacs editing mode is active.
+#
+# Only applies when "show-mode-in-prompt" is enabled.
+set emacs-mode-string @
 
 # String displayed immediately before the last line of the primary prompt when
 # vi editing mode is active and in command mode.
 #
-# Only applies if using vi editing mode and show-mode-in-prompt is enabled.
-$if version >= 7.0
-set vi-cmd-mode-string '(cmd)'
-$endif
+# Only applies when "show-mode-in-prompt" is enabled.
+set vi-cmd-mode-string (cmd)
 
 # String displayed immediately before the last line of the primary prompt when
 # vi editing mode is active and in insertion mode.
 #
-# Only applies if using vi editing mode and show-mode-in-prompt is enabled.
-$if version >= 7.0
-set vi-ins-mode-string '(ins)'
+# Only applies when "show-mode-in-prompt" is enabled.
+set vi-ins-mode-string (ins)
+
+$if version >= 8.3
+# Enable certain commands to designate a region as "active", highlighting the
+# text in the region. See the "active-region-start-color" and "active-region-
+# end-color" settings to control the highlighting.
+enable-active-region on
+
+# Escape sequences to set text colour and background in an active region
+#
+# The default is obtained from the terminal's terminfo description.
+#active-region-start-color
+
+# Escape sequences to reset text colour and background after an active region
+#
+# The default is obtained from the terminal's terminfo description.
+#active-region-end-color
 $endif
 
-# Append a character denoting a file's type when listing completion matches
-set visible-stats on
+# --------------------------------- History -----------------------------------
 
-# ------------------------------ Key Mappings ---------------------------------
+# Preserve the current cursor position when browsing history
+set history-preserve-point off
+
+# Number of history entries to retain in the history list
+#
+# Valid values:
+# - <0      Do not limit the number of history entries
+# -  0      Do not retain and delete existing history
+# - >0      Maximum number of history entries to retain
+set history-size -1
+
+# String of characters to terminate an incremental history search
+set isearch-terminators \e\C-j
+
+# Mark modified history lines with a prepended asterisk
+set mark-modified-lines off
+
+# Undo changes to history lines before returning from "accept-line"
+set revert-all-at-newline off
+
+# Perform searches of the history list case-insensitively
+$if version >= 8.3
+set search-ignore-case off
+$endif
+
+# ------------------------------ Key bindings ---------------------------------
 
 # Set Home/End keys to jump to the beginning/end of line
 "\e[1~": beginning-of-line
@@ -215,11 +282,12 @@ set visible-stats on
 "\e[B": history-search-forward
 
 # Set Ctrl+Left/Right arrow keys to move to the adjacent word
-"\e[D": backward-word
-"\e[C": forward-word
-"\e[1;2D": backward-word
-"\e[1;2C": forward-word
+"\eOD": backward-word
+"\eOC": forward-word
 "\e[1;5D": backward-word
 "\e[1;5C": forward-word
+
+# Set Ctrl+R to perform an incremental backwards history search
+"\C-r": reverse-search-history
 
 # vim: syntax=readline cc=80 tw=79 ts=4 sw=4 sts=4 et sr
