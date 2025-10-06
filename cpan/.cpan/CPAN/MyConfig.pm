@@ -164,8 +164,14 @@ $CPAN::Config = {
     # Include suggested module dependencies
     'suggests_policy' => q[0],
 
-    # Verify module signatures (requires Module::Signature)
-    'check_sigs' => q[1],
+    # Verify module signatures (requires Module::Signature and gpg)
+    #
+    # Disabled as apart from the dependency requirements it also doesn't work
+    # on Windows due to CPAN hardcoding the temporary directory path to "/tmp".
+    # This path will be resolved to "C:\tmp" and if it doesn't exist (which it
+    # typically won't) then creating the temporary file will fail. Verified to
+    # still be broken as of CPAN v2.38.
+    'check_sigs' => q[0],
 
     # Use default values for interactive prompts during builds
     'use_prompt_default' => q[0],
