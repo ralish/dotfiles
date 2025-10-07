@@ -1,6 +1,16 @@
 # ShellCheck settings
+# https://github.com/koalaman/shellcheck/wiki/Directive#shellcheckrc-file
 #
-# Last reviewed release: v0.10.0
+# Last reviewed release: v0.11.0
+# Default file paths in preference order:
+# - .shellcheckrc, shellcheckrc
+#   In script directory and each parent directory up to the root
+# - User data directory
+#   Unix-like: ~/.shellcheckrc
+#   Windows: %APPDATA%/shellcheckrc
+# - XDG config directory
+#   Unix-like: ${XDG_CONFIG_HOME:-~/.config}/shellcheckrc
+#   Windows: ${XDG_CONFIG_HOME:-%APPDATA%}/shellcheckrc
 
 # List of optional checks to enable
 enable=all
