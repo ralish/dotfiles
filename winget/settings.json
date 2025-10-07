@@ -37,27 +37,16 @@
         "progressBar": "accent"
     },
 
-    "downloadBehavior": {
-        "defaultDownloadDirectory": "%USERPROFILE%/Downloads/WinGet/"
-    },
-
     "installBehavior": {
         "archiveExtractionMethod": "shellApi",
         "disableInstallNotes": false,
         "maxResumes": 3,
         "skipDependencies": false,
 
-        "portablePackageMachineRoot": "%PROGRAMFILES%/WinGet/Packages/",
-        "portablePackageUserRoot": "%LOCALAPPDATA%/Microsoft/WinGet/Packages/",
-
         "preferences": {
             "locale": ["en-AU", "en-GB", "en-US"],
             "scope": "user"
         }
-    },
-
-    "configureBehavior": {
-        "defaultModuleRoot": "%LOCALAPPDATA%/Microsoft/WinGet/Configuration/Modules/"
     },
 
     "uninstallBehavior": {
