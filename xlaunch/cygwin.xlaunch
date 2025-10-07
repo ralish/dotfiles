@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     XLaunch configuration for Cygwin/X
+    https://x.cygwin.com/docs/xlaunch/
+
     Last reviewed release: v20160530-1
 
     There's no XML schema seemingly available so the supported settings have

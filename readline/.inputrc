@@ -1,8 +1,9 @@
 # Readline configuration
+# https://tiswww.cwru.edu/php/chet/readline/rluserman.html
 #
 # Last reviewed release: 8.3
-# Default file path in order of preference:
-# - Value of INPUTRC environment variable
+# Default file paths in preference order:
+# - INPUTRC environment variable
 # - ~/.inputrc
 # - /etc/inputrc
 

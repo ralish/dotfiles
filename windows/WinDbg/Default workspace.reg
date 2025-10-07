@@ -1,6 +1,7 @@
 Windows Registry Editor Version 5.00
 
 ; WinDbg workspace configuration
+; https://learn.microsoft.com/en-au/windows-hardware/drivers/debuggercmds/windbg-overview
 ;
 ; Last reviewed release: v10.0.26100.4948
 

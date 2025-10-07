@@ -1,4 +1,4 @@
-# CPAN
+# CPAN configuration
 # https://perldoc.perl.org/CPAN
 #
 # Last reviewed release: 2.38

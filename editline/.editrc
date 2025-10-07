@@ -1,8 +1,9 @@
 # Editline configuration
+# https://man.netbsd.org/editrc.5
 #
 # Last reviewed release: v20250104
-# Default file path in order of preference:
-# - Value of EDITRC environment variable
+# Default file paths in preference order:
+# - EDITRC environment variable
 # - ~/.editrc
 
 # -------------------------------- Settings -----------------------------------
