@@ -19,9 +19,8 @@ fi
 # Clear the console on exit if this is not a nested shell session
 # shellcheck disable=SC3028
 if [ "${SHLVL:-1}" = 1 ]; then
-    clear_console="$(command -v clear_console > /dev/null)"
-    if [ -n "$clear_console" ]; then
-        "$clear_console" -q
+    if command -v clear_console > /dev/null; then
+        clear_console -q
     fi
 fi
 
