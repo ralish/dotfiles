@@ -522,6 +522,7 @@
 	brv = branch -vv
 	bra = branch --all -vv
 	brd = branch --delete
+	brr = branch --remote
 
 	bs  = bisect
 	bsb = bisect bad
