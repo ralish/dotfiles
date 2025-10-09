@@ -70,6 +70,14 @@ temp/
 /cpan/.cpan/prefs/
 /cpan/.cpan/sources/
 
+# CPANPLUS
+/cpanp/.cpanplus/*.gz
+/cpanp/.cpanplus/*.stored
+/cpanp/.cpanplus/history
+/cpanp/.cpanplus/[0-9].*/
+/cpanp/.cpanplus/authors/
+/cpanp/.cpanplus/install-logs/
+
 # Fiddler
 /fiddler/Scripts/BrowserPAC.js
 
