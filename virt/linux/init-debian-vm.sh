@@ -40,7 +40,7 @@ function apt_install() {
 if [[ $lsb_release_id == 'Ubuntu' ]]; then
     echo '[apt] Switching to local mirror ... '
     ubuntu_release="$(lsb_release -s -r)"
-    ubuntu_release_year="$(echo "$ubuntu_release" | grep -o -E '^[0-9]+')"
+    ubuntu_release_year="$(echo "$ubuntu_release" | grep -Eo '^[0-9]+')"
     if ((ubuntu_release_year >= 14)); then
         sed -i 's/http:\/\/\([a-z]\{2\}\.\)\?\(archive\.ubuntu\.com\)/http:\/\/au\.\2/' /etc/apt/sources.list
     else
@@ -102,7 +102,7 @@ if [[ -f /etc/update-manager/release-upgrades ]]; then
     # Remove any cached release upgrade prompt
     if ((ubuntu_release_year >= 13)); then
         cat /dev/null > /var/lib/ubuntu-release-upgrader/release-upgrade-available
-    else
+    elif [[ -d /var/lib/update-notifier ]]; then
         cat /dev/null > /var/lib/update-notifier/release-upgrade-available
     fi
 fi
