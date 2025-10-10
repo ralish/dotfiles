@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code settings
      *
-     * Last reviewed release: v1.104.3
+     * Last reviewed release: v1.105.0
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
@@ -135,6 +135,9 @@
     "terminal.integrated.tabs.showActions": "always",
     "terminal.sourceControlRepositoriesKind": "both",
 
+    // Features: Task
+    "task.notifyWindowOnTaskCompletion": -1,
+
     // Features: Remote
     "remote.autoForwardPorts": false,
 
@@ -152,6 +155,8 @@
 
     // Features: Chat
     "chat.agent.thinkingStyle": "collapsedPreview",
+    "chat.notifyWindowOnConfirmation": false,
+    "chat.notifyWindowOnResponseReceived": false,
     "chat.tools.terminal.enableAutoApprove": false,
     "inlineChat.holdToSpeech": false,
 

@@ -452,7 +452,7 @@
     //  - vscjava.vscode-java-pack: Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven/Gradle support, project management and more
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
-    //  - serkonda7.vscode-vba: VBA tooling, syntax highlighting and snippets.
+    //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
     //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
@@ -485,6 +485,7 @@
     //  - emilast.LogFileHighlighter: Adds color highlighting to log files to make it easier to follow the flow of log events and identify problems.
     //  - vscode.media-preview: Provides VS Code's built-in previews for images, audio, and video
     //  - vscode.merge-conflict: Highlighting and commands for inline merge conflicts.
+    //  - vscode.mermaid-chat-features: Adds Mermaid diagram support to built-in chats.
     //  - vscode.microsoft-authentication: Microsoft authentication provider
     //  - vscode.npm: Extension to add task support for npm scripts.
     //  - xdebug.php-debug: Debug support for PHP with Xdebug
@@ -575,7 +576,7 @@
     //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
-    //  - serkonda7.vscode-vba: VBA tooling, syntax highlighting and snippets.
+    //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
     //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
@@ -607,6 +608,7 @@
     //  - emilast.LogFileHighlighter: Adds color highlighting to log files to make it easier to follow the flow of log events and identify problems.
     //  - vscode.media-preview: Provides VS Code's built-in previews for images, audio, and video
     //  - vscode.merge-conflict: Highlighting and commands for inline merge conflicts.
+    //  - vscode.mermaid-chat-features: Adds Mermaid diagram support to built-in chats.
     //  - vscode.microsoft-authentication: Microsoft authentication provider
     //  - vscode.npm: Extension to add task support for npm scripts.
     //  - xdebug.php-debug: Debug support for PHP with Xdebug
@@ -920,6 +922,9 @@
     // Controls whether to automatically show inline suggestions in the editor.
     "editor.inlineSuggest.enabled": true,
 
+    // Controls whether to send request information from the inline suggestion provider.
+    "editor.inlineSuggest.experimental.emptyResponseInformation": true,
+
     // Controls whether to show inline suggestions when there is a suggest conflict.
     "editor.inlineSuggest.experimental.showOnSuggestConflict": "never",
 
@@ -937,6 +942,9 @@
     //  - onHover: Show the inline suggestion toolbar when hovering over an inline suggestion.
     //  - never: Never show the inline suggestion toolbar.
     "editor.inlineSuggest.showToolbar": "onHover",
+
+    // Controls whether inline suggestions are suppressed when in snippet mode.
+    "editor.inlineSuggest.suppressInSnippetMode": true,
 
     // Controls how inline suggestions interact with the suggest widget. If enabled, the suggest widget is not shown automatically when inline suggestions are available.
     "editor.inlineSuggest.suppressSuggestions": false,
@@ -1037,6 +1045,9 @@
     //  - fill: The minimap will stretch or shrink as necessary to fill the height of the editor (no scrolling).
     //  - fit: The minimap will shrink as necessary to never be larger than the editor (no scrolling).
     "editor.minimap.size": "proportional",
+
+    // Controls what happens when middle mouse button is clicked in the editor.
+    "editor.mouseMiddleClickAction": "default",
 
     // A multiplier to be used on the `deltaX` and `deltaY` of mouse wheel scroll events.
     "editor.mouseWheelScrollSensitivity": 1,
@@ -2780,9 +2791,6 @@
     // Suppresses error toasts from showing up if the server encounters a recoverable error.
     "razor.languageServer.suppressLspErrorToasts": true,
 
-    // Use the new Razor formatting engine.
-    "razor.languageServer.useNewFormattingEngine": true,
-
     // Controls the font size (in pixels) of the screencast mode keyboard.
     "screencastMode.fontSize": 56,
 
@@ -2921,6 +2929,7 @@
         "*.json": "${capture}.Development.json",
         "*.cshtml": "${capture}.cshtml.cs,${capture}.cshtml.css",
         "*.razor": "${capture}.razor.cs,${capture}.razor.css",
+        "*.resx": "${capture}.Designer.cs",
         "*.xaml": "${capture}.xaml.cs"
     },
 
@@ -3585,6 +3594,9 @@
 
     // Controls whether use of Electron's fetch implementation instead of Node.js' should be enabled. All local extensions will get Electron's fetch implementation for the global fetch API.
     "http.electronFetch": false,
+
+    // Controls the interval in seconds for checking network interface changes to invalidate the proxy cache. Set to -1 to disable. When during [remote development](https://aka.ms/vscode-remote) the `http.useLocalProxyConfiguration` setting is disabled this setting can be configured in the local and the remote settings separately.
+    "http.experimental.networkInterfaceCheckInterval": 300,
 
     // Controls whether experimental loading of CA certificates from the OS should be enabled. This uses a more general approach than the default implementation. When during [remote development](https://aka.ms/vscode-remote) the `http.useLocalProxyConfiguration` setting is disabled this setting can be configured in the local and the remote settings separately.
     "http.experimental.systemCertificatesV2": false,
@@ -4536,6 +4548,11 @@
 
     // Controls whether test decorations are shown in the editor gutter.
     "testing.gutterEnabled": true,
+
+    // Controls the layout of the Test Results view.
+    //  - treeRight: Show the test run tree on the right side with details on the left.
+    //  - treeLeft: Show the test run tree on the left side with details on the right.
+    "testing.resultsView.layout": "treeRight",
 
     // Control whether save all dirty editors before running a test.
     "testing.saveBeforeTest": true,
@@ -5685,7 +5702,7 @@
     //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
-    //  - serkonda7.vscode-vba: VBA tooling, syntax highlighting and snippets.
+    //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
     //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
@@ -5717,6 +5734,7 @@
     //  - emilast.LogFileHighlighter: Adds color highlighting to log files to make it easier to follow the flow of log events and identify problems.
     //  - vscode.media-preview: Provides VS Code's built-in previews for images, audio, and video
     //  - vscode.merge-conflict: Highlighting and commands for inline merge conflicts.
+    //  - vscode.mermaid-chat-features: Adds Mermaid diagram support to built-in chats.
     //  - vscode.microsoft-authentication: Microsoft authentication provider
     //  - vscode.npm: Extension to add task support for npm scripts.
     //  - xdebug.php-debug: Debug support for PHP with Xdebug
@@ -6061,10 +6079,14 @@
         "du": true,
         "df": true,
         "sleep": true,
+        "grep": true,
         "git status": true,
         "git log": true,
         "git show": true,
         "git diff": true,
+        "git grep": true,
+        "git branch": true,
+        "/^git branch\\b.*-(d|D|m|M|-delete|-force)\\b/": false,
         "Get-ChildItem": true,
         "Get-Content": true,
         "Get-Date": true,
@@ -6087,21 +6109,19 @@
         "/^date\\b.*(-s|--set)\\b/": false,
         "find": true,
         "/^find\\b.*-(delete|exec|execdir|fprint|fprintf|fls|ok|okdir)\\b/": false,
-        "grep": true,
-        "/^grep\\b.*-(f|P)\\b/": false,
         "sort": true,
         "/^sort\\b.*-(o|S)\\b/": false,
         "tree": true,
         "/^tree\\b.*-o\\b/": false,
-        "/\\(.+\\)/": {
+        "/\\(.+\\)/s": {
             "approve": false,
             "matchCommandLine": true
         },
-        "/\\{.+\\}/": {
+        "/\\{.+\\}/s": {
             "approve": false,
             "matchCommandLine": true
         },
-        "/`.+`/": {
+        "/`.+`/s": {
             "approve": false,
             "matchCommandLine": true
         },
@@ -6138,11 +6158,23 @@
         "iex": false
     },
 
+    // Whether to automatically respond to prompts in the terminal such as `Confirm? y/n`. This is an experimental feature and may not work in all scenarios.
+    "chat.tools.terminal.autoReplyToPrompts": false,
+
     // Controls whether to allow auto approval in the run in terminal tool.
     "chat.tools.terminal.enableAutoApprove": true,
 
     // Configures the duration in milliseconds to wait for shell integration to be detected when the run in terminal tool launches a new terminal. Set to `0` to wait the minimum time, the default value `-1` means the wait time is variable based on the value of `terminal.integrated.shellIntegration.enabled` and whether it's a remote window. A large value can be useful if your shell starts very slowly and a low value if you're intentionally not using shell integration.
     "chat.tools.terminal.shellIntegrationTimeout": -1,
+
+    // The terminal profile to use on Linux for chat agent's run in terminal tool.
+    "chat.tools.terminal.terminalProfile.linux": null,
+
+    // The terminal profile to use on macOS for chat agent's run in terminal tool.
+    "chat.tools.terminal.terminalProfile.osx": null,
+
+    // The terminal profile to use on Windows for chat agent's run in terminal tool.
+    "chat.tools.terminal.terminalProfile.windows": null,
 
     // Use `chat.tools.terminal.autoApprove` instead
     //
@@ -7534,6 +7566,9 @@
     //  - comment-discussion-sparkle: $(comment-discussion-sparkle)
     //  - chat-sparkle-warning: $(chat-sparkle-warning)
     //  - chat-sparkle-error: $(chat-sparkle-error)
+    //  - collection: $(collection)
+    //  - new-collection: $(new-collection)
+    //  - thinking: $(thinking)
     //  - dialog-error: $(dialog-error)
     //  - dialog-warning: $(dialog-warning)
     //  - dialog-info: $(dialog-info)
@@ -7662,6 +7697,9 @@
 
     // Controls enablement of `provideTasks` for all task provider extension. If the Tasks: Run Task command is slow, disabling auto detect for task providers may help. Individual extensions may also provide settings that disable auto detection.
     "task.autoDetect": "on",
+
+    // Controls the minimum task runtime in milliseconds before showing an OS notification when the task finishes while the window is not in focus. Set to -1 to disable notifications. Set to 0 to always show notifications. This includes a window badge as well as notification toast.
+    "task.notifyWindowOnTaskCompletion": 60000,
 
     // Configures whether to show the problem matcher prompt when running a task. Set to `true` to never prompt, or use a dictionary of task types to turn off prompting only for specific task types.
     "task.problemMatchers.neverPrompt": false,
@@ -9610,10 +9648,20 @@
     //  - collapsedPreview: Thinking parts will be expanded first, then collapse once we reach a part that is not thinking.
     //  - expanded: Thinking parts will be expanded by default.
     //  - none: Do not show the thinking
+    //  - collapsedPerItem: Each thinking subsection is individually collapsible and collapsed by default inside the thinking block.
+    //  - fixedScrolling: Show thinking in a fixed-height streaming panel that auto-scrolls; click header to expand to full height.
     "chat.agent.thinkingStyle": "collapsed",
+
+    // Configures the todo list widget in chat.
+    "chat.agent.todoList": {
+        "position": "default"
+    },
 
     // Controls where to show the agent sessions menu.
     "chat.agentSessionsViewLocation": "disabled",
+
+    // Controls whether anonymous access is allowed in chat.
+    "chat.allowAnonymousAccess": false,
 
     // Enables checkpoints in chat. Checkpoints allow you to restore the chat to a previous state.
     "chat.checkpoints.enabled": true,
@@ -9697,10 +9745,10 @@
     // Enable math rendering in chat responses using KaTeX.
     "chat.math.enabled": true,
 
-    // Controls access to Model Context Protocol servers.
+    // Controls access to installed Model Context Protocol servers.
     //  - none: No access to MCP servers.
-    //  - registry: Only allow access to MCP servers from the registry.
-    //  - all: Allow access to any MCP server.
+    //  - registry: Allows access to MCP servers installed from the registry that VS Code is connected to.
+    //  - all: Allow access to any installed MCP server.
     "chat.mcp.access": "all",
 
     // Enables NuGet packages for AI-assisted MCP server installation. Used to install MCP servers by name from the central registry for .NET packages (NuGet.org).
@@ -9710,7 +9758,7 @@
     //  - never: Never automatically start MCP servers.
     //  - onlyNew: Only automatically start new MCP servers that have never been run.
     //  - newAndOutdated: Automatically start new and outdated MCP servers that are not yet running.
-    "chat.mcp.autostart": "never",
+    "chat.mcp.autostart": "newAndOutdated",
 
     // Configures discovery of Model Context Protocol servers from configuration from various other applications.
     "chat.mcp.discovery.enabled": {
@@ -9719,6 +9767,9 @@
         "cursor-global": false,
         "cursor-workspace": false
     },
+
+    // Enables the default Marketplace for Model Context Protocol (MCP) servers.
+    "chat.mcp.gallery.enabled": false,
 
     // Configures which models are exposed to MCP servers for sampling (making model requests in the background). This setting can be edited in a graphical way under the `MCP: List Servers` command.
     "chat.mcp.serverSampling": {},
@@ -9730,8 +9781,11 @@
         ".github/chatmodes": true
     },
 
-    // Controls whether a chat session should notify the user when a confirmation is needed while the window is not in focus. This includes a window badge as well as notification toast.
+    // Controls whether a chat session should present the user with an OS notification when a confirmation is needed while the window is not in focus. This includes a window badge as well as notification toast.
     "chat.notifyWindowOnConfirmation": true,
+
+    // Controls whether a chat session should present the user with an OS notification when a response is received while the window is not in focus. This includes a window badge as well as notification toast.
+    "chat.notifyWindowOnResponseReceived": true,
 
     // Enable reusable prompt (`*.prompt.md`) and instruction files (`*.instructions.md`) in Chat sessions. [Learn More](https://aka.ms/vscode-ghcp-prompt-snippets).
     "chat.promptFiles": true,
@@ -9764,15 +9818,15 @@
     // Controls whether session descriptions are displayed on a second row in the Chat Sessions view.
     "chat.showAgentSessionsViewDescription": true,
 
-    // Enables todo lists in chat, which the agent uses as a tool for planning, progress tracking, and context management for complex development workflows.
-    "chat.todoListTool.enabled": false,
+    // When enabled, todo items include detailed descriptions for implementation context. This provides more information but uses additional tokens and may slow down responses.
+    "chat.todoListTool.descriptionField": true,
 
     // When enabled, the todo tool operates in write-only mode, requiring the agent to remember todos in context.
     "chat.todoListTool.writeOnly": false,
 
     // Controls whether edits made by chat are automatically approved. The default is to approve all edits except those made to certain files which have the potential to cause immediate unintended side-effects, such as `**/.vscode/*.json`.
     //
-    // Files are matched against the glob patterns in the order they are specified.
+    // Set to `true` to automatically approve edits to matching files, `false` to always require explicit approval. The last pattern matching a given file will determine whether the edit is automatically approved.
     "chat.tools.edits.autoApprove": {
         "**/*": true,
         "**/.vscode/*.json": false,
@@ -9792,11 +9846,11 @@
     // Controls whether instructions from `AGENTS.MD` file found in a workspace roots are added to all chat requests.
     "chat.useAgentsMdFile": true,
 
-    // Controls whether the 'Delegate to coding agent' button uses the new chat sessions API.
-    "chat.useChatSessionsForCloudButton": false,
+    // Experimental implementation of 'cloud button'
+    "chat.useCloudButtonV2": false,
 
-    // Enables storing chat sessions on disk instead of in the storage service. Enabling this does a one-time per-workspace migration of existing sessions to the new format.
-    "chat.useFileStorage": true,
+    // Controls whether instructions `AGENTS.MD` files found in the workspace are listed in all chat requests.
+    "chat.useNestedAgentsMdFiles": false,
 
     //
     //  - legacy: Uses the legacy diffing algorithm.
@@ -10108,6 +10162,9 @@
 
     // Controls whether links should be underlined in the workbench.
     "accessibility.underlineLinks": false,
+
+    // Controls whether verbose progress announcements should be made when a chat request is in progress, including information like searched text for <search term> with X results, created file <file_name>, or read file <file path>.
+    "accessibility.verboseChatProgressUpdates": true,
 
     // Provide information about actions that can be taken in the comment widget or in a file which contains comments.
     "accessibility.verbosity.comments": true,
@@ -10657,6 +10714,9 @@
     //  - Beside: Open the diff view next to the current editor group.
     //  - Below: Open the diff view below the current editor group.
     "merge-conflict.diffViewPosition": "Current",
+
+    // Enable a tool for experimental Mermaid diagram rendering in chat responses.
+    "mermaid-chat.enabled": false,
 
     // The custom configuration for the Sovereign Cloud to use with the Microsoft Sovereign Cloud authentication provider. This along with setting `microsoft-sovereign-cloud.environment` to `custom` is required to use this feature.
     "microsoft-sovereign-cloud.customEnvironment": {},
@@ -11838,6 +11898,9 @@
     // Note: Keep your instructions short and precise. Poor instructions can degrade Copilot's quality and performance.
     "github.copilot.chat.commitMessageGeneration.instructions": [],
 
+    // Sets the fetcher used for the inline completions.
+    "github.copilot.chat.completionsFetcher": "",
+
     // Configure custom OpenAI-compatible models. Each key should be a unique model ID, and the value should be an object with model configuration including name, url, toolCalling, vision, maxInputTokens, and maxOutputTokens properties.
     "github.copilot.chat.customOAIModels": {},
 
@@ -11873,6 +11936,9 @@
 
     // Enables the TypeScript language context provider for inline completions
     "github.copilot.chat.languageContext.typescript.enabled": false,
+
+    // Sets the fetcher used for the next edit suggestions.
+    "github.copilot.chat.nesFetcher": "",
 
     // Whether to use the [Context7](command:github.copilot.mcp.viewContext7) tools to scaffold project for new workspace creation.
     "github.copilot.chat.newWorkspace.useContext7": false,
@@ -11999,6 +12065,7 @@
     // Languages that the '#' character should not be used to trigger issue completion suggestions.
     "githubIssues.ignoreCompletionTrigger": [
         "coffeescript",
+        "crystal",
         "diff",
         "dockerfile",
         "dockercompose",
@@ -12020,6 +12087,11 @@
 
     // Languages that the '@' character should not be used to trigger user completion suggestions.
     "githubIssues.ignoreUserCompletionTrigger": [],
+
+    // Controls which avatar to display in the issue list.
+    //  - author: Show the avatar of the issue creator
+    //  - assignee: Show the avatar of the first assignee (show GitHub icon if no assignees)
+    "githubIssues.issueAvatarDisplay": "author",
 
     // Advanced settings for the name of the branch that is created when you start working on an issue.
     // - `${user}` will be replaced with the currently logged in username
@@ -12082,7 +12154,7 @@
     "githubPullRequests.codingAgent.promptForConfirmation": true,
 
     // Enables UI integration within VS Code to create new coding agent sessions.
-    "githubPullRequests.codingAgent.uiIntegration": false,
+    "githubPullRequests.codingAgent.uiIntegration": true,
 
     // Controls whether comments are expanded when a document with comments is opened. Requires a reload to take effect for comments that have already been added.
     //  - expandUnresolved: All unresolved comments will be expanded.
@@ -12147,7 +12219,7 @@
     // Prevents branches that are associated with a pull request from being automatically detected. This will prevent review mode from being entered on these branches.
     "githubPullRequests.ignoredPullRequestBranches": [],
 
-    // Prevents repositories that are submodules from being managed by the GitHub Pull Requests extension.
+    // Prevents repositories that are submodules from being managed by the GitHub Pull Requests extension. A window reload is required for changes to this setting to take effect.
     "githubPullRequests.ignoreSubmodules": false,
 
     // The setting `githubPullRequests.includeRemotes` has been deprecated. Use `githubPullRequests.remotes` to configure what remotes are shown.
@@ -12177,6 +12249,11 @@
     //  - checkoutDefaultBranchAndShow: Checkout the default branch of the repository and show the pull request in the Pull Requests view
     //  - checkoutDefaultBranchAndCopy: Checkout the default branch of the repository and copy a link to the pull request to the clipboard
     "githubPullRequests.postCreate": "openOverview",
+
+    // The action to take after using the 'checkout default branch' or 'delete branch' actions on a currently checked out pull request.
+    //  - checkoutDefaultBranch: Checkout the default branch of the repository
+    //  - checkoutDefaultBranchAndPull: Checkout the default branch of the repository and pull the latest changes
+    "githubPullRequests.postDone": "checkoutDefaultBranch",
 
     // Pull changes from the remote when a pull request branch is checked out locally. Changes are detected when the pull request is manually refreshed and during periodic background updates.
     //  - prompt: Prompt to pull a pull request branch when changes are detected in the pull request.
@@ -13195,6 +13272,9 @@
     // Enables/disables the feature for the extension to automatically track the currently active item in the editor and highlight it within the Solution Explorer.
     "dotnet.automaticallySyncWithActiveItem": false,
 
+    // Suppresses the warning dialog when attempting to debug a project with an unsupported DebugType (e.g. full or pdbonly).
+    "dotnet.debug.suppressInvalidDebugTypeWarning": false,
+
     // Controls whether the extension uses the default Visual Studio Code File System Watcher. This is recommended if you have a files.watcherExclude setting.
     "dotnet.preferVisualStudioCodeFileSystemWatcher": false,
 
@@ -13209,6 +13289,9 @@
 
     // Disable automatic build before running tests. If this option is set, you must manually build your tests before running to make sure they are up to date.
     "dotnet.testWindow.disableBuildOnRun": false,
+
+    // Override the default timeout (in seconds) for test discovery operations.
+    "dotnet.testWindow.discoveryTimeoutInSec": 900,
 
     // Enables the Test Explorer to show the diff of the test results.
     "dotnet.testWindow.enableTestExplorerDiff": false,
