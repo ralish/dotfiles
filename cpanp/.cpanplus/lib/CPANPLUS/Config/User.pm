@@ -67,12 +67,12 @@ sub setup {
     # Fetched archives
     #
     # If an empty string, a directory under the "base" directory will be used.
-    $conf->set_conf( fetchdir => '' );
+    $conf->set_conf( fetchdir => $IsWin ? q[D:\\Cache\\CPANPLUS\\sources] : qq[$ENV{HOME}/.cpanplus/sources] );
 
     # Extracted archives
     #
     # If an empty string, a directory under the "base" directory will be used.
-    $conf->set_conf( extractdir => '' );
+    $conf->set_conf( extractdir => $IsWin ? q[D:\\Cache\\CPANPLUS\\build] : qq[$ENV{HOME}/.cpanplus/build] );
 
     #####################
     ### Interactivity ###
