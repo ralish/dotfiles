@@ -78,6 +78,7 @@ file_exts=(
     # rpm
     'rpmnew'
     'rpmsave'
+    'save_by_rpm'
 
     # ucf
     'ucf-dist'
