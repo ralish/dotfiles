@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # Git configuration
-if df_app_load 'Git [git]' 'command -v git > /dev/null'; then
+if df_app_load 'git' 'command -v git > /dev/null'; then
     # Switch to or retrieve the root of the repository
     alias git-repo-root='cd "$(git rev-parse --show-toplevel)"'
     alias grr='git-repo-root'

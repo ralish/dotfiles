@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # ripgrep configuration
-if df_app_load 'ripgrep [rg]' 'command -v rg > /dev/null'; then
+if df_app_load 'rg' 'command -v rg > /dev/null'; then
     # Config file path must be set explicitly
     export RIPGREP_CONFIG_PATH="${HOME}/.ripgreprc"
 

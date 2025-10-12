@@ -13,7 +13,7 @@ elif command -v brew > /dev/null; then
     brew_path="$(command -v brew)"
 fi
 
-if df_app_load 'Homebrew [brew]' "[ -n \"$brew_path\" ]"; then
+if df_app_load 'brew' "[ -n \"$brew_path\" ]"; then
     # Opt-out of analytics
     export HOMEBREW_NO_ANALYTICS=1
 

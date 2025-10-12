@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # AWS CLI configuration
-if df_app_load 'AWS CLI [aws]' 'command -v aws > /dev/null'; then
+if df_app_load 'aws' 'command -v aws > /dev/null'; then
     # Command completion
     # https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html
     if command -v aws_completer > /dev/null; then

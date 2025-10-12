@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # Cabal configuration
-if df_app_load 'Cabal [cabal]' 'command -v cabal > /dev/null'; then
+if df_app_load 'cabal' 'command -v cabal > /dev/null'; then
     cabal_bin="${HOME}/.cabal/bin"
 
     # Add local bin directory to PATH

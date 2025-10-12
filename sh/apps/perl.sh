@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # Perl configuration
-if df_app_load 'Perl [perl]' 'command -v perl > /dev/null'; then
+if df_app_load 'perl' 'command -v perl > /dev/null'; then
     # Check if local::lib is available
     if ! perl -e 'eval "require local::lib"; if ($@) { exit 1 }'; then
         echo '[dotfiles] Perl found but local:lib module not available.'

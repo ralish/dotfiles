@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # The Silver Searcher configuration
-if df_app_load 'The Silver Searcher [ag]' 'command -v ag > /dev/null'; then
+if df_app_load 'ag' 'command -v ag > /dev/null'; then
     # Aliases for common operations
     alias ag-todo="ag 'fixme|hack|todo'"
 fi

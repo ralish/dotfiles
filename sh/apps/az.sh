@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 
 # Azure CLI configuration
-if df_app_load 'Azure CLI [az]' 'command -v az > /dev/null'; then
+if df_app_load 'az' 'command -v az > /dev/null'; then
     # Opt-out of telemetry
     export AZURE_CORE_COLLECT_TELEMETRY=false
 fi
