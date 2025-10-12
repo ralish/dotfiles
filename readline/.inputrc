@@ -201,7 +201,7 @@ set horizontal-scroll-mode off
 set keyseq-timeout 500
 
 # Use the visible bell if available instead of ringing the terminal bell
-prefer-visible-bell off
+set prefer-visible-bell off
 
 # Add a string to the begining of the prompt indicating the editing mode
 set show-mode-in-prompt off
@@ -228,17 +228,17 @@ $if version >= 8.3
 # Enable certain commands to designate a region as "active", highlighting the
 # text in the region. See the "active-region-start-color" and "active-region-
 # end-color" settings to control the highlighting.
-enable-active-region on
+set enable-active-region on
 
 # Escape sequences to set text colour and background in an active region
 #
 # The default is obtained from the terminal's terminfo description.
-#active-region-start-color
+#set active-region-start-color
 
 # Escape sequences to reset text colour and background after an active region
 #
 # The default is obtained from the terminal's terminfo description.
-#active-region-end-color
+#set active-region-end-color
 $endif
 
 # --------------------------------- History -----------------------------------
