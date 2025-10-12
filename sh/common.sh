@@ -48,7 +48,8 @@ elif [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
     . "$sh_systems_dir/linux.sh"
 
     # shellcheck source=sh/systems/wsl.sh
-    if [ -f "/proc/sys/fs/binfmt_misc/WSLInterop" ]; then
+    if [ -f "/proc/sys/fs/binfmt_misc/WSLInterop" ] ||
+        [ -f "/proc/sys/fs/binfmt_misc/WSLInterop-late" ]; then
         . "$sh_systems_dir/wsl.sh"
     fi
 fi
