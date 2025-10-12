@@ -3,7 +3,7 @@
 # Cygwin shell configuration
 
 # Cygwin package repository mirror
-CYGWIN_PKGS='http://mirrors.kernel.org/sourceware/cygwin/'
+CYGWIN_PKGS='https://mirrors.kernel.org/sourceware/cygwin/'
 
 # -----------------------------------------------------------------------------
 
