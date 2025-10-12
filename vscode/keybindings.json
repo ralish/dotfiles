@@ -5,10 +5,20 @@
      * Default file path: %APPDATA%\Code\User\keybindings.json
      */
 
-    // Close window if there's nothing open
+    // Close window if nothing open
     {
         "key": "ctrl+w",
         "command": "workbench.action.closeWindow",
         "when": "!editorIsOpen && !multipleEditorGroups"
+    },
+    // Sort lines in ascending order
+    {
+        "key": "alt+a",
+        "command": "-editor.action.accessibilityHelpConfigureAssignedKeybindings",
+        "when": "accessibilityHelpIsShown && accessibleViewHasAssignedKeybindings"
+    },
+    {
+        "key": "alt+a",
+        "command": "editor.action.sortLinesAscending"
     }
 ]
