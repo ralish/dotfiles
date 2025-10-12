@@ -7,6 +7,8 @@ SETUP_SSH_AUTH_SOCK=true
 
 # -----------------------------------------------------------------------------
 
+df_log 'Loading system configuration: WSL'
+
 # Helper function to setup SSH agent forwarding
 # Based on: https://github.com/rupor-github/wsl-ssh-agent#wsl-2-compatibility
 #

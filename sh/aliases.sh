@@ -1,7 +1,6 @@
 # shellcheck shell=sh
 
-# Dummy command for correct scoping of subsequent shellcheck directive
-true
+df_log 'Loading shell aliases ...'
 
 # Enable colour support for ls and *grep
 # shellcheck disable=SC2154

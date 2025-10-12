@@ -10,6 +10,8 @@ EXTRA_SYS_PATHS='/usr/local/bin'
 
 # -----------------------------------------------------------------------------
 
+df_log 'Loading system configuration: macOS'
+
 # Tell ls to be colourful
 export CLICOLOR='1'
 export LSCOLORS='Exfxcxdxbxegedabagacad'

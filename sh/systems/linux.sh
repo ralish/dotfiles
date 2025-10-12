@@ -7,6 +7,8 @@ USE_STDERRED=1
 
 # -----------------------------------------------------------------------------
 
+df_log 'Loading system configuration: Linux'
+
 # Load stderred if requested and it's present
 stderred_path='/usr/local/lib/libstderred.so'
 if [ -n "${USE_STDERRED-}" ]; then

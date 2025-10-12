@@ -42,7 +42,8 @@ build_path() {
                 # Add the path if it's not present in the second path argument
                 case ":$second_path:" in
                     *:"$path_entry":*) ;;
-                                    *) new_path="$new_path:$path_entry"
+                                    *)
+                                       new_path="$new_path:$path_entry"
                                        ;;
                 esac
 
@@ -68,7 +69,8 @@ build_path() {
         # Add the path if it's not present
         case ":$new_path:" in
             *:"$path_entry":*) ;;
-                            *) new_path="$new_path:$path_entry"
+                            *)
+                               new_path="$new_path:$path_entry"
                                ;;
         esac
 
@@ -96,11 +98,11 @@ df_app_load() {
     fi
 
     if eval "$2"; then
-        df_log "[dotfiles] Load app configuration: $1"
+        df_log "Loading app configuration: $1"
         return 0
     fi
 
-    df_log "[dotfiles] Skip app configuration: $1"
+    df_log "Skipping app configuration: $1"
     return 1
 }
 
@@ -116,7 +118,7 @@ df_log() {
 
     # shellcheck disable=SC2154
     if [ "$DOTFILES_LOG" = 'true' ]; then
-        echo "$1"
+        echo "[dotfiles] $1"
     fi
 }
 

@@ -7,6 +7,8 @@ CYGWIN_PKGS='https://mirrors.kernel.org/sourceware/cygwin/'
 
 # -----------------------------------------------------------------------------
 
+df_log 'Loading system configuration: Cygwin'
+
 # Configure package repository for apt-cyg
 if command -v apt-cyg > /dev/null; then
     # shellcheck disable=SC2139
