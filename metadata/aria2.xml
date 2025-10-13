@@ -9,6 +9,7 @@
     </Detection>
 
     <InstallPath>
-        <SpecialFolder>ApplicationData</SpecialFolder>
+        <Destination>%XDG_CONFIG_HOME%</Destination>
+        <ExpandEnvVars>true</ExpandEnvVars>
     </InstallPath>
 </Component>
