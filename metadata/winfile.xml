@@ -12,6 +12,6 @@
     </InstallPath>
 
     <IgnorePaths>
-        <IgnorePath>DEFAULTS.INI</IgnorePath>
+        <IgnorePath>TEMPLATE.INI</IgnorePath>
     </IgnorePaths>
 </Component>
