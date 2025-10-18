@@ -1,7 +1,7 @@
 # CPAN configuration
 # https://metacpan.org/pod/CPAN
 #
-# Last reviewed release: 2.38
+# Last reviewed release: v2.38
 # Default file path: ~/.cpan/CPAN/MyConfig.pm
 #
 # On Debian (or derived) distributions you may want to install:

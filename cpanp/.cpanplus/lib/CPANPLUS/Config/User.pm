@@ -1,7 +1,7 @@
 # CPANPLUS::Config
 # https://metacpan.org/pod/CPANPLUS::Config
 #
-# Last reviewed release: 0.9916
+# Last reviewed release: v0.9916
 # Default file path: ~/.cpanplus/User.pm
 
 package CPANPLUS::Config::User;
@@ -61,7 +61,7 @@ sub setup {
 
     # Build & state
     #
-    # Can be overridden by the PERL5_CPANPLUS_HOME environment variable.
+    # Overridden by the PERL5_CPANPLUS_HOME environment variable.
     $conf->set_conf( base => $IsWin ? qq[$ENV{USERPROFILE}\\.cpanplus] : qq[$ENV{HOME}/.cpanplus] );
 
     # Fetched archives
@@ -224,7 +224,7 @@ sub setup {
 
     # Verbose output (recommended)
     #
-    # Can be overridden by the PERL5_CPANPLUS_VERBOSE environment variable.
+    # Overridden by the PERL5_CPANPLUS_VERBOSE environment variable.
     $conf->set_conf( verbose => 1 );
 
     # Debug output

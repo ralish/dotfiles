@@ -3,7 +3,7 @@
 #
 # Last reviewed release: v20250104
 # Default file paths in preference order:
-# - EDITRC environment variable
+# - $EDITRC
 # - ~/.editrc
 
 # -------------------------------- Settings -----------------------------------
