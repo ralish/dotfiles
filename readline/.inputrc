@@ -201,7 +201,9 @@ set horizontal-scroll-mode off
 set keyseq-timeout 500
 
 # Use the visible bell if available instead of ringing the terminal bell
-set prefer-visible-bell off
+#
+# Overrides the "bell-style" setting.
+#set prefer-visible-bell on
 
 # Add a string to the begining of the prompt indicating the editing mode
 set show-mode-in-prompt off
