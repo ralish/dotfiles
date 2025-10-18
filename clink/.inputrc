@@ -1,110 +1,207 @@
 # Clink Readline configuration
+# https://chrisant996.github.io/clink/clink.html#configuring-readline
 #
-# Last reviewed release: v1.6.8
-
-# ----------------------------- Config Settings -------------------------------
-
-# The following settings are removed as they do not apply to Clink:
+# Last reviewed release: v1.8.6
+# Default file paths in preference order:
+# - %CLINK_INPUTRC%
+# - Clink profile directory
+#   Default: %LOCALAPPDATA%\clink
+#   Override: %CLINK_PROFILE%
+# - %USERPROFILE%
+# - %LOCALAPPDATA%
+# - %APPDATA%
+# - %HOME% or %HOMEDRIVE%%HOMEPATH%
+#
+# Directories are searched for a ".inputrc" or "_inputrc" file (in that order).
+#
+# Added settings which are specific to Clink:
+# - completion-auto-query-items
+# - history-point-at-end-of-anchored-search
+# - menu-complete-wraparound
+#
+# Removed settings which are unsupported by Clink:
 # - active-region-end-color
 # - bind-tty-special-chars
 # - completion-map-case
 # - convert-meta
 # - disable-completion
-# - enable-meta-key
+# - enable-bracketed-paste
 # - enable-keypad
+# - enable-meta-key
+# - force-meta-prefix
 # - history-size
 # - input-meta
 # - keyseq-timeout
 # - output-meta
 # - revert-all-at-newline
+
+# ------------------------------- Completion ----------------------------------
+
+# Display the common prefix of possible completions using a different colour
 #
-# The following settings are only supported by Clink:
-# - completion-auto-query-items
-# - history-point-at-end-of-anchored-search
-# - menu-complete-wraparound
-# - search-ignore-case
-
-# Terminal escape sequence which sets the text colour and background when
-# displaying the text in the active region.
-#
-# Only applies if enable-active-region is enabled.
-set active-region-start-color '\e[0;7m'
-
-# Handling of the terminal bell
-#
-# Valid values:
-# - none            Never ring the bell
-# - visible         Ring the visible bell
-# - audible         Ring the audible bell
-set bell-style none
-
-# Briefly move the cursor to the opening parenthesis on entering the close
-set blink-matching-paren off
-
-# Display the common prefix of possible completions in a different colour
+# Colour definitions are taken from the LS_COLORS environment variable.
 set colored-completion-prefix on
 
-# Display completion matches using different colours to indicate file type
+# Display possible completions using different colours to indicate file type
+#
+# Colour definitions are taken from the LS_COLORS environment variable.
 set colored-stats on
-
-# String to insert at the beginning of the line for insert-comment command
-set comment-begin '#'
 
 # Prompt before displaying completions if they won't fit without scrolling
 #
-# If enabled, overrides the completion-query-items setting.
+# Overrides the "completion-query-items" setting.
 set completion-auto-query-items on
 
-# Number of screen columns used to display possible completion matches
+# Number of screen columns used to display possible completions
 #
-# Ignored if <0 or greater than the terminal screen width.
+# Ignored if less than zero or greater than the terminal screen width.
 #
 # Valid values:
-# -  0              Display one match per line
-# - >0              Number of columns to use per line of matches
+# -  0      Display one match per line
+# - >0      Number of screen columns per line
 set completion-display-width -1
 
 # Perform filename matching and completion case-insensitively
 set completion-ignore-case on
 
-# Maximum length of the common prefix in a list of completion matches which is
-# displayed without modification. If >0, common prefixes longer than this value
-# will be replaced with an ellipsis when displaying the possible completions.
+# Maximum number of characters in the common prefix of possible completions to
+# display without modification.
+#
+# If greater than zero, common prefixes longer than this value will be replaced
+# with an ellipsis. If filenames are being completed and a completion begins
+# with a period, three underscores will be used instead of an ellipsis.
 set completion-prefix-display-length 0
 
-# Number of possible completions for which confirmation is needed to display
+# Maximum number of possible completions to display without prompting the user
+# for comfirmation.
 #
 # Valid values:
-# - <0              Never prompt to display completion matches
-# -  0              Always prompt to display completion matches
-# - >0              Prompt if more than this number of matches
+# - <=0     Never prompt to display completions
+# - >=1     Number of completions which triggers a confirmation prompt
 set completion-query-items 200
 
-# Echo the corresponding control character for keyboard generated signals
-set echo-control-characters off
+# Perform tilde expansion when performing word completion
+set expand-tilde on
+
+# Display completed directory names with an appended slash
+set mark-directories on
+
+# Display completed directory symlinks with an appended slash
+#
+# Only applies when "mark-directories" is enabled.
+set mark-symlinked-directories on
+
+# When performing filename matching, include hidden files without requiring the
+# leading "." to be included in the filename.
+set match-hidden-files off
+
+# When performing menu completion, display the common prefix of possible
+# completions before cycling through the completions list.
+set menu-complete-display-prefix off
+
+# When performing menu completion, wrap-around on reaching the last completion
+set menu-complete-wraparound on
+
+# Display possible completions using an internal more(1)-like pager
+set page-completions off
+
+# Display possible completions with matches sorted horizontally
+set print-completions-horizontally off
+
+# When there is more than one possible completion, display the completions
+# immediately instead of ringing the terminal bell.
+set show-all-if-ambiguous on
+
+# When there is more than one possible completion and no partial completion,
+# display the completions immediately instead of ringing the terminal bell.
+set show-all-if-unmodified on
+
+# Factor text after the cursor position in a word into completion matching,
+# avoiding duplicating the portion of the word following the cursor.
+set skip-completed-text on
+
+# Append a character denoting a file's type when listing possible completions
+set visible-stats on
+
+# --------------------------------- Editing -----------------------------------
 
 # Default set of key bindings
 #
 # Valid values:
-# - emacs           Emacs-style key bindings
-# - vi              vi-style key bindings
+# - emacs
+# - vi
 set editing-mode emacs
+
+# Keymap for key binding commands
+#
+# Valid values:
+# - emacs-standard
+#   Synonyms: emacs
+# - emacs-ctlx
+# - emacs-meta
+# - vi-command
+#   Synonyms: vi, vi-move
+# - vi-insert
+set keymap emacs
+
+# Handling of the terminal bell
+#
+# Valid values:
+# - none        Never ring the bell
+# - visible     Ring the visible bell
+# - audible     Ring the audible bell
+set bell-style none
+
+# Briefly move the cursor to the opening parenthesis on closing
+set blink-matching-paren off
+
+# String to insert at the beginning of a line by the "insert-comment" command
+set comment-begin ::
+
+# Echo a corresponding control character for keyboard generated signals
+set echo-control-characters off
+
+# Scroll lines longer than the screen width being edited instead of wrapping
+set horizontal-scroll-mode off
+
+# Use the visible bell if available instead of ringing the terminal bell
+#
+# Overrides the "bell-style" setting.
+#set prefer-visible-bell on
+
+# Add a string to the begining of the prompt indicating the editing mode
+set show-mode-in-prompt off
 
 # String displayed immediately before the last line of the primary prompt when
 # emacs editing mode is active.
 #
-# Only applies if using emacs editing mode and show-mode-in-prompt is enabled.
-set emacs-mode-string '@'
+# Only applies when "show-mode-in-prompt" is enabled.
+set emacs-mode-string @
 
-# Allow certain commands to designate the "region" as active, where the region
-# is the text between a saved cursor position and the current cursor position.
+# String displayed immediately before the last line of the primary prompt when
+# vi editing mode is active and in command mode.
+#
+# Only applies when "show-mode-in-prompt" is enabled.
+set vi-cmd-mode-string (cmd)
+
+# String displayed immediately before the last line of the primary prompt when
+# vi editing mode is active and in insertion mode.
+#
+# Only applies when "show-mode-in-prompt" is enabled.
+set vi-ins-mode-string (ins)
+
+$if version >= 8.3
+# Enable certain commands to designate a region as "active", highlighting the
+# text in the region. See the "active-region-start-color" and "active-region-
+# end-color" settings to control the highlighting.
 set enable-active-region on
 
-# Insert each paste into the editing buffer as a single string of characters
-set enable-bracketed-paste on
+# Escape sequences to set text colour and background in an active region
+set active-region-start-color \e[0;7m
 
-# Perform tilde expansion when attempting word completion
-set expand-tilde off
+$endif
+
+# --------------------------------- History -----------------------------------
 
 # Place cursor at end of line for history-search-(forward|backward) commands
 set history-point-at-end-of-anchored-search on
@@ -112,77 +209,20 @@ set history-point-at-end-of-anchored-search on
 # Preserve the current cursor position when browsing history
 set history-preserve-point off
 
-# Scroll lines longer than the screen width being edited instead of wrapping
-set horizontal-scroll-mode off
-
-# String of characters to terminate an incremental search
-set isearch-terminators '\C-[\C-J'
-
-# Keymap for key binding commands
-#
-# The value of editing-mode affects the default keymap.
-#
-# Valid values:
-# - emacs-standard      Synonyms: emacs
-# - emacs-ctlx
-# - emacs-meta
-# - vi-command          Synonyms: vi, vi-move
-# - vi-insert
-#set keymap emacs
-
-# Mark completed directory names with an appended slash
-set mark-directories on
+# String of characters to terminate an incremental history search
+set isearch-terminators \e\C-j
 
 # Mark modified history lines with a prepended asterisk
 set mark-modified-lines off
 
-# Mark completed directory symlinks with an appended slash
-#
-# Only applies if mark-directories is enabled.
-set mark-symlinked-directories on
-
-# Include hidden files without a leading "." when performing completion
-set match-hidden-files off
-
-# Display the common prefix of the possible completions (which may be empty)
-# before cycling through the completions list when performing menu completion.
-set menu-complete-display-prefix off
-
-# Wrap-around on reaching the end of completions for menu-complete commands
-set menu-complete-wraparound on
-
-# Display completion matches using an internal more-like pager if needed
-set page-completions off
-
-# Display completion matches sorted horizontally in alphabetical order
-set print-completions-horizontally off
-
-# Perform history search case-insensitively
+# Perform searches of the history list case-insensitively
+$if version >= 8.3
 set search-ignore-case on
+$endif
 
-# List completion matches immediately when there's multiple completions
-set show-all-if-ambiguous on
+# ------------------------------ Key bindings ---------------------------------
 
-# List completion matches immediately when there's no common prefix
-set show-all-if-unmodified on
-
-# Add a character to the begining of the prompt showing the editing mode
-set show-mode-in-prompt off
-
-# Factor any text after the cursor position in a word into completion matching
-set skip-completed-text on
-
-# String displayed immediately before the last line of the primary prompt when
-# vi editing mode is active and in command mode.
-#
-# Only applies if using vi editing mode and show-mode-in-prompt is enabled.
-set vi-cmd-mode-string '(cmd)'
-
-# String displayed immediately before the last line of the primary prompt when
-# vi editing mode is active and in insertion mode.
-#
-# Only applies if using vi editing mode and show-mode-in-prompt is enabled.
-set vi-ins-mode-string '(ins)'
-
-# Append a character denoting a file's type when listing completion matches
-set visible-stats on
+# Interrogate the Readline configuration
+"\C-x\C-f": dump-functions
+"\C-x\C-m": dump-macros
+"\C-x\C-v": dump-variables
