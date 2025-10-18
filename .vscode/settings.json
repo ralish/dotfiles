@@ -97,9 +97,9 @@
         // windows/Windows Sandbox
         "*.wsb": "xml",
         // winget
-        "**/winget/settings.json": "jsonc",
+        "**/winget/*.json": "jsonc",
         // winterm
-        "**/winterm/settings.json": "jsonc",
+        "**/winterm/*.json": "jsonc",
         // wsl
         ".wslconfig": "ini",
         "wsl.conf": "ini",
