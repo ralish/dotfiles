@@ -59,6 +59,9 @@ temp/
 /clink/clink_errorlevel*
 /clink/clink_history*
 
+# ConEmu
+/conemu/ConEmu.xml
+
 # CPAN
 /cpan/.cpan/.lock
 /cpan/.cpan/FTPstats.yml
