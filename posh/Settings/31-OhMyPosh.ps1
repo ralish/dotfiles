@@ -1,6 +1,6 @@
 $DotFilesSection = @{
     Type    = 'Settings'
-    Name    = 'oh-my-posh'
+    Name    = 'Oh My Posh'
     Command = @('oh-my-posh')
 }
 
@@ -37,14 +37,14 @@ Function Get-OmpConfig {
 
         if ($OmpPathElements -contains 'scoop') {
             $OmpBasePath = Split-Path -Path (Split-Path -Path $OmpBinFilePath)
-            $Message = 'Detected Scoop installation of oh-my-posh.'
+            $Message = 'Detected Scoop installation of Oh My Posh.'
         } elseif ($OmpPathElements -contains '.linuxbrew') {
             $OmpBinFileItem = Get-Item -LiteralPath $OmpBinFilePath
             $OmpBinRealPath = Resolve-Path -Path (Join-Path -Path (Split-Path -Path $OmpBinFileItem.FullName -Parent) -ChildPath $OmpBinFileItem.Target)
             $OmpBasePath = Split-Path -Path (Split-Path -Path $OmpBinRealPath.Path)
-            $Message = 'Detected Homebrew installation of oh-my-posh.'
+            $Message = 'Detected Homebrew installation of Oh My Posh.'
         } else {
-            $Message = 'Unable to determine oh-my-posh themes path.'
+            $Message = 'Unable to determine Oh My Posh themes path.'
             Write-Warning -Message (Get-DotFilesMessage -Message $Message)
             return
         }
@@ -52,13 +52,13 @@ Function Get-OmpConfig {
         $OmpThemeDir = Join-Path -Path $OmpBasePath -ChildPath 'themes'
     }
 
-    # Output the detected oh-my-posh themes path
+    # Output the detected Oh My Posh themes path
     Write-Verbose -Message (Get-DotFilesMessage -Message $Message)
 
     $OmpThemePath = Join-Path -Path $OmpThemeDir -ChildPath ('{0}.omp.json' -f $ThemeName)
     $OmpThemeFile = Get-Item -LiteralPath $OmpThemePath -ErrorAction Ignore
     if ($OmpThemeFile -isnot [IO.FileInfo]) {
-        $Message = 'Expected oh-my-posh theme path is not a file: {0}' -f $OmpThemePath
+        $Message = 'Expected Oh My Posh theme path is not a file: {0}' -f $OmpThemePath
         Write-Warning -Message (Get-DotFilesMessage -Message $Message)
         return
     }
@@ -66,7 +66,7 @@ Function Get-OmpConfig {
     return $OmpThemePath
 }
 
-# Retrieve oh-my-posh config
+# Retrieve Oh My Posh config
 $OmpConfig = Get-OmpConfig -ThemeName $OmpThemeName
 if ($OmpConfig) {
     Write-Verbose -Message (Get-DotFilesMessage -Message ('Using theme file: {0}' -f $OmpConfig))
@@ -76,7 +76,7 @@ if ($OmpConfig) {
 $VerboseOriginal = $Global:VerbosePreference
 $Global:VerbosePreference = 'SilentlyContinue'
 
-# Load oh-my-posh
+# Load Oh My Posh
 if ($OmpConfig) {
     & oh-my-posh init pwsh --config $OmpConfig | Invoke-Expression # DevSkim: ignore DS104456
 } else {

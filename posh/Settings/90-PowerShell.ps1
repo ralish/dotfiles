@@ -23,7 +23,7 @@ Function Out-Default {
     $Global:LastObject = $LastObject
 }
 
-# Setup our custom prompt if oh-my-posh is not loaded
+# Setup our custom prompt if Oh My Posh is not loaded
 if (!(Get-Command -Name 'oh-my-posh' -ErrorAction Ignore)) {
     Function Prompt {
         $prompt = ''
