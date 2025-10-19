@@ -210,7 +210,8 @@
                 "source": "Windows.Terminal.PowershellCore",
                 "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}", // Default GUID
 
-                "commandline": "\"%ProgramFiles%\\PowerShell\\7\\pwsh.exe\" -NoLogo"
+                "commandline": "\"%ProgramFiles%\\PowerShell\\7\\pwsh.exe\" -NoLogo",
+                "showMarksOnScrollbar": true
             },
             {
                 "name": "Windows PowerShell",
