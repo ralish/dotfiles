@@ -1,7 +1,7 @@
 $DotFilesSection = @{
     Type            = 'Settings'
     Name            = 'Az Predictor'
-    Module          = @('Az', 'Az.Tools.Predictor')
+    Module          = @('Az.Accounts', 'Az.Tools.Predictor')
     ForceTestModule = $true
 }
 
