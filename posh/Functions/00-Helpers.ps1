@@ -107,6 +107,9 @@ Function Start-DotFilesSection {
         [ValidateSet('Unix', 'Windows')]
         [String]$Platform,
 
+        [ValidateNotNull()]
+        [Version]$PwshMinVersion,
+
         [ValidateNotNullOrEmpty()]
         [String[]]$PwshHostName,
 
@@ -146,6 +149,13 @@ Function Start-DotFilesSection {
     } elseif ($Platform -eq 'Unix') {
         if (Test-IsWindows) {
             Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as platform is not Unix-like.')
+            return $false
+        }
+    }
+
+    if ($PwshMinVersion) {
+        if ($PwshMinVersion -gt $PSVersionTable.PSVersion) {
+            Write-Verbose -Message (Get-DotFilesMessage -Message ('Skipping as PowerShell version is below minimum: {0}' -f $PwshMinVersion))
             return $false
         }
     }
