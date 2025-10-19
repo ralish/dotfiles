@@ -272,6 +272,11 @@ $endif
 
 # ------------------------------ Key bindings ---------------------------------
 
+# Interrogate the Readline configuration
+"\C-x\C-f": dump-functions
+"\C-x\C-m": dump-macros
+"\C-x\C-v": dump-variables
+
 # Set Home/End keys to jump to the beginning/end of line
 "\e[1~": beginning-of-line
 "\e[4~": end-of-line
