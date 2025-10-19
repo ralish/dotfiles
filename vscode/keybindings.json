@@ -5,13 +5,13 @@
      * Default file path: %APPDATA%\Code\User\keybindings.json
      */
 
-    // Close window if nothing open
+    // Close the VS Code window if nothing is open
     {
         "key": "ctrl+w",
         "command": "workbench.action.closeWindow",
         "when": "!editorIsOpen && !multipleEditorGroups"
     },
-    // Sort lines in ascending order
+    // Repurpose shortcut for Sort Lines Ascending
     {
         "key": "alt+a",
         "command": "-editor.action.accessibilityHelpConfigureAssignedKeybindings",
@@ -20,5 +20,11 @@
     {
         "key": "alt+a",
         "command": "editor.action.sortLinesAscending"
+    },
+    // Disable Open New External Terminal shortcut
+    {
+        "key": "ctrl+shift+c",
+        "command": "-workbench.action.terminal.openNativeConsole",
+        "when": "!terminalFocus"
     }
 ]
