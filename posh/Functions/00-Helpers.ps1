@@ -152,7 +152,7 @@ Function Start-DotFilesSection {
 
     if ($PwshHostName) {
         if ($Host.Name -notin $PwshHostName) {
-            Write-Verbose -Message (Get-DotFilesMessage -Message ('Skipping as host is not supported: {0}' -f $Host.Name))
+            Write-Verbose -Message (Get-DotFilesMessage -Message ('Skipping as PowerShell host is not supported: {0}' -f $Host.Name))
             return $false
         }
     }

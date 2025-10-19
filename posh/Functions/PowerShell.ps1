@@ -557,8 +557,8 @@ Function Compare-ObjectProperties {
         if ($Diff) {
             $DiffProps = [PSCustomObject]@{
                 PropertyName = $Property
-                RefValue     = $Diff | Where-Object SideIndicator -EQ '<=' | Select-Object -ExpandProperty $($Property)
-                DiffValue    = $Diff | Where-Object SideIndicator -EQ '=>' | Select-Object -ExpandProperty $($Property)
+                RefValue     = $Diff | Where-Object SideIndicator -EQ '<=' | Select-Object -ExpandProperty $Property
+                DiffValue    = $Diff | Where-Object SideIndicator -EQ '=>' | Select-Object -ExpandProperty $Property
             }
 
             $ObjDiffs.Add($DiffProps)

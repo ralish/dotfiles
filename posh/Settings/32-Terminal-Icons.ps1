@@ -1,6 +1,6 @@
 $DotFilesSection = @{
     Type            = 'Settings'
-    Name            = 'Terminal Icons'
+    Name            = 'Terminal-Icons'
     Module          = @('Terminal-Icons')
     ModuleOperation = 'Import'
 }

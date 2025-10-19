@@ -15,14 +15,15 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $ConEmuPrompt = {
     # Let ConEmu know where the prompt ends
-    $prompt = '{0}]9;12{1}' -f [Char]27, [Char]7
+    $Prompt = '{0}]9;12{1}' -f [Char]27, [Char]7
 
     # Let ConEmu know the current working dir
-    if ($ExecutionContext.SessionState.Path.CurrentLocation.Provider.Name -eq 'FileSystem') {
-        $prompt += '{0}]9;9;"{1}"{2}' -f [Char]27, $ExecutionContext.SessionState.Path.CurrentLocation.Path, [Char]7
+    $CurLoc = $ExecutionContext.SessionState.Path.CurrentLocation
+    if ($CurLoc.Provider.Name -eq 'FileSystem') {
+        $Prompt += '{0}]9;9;"{1}"{2}' -f [Char]27, $CurLoc, [Char]7
     }
 
-    return $prompt
+    return $Prompt
 }
 
 Complete-DotFilesSection
