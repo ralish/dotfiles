@@ -223,7 +223,8 @@
                 "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}", // Default GUID
 
                 "commandline": "%SystemRoot%\\System32\\cmd.exe /K \"%DOTFILES%\\cmd\\SetupEnv.cmd\"",
-                "closeOnExit": "always"
+                "closeOnExit": "always",
+                "showMarksOnScrollbar": true
             },
             {
                 "name": "Ubuntu",

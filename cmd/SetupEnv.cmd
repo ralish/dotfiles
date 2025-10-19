@@ -82,6 +82,22 @@ IF "%ConEmuIsAdmin%" == "ADMIN" (
 :ConEmuEnd
 
 @REM ##########################################################################
+@REM ###                        Windows Terminal                            ###
+@REM ##########################################################################
+
+@REM Shell Integration: Command Prompt
+@REM https://learn.microsoft.com/en-us/windows/terminal/tutorials/shell-integration#command-prompt
+
+@REM Check we're running under Windows Terminal
+IF NOT DEFINED WT_SESSION GOTO WinTermEnd
+
+@REM Setup a more informative prompt
+IF DEFINED SetupEnvVerbose ECHO * [Windows Terminal] Configuring prompt ...
+PROMPT $e]133;D$e\$e]133;A$e\$e]9;9;$P$e\$P$G$e]133;B$e\
+
+:WinTermEnd
+
+@REM ##########################################################################
 @REM ###                            DOSKEY                                  ###
 @REM ##########################################################################
 
