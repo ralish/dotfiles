@@ -23,28 +23,4 @@ Function Out-Default {
     $Global:LastObject = $LastObject
 }
 
-# Setup our custom prompt if Oh My Posh is not loaded
-if (!(Get-Command -Name 'oh-my-posh' -ErrorAction Ignore)) {
-    Function Prompt {
-        $prompt = ''
-
-        # posh-git
-        if ($GitPromptScriptBlock) {
-            $prompt += & $GitPromptScriptBlock
-        }
-
-        # Default
-        if (-not $prompt) {
-            $prompt = 'PS {0}{1} ' -f $ExecutionContext.SessionState.Path.CurrentLocation, '>' * ($NestedPromptLevel + 1)
-        }
-
-        # ConEmu
-        if ($ConEmuPrompt) {
-            $prompt += & $ConEmuPrompt
-        }
-
-        return $prompt
-    }
-}
-
 Complete-DotFilesSection
