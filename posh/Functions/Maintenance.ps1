@@ -120,85 +120,110 @@ Function Update-AllTheThings {
     Param()
 
     DynamicParam {
-        $ValidTasks = @(
-            'PowerShell'
-            'DotNetTools'
-            'GoExecutables'
-            'NodejsPackages'
-            'PythonPackages'
-            'RubyGems'
-            'RustToolchains'
-        )
+        $TasksApps = @('PowerShell')
+        $TasksDevel = @('DotNetTools', 'GoExecutables', 'NodejsPackages', 'PythonPackages', 'RubyGems', 'RustToolchains')
+        $TasksSystem = @()
 
         if (Test-IsWindows) {
-            $ValidTasks += @(
-                'Windows'
-                'WSL'
-                'Office'
-                'VisualStudio'
-                'MicrosoftStore'
-                'Scoop'
-                'QtComponents'
-            )
+            $TasksApps += @('MicrosoftStore', 'Office', 'Scoop', 'VisualStudio')
+            $TasksDevel += @('QtComponents')
+            $TasksSystem += @('Windows', 'WSL')
         } else {
-            $ValidTasks += 'Homebrew'
+            $TasksApps += @('Homebrew')
         }
 
-        $ValidateSetAttr = [Management.Automation.ValidateSetAttribute]::new([String[]]$ValidTasks)
+        $AllTasks = $TasksApps + $TasksDevel + $TasksSystem
+        $TasksVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]$AllTasks)
 
-        $OptOutParamAttr = [Management.Automation.ParameterAttribute]@{
-            ParameterSetName = 'OptOut'
+        $AllCategories = @('Apps', 'Devel', 'System')
+        $CategoriesVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]$AllCategories)
+
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
+
+        # Category parameter set
+        $CategoryParamAttr = [Management.Automation.ParameterAttribute]@{
+            ParameterSetName = 'Category'
+            Mandatory        = $true
         }
 
+        $CategoryAttrs = [Collections.ObjectModel.Collection[Attribute]]::new()
+        $CategoryAttrs.Add($CategoriesVsa)
+        $CategoryAttrs.Add($CategoryParamAttr)
+
+        $CategoryParam = [Management.Automation.RuntimeDefinedParameter]::new(
+            'Category', [String[]], $CategoryAttrs
+        )
+
+        $RuntimeParams.Add('Category', $CategoryParam)
+
+        # OptIn parameter set
         $OptInParamAttr = [Management.Automation.ParameterAttribute]@{
             ParameterSetName = 'OptIn'
             Mandatory        = $true
         }
 
-        $OptOutAttrCollection = [Collections.ObjectModel.Collection[Attribute]]::new()
-        $OptOutAttrCollection.Add($ValidateSetAttr)
-        $OptOutAttrCollection.Add($OptOutParamAttr)
-
-        $OptInAttrCollection = [Collections.ObjectModel.Collection[Attribute]]::new()
-        $OptInAttrCollection.Add($ValidateSetAttr)
-        $OptInAttrCollection.Add($OptInParamAttr)
-
-        $OptOutParam = [Management.Automation.RuntimeDefinedParameter]::new(
-            'ExcludeTasks', [String[]], $OptOutAttrCollection
-        )
+        $OptInAttrs = [Collections.ObjectModel.Collection[Attribute]]::new()
+        $OptInAttrs.Add($TasksVsa)
+        $OptInAttrs.Add($OptInParamAttr)
 
         $OptInParam = [Management.Automation.RuntimeDefinedParameter]::new(
-            'IncludeTasks', [String[]], $OptInAttrCollection
+            'IncludeTasks', [String[]], $OptInAttrs
         )
 
-        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
-        $RuntimeParams.Add('ExcludeTasks', $OptOutParam)
         $RuntimeParams.Add('IncludeTasks', $OptInParam)
+
+        # OptOut parameter set
+        $OptOutParamAttr = [Management.Automation.ParameterAttribute]@{
+            ParameterSetName = 'OptOut'
+        }
+
+        $OptOutAttrs = [Collections.ObjectModel.Collection[Attribute]]::new()
+        $OptOutAttrs.Add($TasksVsa)
+        $OptOutAttrs.Add($OptOutParamAttr)
+
+        $OptOutParam = [Management.Automation.RuntimeDefinedParameter]::new(
+            'ExcludeTasks', [String[]], $OptOutAttrs
+        )
+
+        $RuntimeParams.Add('ExcludeTasks', $OptOutParam)
 
         return $RuntimeParams
     }
 
     End {
+        $Results = [PSCustomObject]@{}
         $Tasks = [Collections.Generic.List[String]]::new()
         $TasksDone = 0
         $TasksTotal = 0
-        $Results = [PSCustomObject]@{}
 
-        foreach ($Task in $ValidTasks) {
-            if (($PSCmdlet.ParameterSetName -eq 'OptOut' -and $PSBoundParameters['ExcludeTasks'] -notcontains $Task) -or
-                ($PSCmdlet.ParameterSetName -eq 'OptIn' -and $PSBoundParameters['IncludeTasks'] -contains $Task)) {
-                $Tasks.Add($Task)
-                $TasksTotal++
-                $Results | Add-Member -Name $Task -MemberType NoteProperty -Value $null
+        if ($PSCmdlet.ParameterSetName -eq 'Category') {
+            foreach ($Category in $AllCategories) {
+                if ($PSBoundParameters['Category'] -contains $Category) {
+                    $CategoryVar = 'Tasks{0}' -f $Category
+                    $CategoryTasks = Get-Variable -Name $CategoryVar -ValueOnly
+                    foreach ($Task in $CategoryTasks) {
+                        $Tasks.Add($Task)
+                    }
+                }
+            }
+        } else {
+            foreach ($Task in $AllTasks) {
+                if (($PSCmdlet.ParameterSetName -eq 'OptOut' -and $PSBoundParameters['ExcludeTasks'] -notcontains $Task) -or
+                    ($PSCmdlet.ParameterSetName -eq 'OptIn' -and $PSBoundParameters['IncludeTasks'] -contains $Task)) {
+                    $Tasks.Add($Task)
+                }
             }
         }
 
-        if (Test-IsWindows) {
-            if ($Tasks -contains 'Windows' -or $Tasks -contains 'Office' -or $Tasks -contains 'VisualStudio' -or $Tasks -contains 'MicrosoftStore') {
-                $IsAdministrator = Test-IsAdministrator
-                if (!$IsAdministrator -and !$WhatIfPreference) {
-                    throw 'You must have administrator privileges to perform Windows, Office, Visual Studio, or Microsoft Store updates.'
-                }
+        $TasksTotal = $Tasks.Count
+        foreach ($Task in $Tasks) {
+            $Results | Add-Member -Name $Task -MemberType NoteProperty -Value $null
+        }
+
+        if ($Tasks -contains 'Windows' -or $Tasks -contains 'Office' -or $Tasks -contains 'VisualStudio' -or $Tasks -contains 'MicrosoftStore') {
+            $IsAdministrator = Test-IsAdministrator
+            if (!$IsAdministrator -and !$WhatIfPreference) {
+                throw 'You must have administrator privileges to perform Windows, Office, Visual Studio, or Microsoft Store updates.'
             }
         }
 
