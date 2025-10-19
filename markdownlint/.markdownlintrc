@@ -1,13 +1,9 @@
 {
     "default": true,
-    // Heading style
-    "MD003": { "style": "setext_with_atx" },
-    // Trailing spaces
-    "MD009": { "br_spaces": 2 },
-    // Line length
-    "MD013": false,
-    // Trailing punctuation in heading
-    "MD026": { "punctuation": ".,;:!" }
+    "heading-style": { "style": "setext_with_atx" },
+    "no-trailing-spaces": { "br_spaces": 2 },
+    "line-length": false,
+    "no-trailing-punctuation": { "punctuation": ".,;:!" }
 }
 
 // vim: syntax=jsonc ts=4 sw=4 sts=4 et sr
