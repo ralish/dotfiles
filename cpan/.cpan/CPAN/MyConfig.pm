@@ -20,8 +20,9 @@
 use strict;
 use warnings;
 
-# Core module since Perl v5.9.5 (2007/07/07)
+# Core modules since Perl v5.10.0 (2007/12/18)
 use IPC::Cmd qw[can_run run];
+use Module::Load::Conditional qw(check_install);
 
 # Running on Windows?
 my $IsWin = $^O eq 'MSWin32' ? 1 : 0;
@@ -47,6 +48,9 @@ my $exe_shell = $IsWin ? can_run($ENV{'COMSPEC'}) : can_run($ENV{'SHELL'});
 my $exe_tar = can_run('tar');
 my $exe_unzip = can_run('unzip');
 my $exe_wget = can_run('wget');
+
+# Perl modules
+my $mod_signature = check_install(module => "Module::Signature") ? 1 : 0;
 
 # Determine number of processors
 my $num_procs = 1;
@@ -188,12 +192,15 @@ $CPAN::Config = {
 
     # Verify module signatures (requires Module::Signature and gpg)
     #
-    # Disabled as apart from the dependency requirements it also doesn't work
-    # on Windows due to CPAN hardcoding the temporary directory path to "/tmp".
-    # This path will be resolved to "C:\tmp" and if it doesn't exist (which it
-    # typically won't) then creating the temporary file will fail. Verified to
-    # still be broken as of CPAN v2.38.
-    'check_sigs' => $IsWin ? q[0] : q[1],
+    # Disabled as it's more trouble than it's worth. On Unix-like systems, the
+    # signature check will often fail due to required public keys not being
+    # readily available (e.g. from the Ubuntu keyserver). On Windows systems,
+    # we won't even get that far as CPAN hardcodes the temporary directory it
+    # uses during signature checks to "/tmp". This path resolves to "C:\tmp"
+    # and if it doesn't exist (which it typically won't) then creating the
+    # temporary file will fail. Verified to still be broken as of CPAN v2.38.
+    'check_sigs' => $IsWin ? q[0] :
+                    defined $exe_gpg && $mod_signature ? q[0] : q[0],
 
     #######################
     ### Build & install ###
