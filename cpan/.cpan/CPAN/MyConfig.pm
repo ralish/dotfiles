@@ -50,6 +50,7 @@ my $exe_unzip = can_run('unzip');
 my $exe_wget = can_run('wget');
 
 # Perl modules
+my $mod_distnameinfo = check_install(module => "CPAN::DistnameInfo") ? 1 : 0;
 my $mod_signature = check_install(module => "Module::Signature") ? 1 : 0;
 
 # Determine number of processors
@@ -261,7 +262,8 @@ $CPAN::Config = {
     # Valid values: yes, no, ask/yes, ask/no
     #
     # Any option other than "yes" requires CPAN::DistnameInfo.
-    'allow_installing_outdated_dists' => q[ask/no],
+    'allow_installing_outdated_dists' => $mod_distnameinfo ?
+                                         q[ask/no] : q[yes],
     # Permit installation of module downgrades
     #
     # Valid values: yes, no, ask/yes, ask/no
