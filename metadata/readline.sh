@@ -24,6 +24,9 @@ elif [[ "${kernel_name#*CYGWIN_NT}" != "$kernel_name" ]]; then
     if ! cygcheck -c -d | grep -E '^libreadline' > /dev/null; then
         exit "$DETECTION_NOT_AVAILABLE"
     fi
+elif [[ "${kernel_name#*OpenBSD}" != "$kernel_name" ]]; then
+    # Readline is part of the base system
+    exit "$DETECTION_SUCCESS"
 else
     exit "$DETECTION_NO_LOGIC"
 fi
