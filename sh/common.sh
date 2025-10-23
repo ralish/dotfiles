@@ -12,6 +12,9 @@ EXTRA_PATHS=''
 # Set to true to enable log output during loading
 DOTFILES_LOG="${DOTFILES_LOG:-false}"
 
+# Preferred locales ordered by priority (space-separated)
+PREFERRED_LOCALES='en_AU.UTF-8 en_us.UTF-8 C.UTF-8'
+
 # -----------------------------------------------------------------------------
 
 # Guess the dotfiles directory if $dotfiles wasn't set
@@ -33,6 +36,10 @@ sh_dir="$dotfiles/sh"
 # Console Do Not Track (DNT)
 # https://consoledonottrack.com/
 export DO_NOT_TRACK=1
+
+# Attempt to set a preferred locale when none is set
+# shellcheck source=sh/locale.sh
+. "$sh_dir/locale.sh"
 
 # Operating system and environment specific configuration
 kernel_name="$(uname -s)"
