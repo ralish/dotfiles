@@ -19,14 +19,27 @@ if [[ $kernel_name == 'Linux' ]]; then
     else
         exit "$DETECTION_NO_LOGIC"
     fi
+elif [[ $kernel_name =~ BSD$ ]]; then
+    if [[ $kernel_name == 'FreeBSD' ]]; then
+        if ! [[ -f /lib/libedit.so || -f /usr/lib/libedit.so || -f /usr/local/lib/libedit.so ]]; then
+            exit "$DETECTION_NOT_AVAILABLE"
+        fi
+    elif [[ $kernel_name == 'NetBSD' ]]; then
+        if ! [[ -f /lib/libedit.so || -f /usr/lib/libedit.so || -f /usr/pkg/lib/libedit.so ]]; then
+            exit "$DETECTION_NOT_AVAILABLE"
+        fi
+    elif [[ $kernel_name == 'OpenBSD' ]]; then
+        if ! ls /usr/lib/libedit.so* > /dev/null 2>&1; then
+            exit "$DETECTION_NOT_AVAILABLE"
+        fi
+    else
+        exit "$DETECTION_NO_LOGIC"
+    fi
 elif [[ $kernel_name =~ ^CYGWIN_NT ]]; then
     # shellcheck disable=SC2312
     if ! cygcheck -c -d | grep -E '^libedit' > /dev/null; then
         exit "$DETECTION_NOT_AVAILABLE"
     fi
-elif [[ $kernel_name == 'OpenBSD' ]]; then
-    # Editline is part of the base system
-    exit "$DETECTION_SUCCESS"
 else
     exit "$DETECTION_NO_LOGIC"
 fi
