@@ -78,7 +78,7 @@ function dl_shellcheck() {
     if ! [[ -d $APP_DST_DIR ]]; then
         mkdir "$APP_DST_DIR"
     fi
-    curl -sSL "$latest_url" | tar -x -J -C "$APP_DST_DIR" --strip-components=1 --wildcards "*/$APP_NAME"
+    curl -sSL "$latest_url" | tar -xJ -f - -C "$APP_DST_DIR" --strip-components=1 --wildcards "*/$APP_NAME"
 }
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

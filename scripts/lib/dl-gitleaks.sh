@@ -87,7 +87,7 @@ function dl_gitleaks() {
     if ! [[ -d $APP_DST_DIR ]]; then
         mkdir "$APP_DST_DIR"
     fi
-    curl -sSL "$latest_url" | tar -x -z -C "$APP_DST_DIR" "$APP_NAME"
+    curl -sSL "$latest_url" | tar -xz -f - -C "$APP_DST_DIR" "$APP_NAME"
 }
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
