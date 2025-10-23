@@ -126,9 +126,11 @@ function openssh_build_config() {
     # Build the configuration
     echo -n > "$openssh_cfg_tmp"
     chmod 0600 "$openssh_cfg_tmp"
-    head -n -1 "$openssh_banner" >> "$openssh_cfg_tmp"
+    # Don't use "head -n -1" to remove the last line as not all versions
+    # support providing a negative index (e.g. most BSD operating systems).
+    sed '$ d' "$openssh_banner" >> "$openssh_cfg_tmp"
     for include in "$openssh_includes"/*; do
-        head -n -1 "$include" >> "$openssh_cfg_tmp"
+        sed '$ d' "$include" >> "$openssh_cfg_tmp"
         echo >> "$openssh_cfg_tmp"
     done
     cat "$ssh_template" >> "$openssh_cfg_tmp"
