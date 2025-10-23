@@ -6,7 +6,7 @@ script_dir="$(dirname "${BASH_SOURCE[0]}")"
 source "$script_dir/templates/common.sh"
 
 kernel_name=$(uname -s)
-if [[ "${kernel_name#*CYGWIN_NT}" != "$kernel_name" ]]; then
+if [[ $kernel_name =~ ^CYGWIN_NT ]]; then
     exit "$DETECTION_SUCCESS"
 fi
 
