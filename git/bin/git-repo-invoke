@@ -111,7 +111,7 @@ function check_is_git_repo() {
         script_exit 'Missing required argument to check_is_git_repo()!' 2
     fi
 
-    is_git_repo='false'
+    is_git_repo=false
 
     local git_dir="$1"
     if [[ -d $git_dir ]]; then
@@ -119,7 +119,7 @@ function check_is_git_repo() {
 
         cd "$git_dir"
         if git rev-parse --git-dir > /dev/null 2>&1; then
-            is_git_repo='true'
+            is_git_repo=true
         fi
 
         cd "$orig_dir"

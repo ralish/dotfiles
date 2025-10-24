@@ -51,14 +51,12 @@ update-ssh-auth-sock() {
 
     if [ "$SSH_AUTH_SOCK" != "$ssh_current_agent" ]; then
         if [ -n "$SSH_AUTH_SOCK" ]; then
-            echo "Updated \$SSH_AUTH_SOCK to: $SSH_AUTH_SOCK"
+            echo "Updated SSH_AUTH_SOCK to: $SSH_AUTH_SOCK"
         elif [ -n "$ssh_current_agent" ]; then
-            # shellcheck disable=SC2016
-            echo 'Removed $SSH_AUTH_SOCK as unable to find an SSH agent.'
+            echo 'Removed SSH_AUTH_SOCK as unable to find an SSH agent.'
         fi
     else
-        # shellcheck disable=SC2016
-        echo '$SSH_AUTH_SOCK is unchanged.'
+        echo 'SSH_AUTH_SOCK is unchanged.'
     fi
 
     unset ssh_agents ssh_current_agent ssh_latest_agent uid

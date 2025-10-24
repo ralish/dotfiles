@@ -44,8 +44,7 @@ echo
 
 if [[ -f /etc/sudoers ]]; then
     if [[ -z $SUDO_USER ]]; then
-        # shellcheck disable=SC2016
-        echo '[sudo] Expected $SUDO_USER to not be empty or unset.'
+        echo '[sudo] Expected SUDO_USER to not be empty or unset.'
         exit 1
     fi
 

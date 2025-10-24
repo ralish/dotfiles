@@ -3,14 +3,14 @@
 # General configuration common to all shells we use
 # Should be compatible with at least: sh, bash & zsh
 
-# Preferred text editors ordered by priority (space-separated)
-EDITOR_PRIORITY='vim vi nano pico'
+# Set to true to enable log output during loading
+DOTFILES_LOG="${DOTFILES_LOG:-false}"
 
 # Locations to prefix to PATH (colon-separated)
 EXTRA_PATHS=''
 
-# Set to true to enable log output during loading
-DOTFILES_LOG="${DOTFILES_LOG:-false}"
+# Preferred text editors ordered by priority (space-separated)
+PREFERRED_EDITORS='vim vi nano pico'
 
 # Preferred locales ordered by priority (space-separated)
 PREFERRED_LOCALES='en_AU.UTF-8 en_us.UTF-8 C.UTF-8'
@@ -28,20 +28,31 @@ if [ -z "${dotfiles-}" ]; then
     fi
 fi
 
+# Console Do Not Track (DNT)
+# https://consoledonottrack.com/
+export DO_NOT_TRACK=1
+
 # Helper functions
 sh_dir="$dotfiles/sh"
 # shellcheck source=sh/source.sh
 . "$sh_dir/source.sh"
 
-# Console Do Not Track (DNT)
-# https://consoledonottrack.com/
-export DO_NOT_TRACK=1
+# Add extra paths
+# shellcheck source=sh/misc/paths.sh
+. "$sh_dir/misc/paths.sh"
+unset EXTRA_PATHS
 
-# Attempt to set a preferred locale when none is set
-# shellcheck source=sh/locale.sh
-. "$sh_dir/locale.sh"
+# Set preferred locale
+# shellcheck source=sh/misc/locale.sh
+. "$sh_dir/misc/locale.sh"
+unset PREFERRED_LOCALES
 
-# Operating system and environment specific configuration
+# Set preferred editor
+# shellcheck source=sh/misc/editor.sh
+. "$sh_dir/misc/editor.sh"
+unset PREFERRED_EDITORS
+
+# Operating system and environment configuration
 kernel_name="$(uname -s)"
 sh_systems_dir="$sh_dir/systems"
 if [ "${kernel_name#*CYGWIN_NT}" != "$kernel_name" ]; then
@@ -62,13 +73,13 @@ elif [ "${kernel_name#*Linux}" != "$kernel_name" ]; then
 fi
 unset kernel_name sh_systems_dir
 
-# Source in secrets that may be referenced by apps
+# Source in secrets (may be referenced by apps)
 unset dotfiles_secrets
-sh_secrets_file="$sh_dir/secrets.sh"
+sh_secrets_file="$sh_dir/misc/secrets.sh"
 if [ -f "$sh_secrets_file" ]; then
     dotfiles_secrets=true
 
-    # shellcheck source=sh/secrets.sh
+    # shellcheck source=sh/misc/secrets.sh
     . "$sh_secrets_file"
 
     # Make the secrets accessible as variables
@@ -76,7 +87,7 @@ if [ -f "$sh_secrets_file" ]; then
 fi
 unset sh_secrets_file
 
-# Additional configuration for various applications
+# Application configuration
 sh_apps_dir="$sh_dir/apps"
 if [ -d "$sh_apps_dir" ]; then
     for sh_app in "$sh_apps_dir"/*.sh; do
@@ -87,53 +98,19 @@ if [ -d "$sh_apps_dir" ]; then
 fi
 unset sh_app sh_apps_dir
 
-# Remove the secret variables (if loaded)
-if [ -n "$dotfiles_secrets" ]; then
-    unset-dotfiles-secret-vars
-fi
+# Remove secret variables
+if [ -n "$dotfiles_secrets" ]; then unset-dotfiles-secret-vars; fi
 unset dotfiles_secrets
 
-# Add any ~/bin directory to our PATH
-if [ -d "$HOME/bin" ]; then
-    build_path "$HOME/bin" "$PATH"
-    export PATH="$build_path"
-fi
-
-# Add any ~/.local/bin directory to our PATH
-if [ -d "$HOME/.local/bin" ]; then
-    build_path "$HOME/.local/bin" "$PATH"
-    export PATH="$build_path"
-fi
-
-# Add any explicit extra paths to our PATH
-if [ -n "$EXTRA_PATHS" ]; then
-    build_path "$EXTRA_PATHS" "$PATH"
-    export PATH="$build_path"
-fi
-unset EXTRA_PATHS
-
-# Set our preferred editor
-if [ -n "$EDITOR_PRIORITY" ]; then
-    for editor in $EDITOR_PRIORITY; do
-        editor_path="$(command -v "$editor")"
-        if [ -n "$editor_path" ]; then
-            export EDITOR="$editor_path"
-            export VISUAL="$editor_path"
-            break
-        fi
-    done
-fi
-unset EDITOR_PRIORITY editor editor_path
-
-# Include any custom aliases
-sh_aliases_file="$sh_dir/aliases.sh"
+# Load shell aliases
+sh_aliases_file="$sh_dir/misc/aliases.sh"
 if [ -f "$sh_aliases_file" ]; then
-    # shellcheck source=sh/aliases.sh
+    # shellcheck source=sh/misc/aliases.sh
     . "$sh_aliases_file"
 fi
 unset sh_aliases_file
 
-# Include any custom functions
+# Set custom functions
 sh_functions_dir="$sh_dir/functions"
 if [ -d "$sh_functions_dir" ]; then
     df_log 'Loading shell functions ...'

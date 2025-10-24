@@ -7,7 +7,7 @@ SETUP_SSH_AUTH_SOCK=true
 
 # -----------------------------------------------------------------------------
 
-df_log 'Loading system configuration: WSL'
+df_log 'Loading environment configuration: WSL'
 
 # Helper function to setup SSH agent forwarding
 # Based on: https://github.com/rupor-github/wsl-ssh-agent#wsl-2-compatibility
@@ -103,8 +103,6 @@ wsl_setup_ssh_auth_sock() {
             EXEC:"$npiperelay -ei -s //./pipe/openssh-ssh-agent",nofork &
     ) > /dev/null 2>&1
     export SSH_AUTH_SOCK
-
-    unset dep deps npiperelay winappdata
 }
 
 # Setup SSH agent forwarding if requested

@@ -1,14 +1,14 @@
 # shellcheck shell=sh
 
-df_log 'Configuring locale ...'
+df_log 'Setting preferred locale ...'
 
 if [ -z "$PREFERRED_LOCALES" ]; then
-    df_log "Skipping setting locale as \$PREFERRED_LOCALES is empty."
+    df_log 'Skipping setting locale as PREFERRED_LOCALES is empty.'
     return
 fi
 
 if [ -n "$LANG" ]; then
-    df_log "Skipping setting locale as \$LANG already set to: $LANG"
+    df_log "Skipping setting locale as LANG already set to: $LANG"
     return
 fi
 
@@ -21,11 +21,11 @@ fi
 for locale in $PREFERRED_LOCALES; do
     if locale -a | grep "$locale" > /dev/null; then
         export LANG="$locale"
-        df_log "Set locale via \$LANG to: $LANG"
+        df_log "Set locale via LANG to: $LANG"
         return
     fi
 done
-unset PREFERRED_LOCALES locale
+unset locale
 
 echo '[dotfiles] No preferred locales were found.'
 
