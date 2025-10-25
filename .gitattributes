@@ -8,6 +8,7 @@
 *.fish                          text        eol=lf
 *.zsh                           text        eol=lf
 .bashrc                         text        eol=lf
+.cshrc                          text        eol=lf
 .mk-sbuild.rc                   text        eol=lf
 .quiltrc                        text        eol=lf
 .shellcheckrc                   text        eol=lf

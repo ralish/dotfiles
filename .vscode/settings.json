@@ -19,6 +19,8 @@
         // clink
         "clink_history*": "plaintext",
         "clink_settings": "properties",
+        // csh
+        ".cshrc": "shellscript",
         // curl
         ".curlrc": "properties",
         // cygwin
@@ -147,6 +149,7 @@
 
     // Excludes for ShellCheck linter
     "shellcheck.ignorePatterns": {
+        "**/*.cshrc": true,
         "**/*.zsh": true,
         "**/.zshrc": true
     },
