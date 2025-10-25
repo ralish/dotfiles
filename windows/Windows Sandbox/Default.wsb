@@ -2,7 +2,7 @@
   Windows Sandbox configuration
   https://learn.microsoft.com/en-au/windows/security/application-security/application-isolation/windows-sandbox/windows-sandbox-configure-using-wsb-file
 
-  Last reviewed release: Windows 11 24H2
+  Last reviewed release: Windows 11 25H2
   Initial support: Windows 10 1903
 
   No XML schema appears to be publicly available.

@@ -3,9 +3,9 @@ Windows Registry Editor Version 5.00
 ; WinDbg workspace configuration
 ; https://learn.microsoft.com/en-au/windows-hardware/drivers/debuggercmds/windbg-overview
 ;
-; Last reviewed release: v10.0.26100.4948
+; Last reviewed release: Windows 11 25H2
 
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windbg\Workspaces]
+[HKEY_CURRENT_USER\Software\Microsoft\Windbg\Workspaces]
 "Default"=hex:57,44,57,53,01,00,00,00,44,00,00,00,10,00,04,00,01,00,00,00,00,\
   00,00,00,0a,00,00,00,10,00,04,00,10,00,00,00,00,00,00,00,3d,00,00,00,10,00,\
   04,00,00,00,00,00,00,00,00,00,0c,00,00,00,10,00,04,00,01,00,00,00,00,00,00,\

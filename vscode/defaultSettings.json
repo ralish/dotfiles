@@ -7733,7 +7733,8 @@
 
     // Providers are enabled by default. Omit them by setting the id of the provider to `false`.
     "terminal.integrated.suggest.providers": {
-        "lsp": false
+        "lsp": false,
+        "terminal-suggest": true
     },
 
     // Specifies whether to try to collapse the opened worktrees into a single (common) repository in the views when possible
@@ -11788,6 +11789,9 @@
     // Automatically fix diagnostics for edited files.
     "github.copilot.chat.agent.autoFix": true,
 
+    // When enabled, Copilot will include the name of the current active editor in the context for agent mode.
+    "github.copilot.chat.agent.currentEditorContext.enabled": true,
+
     // Controls whether code instructions from `.github/copilot-instructions.md` are added to Copilot requests.
     //
     // Note: Keep your instructions short and precise. Poor instructions can degrade Copilot's quality and performance. [Learn more](https://aka.ms/github-copilot-custom-instructions) about customizing Copilot.
@@ -11869,9 +11873,6 @@
     // Enables the `/startDebugging` intent in panel chat. Generates or finds launch config to match the query (if any), project structure, and more.
     "github.copilot.chat.startDebugging.enabled": true,
 
-    // When enabled, Copilot will include the name of the current active editor in the context for agent mode.
-    "github.copilot.chat.agent.currentEditorContext.enabled": true,
-
     // Enables the thinking tool that allows Copilot to think deeply about your request before generating a response in agent mode.
     "github.copilot.chat.agent.thinkingTool": false,
 
@@ -11880,6 +11881,9 @@
 
     // Configure custom Azure OpenAI models. Each key should be a unique model ID, and the value should be an object with model configuration including name, url, toolCalling, vision, maxInputTokens, and maxOutputTokens properties.
     "github.copilot.chat.azureModels": {},
+
+    // Specifies an experimental alternate prompt to use for Claude Sonnet 4.5.
+    "github.copilot.chat.claudeSonnet45AlternatePrompt": "default",
 
     // Use instructions files instead. See https://aka.ms/vscode-ghcp-custom-instructions for more information.
     // A set of instructions that will be added to Copilot requests that generate code.
@@ -11916,14 +11920,23 @@
     // When making edits request whether to include recently viewed and edited files with Copilot requests.
     "github.copilot.chat.edits.temporalContext.enabled": false,
 
+    // The executePrompt tool enables the agent to execute tasks in a separate, isolated context.
+    "github.copilot.chat.executePrompt.enabled": false,
+
     // Show 'Generate tests' code lens for symbols that are not covered by current test coverage information.
     "github.copilot.chat.generateTests.codeLens": false,
 
     // Specifies an experimental alternate prompt to use for GPT-5 models.
     "github.copilot.chat.gpt5AlternatePrompt": "default",
 
+    // Specifies an experimental alternate prompt to use for the GPT-5-Codex model.
+    "github.copilot.chat.gpt5CodexAlternatePrompt": "codex",
+
     // Specifies an experimental alternate prompt to use for Grok Code models.
     "github.copilot.chat.grokCodeAlternatePrompt": "default",
+
+    // Enables the use of image upload URLs in chat requests instead of raw base64 strings.
+    "github.copilot.chat.imageUpload.enabled": true,
 
     // Enables the TypeScript language context provider for /fix commands
     "github.copilot.chat.languageContext.fix.typescript.enabled": false,
@@ -11936,6 +11949,12 @@
 
     // Enables the TypeScript language context provider for inline completions
     "github.copilot.chat.languageContext.typescript.enabled": false,
+
+    // Controls whether to include documentation comments in the generated code snippets.
+    "github.copilot.chat.languageContext.typescript.includeDocumentation": false,
+
+    // Controls which kind of items are included in the TypeScript language context provider.
+    "github.copilot.chat.languageContext.typescript.items": "minimal",
 
     // Sets the fetcher used for the next edit suggestions.
     "github.copilot.chat.nesFetcher": "",
@@ -14070,6 +14089,12 @@
 
     // Maximum number of user files to index in the workspace. Indexing files is a performance-intensive task. Please use this setting to limit the number of files you want us to index. If you enter -1, we will index all files.
     "python.analysis.userFileIndexingLimit": 2000,
+
+    // Global search paths for Python environments. Absolute directory paths that are searched at the user level.
+    "python-env.globalSearchPaths": [],
+
+    // Workspace search paths for Python environments. Can be absolute paths or relative directory paths searched within the workspace.
+    "python-env.workspaceSearchPaths": [],
 
     // The default environment manager for creating and managing environments.
     "python-envs.defaultEnvManager": "ms-python.python:venv",
