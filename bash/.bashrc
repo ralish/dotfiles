@@ -91,6 +91,7 @@ PROMPT_COMMAND='history -a'
 # shellcheck disable=SC2249
 case "$TERM" in
     xterm-color | *-256color) colour_prompt=yes ;;
+    *) colour_prompt= ;;
 esac
 
 # Force usage of a colour prompt (we'll still sanity check the terminal)
