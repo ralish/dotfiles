@@ -39,8 +39,6 @@ bind "\e[A" ed-search-prev-history
 bind "\e[B" ed-search-next-history
 
 # Set Ctrl+Left/Right arrow keys to move to the adjacent word
-bind "\eOD" ed-prev-word
-bind "\eOC" em-next-word
 bind "\e[1;5D" ed-prev-word
 bind "\e[1;5C" em-next-word
 
