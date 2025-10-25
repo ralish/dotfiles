@@ -109,7 +109,7 @@ Windows Registry Editor Version 5.00
 ;"CurrentPage"=dword:00000000
 ; Allow colourisation of selection
 "EnableColorSelection"=dword:00000001
-; Load the Console Input Method Editor (IME)
+; Load the Console Input Method Editor (IME) [v1 only]
 "LoadConIme"=dword:00000000
 ; Popup window foreground/background colours
 "PopupColors"=dword:00000070
