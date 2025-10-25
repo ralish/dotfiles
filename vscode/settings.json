@@ -164,6 +164,9 @@
     "telemetry.feedback.enabled": false,
     "telemetry.telemetryLevel": "off",
 
+    // Security
+    "security.allowedUNCHosts": ["wsl$"],
+
     // Security: Workspace
     "security.workspace.trust.startupPrompt": "always",
 
