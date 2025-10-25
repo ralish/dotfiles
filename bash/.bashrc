@@ -107,14 +107,14 @@ fi
 # shellcheck disable=SC2034
 if [[ -n ${colour_prompt-} ]]; then
     if typeset -F __git_ps1 > /dev/null; then
-        PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\$(__git_ps1)\[\033[00m\]\$ "
+        PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\$(__git_ps1)\[\033[00m\]> "
     else
-        PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+        PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]> "
     fi
 elif typeset -F __git_ps1 > /dev/null; then
-    PS1="\u@\h:\w\$(__git_ps1)\$ "
+    PS1="\u@\h:\w\$(__git_ps1)> "
 else
-    PS1="\u@\h:\w\$ "
+    PS1="\u@\h:\w> "
 fi
 unset colour_prompt force_colour_prompt
 
