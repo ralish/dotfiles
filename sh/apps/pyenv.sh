@@ -27,6 +27,6 @@ if df_app_load 'pyenv' "[ -d \"$pyenv_root\" ]"; then
     fi
 fi
 
-unset pyenv_root
+unset pyenv_bin pyenv_root
 
 # vim: syntax=sh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
