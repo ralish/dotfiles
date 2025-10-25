@@ -272,10 +272,14 @@ $endif
 
 # ------------------------------ Key bindings ---------------------------------
 
+# To check the codes being sent from key sequences use "showkey -a". If a key
+# sequence doesn't return any output it's most likely already being handled by
+# the terminal driver. You can check its configuration using "stty -a".
+
 # Interrogate the Readline configuration
-"\C-x\C-f": dump-functions
-"\C-x\C-m": dump-macros
-"\C-x\C-v": dump-variables
+"\C-x\C-f": dump-functions      # bind -P
+"\C-x\C-m": dump-macros         # bind -S
+"\C-x\C-v": dump-variables      # bind -V
 
 # Set Home/End keys to jump to the beginning/end of line
 "\e[1~": beginning-of-line
