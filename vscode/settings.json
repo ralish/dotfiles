@@ -171,7 +171,7 @@
     "security.workspace.trust.startupPrompt": "always",
 
     // ##################################################
-    // ###             Built-in extensions            ###
+    // ###            Built-in extensions             ###
     // ##################################################
 
     // CSS: CSS
@@ -601,7 +601,7 @@
     "yaml.maxItemsComputed": 10000,
 
     // ##################################################
-    // ###           Language customisations          ###
+    // ###          Language customisations           ###
     // ##################################################
 
     "[dockercompose]": {
