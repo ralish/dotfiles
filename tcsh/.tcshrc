@@ -586,4 +586,7 @@ bindkey -k down history-search-forward      # Down
 bindkey "\e[1;5D" backward-word             # Ctrl+Left
 bindkey "\e[1;5C" forward-word              # Ctrl+Right
 
+# Delete the previous word
+bindkey "^W" backward-delete-word           # Ctrl+W
+
 # vim: syntax=tcsh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
