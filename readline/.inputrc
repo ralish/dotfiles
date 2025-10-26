@@ -91,7 +91,7 @@ set completion-map-case on
 set completion-prefix-display-length 0
 
 # Maximum number of possible completions to display without prompting the user
-# for comfirmation.
+# for confirmation.
 #
 # Valid values:
 # - <=0     Never prompt to display completions
