@@ -1,0 +1,589 @@
+#!/usr/bin/env tcsh
+
+# TENEX C shell
+#
+# Last reviewed release: v6.24.10
+# Default file path: ~/.tcshrc
+#
+# tcsh is *not* compatible with the Bourne shell (sh) so we cannot use our
+# common shell setup configuration (sh/common.sh).
+
+# If we're not running interactively then bail out
+if ($?prompt == 0) exit
+
+##################################################
+###             Character encoding             ###
+##################################################
+
+# Enables the display and editing of different character sets
+#
+# Valid values:
+# - euc         EUC-kanji (Japanese)
+# - sjis        Shift-JIS (Japanese)
+# - big5        Big5 (Chinese)
+# - utf8        Utf8 (Unicode)
+#
+# The variable can also be set to exactly 256 characters in a specific format
+# for display and editing of the original multi-byte code format. Consult the
+# documentation for details on the format.
+#
+# GNU `ls` cannot display multi-byte filenames with the `-N` (`--literal`)
+# option. If using this version, set the second word of `dspmbyte` to `ls`.
+#
+# Only applies if `dspm` is listed in the `version` variable.
+set dspmbyte = ( 'utf8' )
+
+# Disable Kanji support so the meta key can be used
+#
+# Only applies if `kan` is listed in the `version` variable.
+#set nokanji
+
+##################################################
+###              Command history               ###
+##################################################
+
+# Maximum size of the history list
+#
+# The optional second word specifies the format in which history is printed. If
+# unspecified, the default is `%h\t%T\t%R\n`.
+set history = ( 10240 )
+
+# Characters used for history substitution
+#
+# 1st character: History substitution
+# 2nd character: Quick substitution
+set histchars = '\!^'
+
+# Handling of duplicate entries in the history list
+#
+# Valid values:
+# - all
+#   Only unique history events are stored.
+# - prev
+#   If the last history event is the same as the current command, do not store
+#   the current command.
+# - erase
+#   If the current event exists in the history list, erase the previous event
+#   and insert the current event.
+#set histdup =
+
+# Path to save the command history
+#
+# If unset, `~/.history` will be used.
+set histfile = ~/.tcsh_history
+
+# Use the literal (unexpanded) form of lines in the history list for builtin
+# and editor commands and the `savehist` mechanism.
+#set histlit
+
+# Save command history entries to the command history file on shell exit
+#
+# The optional first word specifies the maximum number of history entries to
+# save. The provided value is capped to the value of `history`.
+#
+# The optional second word can be set to `merge`, which will result in the
+# saved history being merged with any existing history file.
+#
+# The optional third word can be set to `lock`, which will serialise the
+# history file update to protect against simultaneous updates.
+set savehist = ( $history merge lock )
+
+##################################################
+###               Command prompt               ###
+##################################################
+
+# Format of the prompt for a command
+set prompt = '%n@%m:%~%# '
+
+# Format of the prompt for incomplete multi-line commands
+set prompt2 = '%R? '
+
+# Format of the prompt for confirming automatic spelling corrections
+set prompt3 = 'CORRECT>%R (y|n|e|a)? '
+
+# Format of prompt displayed on the right-hand side of the screen
+#
+# The prompt will automatically disappear and reappear as necessary to ensure
+# that command input isn't obscured. If `edit` isn't set, then the prompt will
+# be printed after the `prompt` and before the command input.
+#set rprompt =
+
+# Characters used for indicating user type
+#
+# 1st character: Normal users
+# 2nd character: Superuser
+set promptchars = '>!'
+
+# Indicate skipped directories with an ellipsis (`...`) instead of `/<skipped>`
+# for the `%c`, `%.`, and `%C` prompt sequences.
+set ellipsis
+
+# Disable print of `DING` at the change of hour in the prompt time specifiers
+set noding
+
+##################################################
+###          Completion & correction           ###
+##################################################
+
+# Add a `/` to the end of directories and a space to the end of normal files
+# when they are matched exactly.
+set addsuffix
+
+# Invoke the `spell-word` editor command before each completion attempt
+#set autocorrect
+
+# Invoke the `expand-history` editor command before each completion attempt
+#
+# If set to `onlyhistory`, the first completion will only expand history and a
+# second completion will expand filenames.
+set autoexpand
+
+# List possibilities after an ambiguous completion
+#
+# If set to `ambiguous`, possibilities are only listed when no new characters
+# are added by completion.
+set autolist
+
+# Recompute the hash table of the contents of the directories in the `path`
+# variable if a command is not found in the hash table.
+#
+# Can optionally be set to:
+# - complete
+#   Rebuild the list of available commands on each command completion attempt.
+# - correct
+#   Rebuild the list of available commands on each spelling correction attempt.
+# - always
+#   Enable the `complete` and `correct` options.
+set autorehash
+
+# Sets the case-sensitivity handling and word separators used by completion
+#
+# Valid values:
+# - igncase
+#   Perform completion case-insensitively.
+# - enhance
+#   As per `igncase`, but consider hyphens and underscores to be equivalent,
+#   and treat periods, hyphens, and underscores as word separators.
+# - Enhance
+#   Match uppercase and underscore characters explicitly, lowercase and hyphen
+#   characters case-insensitively, and treat periods, hyphens, and underscores
+#   as word separators.
+set complete = 'Enhance'
+
+# Sets when completion and spelling correction is automatically performed
+#
+# Valid values:
+# - cmd
+#   Automatically perform spelling correction on commands.
+# - complete
+#   Automatically perform completion on commands.
+# - all
+#   Enable the `cmd` and `complete` options.
+#set correct =
+
+# List of filename suffixes to be excluded from filename completion
+#set fignore = ( )
+
+# Beep behaviour when performing completion
+#
+# If unset, the `ambiguous` behaviour is used.
+#
+# Valid values:
+# - never
+#   Never beep.
+# - nomatch
+#   Beep only when there is no match.
+# - ambiguous
+#   Beep when there are multiple matches.
+# - notunique
+#   Beep when there is one exact and other longer matches.
+#set matchbeep =
+
+# List of directories or glob-patterns which match directories for which the
+# `stat(2)` system call should not be invoked when performing completion.
+#set nostat = ( )
+
+# Complete on an exact match even if a longer match is possible
+#set recexact
+
+##################################################
+###             Directory handling             ###
+##################################################
+
+# List of alternate directories searched by `cd`
+#set cdpath = ( )
+
+# Change to the user's home directory if `cd` is invoked without an argument
+set cdtohome
+
+# Treat a directory name typed as a command as a request to change directory
+#
+# If set to `verbose`, the change of directory is echoed to standard output.
+#set implicitcd
+
+# On `pushd +n`, extract the `n`-th directory from the directory stack instead
+# of rotating it to the top of the stack.
+#set dextract
+
+# Remove any existing instances of the directory name provided to `pushd`
+# before pushing it onto the stack.
+#set dunique
+
+# Do not print the directory stack on calling `pushd` and `popd`
+#set pushdsilent
+
+# Change to the user's home directory if `pushd` is invoked without arguments
+#set pushdtohome
+
+# Path to save the directory stack
+#
+# If unset, `~/.cshdirs` will be used.
+#set dirsfile = ~/.tcsh_dirs
+
+# Save directory stack entries to the directory stack file on shell exit
+#
+# A numeric value can optionally be provided to control the maximum number of
+# directory stack entries to save.
+#set savedirs
+
+##################################################
+###          Expansion & substitution          ###
+##################################################
+
+# Inhibit filename and directory stack substitution
+#set noglob
+
+# Wildcard glob-patterns match files and directories beginning with `.`, except
+# for `.` and `..`.
+#set globdot
+
+# Wildcard glob-patterns of the form `**` and `***` will match any string of
+# characters, including `/`, and so traverse into any existing subdirectories.
+set globstar
+
+# Replace newlines and carriage returns in command substitution with spaces
+set csubstnonl
+
+# Allow filename and directory stack substitutions which do not match any files
+#set nonomatch
+
+##################################################
+###                Shell input                 ###
+##################################################
+
+# Enable the command-line editor (default for interactive shells)
+#
+# If unset, then traditional `csh` completion is used.
+set edit
+
+# List of command names for the `run-fg-editor` editor command to match
+#
+# If unset, the `EDITOR` (`ed` if unset) and `VISUAL` (`vi` if unset)
+# environment variables will be used.
+#set editors = ( )
+
+# Input mode to be set at the beginning of each line
+#
+# Valid values:
+# - insert
+# - overwrite
+#set inputmode =
+
+# Parse numeric variables starting with `0` as octal
+set parseoctal
+
+# Use `vi`-style key bindings instead of `emacs`-style
+#
+# If set, word boundaries are determined by `wordchars` versus whitespace
+# versus other characters, and the behaviour of the cursor depends upon the
+# current `vi` mode.
+#
+# If unset, word boundaries are determined by `wordchars` versus other
+# characters.
+#
+# This variable is set by `bindkey -v` and unset by `bindkey -e` but can be
+# independently set after these `bindkey` operations.
+#set vimode
+
+##################################################
+###                Shell output                ###
+##################################################
+
+# Show all times in 12-hour AM/PM format
+set ampm
+
+# Default to using colour if the terminal type seems to support it
+switch ( $TERM )
+    case xterm-color:
+    case *-256color:
+        set use_colour=true
+        breaksw
+    default:
+        set use_colour=false
+endsw
+
+# Enable colour support based on the earlier terminal support check
+if ( "$use_colour" == 'true' ) then
+    # Enable colour for the `ls-F` builtin and pass `--color=auto` to `ls`
+    set color
+
+    # Enable colour escape sequences for NLS message files and message output
+    set colorcat
+endif
+unset use_colour
+
+# Echo each command before executing (`-x` option)
+#set echo
+
+# Style of the `echo` builtin
+#
+# Valid values:
+# - bsd
+#   Don't echo a newline if the first argument is `-n` (default for `csh`).
+# - sysv
+#   Recognise backslashed escape sequences.
+# - both
+#   Combination of `bsd` and `sysv` options (default for `tcsh`).
+# - none
+#   Disable the `bsd` and `sysv` options.
+set echo_style = 'both'
+
+# Highlight in reverse video the region between the mark and the cursor in
+# incremental search matches (`i-search-back` and `i-search-fwd`).
+set highlight
+
+# Flags which are provided to the `ls-F` builtin
+#
+# One or more of the following flags can be provided:
+# - a
+#   Show all files.
+# - A
+#   Show all files except for `.` and `..`.
+# - x
+#   Sort horizontally instead of vertically.
+#
+# The optional second word specifies the path to `ls`.
+#set listflags = ( )
+
+# List all jobs when a job is suspended
+#
+# If set to `long`, the listing is displayed in long format.
+#set listjobs
+
+# Show the type of file each symbolic links points to with the `ls-F` builtin
+set listlinks
+
+# Maximum number of items which the `list-choices` editor command will list
+# without prompting the user for confirmation.
+#set listmax =
+
+# Maximum number of rows of items which the `list-choices` editor command will
+# list without prompting the user for confirmation.
+#set listmaxrows =
+
+# Disable all usage of the terminal bell
+set nobeep
+
+# Print a padding `0` for hours in 12 and 24 hour formats where necessary
+set padhour
+
+# Print exit status of interactive programs which exit with a non-zero status
+#set printexitvalue
+
+# Format of the output from the `sched` builtin for printing scheduled events
+#
+# The default is `%h\t%T\t%R\n`.
+#set sched =
+
+# Echo the words of each command after history substitution (`-v` option)
+#set verbose
+
+# Flash the screen instead of ringing the audible bell
+#set visiblebell
+
+# Format of the output for `watch` messages
+#
+# The default depends on system support for storing the remote hostname:
+# - Supported
+#   `%n has %a %l from %m`
+# - Unsupported
+#   `%n has %a %l`
+#set who =
+
+##################################################
+###               Miscellaneous                ###
+##################################################
+
+# Use the AFS username from the autolock feature of `autologout` instead of the
+# local username for Kerberos authentication.
+#set afsuser
+
+# In addition to the exit status of the last command, propagate to the `status`
+# variable the exit status from any command in a pipeline, and the exit status
+# of backquote expansion.
+#
+# If unset, the value of the `status` variable is set to the exit status of
+# only the last command in the pipeline, and the exit status of backquote
+# expansion is not propagated. This matches the POSIX mandated behaviour.
+set anyerror
+
+# Duration of inactivity which triggers automatic logout (minutes)
+#
+# The optional second word specifies the number of minutes before automatic
+# locking. After five incorrect attempts the user is automatically logged-out.
+#
+# The default is to automatically logout after 60 minutes of inactivity, with
+# no automatic locking, for login and superuser shells. However, this default
+# is not applied if the shell believes we're running under a window system (the
+# `DISPLAY` environment variable is set) or the TTY is a pseudo-TTY (a `pty`).
+#set autologout = ( )
+
+# Backslashes (`\`) always quote the the `\`, `'`, and `"` characters
+#set backslash_quote
+
+# File name of the message catalog
+#
+# If set, tcsh will use `tcsh.${catalog}` instead of the default of `tcsh`.
+#set catalog =
+
+# Evaluate expressions right to left for compatibility with `csh`
+#set compat_expr
+
+# List of commands to continue instead of starting a new one
+#set continue = ( )
+
+# Behaves the same as `continue` except the shell will execute:
+# echo `pwd` $argv > ~/.<cmd>_pause; %<cmd>
+#set continue_args = ( )
+
+# Ignore EOF from input devices which are terminals
+#
+# If set to zero or an empty string, all EOFs are ignored. If set to greater
+# than zero, the shell will ignore `n - 1` consecutive EOFs before exiting.
+#set ignoreeof
+
+# Handling of duplicate entries in the kill ring
+#
+# Valid values:
+# - all
+#   Only unique strings are stored.
+# - prev
+#   If the last killed string is the same as the current killed string, do not
+#   store the current string.
+# - erase
+#   If the current string exists in the kill ring, erase the previous string
+#   and insert the current string.
+#set killdup =
+
+# Maximum size of the kill ring
+#
+# If unset or less than two, only the most recently killed string is kept.
+set killring = 30
+
+# List of files and directories which are periodically checked for mail
+#
+# If the first word is numeric it specifies the check interval (seconds).
+#set mail = ( )
+
+# Enable restrictions on output redirection
+#
+# If set, `>` redirection must be to a file that does not exist or a character
+# special file (e.g. `/dev/null`). `>>` redirections must be to a file which
+# already exists.
+#
+# One or more of the following optional values can be provided:
+# - ask
+#   Display an interactive confirmation prompt instead of an error.
+# - notempty
+#   Permit `>` on empty files.
+#set noclobber
+
+# Notify on job completions asynchronously
+#set notify
+
+# Display only executable files in the path in command listing
+#set recognize_only_executables
+
+# Prompt for confirmation before executing `rm *`
+#set rmstar
+
+# Behaviour of symbolic link ('symlink') resolution when changing directory
+#
+# Valid values:
+# - (not set)
+#   No special behaviour.
+# - chase
+#   Resolve all symlinks to their targets.
+# - expand
+#   Attempt to "fix" symlinks by expanding arguments which look like paths.
+# - ignore
+#   Construct a current directory relative to the directory before the link was
+#   crossed. This affects only builtin commands and filename completion.
+set symlinks = 'ignore'
+
+# Duration of CPU time used by a command which triggers timing info (seconds)
+#
+# The optional second word specifies the format for the output of the `time`
+# builtin. The default depends on system support for resource usage reporting:
+# - Supported
+#   `%Uu %Ss %E %P %X+%Dk %I+%Oio %Fpf+%Ww`
+# - Unsupported
+#   `%Uu %Ss %E %P`
+#set time = ( )
+
+# Period between executions of the `periodic` special alias (minutes)
+#set tperiod =
+
+# List of user/terminal pairs to watch for logins and logouts
+#
+# The user can be set to `any` to watch for logins and logouts for any user on
+# the specified terminal. Conversely, the terminal can be set to `any` to watch
+# for logins and logouts for the specified user on any terminal. Both elements
+# can be set to `any` to watch for logins and logouts without restrictions.
+#
+# Logins and logouts are checked every 10 minutes by default, but the first
+# word can optionally be set to the number of minutes for the check period.
+#set watch = ( )
+
+# List of non-alphanumeric characters which are considered part of a word by
+# editor commands.
+#
+# The default depends on the state of the `vimode` variable:
+# - Set
+#   `_`
+# - Unset
+#   `*?_-.[]~=`
+#set wordchars = ( )
+
+##################################################
+###                Key bindings                ###
+##################################################
+
+# To check the codes being sent from key sequences use "showkey -a". If a key
+# sequence doesn't return any output it's most likely already being handled by
+# the terminal driver. You can check its configuration using "stty -a".
+
+# Default key bindings
+#
+# Valid options:
+# -e    Emacs-style
+# -v    vi-style
+bindkey -e
+
+# Jump to the beginning/end of line
+bindkey "\e[1~" beginning-of-line           # Home
+bindkey "\e[4~" end-of-line                 # End
+
+# Insert/delete characters
+bindkey "\e[2~" overwrite-mode              # Insert
+bindkey "\e[3~" delete-char                 # Delete
+
+# Perform a command history prefix search
+bindkey -k up history-search-backward       # Up
+bindkey -k down history-search-forward      # Down
+
+# Move to the adjacent word
+bindkey "\e[1;5D" backward-word             # Ctrl+Left
+bindkey "\e[1;5C" forward-word              # Ctrl+Right
+
+# vim: syntax=tcsh cc=80 tw=79 ts=4 sw=4 sts=4 et sr

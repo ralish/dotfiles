@@ -13,6 +13,7 @@
 .quiltrc                        text        eol=lf
 .shellcheckrc                   text        eol=lf
 .startxwinrc                    text        eol=lf
+.tcshrc                         text        eol=lf
 .zshrc                          text        eol=lf
 user-dirs.dirs                  text        eol=lf
 git/bin/*                       text        eol=lf

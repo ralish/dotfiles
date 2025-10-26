@@ -10,7 +10,7 @@
 # - ~/.bash_login
 # - ~/.profile
 #
-# csh
+# (t)csh
 # Not used.
 #
 # zsh

@@ -92,6 +92,8 @@
         // subversion
         "**/.subversion/config": "ini",
         "**/.subversion/servers": "ini",
+        // tcsh
+        ".tcshrc": "shellscript",
         // vscode
         "**/vscode/*.json": "jsonc",
         // wget
@@ -150,6 +152,7 @@
     // Excludes for ShellCheck linter
     "shellcheck.ignorePatterns": {
         "**/*.cshrc": true,
+        "**/*.tcshrc": true,
         "**/*.zsh": true,
         "**/.zshrc": true
     },
