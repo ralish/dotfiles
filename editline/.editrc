@@ -19,6 +19,10 @@ history unique 1
 
 # ------------------------------ Key bindings ---------------------------------
 
+# To check the codes being sent from key sequences use "showkey -a". If a key
+# sequence doesn't return any output it's most likely already being handled by
+# the terminal driver. You can check its configuration using "stty -a".
+
 # Default key bindings
 #
 # Valid options:
@@ -35,8 +39,8 @@ bind "\e[2~" em-toggle-overwrite
 bind "\e[3~" ed-delete-next-char
 
 # Set Up/Down arrow keys to perform a command history prefix search
-bind "\e[A" ed-search-prev-history
-bind "\e[B" ed-search-next-history
+bind -k up ed-search-prev-history
+bind -k down ed-search-next-history
 
 # Set Ctrl+Left/Right arrow keys to move to the adjacent word
 bind "\e[1;5D" ed-prev-word
