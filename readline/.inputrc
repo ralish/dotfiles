@@ -277,27 +277,27 @@ $endif
 # the terminal driver. You can check its configuration using "stty -a".
 
 # Interrogate the Readline configuration
-"\C-x\C-f": dump-functions      # bind -P
-"\C-x\C-m": dump-macros         # bind -S
-"\C-x\C-v": dump-variables      # bind -V
+"\C-x\C-f": dump-functions                  # Ctrl+X, Ctrl+F (bind -P)
+"\C-x\C-m": dump-macros                     # Ctrl+X, Ctrl+M (bind -S)
+"\C-x\C-v": dump-variables                  # Ctrl+X, Ctrl+V (bind -V)
 
-# Set Home/End keys to jump to the beginning/end of line
-"\e[1~": beginning-of-line
-"\e[4~": end-of-line
+# Jump to the beginning/end of line
+"\e[1~": beginning-of-line                  # Home
+"\e[4~": end-of-line                        # End
 
-# Set Insert/Delete keys to insert/delete characters
-"\e[2~": overwrite-mode
-"\e[3~": delete-char
+# Insert/delete characters
+"\e[2~": overwrite-mode                     # Insert
+"\e[3~": delete-char                        # Delete
 
-# Set Up/Down arrow keys to perform a command history prefix search
-"\e[A": history-search-backward
-"\e[B": history-search-forward
+# Perform a command history prefix search
+"\e[A": history-search-backward             # Up
+"\e[B": history-search-forward              # Down
 
-# Set Ctrl+Left/Right arrow keys to move to the adjacent word
-"\e[1;5D": backward-word
-"\e[1;5C": forward-word
+# Move to the adjacent word
+"\e[1;5D": backward-word                    # Ctrl+Left
+"\e[1;5C": forward-word                     # Ctrl+Right
 
-# Set Ctrl+R to perform an incremental backwards history search
-"\C-r": reverse-search-history
+# Incremental backwards history search
+"\C-r": reverse-search-history              # Ctrl+R
 
 # vim: syntax=readline cc=80 tw=79 ts=4 sw=4 sts=4 et sr

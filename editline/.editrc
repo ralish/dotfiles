@@ -30,23 +30,23 @@ history unique 1
 # -v    vi-style
 bind -e
 
-# Set Home/End keys to jump to the beginning/end of line
-bind "\e[1~" ed-move-to-beg
-bind "\e[4~" ed-move-to-end
+# Jump to the beginning/end of line
+bind "\e[1~" ed-move-to-beg                 # Home
+bind "\e[4~" ed-move-to-end                 # End
 
-# Set Insert/Delete keys to insert/delete characters
-bind "\e[2~" em-toggle-overwrite
-bind "\e[3~" ed-delete-next-char
+# Insert/delete characters
+bind "\e[2~" em-toggle-overwrite            # Insert
+bind "\e[3~" ed-delete-next-char            # Delete
 
-# Set Up/Down arrow keys to perform a command history prefix search
-bind -k up ed-search-prev-history
-bind -k down ed-search-next-history
+# Perform a command history prefix search
+bind -k up ed-search-prev-history           # Up
+bind -k down ed-search-next-history         # Down
 
-# Set Ctrl+Left/Right arrow keys to move to the adjacent word
-bind "\e[1;5D" ed-prev-word
-bind "\e[1;5C" em-next-word
+# Move to the adjacent word
+bind "\e[1;5D" ed-prev-word                 # Ctrl+Left
+bind "\e[1;5C" em-next-word                 # Ctrl+Right
 
-# Set Ctrl+R to perform an incremental backwards history search
-bind "^R" em-inc-search-prev
+# Incremental backwards history search
+bind "^R" em-inc-search-prev                # Ctrl+R
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr

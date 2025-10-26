@@ -223,6 +223,6 @@ $endif
 # ------------------------------ Key bindings ---------------------------------
 
 # Interrogate the Readline configuration
-"\C-x\C-f": dump-functions
-"\C-x\C-m": dump-macros
-"\C-x\C-v": dump-variables
+"\C-x\C-f": dump-functions                  # Ctrl+X, Ctrl+F
+"\C-x\C-m": dump-macros                     # Ctrl+X, Ctrl+M
+"\C-x\C-v": dump-variables                  # Ctrl+X, Ctrl+V
