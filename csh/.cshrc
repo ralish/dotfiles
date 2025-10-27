@@ -1,47 +1,21 @@
 #!/usr/bin/env csh
 
 # C shell
+# https://man.netbsd.org/csh.1
 #
 # Last reviewed release: v20230828
 # Default file path: ~/.cshrc
 #
-# csh is *not* compatible with the Bourne shell (sh) so we cannot use our
-# common shell setup configuration (sh/common.sh).
+# Configuration is performed entirely through shell variables, which has the
+# useful property of providing simple backwards compatibility even with very
+# old releases. Where a csh release does not support a feature, the variable
+# will effectively be a no-op.
+#
+# csh is not compatible with the Bourne shell (`sh`), so our common shell
+# configuration (`sh/common.sh`) cannot be used.
 
 # If we're not running interactively then bail out
-if ($?prompt == 0) exit
-
-##################################################
-###              Command history               ###
-##################################################
-
-# Maximum size of the history list
-set history = 1024
-
-# Characters used for history substitution
-#
-# 1st character: History substitution
-# 2nd character: Quick substitution
-set histchars = '\!^'
-
-# Path to save the history
-set histfile = ~/.csh_history
-
-# Save history entries to the history file on shell exit
-#
-# A numeric value can optionally be provided to control the maximum number of
-# history entries to save. If unspecified, the value of `history` is used.
-set savehist
-
-##################################################
-###               Command prompt               ###
-##################################################
-
-# Format of the prompt for a command
-set prompt = "${USER:q}@%m> "
-
-# Format of the prompt for incomplete multi-line commands
-set prompt2 = '? '
+if ( $?prompt == 0 ) exit
 
 ##################################################
 ###                 Completion                 ###
@@ -50,8 +24,26 @@ set prompt2 = '? '
 # Enable filename completion
 set filec
 
-# List of filename suffixes to be excluded from filename completion
+# List of filename suffixes excluded from filename completion
 #set fignore = ( )
+
+##################################################
+###             Directory handling             ###
+##################################################
+
+# List of alternate directories searched by `chdir`
+#set cdpath = ( )
+
+##################################################
+###            Execution & parsing             ###
+##################################################
+
+# Enable restrictions on output redirection
+#
+# If set, `>` redirection must be to a file that does not exist or a character
+# special file (e.g. `/dev/null`). `>>` redirection must be to a file which
+# already exists.
+#set noclobber
 
 ##################################################
 ###                 Expansion                  ###
@@ -64,6 +56,37 @@ set filec
 #set nonomatch
 
 ##################################################
+###                  History                   ###
+##################################################
+
+# Maximum size of the history list
+set history = 1000
+
+# Characters used for history substitution
+#
+# 1st character: History substitution
+# 2nd character: Quick substitution
+#
+# If unset, the default is `!^`.
+#set histchars =
+
+# Path to save the history
+set histfile = ~/.csh_history
+
+# Save history entries to the history file on shell exit
+#
+# A numeric value can optionally be provided to control the maximum number of
+# history entries to save. If unspecified, the value of `history` is used.
+set savehist
+
+##################################################
+###                Shell input                 ###
+##################################################
+
+# Ignore EOF from input devices which are terminals
+#set ignoreeof
+
+##################################################
 ###                Shell output                ###
 ##################################################
 
@@ -73,6 +96,9 @@ set filec
 # Inhibit use of the terminal bell to signal errors or ambiguous completion
 set nobeep
 
+# Notify on job completions asynchronously
+#set notify
+
 # Echo the words of each command after history substitution (`-v` option)
 #set verbose
 
@@ -80,28 +106,29 @@ set nobeep
 ###               Miscellaneous                ###
 ##################################################
 
-# List of alternate directories searched by `chdir`
-#set cdpath = ( )
-
-# Ignore EOF from input devices which are terminals
-#set ignoreeof
-
 # List of files which are periodically checked for mail
 #
-# If the first word is numeric it specifies the check interval (seconds).
+# If the first word is numeric it specifies the check interval (secs).
 #set mail = ( )
 
-# Enable restrictions on output redirection
-#
-# If set, `>` redirection must be to a file that does not exist or a character
-# special file (e.g. `/dev/null`). `>>` redirections must be to a file which
-# already exists.
-#set noclobber
-
-# Notify on job completions asynchronously
-#set notify
-
-# Duration of CPU time used by a command which triggers timing info (seconds)
+# Duration of CPU time used by a command which triggers timing info (secs)
 #set time =
+
+##################################################
+###            Prompt customisation            ###
+##################################################
+
+# Retrieve the short hostname to use in the prompt
+set prompt_hostname = `hostname -s`
+
+# Format string of the prompt for command input
+#
+# The default is `% ` for users and `# ` for the superuser.
+set prompt = "${USER:q}@${prompt_hostname:q}> "
+
+# Format string of the prompt for incomplete multi-line commands
+#
+# The default is `? `.
+#set prompt2 =
 
 # vim: syntax=csh cc=80 tw=79 ts=4 sw=4 sts=4 et sr
