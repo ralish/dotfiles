@@ -476,7 +476,7 @@ terminal.use_altgr_substitute = False
 
 # Show usage hints provided by argmatchers in the comment row
 #
-# Only applies wheen "comment_row.show_hints" is enabled.
+# Only applies when "comment_row.show_hints" is enabled.
 argmarcher.show_hints = True
 
 # Show input hints in the comment row
