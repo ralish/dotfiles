@@ -20,7 +20,7 @@
         "clink_history*": "plaintext",
         "clink_settings": "properties",
         // csh
-        ".cshrc": "shellscript",
+        ".cshrc": "properties", // csh is not compatible with `shellscript`
         // curl
         ".curlrc": "properties",
         // cygwin
@@ -93,7 +93,7 @@
         "**/.subversion/config": "ini",
         "**/.subversion/servers": "ini",
         // tcsh
-        ".tcshrc": "shellscript",
+        ".tcshrc": "properties", // tcsh is not compatible with `shellscript`
         // vscode
         "**/vscode/*.json": "jsonc",
         // wget
