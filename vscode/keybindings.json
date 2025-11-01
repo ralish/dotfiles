@@ -11,7 +11,7 @@
         "command": "workbench.action.closeWindow",
         "when": "!editorIsOpen && !multipleEditorGroups"
     },
-    // Repurpose shortcut for Sort Lines Ascending
+    // Repurpose shortcut for "Sort Lines Ascending"
     {
         "key": "alt+a",
         "command": "-editor.action.accessibilityHelpConfigureAssignedKeybindings",
@@ -21,7 +21,7 @@
         "key": "alt+a",
         "command": "editor.action.sortLinesAscending"
     },
-    // Disable Open New External Terminal shortcut
+    // Disable "Open New External Terminal" shortcut
     {
         "key": "ctrl+shift+c",
         "command": "-workbench.action.terminal.openNativeConsole",

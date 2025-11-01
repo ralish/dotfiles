@@ -22,8 +22,8 @@ function apt_install() {
         return
     fi
 
-    # Check if the package is available to install. Simply using "apt-cache
-    # show $pkg_name" is insufficient as it may return success if the package
+    # Check if the package is available to install. Simply using `apt-cache
+    # show $pkg_name` is insufficient as it may return success if the package
     # is referenced by other packages but has no installation candidate.
     local pkg_exists
     pkg_exists="$(apt-cache search --names-only "^$pkg_name$")"
@@ -78,7 +78,7 @@ rm -rf /var/lib/apt/lists
 mkdir -p /var/lib/apt/lists/partial
 
 if command -v snap > /dev/null; then
-    # Suppress any error as only recent snapd versions have this command
+    # Suppress any error as only recent `snapd` versions have this command
     echo '[snap] Disabling automatic updates ...'
     snap refresh --hold || true
     echo

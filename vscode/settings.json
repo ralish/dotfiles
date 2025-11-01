@@ -6,7 +6,7 @@
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
-    // Explicitly set schema for directly editing in dotfiles repo
+    // Explicitly set schema for directly editing in repository
     "$schema": "vscode://schemas/settings/user",
 
     // Text Editor

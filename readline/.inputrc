@@ -15,9 +15,9 @@
 # of what the terminal claims it can support. The default is disabled, but the
 # setting will be automatically enabled if the locale contains characters whose
 # encoding requires the eighth bit to be set. This setting is dependent on the
-# LC_CTYPE environment variable and may change if the locale changes.
+# `LC_CTYPE` environment variable and may change if the locale changes.
 #
-# The name "meta-flag" is an alias for this setting.
+# The setting `meta-flag` is an alias for this setting.
 set input-meta on
 
 # Enable 8-bit output (required for UTF-8)
@@ -26,7 +26,7 @@ set input-meta on
 # instead of as a meta-prefixed escape sequence. The default is disabled, but
 # the setting will be automatically enabled if the locale contains characters
 # whose encoding requires the eighth bit to be set. This setting is dependent
-# on the LC_CTYPE environment variable and may change if the locale changes.
+# on the `LC_CTYPE` environment variable and may change if the locale changes.
 set output-meta on
 
 # Enable 8-bit conversion (incompatible with UTF-8)
@@ -34,16 +34,16 @@ set output-meta on
 # If enabled, characters with the eighth bit set will be converted to a meta-
 # prefixed escape sequence. The default is enabled, but the setting will be
 # automatically disabled if the locale contains characters whose encoding
-# requires the eighth bit to be set. This setting is dependent on the LC_CTYPE
-# environment variable and may change if the locale changes. Key bindings may
-# also be affected when enabled; see the "force-meta-prefix" setting.
+# requires the eighth bit to be set. This setting is dependent on the
+# `LC_CTYPE` environment variable and may change if the locale changes. Key
+# bindings may also be affected when enabled (see `force-meta-prefix` setting).
 set convert-meta off
 
 # Convert binding key sequences to meta-prefixed escape sequences
 #
 # If enabled, binding key sequences containing a meta key are always converted
 # to meta-prefixed escape sequences. If disabled, this behaviour is enabled if
-# the "convert-meta" setting is enabled.
+# the `convert-meta` setting is enabled.
 $if version >= 8.3
 set force-meta-prefix off
 $endif
@@ -52,26 +52,26 @@ $endif
 
 # Disable word completion
 #
-# If enabled, completion characters are mapped to the "self-insert" command.
+# If enabled, completion characters are mapped to the `self-insert` command.
 set disable-completion off
 
 # Display the common prefix of possible completions using a different colour
 #
-# Colour definitions are taken from the LS_COLORS environment variable.
+# Colour definitions are taken from the `LS_COLORS` environment variable.
 set colored-completion-prefix on
 
 # Display possible completions using different colours to indicate file type
 #
-# Colour definitions are taken from the LS_COLORS environment variable.
+# Colour definitions are taken from the `LS_COLORS` environment variable.
 set colored-stats on
 
 # Number of screen columns used to display possible completions
 #
-# Ignored if less than zero or greater than the terminal screen width.
-#
 # Valid values:
 # -  0      Display one match per line
 # - >0      Number of screen columns per line
+#
+# Ignored if less than zero or greater than the terminal screen width.
 set completion-display-width -1
 
 # Perform filename matching and completion case-insensitively
@@ -79,7 +79,7 @@ set completion-ignore-case on
 
 # Treat hypens and underscores as equal for filename matching and completion
 #
-# Only applies when "completion-ignore-case" is enabled.
+# Only applies when `completion-ignore-case` is enabled.
 set completion-map-case on
 
 # Maximum number of characters in the common prefix of possible completions to
@@ -106,18 +106,18 @@ set mark-directories on
 
 # Display completed directory symlinks with an appended slash
 #
-# Only applies when "mark-directories" is enabled.
+# Only applies when `mark-directories` is enabled.
 set mark-symlinked-directories on
 
 # When performing filename matching, include hidden files without requiring the
-# leading "." to be included in the filename.
+# leading `.` to be included in the filename.
 set match-hidden-files off
 
 # When performing menu completion, display the common prefix of possible
 # completions before cycling through the completions list.
 set menu-complete-display-prefix off
 
-# Display possible completions using an internal more(1)-like pager
+# Display possible completions using an internal `more(1)`-like pager
 set page-completions off
 
 # Display possible completions with matches sorted horizontally
@@ -173,7 +173,7 @@ set bind-tty-special-chars on
 # Briefly move the cursor to the opening parenthesis on closing
 set blink-matching-paren off
 
-# String to insert at the beginning of a line by the "insert-comment" command
+# String to insert at the beginning of a line by the `insert-comment` command
 set comment-begin #
 
 # Echo a corresponding control character for keyboard generated signals
@@ -192,54 +192,55 @@ set enable-meta-key on
 # Scroll lines longer than the screen width being edited instead of wrapping
 set horizontal-scroll-mode off
 
-# Duration to wait for further input on an ambiguous key sequence. If no
-# further input is received the shorter but complete key sequence is used.
+# Duration to wait for further input on an ambiguous key sequence
 #
 # Valid values:
 # - <=0     Wait until the key sequence is unambiguous
-# - >=1     Duration to wait for further input (milliseconds)
+# - >=1     Duration to wait for further input (ms)
+#
+# If no further input is received uses the shorter but complete key sequence.
 set keyseq-timeout 500
 
 # Use the visible bell if available instead of ringing the terminal bell
 #
-# Overrides the "bell-style" setting.
+# Overrides the `bell-style` setting.
 #set prefer-visible-bell on
 
 # Add a string to the begining of the prompt indicating the editing mode
 set show-mode-in-prompt off
 
 # String displayed immediately before the last line of the primary prompt when
-# emacs editing mode is active.
+# `emacs` editing mode is active.
 #
-# Only applies when "show-mode-in-prompt" is enabled.
+# Only applies when `show-mode-in-prompt` is enabled.
 set emacs-mode-string @
 
 # String displayed immediately before the last line of the primary prompt when
-# vi editing mode is active and in command mode.
+# `vi` editing mode is active and in command mode.
 #
-# Only applies when "show-mode-in-prompt" is enabled.
+# Only applies when `show-mode-in-prompt` is enabled.
 set vi-cmd-mode-string (cmd)
 
 # String displayed immediately before the last line of the primary prompt when
-# vi editing mode is active and in insertion mode.
+# `vi` editing mode is active and in insertion mode.
 #
-# Only applies when "show-mode-in-prompt" is enabled.
+# Only applies when `show-mode-in-prompt` is enabled.
 set vi-ins-mode-string (ins)
 
 $if version >= 8.3
-# Enable certain commands to designate a region as "active", highlighting the
-# text in the region. See the "active-region-start-color" and "active-region-
-# end-color" settings to control the highlighting.
+# Enable certain commands to designate a region as `active`, highlighting the
+# text in the region. See the `active-region-start-color` and `active-region-
+# end-color` settings to control the highlighting.
 set enable-active-region on
 
 # Escape sequences to set text colour and background in an active region
 #
-# The default is obtained from the terminal's terminfo description.
+# The default is obtained from the terminal's `terminfo` description.
 #set active-region-start-color
 
 # Escape sequences to reset text colour and background after an active region
 #
-# The default is obtained from the terminal's terminfo description.
+# The default is obtained from the terminal's `terminfo` description.
 #set active-region-end-color
 $endif
 
@@ -262,7 +263,7 @@ set isearch-terminators \e\C-j
 # Mark modified history lines with a prepended asterisk
 set mark-modified-lines off
 
-# Undo changes to history lines before returning from "accept-line"
+# Undo changes to history lines before returning from `accept-line`
 set revert-all-at-newline off
 
 # Perform searches of the history list case-insensitively
@@ -272,9 +273,9 @@ $endif
 
 # ------------------------------ Key bindings ---------------------------------
 
-# To check the codes being sent from key sequences use "showkey -a". If a key
+# To check the codes being sent from key sequences use `showkey -a`. If a key
 # sequence doesn't return any output it's most likely already being handled by
-# the terminal driver. You can check its configuration using "stty -a".
+# the terminal driver. You can check its configuration using `stty -a`.
 
 # Interrogate the Readline configuration
 "\C-x\C-f": dump-functions                  # Ctrl+X, Ctrl+F (bind -P)

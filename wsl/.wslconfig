@@ -8,7 +8,7 @@
 [general]
 # Absolute path to directory to install distributions [UNDOCUMENTED]
 #
-# An empty string will default to "%LOCALAPPDATA%\\wsl".
+# An empty string defaults to `%LOCALAPPDATA%\\wsl`.
 #
 # Default: (empty)
 # Support: WSL 2.4.4
@@ -16,7 +16,7 @@
 
 # Idle timeout for terminating distributions (ms)
 #
-# If set to -1, termination of idle instance will be disabled.
+# If set to `-1`, termination of idle instance is disabled.
 #
 # Default: 15000
 # Support: WSL 2.5.4
@@ -29,7 +29,7 @@
 
 # Number of logical processors to assign to the VM
 #
-# If set to zero, all logical processors will be assigned.
+# If set to `0`, all logical processors are assigned.
 #
 # Default: 0
 # Support: Windows 10 2004
@@ -53,8 +53,8 @@
 
 # Amount of memory to assign to the VM (bytes)
 #
-# Using size suffixes (e.g. MB, GB) is supported. If set to zero, a percentage
-# of memory will be assigned which differs by Windows build:
+# Using size suffixes (e.g. MB, GB) is supported. If set to `0`, a percentage
+# of memory is assigned which differs by Windows build:
 #  < 20175: 80% of total memory
 # >= 20175: 50% of total memory
 #
@@ -64,7 +64,7 @@
 
 # Amount of swap space to add to the VM (bytes)
 #
-# Using size suffixes (e.g. MB, GB) is supported. If set to zero, a swap file
+# Using size suffixes (e.g. MB, GB) is supported. If set to `0`, a swap file
 # will not be created. The default adds swap space equal to 25% of the total
 # memory, rounded-up to the nearest GB.
 #
@@ -74,9 +74,9 @@
 
 # Absolute path to swap VHDX file
 #
-# An empty string will default to "%LOCALAPPDATA%\\temp\\swap.vhdx". If a path
-# is explicitly provided and doesn't end with ".vhdx", the file extension will
-# automatically be appended.
+# An empty string defaults to `%LOCALAPPDATA%\\temp\\swap.vhdx`. If a path is
+# explicitly provided and doesn't end with `.vhdx`, the `.vhdx` file extension
+# will automatically be appended.
 #
 # Default: (empty)
 # Support: Windows 10 2004
@@ -84,7 +84,7 @@
 
 # Idle threshold for memory compaction
 #
-# If set to zero, memory compaction on CPU idle is disabled.
+# If set to `0`, memory compaction on CPU idle is disabled.
 #
 # Default: 1
 # Support: Windows 10 2004
@@ -115,7 +115,8 @@
 #gpuSupport =
 
 # Use GPU libraries packaged with WSL [UNDOCUMENTED]
-# - Only applies when GPU acceleration support is enabled.
+#
+# Only applies when GPU acceleration support is enabled.
 #
 # Default: true
 # Support: WSL 0.58.0
@@ -134,7 +135,7 @@
 
 # Enable 9P protocol over VirtIO for exposing host storage [UNDOCUMENTED]
 #
-# Automatically disabled if VirtIO is not enabled.
+# Automatically disabled if VirtIO is disabled.
 #
 # Default: false
 # Support: Unknown (Inbox release)
@@ -142,7 +143,7 @@
 
 # Enable VirtIO shared filesystem for exposing host storage [UNDOCUMENTED]
 #
-# Automatically disabled if VirtIO is not enabled.
+# Automatically disabled if VirtIO is disabled.
 #
 # Default: false
 # Support: WSL 0.68.2
@@ -159,7 +160,6 @@
 ##################################################
 
 # Networking mode
-# - Experimental prior to WSL 2.0.5.
 #
 # Valid values (case-insensitive):
 # - None            Disconnect WSL network (WSL 0.66.2)
@@ -169,12 +169,15 @@
 #                   Allegedly requires Windows 11 22H2 (OS Build 22621.2359)
 # - VirtioProxy     VirtIO proxy networking (WSL 1.3.10)
 #
+# Experimental prior to WSL 2.0.5.
+#
 # Default: Nat
 # Support: WSL 0.51.2
 #networkingMode =
 
 # Name of the Hyper-V virtual switch to connect [UNDOCUMENTED]
-# - Only applies when using bridged networking mode.
+#
+# Only applies when using bridged networking mode.
 #
 # Default: (empty)
 # Support: WSL 0.51.2
@@ -191,7 +194,8 @@
 #macAddress =
 
 # Enable IPv6 support [UNDOCUMENTED]
-# - Only applies when using bridged networking mode.
+#
+# Only applies when using bridged networking mode.
 #
 # Default: false
 # Support: WSL 0.51.2
@@ -199,43 +203,42 @@
 
 # Permit access from the host to listening ports in the VM
 #
-# Defaults to true for all networking modes except mirrored networking mode, in
-# which it is unsupported.
+# Defaults to `true` for all networking modes except mirrored networking mode,
+# in which it is unsupported.
 #
 # Default: (unset)
 # Support: Windows 10 2004
 #localhostForwarding =
 
 # Assign network interface address using DHCP [UNDOCUMENTED]
-# - Only applies when using bridged networking mode.
+#
+# Only applies when using bridged networking mode.
 #
 # Default: true
 # Support: WSL 0.51.2
 #dhcp =
 
 # Timeout for DHCP offer response from server (ms) [UNDOCUMENTED]
-# - Only applies when using bridged networking mode and DHCP is enabled.
+#
+# Only applies when using bridged networking mode and DHCP is enabled.
 #
 # Default: 5000
 # Support: WSL 0.51.2
 #dhcpTimeout =
 
 # Use the NAT interface for DNS requests
-# - Only applies when using NAT networking mode.
 #
 # If disabled, the DNS servers configured on the host are mirrored into the
-# distribution.
+# distribution. Only applies when using NAT networking mode.
 #
 # Default: true
 # Support: WSL 0.64.0
 #dnsProxy =
 
 # Tunnel DNS requests to Windows
-# - Only applies when using NAT or mirrored networking modes.
-# - Experimental prior to WSL 2.0.5.
 #
-# If enabled by default (see below), will automatically be disabled if it's not
-# supported by the Windows release.
+# If enabled by default, will automatically be disabled if it's not supported
+# by the Windows release. Only applies when using NAT networking mode.
 #
 # Default differs by WSL version:
 #  < 2.1.0: false
@@ -245,17 +248,19 @@
 #dnsTunneling =
 
 # Apply Windows Firewall rules to WSL container processes
-# - Experimental prior to WSL 2.0.5.
 #
 # Always enabled when using mirrored networking mode unless it's not supported
 # by the Windows release.
+#
+# Experimental prior to WSL 2.0.5.
 #
 # Default: true
 # Support: WSL 1.3.14
 #firewall =
 
 # Use Windows HTTP proxy settings
-# - Experimental prior to WSL 2.0.5.
+#
+# Experimental prior to WSL 2.0.5.
 #
 # Default: true
 # Support: WSL 1.3.14
@@ -275,7 +280,7 @@
 # Support: Windows 10 2004
 #kernel =
 
-# Additional kernel command line arguments
+# Additional kernel command-line arguments
 #
 # Default: (empty)
 # Support: Windows 10 2004
@@ -283,7 +288,7 @@
 
 # Absolute path to kernel modules VHD
 #
-# An empty string defaults to "%ProgramFiles%\\WSL\\tools\\modules.vhd" only if
+# An empty string defaults to `%ProgramFiles%\\WSL\\tools\\modules.vhd` only if
 # the default kernel image is used.
 #
 # Default: (empty)
@@ -292,7 +297,7 @@
 
 # Loads the default kernel modules [UNDOCUMENTED]
 #
-# Default set: br_netfilter, ip_tables, tun
+# Default set: `br_netfilter`, `ip_tables`, `tun`
 #
 # Default: true
 # Support: WSL 2.6.0
@@ -312,7 +317,7 @@
 
 # Enable kernel debugging over the specified TCP port
 #
-# If set to zero, kernel debugging is disabled.
+# If set to `0`, kernel debugging is disabled.
 #
 # Default: 0
 # Support: WSL 1.2.0
@@ -324,7 +329,7 @@
 
 # Absolute path to system distribution VHD
 #
-# An empty string will default to "%ProgramFiles%\\WSL\\system.vhd".
+# An empty string defaults to `%ProgramFiles%\\WSL\\system.vhd`.
 #
 # Default: (empty)
 # Support: Unknown (Inbox release)
@@ -332,7 +337,7 @@
 
 # Idle timeout for stopping the VM (ms)
 #
-# If set to -1, termination of the WSL VM when idle will be disabled.
+# If set to `-1`, termination of the WSL VM when idle is disabled.
 #
 # Default: 60000
 # Support: Windows 11 21H2
@@ -352,7 +357,7 @@
 
 # Timeout for starting a distribution (ms) [UNDOCUMENTED]
 #
-# If set to -1, no timeout will apply for distribution startup.
+# If set to `-1`, no timeout is applied to distribution startup.
 #
 # Default: 60000
 # Support: WSL 2.4.4
@@ -382,7 +387,8 @@ telemetry = false
 
 # Launch WSL and distributions in Safe Mode
 #
-# If enabled, multiple configuration settings are overridden to be disabled.
+# If enabled, multiple configuration settings are overridden to be disabled to
+# maximise the chance of successful startup.
 #
 # Default: false
 # Support: WSL 0.66.2
@@ -420,7 +426,7 @@ telemetry = false
 
 # Absolute path to directory to store crash dumps [UNDOCUMENTED]
 #
-# An empty string will default to "%LOCALAPPDATA%\\temp\\wsl-crashes".
+# An empty string defaults to `%LOCALAPPDATA%\\temp\\wsl-crashes`.
 #
 # Default: (empty)
 # Support: WSL 2.3.14
@@ -428,7 +434,7 @@ telemetry = false
 
 # Maximum number of crash dump files to retain
 #
-# When the maximum is exceeded, the oldest crash dump will be deleted.
+# When the maximum is exceeded, the oldest crash dump is deleted.
 #
 # Default: 10
 # Support: WSL 2.3.14
@@ -440,16 +446,17 @@ telemetry = false
 ##################################################
 
 # Automatically release cached memory on CPU idle
-# - Boolean prior to WSL 2.0.0.
 #
 # Valid values (case-insensitive):
-# - Disabled        No release
-# - DropCache       Instant release
+# - Disabled        No release (previously `false`)
+# - DropCache       Instant release (previously `true`)
 # - Gradual         Slow release
 #
 # Default differs by WSL version:
 #  < 2.1.3: false (Disabled)
 # >= 2.1.3: DropCache
+#
+# Boolean prior to WSL 2.0.0.
 #
 # Support: WSL 1.3.10
 #autoMemoryReclaim =
@@ -469,45 +476,45 @@ telemetry = false
 ##################################################
 
 # Assign an IP address to the host for access to/from WSL
-# - Only applies when using mirrored networking mode.
 #
-# Analogous to the "localhostForwarding" setting.
+# Analogous to the `localhostForwarding` setting. Only applies when using
+# mirrored networking mode.
 #
 # Default: false
 # Support: WSL 2.0.0 & Windows 11 22H2 (OS Build 22621.2359)
 #hostAddressLoopback =
 
 # Ports to permit binding to when in-use by a Windows process (comma-separated)
-# - Only applies when using mirrored networking mode.
 #
-# When binding to a port which is already in-use, the bound port will only be
-# accessible from within WSL.
+# When binding to a port which is already in-use, the port is only accessible
+# from within WSL. Only applies when using mirrored networking mode.
 #
 # Default: (empty)
 # Support: WSL 2.0.0 & Windows 11 22H2 (OS Build 22621.2359)
 #ignoredPorts =
 
 # IP address for tunneling of DNS requests to Windows
-# - Only applies when DNS tunneling is enabled.
+#
+# Only applies when DNS tunneling is enabled.
 #
 # Default: 10.255.255.255
 # Support: WSL 2.2.1
 #dnsTunnelingIpAddress =
 
 # Perform best-effort parsing of DNS requests
-# - Only applies when DNS tunneling is enabled.
 #
 # Determines how Windows handles requests for record types which the DNS client
-# does not know how to parse. If enabled, the DNS query will be extracted from
-# the request and resolution attempted, ignoring unknown records. If disabled,
-# the request will immediately fail.
+# does not know how to parse. If enabled, the DNS query is extracted from the
+# request and resolution attempted, ignoring unknown records. If disabled, the
+# request will immediately fail. Only applies when DNS tunneling is enabled.
 #
 # Default: false
 # Support: WSL 1.3.15
 #bestEffortDnsParsing =
 
 # Use the Windows DNS cache when resolving names
-# - Only applies when DNS tunneling is enabled.
+#
+# Only applies when DNS tunneling is enabled.
 #
 # Default: false
 # Support: WSL 1.3.15
@@ -515,7 +522,8 @@ telemetry = false
 #useWindowsDnsCache =
 
 # Timeout for retrieval of HTTP proxy settings startup (ms)
-# - Only applies when automatic configuration of proxy settings is enabled.
+#
+# Only applies when automatic configuration of proxy settings is enabled.
 #
 # Default: 1000
 # Support: WSL 1.3.14

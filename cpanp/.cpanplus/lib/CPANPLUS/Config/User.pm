@@ -52,7 +52,7 @@ sub setup {
     # Display a random tip on startup
     $conf->set_conf( show_startup_tip => 0 );
 
-    # List of directories to add to @INC
+    # List of directories to add to `@INC`
     $conf->set_conf( lib => [] );
 
     ###################
@@ -61,17 +61,17 @@ sub setup {
 
     # Build & state
     #
-    # Overridden by the PERL5_CPANPLUS_HOME environment variable.
+    # Overridden by the `PERL5_CPANPLUS_HOME` environment variable.
     $conf->set_conf( base => $IsWin ? qq[$ENV{USERPROFILE}\\.cpanplus] : qq[$ENV{HOME}/.cpanplus] );
 
     # Fetched archives
     #
-    # If an empty string, a directory under the "base" directory will be used.
+    # If an empty string, a directory under the `base` directory will be used.
     $conf->set_conf( fetchdir => $IsWin ? q[D:\\Cache\\CPANPLUS\\sources] : qq[$ENV{HOME}/.cpanplus/sources] );
 
     # Extracted archives
     #
-    # If an empty string, a directory under the "base" directory will be used.
+    # If an empty string, a directory under the `base` directory will be used.
     $conf->set_conf( extractdir => $IsWin ? q[D:\\Cache\\CPANPLUS\\build] : qq[$ENV{HOME}/.cpanplus/build] );
 
     #####################
@@ -107,23 +107,23 @@ sub setup {
 
     # Email address used for:
     # - Anonymous FTP access
-    # - FROM email address
+    # - `FROM` email address
     $conf->set_conf( email => 'cpanplus@metacpan.org' );
 
     # Use FTP passive mode
     $conf->set_conf( passive => 1 );
 
-    # Duration to wait for a fetch request to complete (seconds)
+    # Duration to wait for a fetch request to complete (secs)
     $conf->set_conf( timeout => 300 );
 
     ################
     ### Security ###
     ################
 
-    # Check the SHA-256 hash of fetched archives (requires Digest::SHA)
+    # Check the SHA-256 hash of fetched archives (requires `Digest::SHA`)
     $conf->set_conf( md5 => 1 );
 
-    # Verify signatures for signed packages (requires gpg or Crypt::OpenPGP)
+    # Verify signatures of signed packages (requires `gpg` or `Crypt::OpenPGP`)
     $conf->set_conf( signature => 1 );
 
     #######################
@@ -142,18 +142,18 @@ sub setup {
     # Permit unresolveable module prerequisites
     $conf->set_conf( allow_unknown_prereqs => 0 );
 
-    # Prefer Makefile.pl over Build.pl (if both are present)
+    # Prefer `Makefile.pl` over `Build.pl` (if both are present)
     $conf->set_conf( prefer_makefile => !!1 );
 
-    # Arguments to pass to Makefile.pl
+    # Arguments to pass to `Makefile.pl`
     $conf->set_conf( makemakerflags => $IsWin ? q[] : q[INSTALLDIRS=site] );
-    # Arguments to pass to "make"
+    # Arguments to pass to `make`
     $conf->set_conf( makeflags => qq[-j${num_procs}] );
 
-    # Arguments to pass to Build.pl
+    # Arguments to pass to `Build.pl`
     $conf->set_conf( buildflags => $IsWin ? q[] : q[--installdirs site] );
 
-    # Default distribution type when building packages (see CPANPLUS::Dist)
+    # Default distribution type when building packages (see `CPANPLUS::Dist`)
     #
     # If an empty string, no package building software will be used.
     $conf->set_conf( dist_type => '' );
@@ -166,7 +166,7 @@ sub setup {
     #
     # If an empty string, will use the system settings.
     $conf->set_conf( cpantest_mx => '' );
-    # Dictionary passed to the Test::Reporter constructor
+    # Dictionary passed to the `Test::Reporter` constructor
     $conf->set_conf( cpantest_reporter_args => {} );
 
     # Forces operations to succeed where possible
@@ -192,14 +192,14 @@ sub setup {
     $conf->set_program( sudo => undef );
     $conf->set_program( perlwrapper => defined $exe_perlwrapper ? $exe_perlwrapper : q[] );
 
-    # Prefer external programs (instead of Compress::Zlib)
+    # Prefer external programs (instead of `Compress::Zlib`)
     $conf->set_conf( prefer_bin => 0 );
 
     #############
     ### Cache ###
     #############
 
-    # Cache metadata (requires Storable)
+    # Cache metadata (requires `Storable`)
     $conf->set_conf( storable => 1 );
 
     # Flush temporary data after every operation
@@ -209,10 +209,10 @@ sub setup {
     ### Internals ###
     #################
 
-    # Source engine class (see CPANPLUS::Internals::Source)
+    # Source engine class (see `CPANPLUS::Internals::Source`)
     $conf->set_conf( source_engine => 'CPANPLUS::Internals::Source::Memory' );
 
-    # Permit custom sources (see CPANPLUS::Backend)
+    # Permit custom sources (see `CPANPLUS::Backend`)
     $conf->set_conf( enable_custom_sources => 1 );
 
     # Skip updating source files
@@ -224,7 +224,7 @@ sub setup {
 
     # Verbose output (recommended)
     #
-    # Overridden by the PERL5_CPANPLUS_VERBOSE environment variable.
+    # Overridden by the `PERL5_CPANPLUS_VERBOSE` environment variable.
     $conf->set_conf( verbose => 1 );
 
     # Debug output

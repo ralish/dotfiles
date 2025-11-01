@@ -6,7 +6,7 @@
   Last reviewed release: Windows 11 25H2
   Default file path: <InstallDir>\wpr.config.xml
 
-  The XML schema is included in wpr.exe as an RCData resource.
+  The XML schema is included in `wpr.exe` as an `RCData` resource.
 -->
 <WindowsPerformanceRecorder Version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="wpr.config.xsd">
   <Configuration>

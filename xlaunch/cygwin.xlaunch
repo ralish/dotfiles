@@ -16,14 +16,14 @@
 
     Display (integer) [:<display>]
     The unique display identifier to use given as a positive integer or zero.
-    Alternatively, "-1" will use the next available display identifier.
+    Alternatively, `-1` will use the next available display identifier.
 
     WindowMode (string)
-    Configures how the X server will display programs:
+    Configures how the X server displays programs:
     - MultiWindow [-multiwindow]
-      Launches the X server in the background, with each program displayed as
-      an individual window on the native Windows desktop. This option is not
-      compatible with using XDMCP.
+      Launches the X server in the background with each program displayed as an
+      individual window on the Windows desktop. This option is not compatible
+      with using XDMCP.
     - Fullscreen [-fullscreen]
       Launches the X server fullscreen.
     - Windowed
@@ -32,33 +32,36 @@
       Launches the X server in its own window with no titlebar.
 
     XDMCPBroadcast (boolean) [-broadcast]
-    Enables XDMCP and broadcasts BroadcastQuery packets to the network. The
+    Enable XDMCP and broadcast `BroadcastQuery` packets to the network. The
     first responding display manager will be chosen for the session. Only
-    applies if ClientMode is set to XDMCP.
+    applies when `ClientMode` is set to `XDMCP`.
 
     XDMCPIndirect (boolean) [-indirect | -query]
-    Enables XDMCP and sends IndirectQuery packets to the host specified by
-    XDMCPHost. If disabled, instead sends Query packets. Only applies if
-    ClientMode is set to XDMCP and XDMCPBroadcast is disabled.
+    Enable XDMCP and send `IndirectQuery` packets to the host specified by
+    `XDMCPHost`. If disabled, instead send `Query` packets. Only applies when
+    `ClientMode` is set to `XDMCP` and `XDMCPBroadcast` is disabled.
 
     XDMCPHost (string) [<hostname>]
-    The hostname to send Query or IndirectQuery packets to. Only applies if
-    ClientMode is set to XDMCP and XDMCPBroadcast is disabled.
+    The hostname to send `Query` or `IndirectQuery` packets to. Only applies
+    when `ClientMode` is set to `XDMCP` and `XDMCPBroadcast` is disabled.
 
     XDMCPTerminate (boolean) [-terminate]
     Terminate the server instead of resetting when the XDMCP sessions ends.
-    Only applies if ClientMode is set to XDMCP.
+    Only applies when `ClientMode` is set to `XDMCP`.
 
     Clipboard (boolean) [-clipboard | -noclipboard]
     Start the integrated clipboard manager.
 
     Wgl (boolean) [-wgl | -nowgl]
-    Use hardware-accelerated OpenGL rendering. You should also export the
-    LIBGL_ALWAYS_INDIRECT environment variable.
+    Enable hardware-accelerated rendering using the Windows OpenGL (WGL)
+    interface. If disabled, uses the Mesa software renderer. You may wish to
+    set environment variables to modify the OpenGL (GLX) behaviour. Consult the
+    documentation for the `LIBGL_ALWAYS_INDIRECT` and `LIBGL_ALWAYS_SOFTWARE`
+    environment variables.
 
     DisableAC (boolean) [-ac]
-    Disables host-based access control. This enables access by any host, and
-    permits any host to modify the access control list. Use extreme caution!
+    Disable host-based access control, enabling access from any host and for
+    any host to modify the access control list. Use with extreme caution!
 
     ExtraParams (string) [<params>]
     Extra parameters provided to the X server.
@@ -68,51 +71,51 @@
     |========================|
 
     ClientMode (string)
-    Configures how X clients will be started:
+    Configures how X clients are started:
     - NoClient
-      Does not start any initial clients (you can start them later).
+      Does not start any initial clients.
     - StartProgram
-      Starts a local or remote program as indicated by LocalClient.
+      Starts a local or remote program as indicated by `LocalClient`.
     - XDMCP
       Starts a remote XDMCP session. This option is not compatible with an X
-      server running in MultiWindow mode.
+      server running in `MultiWindow` mode.
 
     LocalClient (boolean)
-    If enabled, indicates a local program specified by LocalProgram will be
+    If enabled, indicates a local program specified by `LocalProgram` will be
     launched after starting the X client. If disabled, a remote program will be
-    launched as specified by RemoteProgram and its associated settings.
+    launched as specified by `RemoteProgram` and its associated settings.
 
     LocalProgram (string)
     Command to run to start a program on the local computer after launching the
-    X client. Only applies if ClientMode is set to StartProgram and LocalClient
-    is enabled.
+    X client. Only applies when `ClientMode` is set to `StartProgram` and
+    `LocalClient` is enabled.
 
     RemoteProgram (string)
     Command to run to start a program on a remote computer after launching the
-    X client. Only applies if ClientMode is set to StartProgram and LocalClient
-    is disabled.
+    X client. Only applies when `ClientMode` is set to `StartProgram` and
+    `LocalClient` is disabled.
 
     RemoteHost (string)
-    Address of the remote computer. Only applies when using RemoteProgram.
+    Address of the remote computer. Only applies when using `RemoteProgram`.
 
     RemoteUser (string)
-    Username on the remote computer. Only applies when using RemoteProgram.
+    Username on the remote computer. Only applies when using `RemoteProgram`.
 
     RemoteProtocol (string)
-    Protocol for the remote computer. Only applies when using RemoteProgram.
-    Valid options are "rsh" and "ssh".
+    Protocol for the remote computer. Only applies when using `RemoteProgram`.
+    Valid options are `rsh` and `ssh`.
 
     SSHKeyChain (boolean)
-    Use keychain to contact ssh-agent for login to the remote computer. Only
-    applies when RemoteProtocol is set to "ssh".
+    Use keychain to contact `ssh-agent` for login to the remote computer. Only
+    applies when `RemoteProtocol` is set to `ssh`.
 
     SSHTerminal (boolean)
-    Launch the SSH connection via a terminal. This is required for interactive
-    authentication. Only applies when RemoteProtocol is set to "ssh".
+    Launch the SSH connection via a terminal, which is required for interactive
+    authentication. Only applies when `RemoteProtocol` is set to `ssh`.
 
     ExtraSSH (string)
-    Extra parameters for the SSH client. Only applies when RemoteProtocol is
-    set to "ssh".
+    Extra parameters for the SSH client. Only applies when `RemoteProtocol` is
+    set to `ssh`.
 -->
 <XLaunch
     Display="-1"

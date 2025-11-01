@@ -8,7 +8,7 @@
 
 	ConEmu writes various values which frequently change into its settings file
 	(e.g. modification timestamps). As this causes the file to be marked as
-	modified in Git, use this file as the template and copy it to ConEmu.xml.
+	modified in Git, use this file as the template and copy it to `ConEmu.xml`.
 -->
 <key name="Software">
 	<key name="ConEmu">

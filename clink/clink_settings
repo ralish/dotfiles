@@ -8,8 +8,8 @@
 
 # Command to run in the first CMD prompt shown after Clink is injected
 #
-# If blank, Clink looks for "clink_start.cmd" in the binaries and profile
-# directories and runs it if found. Set to "nul" to disable autostart.
+# If blank, Clink looks for `clink_start.cmd` in the binaries and profile
+# directories and runs it if found. Set to `nul` to disable autostart.
 clink.autostart = nul
 
 # Frequency to check for updates
@@ -26,7 +26,7 @@ clink.update_interval = 5
 # Context sensitive colouring of input
 clink.colorize_input = True
 
-# Name of a ".clinkprompt" file containing prompt customisations
+# Name of a `.clinkprompt` file containing prompt customisations
 #clink.customprompt =
 
 # Default key bindings
@@ -46,7 +46,7 @@ clink.logo = none
 
 # Maximum number of rows the input line can use, up to the terminal height
 #
-# If set to zero, the limit is the terminal height.
+# If set to `0`, the limit is the terminal height.
 clink.max_input_rows = 0
 
 # Handling of CR and LF characters on paste
@@ -78,7 +78,7 @@ clink.popup_search_mode = find
 clink.promptfilter = True
 
 # Number of screen lines to show above or below a selected item in a pop-up
-# list or when invoking the "clink-select-complete" command.
+# list or when invoking the `clink-select-complete` command.
 clink.scroll_offset = 3
 
 # -------------------------- Automatic suggestions ----------------------------
@@ -97,12 +97,12 @@ autosuggest.original_case = True
 
 # Strategy for choosing suggestions
 #
-# Multiple strategies are attempted in listed order (space-separated).
-#
 # Valid values:
 # - completion
 # - history
 # - match_prev_cmd
+#
+# Multiple strategies are attempted in listed order (space-separated).
 autosuggest.strategy = match_prev_cmd history completion
 
 # --------------------------------- Colours -----------------------------------
@@ -118,7 +118,7 @@ color.input                     = sgr 38;5;214
 #
 # Selected text
 color.selection                 = sgr 38;5;16;48;5;179
-# Automatic suggestion (autosuggest.enable)
+# Automatic suggestion (`autosuggest.enable`)
 #color.suggestion               =
 # Unrecognised command word
 color.unrecognized              = sgr 38;5;203
@@ -140,7 +140,7 @@ color.horizscroll               = sgr 38;5;16;48;5;30
 #
 # Argument information (with argmatcher)
 color.arginfo                   = sgr 38;5;172
-# CMD completion (also used by clink.colorize_input)
+# CMD completion (also used by `clink.colorize_input`)
 color.cmd                       = bold
 # Comment row
 color.comment_row               = sgr 38;5;87;48;5;18
@@ -148,18 +148,18 @@ color.comment_row               = sgr 38;5;87;48;5;18
 #color.common_match_prefix      =
 # Match description
 color.description               = sgr 38;5;39
-# DOSKEY alias (also used by clink.colorize_input)
+# DOSKEY alias (also used by `clink.colorize_input`)
 color.doskey                    = sgr 1;38;5;75
 # Filtered completion
 color.filtered                  = bold
-# File with "Hidden" attribute
+# File with the "Hidden" attribute
 color.hidden                    = sgr 38;5;160
-# File with "Read-only" attribute
+# File with the "Read-only" attribute
 color.readonly                  = sgr 38;5;28
 # Selected completion
 #color.selected_completion      =
 
-# Context sensitive input (clink.colorize_input)
+# Context sensitive input (`clink.colorize_input`)
 #
 # Command argument
 #color.arg                      =
@@ -250,7 +250,7 @@ history.dont_add_to_history_cmds = exit history
 # - ignore
 history.dupe_mode = erase_prev
 
-# Interpretation of "!" character for word expansion
+# Interpretation of `!` character for word expansion
 #
 # Valid values:
 # - off
@@ -265,7 +265,7 @@ history.ignore_space = True
 
 # Maximum number of history lines to retain
 #
-# If set to -1, no limit is enforced on the history size.
+# If set to `-1`, no limit is enforced on the history size.
 history.max_lines = 25000
 
 # Share history across all active instances
@@ -287,12 +287,12 @@ history.sticky_search = False
 # - save
 # - show
 history.time_stamp = off
-# Time format string for display of timestamps
+# Time format string for the display of timestamps
 history.time_format = %F %T
 
 # ----------------------------------- Lua -------------------------------------
 
-# Value to append to "package.path"
+# Value to append to `package.path`
 #lua.path =
 
 # Treat argument errors as fatal in scripts
@@ -301,9 +301,9 @@ lua.strict = True
 # Reload scripts each time the edit prompt is activated
 lua.reload_scripts = False
 
-# Maximum duration which a coroutine can be executing (seconds)
+# Maximum duration which a coroutine can be executing (secs)
 #
-# If set to zero, no limit is imposed on coroutine execution time.
+# If set to `0`, no limit is imposed on coroutine execution time.
 lua.throttle_interval = 0
 
 # Print stack trace on errors
@@ -313,7 +313,7 @@ lua.traceback_on_error = False
 lua.debug = False
 # Break into the debugger on errors
 lua.break_on_error = False
-# Break into the debugger on traceback()
+# Break into the debugger on `traceback()`
 lua.break_on_traceback = False
 
 # -------------------------------- Matching -----------------------------------
@@ -331,7 +331,7 @@ match.expand_envvars = True
 match.fit_columns = True
 # Maximum number of values to consider for calculating column widths
 #
-# If set to zero, no limit is imposed for calculating column widths.
+# If set to `0`, no limit is imposed for calculating column widths.
 match.max_fitted_matches = 0
 
 # Ignore character accents when completing matches
@@ -344,13 +344,13 @@ match.ignore_accent = True
 # - relaxed
 match.ignore_case = relaxed
 
-# Maximum number of rows which "clink-select-complete" can show
+# Maximum number of rows which `clink-select-complete` can show
 #
-# If set to zero, the limit is the terminal height.
+# If set to `0`, the limit is the terminal height.
 match.max_rows = 0
-# Number of rows to show as a preview with "clink-select-complete"
+# Number of rows to show as a preview with `clink-select-complete`
 #
-# If set to zero, all rows are shown unless there's too many matches, in which
+# If set to `0`, all rows are shown unless there's too many matches, in which
 # case the user will first be prompted.
 match.preview_rows = 5
 
@@ -375,7 +375,7 @@ match.substring = True
 # - backslash
 match.translate_slashes = atuo
 
-# Match wildcards ("?" and "*") when performing completion
+# Match wildcards (`?` and `*`) when performing completion
 match.wild = True
 
 # -------------------------- Matching: Executables ----------------------------
@@ -394,16 +394,16 @@ exec.commands = True
 # Executables in the current working directory
 #
 # This matching source is implicitly enabled if the word being completed is a
-# relative path or "exec.files" is enabled.
+# relative path or `exec.files` is enabled.
 exec.cwd = True
 # Directories relative to the current working directory
 exec.dirs = True
 # Files in the current working directory
 exec.files = False
-# Executables in directories specified in the %PATH% environment variable
+# Executables in directories specified in the `%PATH%` environment variable
 exec.path = True
 
-# Bypass executable matching ("exec.path") if the line begins with whitespace
+# Bypass executable matching (`exec.path`) if the line begins with whitespace
 exec.space_prefix = True
 
 # -------------------------------- Terminal -----------------------------------
@@ -416,11 +416,11 @@ exec.space_prefix = True
 # - Show Insert Mode
 # - Support ANSI escape codes that adjust cursor shape and visibility
 #
-# This setting interferes with the Cursor Shape console setting available from
-# Windows 10 and Windows Server 2016.
+# This setting interferes with the "Cursor Shape" console setting available
+# from Windows 10 and Windows Server 2016.
 terminal.adjust_cursor_style = True
 
-# Indicates if emojis are drawn using coloured double width characters
+# Indicates if emojis are drawn using coloured double-width characters
 #
 # Valid values:
 # - auto
@@ -434,13 +434,13 @@ terminal.differentiate_keys = False
 
 # Method for resolving ambiguous widths of East Asian characters
 #
-# Overridden by the CLINK_EAST_ASIAN_AMBIGUOUS environment variable.
-#
 # Valid values:
 # - auto
 # - font
 # - one
 # - two
+#
+# Overridden by the `CLINK_EAST_ASIAN_AMBIGUOUS` environment variable.
 terminal.east_asian_ambiguous = auto
 
 # Perform virtual terminal emulation and handle ANSI escape codes
@@ -460,7 +460,7 @@ terminal.emulation = auto
 terminal.mouse_input = auto
 # Modifier keys for Clink to respond to mouse input (space-separated)
 #
-# Overridden by the CLINK_MOUSE_MODIFIER environment variable.
+# Overridden by the `CLINK_MOUSE_MODIFIER` environment variable.
 #terminal.mouse_modifier =
 
 # Send a literal escape character on pressing the Esc key
@@ -469,26 +469,26 @@ terminal.raw_esc = False
 # Display list scrollbars using extended Unicode box drawing characters
 terminal.scrollbars = True
 
-# Support Windows' Ctrl+Alt substitute for the AltGr key
+# Support the Windows Ctrl+Alt substitute for the AltGr key
 terminal.use_altgr_substitute = False
 
 # ------------------------------ Miscellaneous --------------------------------
 
 # Show usage hints provided by argmatchers in the comment row
 #
-# Only applies when "comment_row.show_hints" is enabled.
+# Only applies when `comment_row.show_hints` is enabled.
 argmarcher.show_hints = True
 
 # Show input hints in the comment row
 comment_row.show_hints = False
-# Delay before showing input hints (milliseconds)
+# Delay before showing input hints (ms)
 comment_row.hint_delay = 500
 
 # Log the raw prompt string generated by prompt filters
 debug.log_prompt = False
 # Log all terminal input and output
 debug.log_terminal = False
-# Include callstack when logging output (only with "debug.log_terminal")
+# Include callstack when logging output (only with `debug.log_terminal`)
 debug.log_output_callstacks = False
 
 # Handling of duplicate entries when updating the directory history
@@ -523,7 +523,7 @@ prompt.spacing = normal
 # - always
 prompt.transient = off
 
-# Suppress stderr output from Readline
+# Suppress standard error output from Readline
 readline.hide_stderr = False
 
 # Start Clink sessions with the suggestion list enabled

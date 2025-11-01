@@ -5,8 +5,8 @@
 #
 # Default file path: ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
 #
-# This file is read by xdg-user-dir(1) to inform XDG aware applications of our
-# preferred directories for storing various files.
+# Read by `xdg-user-dir(1)` to inform XDG-aware applications of preferred
+# directories for storing various files.
 
 XDG_DESKTOP_DIR="$HOME"
 XDG_DOCUMENTS_DIR="$HOME"

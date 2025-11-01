@@ -160,9 +160,9 @@ Function Optimize-PowerShell {
     if (Get-Command -Name 'Install-PackageProvider' -ErrorAction Ignore) {
         $null = Install-PackageProvider -Name NuGet -Force
     } else {
-        # Older versions of PowerShellGet lack the Install-PackageProvider
+        # Older versions of PowerShellGet lack the `Install-PackageProvider`
         # command. They will try to download the NuGet package provider on
-        # calling Install-Module but the manifest specifies a dead URL. The
+        # calling `Install-Module` but the manifest specifies a dead URL. The
         # workaround is to manually retrieve the required binary and place it
         # where the module expects.
         $ProvidersPath = Join-Path -Path $env:ProgramFiles -ChildPath 'PackageManagement\ProviderAssemblies'

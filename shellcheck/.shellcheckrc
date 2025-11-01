@@ -4,7 +4,7 @@
 # Last reviewed release: v0.11.0
 # Default file paths in preference order:
 # - .shellcheckrc, shellcheckrc
-#   In script directory and each parent directory up to the root
+#   In script directory and each parent directory up to the root.
 # - User data directory
 #   Unix-like: ~/.shellcheckrc
 #   Windows: %APPDATA%/shellcheckrc

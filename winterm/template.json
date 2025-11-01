@@ -15,8 +15,8 @@
      * the user profile settings will be overlaid to form the complete profile.
      *
      * Because of this we define this template settings file which should be
-     * copied to "settings.json" and modified as needed for the given system.
-     * Future changes to "template.json" will need to be manually merged in.
+     * copied to `settings.json` and modified as needed for the given system.
+     * Future changes to `template.json` will need to be manually merged in.
      */
 
     "$help": "https://aka.ms/terminal-documentation",

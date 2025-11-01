@@ -12,7 +12,7 @@
 # - %APPDATA%
 # - %HOME% or %HOMEDRIVE%%HOMEPATH%
 #
-# Directories are searched for a ".inputrc" or "_inputrc" file (in that order).
+# Directories are searched for a `.inputrc` or `_inputrc` file (in that order).
 #
 # Added settings which are specific to Clink:
 # - completion-auto-query-items
@@ -39,26 +39,26 @@
 
 # Display the common prefix of possible completions using a different colour
 #
-# Colour definitions are taken from the LS_COLORS environment variable.
+# Colour definitions are taken from the `LS_COLORS` environment variable.
 set colored-completion-prefix on
 
 # Display possible completions using different colours to indicate file type
 #
-# Colour definitions are taken from the LS_COLORS environment variable.
+# Colour definitions are taken from the `LS_COLORS` environment variable.
 set colored-stats on
 
 # Prompt before displaying completions if they won't fit without scrolling
 #
-# Overrides the "completion-query-items" setting.
+# Overrides the `completion-query-items` setting.
 set completion-auto-query-items on
 
 # Number of screen columns used to display possible completions
 #
-# Ignored if less than zero or greater than the terminal screen width.
-#
 # Valid values:
 # -  0      Display one match per line
 # - >0      Number of screen columns per line
+#
+# Ignored if less than zero or greater than the terminal screen width.
 set completion-display-width -1
 
 # Perform filename matching and completion case-insensitively
@@ -88,11 +88,11 @@ set mark-directories on
 
 # Display completed directory symlinks with an appended slash
 #
-# Only applies when "mark-directories" is enabled.
+# Only applies when `mark-directories` is enabled.
 set mark-symlinked-directories on
 
 # When performing filename matching, include hidden files without requiring the
-# leading "." to be included in the filename.
+# leading `.` to be included in the filename.
 set match-hidden-files off
 
 # When performing menu completion, display the common prefix of possible
@@ -102,7 +102,7 @@ set menu-complete-display-prefix off
 # When performing menu completion, wrap-around on reaching the last completion
 set menu-complete-wraparound on
 
-# Display possible completions using an internal more(1)-like pager
+# Display possible completions using an internal `more(1)`-like pager
 set page-completions off
 
 # Display possible completions with matches sorted horizontally
@@ -155,7 +155,7 @@ set bell-style none
 # Briefly move the cursor to the opening parenthesis on closing
 set blink-matching-paren off
 
-# String to insert at the beginning of a line by the "insert-comment" command
+# String to insert at the beginning of a line by the `insert-comment` command
 set comment-begin ::
 
 # Echo a corresponding control character for keyboard generated signals
@@ -166,34 +166,34 @@ set horizontal-scroll-mode off
 
 # Use the visible bell if available instead of ringing the terminal bell
 #
-# Overrides the "bell-style" setting.
+# Overrides the `bell-style` setting.
 #set prefer-visible-bell on
 
 # Add a string to the begining of the prompt indicating the editing mode
 set show-mode-in-prompt off
 
 # String displayed immediately before the last line of the primary prompt when
-# emacs editing mode is active.
+# `emacs` editing mode is active.
 #
-# Only applies when "show-mode-in-prompt" is enabled.
+# Only applies when `show-mode-in-prompt` is enabled.
 set emacs-mode-string @
 
 # String displayed immediately before the last line of the primary prompt when
-# vi editing mode is active and in command mode.
+# `vi` editing mode is active and in command mode.
 #
-# Only applies when "show-mode-in-prompt" is enabled.
+# Only applies when `show-mode-in-prompt` is enabled.
 set vi-cmd-mode-string (cmd)
 
 # String displayed immediately before the last line of the primary prompt when
-# vi editing mode is active and in insertion mode.
+# `vi` editing mode is active and in insertion mode.
 #
-# Only applies when "show-mode-in-prompt" is enabled.
+# Only applies when `show-mode-in-prompt` is enabled.
 set vi-ins-mode-string (ins)
 
 $if version >= 8.3
-# Enable certain commands to designate a region as "active", highlighting the
-# text in the region. See the "active-region-start-color" and "active-region-
-# end-color" settings to control the highlighting.
+# Enable certain commands to designate a region as `active`, highlighting the
+# text in the region. See the `active-region-start-color` and `active-region-
+# end-color` settings to control the highlighting.
 set enable-active-region on
 
 # Escape sequences to set text colour and background in an active region
@@ -203,7 +203,8 @@ $endif
 
 # --------------------------------- History -----------------------------------
 
-# Place cursor at end of line for history-search-(forward|backward) commands
+# Place cursor at the end of the line for `history-search-forward` and
+# `history-search-backward` commands.
 set history-point-at-end-of-anchored-search on
 
 # Preserve the current cursor position when browsing history

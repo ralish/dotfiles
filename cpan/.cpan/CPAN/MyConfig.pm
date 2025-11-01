@@ -6,16 +6,16 @@
 #
 # On Debian (or derived) distributions you may want to install:
 # - libcpan-distnameinfo-perl (CPAN::DistnameInfo)
-# - libcpan-sqlite-perl (CPAN::SQLite) [Many deps]
-# - liblog-log4perl-perl (Log::Log4perl) [Many deps]
-# - libmodule-build-perl (Module::Build) [Many deps]
+# - libcpan-sqlite-perl (CPAN::SQLite) [Warning: Has many deps!]
+# - liblog-log4perl-perl (Log::Log4perl) [Warning: Has many deps!]
+# - libmodule-build-perl (Module::Build) [Warning: Has many deps!]
 # - libmodule-signature-perl (Module::Signature)
 # - libterm-readline-gnu-perl (Term:ReadLine::Gnu)
 # - libyaml-libyaml-perl (YAML::XS)
 #
 # On Windows using Strawberry Perl you may want to install:
 # - Log::Log4perl
-# - Module::Signature (but see the "check_sigs" setting)
+# - Module::Signature (but see the `check_sigs` setting)
 
 use strict;
 use warnings;
@@ -50,8 +50,8 @@ my $exe_unzip = can_run('unzip');
 my $exe_wget = can_run('wget');
 
 # Perl modules
-my $mod_distnameinfo = check_install(module => "CPAN::DistnameInfo") ? 1 : 0;
-my $mod_signature = check_install(module => "Module::Signature") ? 1 : 0;
+my $mod_distnameinfo = check_install(module => 'CPAN::DistnameInfo') ? 1 : 0;
+my $mod_signature = check_install(module => 'Module::Signature') ? 1 : 0;
 
 # Determine number of processors
 my $num_procs = 1;
@@ -76,10 +76,10 @@ $CPAN::Config = {
     # Suppress startup greeting message
     'inhibit_startup_message' => q[0],
 
-    # List of enabled plugins (see CPAN::Plugin)
+    # List of enabled plugins (see `CPAN::Plugin`)
     'plugin_list' => [],
 
-    # List of modules to skip loading (via CPAN::has_inst())
+    # List of modules to skip loading (via `CPAN::has_inst()`)
     'dontload_list' => [],
 
     ###################
@@ -106,12 +106,12 @@ $CPAN::Config = {
     # Disabling is equivalent to enabling UTF-8.
     'term_is_latin' => q[0],
 
-    # Enable terminal ornaments (requires Term::ReadLine)
+    # Enable terminal ornaments (requires `Term::ReadLine`)
     'term_ornaments' => q[1],
 
-    # Enable colourised terminal output (requires Term::ANSIColor)
+    # Enable colourised terminal output (requires `Term::ANSIColor`)
     #
-    # Windows also requires Win32::Console::ANSI.
+    # Windows also requires `Win32::Console::ANSI`.
     'colorize_output' => q[1],
     # Colour for normal output
     'colorize_print' => q[bold green],
@@ -123,7 +123,7 @@ $CPAN::Config = {
     # Display the current command number in the prompt
     'commandnumber_in_prompt' => q[0],
 
-    # Path to the history file (requires Term::ReadLine)
+    # Path to the history file (requires `Term::ReadLine`)
     'histfile' => $IsWin ? qq[$ENV{USERPROFILE}\\.cpan\\histfile] : qq[$ENV{HOME}/.cpan/histfile],
     # Maximum number of commands in the history
     'histsize' => q[1000],
@@ -141,7 +141,7 @@ $CPAN::Config = {
     ### Network ###
     ###############
 
-    # If urllist has not been configured, permit connecting to the built-in
+    # If `urllist` has not been configured, permit connecting to the built-in
     # default sites without asking (the default is to ask once per session).
     'connect_to_internet_ok' => q[1],
 
@@ -149,7 +149,7 @@ $CPAN::Config = {
     #
     # HTTPS will be preferenced with fallback to HTTP if it cannot be used
     # (e.g. missing dependencies), in which case a warning will be emitted.
-    # Enabling this option will ignore any "urllist".
+    # Enabling this option will ignore the `urllist` configuration.
     'pushy_https' => q[1],
 
     # List of CPAN mirrors to use
@@ -157,9 +157,9 @@ $CPAN::Config = {
         $IsWin ? q[https://cpan.strawberryperl.com/] : (),
         q[https://www.cpan.org/]
     ],
-    # Randomize the mirror selected from "urllist"
+    # Randomize the mirror selected from `urllist`
     'randomize_urllist' => q[0],
-    # Use external "ping" command when automatically selecting mirrors
+    # Use external `ping` command when automatically selecting mirrors
     'urllist_ping_external' => q[0],
     # Increase output verbosity when automatically selecting mirrors
     'urllist_ping_verbose' => q[0],
@@ -191,13 +191,13 @@ $CPAN::Config = {
     ### Security ###
     ################
 
-    # Verify module signatures (requires Module::Signature and gpg)
+    # Verify module signatures (requires `Module::Signature` and `gpg`)
     #
     # Disabled as it's more trouble than it's worth. On Unix-like systems, the
     # signature check will often fail due to required public keys not being
     # readily available (e.g. from the Ubuntu keyserver). On Windows systems,
     # we won't even get that far as CPAN hardcodes the temporary directory it
-    # uses during signature checks to "/tmp". This path resolves to "C:\tmp"
+    # uses during signature checks to `/tmp`. This path resolves to `C:\tmp`
     # and if it doesn't exist (which it typically won't) then creating the
     # temporary file will fail. Verified to still be broken as of CPAN v2.38.
     'check_sigs' => $IsWin ? q[0] :
@@ -227,32 +227,32 @@ $CPAN::Config = {
     # Preferred installer module
     #
     # Valid values:
-    # - EUMM        ExtUtils::MakeMaker (Makefile.pl)
-    # - MB          Module::Build (Build.pl)
+    # - EUMM        ExtUtils::MakeMaker (`Makefile.pl`)
+    # - MB          Module::Build (`Build.pl`)
     # - RAND        Randomised
     'prefer_installer' => q[MB],
 
-    # Arguments to pass to Makefile.pl
+    # Arguments to pass to `Makefile.pl`
     'makepl_arg' => $IsWin ? q[] : q[INSTALLDIRS=site],
-    # Arguments to pass to "make"
+    # Arguments to pass to `make`
     'make_arg' => qq[-j${num_procs}],
-    # Command to run instead of "make" when running "make install"
+    # Command to run instead of `make` when running `make install`
     'make_install_make_command' => $IsWin && -x $exe_make_win32 ?
                                        $exe_make_win32 :
                                        defined $exe_make ? $exe_make : q[],
-    # Arguments to pass to "make install"
+    # Arguments to pass to `make install`
     'make_install_arg' => q[UNINST=1],
 
-    # Arguments to pass to Build.pl
+    # Arguments to pass to `Build.pl`
     'mbuildpl_arg' => $IsWin ? q[] : q[--installdirs site],
-    # Arguments to pass to "./Build"
+    # Arguments to pass to `./Build`
     'mbuild_arg' => q[],
-    # Command to run instead of "./Build" when running "./Build install"
+    # Command to run instead of `./Build` when running `./Build install`
     'mbuild_install_build_command' => $IsWin ? q[] : q[./Build],
-    # Arguments to pass to "./Build install"
+    # Arguments to pass to `./Build install`
     'mbuild_install_arg' => q[--uninst=1],
 
-    # Generate test reports (requires CPAN::Reporter)
+    # Generate test reports (requires `CPAN::Reporter`)
     'test_report' => q[0],
     # Skip tests if a matching distribution passed
     'trust_test_report_history' => q[0],
@@ -261,7 +261,7 @@ $CPAN::Config = {
     #
     # Valid values: yes, no, ask/yes, ask/no
     #
-    # Any option other than "yes" requires CPAN::DistnameInfo.
+    # Any option other than `yes` requires `CPAN::DistnameInfo`.
     'allow_installing_outdated_dists' => $mod_distnameinfo ?
                                          q[ask/no] : q[yes],
     # Permit installation of module downgrades
@@ -279,12 +279,12 @@ $CPAN::Config = {
     # Halt on the first failed build target or dependency
     #
     # If enabled, this seems to have the annoying side-effect of aborting an
-    # install if permanently installing a build or test only dependency is
-    # declined, as set with the "build_requires_install_policy" setting.
+    # install if permanently installing a build or test-only dependency is
+    # declined, as set with the `build_requires_install_policy` setting.
     'halt_on_failure' => q[0],
-    # Timeout for parsing $VERSION from a module (secs)
+    # Timeout for parsing `$VERSION` from a module (secs)
     'version_timeout' => q[15],
-    # Timeout to kill Makefile.pl and Build.pl processes (secs)
+    # Timeout to kill `Makefile.pl` and `Build.pl` processes (secs)
     'inactivity_timeout' => q[0],
 
     # Store build state for reuse between sessions
@@ -326,7 +326,7 @@ $CPAN::Config = {
     # double quote. Setting it to a space will disable quoting (bad idea!).
     #'commands_quote' => q[],
 
-    # Prefer external "tar" command (instead of Archive::Tar)
+    # Prefer external `tar` command instead of `Archive::Tar`
     'prefer_external_tar' => $IsWin ? q[0] : q[1],
 
     #############
@@ -336,12 +336,12 @@ $CPAN::Config = {
     # Validity period of downloaded indexes (days)
     'index_expire' => q[1],
 
-    # Cache metadata (requires Storable)
+    # Cache metadata (requires `Storable`)
     #
-    # Not used when "use_sqlite" is enabled and SQLite is running.
+    # Not used when `use_sqlite` is enabled and SQLite is running.
     'cache_metadata' => q[1],
 
-    # Cache metadata with SQLite (requires CPAN::SQLite)
+    # Cache metadata with SQLite (requires `CPAN::SQLite`)
     'use_sqlite' => q[1],
 
     # Maximum size of the build cache (MB)
@@ -375,7 +375,7 @@ $CPAN::Config = {
     # - YAML::Syck      Requires a C compiler
     # - YAML::XS        Requires a C compiler
     'yaml_module' => q[YAML::XS],
-    # Permit deserialising code in YAML
+    # Permit deserialising code in YAML (INSECURE)
     'yaml_load_code' => q[0],
 
     ###############
@@ -389,14 +389,14 @@ $CPAN::Config = {
     # - v           Module name and version
     'load_module_verbosity' => q[v],
 
-    # Report extending of @INC via PERL5LIB
+    # Report extending of `@INC` via `PERL5LIB`
     #
     # Valid values:
     # - none        Quiet
     # - v           List of added directories
     'perl5lib_verbosity' => q[none],
 
-    # Verbosity level when using the "tar" command
+    # Verbosity level when using the `tar` command
     #
     # Valid values:
     # - none        Quiet

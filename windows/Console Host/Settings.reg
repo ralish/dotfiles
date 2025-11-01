@@ -115,7 +115,7 @@ Windows Registry Editor Version 5.00
 "PopupColors"=dword:00000070
 ; Default foreground/background colours
 "ScreenColors"=dword:00000007
-; Number of lines to scroll with Shift+Scroll-wheel
+; Number of lines to scroll with Shift + Scroll wheel
 "ScrollScale"=dword:00000001
 ; Remove leading zeroes from strings on copy
 "TrimLeadingZeros"=dword:00000000

@@ -1,7 +1,7 @@
 <#
     Find stale network interface "services" in the registry.
 
-    These registry keys reside under HKLM\System\CurrentControlSet\Services,
+    These registry keys reside under `HKLM\System\CurrentControlSet\Services`,
     alongside traditional Windows services, with the key name being a GUID.
     They aren't true services as they're missing values required by the SCM.
 
@@ -10,9 +10,9 @@
     cleaned-up when the associated network interface no longer exists.
 
     The best logic I've found so far for determining which are stale is:
-    - The GUID service key has a "tcpip" sub-key
-    - The "tcpip" sub-key has an "IPAddress" value
-    - The "IPAddress" value data is an IP address no network interface has
+    - The GUID service key has a `tcpip` sub-key
+    - The `tcpip` sub-key has an `IPAddress` value
+    - The `IPAddress` value data is an IP address no network interface has
 #>
 
 [CmdletBinding()]

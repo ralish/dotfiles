@@ -8,7 +8,7 @@
 
 # -------------------------------- Settings -----------------------------------
 
-# Enable editline functionality
+# Enable `editline` functionality
 edit on
 
 # Maximum number of history entries
@@ -19,9 +19,9 @@ history unique 1
 
 # ------------------------------ Key bindings ---------------------------------
 
-# To check the codes being sent from key sequences use "showkey -a". If a key
+# To check the codes being sent from key sequences use `showkey -a`. If a key
 # sequence doesn't return any output it's most likely already being handled by
-# the terminal driver. You can check its configuration using "stty -a".
+# the terminal driver. You can check its configuration using `stty -a`.
 
 # Default key bindings
 #

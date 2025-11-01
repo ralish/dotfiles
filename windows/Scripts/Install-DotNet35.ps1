@@ -28,7 +28,7 @@ if ($SxsPath) {
     $DismParams.Add(('/Source:{0}' -f $SxsPath))
 }
 
-# The /All parameter is only available from Windows 8 / Server 2012
+# The `/All` parameter is only available from Windows 8 / Server 2012
 if ($BuildNumber -ge 9200) {
     $DismParams.Add('/All')
 }
