@@ -88,4 +88,8 @@ insert_final_newline = false
 [xdg-user-dir/.config/user-dirs.locale]
 insert_final_newline = false
 
+# XLaunch configuration
+[*.xlaunch]
+insert_final_newline = false
+
 # vim: syntax=dosini cc=80 tw=79 ts=4 sw=4 sts=4 et sr
