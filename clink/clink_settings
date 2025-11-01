@@ -269,7 +269,7 @@ history.ignore_space = True
 history.max_lines = 25000
 
 # Share history across all active instances
-history.shared = False
+history.shared = True
 
 # If the text at the cursor is subject to history expansion, show a preview of
 # the expanded result below the input line.
