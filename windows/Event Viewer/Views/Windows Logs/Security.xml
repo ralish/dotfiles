@@ -15,9 +15,9 @@
             Category:   Event processing
             Message:    The event logging service encountered an error while processing an incoming event published from %3.
 
-            Useful on Windows 11 22H2 Build 521 (GA) to filter out these events when
-            Process Creation auditing is enabled. A regression causes these events to
-            not be correctly processed, and they're typically extremely high volume.
+            For Windows 11 22H2 Build 521 (GA) when Process Creation auditing
+            is enabled. A regression causes these events to be incorrectly
+            processed and they're typically extremely high volume.
           -->
           <!--
           <Suppress Path="Security">
@@ -32,7 +32,7 @@
             Category:   Authorization Policy Change
             Message:    Permissions on an object were changed.
 
-            Extremely high volume. Requires forensic analysis to be useful.
+            Extremely high volume and requires forensic analysis to be useful.
           -->
           <Suppress Path="Security">
             *[System[EventID=4670 and band(Keywords,9007199254740992)]]
@@ -45,7 +45,7 @@
             Category:   Sensitive Privilege Use
             Message:    A privileged service was called.
 
-            Extremely high volume. Requires forensic analysis to be useful.
+            Extremely high volume and requires forensic analysis to be useful.
           -->
           <Suppress Path="Security">
             *[System[EventID=4673 and band(Keywords,4503599627370496)]]
@@ -61,7 +61,7 @@
             Category:   Process Creation
             Message:    A new process has been created.
 
-            Extremely high volume. Requires forensic analysis to be useful.
+            Extremely high volume and requires forensic analysis to be useful.
           -->
           <Suppress Path="Security">
             *[System[EventID=4688 and band(Keywords,9007199254740992)]]
@@ -72,7 +72,7 @@
             Category:   Other Policy Change Events
             Message:    A Windows Filtering Platform filter has been changed.
 
-            Extremely high volume. Requires forensic analysis to be useful.
+            Extremely high volume and requires forensic analysis to be useful.
           -->
           <Suppress Path="Security">
             *[System[EventID=5447 and band(Keywords,9007199254740992)]]
