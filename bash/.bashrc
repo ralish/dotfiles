@@ -653,8 +653,8 @@ fi
 ###                Key bindings                ###
 ##################################################
 
-# Replace `!!<space>` with the previous command
-bind Space:magic-space
+# Immediately perform history expansion after pressing space
+if [[ -n ${bash_ver_202-} ]]; then bind Space:magic-space; fi
 
 ##################################################
 ###             Common shell setup             ###
