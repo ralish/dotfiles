@@ -1,9 +1,33 @@
 #env
-# Options to pass to less automatically
-LESS = --ignore-case --jump-target=3 --no-init --QUIET --quit-if-one-screen --RAW-CONTROL-CHARS
+
+# Options to provide to `less` automatically
+#
+# --follow-name
+#   Automatically open a new file with the same name when following
+# --ignore-case (-i)
+#   Search case-insensitively unless uppercase letters are present
+# --jump-target=n (-jn)
+#   Line on the screen where the "target" line is to be positioned
+# --mouse
+#   Enable mouse input, including scroll wheel support
+# --no-histdups
+#   Remove identical entries in the history list before adding the new entry
+# --no-init (-X)
+#   Disable sending the `termcap` initialisation and deinitialisation strings
+# --QUIET / --SILENT (-Q)
+#   Never ring the terminal bell, instead ring the visual bell if available
+# --quit-if-one-screen (-F)
+#   Automatically exit if the entire file can be displayed in a single screen
+# --RAW-CONTROL-CHARS (-R)
+#   Display a safe subset of "raw" control characters (e.g. colour codes)
+# --use-color
+#   Enable coloured text in various parts of `less` itself
+LESS = --follow-name -i -j3 --mouse --no-histdups -X -Q -F -R --use-color
+
 # Don't store a history of search and shell commands
 LESSHISTFILE = -
-# Disable the visual bell (flash) terminal capability
+
+# Disable the visual bell ("flash") terminal capability
 LESS_TERMCAP_vb =
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
