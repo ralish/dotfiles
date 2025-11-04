@@ -247,7 +247,7 @@ $endif
 # --------------------------------- History -----------------------------------
 
 # Preserve the current cursor position when browsing history
-set history-preserve-point off
+set history-preserve-point on
 
 # Number of history entries to retain in the history list
 #
@@ -264,7 +264,7 @@ set isearch-terminators \e\C-j
 set mark-modified-lines off
 
 # Undo changes to history lines before returning from `accept-line`
-set revert-all-at-newline off
+set revert-all-at-newline on
 
 # Perform searches of the history list case-insensitively
 $if version >= 8.3
