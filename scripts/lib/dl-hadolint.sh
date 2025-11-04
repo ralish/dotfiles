@@ -36,11 +36,20 @@ function dl_hadolint() {
         exit 0
     fi
 
-    local kernel_name
-    kernel_name="$(uname -s)"
-    if ! [[ $kernel_name =~ Darwin|Linux ]]; then
-        script_exit "[$APP_NAME] Unsupported kernel: $kernel_name" 1
-    fi
+    local kernel_name kernel_name_raw
+    kernel_name_raw="$(uname -s)"
+    kernel_name="${kernel_name_raw,,}"
+    case $kernel_name_raw in
+        darwin)
+            kernel_name='macos'
+            ;;
+        linux)
+            kernel_name="$kernel_name_raw"
+            ;;
+        *)
+            script_exit "[$APP_NAME] Unsupported kernel: $kernel_name_raw" 1
+            ;;
+    esac
 
     local machine_hw_name machine_hw_name_raw
     machine_hw_name_raw="$(uname -m)"
