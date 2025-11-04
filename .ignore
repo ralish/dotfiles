@@ -19,4 +19,8 @@
 # Visual Studio Code
 /vscode/defaultSettings.json
 
+# Zsh
+/zsh/.oh-my-zsh/
+/zsh/oh-my-zsh/plugins/zsh-autosuggestions/
+
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
