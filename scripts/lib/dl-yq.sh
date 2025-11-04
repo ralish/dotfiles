@@ -61,7 +61,7 @@ function dl_yq() {
         amd64 | x86_64)
             machine_hw_name='amd64'
             ;;
-        mips | mips64 | ppc64 | ppc64le | s390x)
+        mips | mips64 | ppc64 | ppc64le | riscv64 | s390x)
             machine_hw_name="$machine_hw_name_raw"
             ;;
         *)
