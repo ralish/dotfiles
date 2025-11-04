@@ -3,6 +3,11 @@ Posterity
 
 A collection of resources I've found useful while cultivating my own dotfiles.
 
+Dotfiles
+--------
+
+- [Tom Ryder](https://dev.sanctum.geek.nz/cgit/dotfiles.git/about/)
+
 Bash
 ----
 
