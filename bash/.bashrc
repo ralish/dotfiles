@@ -439,7 +439,7 @@ HISTSIZE=100000
 # line. In addition to normal shell pattern matching characters, `&` matches
 # the previous history line. A backslash is used to escape an `&` character.
 # The pattern matching honours the `extglob` shell option.
-HISTIGNORE='bg:clear:exit:fg:history'
+HISTIGNORE='bg:clear:env:exit:fg:history:ls:pwd'
 
 # Format string passed to `strftime(3)` for printing history entry timestamps
 #
