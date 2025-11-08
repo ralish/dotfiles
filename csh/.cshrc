@@ -3,7 +3,8 @@
 # C shell
 # https://man.netbsd.org/csh.1
 #
-# Last reviewed release: v20230828
+# Last reviewed release: v20240808
+# Upstream source: https://cvsweb.openbsd.org/src/bin/csh/
 # Default file path: ~/.cshrc
 #
 # Configuration is performed entirely through shell variables, which has the

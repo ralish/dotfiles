@@ -2,6 +2,7 @@
 # https://man.netbsd.org/editrc.5
 #
 # Last reviewed release: v20250104
+# Upstream source: https://cvsweb.netbsd.org/bsdweb.cgi/src/lib/libedit/
 # Default file paths in preference order:
 # - $EDITRC
 # - ~/.editrc

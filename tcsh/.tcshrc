@@ -3,7 +3,7 @@
 # TENEX C shell
 # https://www.tcsh.org/
 #
-# Last reviewed release: v6.24.10
+# Last reviewed release: v6.24.16
 # Default file path: ~/.tcshrc
 #
 # Configuration is performed entirely through shell variables, which has the
