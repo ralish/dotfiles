@@ -88,12 +88,42 @@
     "compatibility.textMeasurement": "graphemes",
 
     // Actions
-    "actions": [],
-    "keybindings": [
+    "actions": [
         {
-            "id": "Terminal.DuplicatePaneAuto",
-            "keys": "alt+shift+d"
+            "id": "User.selectCommandNext",
+            "command": { "action": "selectCommand", "direction": "next" }
+        },
+        {
+            "id": "User.selectCommandPrevious",
+            "command": { "action": "selectCommand", "direction": "prev" }
+        },
+        {
+            "id": "User.selectOutputNext",
+            "command": { "action": "selectOutput", "direction": "next" }
+        },
+        {
+            "id": "User.selectOutputPrevious",
+            "command": { "action": "selectOutput", "direction": "prev" }
+        },
+        {
+            "id": "User.scrollToMarkNext",
+            "command": { "action": "scrollToMark", "direction": "next" }
+        },
+        {
+            "id": "User.scrollToMarkPrevious",
+            "command": { "action": "scrollToMark", "direction": "previous" }
+        },
+        {
+            "id": "User.splitPane",
+            "command": { "action": "splitPane", "split": "auto" }
         }
+    ],
+
+    // Key bindings
+    "keybindings": [
+        { "id": "User.scrollToMarkNext", "keys": "ctrl+down" },
+        { "id": "User.scrollToMarkPrevious", "keys": "ctrl+up" },
+        { "id": "User.splitPane", "keys": "alt+shift+d" }
     ],
 
     // New Tab Menu
