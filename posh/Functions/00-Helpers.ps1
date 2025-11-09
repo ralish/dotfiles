@@ -7,7 +7,7 @@ Function Complete-DotFilesSection {
     [OutputType([Void])]
     Param()
 
-    if ($Global:DotFilesShowTimings) {
+    if ($DotFilesShowTimings) {
         if ($Global:DotFilesSectionStart -isnot [DateTime]) {
             throw 'No start time found for section timing.'
         }
@@ -59,7 +59,7 @@ Function Get-DotFilesTiming {
         [Int]$SlowThresholdMs = 100
     )
 
-    if (!$Global:DotFilesShowTimings) {
+    if (!$DotFilesShowTimings) {
         return
     }
 
@@ -136,7 +136,7 @@ Function Start-DotFilesSection {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     $Global:DotFilesSectionName = $Name
 
-    if ($Global:DotFilesShowTimings) {
+    if ($DotFilesShowTimings) {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
         $Global:DotFilesSectionStart = Get-Date
     }
