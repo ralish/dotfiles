@@ -51,7 +51,7 @@ if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
 #   Assume the module exists instead of checking
 if (!(Get-Variable -Name 'DotFilesFastLoad' -ErrorAction Ignore)) {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-    $DotFilesFastLoad = $true
+    $Global:DotFilesFastLoad = $true
 }
 
 # Array of paths containing additional formatting data
