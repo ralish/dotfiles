@@ -36,3 +36,7 @@ REG ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v Na
 @REM Add Sysinternals to system path
 FOR /F "usebackq tokens=2,*" %%A IN (`REG QUERY "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" /v Path`) DO SET PATH_MACHINE=%%B
 SETX /M PATH "%PATH_MACHINE%;%ProgramFiles(x86)%\Sysinternals"
+
+@REM Process Monitor options
+@REM Filter -> Drop Filtered Events
+REG ADD "HKCU\Software\Sysinternals\Process Monitor" /v DestructiveFilter /t REG_DWORD /d 1 /f
