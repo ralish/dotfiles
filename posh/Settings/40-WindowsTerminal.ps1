@@ -1,9 +1,8 @@
 $DotFilesSection = @{
-    Type           = 'Settings'
-    Name           = 'Windows Terminal'
-    Platform       = 'Windows'
-    PwshMinVersion = '6.0'
-    Environment    = @{ WT_SESSION = $true }
+    Type        = 'Settings'
+    Name        = 'Windows Terminal'
+    Platform    = 'Windows'
+    Environment = @{ WT_SESSION = $true }
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) {
@@ -41,25 +40,25 @@ Function Prompt {
         if ($LastHistoryEntry.Id -ne $Global:__LastHistoryId) {
             # Mark the end of the last command including the exit code
             $LastExitCodeForWinTerm = __Get-LastExitCodeForWinTerm
-            $Prompt = "`e]133;D;$LastExitCodeForWinTerm`a"
+            $Prompt = "{0}]133;D;{1}`a" -f [Char]27, $LastExitCodeForWinTerm
         } else {
             # As above, but without the exit code if no history entry
-            $Prompt = "`e]133;D`a"
+            $Prompt = "{0}]133;D`a" -f [Char]27
         }
     }
 
     # Mark start of prompt
-    $Prompt += "`e]133;A{0}" -f [Char]7
+    $Prompt += "{0}]133;A`a" -f [Char]27
 
     # Mark current working directory
     $CurLoc = $ExecutionContext.SessionState.Path.CurrentLocation
-    $Prompt += "`e]9;9;`"{0}`"{1}" -f $CurLoc, [Char]7
+    $Prompt += "{0}]9;9;`"{1}`"`a" -f [Char]27, $CurLoc
 
     # Invoke the original prompt function
     $Prompt += $Global:__OriginalPrompt.Invoke()
 
     # Mark end of prompt
-    $Prompt += "`e]133;B{0}" -f [Char]7
+    $Prompt += "{0}]133;B`a" -f [Char]27
 
     # Save the last history ID for the next invocation
     $Global:__LastHistoryId = $LastHistoryEntry.Id
