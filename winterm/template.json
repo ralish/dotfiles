@@ -217,7 +217,7 @@
             "closeOnExit": "graceful",
             "bellStyle": "none",
             "bellSound": [], // Default system sound
-            "experimental.rightClickContextMenu": false,
+            "experimental.rightClickContextMenu": true,
             "showMarksOnScrollbar": false,
             "autoMarkPrompts": true,
             "compatibility.reloadEnvironmentVariables": true,
