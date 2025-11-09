@@ -11,7 +11,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 }
 
 # Shell Integration: PowerShell
-# https://learn.microsoft.com/en-us/windows/terminal/tutorials/shell-integration#powershell-pwshexe
+# https://learn.microsoft.com/en-au/windows/terminal/tutorials/shell-integration#powershell-pwshexe
 
 # Initial history ID to indicate no previous command has executed
 $Global:__LastHistoryId = -1
@@ -38,26 +38,31 @@ Function Prompt {
     $LastHistoryEntry = Get-History -Count 1
     if ($Global:__LastHistoryId -ne -1) {
         if ($LastHistoryEntry.Id -ne $Global:__LastHistoryId) {
-            # Mark the end of the last command including the exit code
+            # Mark end of last command with exit code
             $LastExitCodeForWinTerm = __Get-LastExitCodeForWinTerm
+            # OSC FinalTerm ; CmdEnd ; <ExitCode> ST
             $Prompt = "{0}]133;D;{1}`a" -f [Char]27, $LastExitCodeForWinTerm
         } else {
-            # As above, but without the exit code if no history entry
+            # As above, but without exit code as there's no history entry
+            # OSC FinalTerm ; CmdEnd ST
             $Prompt = "{0}]133;D`a" -f [Char]27
         }
     }
 
     # Mark start of prompt
+    # OSC FinalTerm ; PromptStart ST
     $Prompt += "{0}]133;A`a" -f [Char]27
 
     # Mark current working directory
     $CurLoc = $ExecutionContext.SessionState.Path.CurrentLocation
+    # OSC ConEmu ; CurrentDir ; "<Cwd>" ST
     $Prompt += "{0}]9;9;`"{1}`"`a" -f [Char]27, $CurLoc
 
     # Invoke the original prompt function
     $Prompt += $Global:__OriginalPrompt.Invoke()
 
     # Mark end of prompt
+    # OSC FinalTerm ; CmdStart ST
     $Prompt += "{0}]133;B`a" -f [Char]27
 
     # Save the last history ID for the next invocation
