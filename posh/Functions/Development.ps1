@@ -155,33 +155,44 @@ Function Invoke-GitChildDir {
                 continue
             }
 
-            $SubDirs = Get-ChildItem -LiteralPath $BaseDir.FullName -Directory
-            foreach ($SubDir in $SubDirs) {
-                $GitDir = Join-Path -Path $SubDir.FullName -ChildPath '.git'
-                if (-not (Test-Path -LiteralPath $GitDir -PathType Container)) {
-                    if ($Recurse) {
-                        Invoke-GitChildDir -Path $SubDir.FullName -Command $Command -Recurse:$Recurse
-                    } else {
-                        Write-Verbose -Message ('Skipping directory: {0}' -f $SubDir.Name)
+            $GitDirs = [Collections.Generic.List[IO.DirectoryInfo]]::new()
+
+            $GitDir = Join-Path -Path $BaseDir.FullName -ChildPath '.git'
+            if (-not (Test-Path -LiteralPath $GitDir -PathType Container)) {
+                $SubDirs = Get-ChildItem -LiteralPath $BaseDir.FullName -Directory
+
+                foreach ($SubDir in $SubDirs) {
+                    $GitDir = Join-Path -Path $SubDir.FullName -ChildPath '.git'
+                    if (-not (Test-Path -LiteralPath $GitDir -PathType Container)) {
+                        if ($Recurse) {
+                            Invoke-GitChildDir -Path $SubDir.FullName -Command $Command -Recurse:$Recurse
+                        } else {
+                            Write-Verbose -Message ('Skipping directory: {0}' -f $SubDir.Name)
+                        }
+                        continue
                     }
-                    continue
-                }
 
-                if ($RepoInclude -and $SubDir.Name -notmatch $RepoInclude) {
-                    Write-Verbose -Message ('Skipping repository not matching inclusion filter: {0}' -f $SubDir.Name)
-                    continue
-                }
+                    if ($RepoInclude -and $SubDir.Name -notmatch $RepoInclude) {
+                        Write-Verbose -Message ('Skipping repository not matching inclusion filter: {0}' -f $SubDir.Name)
+                        continue
+                    }
 
-                if ($RepoExclude -and $SubDir.Name -match $RepoExclude) {
-                    Write-Verbose -Message ('Skipping repository matching exclusion filter: {0}' -f $SubDir.Name)
-                    continue
-                }
+                    if ($RepoExclude -and $SubDir.Name -match $RepoExclude) {
+                        Write-Verbose -Message ('Skipping repository matching exclusion filter: {0}' -f $SubDir.Name)
+                        continue
+                    }
 
-                if ($PSCmdlet.ShouldProcess($SubDir.Name, 'Invoke Git command')) {
-                    Write-Host -ForegroundColor Green ('Running in: {0}' -f $SubDir.Name)
-                    Set-Location -LiteralPath $SubDir.FullName
+                    $GitDirs.Add($SubDir)
+                }
+            } else {
+                $GitDirs.Add($BaseDir)
+            }
+
+            foreach ($GitDir in $GitDirs) {
+                if ($PSCmdlet.ShouldProcess($GitDir.Name, 'Invoke Git command')) {
+                    Write-Host -ForegroundColor Green ('Running in: {0}' -f $GitDir.Name)
+                    Set-Location -LiteralPath $GitDir.FullName
                     git @GitArgs
-                    Set-Location -LiteralPath $BaseDir.FullName
                     Write-Host
                 }
             }
