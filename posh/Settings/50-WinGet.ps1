@@ -1,7 +1,8 @@
 $DotFilesSection = @{
-    Type    = 'Settings'
-    Name    = 'WinGet'
-    Command = @('winget')
+    Type     = 'Settings'
+    Name     = 'WinGet'
+    Platform = 'Windows'
+    Command  = @('winget')
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) {
