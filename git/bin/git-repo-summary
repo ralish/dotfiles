@@ -105,7 +105,7 @@ function early_init() {
 function git_repo_summary() {
     local repo_dir="$1"
 
-    (   
+    (
         cd -- "$repo_dir"
 
         local repo_root
