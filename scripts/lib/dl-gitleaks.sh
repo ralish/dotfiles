@@ -49,21 +49,11 @@ function dl_gitleaks() {
     local machine_hw_name machine_hw_name_raw
     machine_hw_name_raw="$(uname -m)"
     case $machine_hw_name_raw in
-        aarch64)
-            machine_hw_name='arm64'
-            ;;
-        armv6*)
-            machine_hw_name='armv6'
-            ;;
-        armv7*)
-            machine_hw_name='armv7'
-            ;;
-        i686)
-            machine_hw_name='x32'
-            ;;
-        x86_64)
-            machine_hw_name='x64'
-            ;;
+        aarch64) machine_hw_name='arm64' ;;
+        armv6*) machine_hw_name='armv6' ;;
+        armv7*) machine_hw_name='armv7' ;;
+        i686) machine_hw_name='x32' ;;
+        x86_64) machine_hw_name='x64' ;;
         *)
             script_exit "[$APP_NAME] Unsupported machine hardware: $machine_hw_name_raw" 1
             ;;

@@ -40,9 +40,7 @@ function dl_hadolint() {
     kernel_name_raw="$(uname -s)"
     kernel_name="${kernel_name_raw,,}"
     case $kernel_name_raw in
-        Darwin)
-            kernel_name='macos'
-            ;;
+        Darwin) kernel_name='macos' ;;
         Linux) ;;
         *)
             script_exit "[$APP_NAME] Unsupported kernel: $kernel_name_raw" 1
@@ -51,13 +49,10 @@ function dl_hadolint() {
 
     local machine_hw_name machine_hw_name_raw
     machine_hw_name_raw="$(uname -m)"
+    machine_hw_name="$machine_hw_name_raw"
     case $machine_hw_name_raw in
-        aarch64)
-            machine_hw_name='arm64'
-            ;;
-        x86_64)
-            machine_hw_name="$machine_hw_name_raw"
-            ;;
+        aarch64) machine_hw_name='arm64' ;;
+        x86_64) ;;
         *)
             script_exit "[$APP_NAME] Unsupported machine hardware: $machine_hw_name_raw" 1
             ;;

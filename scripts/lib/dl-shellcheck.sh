@@ -48,13 +48,10 @@ function dl_shellcheck() {
 
     local machine_hw_name machine_hw_name_raw
     machine_hw_name_raw="$(uname -m)"
+    machine_hw_name="$machine_hw_name_raw"
     case $machine_hw_name_raw in
-        armv6*)
-            machine_hw_name='armv6hf'
-            ;;
-        aarch64 | riscv64 | x86_64)
-            machine_hw_name="$machine_hw_name_raw"
-            ;;
+        aarch64 | riscv64 | x86_64) ;;
+        armv6*) machine_hw_name='armv6hf' ;;
         *)
             script_exit "[$APP_NAME] Unsupported machine hardware: $machine_hw_name_raw" 1
             ;;
