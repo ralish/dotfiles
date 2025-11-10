@@ -96,6 +96,35 @@ Function Clear-DockerCache {
 
 #region Git
 
+# Print summary information about a Git repository
+Function Get-GitRepoSummary {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
+    Param(
+        [Parameter(ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$Path,
+
+        [Switch]$Recurse
+    )
+
+    Begin {
+        if (!$Path) {
+            $Path += $PWD.Path
+        }
+    }
+
+    Process {
+        $GitCmds = @(
+            'status --short --branch'
+            'remote -v'
+            '--no-pager branch -vv'
+        )
+
+        $Path | Invoke-GitRepoCommand -Command $GitCmds
+    }
+}
+
 # Run a Git command in all repositories under a path
 Function Invoke-GitRepoCommand {
     [CmdletBinding(SupportsShouldProcess)]
