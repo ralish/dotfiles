@@ -1,3 +1,7 @@
+# Temporarily disabled because it is so slow! On average it takes almost a full
+# second to load. Need to find a way to load this on-demand or asynchronously.
+return
+
 $DotFilesSection = @{
     Type            = 'Settings'
     Name            = 'Az Predictor'
