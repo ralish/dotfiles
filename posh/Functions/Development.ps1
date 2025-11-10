@@ -102,7 +102,7 @@ Function Invoke-GitRepoCommand {
     [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
-        [String]$Command,
+        [String[]]$Command,
 
         [ValidateNotNullOrEmpty()]
         [Regex]$RepoInclude,
@@ -118,11 +118,16 @@ Function Invoke-GitRepoCommand {
     )
 
     Begin {
-        $GitArgs = $Command.Split()
         $OriginalLocation = Get-Location
 
         if (!$Path) {
             $Path += $PWD.Path
+        }
+
+        $GitCmds = [Collections.Generic.List[String[]]]::new()
+        foreach ($GitCmd in $Command) {
+            $GitArgs = $GitCmd.Split()
+            $GitCmds.Add($GitArgs)
         }
     }
 
@@ -192,7 +197,7 @@ Function Invoke-GitRepoCommand {
                 if ($PSCmdlet.ShouldProcess($GitDir.Name, 'Invoke Git command')) {
                     Write-Host -ForegroundColor Green ('Running in: {0}' -f $GitDir.Name)
                     Set-Location -LiteralPath $GitDir.FullName
-                    git @GitArgs
+                    foreach ($GitCmd in $GitCmds) { git @GitCmd }
                     Write-Host
                 }
             }
