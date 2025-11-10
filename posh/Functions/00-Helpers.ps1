@@ -56,7 +56,10 @@ Function Get-DotFilesTiming {
         [DateTime]$StartTime,
 
         [ValidateRange(0, [Int]::MaxValue)]
-        [Int]$SlowThresholdMs = 100
+        [Int]$SlowThresholdMs = 100,
+
+        [ValidateRange(0, [Int]::MaxValue)]
+        [Int]$UltraSlowThresholdMs = 300
     )
 
     if (!$DotFilesShowTimings) {
@@ -66,7 +69,9 @@ Function Get-DotFilesTiming {
     $ElapsedTime = (Get-Date) - $StartTime
     $Timing = 'Elapsed time: {0} ms' -f [Int]($ElapsedTime.TotalMilliseconds)
 
-    if ($ElapsedTime.TotalMilliseconds -ge $SlowThresholdMs) {
+    if ($ElapsedTime.TotalMilliseconds -ge $UltraSlowThresholdMs) {
+        $Timing += ' [ULTRA SLOW]'
+    } elseif ($ElapsedTime.TotalMilliseconds -ge $SlowThresholdMs) {
         $Timing += ' [SLOW]'
     }
 
