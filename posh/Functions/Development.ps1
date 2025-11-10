@@ -96,8 +96,8 @@ Function Clear-DockerCache {
 
 #region Git
 
-# Invoke a Git command in all Git repositories
-Function Invoke-GitChildDir {
+# Run a Git command in all repositories under a path
+Function Invoke-GitRepoCommand {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param(
@@ -165,7 +165,7 @@ Function Invoke-GitChildDir {
                     $GitDir = Join-Path -Path $SubDir.FullName -ChildPath '.git'
                     if (-not (Test-Path -LiteralPath $GitDir -PathType Container)) {
                         if ($Recurse) {
-                            Invoke-GitChildDir -Path $SubDir.FullName -Command $Command -Recurse:$Recurse
+                            Invoke-GitRepoCommand -Path $SubDir.FullName -Command $Command -Recurse:$Recurse
                         } else {
                             Write-Verbose -Message ('Skipping directory: {0}' -f $SubDir.Name)
                         }
