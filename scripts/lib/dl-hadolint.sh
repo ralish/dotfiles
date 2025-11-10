@@ -40,12 +40,10 @@ function dl_hadolint() {
     kernel_name_raw="$(uname -s)"
     kernel_name="${kernel_name_raw,,}"
     case $kernel_name_raw in
-        darwin)
+        Darwin)
             kernel_name='macos'
             ;;
-        linux)
-            kernel_name="$kernel_name_raw"
-            ;;
+        Linux) ;;
         *)
             script_exit "[$APP_NAME] Unsupported kernel: $kernel_name_raw" 1
             ;;
