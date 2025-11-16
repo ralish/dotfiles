@@ -13,7 +13,6 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 }
 
 # Save the output of the last command in a variable
-# http://get-powershell.com/post/2008/06/25/Stuffing-the-output-of-the-last-command-into-an-automatic-variable.aspx
 Function Out-Default {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidOverwritingBuiltInCmdlets', '')]
