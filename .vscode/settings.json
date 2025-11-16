@@ -249,10 +249,6 @@
         {
             "pattern": "**/windows/Event Viewer/**.xml",
             "systemId": "windows/Event Viewer/Schemas/Viewer.xsd"
-        },
-        {
-            "pattern": "**/windows/Windows Performance Recorder/*.xml",
-            "systemId": "windows/Windows Performance Recorder/wpr.config.xsd"
         }
     ],
 
