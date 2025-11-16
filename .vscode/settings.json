@@ -50,7 +50,7 @@
         // less
         ".lesskey": "properties",
         // markdownlint
-        ".markdownlintrc": "jsonc",
+        ".markdownlint.json": "jsonc",
         // mysql
         ".my.cnf": "ini",
         // npm
