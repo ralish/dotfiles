@@ -249,6 +249,9 @@ Function Invoke-GitLinter {
         [Parameter(ParameterSetName = 'DevSkim', Mandatory)]
         [Switch]$DevSkim,
 
+        [Parameter(ParameterSetName = 'Markdownlint', Mandatory)]
+        [Switch]$Markdownlint,
+
         [Parameter(ParameterSetName = 'PSScriptAnalyzer', Mandatory)]
         [Switch]$PSScriptAnalyzer,
 
@@ -284,6 +287,37 @@ Function Invoke-GitLinter {
 
                 Write-Verbose -Message ('Invoking DevSkim on: {0}' -f $_)
                 devskim analyze -I $_ -o '%F:%L [%S] %R %N'
+            }
+        }
+
+        'Markdownlint' {
+            try {
+                Test-CommandAvailable -Name 'markdownlint-cli2'
+                $MdlCliCmd = 'markdownlint-cli2'
+            } catch { $MdlCliCmd = [String]::Empty }
+
+            if (!$MdlCliCmd) {
+                try {
+                    Test-CommandAvailable -Name 'markdownlint'
+                    $MdlCliCmd = 'markdownlint'
+                } catch {
+                    throw 'The markdownlint-cli2 or markdownlint commands must be available.'
+                }
+            }
+
+            $GitOutput = git ls-files | Where-Object { $_ -match '\.md$' }
+            if ($LASTEXITCODE -ne 0) { return }
+
+            $GitOutput | ForEach-Object {
+                if ($Exclude) {
+                    if ($_ -match $Exclude) { return }
+                }
+
+                $Item = Get-Item -LiteralPath $_ -Force
+                if ($Item.LinkType -eq 'SymbolicLink') { return }
+
+                Write-Verbose -Message ('Invoking {0} on: {1}' -f $MdlCliCmd, $_)
+                & $MdlCliCmd $_
             }
         }
 
