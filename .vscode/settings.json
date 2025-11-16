@@ -143,9 +143,6 @@
     // PowerShell script analysis
     "powershell.scriptAnalysis.settingsPath": ".config/PSScriptAnalyzerSettings.psd1",
 
-    // Prettier code formatter
-    "prettier.configPath": ".config/.prettierrc",
-
     // Python virtual environment
     "python.defaultInterpreterPath": "${env:DOTFILES}/.venv",
 
