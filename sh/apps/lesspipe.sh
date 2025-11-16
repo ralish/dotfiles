@@ -2,7 +2,7 @@
 
 # lesspipe configuration
 if df_app_load 'lesspipe' 'command -v lesspipe > /dev/null'; then
-    # Setup for handling non-text input
+    # Enable lesspipe
     # shellcheck disable=SC2312
     eval "$(lesspipe)"
 fi

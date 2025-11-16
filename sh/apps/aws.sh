@@ -2,7 +2,7 @@
 
 # AWS CLI configuration
 if df_app_load 'aws' 'command -v aws > /dev/null'; then
-    # Command completion
+    # Configuring command completion in the AWS CLI
     # https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html
     if command -v aws_completer > /dev/null; then
         if [ -n "$ZSH_NAME" ]; then

@@ -3,10 +3,10 @@
 # Trivy configuration
 if df_app_load 'trivy' 'command -v trivy > /dev/null'; then
     # Opt-out of telemetry
+    # https://trivy.dev/docs/latest/advanced/telemetry/
     export TRIVY_DISABLE_TELEMETRY=1
 
     # Enable shell completion
-    # https://trivy.dev/docs/latest/tutorials/shell/shell-completion/
     if [ -n "$BASH" ]; then
         # shellcheck disable=SC2312,SC3001,SC3046,SC3051 source=/dev/null
         source <(trivy completion bash)

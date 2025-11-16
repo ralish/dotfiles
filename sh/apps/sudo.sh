@@ -1,8 +1,8 @@
 # shellcheck shell=sh
 
-# sudo configuration
+# Sudo configuration
 if df_app_load 'sudo' 'command -v sudo > /dev/null'; then
-    # Enables expansion of the subsequent command if it's an alias
+    # Enable expansion of the subsequent command when it's an alias
     # See: https://askubuntu.com/a/22043/1602916
     alias sudo='sudo '
 fi
