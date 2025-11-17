@@ -584,6 +584,7 @@
 	la  = log --notes='*' --graph --abbrev-commit --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%aN>%Creset' --all
 	lm  = "!git log --author=\"$(git config user.name)\" --name-status"
 	ln  = log --name-status
+	lst = log --stat
 
 	ls  = ls-tree --name-only HEAD
 	lsr = ls-tree -r --name-only HEAD
