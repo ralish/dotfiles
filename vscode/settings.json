@@ -245,6 +245,7 @@
     "autopep8.importStrategy": "fromEnvironment",
 
     // AWS Toolkit
+    "aws.cloudformation.telemetry.enabled": false,
     "aws.telemetry": false,
 
     // Azure Repos
