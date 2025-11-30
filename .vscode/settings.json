@@ -122,7 +122,8 @@
         "**/.venv": true,
         "**/~$*.doc*": true,
         "**/~$*.ppt*": true,
-        "**/~$*.xls*": true
+        "**/~$*.xls*": true,
+        "**/desktop.ini": true
     },
 
     // Excludes for search & quick open
