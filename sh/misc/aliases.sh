@@ -6,9 +6,20 @@ df_log 'Loading shell aliases ...'
 # shellcheck disable=SC2154
 if [ -n "$LS_COLORS" ] || [ -n "$LSCOLORS" ]; then
     alias ls='ls --color=auto'
-    alias grep='grep --color=auto'
-    alias egrep='egrep --color=auto'
-    alias fgrep='fgrep --color=auto'
+
+    if command -v diff > /dev/null; then
+        alias diff='diff --color=auto'
+    fi
+
+    if command -v grep > /dev/null; then
+        alias grep='grep --color=auto'
+        alias egrep='egrep --color=auto'
+        alias fgrep='fgrep --color=auto'
+    fi
+
+    if command -v ip > /dev/null; then
+        alias ip='ip --color=auto'
+    fi
 fi
 
 # Git functions
