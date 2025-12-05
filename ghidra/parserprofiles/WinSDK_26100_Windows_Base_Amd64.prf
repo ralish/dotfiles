@@ -1,0 +1,41 @@
+Windows.h
+
+-v0
+-D_MSC_VER=1950
+-D_INTEGRAL_MAX_BITS=64
+-DWINVER=0x0a00
+-D_WIN32_WINNT=0x0a00
+-D_AMD64_
+-D_M_AMD64
+-D_M_X64
+-D_WIN64
+-D_WIN32
+-D_USE_ATTRIBUTES_FOR_SAL
+-D_CRTBLD
+-DSTRSAFE_LIB
+-DSTRSAFE_LIB_IMPL
+-DCONST=const
+-D_CRT_SECURE_NO_WARNINGS
+-D_CRT_NONSTDC_NO_DEPRECATE
+-D_CRT_NONSTDC_NO_WARNINGS
+-D_CRT_OBSOLETE_NO_DEPRECATE
+-D_ASSERT_OK
+-DSTRSAFE_NO_DEPRECATE
+-D__possibly_notnullterminated
+"-Dtype_info=\"void *\"",
+-D__unaligned=
+-D__inner_checkReturn=
+-DWINAPI_PARTITION_APP=1
+-DWINAPI_PARTITION_SYSTEM=1
+-DWINAPI_PARTITION_GAMES=1
+-DSECURITY_WIN32
+
+C:/Program Files/Microsoft Visual Studio/18/Professional/VC/Tools/MSVC/14.50.35717/include
+C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared
+C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/ucrt
+C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um
+C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/winrt
+
+x86:LE:64:default
+
+windows
