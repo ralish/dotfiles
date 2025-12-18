@@ -374,7 +374,6 @@
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - ms-python.black-formatter: Formatting support for Python files using the Black formatter.
     //  - ms-vscode.cmake-tools: Extended CMake support in Visual Studio Code
-    //  - GitHub.copilot: Your AI pair programmer
     //  - GitHub.copilot-chat: AI chat features powered by Copilot
     //  - ms-vscode.cpptools: C/C++ IntelliSense, debugging, and code browsing.
     //  - ms-vscode.cpptools-extension-pack: Popular extensions for C++ development in Visual Studio Code.
@@ -402,9 +401,10 @@
     //  - ms-python.pylint: Linting support for Python files using Pylint.
     //  - ms-python.python: Python language support with extension access points for IntelliSense (Pylance), Debugging (Python Debugger), linting, formatting, refactoring, unit tests, and more.
     //  - mechatroner.rainbow-csv: Highlight CSV and TSV files, Run SQL-like queries
+    //  - willasm.rc-script: RC Script Language Syntax Highlighting
     //  - ionutvmi.reg: Windows Registry Script (.reg) Language package for VSCode
     //  - ms-vscode-remote.remote-ssh-edit: Edit SSH configuration files
-    //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter.
+    //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
     //  - timonwong.shellcheck: Integrates ShellCheck into VS Code, a linter for Shell scripts.
     //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
     //  - XadillaX.viml: Vim Script language server protocol and highlighting support for VSCode.
@@ -423,7 +423,6 @@
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
     //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
-    //  - ms-dotnettools.vscodeintellicode-csharp: AI-assisted development for C# Dev Kit
     //  - amazonwebservices.aws-toolkit-vscode: Including CodeCatalyst, Infrastructure Composer, and support for Lambda, S3, CloudWatch Logs, CloudFormation, and many other services.
     //  - ms-vscode.azure-repos: Remotely browse and edit any Azure Repos
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -486,12 +485,15 @@
 
     // Defines a default formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
+    //  - vscode.json-language-features: Provides rich language support for JSON files.
+    //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
+    //  - esbenp.prettier-vscode: Code formatter using prettier
+    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
     //  - ms-python.black-formatter: Formatting support for Python files using the Black formatter.
     //  - ms-vscode.cmake-tools: Extended CMake support in Visual Studio Code
-    //  - GitHub.copilot: Your AI pair programmer
     //  - GitHub.copilot-chat: AI chat features powered by Copilot
     //  - ms-vscode.cpptools: C/C++ IntelliSense, debugging, and code browsing.
     //  - ms-vscode.cpptools-extension-pack: Popular extensions for C++ development in Visual Studio Code.
@@ -506,25 +508,22 @@
     //  - ms-python.isort: Import organization support for Python files using isort.
     //  - redhat.java: Java Linting, Intellisense, formatting, refactoring, Maven/Gradle support and more...
     //  - samuelcolvin.jinjahtml: Syntax highlighting for jinja(2) including HTML, Markdown, YAML, Ruby and LaTeX templates
-    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - sumneko.lua: Lua Language Server coded by Lua
     //  - ms-vscode.makefile-tools: Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.
-    //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
     //  - vscode.markdown-language-features: Provides rich language support for Markdown.
     //  - vscode.markdown-math: Adds math support to Markdown in notebooks.
     //  - josee9988.minifyall: Minifier for JSON, CSS, HTML, XML, TWIG, LESS, SASS, SCSS, JavaScript, JSONC, and JavaScriptReact(testing). Compressor of files and folders. You will love its simplicity!
     //  - ms-python.mypy-type-checker: Type checking support for Python files using Mypy.
     //  - vscode.php-language-features: Provides rich language support for PHP files.
     //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
-    //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - ms-python.pylint: Linting support for Python files using Pylint.
     //  - ms-python.python: Python language support with extension access points for IntelliSense (Pylance), Debugging (Python Debugger), linting, formatting, refactoring, unit tests, and more.
     //  - mechatroner.rainbow-csv: Highlight CSV and TSV files, Run SQL-like queries
+    //  - willasm.rc-script: RC Script Language Syntax Highlighting
     //  - ionutvmi.reg: Windows Registry Script (.reg) Language package for VSCode
     //  - ms-vscode-remote.remote-ssh-edit: Edit SSH configuration files
     //  - dnut.rewrap-revived: Hard word wrapping for comments and other text at a given column.
-    //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter.
-    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
+    //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
     //  - timonwong.shellcheck: Integrates ShellCheck into VS Code, a linter for Shell scripts.
     //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
     //  - XadillaX.viml: Vim Script language server protocol and highlighting support for VSCode.
@@ -544,7 +543,6 @@
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
     //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
-    //  - ms-dotnettools.vscodeintellicode-csharp: AI-assisted development for C# Dev Kit
     //  - amazonwebservices.aws-toolkit-vscode: Including CodeCatalyst, Infrastructure Composer, and support for Lambda, S3, CloudWatch Logs, CloudFormation, and many other services.
     //  - ms-vscode.azure-repos: Remotely browse and edit any Azure Repos
     //  - vscode.configuration-editing: Provides capabilities (advanced IntelliSense, auto-fixing) in configuration files like settings, launch, and extension recommendation files.
@@ -833,7 +831,10 @@
     "editor.hover.delay": 300,
 
     // Controls whether the hover is shown.
-    "editor.hover.enabled": true,
+    //  - on: Hover is enabled.
+    //  - off: Hover is disabled.
+    //  - onKeyboardModifier: Hover is shown when holding `Control` or `Alt` (the opposite modifier of `editor.multiCursorModifier`)
+    "editor.hover.enabled": "on",
 
     // Controls the delay in milliseconds after which the hover is hidden. Requires `editor.hover.sticky` to be enabled.
     "editor.hover.hidingDelay": 300,
@@ -879,6 +880,9 @@
 
     // Controls whether the suggestion will show as collapsed until jumping to it.
     "editor.inlineSuggest.edits.showCollapsed": false,
+
+    // Controls whether long distance inline suggestions are shown.
+    "editor.inlineSuggest.edits.showLongDistanceHint": true,
 
     // Controls whether to automatically show inline suggestions in the editor.
     "editor.inlineSuggest.enabled": true,
@@ -1090,9 +1094,6 @@
     // Controls the delay in milliseconds after which quick suggestions will show up.
     "editor.quickSuggestionsDelay": 10,
 
-    // Enable/disable the ability to preview changes before renaming
-    "editor.rename.enablePreview": true,
-
     // Deprecated, use `editor.linkedEditing` instead.
     // Controls whether the editor auto renames on type.
     "editor.renameOnType": false,
@@ -1183,9 +1184,6 @@
     //  - false: Semantic highlighting disabled for all color themes.
     //  - configuredByTheme: Semantic highlighting is configured by the current color theme's `semanticHighlighting` setting.
     "editor.semanticHighlighting.enabled": "configuredByTheme",
-
-    // Overrides editor semantic token color and styles from the currently selected color theme.
-    "editor.semanticTokenColorCustomizations": {},
 
     // Controls strikethrough deprecated variables.
     "editor.showDeprecated": true,
@@ -1397,30 +1395,6 @@
     // The number of spaces a tab is equal to. This setting is overridden based on the file contents when `editor.detectIndentation` is on.
     "editor.tabSize": 4,
 
-    // Overrides editor syntax colors and font style from the currently selected color theme.
-    "editor.tokenColorCustomizations": {
-        "[*Light*]": {
-            "textMateRules": [
-                {
-                    "scope": "ref.matchtext",
-                    "settings": {
-                        "foreground": "#000"
-                    }
-                }
-            ]
-        },
-        "[*Dark*]": {
-            "textMateRules": [
-                {
-                    "scope": "ref.matchtext",
-                    "settings": {
-                        "foreground": "#fff"
-                    }
-                }
-            ]
-        }
-    },
-
     // Remove trailing auto inserted whitespace.
     "editor.trimAutoWhitespace": true,
 
@@ -1515,30 +1489,6 @@
     //  - simple: Assumes that all characters are of the same width. This is a fast algorithm that works correctly for monospace fonts and certain scripts (like Latin characters) where glyphs are of equal width.
     //  - advanced: Delegates wrapping points computation to the browser. This is a slow algorithm, that might cause freezes for large files, but it works correctly in all cases.
     "editor.wrappingStrategy": "simple",
-
-    // Whether the inline chat also renders an accessible diff viewer for its changes.
-    //  - auto: The accessible diff viewer is based on screen reader mode being enabled.
-    //  - on: The accessible diff viewer is always enabled.
-    //  - off: The accessible diff viewer is never enabled.
-    "inlineChat.accessibleDiffView": "auto",
-
-    // Whether to use the next version of inline chat.
-    "inlineChat.enableV2": false,
-
-    // Whether to finish an inline chat session when typing outside of changed regions.
-    "inlineChat.finishOnType": false,
-
-    // Whether holding the inline chat keybinding will automatically enable speech recognition.
-    "inlineChat.holdToSpeech": true,
-
-    // Whether empty lines show a hint to generate code with inline chat.
-    "inlineChat.lineEmptyHint": false,
-
-    // Whether lines that are dominated by natural language or pseudo code show a hint to continue with inline chat. For instance, `class Person with name and hobbies` would show a hint to continue with chat.
-    "inlineChat.lineNaturalLanguageHint": true,
-
-    // Enable agent-like behavior for inline chat widget in notebooks.
-    "inlineChat.notebookAgent": false,
 
     // Run a series of Code Actions for a notebook on save. Code Actions must be specified and the editor must not be shutting down. When `files.autoSave` is set to `afterDelay`, Code Actions will only be run when the file is saved explicitly. Example: `"notebook.source.organizeImports": "explicit"`
     "notebook.codeActionsOnSave": {},
@@ -1744,12 +1694,6 @@
     //  - off: Do not store working changes in the cloud with Continue Working On unless the user has already turned on Cloud Changes.
     "workbench.cloudChanges.continueOn": "prompt",
 
-    // Overrides colors from the currently selected color theme.
-    "workbench.colorCustomizations": {},
-
-    // Specifies the color theme used in the workbench when `window.autoDetectColorScheme` is not enabled.
-    "workbench.colorTheme": "Default Dark Modern",
-
     // Controls where the command palette should ask chat questions.
     //  - chatView: Ask chat questions in the Chat view.
     //  - quickChat: Ask chat questions in Quick Chat.
@@ -1777,7 +1721,7 @@
     "workbench.editor.autoLockGroups": {
         "default": false,
         "hexEditor.hexedit": false,
-        "workbench.editor.chatSession": true,
+        "workbench.editor.chatSession": false,
         "workbench.editorinputs.searchEditorInput": false,
         "workbench.editor.processExplorer": true,
         "notebookOutputEditor": false,
@@ -1883,7 +1827,7 @@
     // Controls whether the language in a text editor is automatically detected unless the language has been explicitly set by the language picker. This can also be scoped by language so you can specify which languages you do not want to be switched off of. This is useful for languages like Markdown that often contain other languages that might trick language detection into thinking it's the embedded language and not Markdown.
     "workbench.editor.languageDetection": true,
 
-    // When enabled, shows a Status bar Quick Fix when the editor language doesn't match detected content language.
+    // When enabled, shows a status bar Quick Fix when the editor language doesn't match detected content language.
     "workbench.editor.languageDetectionHints": {
         "untitledEditors": true,
         "notebookEditors": true
@@ -2047,13 +1991,6 @@
     // Controls the delay in milliseconds after which the hover is shown for workbench items (ex. some extension provided tree view items). Already visible items may require a refresh before reflecting this setting change.
     "workbench.hover.delay": 500,
 
-    // Specifies the file icon theme used in the workbench or 'null' to not show any file icons.
-    //  - null: No file icons
-    //  - vs-minimal
-    //  - vs-seti
-    //  - vscode-icons
-    "workbench.iconTheme": "vs-seti",
-
     // Controls whether the layout control is shown in the custom title bar. This setting only has an effect when `window.customTitleBarVisibility` is not set to `never`.
     "workbench.layoutControl.enabled": true,
 
@@ -2136,22 +2073,6 @@
     // Controls whether activity items in the panel title are shown as label or icon.
     "workbench.panel.showLabels": true,
 
-    // Specifies the color theme when system color mode is dark and `window.autoDetectColorScheme` is enabled.
-    "workbench.preferredDarkColorTheme": "Default Dark Modern",
-
-    // Specifies the color theme when in high contrast dark mode and `window.autoDetectHighContrast` is enabled.
-    "workbench.preferredHighContrastColorTheme": "Default High Contrast",
-
-    // Specifies the color theme when in high contrast light mode and `window.autoDetectHighContrast` is enabled.
-    "workbench.preferredHighContrastLightColorTheme": "Default High Contrast Light",
-
-    // Specifies the color theme when system color mode is light and `window.autoDetectColorScheme` is enabled.
-    "workbench.preferredLightColorTheme": "Default Light Modern",
-
-    // Specifies the product icon theme used.
-    //  - Default: Default
-    "workbench.productIconTheme": "Default",
-
     // Controls whether Quick Open should close automatically once it loses focus.
     "workbench.quickOpen.closeOnFocusLost": true,
 
@@ -2180,9 +2101,6 @@
     //  - maximizedInWorkspace: The secondary side bar is visible and maximized by default if a workspace is opened.
     //  - maximized: The secondary side bar is visible and maximized by default.
     "workbench.secondarySideBar.defaultVisibility": "visibleInWorkspace",
-
-    // Enables the default secondary sidebar visibility in older workspaces before we had default visibility support.
-    "workbench.secondarySideBar.enableDefaultVisibilityInOldWorkspace": false,
 
     // Controls whether activity items in the secondary side bar title are shown as label or icon. This setting only has an effect when `workbench.activityBar.location` is not set to `top`.
     "workbench.secondarySideBar.showLabels": true,
@@ -2263,6 +2181,35 @@
 
     // When enabled, an extension's walkthrough will open upon install of the extension.
     "workbench.welcomePage.walkthroughs.openOnInstall": true,
+
+    // Overrides colors from the currently selected color theme.
+    "workbench.colorCustomizations": {},
+
+    // Specifies the color theme used in the workbench when `window.autoDetectColorScheme` is not enabled.
+    "workbench.colorTheme": "Default Dark Modern",
+
+    // Specifies the file icon theme used in the workbench or 'null' to not show any file icons.
+    //  - null: No file icons
+    //  - vs-minimal
+    //  - vs-seti
+    //  - vscode-icons
+    "workbench.iconTheme": "vs-seti",
+
+    // Specifies the color theme when system color mode is dark and `window.autoDetectColorScheme` is enabled.
+    "workbench.preferredDarkColorTheme": "Default Dark Modern",
+
+    // Specifies the color theme when in high contrast dark mode and `window.autoDetectHighContrast` is enabled.
+    "workbench.preferredHighContrastColorTheme": "Default High Contrast",
+
+    // Specifies the color theme when in high contrast light mode and `window.autoDetectHighContrast` is enabled.
+    "workbench.preferredHighContrastLightColorTheme": "Default High Contrast Light",
+
+    // Specifies the color theme when system color mode is light and `window.autoDetectColorScheme` is enabled.
+    "workbench.preferredLightColorTheme": "Default Light Modern",
+
+    // Specifies the product icon theme used.
+    //  - Default: Default
+    "workbench.productIconTheme": "Default",
 
     // Debugger
     // **Note:** _This option is only used for console projects launched with the `dotnet` debug configuration type_.
@@ -2404,12 +2351,6 @@
     "dotnet.unitTests.runSettingsPath": "",
 
     // Window
-    // If enabled, will automatically select a color theme based on the system color mode. If the system color mode is dark, `workbench.preferredDarkColorTheme#` is used, else `#workbench.preferredLightColorTheme`.
-    "window.autoDetectColorScheme": false,
-
-    // If enabled, will automatically change to high contrast theme if the OS is using a high contrast theme. The high contrast theme to use is specified by `workbench.preferredHighContrastColorTheme#` and `#workbench.preferredHighContrastLightColorTheme`.
-    "window.autoDetectHighContrast": true,
-
     // Controls the border color of the window:
     // - `default`: respect color theme settings, fallback to Windows settings
     // - `system`: respect Windows settings only
@@ -2545,6 +2486,12 @@
 
     // Controls if the 'Zoom In' and 'Zoom Out' commands apply the zoom level to all windows or only the active window. See `window.zoomLevel` for configuring a default zoom level for all windows.
     "window.zoomPerWindow": true,
+
+    // If enabled, will automatically select a color theme based on the system color mode. If the system color mode is dark, `workbench.preferredDarkColorTheme#` is used, else `#workbench.preferredLightColorTheme`.
+    "window.autoDetectColorScheme": false,
+
+    // If enabled, will automatically change to high contrast theme if the OS is using a high contrast theme. The high contrast theme to use is specified by `workbench.preferredHighContrastColorTheme#` and `#workbench.preferredHighContrastLightColorTheme`.
+    "window.autoDetectHighContrast": true,
 
     // Files
     // Configure [glob patterns](https://aka.ms/vscode-glob-patterns) of file associations to languages (for example `"*.extension": "html"`). Patterns will match on the absolute path of a file if they contain a path separator and will match on the name of the file otherwise. These have precedence over the default associations of the languages installed.
@@ -2688,9 +2635,6 @@
     // Configure paths or [glob patterns](https://aka.ms/vscode-glob-patterns) to mark as read-only. Glob patterns are always evaluated relative to the path of the workspace folder unless they are absolute paths. You can exclude matching paths via the `files.readonlyExclude` setting. Files from readonly file system providers will always be read-only independent of this setting.
     "files.readonlyInclude": {},
 
-    // Controls if files that were part of a refactoring are saved automatically
-    "files.refactoring.autoSave": true,
-
     // Restore the undo stack when a file is reopened.
     "files.restoreUndoStack": true,
 
@@ -2734,8 +2678,11 @@
     // Enables automatic NuGet restore if the extension detects assets are missing.
     "dotnet.projects.enableAutomaticRestore": true,
 
-    // Enables the preview "file-based programs" (dotnet run app.cs) experience.
-    "dotnet.projects.enableFileBasedPrograms": false,
+    // Enables the "file-based programs" (dotnet run app.cs) experience.
+    "dotnet.projects.enableFileBasedPrograms": true,
+
+    // Enables the "file-based programs" (dotnet run app.cs) experience in files where the editor is unable to determine with certainty whether the file is a file-based program. Only respected when `dotnet.projects.enableFileBasedPrograms` is `true`.
+    "dotnet.projects.enableFileBasedProgramsWhenAmbiguous": false,
 
     // Allows overriding the folder path for built in components of the language server (for example, override the .roslynDevKit path in the extension directory to use locally built components)
     "dotnet.server.componentPaths": {},
@@ -2763,9 +2710,6 @@
 
     // Passes the --debug flag when launching the server to allow a debugger to be attached. (Previously `omnisharp.waitForDebugger`)
     "dotnet.server.waitForDebugger": false,
-
-    // Enable Razor cohosting.
-    "razor.languageServer.cohostingEnabled": true,
 
     // Specifies whether to wait for debug attach when launching the language server.
     "razor.languageServer.debug": false,
@@ -3317,7 +3261,7 @@
     "gitlens.statusBar.reduceFlicker": true,
 
     // Specifies the format (in markdown) of hover shown over the blame information in the status bar. See [_Commit Tokens_](https://github.com/gitkraken/vscode-gitlens/wiki/Custom-Formatting#commit-tokens) in the GitLens docs
-    "gitlens.statusBar.tooltipFormat": "${avatar} &nbsp;__${author}__ &nbsp;$(history) ${ago} _(${date})_${' via  'pullRequest} ${message}${\n\n---\n\nfootnotes}\n\n${commands}",
+    "gitlens.statusBar.tooltipFormat": "${avatar} &nbsp;__${author}__ &nbsp;$(history) ${agoAndDateBothSources}${' via  'pullRequest} ${message}${\n\n---\n\nfootnotes}\n\n${commands}",
 
     // Hovers
     // Specifies whether to provide a _changes (diff)_ hover for all lines when showing blame annotations
@@ -3366,7 +3310,7 @@
     "gitlens.hovers.currentLine.over": "annotation",
 
     // Specifies the format (in markdown) of the _commit details_ hover. See [_Commit Tokens_](https://github.com/gitkraken/vscode-gitlens/wiki/Custom-Formatting#commit-tokens) in the GitLens docs
-    "gitlens.hovers.detailsMarkdownFormat": "${avatar} &nbsp;__${author}__ &nbsp;$(history) ${ago} _(${date})_${' via  'pullRequest} ${message}${\n\n---\n\nfootnotes}\n\n${commands}",
+    "gitlens.hovers.detailsMarkdownFormat": "${avatar} &nbsp;__${author}__ &nbsp;$(history) ${agoAndDateBothSources}${' via  'pullRequest} ${message}${\n\n---\n\nfootnotes}\n\n${commands}",
 
     // Specifies whether to provide any hovers
     "gitlens.hovers.enabled": true,
@@ -3629,7 +3573,7 @@
     "http.systemCertificates": true,
 
     // Controls whether system certificates should be loaded using Node.js built-in support. Reload the window after changing this setting. When during [remote development](https://aka.ms/vscode-remote) the `http.useLocalProxyConfiguration` setting is disabled this setting can be configured in the local and the remote settings separately.
-    "http.systemCertificatesNode": true,
+    "http.systemCertificatesNode": false,
 
     // Controls whether in the remote extension host the local proxy configuration should be used. This setting only applies as a remote setting during [remote development](https://aka.ms/vscode-remote).
     "http.useLocalProxyConfiguration": true,
@@ -3769,7 +3713,7 @@
     // Show Source Code in Disassembly View.
     "debug.disassemblyView.showSourceCode": true,
 
-    // Color of the Status bar when debugger is active.
+    // Color of the status bar when the debugger is active.
     "debug.enableStatusBarColor": true,
 
     // Controls whether the editor should be focused when the debugger breaks.
@@ -3825,10 +3769,10 @@
     // Controls whether inline breakpoints candidate decorations should be shown in the editor while debugging.
     "debug.showInlineBreakpointCandidates": true,
 
-    // Controls when the debug Status bar should be visible.
-    //  - never: Never show debug in Status bar
-    //  - always: Always show debug in Status bar
-    //  - onFirstSessionStart: Show debug in Status bar only after debug was started for the first time
+    // Controls when the debug status bar item should be visible.
+    //  - never: Never show debug item in status bar
+    //  - always: Always show debug item in status bar
+    //  - onFirstSessionStart: Show debug item in status bar only after debug was started for the first time
     "debug.showInStatusBar": "onFirstSessionStart",
 
     // Controls whether the debug sub-sessions are shown in the debug tool bar. When this setting is false the stop command on a sub-session will also stop the parent session.
@@ -4218,116 +4162,143 @@
     // Enable/disable automatic closing of JSX tags.
     "javascript.autoClosingTags": true,
 
-    // Enable/disable default JavaScript formatter.
-    "javascript.format.enable": true,
+    // Makes `Go to Definition` avoid type declaration files when possible by triggering `Go to Source Definition` instead. This allows `Go to Source Definition` to be triggered with the mouse gesture.
+    "javascript.preferGoToSourceDefinition": false,
 
-    // Indent case clauses in switch statements. Requires using TypeScript 5.1+ in the workspace.
-    "javascript.format.indentSwitchCase": true,
+    // Enable/disable references CodeLens in JavaScript files.
+    "javascript.referencesCodeLens.enabled": false,
 
-    // Defines space handling after a comma delimiter.
-    "javascript.format.insertSpaceAfterCommaDelimiter": true,
+    // Enable/disable references CodeLens on all functions in JavaScript files.
+    "javascript.referencesCodeLens.showOnAllFunctions": false,
 
-    // Defines space handling after the constructor keyword.
-    "javascript.format.insertSpaceAfterConstructor": false,
+    // Enable/disable suggestion diagnostics for JavaScript files in the editor.
+    "javascript.suggestionActions.enabled": true,
 
-    // Defines space handling after function keyword for anonymous functions.
-    "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
+    // Enable/disable automatic updating of import paths when you rename or move a file in VS Code.
+    //  - prompt: Prompt on each rename.
+    //  - always: Always update paths automatically.
+    //  - never: Never rename paths and don't prompt.
+    "javascript.updateImportsOnFileMove.enabled": "prompt",
 
-    // Defines space handling after keywords in a control flow statement.
-    "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": true,
+    // Automatically update imports when pasting code. Requires TypeScript 5.6+.
+    "javascript.updateImportsOnPaste.enabled": true,
 
-    // Defines space handling after opening and before closing empty braces.
-    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": true,
+    // Enable/disable JavaScript validation.
+    "javascript.validate.enable": true,
 
-    // Defines space handling after opening and before closing JSX expression braces.
-    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": false,
+    // The maximum number of characters in a hover. If the hover is longer than this, it will be truncated. Requires TypeScript 5.9+.
+    "js/ts.hover.maximumLength": 500,
 
-    // Defines space handling after opening and before closing non-empty braces.
-    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+    // Enable/disable semantic checking of JavaScript files. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
+    "js/ts.implicitProjectConfig.checkJs": false,
 
-    // Defines space handling after opening and before closing non-empty brackets.
-    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
+    // Enable/disable `experimentalDecorators` in JavaScript files that are not part of a project. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
+    "js/ts.implicitProjectConfig.experimentalDecorators": false,
 
-    // Defines space handling after opening and before closing non-empty parenthesis.
-    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+    // Sets the module system for the program. See more: https://www.typescriptlang.org/tsconfig#module.
+    "js/ts.implicitProjectConfig.module": "ESNext",
 
-    // Defines space handling after opening and before closing template string braces.
-    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": false,
+    // Enable/disable [strict mode](https://www.typescriptlang.org/tsconfig#strict) in JavaScript and TypeScript files that are not part of a project. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
+    "js/ts.implicitProjectConfig.strict": true,
 
-    // Defines space handling after a semicolon in a for statement.
-    "javascript.format.insertSpaceAfterSemicolonInForStatements": true,
+    // Enable/disable [strict function types](https://www.typescriptlang.org/tsconfig#strictFunctionTypes) in JavaScript and TypeScript files that are not part of a project. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
+    "js/ts.implicitProjectConfig.strictFunctionTypes": true,
 
-    // Defines space handling after a binary operator.
-    "javascript.format.insertSpaceBeforeAndAfterBinaryOperators": true,
+    // Enable/disable [strict null checks](https://www.typescriptlang.org/tsconfig#strictNullChecks) in JavaScript and TypeScript files that are not part of a project. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
+    "js/ts.implicitProjectConfig.strictNullChecks": true,
 
-    // Defines space handling before function argument parentheses.
-    "javascript.format.insertSpaceBeforeFunctionParenthesis": false,
+    // Set target JavaScript language version for emitted JavaScript and include library declarations. See more: https://www.typescriptlang.org/tsconfig#target.
+    "js/ts.implicitProjectConfig.target": "ES2024",
 
-    // Defines whether an open brace is put onto a new line for control blocks or not.
-    "javascript.format.placeOpenBraceOnNewLineForControlBlocks": false,
+    // Enable/disable automatic closing of JSX tags.
+    "typescript.autoClosingTags": true,
 
-    // Defines whether an open brace is put onto a new line for functions or not.
-    "javascript.format.placeOpenBraceOnNewLineForFunctions": false,
+    // Disables [automatic type acquisition](https://code.visualstudio.com/docs/nodejs/working-with-javascript#_typings-and-automatic-type-acquisition). Automatic type acquisition fetches `@types` packages from npm to improve IntelliSense for external libraries.
+    "typescript.disableAutomaticTypeAcquisition": false,
 
-    // Defines handling of optional semicolons.
-    //  - ignore: Don't insert or remove any semicolons.
-    //  - insert: Insert semicolons at statement ends.
-    //  - remove: Remove unnecessary semicolons.
-    "javascript.format.semicolons": "ignore",
+    // Enables prompting of users to use the TypeScript version configured in the workspace for Intellisense.
+    "typescript.enablePromptUseWorkspaceTsdk": false,
 
-    // Enable/disable inlay hints for implicit return types on function signatures:
-    // ```typescript
+    // Disables TypeScript and JavaScript language features to allow usage of the TypeScript Go experimental extension. Requires TypeScript Go to be installed and configured. Requires reloading extensions after changing this setting.
+    "typescript.experimental.useTsgo": false,
+
+    // Enable/disable implementations CodeLens. This CodeLens shows the implementers of an interface.
+    "typescript.implementationsCodeLens.enabled": false,
+
+    // Enable/disable showing implementations CodeLens above all class methods instead of only on abstract methods.
+    "typescript.implementationsCodeLens.showOnAllClassMethods": false,
+
+    // Enable/disable implementations CodeLens on interface methods.
+    "typescript.implementationsCodeLens.showOnInterfaceMethods": false,
+
+    // Sets the locale used to report JavaScript and TypeScript errors. Defaults to use VS Code's locale.
+    //  - auto: Use VS Code's configured display language.
+    //  - de: Deutsch
+    //  - es: español
+    //  - en: English
+    //  - fr: français
+    //  - it: italiano
+    //  - ja: 日本語
+    //  - ko: 한국어
+    //  - ru: русский
+    //  - zh-CN: 中文(简体)
+    //  - zh-TW: 中文(繁體)
+    "typescript.locale": "auto",
+
+    // Makes `Go to Definition` avoid type declaration files when possible by triggering `Go to Source Definition` instead. This allows `Go to Source Definition` to be triggered with the mouse gesture.
+    "typescript.preferGoToSourceDefinition": false,
+
+    // Enable/disable references CodeLens in TypeScript files.
+    "typescript.referencesCodeLens.enabled": false,
+
+    // Enable/disable references CodeLens on all functions in TypeScript files.
+    "typescript.referencesCodeLens.showOnAllFunctions": false,
+
+    // Report style checks as warnings.
+    "typescript.reportStyleChecksAsWarnings": true,
+
+    // Enable/disable suggestion diagnostics for TypeScript files in the editor.
+    "typescript.suggestionActions.enabled": true,
+
+    // Controls auto detection of tsc tasks.
+    //  - on: Create both build and watch tasks.
+    //  - off: Disable this feature.
+    //  - build: Only create single run compile tasks.
+    //  - watch: Only create compile and watch tasks.
+    "typescript.tsc.autoDetect": "on",
+
+    // Specifies the folder path to the tsserver and `lib*.d.ts` files under a TypeScript install to use for IntelliSense, for example: `./node_modules/typescript/lib`.
     //
-    // function foo() /* :number */ {
-    // 	return Date.now();
-    // }
+    // - When specified as a user setting, the TypeScript version from `typescript.tsdk` automatically replaces the built-in TypeScript version.
+    // - When specified as a workspace setting, `typescript.tsdk` allows you to switch to use that workspace version of TypeScript for IntelliSense with the `TypeScript: Select TypeScript version` command.
     //
-    // ```
-    "javascript.inlayHints.functionLikeReturnTypes.enabled": false,
+    // See the [TypeScript documentation](https://code.visualstudio.com/docs/typescript/typescript-compiling#_using-newer-typescript-versions) for more detail about managing TypeScript versions.
+    "typescript.tsdk": "",
 
-    // Enable/disable inlay hints for parameter names:
-    // ```typescript
-    //
-    // parseInt(/* str: */ '123', /* radix: */ 8)
-    //
-    // ```
-    //  - none: Disable parameter name hints.
-    //  - literals: Enable parameter name hints only for literal arguments.
-    //  - all: Enable parameter name hints for literal and non-literal arguments.
-    "javascript.inlayHints.parameterNames.enabled": "none",
+    // Enables region-based diagnostics in TypeScript. Requires using TypeScript 5.6+ in the workspace.
+    "typescript.tsserver.enableRegionDiagnostics": true,
 
-    // Suppress parameter name hints on arguments whose text is identical to the parameter name.
-    "javascript.inlayHints.parameterNames.suppressWhenArgumentMatchesName": true,
+    // Enable/disable automatic updating of import paths when you rename or move a file in VS Code.
+    //  - prompt: Prompt on each rename.
+    //  - always: Always update paths automatically.
+    //  - never: Never rename paths and don't prompt.
+    "typescript.updateImportsOnFileMove.enabled": "prompt",
 
-    // Enable/disable inlay hints for implicit parameter types:
-    // ```typescript
-    //
-    // el.addEventListener('click', e /* :MouseEvent */ => ...)
-    //
-    // ```
-    "javascript.inlayHints.parameterTypes.enabled": false,
+    // Automatically update imports when pasting code. Requires TypeScript 5.6+.
+    "typescript.updateImportsOnPaste.enabled": true,
 
-    // Enable/disable inlay hints for implicit types on property declarations:
-    // ```typescript
-    //
-    // class Foo {
-    // 	prop /* :number */ = Date.now();
-    // }
-    //
-    // ```
-    "javascript.inlayHints.propertyDeclarationTypes.enabled": false,
+    // Enable/disable TypeScript validation.
+    "typescript.validate.enable": true,
 
-    // Enable/disable inlay hints for implicit variable types:
-    // ```typescript
-    //
-    // const foo /* :number */ = Date.now();
-    //
-    // ```
-    "javascript.inlayHints.variableTypes.enabled": false,
+    // Exclude symbols that come from library files in `Go to Symbol in Workspace` results. Requires using TypeScript 5.3+ in the workspace.
+    "typescript.workspaceSymbols.excludeLibrarySymbols": true,
 
-    // Suppress type hints on variables whose name is identical to the type name.
-    "javascript.inlayHints.variableTypes.suppressWhenTypeMatchesName": true,
+    // Controls which files are searched by [Go to Symbol in Workspace](https://code.visualstudio.com/docs/editor/editingevolved#_open-symbol-by-name).
+    //  - allOpenProjects: Search all open JavaScript or TypeScript projects for symbols.
+    //  - currentProject: Only search for symbols in the current JavaScript or TypeScript project.
+    "typescript.workspaceSymbols.scope": "allOpenProjects",
 
+    // Preferences
     // Specify glob patterns of files to exclude from auto imports. Relative paths are resolved relative to the workspace root. Patterns are evaluated using tsconfig.json [`exclude`](https://www.typescriptlang.org/tsconfig#exclude) semantics.
     "javascript.preferences.autoImportFileExcludePatterns": [],
 
@@ -4373,249 +4344,6 @@
 
     // Enable/disable introducing aliases for object shorthand properties during renames.
     "javascript.preferences.useAliasesForRenames": true,
-
-    // Makes `Go to Definition` avoid type declaration files when possible by triggering `Go to Source Definition` instead. This allows `Go to Source Definition` to be triggered with the mouse gesture.
-    "javascript.preferGoToSourceDefinition": false,
-
-    // Enable/disable references CodeLens in JavaScript files.
-    "javascript.referencesCodeLens.enabled": false,
-
-    // Enable/disable references CodeLens on all functions in JavaScript files.
-    "javascript.referencesCodeLens.showOnAllFunctions": false,
-
-    // Enable/disable auto import suggestions.
-    "javascript.suggest.autoImports": true,
-
-    // Enable/disable snippet completions for class members.
-    "javascript.suggest.classMemberSnippets.enabled": true,
-
-    // Complete functions with their parameter signature.
-    "javascript.suggest.completeFunctionCalls": false,
-
-    // Enable/disable suggestion to complete JSDoc comments.
-    "javascript.suggest.completeJSDocs": true,
-
-    // Enable/disable autocomplete suggestions.
-    "javascript.suggest.enabled": true,
-
-    // Enable/disable showing completions on potentially undefined values that insert an optional chain call. Requires strict null checks to be enabled.
-    "javascript.suggest.includeAutomaticOptionalChainCompletions": true,
-
-    // Enable/disable auto-import-style completions on partially-typed import statements.
-    "javascript.suggest.includeCompletionsForImportStatements": true,
-
-    // Enable/disable generating `@returns` annotations for JSDoc templates.
-    "javascript.suggest.jsdoc.generateReturns": true,
-
-    // Enable/disable including unique names from the file in JavaScript suggestions. Note that name suggestions are always disabled in JavaScript code that is semantically checked using `@ts-check` or `checkJs`.
-    "javascript.suggest.names": true,
-
-    // Enable/disable suggestions for paths in import statements and require calls.
-    "javascript.suggest.paths": true,
-
-    // Enable/disable suggestion diagnostics for JavaScript files in the editor.
-    "javascript.suggestionActions.enabled": true,
-
-    // Enable/disable automatic updating of import paths when you rename or move a file in VS Code.
-    //  - prompt: Prompt on each rename.
-    //  - always: Always update paths automatically.
-    //  - never: Never rename paths and don't prompt.
-    "javascript.updateImportsOnFileMove.enabled": "prompt",
-
-    // Automatically update imports when pasting code. Requires TypeScript 5.6+.
-    "javascript.updateImportsOnPaste.enabled": true,
-
-    // Enable/disable JavaScript validation.
-    "javascript.validate.enable": true,
-
-    // The maximum number of characters in a hover. If the hover is longer than this, it will be truncated. Requires TypeScript 5.9+.
-    "js/ts.hover.maximumLength": 500,
-
-    // Enable/disable semantic checking of JavaScript files. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
-    "js/ts.implicitProjectConfig.checkJs": false,
-
-    // Enable/disable `experimentalDecorators` in JavaScript files that are not part of a project. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
-    "js/ts.implicitProjectConfig.experimentalDecorators": false,
-
-    // Sets the module system for the program. See more: https://www.typescriptlang.org/tsconfig#module.
-    "js/ts.implicitProjectConfig.module": "ESNext",
-
-    // Enable/disable [strict mode](https://www.typescriptlang.org/tsconfig#strict) in JavaScript and TypeScript files that are not part of a project. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
-    "js/ts.implicitProjectConfig.strict": true,
-
-    // Enable/disable [strict function types](https://www.typescriptlang.org/tsconfig#strictFunctionTypes) in JavaScript and TypeScript files that are not part of a project. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
-    "js/ts.implicitProjectConfig.strictFunctionTypes": true,
-
-    // Enable/disable [strict null checks](https://www.typescriptlang.org/tsconfig#strictNullChecks) in JavaScript and TypeScript files that are not part of a project. Existing `jsconfig.json` or `tsconfig.json` files override this setting.
-    "js/ts.implicitProjectConfig.strictNullChecks": true,
-
-    // Set target JavaScript language version for emitted JavaScript and include library declarations. See more: https://www.typescriptlang.org/tsconfig#target.
-    "js/ts.implicitProjectConfig.target": "ES2024",
-
-    // Enable/disable automatic closing of JSX tags.
-    "typescript.autoClosingTags": true,
-
-    // Check if npm is installed for [Automatic Type Acquisition](https://code.visualstudio.com/docs/nodejs/working-with-javascript#_typings-and-automatic-type-acquisition).
-    "typescript.check.npmIsInstalled": true,
-
-    // Disables [automatic type acquisition](https://code.visualstudio.com/docs/nodejs/working-with-javascript#_typings-and-automatic-type-acquisition). Automatic type acquisition fetches `@types` packages from npm to improve IntelliSense for external libraries.
-    "typescript.disableAutomaticTypeAcquisition": false,
-
-    // Enables prompting of users to use the TypeScript version configured in the workspace for Intellisense.
-    "typescript.enablePromptUseWorkspaceTsdk": false,
-
-    // Disables TypeScript and JavaScript language features to allow usage of the TypeScript Go experimental extension. Requires TypeScript Go to be installed and configured. Requires reloading extensions after changing this setting.
-    "typescript.experimental.useTsgo": false,
-
-    // Enable/disable default TypeScript formatter.
-    "typescript.format.enable": true,
-
-    // Indent case clauses in switch statements. Requires using TypeScript 5.1+ in the workspace.
-    "typescript.format.indentSwitchCase": true,
-
-    // Defines space handling after a comma delimiter.
-    "typescript.format.insertSpaceAfterCommaDelimiter": true,
-
-    // Defines space handling after the constructor keyword.
-    "typescript.format.insertSpaceAfterConstructor": false,
-
-    // Defines space handling after function keyword for anonymous functions.
-    "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
-
-    // Defines space handling after keywords in a control flow statement.
-    "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": true,
-
-    // Defines space handling after opening and before closing empty braces.
-    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": true,
-
-    // Defines space handling after opening and before closing JSX expression braces.
-    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": false,
-
-    // Defines space handling after opening and before closing non-empty braces.
-    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
-
-    // Defines space handling after opening and before closing non-empty brackets.
-    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
-
-    // Defines space handling after opening and before closing non-empty parenthesis.
-    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
-
-    // Defines space handling after opening and before closing template string braces.
-    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": false,
-
-    // Defines space handling after a semicolon in a for statement.
-    "typescript.format.insertSpaceAfterSemicolonInForStatements": true,
-
-    // Defines space handling after type assertions in TypeScript.
-    "typescript.format.insertSpaceAfterTypeAssertion": false,
-
-    // Defines space handling after a binary operator.
-    "typescript.format.insertSpaceBeforeAndAfterBinaryOperators": true,
-
-    // Defines space handling before function argument parentheses.
-    "typescript.format.insertSpaceBeforeFunctionParenthesis": false,
-
-    // Defines whether an open brace is put onto a new line for control blocks or not.
-    "typescript.format.placeOpenBraceOnNewLineForControlBlocks": false,
-
-    // Defines whether an open brace is put onto a new line for functions or not.
-    "typescript.format.placeOpenBraceOnNewLineForFunctions": false,
-
-    // Defines handling of optional semicolons.
-    //  - ignore: Don't insert or remove any semicolons.
-    //  - insert: Insert semicolons at statement ends.
-    //  - remove: Remove unnecessary semicolons.
-    "typescript.format.semicolons": "ignore",
-
-    // Enable/disable implementations CodeLens. This CodeLens shows the implementers of an interface.
-    "typescript.implementationsCodeLens.enabled": false,
-
-    // Enable/disable showing implementations CodeLens above all class methods instead of only on abstract methods.
-    "typescript.implementationsCodeLens.showOnAllClassMethods": false,
-
-    // Enable/disable implementations CodeLens on interface methods.
-    "typescript.implementationsCodeLens.showOnInterfaceMethods": false,
-
-    // Enable/disable inlay hints for member values in enum declarations:
-    // ```typescript
-    //
-    // enum MyValue {
-    // 	A /* = 0 */;
-    // 	B /* = 1 */;
-    // }
-    //
-    // ```
-    "typescript.inlayHints.enumMemberValues.enabled": false,
-
-    // Enable/disable inlay hints for implicit return types on function signatures:
-    // ```typescript
-    //
-    // function foo() /* :number */ {
-    // 	return Date.now();
-    // }
-    //
-    // ```
-    "typescript.inlayHints.functionLikeReturnTypes.enabled": false,
-
-    // Enable/disable inlay hints for parameter names:
-    // ```typescript
-    //
-    // parseInt(/* str: */ '123', /* radix: */ 8)
-    //
-    // ```
-    //  - none: Disable parameter name hints.
-    //  - literals: Enable parameter name hints only for literal arguments.
-    //  - all: Enable parameter name hints for literal and non-literal arguments.
-    "typescript.inlayHints.parameterNames.enabled": "none",
-
-    // Suppress parameter name hints on arguments whose text is identical to the parameter name.
-    "typescript.inlayHints.parameterNames.suppressWhenArgumentMatchesName": true,
-
-    // Enable/disable inlay hints for implicit parameter types:
-    // ```typescript
-    //
-    // el.addEventListener('click', e /* :MouseEvent */ => ...)
-    //
-    // ```
-    "typescript.inlayHints.parameterTypes.enabled": false,
-
-    // Enable/disable inlay hints for implicit types on property declarations:
-    // ```typescript
-    //
-    // class Foo {
-    // 	prop /* :number */ = Date.now();
-    // }
-    //
-    // ```
-    "typescript.inlayHints.propertyDeclarationTypes.enabled": false,
-
-    // Enable/disable inlay hints for implicit variable types:
-    // ```typescript
-    //
-    // const foo /* :number */ = Date.now();
-    //
-    // ```
-    "typescript.inlayHints.variableTypes.enabled": false,
-
-    // Suppress type hints on variables whose name is identical to the type name.
-    "typescript.inlayHints.variableTypes.suppressWhenTypeMatchesName": true,
-
-    // Sets the locale used to report JavaScript and TypeScript errors. Defaults to use VS Code's locale.
-    //  - auto: Use VS Code's configured display language.
-    //  - de: Deutsch
-    //  - es: español
-    //  - en: English
-    //  - fr: français
-    //  - it: italiano
-    //  - ja: 日本語
-    //  - ko: 한국어
-    //  - ru: русский
-    //  - zh-CN: 中文(简体)
-    //  - zh-TW: 中文(繁體)
-    "typescript.locale": "auto",
-
-    // Specifies the path to the npm executable used for [Automatic Type Acquisition](https://code.visualstudio.com/docs/nodejs/working-with-javascript#_typings-and-automatic-type-acquisition).
-    "typescript.npm": "",
 
     // Specify glob patterns of files to exclude from auto imports. Relative paths are resolved relative to the workspace root. Patterns are evaluated using tsconfig.json [`exclude`](https://www.typescriptlang.org/tsconfig#exclude) semantics.
     "typescript.preferences.autoImportFileExcludePatterns": [],
@@ -4672,17 +4400,36 @@
     // Enable/disable introducing aliases for object shorthand properties during renames.
     "typescript.preferences.useAliasesForRenames": true,
 
-    // Makes `Go to Definition` avoid type declaration files when possible by triggering `Go to Source Definition` instead. This allows `Go to Source Definition` to be triggered with the mouse gesture.
-    "typescript.preferGoToSourceDefinition": false,
+    // Suggestions
+    // Enable/disable auto import suggestions.
+    "javascript.suggest.autoImports": true,
 
-    // Enable/disable references CodeLens in TypeScript files.
-    "typescript.referencesCodeLens.enabled": false,
+    // Enable/disable snippet completions for class members.
+    "javascript.suggest.classMemberSnippets.enabled": true,
 
-    // Enable/disable references CodeLens on all functions in TypeScript files.
-    "typescript.referencesCodeLens.showOnAllFunctions": false,
+    // Complete functions with their parameter signature.
+    "javascript.suggest.completeFunctionCalls": false,
 
-    // Report style checks as warnings.
-    "typescript.reportStyleChecksAsWarnings": true,
+    // Enable/disable suggestion to complete JSDoc comments.
+    "javascript.suggest.completeJSDocs": true,
+
+    // Enable/disable autocomplete suggestions.
+    "javascript.suggest.enabled": true,
+
+    // Enable/disable showing completions on potentially undefined values that insert an optional chain call. Requires strict null checks to be enabled.
+    "javascript.suggest.includeAutomaticOptionalChainCompletions": true,
+
+    // Enable/disable auto-import-style completions on partially-typed import statements.
+    "javascript.suggest.includeCompletionsForImportStatements": true,
+
+    // Enable/disable generating `@returns` annotations for JSDoc templates.
+    "javascript.suggest.jsdoc.generateReturns": true,
+
+    // Enable/disable including unique names from the file in JavaScript suggestions. Note that name suggestions are always disabled in JavaScript code that is semantically checked using `@ts-check` or `checkJs`.
+    "javascript.suggest.names": true,
+
+    // Enable/disable suggestions for paths in import statements and require calls.
+    "javascript.suggest.paths": true,
 
     // Enable/disable auto import suggestions.
     "typescript.suggest.autoImports": true,
@@ -4713,83 +4460,6 @@
 
     // Enable/disable suggestions for paths in import statements and require calls.
     "typescript.suggest.paths": true,
-
-    // Enable/disable suggestion diagnostics for TypeScript files in the editor.
-    "typescript.suggestionActions.enabled": true,
-
-    // Controls auto detection of tsc tasks.
-    //  - on: Create both build and watch tasks.
-    //  - off: Disable this feature.
-    //  - build: Only create single run compile tasks.
-    //  - watch: Only create compile and watch tasks.
-    "typescript.tsc.autoDetect": "on",
-
-    // Specifies the folder path to the tsserver and `lib*.d.ts` files under a TypeScript install to use for IntelliSense, for example: `./node_modules/typescript/lib`.
-    //
-    // - When specified as a user setting, the TypeScript version from `typescript.tsdk` automatically replaces the built-in TypeScript version.
-    // - When specified as a workspace setting, `typescript.tsdk` allows you to switch to use that workspace version of TypeScript for IntelliSense with the `TypeScript: Select TypeScript version` command.
-    //
-    // See the [TypeScript documentation](https://code.visualstudio.com/docs/typescript/typescript-compiling#_using-newer-typescript-versions) for more detail about managing TypeScript versions.
-    "typescript.tsdk": "",
-
-    // Enables region-based diagnostics in TypeScript. Requires using TypeScript 5.6+ in the workspace.
-    "typescript.tsserver.enableRegionDiagnostics": true,
-
-    // Enables tracing TS server performance to a directory. These trace files can be used to diagnose TS Server performance issues. The log may contain file paths, source code, and other potentially sensitive information from your project.
-    "typescript.tsserver.enableTracing": false,
-
-    // Enables project wide error reporting.
-    "typescript.tsserver.experimental.enableProjectDiagnostics": false,
-
-    // Enables logging of the TS server to a file. This log can be used to diagnose TS Server issues. The log may contain file paths, source code, and other potentially sensitive information from your project.
-    "typescript.tsserver.log": "off",
-
-    // The maximum amount of memory (in MB) to allocate to the TypeScript server process. To use a memory limit greater than 4 GB, use `typescript.tsserver.nodePath` to run TS Server with a custom Node installation.
-    "typescript.tsserver.maxTsServerMemory": 3072,
-
-    // Run TS Server on a custom Node installation. This can be a path to a Node executable, or 'node' if you want VS Code to detect a Node installation.
-    "typescript.tsserver.nodePath": "",
-
-    // Additional paths to discover TypeScript Language Service plugins.
-    "typescript.tsserver.pluginPaths": [],
-
-    // Controls if TypeScript launches a dedicated server to more quickly handle syntax related operations, such as computing code folding.
-    //  - always: Use a lighter weight syntax server to handle all IntelliSense operations. This syntax server can only provide IntelliSense for opened files.
-    //  - never: Don't use a dedicated syntax server. Use a single server to handle all IntelliSense operations.
-    //  - auto: Spawn both a full server and a lighter weight server dedicated to syntax operations. The syntax server is used to speed up syntax operations and provide IntelliSense while projects are loading.
-    "typescript.tsserver.useSyntaxServer": "auto",
-
-    // Configure which watching strategies should be used to keep track of files and directories.
-    "typescript.tsserver.watchOptions": "vscode",
-
-    // Enable/disable project-wide IntelliSense on web. Requires that VS Code is running in a trusted context.
-    "typescript.tsserver.web.projectWideIntellisense.enabled": true,
-
-    // Suppresses semantic errors on web even when project wide IntelliSense is enabled. This is always on when project wide IntelliSense is not enabled or available. See `typescript.tsserver.web.projectWideIntellisense.enabled`
-    "typescript.tsserver.web.projectWideIntellisense.suppressSemanticErrors": false,
-
-    // Enable/disable package acquisition on the web. This enables IntelliSense for imported packages. Requires `typescript.tsserver.web.projectWideIntellisense.enabled`. Currently not supported for Safari.
-    "typescript.tsserver.web.typeAcquisition.enabled": true,
-
-    // Enable/disable automatic updating of import paths when you rename or move a file in VS Code.
-    //  - prompt: Prompt on each rename.
-    //  - always: Always update paths automatically.
-    //  - never: Never rename paths and don't prompt.
-    "typescript.updateImportsOnFileMove.enabled": "prompt",
-
-    // Automatically update imports when pasting code. Requires TypeScript 5.6+.
-    "typescript.updateImportsOnPaste.enabled": true,
-
-    // Enable/disable TypeScript validation.
-    "typescript.validate.enable": true,
-
-    // Exclude symbols that come from library files in `Go to Symbol in Workspace` results. Requires using TypeScript 5.3+ in the workspace.
-    "typescript.workspaceSymbols.excludeLibrarySymbols": true,
-
-    // Controls which files are searched by [Go to Symbol in Workspace](https://code.visualstudio.com/docs/editor/editingevolved#_open-symbol-by-name).
-    //  - allOpenProjects: Search all open JavaScript or TypeScript projects for symbols.
-    //  - currentProject: Only search for symbols in the current JavaScript or TypeScript project.
-    "typescript.workspaceSymbols.scope": "allOpenProjects",
 
     // Testing
     // Always reveal the executed test when `testing.followRunningTest` is on. If this setting is turned off, only failed tests will be revealed.
@@ -4968,6 +4638,124 @@
     // Enables or disables all validations.
     "css.validate": true,
 
+    // Formatting
+    // Enable/disable default JavaScript formatter.
+    "javascript.format.enable": true,
+
+    // Indent case clauses in switch statements. Requires using TypeScript 5.1+ in the workspace.
+    "javascript.format.indentSwitchCase": true,
+
+    // Defines space handling after a comma delimiter.
+    "javascript.format.insertSpaceAfterCommaDelimiter": true,
+
+    // Defines space handling after the constructor keyword.
+    "javascript.format.insertSpaceAfterConstructor": false,
+
+    // Defines space handling after function keyword for anonymous functions.
+    "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
+
+    // Defines space handling after keywords in a control flow statement.
+    "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": true,
+
+    // Defines space handling after opening and before closing empty braces.
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": true,
+
+    // Defines space handling after opening and before closing JSX expression braces.
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": false,
+
+    // Defines space handling after opening and before closing non-empty braces.
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+
+    // Defines space handling after opening and before closing non-empty brackets.
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
+
+    // Defines space handling after opening and before closing non-empty parenthesis.
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+
+    // Defines space handling after opening and before closing template string braces.
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": false,
+
+    // Defines space handling after a semicolon in a for statement.
+    "javascript.format.insertSpaceAfterSemicolonInForStatements": true,
+
+    // Defines space handling after a binary operator.
+    "javascript.format.insertSpaceBeforeAndAfterBinaryOperators": true,
+
+    // Defines space handling before function argument parentheses.
+    "javascript.format.insertSpaceBeforeFunctionParenthesis": false,
+
+    // Defines whether an open brace is put onto a new line for control blocks or not.
+    "javascript.format.placeOpenBraceOnNewLineForControlBlocks": false,
+
+    // Defines whether an open brace is put onto a new line for functions or not.
+    "javascript.format.placeOpenBraceOnNewLineForFunctions": false,
+
+    // Defines handling of optional semicolons.
+    //  - ignore: Don't insert or remove any semicolons.
+    //  - insert: Insert semicolons at statement ends.
+    //  - remove: Remove unnecessary semicolons.
+    "javascript.format.semicolons": "ignore",
+
+    // Enable/disable default TypeScript formatter.
+    "typescript.format.enable": true,
+
+    // Indent case clauses in switch statements. Requires using TypeScript 5.1+ in the workspace.
+    "typescript.format.indentSwitchCase": true,
+
+    // Defines space handling after a comma delimiter.
+    "typescript.format.insertSpaceAfterCommaDelimiter": true,
+
+    // Defines space handling after the constructor keyword.
+    "typescript.format.insertSpaceAfterConstructor": false,
+
+    // Defines space handling after function keyword for anonymous functions.
+    "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
+
+    // Defines space handling after keywords in a control flow statement.
+    "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": true,
+
+    // Defines space handling after opening and before closing empty braces.
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": true,
+
+    // Defines space handling after opening and before closing JSX expression braces.
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": false,
+
+    // Defines space handling after opening and before closing non-empty braces.
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+
+    // Defines space handling after opening and before closing non-empty brackets.
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
+
+    // Defines space handling after opening and before closing non-empty parenthesis.
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": false,
+
+    // Defines space handling after opening and before closing template string braces.
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": false,
+
+    // Defines space handling after a semicolon in a for statement.
+    "typescript.format.insertSpaceAfterSemicolonInForStatements": true,
+
+    // Defines space handling after type assertions in TypeScript.
+    "typescript.format.insertSpaceAfterTypeAssertion": false,
+
+    // Defines space handling after a binary operator.
+    "typescript.format.insertSpaceBeforeAndAfterBinaryOperators": true,
+
+    // Defines space handling before function argument parentheses.
+    "typescript.format.insertSpaceBeforeFunctionParenthesis": false,
+
+    // Defines whether an open brace is put onto a new line for control blocks or not.
+    "typescript.format.placeOpenBraceOnNewLineForControlBlocks": false,
+
+    // Defines whether an open brace is put onto a new line for functions or not.
+    "typescript.format.placeOpenBraceOnNewLineForFunctions": false,
+
+    // Defines handling of optional semicolons.
+    //  - ignore: Don't insert or remove any semicolons.
+    //  - insert: Insert semicolons at statement ends.
+    //  - remove: Remove unnecessary semicolons.
+    "typescript.format.semicolons": "ignore",
+
     // LESS
     // Insert semicolon at end of line when completing CSS properties.
     "less.completion.completePropertyWithSemicolon": true,
@@ -5065,6 +4853,124 @@
     // Enables or disables all validations.
     "less.validate": true,
 
+    // Inlay Hints
+    // Enable/disable inlay hints for implicit return types on function signatures:
+    // ```typescript
+    //
+    // function foo() /* :number */ {
+    // 	return Date.now();
+    // }
+    //
+    // ```
+    "javascript.inlayHints.functionLikeReturnTypes.enabled": false,
+
+    // Enable/disable inlay hints for parameter names:
+    // ```typescript
+    //
+    // parseInt(/* str: */ '123', /* radix: */ 8)
+    //
+    // ```
+    //  - none: Disable parameter name hints.
+    //  - literals: Enable parameter name hints only for literal arguments.
+    //  - all: Enable parameter name hints for literal and non-literal arguments.
+    "javascript.inlayHints.parameterNames.enabled": "none",
+
+    // Suppress parameter name hints on arguments whose text is identical to the parameter name.
+    "javascript.inlayHints.parameterNames.suppressWhenArgumentMatchesName": true,
+
+    // Enable/disable inlay hints for implicit parameter types:
+    // ```typescript
+    //
+    // el.addEventListener('click', e /* :MouseEvent */ => ...)
+    //
+    // ```
+    "javascript.inlayHints.parameterTypes.enabled": false,
+
+    // Enable/disable inlay hints for implicit types on property declarations:
+    // ```typescript
+    //
+    // class Foo {
+    // 	prop /* :number */ = Date.now();
+    // }
+    //
+    // ```
+    "javascript.inlayHints.propertyDeclarationTypes.enabled": false,
+
+    // Enable/disable inlay hints for implicit variable types:
+    // ```typescript
+    //
+    // const foo /* :number */ = Date.now();
+    //
+    // ```
+    "javascript.inlayHints.variableTypes.enabled": false,
+
+    // Suppress type hints on variables whose name is identical to the type name.
+    "javascript.inlayHints.variableTypes.suppressWhenTypeMatchesName": true,
+
+    // Enable/disable inlay hints for member values in enum declarations:
+    // ```typescript
+    //
+    // enum MyValue {
+    // 	A /* = 0 */;
+    // 	B /* = 1 */;
+    // }
+    //
+    // ```
+    "typescript.inlayHints.enumMemberValues.enabled": false,
+
+    // Enable/disable inlay hints for implicit return types on function signatures:
+    // ```typescript
+    //
+    // function foo() /* :number */ {
+    // 	return Date.now();
+    // }
+    //
+    // ```
+    "typescript.inlayHints.functionLikeReturnTypes.enabled": false,
+
+    // Enable/disable inlay hints for parameter names:
+    // ```typescript
+    //
+    // parseInt(/* str: */ '123', /* radix: */ 8)
+    //
+    // ```
+    //  - none: Disable parameter name hints.
+    //  - literals: Enable parameter name hints only for literal arguments.
+    //  - all: Enable parameter name hints for literal and non-literal arguments.
+    "typescript.inlayHints.parameterNames.enabled": "none",
+
+    // Suppress parameter name hints on arguments whose text is identical to the parameter name.
+    "typescript.inlayHints.parameterNames.suppressWhenArgumentMatchesName": true,
+
+    // Enable/disable inlay hints for implicit parameter types:
+    // ```typescript
+    //
+    // el.addEventListener('click', e /* :MouseEvent */ => ...)
+    //
+    // ```
+    "typescript.inlayHints.parameterTypes.enabled": false,
+
+    // Enable/disable inlay hints for implicit types on property declarations:
+    // ```typescript
+    //
+    // class Foo {
+    // 	prop /* :number */ = Date.now();
+    // }
+    //
+    // ```
+    "typescript.inlayHints.propertyDeclarationTypes.enabled": false,
+
+    // Enable/disable inlay hints for implicit variable types:
+    // ```typescript
+    //
+    // const foo /* :number */ = Date.now();
+    //
+    // ```
+    "typescript.inlayHints.variableTypes.enabled": false,
+
+    // Suppress type hints on variables whose name is identical to the type name.
+    "typescript.inlayHints.variableTypes.suppressWhenTypeMatchesName": true,
+
     // SCSS (Sass)
     // Insert semicolon at end of line when completing CSS properties.
     "scss.completion.completePropertyWithSemicolon": true,
@@ -5161,6 +5067,49 @@
 
     // Enables or disables all validations.
     "scss.validate": true,
+
+    // TS Server
+    // Check if npm is installed for [Automatic Type Acquisition](https://code.visualstudio.com/docs/nodejs/working-with-javascript#_typings-and-automatic-type-acquisition).
+    "typescript.check.npmIsInstalled": true,
+
+    // Specifies the path to the npm executable used for [Automatic Type Acquisition](https://code.visualstudio.com/docs/nodejs/working-with-javascript#_typings-and-automatic-type-acquisition).
+    "typescript.npm": "",
+
+    // Enables tracing TS server performance to a directory. These trace files can be used to diagnose TS Server performance issues. The log may contain file paths, source code, and other potentially sensitive information from your project.
+    "typescript.tsserver.enableTracing": false,
+
+    // Enables project wide error reporting.
+    "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+
+    // Enables logging of the TS server to a file. This log can be used to diagnose TS Server issues. The log may contain file paths, source code, and other potentially sensitive information from your project.
+    "typescript.tsserver.log": "off",
+
+    // The maximum amount of memory (in MB) to allocate to the TypeScript server process. To use a memory limit greater than 4 GB, use `typescript.tsserver.nodePath` to run TS Server with a custom Node installation.
+    "typescript.tsserver.maxTsServerMemory": 3072,
+
+    // Run TS Server on a custom Node installation. This can be a path to a Node executable, or 'node' if you want VS Code to detect a Node installation.
+    "typescript.tsserver.nodePath": "",
+
+    // Additional paths to discover TypeScript Language Service plugins.
+    "typescript.tsserver.pluginPaths": [],
+
+    // Controls if TypeScript launches a dedicated server to more quickly handle syntax related operations, such as computing code folding.
+    //  - always: Use a lighter weight syntax server to handle all IntelliSense operations. This syntax server can only provide IntelliSense for opened files.
+    //  - never: Don't use a dedicated syntax server. Use a single server to handle all IntelliSense operations.
+    //  - auto: Spawn both a full server and a lighter weight server dedicated to syntax operations. The syntax server is used to speed up syntax operations and provide IntelliSense while projects are loading.
+    "typescript.tsserver.useSyntaxServer": "auto",
+
+    // Configure which watching strategies should be used to keep track of files and directories.
+    "typescript.tsserver.watchOptions": "vscode",
+
+    // Enable/disable project-wide IntelliSense on web. Requires that VS Code is running in a trusted context.
+    "typescript.tsserver.web.projectWideIntellisense.enabled": true,
+
+    // Suppresses semantic errors on web even when project wide IntelliSense is enabled. This is always on when project wide IntelliSense is not enabled or available. See `typescript.tsserver.web.projectWideIntellisense.enabled`
+    "typescript.tsserver.web.projectWideIntellisense.suppressSemanticErrors": false,
+
+    // Enable/disable package acquisition on the web. This enables IntelliSense for imported packages. Requires `typescript.tsserver.web.projectWideIntellisense.enabled`. Currently not supported for Safari.
+    "typescript.tsserver.web.typeAcquisition.enabled": true,
 
     // Extensions
     // Specify a list of extensions that are allowed to use. This helps maintain a secure and consistent development environment by restricting the use of unauthorized extensions. For more information on how to configure this setting, please visit the [Configure Allowed Extensions](https://code.visualstudio.com/docs/setup/enterprise#_configure-allowed-extensions) section.
@@ -5387,7 +5336,7 @@
     "gitlens.graph.scrollRowPadding": 0,
 
     // Specifies the number of results to gather when searching in the _Commit Graph_. Use 0 to specify no limit
-    "gitlens.graph.searchItemLimit": 100,
+    "gitlens.graph.searchItemLimit": 0,
 
     // Specifies when to show the _Commit Details_ view for the selected row in the _Commit Graph_
     //  - false: Never shows the _Commit Details_ view automatically
@@ -5409,6 +5358,9 @@
 
     // Specifies whether to show the _Commit Graph_ in the status bar
     "gitlens.graph.statusBar.enabled": true,
+
+    // Specifies whether to show a sticky timeline header that remains visible at the top while scrolling in the _Commit Graph_
+    "gitlens.graph.stickyTimeline": true,
 
     // Findings
     // By default, when a source file is closed the findings remain in the 'Problems' window.  Setting this value to true will cause findings to be removed from 'Problems' when the document is closed.  Note, setting this to true will cause findings that are listed when invoking the 'Scan all files in workspace' command to automatically clear away after a couple of minutes.
@@ -5463,21 +5415,24 @@
     "java.compile.nullAnalysis.nonnull": [
         "javax.annotation.Nonnull",
         "org.eclipse.jdt.annotation.NonNull",
-        "org.springframework.lang.NonNull"
+        "org.springframework.lang.NonNull",
+        "org.jspecify.annotations.NonNull"
     ],
 
     // Specify the NonNullByDefault annotation types to be used for null analysis. If more than one annotation is specified, then the topmost annotation will be used first if it exists in project dependencies. This setting will be ignored if `java.compile.nullAnalysis.mode` is set to `disabled`
     "java.compile.nullAnalysis.nonnullbydefault": [
         "javax.annotation.ParametersAreNonnullByDefault",
         "org.eclipse.jdt.annotation.NonNullByDefault",
-        "org.springframework.lang.NonNullApi"
+        "org.springframework.lang.NonNullApi",
+        "org.jspecify.annotations.NullMarked"
     ],
 
     // Specify the Nullable annotation types to be used for null analysis. If more than one annotation is specified, then the topmost annotation will be used first if it exists in project dependencies. This setting will be ignored if `java.compile.nullAnalysis.mode` is set to `disabled`
     "java.compile.nullAnalysis.nullable": [
         "javax.annotation.Nullable",
         "org.eclipse.jdt.annotation.Nullable",
-        "org.springframework.lang.Nullable"
+        "org.springframework.lang.Nullable",
+        "org.jspecify.annotations.Nullable"
     ],
 
     // Specifies the severity of the message when the classpath is incomplete for a Java file
@@ -5728,6 +5683,22 @@
     // Specifies the type comment for new Java type. Supports configuring multi-line comments with an array of strings, and using ${variable} to reference the [predefined variables](command:_java.templateVariables).
     "java.templates.typeComment": [],
 
+    // Edit Telemetry
+    // Controls whether to enable AI statistics in the editor. The gauge represents the average amount of code inserted by AI vs manual typing over a 24 hour period.
+    "editor.aiStats.enabled": false,
+
+    // Controls whether to enable telemetry for detailed edit statistics (only sends statistics if general telemetry is enabled).
+    "telemetry.editStats.details.enabled": false,
+
+    // Controls whether to enable telemetry for edit statistics (only sends statistics if general telemetry is enabled).
+    "telemetry.editStats.enabled": true,
+
+    // Controls whether to show decorations for edit telemetry.
+    "telemetry.editStats.showDecorations": false,
+
+    // Controls whether to show the status bar for edit telemetry.
+    "telemetry.editStats.showStatusBar": false,
+
     // External Terminal
     // When opening a file from the Explorer in a terminal, determines what kind of terminal will be launched
     //  - integrated: Show the integrated terminal action.
@@ -5808,6 +5779,7 @@
         "du": true,
         "df": true,
         "sleep": true,
+        "nl": true,
         "grep": true,
         "git status": true,
         "git log": true,
@@ -5889,7 +5861,7 @@
     // Controls whether to allow auto approval in the run in terminal tool.
     "chat.tools.terminal.enableAutoApprove": true,
 
-    // Whether to ignore the built-in default auto-approve rules used by the run in terminal tool as defined in `chat.tools.terminal.autoApprove`. Setting to false will disable any rule that comes from the default set, enabling only rules from user, remote and workspace settings. Use this at your own risk, the default denial rules are designed to protect you against running dangerous commands.
+    // Whether to ignore the built-in default auto-approve rules used by the run in terminal tool as defined in `chat.tools.terminal.autoApprove`. When this setting is enabled, the run in terminal tool will ignore any rule that comes from the default set but still follow rules defined in the user, remote and workspace settings. Use this setting at your own risk; the default auto-approve rules are designed to protect you against running dangerous commands.
     "chat.tools.terminal.ignoreDefaultAutoApproveRules": false,
 
     // Where to show the output from the run in terminal tool session.
@@ -6195,7 +6167,7 @@
     // - path: C:\Program Files\PowerShell\7\pwsh.exe
     //  - Windows PowerShell: $(terminal-powershell) Windows PowerShell
     // - path: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe
-    //  - Git Bash: $(terminal) Git Bash
+    //  - Git Bash: $(terminal-git-bash) Git Bash
     // - path: C:\Program Files\Git\bin\bash.exe
     // - args: ['--login','-i']
     //  - Command Prompt: $(terminal-cmd) Command Prompt
@@ -6554,10 +6526,13 @@
                 "${env:windir}\\System32\\cmd.exe"
             ],
             "args": [],
-            "icon": "terminal-cmd"
+            "icon": {
+                "id": "terminal-cmd"
+            }
         },
         "Git Bash": {
-            "source": "Git Bash"
+            "source": "Git Bash",
+            "icon": "terminal-git-bash"
         }
     },
 
@@ -7338,6 +7313,15 @@
     //  - git-branch-delete: $(git-branch-delete)
     //  - search-large: $(search-large)
     //  - terminal-git-bash: $(terminal-git-bash)
+    //  - window-active: $(window-active)
+    //  - forward: $(forward)
+    //  - download: $(download)
+    //  - clockface: $(clockface)
+    //  - unarchive: $(unarchive)
+    //  - session-in-progress: $(session-in-progress)
+    //  - collection-small: $(collection-small)
+    //  - vm-small: $(vm-small)
+    //  - cloud-small: $(cloud-small)
     //  - dialog-error: $(dialog-error)
     //  - dialog-warning: $(dialog-warning)
     //  - dialog-info: $(dialog-info)
@@ -7501,12 +7485,15 @@
 
     // Defines a default notebook formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
+    //  - vscode.json-language-features: Provides rich language support for JSON files.
+    //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
+    //  - esbenp.prettier-vscode: Code formatter using prettier
+    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
     //  - ms-python.black-formatter: Formatting support for Python files using the Black formatter.
     //  - ms-vscode.cmake-tools: Extended CMake support in Visual Studio Code
-    //  - GitHub.copilot: Your AI pair programmer
     //  - GitHub.copilot-chat: AI chat features powered by Copilot
     //  - ms-vscode.cpptools: C/C++ IntelliSense, debugging, and code browsing.
     //  - ms-vscode.cpptools-extension-pack: Popular extensions for C++ development in Visual Studio Code.
@@ -7521,25 +7508,22 @@
     //  - ms-python.isort: Import organization support for Python files using isort.
     //  - redhat.java: Java Linting, Intellisense, formatting, refactoring, Maven/Gradle support and more...
     //  - samuelcolvin.jinjahtml: Syntax highlighting for jinja(2) including HTML, Markdown, YAML, Ruby and LaTeX templates
-    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - sumneko.lua: Lua Language Server coded by Lua
     //  - ms-vscode.makefile-tools: Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.
-    //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
     //  - vscode.markdown-language-features: Provides rich language support for Markdown.
     //  - vscode.markdown-math: Adds math support to Markdown in notebooks.
     //  - josee9988.minifyall: Minifier for JSON, CSS, HTML, XML, TWIG, LESS, SASS, SCSS, JavaScript, JSONC, and JavaScriptReact(testing). Compressor of files and folders. You will love its simplicity!
     //  - ms-python.mypy-type-checker: Type checking support for Python files using Mypy.
     //  - vscode.php-language-features: Provides rich language support for PHP files.
     //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
-    //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - ms-python.pylint: Linting support for Python files using Pylint.
     //  - ms-python.python: Python language support with extension access points for IntelliSense (Pylance), Debugging (Python Debugger), linting, formatting, refactoring, unit tests, and more.
     //  - mechatroner.rainbow-csv: Highlight CSV and TSV files, Run SQL-like queries
+    //  - willasm.rc-script: RC Script Language Syntax Highlighting
     //  - ionutvmi.reg: Windows Registry Script (.reg) Language package for VSCode
     //  - ms-vscode-remote.remote-ssh-edit: Edit SSH configuration files
     //  - dnut.rewrap-revived: Hard word wrapping for comments and other text at a given column.
-    //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter.
-    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
+    //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
     //  - timonwong.shellcheck: Integrates ShellCheck into VS Code, a linter for Shell scripts.
     //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
     //  - XadillaX.viml: Vim Script language server protocol and highlighting support for VSCode.
@@ -7559,7 +7543,6 @@
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
     //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
-    //  - ms-dotnettools.vscodeintellicode-csharp: AI-assisted development for C# Dev Kit
     //  - amazonwebservices.aws-toolkit-vscode: Including CodeCatalyst, Infrastructure Composer, and support for Lambda, S3, CloudWatch Logs, CloudFormation, and many other services.
     //  - ms-vscode.azure-repos: Remotely browse and edit any Azure Repos
     //  - vscode.configuration-editing: Provides capabilities (advanced IntelliSense, auto-fixing) in configuration files like settings, launch, and extension recommendation files.
@@ -7745,9 +7728,9 @@
     "notebook.scrolling.revealNextCellOnExecute": "fullCell",
 
     // Whether the cell status bar should be shown.
-    //  - hidden: The cell Status bar is always hidden.
-    //  - visible: The cell Status bar is always visible.
-    //  - visibleAfterExecute: The cell Status bar is hidden until the cell has executed. Then it becomes visible to show the execution status.
+    //  - hidden: The cell status bar is always hidden.
+    //  - visible: The cell status bar is always visible.
+    //  - visibleAfterExecute: The cell status bar is hidden until the cell has executed. Then it becomes visible to show the execution status.
     "notebook.showCellStatusBar": "visible",
 
     // Controls when the Markdown header folding arrow is shown.
@@ -7771,9 +7754,6 @@
     "notebook.variablesView": false,
 
     // Tasks
-    // Controls whether to enable AI statistics in the editor. The gauge represents the average amount of code inserted by AI vs manual typing over a 24 hour period.
-    "editor.aiStats.enabled": false,
-
     // Enable automatic tasks - note that tasks won't run in an untrusted workspace.
     //  - on: Always
     //  - off: Never
@@ -7815,22 +7795,10 @@
     // Enable verbose logging for tasks.
     "task.verboseLogging": false,
 
-    // Controls whether to enable telemetry for detailed edit statistics (only sends statistics if general telemetry is enabled).
-    "telemetry.editStats.details.enabled": false,
-
-    // Controls whether to enable telemetry for edit statistics (only sends statistics if general telemetry is enabled).
-    "telemetry.editStats.enabled": true,
-
-    // Controls whether to show decorations for edit telemetry.
-    "telemetry.editStats.showDecorations": false,
-
-    // Controls whether to show the status bar for edit telemetry.
-    "telemetry.editStats.showStatusBar": false,
-
     // Terminal Suggest Providers
-    // Controls which suggestions automatically show up while typing. Suggestion providers are disabled by default.
+    // Controls which suggestions automatically show up while typing. Suggestion providers are enabled by default.
     "terminal.integrated.suggest.providers": {
-        "lsp": false
+        "lsp": true
     },
 
     // Views
@@ -7863,10 +7831,10 @@
     "gitlens.views.formats.commits.label": "${❰ tips|11? ❱➤  }${message}",
 
     // Specifies the tooltip format (in markdown) of commits in the views. See [_Commit Tokens_](https://github.com/eamodio/vscode-gitlens/wiki/Custom-Formatting#commit-tokens) in the GitLens docs
-    "gitlens.views.formats.commits.tooltip": "${avatar} &nbsp;__${author}__ &nbsp;$(history) ${ago} _(${date})_ \\\n${link}${' via  'pullRequest}${'&nbsp;&nbsp;'changesDetail} ${message}${\n\n---\n\nfootnotes}\n\n${tips}",
+    "gitlens.views.formats.commits.tooltip": "${avatar} &nbsp;__${author}__ &nbsp;$(history) ${agoAndDateBothSources} \\\n${link}${' via  'pullRequest}${'&nbsp;&nbsp;'changesDetail} ${message}${\n\n---\n\nfootnotes}\n\n${tips}",
 
     // Specifies the tooltip format (in markdown) of "file" commits in the views. See [_Commit Tokens_](https://github.com/eamodio/vscode-gitlens/wiki/Custom-Formatting#commit-tokens) in the GitLens docs
-    "gitlens.views.formats.commits.tooltipWithStatus": "${avatar} &nbsp;__${author}__ &nbsp;$(history) ${ago} _(${date})_ \\\n${link}${' via  'pullRequest}&nbsp;&nbsp;•&nbsp;&nbsp;{{slot-status}} ${message}${\n\n---\n\nfootnotes}\n\n${tips}",
+    "gitlens.views.formats.commits.tooltipWithStatus": "${avatar} &nbsp;__${author}__ &nbsp;$(history) ${agoAndDateBothSources} \\\n${link}${' via  'pullRequest}&nbsp;&nbsp;•&nbsp;&nbsp;{{slot-status}} ${message}${\n\n---\n\nfootnotes}\n\n${tips}",
 
     // Specifies the description format of a file in the views. See [_File Tokens_](https://github.com/gitkraken/vscode-gitlens/wiki/Custom-Formatting#file-tokens) in the GitLens docs
     "gitlens.views.formats.files.description": "${directory}${  ←  originalPath}",
@@ -7881,7 +7849,7 @@
     "gitlens.views.formats.stashes.label": "${message}",
 
     // Specifies the tooltip format (in markdown) of stashes in the views. See [_Commit Tokens_](https://github.com/eamodio/vscode-gitlens/wiki/Custom-Formatting#commit-tokens) in the GitLens docs
-    "gitlens.views.formats.stashes.tooltip": "${link}${' on `'stashOnRef`}${'\\\n&nbsp;&nbsp;'changesDetail} \\\n &nbsp;$(history) ${ago} _(${date})_ ${message}${\n\n---\n\nfootnotes}",
+    "gitlens.views.formats.stashes.tooltip": "${link}${' on `'stashOnRef`}${'\\\n&nbsp;&nbsp;'changesDetail} \\\n &nbsp;$(history) ${agoAndDate} ${message}${\n\n---\n\nfootnotes}",
 
     // Specifies whether to allow selecting multiple items in the views
     "gitlens.views.multiselect": true,
@@ -7971,6 +7939,9 @@
     // Deprecated. Use `gitlens.views.formats.files.label` instead
     //
     "gitlens.views.statusFileFormat": null,
+
+    // Show Errors & Warnings on files and folder. Overwritten by `problems.visibility` when it is off.
+    "problems.decorations.enabled": true,
 
     // Breadcrumb Navigation
     // Enable/disable navigation breadcrumbs.
@@ -8099,9 +8070,6 @@
     // Problems
     // Controls whether Problems view should automatically reveal files when opening them.
     "problems.autoReveal": true,
-
-    // Show Errors & Warnings on files and folder. Overwritten by `problems.visibility` when it is off.
-    "problems.decorations.enabled": true,
 
     // Controls the default view mode of the Problems view.
     "problems.defaultViewMode": "tree",
@@ -8323,6 +8291,9 @@
     "outline.showVariables": true,
 
     // Code Navigation
+    // Enable/disable displaying Javadoc on hover.
+    "java.hover.javadoc.enabled": true,
+
     // Enable/disable the implementations code lens for the provided categories.
     //  - none: Disable the implementations code lens
     //  - types: Enable the implementations code lens only for types
@@ -9043,16 +9014,24 @@
     "gitlens.views.workspaces.worktrees.viewAs": "name",
 
     // Interactive Rebase Editor
+    // Specifies whether to automatically open the _Interactive Rebase Editor_ when a paused rebase is detected
+    "gitlens.rebaseEditor.openOnPausedRebase": true,
+
     // Specifies how Git commits are displayed in the _Interactive Rebase Editor_
     //  - asc: Shows oldest commit first
     //  - desc: Shows newest commit first
     "gitlens.rebaseEditor.ordering": "desc",
 
-    // Specifies when to show the _Commit Details_ view for the selected row in the _Interactive Rebase Editor_
-    //  - false: Never shows the _Commit Details_ view automatically
-    //  - open: Shows the _Commit Details_ view automatically only when opening the _Interactive Rebase Editor_
-    //  - selection: Shows the _Commit Details_ view automatically when selection changes in the _Interactive Rebase Editor_
-    "gitlens.rebaseEditor.showDetailsView": "selection",
+    // Specifies when to automatically reveal commits in the preferred location
+    //  - never: Never automatically reveals commits
+    //  - onOpen: Automatically reveals commits only when opening the editor
+    //  - onSelection: Automatically reveals commits when selection changes
+    "gitlens.rebaseEditor.revealBehavior": "onOpen",
+
+    // Specifies where to reveal commits and references
+    //  - graph: Reveals commits in the _Commit Graph_
+    //  - inspect: Reveals commits in the _Inspect_ view
+    "gitlens.rebaseEditor.revealLocation": "graph",
 
     // Git Command Palette
     // Specifies whether to show avatar images in quick pick menus when applicable
@@ -9400,9 +9379,6 @@
     // Specifies additional arguments to pass to the `git blame` command
     "gitlens.advanced.blame.customArguments": null,
 
-    // Specifies whether git output will be cached — changing the default is not recommended
-    "gitlens.advanced.caching.enabled": true,
-
     // Specifies whether to cache (per-workspace) the path to the Git executable to use for GitLens
     "gitlens.advanced.caching.gitPath": true,
 
@@ -9421,6 +9397,9 @@
 
     // Specifies an optional external diff tool to use when comparing directories. Must be a configured [Git difftool](https://git-scm.com/docs/git-config#Documentation/git-config.txt-difftool).
     "gitlens.advanced.externalDirectoryDiffTool": null,
+
+    // Specifies the timeout (in seconds) for Git commands. Use 0 to disable the timeout. Some long-running operations like merge, rebase, and revert always have the timeout disabled
+    "gitlens.advanced.gitTimeout": 60,
 
     // Specifies the maximum number of items to show in a list. Use 0 to specify no maximum
     "gitlens.advanced.maxListItems": 200,
@@ -9455,8 +9434,14 @@
     // Specifies how many folders deep to search for repositories. Defaults to `git.repositoryScanMaxDepth`
     "gitlens.advanced.repositorySearchDepth": null,
 
+    // Specifies whether to resolve symbolic links when determining file paths for Git operations
+    "gitlens.advanced.resolveSymlinks": false,
+
     // Specifies the amount (percent) of similarity a deleted and added file pair must have to be considered a rename
     "gitlens.advanced.similarityThreshold": null,
+
+    // Specifies whether to skip onboarding experiences, such as welcome views and walkthroughs. Useful for ephemeral environments like containers or sandboxes
+    "gitlens.advanced.skipOnboarding": false,
 
     // Specifies whether to ignore whitespace when comparing revisions during blame operations
     "gitlens.blame.ignoreWhitespace": false,
@@ -9522,9 +9507,10 @@
         "editor.wordWrap": "on",
         "editor.quickSuggestions": {
             "comments": "off",
-            "strings": "off",
-            "other": "off"
-        }
+            "strings": "on",
+            "other": "on"
+        },
+        "editor.wordBasedSuggestions": "off"
     },
 
     // Configure settings to be overridden for clojure.
@@ -9548,8 +9534,7 @@
 
     // Configure settings to be overridden for csharp.
     "[csharp]": {
-        "editor.maxTokenizationLineLength": 2500,
-        "editor.inlineSuggest.suppressSuggestions": false
+        "editor.maxTokenizationLineLength": 2500
     },
 
     // Configure settings to be overridden for css.
@@ -9642,9 +9627,10 @@
         "editor.wordWrap": "on",
         "editor.quickSuggestions": {
             "comments": "off",
-            "strings": "off",
-            "other": "off"
-        }
+            "strings": "on",
+            "other": "on"
+        },
+        "editor.wordBasedSuggestions": "off"
     },
 
     // Configure settings to be overridden for jade.
@@ -9740,9 +9726,10 @@
         "editor.wordWrap": "on",
         "editor.quickSuggestions": {
             "comments": "off",
-            "strings": "off",
-            "other": "off"
-        }
+            "strings": "on",
+            "other": "on"
+        },
+        "editor.wordBasedSuggestions": "off"
     },
 
     // Configure settings to be overridden for python.
@@ -9820,18 +9807,51 @@
         }
     },
 
+    // Enable/disable the ability to preview changes before renaming
+    "editor.rename.enablePreview": true,
+
+    // Overrides editor semantic token color and styles from the currently selected color theme.
+    "editor.semanticTokenColorCustomizations": {},
+
+    // Overrides editor syntax colors and font style from the currently selected color theme.
+    "editor.tokenColorCustomizations": {},
+
+    // Whether the inline chat also renders an accessible diff viewer for its changes.
+    //  - auto: The accessible diff viewer is based on screen reader mode being enabled.
+    //  - on: The accessible diff viewer is always enabled.
+    //  - off: The accessible diff viewer is never enabled.
+    "inlineChat.accessibleDiffView": "auto",
+
+    // Whether to use the next version of inline chat.
+    "inlineChat.enableV2": false,
+
+    // Whether to finish an inline chat session when typing outside of changed regions.
+    "inlineChat.finishOnType": false,
+
+    // Whether holding the inline chat keybinding will automatically enable speech recognition.
+    "inlineChat.holdToSpeech": true,
+
+    // Enable agent-like behavior for inline chat widget in notebooks.
+    "inlineChat.notebookAgent": false,
+
     // Chat
-    // Enable agent mode for chat. When this is enabled, agent mode can be activated via the dropdown in the view.
+    // When applying edits, show a progress animation in the code block pill. If disabled, shows the progress percentage instead.
+    "chat.agent.codeBlockProgress": true,
+
+    // When enabled, agent mode can be activated from chat and tools in agentic contexts with side effects can be used.
     "chat.agent.enabled": true,
 
     // The maximum number of requests to allow per-turn when using an agent. When the limit is reached, will ask to confirm to continue.
     "chat.agent.maxRequests": 25,
 
-    // When enabled, tool calls are added into the collapsible thinking section according to the selected mode.
-    //  - none: No tool calls are added into the collapsible thinking section.
-    //  - all: All tool calls are added into the collapsible thinking section.
-    //  - readOnly: Only read-only tool calls are added into the collapsible thinking section.
-    "chat.agent.thinking.collapsedTools": "readOnly",
+    // Controls how tool calls are displayed in relation to thinking sections.
+    //  - off: Tool calls are shown separately, not collapsed into thinking.
+    //  - withThinking: Tool calls are collapsed into thinking sections when thinking is present.
+    //  - always: Tool calls are always collapsed, even without thinking.
+    "chat.agent.thinking.collapsedTools": "always",
+
+    // Controls whether to use an LLM to generate summary titles for thinking sections.
+    "chat.agent.thinking.generateTitles": true,
 
     // Controls how thinking is rendered.
     //  - collapsed: Thinking parts will be collapsed by default.
@@ -9840,7 +9860,7 @@
     "chat.agent.thinkingStyle": "fixedScrolling",
 
     // Controls where to show the agent sessions menu.
-    "chat.agentSessionsViewLocation": "view",
+    "chat.agentSessionsViewLocation": "disabled",
 
     // Controls whether anonymous access is allowed in chat.
     "chat.allowAnonymousAccess": false,
@@ -9893,8 +9913,8 @@
     // Enable the new Edits mode that is based on tool-calling. When this is enabled, models that don't support tool-calling are unavailable for Edits mode.
     "chat.edits2.enabled": false,
 
-    // Show recent chat history on the empty chat state.
-    "chat.emptyState.history.enabled": false,
+    // Controls whether the chat panel automatically exits after delegating a request to another session.
+    "chat.exitAfterDelegation": true,
 
     // This setting is deprecated. Please use `chat.detectParticipant.enabled` instead.
     // Enables chat participant autodetection for panel chat.
@@ -9904,7 +9924,7 @@
     "chat.extensionTools.enabled": true,
 
     // Enables the unification of GitHub Copilot extensions. When enabled, all GitHub Copilot functionality is served from the GitHub Copilot Chat extension. When disabled, the GitHub Copilot and GitHub Copilot Chat extensions operate independently.
-    "chat.extensionUnification.enabled": false,
+    "chat.extensionUnification.enabled": true,
 
     // Controls the font family in chat messages.
     "chat.fontFamily": "default",
@@ -9986,6 +10006,9 @@
     // Controls whether related files should be rendered in the chat input.
     "chat.renderRelatedFiles": false,
 
+    // Controls whether the last session is restored in panel after restart.
+    "chat.restoreLastPanelSession": true,
+
     // Controls whether CSS of the selected element will be added to the chat. `chat.sendElementsToChat.enabled` must be enabled.
     "chat.sendElementsToChat.attachCSS": true,
 
@@ -9998,8 +10021,13 @@
     // Controls whether session descriptions are displayed on a second row in the Chat Sessions view.
     "chat.showAgentSessionsViewDescription": true,
 
-    // Controls whether sign-in with alternate scopes is used.
-    "chat.signInWithAlternateScopes": false,
+    // Controls which user type should see the status widget in new chat sessions when quota is exceeded.
+    //  - free: Show status widget for free tier users.
+    //  - anonymous: Show status widget for anonymous users.
+    "chat.statusWidget.sku": "",
+
+    // Controls whether background throttling is suspended when a chat request is in progress, allowing the chat session to continue even when the window is not in focus.
+    "chat.suspendThrottling": true,
 
     // When enabled, todo items include detailed descriptions for implementation context. This provides more information but uses additional tokens and may slow down responses.
     "chat.todoListTool.descriptionField": true,
@@ -10015,8 +10043,11 @@
         "**/.vscode/*.json": false,
         "**/.git/**": false,
         "**/{package.json,package-lock.json,server.xml,build.rs,web.config,.gitattributes,.env}": false,
-        "**/*.{csproj,fsproj,vbproj,vcxproj,proj,targets,props}": false
+        "**/*.{code-workspace,csproj,fsproj,vbproj,vcxproj,proj,targets,props}": false
     },
+
+    // Controls which tools are eligible for automatic approval. Tools set to 'false' will always present a confirmation and will never offer the option to auto-approve. The default behavior (or setting a tool to 'true') may result in the tool offering auto-approval options.
+    "chat.tools.eligibleForAutoApproval": {},
 
     // Global auto approve also known as "YOLO mode" disables manual approval completely for _all tools in all workspaces_, allowing the agent to act fully autonomously. This is extremely dangerous and is *never* recommended, even containerized environments like [Codespaces](https://github.com/features/codespaces) and [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) have user keys forwarded into the container that could be compromised.
     //
@@ -10026,17 +10057,43 @@
     // Controls whether to show the todo list widget above the chat input. When enabled, the widget displays todo items created by the agent and updates as progress is made.
     "chat.tools.todos.showWidget": true,
 
+    // Controls which URLs are automatically approved when requested by chat tools. Keys are URL patterns and values can be `true` to approve both requests and responses, `false` to deny, or an object with `approveRequest` and `approveResponse` properties for granular control.
+    //
+    // Examples:
+    // - `"https://example.com": true` - Approve all requests to example.com
+    // - `"https://*.example.com": true` - Approve all requests to any subdomain of example.com
+    // - `"https://example.com/api/*": { "approveRequest": true, "approveResponse": false }` - Approve requests but not responses for example.com/api paths
+    "chat.tools.urls.autoApprove": {},
+
     // Controls whether the input of the chat should be restored when an undo request is made. The input will be filled with the text of the request that was restored.
     "chat.undoRequests.restoreInput": true,
 
-    // Controls whether instructions from `AGENTS.MD` file found in a workspace roots are added to all chat requests.
+    // Controls whether instructions from `AGENTS.MD` file found in a workspace roots are attached to all chat requests.
     "chat.useAgentsMdFile": true,
 
-    // Experimental implementation of 'cloud button'
-    "chat.useCloudButtonV2": true,
+    // Controls whether Claude skills found in the workspace and user home directories under `.claude/skills` are listed in all chat requests. The language model can load these skills on-demand if the `read` tool is available.
+    "chat.useClaudeSkills": false,
 
-    // Controls whether instructions `AGENTS.MD` files found in the workspace are listed in all chat requests.
+    // Controls whether instructions from nested `AGENTS.MD` files found in the workspace are listed in all chat requests. The language model can load these skills on-demand if the `read` tool is available.
     "chat.useNestedAgentsMdFiles": false,
+
+    // Show chat agent sessions when chat is empty or to the side when chat view is wide enough.
+    "chat.viewSessions.enabled": true,
+
+    // Controls the orientation of the chat agent sessions view when it is shown alongside the chat.
+    //  - auto: Automatically determine the orientation based on available space.
+    //  - stacked: Display sessions vertically stacked unless a chat session is visible.
+    //  - sideBySide: Display sessions side by side if space is sufficient, otherwise stacked.
+    "chat.viewSessions.orientation": "sideBySide",
+
+    // Show the title of the chat above the chat in the chat view.
+    "chat.viewTitle.enabled": true,
+
+    // Show welcome banner when chat is empty.
+    "chat.viewWelcome.enabled": true,
+
+    // Controls if files that were part of a refactoring are saved automatically
+    "files.refactoring.autoSave": true,
 
     //
     //  - legacy: Uses the legacy diffing algorithm.
@@ -10399,6 +10456,9 @@
     // Provide information about how to access the terminal accessibility help menu when the terminal is focused.
     "accessibility.verbosity.terminal": true,
 
+    // Provide information about how to open the chat terminal output in the Accessible View.
+    "accessibility.verbosity.terminalChatOutput": true,
+
     // Provide information about how to open the walkthrough in an Accessible View.
     "accessibility.verbosity.walkthrough": true,
 
@@ -10621,7 +10681,7 @@
     "git.detectWorktrees": true,
 
     // Controls the limit of Git worktrees detected.
-    "git.detectWorktreesLimit": 10,
+    "git.detectWorktreesLimit": 50,
 
     // Controls whether to check for unresolved diagnostics before committing.
     "git.diagnosticsCommitHook.enabled": false,
@@ -10922,14 +10982,6 @@
     "mermaid-chat.enabled": false,
 
     // Microsoft Sovereign Cloud
-    // The authentication implementation to use for signing in with a Microsoft account.
-    //
-    // *NOTE: The `classic` implementation is deprecated and will be removed in a future release. If the `msal` implementation does not work for you, please [open an issue](command:workbench.action.openIssueReporter) and explain what you are trying to log in to.*
-    //  - msal: Use the Microsoft Authentication Library (MSAL) to sign in with a Microsoft account.
-    //  - msal-no-broker: Use the Microsoft Authentication Library (MSAL) to sign in with a Microsoft account using a browser. This is useful if you are having issues with the native broker.
-    //  - classic: (deprecated) Use the classic authentication flow to sign in with a Microsoft account.
-    "microsoft-authentication.implementation": "msal",
-
     // The custom configuration for the Sovereign Cloud to use with the Microsoft Sovereign Cloud authentication provider. This along with setting `microsoft-sovereign-cloud.environment` to `custom` is required to use this feature.
     "microsoft-sovereign-cloud.customEnvironment": {},
 
@@ -10938,6 +10990,12 @@
     //  - USGovernment: Azure US Government
     //  - custom: A custom Microsoft Sovereign Cloud
     "microsoft-sovereign-cloud.environment": "",
+
+    // Microsoft
+    // The authentication implementation to use for signing in with a Microsoft account.
+    //  - msal: Use the Microsoft Authentication Library (MSAL) to sign in with a Microsoft account.
+    //  - msal-no-broker: Use the Microsoft Authentication Library (MSAL) to sign in with a Microsoft account using a browser. This is useful if you are having issues with the native broker.
+    "microsoft-authentication.implementation": "msal",
 
     // JavaScript Debugger
     // Configures which processes to automatically attach and debug when `debug.node.autoAttach` is on. A Node process launched with the `--inspect` flag will always be attached to, regardless of this setting.
@@ -11110,6 +11168,58 @@
     // A JSON formatted file that specifies template parameter values, a stack policy, and tags. Only parameters are used from this file.
     "aws.accessAnalyzer.policyChecks.cloudFormationParameterFilePath": "",
 
+    // Enable auto-completion for CloudFormation templates
+    "aws.cloudformation.completion.enabled": true,
+
+    // Enable or disable CloudFormation Guard validation
+    "aws.cloudformation.diagnostics.cfnGuard.enabled": true,
+
+    // Cfn-guard enabled rule packs
+    "aws.cloudformation.diagnostics.cfnGuard.enabledRulePacks": [
+        "wa-Security-Pillar"
+    ],
+
+    // Path to custom cfn-guard rules file. If empty, uses default rule packs.
+    "aws.cloudformation.diagnostics.cfnGuard.rulesFile": "",
+
+    // Run cfn-guard when document content changes
+    "aws.cloudformation.diagnostics.cfnGuard.validateOnChange": true,
+
+    // CFN-Lint customization options
+    "aws.cloudformation.diagnostics.cfnLint.customization": {
+        "includeChecks": ["I"]
+    },
+
+    // Delay in milliseconds before running cfn-lint after changes
+    "aws.cloudformation.diagnostics.cfnLint.delayMs": 3000,
+
+    // Enable or disable CloudFormation linting
+    "aws.cloudformation.diagnostics.cfnLint.enabled": true,
+
+    // Run cfn-lint when document content changes
+    "aws.cloudformation.diagnostics.cfnLint.lintOnChange": true,
+
+    // Path to locally installed cfn-lint executable. If empty, uses bundled version.
+    "aws.cloudformation.diagnostics.cfnLint.path": "",
+
+    // Configure optional changeset flags for CloudFormation templates
+    //  - alwaysAsk: Always ask during validation and deploy workflow
+    //  - alwaysSave: Always save to file for both validation and deployment
+    //  - neverSave: Never save to file
+    "aws.cloudformation.environment.saveOptions": "alwaysAsk",
+
+    // Enable hover information for CloudFormation resources
+    "aws.cloudformation.hover.enabled": true,
+
+    // Configure S3 upload behavior for CloudFormation templates
+    //  - alwaysAsk: Always ask during validation and deploy workflow
+    //  - alwaysUpload: Always upload to S3 for both validation and deployment
+    //  - neverUpload: Never upload to S3 (only works for template smaller than 51200 bytes)
+    "aws.cloudformation.s3": "alwaysAsk",
+
+    // Configure anonymous telemetry collection for AWS CloudFormation Language Server
+    "aws.cloudformation.telemetry.enabled": false,
+
     // Maximum amount of log entries pulled per request from CloudWatch Logs. For LiveTail, when the limit is reached, the oldest events will be removed to accomodate new events. (max 10000)
     "aws.cwl.limit": 10000,
 
@@ -11119,7 +11229,8 @@
     // Try experimental features and give feedback. Note that experimental features may be removed at any time.
     //  * `jsonResourceModification` - Enables basic create, update, and delete support for cloud resources via the JSON Resources explorer component.
     "aws.experiments": {
-        "jsonResourceModification": false
+        "jsonResourceModification": false,
+        "cloudFormationService": false
     },
 
     // Controls how many IoT Things, Certificates, or Policies are listed before showing a node to `Load More...`.
@@ -11188,11 +11299,10 @@
     // Enable a code lens that shows a trait usages count and command to peek locations.
     "intelephense.codeLens.usages.enable": false,
 
-    // Resolves `ArrayAccess` and `Traversable` implementations that are unioned with a typed array to generic syntax. eg `ArrayAccessOrTraversable|ElementType[]` => `ArrayAccessOrTraversable<mixed, ElementType>`.
+    // Resolves `ArrayAccess` and `Traversable` implementations that are unioned with a typed array to generic syntax.
+    //
+    // For example: `ArrayAccessAndTraversable|Element[]` => `ArrayAccessAndTraversable&ArrayAccess<int, Element>&Traversable<int, Element>`.
     "intelephense.compatibility.correctForArrayAccessArrayAndTraversableArrayUnionTypes": true,
-
-    // Resolves `BaseClass|static` union types to `static` instead of `BaseClass`.
-    "intelephense.compatibility.correctForBaseClassStaticUnionTypes": true,
 
     // Prefer `@psalm-` and `@phpstan-` prefixed `@return`, `@var`, `@param` tags when determining symbol types.
     "intelephense.compatibility.preferPsalmPhpstanPrefixedAnnotations": false,
@@ -11305,7 +11415,7 @@
     "intelephense.environment.includePaths": [],
 
     // A semver compatible string that represents the target PHP version. Used for providing version appropriate suggestions and diagnostics. PHP 5.3.0 and greater supported.
-    "intelephense.environment.phpVersion": "8.4.0",
+    "intelephense.environment.phpVersion": "8.5.0",
 
     // When enabled '<?' will be parsed as a PHP open tag. Defaults to true.
     "intelephense.environment.shortOpenTag": true,
@@ -11719,6 +11829,9 @@
     // If true, untitled files won't be validated by ESLint.
     "eslint.ignoreUntitled": false,
 
+    // The command to run the task for linting the whole workspace. Defaults to the found eslint binary for the workspace, or 'eslint' if no binary could be found.
+    "eslint.lintTask.command": "eslint",
+
     // Controls whether a task for linting the whole workspace will be available.
     "eslint.lintTask.enable": false,
 
@@ -11760,7 +11873,10 @@
         "vue",
         "markdown",
         "json",
-        "jsonc"
+        "jsonc",
+        "css",
+        "glimmer-js",
+        "glimmer-ts"
     ],
 
     // Shortens the text spans of underlined problems to their first related line.
@@ -11806,6 +11922,9 @@
     // - *9.0.0 <= ESLint version < 10.x*: settings is honored and defaults to true
     // - *10.0.0 <= ESLint version*: setting is ignored. Flat configs are the default and can't be turned off.
     "eslint.useFlatConfig": null,
+
+    // Whether ESLint should use real paths when resolving files. This is useful when working with symlinks or when the casing of file paths is inconsistent.
+    "eslint.useRealpaths": false,
 
     // An array of language ids which should be validated by ESLint. If not installed ESLint will show an error.
     "eslint.validate": null,
@@ -12030,18 +12149,25 @@
     // When enabled, Copilot will include the name of the current active editor in the context for agent mode.
     "github.copilot.chat.agent.currentEditorContext.enabled": true,
 
+    // Temperature setting for agent mode requests.
+    "github.copilot.chat.agent.temperature": 0,
+
+    // Force GPT-4.1 for agent history summarization.
+    "github.copilot.chat.agentHistorySummarizationForceGpt41": false,
+
+    // Mode for agent history summarization.
+    "github.copilot.chat.agentHistorySummarizationMode": "",
+
+    // Use prompt caching for agent history summarization.
+    "github.copilot.chat.agentHistorySummarizationWithPromptCache": false,
+
     // Enables an experimental alternate prompt for GPT models instead of the default prompt.
     "github.copilot.chat.alternateGptPrompt.enabled": false,
 
-    // Enable extended thinking for Anthropic models that support it.
+    // Maximum number of tokens to allocate for extended thinking in Anthropic models. Setting this value enables extended thinking. Valid range is 1,024 to 32,000 tokens. Always capped at (max output tokens - 1).
     //
-    //  **Note**: This is an experimental feature only supported in BYOK Anthropic models.
-    "github.copilot.chat.anthropic.thinking.enabled": false,
-
-    // Maximum number of tokens to allocate for extended thinking in Anthropic models. Valid range is 1,024 to 32,000 tokens. Always capped at (max output tokens - 1).
-    //
-    // **Note**: This is an experimental feature only supported in BYOK Anthropic models.
-    "github.copilot.chat.anthropic.thinking.maxTokens": null,
+    // **Note**: This is an experimental feature not yet activated for all users.
+    "github.copilot.chat.anthropic.thinking.budgetTokens": 4000,
 
     // List of domains to restrict web search results to (e.g., `["example.com", "docs.example.com"]`). Domains should not include the HTTP/HTTPS scheme. Subdomains are automatically included. Cannot be used together with blocked domains.
     "github.copilot.chat.anthropic.tools.websearch.allowedDomains": [],
@@ -12060,11 +12186,28 @@
     // User location for personalizing web search results based on geographic context. All fields (city, region, country, timezone) are optional. Example: `{"city": "San Francisco", "region": "California", "country": "US", "timezone": "America/Los_Angeles"}`
     "github.copilot.chat.anthropic.tools.websearch.userLocation": null,
 
+    // Authentication method for Azure OpenAI models. Entra ID is recommended for enterprise security and uses your Azure credentials.
+    //  - entraId: Use Entra ID (Azure AD) authentication with your Microsoft account credentials
+    //  - apiKey: Use API key authentication. Not recommended as this is less secure than token based authentication.
+    "github.copilot.chat.azureAuthType": "entraId",
+
     // Configure custom Azure OpenAI models. Each key should be a unique model ID, and the value should be an object with model configuration including name, url, toolCalling, vision, maxInputTokens, and maxOutputTokens properties.
     "github.copilot.chat.azureModels": {},
 
     // The endpoint to use for the Ollama when accessed via bring your own key. Defaults to localhost.
     "github.copilot.chat.byok.ollamaEndpoint": "http://localhost:11434",
+
+    // Enable debug mode for Claude Code agent.
+    "github.copilot.chat.claudeCode.debug": false,
+
+    // Enable Claude Code agent.
+    "github.copilot.chat.claudeCode.enabled": false,
+
+    // Enable Custom Agents for Background Agents.
+    "github.copilot.chat.cli.customAgents.enabled": false,
+
+    // Enable Model Context Protocol (MCP) server for Background Agents.
+    "github.copilot.chat.cli.mcp.enabled": false,
 
     // Use instructions files instead. See https://aka.ms/vscode-ghcp-custom-instructions for more information.
     // A set of instructions that will be added to Copilot requests that generate code.
@@ -12079,6 +12222,9 @@
     //
     // Note: Keep your instructions short and precise. Poor instructions can degrade Copilot's quality and performance. [Learn more](https://aka.ms/github-copilot-custom-instructions) about customizing Copilot.
     "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+
+    // Enable code search capabilities in agent mode.
+    "github.copilot.chat.codesearch.agent.enabled": true,
 
     // Whether to enable agentic codesearch when using `#codebase`.
     "github.copilot.chat.codesearch.enabled": false,
@@ -12097,14 +12243,31 @@
     // Whether the `copilot-debug` command is enabled in the terminal.
     "github.copilot.chat.copilotDebugCommand.enabled": true,
 
+    // Enable custom agents from GitHub Enterprise and Organizations. When disabled, custom agents from your organization or enterprise will not be available in Copilot.
+    "github.copilot.chat.customAgents.showOrganizationAndEnterpriseAgents": false,
+
     // When enabled, custom instructions and mode instructions will be appended to the system message instead of a user message.
     "github.copilot.chat.customInstructionsInSystemMessage": true,
 
     // Configure custom OpenAI-compatible models. Each key should be a unique model ID, and the value should be an object with model configuration including name, url, toolCalling, vision, maxInputTokens, and maxOutputTokens properties.
     "github.copilot.chat.customOAIModels": {},
 
-    // When making inline chat request whether to include recently viewed and edited files with Copilot requests.
-    "github.copilot.chat.editor.temporalContext.enabled": false,
+    // Override the chat model. This allows you to test with different models.
+    //
+    // **Note**: This is an advanced debugging setting and should not be used while self-hosting as it may lead to a different experience compared to end-users.
+    "github.copilot.chat.debug.overrideChatEngine": "",
+
+    // Maximum number of entries to keep in the request logger for debugging purposes.
+    "github.copilot.chat.debug.requestLogger.maxEntries": 100,
+
+    // A list of commands for which the "Debug Command" quick fix action should be shown in the debug terminal.
+    "github.copilot.chat.debugTerminalCommandPatterns": [],
+
+    // Enable edit recording for analysis.
+    "github.copilot.chat.editRecording.enabled": false,
+
+    // Enable the modern `multi_replace_string_in_file` edit tool when generating edits with Gemini 3 models.
+    "github.copilot.chat.edits.gemini3MultiReplaceString": false,
 
     // Whether to suggest source files from test files for the Copilot Edits working set.
     "github.copilot.chat.edits.suggestRelatedFilesForTests": true,
@@ -12112,14 +12275,56 @@
     // Whether to suggest related files from git history for the Copilot Edits working set.
     "github.copilot.chat.edits.suggestRelatedFilesFromGitHistory": true,
 
-    // When making edits request whether to include recently viewed and edited files with Copilot requests.
-    "github.copilot.chat.edits.temporalContext.enabled": false,
+    // Enable remembering user preferences in agent mode.
+    "github.copilot.chat.enableUserPreferences": false,
+
+    // Enable feedback collection on configuration changes.
+    "github.copilot.chat.feedback.onChange": false,
 
     // Show 'Generate tests' code lens for symbols that are not covered by current test coverage information.
     "github.copilot.chat.generateTests.codeLens": false,
 
+    // Enable built-in support for the GitHub MCP Server.
+    "github.copilot.chat.githubMcpServer.enabled": false,
+
+    // Enable lockdown mode for the GitHub MCP Server. When enabled, hides public issue details created by users without push access.
+    "github.copilot.chat.githubMcpServer.lockdown": false,
+
+    // Enable read-only mode for the GitHub MCP Server. When enabled, only read tools are available.
+    "github.copilot.chat.githubMcpServer.readonly": false,
+
+    // Specify toolsets to use from the GitHub MCP Server.
+    "github.copilot.chat.githubMcpServer.toolsets": ["default"],
+
+    // Enable GPT-5 alternative patch format.
+    "github.copilot.chat.gpt5AlternativePatch": false,
+
     // Enables the use of image upload URLs in chat requests instead of raw base64 strings.
     "github.copilot.chat.imageUpload.enabled": true,
+
+    // Threshold at which to switch editing strategies for inline chat. When a selection porition of code matches a parse tree node, only that is presented to the language model. This speeds up response times but might have lower quality results. Requires having a parse tree for the document and the `inlineChat.enableV2` setting. Values must be between 0 and 1, where 0 means off and 1 means the selection perfectly matches a parse tree node.
+    "github.copilot.chat.inlineChat.selectionRatioThreshold": 0,
+
+    // Enable diagnostics context provider for next edit suggestions.
+    "github.copilot.chat.inlineEdits.diagnosticsContextProvider.enabled": false,
+
+    // Maximum tokens for current file in next cursor prediction.
+    "github.copilot.chat.inlineEdits.nextCursorPrediction.currentFileMaxTokens": 2000,
+
+    // Display predicted cursor line for next edit suggestions.
+    "github.copilot.chat.inlineEdits.nextCursorPrediction.displayLine": true,
+
+    // Enable rename symbol suggestions in inline edits.
+    "github.copilot.chat.inlineEdits.renameSymbolSuggestions": false,
+
+    // Trigger inline edits after editor has been idle for this many seconds.
+    "github.copilot.chat.inlineEdits.triggerOnEditorChangeAfterSeconds": 0,
+
+    // Token limit for short context instant apply.
+    "github.copilot.chat.instantApply.shortContextLimit": 8000,
+
+    // Model name for short context instant apply.
+    "github.copilot.chat.instantApply.shortContextModelName": "gpt-4o-instant-apply-full-ft-v66-short",
 
     // Enables the TypeScript language context provider for /fix commands
     "github.copilot.chat.languageContext.fix.typescript.enabled": false,
@@ -12137,7 +12342,7 @@
     "github.copilot.chat.languageContext.typescript.includeDocumentation": false,
 
     // Controls which kind of items are included in the TypeScript language context provider.
-    "github.copilot.chat.languageContext.typescript.items": "minimal",
+    "github.copilot.chat.languageContext.typescript.items": "double",
 
     // Specify a locale that Copilot should respond in, e.g. `en` or `fr`. By default, Copilot will respond using VS Code's configured display language locale.
     //  - auto: Use VS Code's configured display language
@@ -12157,6 +12362,9 @@
     //  - pl: polski
     "github.copilot.chat.localeOverride": "auto",
 
+    // Enable local workspace recording for analysis.
+    "github.copilot.chat.localWorkspaceRecording.enabled": false,
+
     // Sets the fetcher used for the next edit suggestions.
     "github.copilot.chat.nesFetcher": "",
 
@@ -12166,11 +12374,38 @@
     // Whether to enable new agentic workspace creation.
     "github.copilot.chat.newWorkspaceCreation.enabled": true,
 
+    // Alternative document format for notebooks.
+    "github.copilot.chat.notebook.alternativeFormat": "xml",
+
+    // Enable alternative format for Next Edit Suggestions in notebooks.
+    "github.copilot.chat.notebook.alternativeNESFormat.enabled": false,
+
     // Controls whether to use an enhanced approach for generating next edit suggestions in notebook cells.
     "github.copilot.chat.notebook.enhancedNextEditSuggestions.enabled": false,
 
     // Controls whether the currently executing cell is revealed into the viewport upon execution from Copilot.
     "github.copilot.chat.notebook.followCellExecution.enabled": false,
+
+    // Enable the notebook summary experiment.
+    "github.copilot.chat.notebook.summaryExperimentEnabled": false,
+
+    // Enable filtering variables by cell document symbols.
+    "github.copilot.chat.notebook.variableFilteringEnabled": false,
+
+    // Omit base agent instructions from prompts.
+    "github.copilot.chat.omitBaseAgentInstructions": false,
+
+    // Add project labels in chat requests.
+    "github.copilot.chat.projectLabels.chat": false,
+
+    // Use the expanded format for project labels in prompts.
+    "github.copilot.chat.projectLabels.expanded": false,
+
+    // Add project labels in inline edit requests.
+    "github.copilot.chat.projectLabels.inline": false,
+
+    // Enable prompt file context provider.
+    "github.copilot.chat.promptFileContextProvider.enabled": true,
 
     // A set of instructions that will be added to Copilot requests that generate pull request titles and descriptions.
     // Instructions can come from:
@@ -12185,6 +12420,9 @@
 
     // Sets the reasoning summary style used for the Responses API. Requires `github.copilot.chat.useResponsesApi`.
     "github.copilot.chat.responsesApiReasoningSummary": "detailed",
+
+    // Enable intent detection for code review.
+    "github.copilot.chat.review.intent": false,
 
     // Enables the code review agent.
     "github.copilot.chat.reviewAgent.enabled": true,
@@ -12206,8 +12444,14 @@
     // Enables the `/setupTests` intent and prompting in `/tests` generation.
     "github.copilot.chat.setupTests.enabled": true,
 
+    // Use embeddings to suggest related files from git history.
+    "github.copilot.chat.suggestRelatedFilesFromGitHistory.useEmbeddings": false,
+
     // Whether to auto-summarize agent conversation history once the context window is filled.
     "github.copilot.chat.summarizeAgentConversationHistory.enabled": true,
+
+    // Threshold for summarizing agent conversation history.
+    "github.copilot.chat.summarizeAgentConversationHistoryThreshold": 0,
 
     // Controls where chat queries from the terminal should be opened.
     //  - chatView: Open the chat view.
@@ -12224,6 +12468,9 @@
     // Note: Keep your instructions short and precise. Poor instructions can degrade Copilot's quality and performance.
     "github.copilot.chat.testGeneration.instructions": [],
 
+    // Group default tools in prompts.
+    "github.copilot.chat.tools.defaultToolsGrouped": false,
+
     // Enable memory tool to allow models to store and retrieve information across conversations.
     //
     // **Note**: This is an experimental feature.
@@ -12235,12 +12482,35 @@
     // Use the Responses API instead of the Chat Completions API when supported. Enables reasoning and reasoning summaries.
     //
     // **Note**: This is an experimental feature that is not yet activated for all users.
+    //
+    // **Important**: URL API path resolution for custom OpenAI-compatible and Azure models is independent of this setting and fully determined by `url` property of `github.copilot.chat.customOAIModels#` or `#github.copilot.chat.azureModels` respectively.
     "github.copilot.chat.useResponsesApi": true,
+
+    // Use Responses API for truncation.
+    "github.copilot.chat.useResponsesApiTruncation": false,
 
     // This setting defines the tool count over which virtual tools should be used. Virtual tools group similar sets of tools together and they allow the model to activate them on-demand. Certain tool groups will optimistically be pre-activated. We are actively developing this feature and you experience degraded tool calling once the threshold is hit.
     //
     // May be set to `0` to disable virtual tools.
     "github.copilot.chat.virtualTools.threshold": 128,
+
+    // Enable code search in workspace context.
+    "github.copilot.chat.workspace.enableCodeSearch": true,
+
+    // Enable embeddings-based search in workspace context.
+    "github.copilot.chat.workspace.enableEmbeddingsSearch": true,
+
+    // Enable full workspace context analysis.
+    "github.copilot.chat.workspace.enableFullWorkspace": true,
+
+    // Maximum size of the local workspace index.
+    "github.copilot.chat.workspace.maxLocalIndexSize": 100000,
+
+    // Preferred embeddings model for semantic search.
+    "github.copilot.chat.workspace.preferredEmbeddingsModel": "",
+
+    // Override endpoint for Azure DevOps code search prototype.
+    "github.copilot.chat.workspace.prototypeAdoCodeSearchEndpointOverride": "",
 
     // Controls if Copilot commands are shown as Code Actions when available
     "github.copilot.editor.enableCodeActions": true,
@@ -12264,15 +12534,14 @@
     // Whether to offer fixes for diagnostics via next edit suggestions (NES).
     "github.copilot.nextEditSuggestions.fixes": true,
 
+    // Preferred model for next edit suggestions.
+    "github.copilot.nextEditSuggestions.preferredModel": "none",
+
     // Controls whether Copilot generates suggestions for renaming
     "github.copilot.renameSuggestions.triggerAutomatically": true,
 
     // The currently selected completion model ID. To select from a list of available models, use the __"Change Completions Model"__ command or open the model picker (from the Copilot menu in the VS Code title bar, select __"Configure Code Completions"__ then __"Change Completions Model"__. The value must be a valid model ID. An empty value indicates that the default model will be used.
     "github.copilot.selectedCompletionModel": "",
-
-    // GitHub Copilot
-    //
-    "github.copilot.advanced": {},
 
     // GitHub Repositories
     // Specifies whether to periodically fetch from the upstream repository
@@ -12435,7 +12704,7 @@
     // Allow automatic git operations (commit, push) to be performed when starting a coding agent session
     "githubPullRequests.codingAgent.autoCommitAndPush": true,
 
-    // Show CodeLens actions above TODO comments for delegating to coding agent.
+    // Show the 'Delegate to agent' CodeLens actions above TODO comments for delegating to coding agent.
     "githubPullRequests.codingAgent.codeLens": true,
 
     // Enables integration with the asynchronous Copilot coding agent. The '#copilotCodingAgent' tool will be available in agent mode when this setting is enabled.
@@ -13579,11 +13848,18 @@
     // Suppresses the warning dialog when attempting to debug a project with an unsupported DebugType (e.g. full or pdbonly).
     "dotnet.debug.suppressInvalidDebugTypeWarning": false,
 
+    // [Preview] Enable workspace-based development where any folder with .NET projects can be opened and will work automatically without requiring solution files. Projects are discovered and managed automatically.
+    "dotnet.enableWorkspaceBasedDevelopment": false,
+
     // Controls whether the extension uses the default Visual Studio Code File System Watcher. This is recommended if you have a files.watcherExclude setting.
     "dotnet.preferVisualStudioCodeFileSystemWatcher": false,
 
+    // Use 'dotnet.enableWorkspaceBasedDevelopment' instead.
     // [Preview] Prevent the automatic creation of solution files in workspaces that do not already contain one. This feature takes priority over the 'Automatically Create Solution In Workspace' setting, even if it is enabled.
     "dotnet.previewSolution-freeWorkspaceMode": false,
+
+    // Specifies a solution file to automatically open for the workspace. This setting takes priority over both workspace-based development mode and default solution settings. Leave empty to use automatic detection.
+    "dotnet.solution.autoOpen": "",
 
     // Disable automatic test discovery when test binaries change on disk. This can avoid file locking issues when building large solutions.
     "dotnet.testWindow.disableAutoDiscovery": false,
@@ -13602,9 +13878,6 @@
 
     // Disable checks for projects with compatible target frameworks. This may cause unstable or broken test behavior. Use at your own risk.
     "dotnet.testWindow.skipTargetFrameworkCompatibilityCheck": false,
-
-    // Enables projects that are using Microsoft.Testing.Platform to communicate via Microsoft.Testing.Platform server protocol instead of using VSTest Translation Layer protocol. See https://aka.ms/mtp-overview for more information.
-    "dotnet.testWindow.useTestingPlatformProtocol": false,
 
     // Use the legacy dotnet resolution. This is a temporary option to workaround potential issues with the new logic.
     "dotnet.useLegacyDotnetResolution": false,
@@ -13638,11 +13911,17 @@
     // 🚀 The version of .NET that is used for your project is determined by the .NET host, or dotnet.exe. The .NET host picks a runtime based on your project. To use a specific version of .NET for your project, install the .NET SDK using the `.NET Install Tool - Install SDK System-Wide` command, install .NET manually using [our instructions](https://dotnet.microsoft.com/download), or edit your PATH environment variable to point to a `dotnet.exe` that has an `/sdk/` folder with only one SDK.
     "dotnetAcquisitionExtension.existingDotnetPath": [],
 
+    // Enable this to show more detailed output from our extension.
+    "dotnetAcquisitionExtension.highVerbosity": false,
+
     // Timeout for installing .NET in seconds.
     "dotnetAcquisitionExtension.installTimeoutValue": 600,
 
     // URL to a proxy if you use one, such as: https://proxy:port
     "dotnetAcquisitionExtension.proxyUrl": "",
+
+    // The amount of seconds to wait before trying to update the .NET Runtime for the day.
+    "dotnetAcquisitionExtension.runtimeUpdateDelaySeconds": 300,
 
     // The path of the preexisting .NET Runtime you'd like to use for ALL extensions. Restart VS Code to apply changes.
     "dotnetAcquisitionExtension.sharedExistingDotnetPath": "",
@@ -13652,16 +13931,6 @@
 
     // Hide all messages in the output window from our extension. Error pop-ups from APIs that other extensions request we display will still appear.
     "dotnetAcquisitionExtension.suppressOutput": false,
-
-    // IntelliCode for C# Dev Kit
-    // Logging level for 'IntelliCode for C# Dev Kit' output pane
-    "intellicode-completions-cdk.loggingLevel": "INFO",
-
-    // A writable path that should be used for the IntelliSense star model cache instead of inside the extension's path. Takes effect after reloading window.
-    "intellicode-completions-cdk.modelCachePath": "",
-
-    // Provide inline completions when GitHub Copilot is also enabled. This setting does not affect starred IntelliSense completion items. This is not recommended because the two extensions will often suggest different completions in the same location, but only one completion can be shown.
-    "intellicode-completions-cdk.runAlongsideCopilot": false,
 
     // autopep8
     // Arguments passed to autopep8 to format Python files. Each argument should be provided as a separate string in the array.
@@ -13729,10 +13998,10 @@
     "black-formatter.showNotifications": "off",
 
     // Python Debugger
-    // When debugging only step through user-written code. Disable this to allow stepping into library code.
+    // %debugpy.debugJustMyCode.description%
     "debugpy.debugJustMyCode": true,
 
-    // Whether to display inline values in the editor while debugging.
+    // %debugpy.showPythonInlineValues.description%
     "debugpy.showPythonInlineValues": false,
 
     // Flake8
@@ -14145,6 +14414,9 @@
 
     // Additional import search resolution paths
     "python.analysis.extraPaths": [],
+
+    // Enable/disable running Find All References on the background thread. For internal use only, may cause Pylance to stop working.
+    "python.analysis.findRefsInBackgroundThread": false,
 
     // source fixes to run in fix all.
     "python.analysis.fixAll": [],
@@ -14645,6 +14917,9 @@
     // A range of **local** ports preferred to utilize for the SSH tunnel connection. If no free port is found in range, an error will be thrown. Valid ranges of the form `number-number` such as `4000-5000`; it's expected the first number will be lower than the next.
     "remote.SSH.preferredLocalPortRange": "",
 
+    // The grace time in **seconds** to wait before terminating the remote server when the client disconnects. Leave empty to use VS Code defaults. _Currently supports only linux remotes._
+    "remote.SSH.reconnectionGraceTime": null,
+
     // A map of the remote hostname to the platform for that remote. The hostname may include a star '*' to wildcard match. Valid values: `linux`, `macOS`, `windows`. Note - this setting will soon be required when `remote.SSH.useLocalServer` is disabled, so it is currently being autopopulated for successful connections, but is not currently used.
     "remote.SSH.remotePlatform": {},
 
@@ -15034,12 +15309,6 @@
     "cmake.useVsDeveloperEnvironment": "auto",
 
     // IntelliSense
-    // Add include paths from `nan` and `node-addon-api` when they are dependencies.
-    "C_Cpp.addNodeAddonIncludePaths": false,
-
-    // Controls whether files are automatically added to `files.associations` when they are the target of a navigation operation from a C/C++ file.
-    "C_Cpp.autoAddFileAssociations": true,
-
     // Controls the auto-completion provider. If `disabled` and you want word-based completion, you will also need to set `"[cpp]": {"editor.wordBasedSuggestions": <value>}` (and similarly for `c` and `cuda-cpp` languages).
     //  - default: Uses the active IntelliSense engine.
     //  - disabled: Uses the word-based completion provided by Visual Studio Code.
@@ -15048,96 +15317,11 @@
     // If `true`, autocomplete will automatically add `(` after function calls, in which case `)` may also be added, depending on the value of the `editor.autoClosingBrackets` setting.
     "C_Cpp.autocompleteAddParentheses": false,
 
-    // If set to `default`, the file system of the workspace is assumed to be case insensitive on Windows and case sensitive on macOS or Linux. If set to `enabled`, the file system of the workspace is assumed to be case sensitive on Windows.
-    "C_Cpp.caseSensitiveFileSupport": "default",
-
-    // Name of the predefined style used as a fallback in case `clang-format` is invoked with style `file` but the `.clang-format` file is not found. Possible values are `Visual Studio`, `LLVM`, `Google`, `Chromium`, `Mozilla`, `WebKit`, `Microsoft`, `GNU`, `none`, or use `{key: value, ...}` to set specific parameters. For example, the `Visual Studio` style is similar to: `{ BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 0, AccessModifierOffset: -4, NamespaceIndentation: All, FixNamespaceComments: false }`.
-    "C_Cpp.clang_format_fallbackStyle": "Visual Studio",
-
-    // The full path of the `clang-format` executable. If not specified, and `clang-format` is available in the environment path, that is used unless the version bundled with the extension is newer. If not found in the environment path, the `clang-format` bundled with the extension will be used.
-    "C_Cpp.clang_format_path": "",
-
-    // If set, overrides the include sorting behavior determined by the `SortIncludes` parameter.
-    "C_Cpp.clang_format_sortIncludes": null,
-
-    // Coding style, currently supports: `Visual Studio`, `LLVM`, `Google`, `Chromium`, `Mozilla`, `WebKit`, `Microsoft`, `GNU`. Use `file` to load the style from a `.clang-format` file in the current or parent directory, or use `file:<path>/.clang-format` to reference a specific path. Use `{key: value, ...}` to set specific parameters. For example, the `Visual Studio` style is similar to: `{ BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 0, AccessModifierOffset: -4, NamespaceIndentation: All, FixNamespaceComments: false }`.
-    "C_Cpp.clang_format_style": "file",
-
-    // Additional command line arguments to pass to `clang-tidy`. These take precedence over the equivalent `C_Cpp.codeAnalysis.clangTidy.*` settings.
-    "C_Cpp.codeAnalysis.clangTidy.args": [],
-
-    // List of disabled `clang-tidy` checks. The values are appended to the `Checks` in a `.clang-tidy` file or `C_Cpp.codeAnalysis.clangTidy.config`, if any.
-    "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [],
-
-    // List of enabled `clang-tidy` checks. The values are appended to the `Checks` in a `.clang-tidy` file or `C_Cpp.codeAnalysis.clangTidy.config`, if any. The default check `clang-analyzer-*` is always used unless it is explicitly disabled.
-    "C_Cpp.codeAnalysis.clangTidy.checks.enabled": [],
-
-    // If `true`, formatting will be run on the lines changed by 'Fix' code actions.
-    "C_Cpp.codeAnalysis.clangTidy.codeAction.formatFixes": true,
-
-    // Controls which 'Clear' code analysis problem code action options are available. Changing the setting to show more options may require re-running code analysis.
-    //  - None: Show no 'Clear' code actions.
-    //  - AllOnly: Show only the 'Clear all' code action (or 'Clear all <type>' if there is only one type or 'Clear this' if there is only one problem).
-    //  - AllAndAllType: Show the 'Clear all' code action (if there are multiple problem types) and the 'Clear all <type>' code action (or 'Clear this' if there is only one problem for the <type>)
-    //  - AllAndAllTypeAndThis: Show the 'Clear all' (if there are multiple problem types), 'Clear all <type>' (if there are multiple problems for the <type>), and 'Clear this' code actions
-    "C_Cpp.codeAnalysis.clangTidy.codeAction.showClear": "AllAndAllTypeAndThis",
-
-    // If `true`, the 'Disable' code action will be shown when available (the next time code analysis is run). When the 'Disable' code action is used, it adds the warning code to the `C_Cpp.codeAnalysis.clangTidy.checks.disabled` setting.
-    "C_Cpp.codeAnalysis.clangTidy.codeAction.showDisable": true,
-
-    // If `true`, the 'Show Documentation for' code action will be shown when available (the next time code analysis is run).
-    "C_Cpp.codeAnalysis.clangTidy.codeAction.showDocumentation": true,
-
-    // Specifies a `clang-tidy` configuration in YAML/JSON format: `{Checks: '-*,clang-analyzer-*', CheckOptions: [{key: x, value: y}]}`. When the value is empty, `clang-tidy` will attempt to find a file named `.clang-tidy` for each source file in its parent directories.
-    "C_Cpp.codeAnalysis.clangTidy.config": "",
-
-    // If `true`, code analysis using `clang-tidy` will be enabled and will run after a file is opened or saved if `C_Cpp.codeAnalysis.runAutomatically` is `true` (the default).
-    "C_Cpp.codeAnalysis.clangTidy.enabled": false,
-
-    // Specifies a `clang-tidy` configuration in YAML/JSON format to be used as a fallback when `C_Cpp.codeAnalysis.clangTidy.config` is not set and no `.clang-tidy` file is found: `{Checks: '-*,clang-analyzer-*', CheckOptions: [{key: x, value: y}]}`.
-    "C_Cpp.codeAnalysis.clangTidy.fallbackConfig": "",
-
-    // A POSIX extended regular expression (ERE) matching the names of the headers to output diagnostics from. Diagnostics from the main file of each translation unit are always displayed. The `${workspaceFolder}` variable is supported (and is used as the default fallback value if no `.clang-tidy` file exists). If this option is not `null` (empty), it overrides the `HeaderFilterRegex` option in a `.clang-tidy` file, if any.
-    "C_Cpp.codeAnalysis.clangTidy.headerFilter": null,
-
-    // The full path of the `clang-tidy` executable. If not specified, and `clang-tidy` is available in the environment path, that is used unless the version bundled with the extension is newer. If not found in the environment path, the `clang-tidy` bundled with the extension will be used.
-    "C_Cpp.codeAnalysis.clangTidy.path": "",
-
-    // If `true` and `compileCommands` is set, the `-p=<build-path>` argument is passed to `clang-tidy` instead of build arguments being passed after `--`. This may not work if environment variables aren't set so that system includes can be found.
-    "C_Cpp.codeAnalysis.clangTidy.useBuildPath": false,
-
-    // Configure glob patterns for excluding folders and files for code analysis. Files not under the workspace folder are always excluded. Inherits values from `files.exclude#` and `#C_Cpp.files.exclude`. Learn more about [glob patterns](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).
-    "C_Cpp.codeAnalysis.exclude": {},
-
-    // The maximum number of concurrent threads to use for code analysis. The default of `null` (empty) uses half the value inherited from `C_Cpp.maxConcurrentThreads`.
-    "C_Cpp.codeAnalysis.maxConcurrentThreads": null,
-
-    // Fewer code analysis processes will run concurrently after this memory usage (in MB) is exceeded. The default of `null` (empty) uses the value inherited from `C_Cpp.maxMemory`.
-    "C_Cpp.codeAnalysis.maxMemory": null,
-
-    // If `true`, code analysis will run automatically on a file after it is opened or saved.
-    "C_Cpp.codeAnalysis.runAutomatically": true,
-
-    // Controls the delay in milliseconds before code analysis starts processing after a save is triggered from an edit when `files.autoSave#` is `afterDelay` and `#C_Cpp.codeAnalysis.runAutomatically` is `true`.
-    "C_Cpp.codeAnalysis.updateDelay": 2000,
-
     // If enabled, code folding ranges are provided by the language server.
     "C_Cpp.codeFolding": "enabled",
 
-    // Defines the editor behavior for when the Enter key is pressed inside a multiline or single line comment block.
-    "C_Cpp.commentContinuationPatterns": ["/**"],
-
     // Determines whether pop up notifications will be shown when a configuration provider extension is unable to provide a configuration for a source file.
     "C_Cpp.configurationWarnings": "enabled",
-
-    // If `disabled`, no 'Generate Copilot summary' option will appear on hover.
-    "C_Cpp.copilotHover": "default",
-
-    // If `true`, debugger shell command substitution will use obsolete backtick ``(`)``.
-    "C_Cpp.debugger.useBacktickCommandSubstitution": false,
-
-    // Show the "Run and Debug" play button and "Add Debug Configuration" gear in the editor title bar for C++ files.
-    "C_Cpp.debugShortcut": true,
 
     // The value to use in a configuration if `browse.databaseFilename` is either not specified or set to `${default}`.
     "C_Cpp.default.browse.databaseFilename": "",
@@ -15211,26 +15395,6 @@
     // Controls whether inactive preprocessor blocks are colored differently than active code. This setting has no effect if IntelliSense is disabled or if using the Default High Contrast theme.
     "C_Cpp.dimInactiveRegions": true,
 
-    // The string of characters used as the starting line of the Doxygen comment.
-    "C_Cpp.doxygen.generatedStyle": "///",
-
-    // Controls whether to automatically insert the Doxygen comment after typing the chosen comment style.
-    "C_Cpp.doxygen.generateOnType": true,
-
-    // Select the Doxygen section tags that you would like to appear on hover in the tooltip area when the 'Simplify Structured Comments' setting is enabled.
-    "C_Cpp.doxygen.sectionTags": [
-        "attention",
-        "tparam",
-        "param",
-        "result",
-        "returns",
-        "retval",
-        "exception",
-        "deprecated",
-        "warning",
-        "note"
-    ],
-
     // If enabled, code is colorized based on IntelliSense. This setting only applies if `C_Cpp.intelliSenseEngine` is set to `default`.
     "C_Cpp.enhancedColorization": "enabled",
 
@@ -15242,21 +15406,11 @@
     //  - checkFilesAndFolders: The exclusion filters will be evaluated against every file and folder encountered.
     "C_Cpp.exclusionPolicy": "checkFolders",
 
-    // Controls whether "experimental" features are usable.
-    "C_Cpp.experimentalFeatures": "disabled",
-
     // Configure glob patterns for excluding folders (and files if `C_Cpp.exclusionPolicy#` is changed). These are specific to the C/C++ extension and are in addition to `#files.exclude#`, but unlike `#files.exclude` they also apply to paths outside the current workspace folder and are not removed from the Explorer view. Learn more about [glob patterns](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).
     "C_Cpp.files.exclude": {
         "**/.vscode": true,
         "**/.vs": true
     },
-
-    // Configures the formatting engine.
-    //  - clangFormat: `clang-format` will be used to format code.
-    //  - vcFormat: The Visual C++ formatting engine will be used to format code.
-    //  - default: By default, `clang-format` will be used to format the code. However, the Visual C++ formatting engine will be used if an `.editorconfig` file with relevant settings is found nearer to the code being formatted and `C_Cpp.clang_format_style` is the default value: `file`.
-    //  - disabled: Code formatting will be disabled.
-    "C_Cpp.formatting": "default",
 
     // If disabled, hover details are no longer provided by the language server.
     "C_Cpp.hover": "default",
@@ -15315,26 +15469,11 @@
     // ```
     "C_Cpp.inlayHints.referenceOperator.showSpace": false,
 
-    // The maximum number of IntelliSense processes to keep running. The default of `null` (empty) uses value inherited from `C_Cpp.maxCachedProcesses`.
-    "C_Cpp.intelliSense.maxCachedProcesses": null,
-
-    // Older IntelliSense processes will shut down before new processes are created after this memory usage (in MB) is exceeded. The default of `null` (empty) uses the value inherited from `C_Cpp.maxMemory`.
-    "C_Cpp.intelliSense.maxMemory": null,
-
-    // Defines the folder path for cached precompiled headers used by IntelliSense. The default cache path is `%LocalAppData%/Microsoft/vscode-cpptools` on Windows, `$XDG_CACHE_HOME/vscode-cpptools/` on Linux (or `$HOME/.cache/vscode-cpptools/` if `XDG_CACHE_HOME` is not defined), and `$HOME/Library/Caches/vscode-cpptools/` on macOS. The default path will be used if no path is specified or if a specified path is invalid.
-    "C_Cpp.intelliSenseCachePath": "",
-
-    // Maximum size of the per-workspace hard drive space in megabytes (MB) for cached precompiled headers; the actual usage may fluctuate around this value. The default size is `5120` MB. Precompiled header caching is disabled when the size is `0`.
-    "C_Cpp.intelliSenseCacheSize": 5120,
-
     // Controls the IntelliSense provider.
     //  - default: Provides context-aware results via a separate IntelliSense process.
     //  - Tag Parser: Provides "fuzzy" results that are not context-aware.
     //  - disabled: Turns off C/C++ language service features.
     "C_Cpp.intelliSenseEngine": "default",
-
-    // Memory usage limit in megabytes (MB) of an IntelliSense process. The default is `4096` and the maximum is `16384`. The extension will shutdown and restart an IntelliSense process when it exceeds the limit.
-    "C_Cpp.intelliSenseMemoryLimit": 4096,
 
     // Controls the delay in milliseconds before IntelliSense starts updating after a modification.
     "C_Cpp.intelliSenseUpdateDelay": 1000,
@@ -15342,56 +15481,43 @@
     // Enable pre-v1.10.0 behavior for how shell escaping is handled in compiler arg settings. Shell escaping is no longer expected or supported by default in arg arrays starting in v1.10.0.
     "C_Cpp.legacyCompilerArgsBehavior": false,
 
-    // The verbosity of logging in the Output Panel. The order of levels from least verbose to most verbose is: `None` < `Error` < `Warning` < `Information` < `Debug`.
-    "C_Cpp.loggingLevel": "Error",
-
-    // Select whether markdown will be available in the hover tooltip. By default, only a subset of markdown will be applied to comments in the hover tooltip.
-    //  - subsetEnabled: Enable all markdown features in the hover tooltip except those that include the '_' and '*' characters.
-    //  - enabled: Enable all markdown features in the hover tooltip.
-    //  - disabled: Disable all markdown features in the hover tooltip.
-    "C_Cpp.markdownInComments": "subsetEnabled",
-
-    // The maximum number of cached processes to use for language service processing. The default of `null` (empty) uses twice the number of logical processors available.
-    "C_Cpp.maxCachedProcesses": null,
-
-    // The maximum number of concurrent threads to use for language service processing. The value is a hint and may not always be used. The default of `null` (empty) uses the number of logical processors available.
-    "C_Cpp.maxConcurrentThreads": null,
-
-    // The maximum memory (in MB) available for language service processing. Fewer processes will be cached and run concurrently after this memory usage is exceeded. The default of `null` (empty) uses the system's free memory.
-    "C_Cpp.maxMemory": null,
-
-    // The maximum number of results to show for 'Go to Symbol in Workspace'. The default is `5000`.
-    "C_Cpp.maxSymbolSearchResults": 5000,
-
-    // The character used as a path separator for generated user paths.
-    "C_Cpp.preferredPathSeparator": "Forward Slash",
-
     // Controls whether to include the header file of a refactored function/symbol to its corresponding source file when doing a refactoring action, such as create declaration/definition.
     //  - always: Always include the header file if it is not included explicitly in its source file.
     //  - ifNeeded: Only include the header file if it is not included explicitly in its source file or through implicit inclusion.
     //  - never: Never include the header file.
     "C_Cpp.refactoring.includeHeader": "always",
 
-    // The maximum number of processes to keep in memory for 'Find All References' and 'Rename'. The default of `0` disables this feature. The value of `null` (empty) uses the value inherited from `C_Cpp.maxCachedProcesses`.
-    "C_Cpp.references.maxCachedProcesses": 0,
-
-    // The maximum number of concurrent threads to use for 'Find All References' and 'Rename'. The default of `null` (empty) uses the value inherited from `C_Cpp.maxConcurrentThreads`.
-    "C_Cpp.references.maxConcurrentThreads": null,
-
-    // Fewer 'Find All References' and 'Rename' processes will be cached and run concurrently after this memory usage (in MB) is exceeded. The default of `null` (empty) uses the value inherited from `C_Cpp.maxMemory`.
-    "C_Cpp.references.maxMemory": null,
-
     // If `true`, 'Rename Symbol' will require a valid C/C++ identifier.
     "C_Cpp.renameRequiresIdentifier": true,
 
-    // If `true`, tooltips of hover and auto-complete will only display certain labels of structured comments. Otherwise, all comments are displayed.
-    "C_Cpp.simplifyStructuredComments": true,
-
-    // Controls whether the SSH Targets view is visible. By default, enable the view when an SSH command is invoked.
-    "C_Cpp.sshTargetsView": "default",
-
     // If `true`, snippets are provided by the language server.
     "C_Cpp.suggestSnippets": true,
+
+    // Controls whether parsing of the non-active workspace files uses sleeps to avoid using 100% CPU. The values `highest`/`high`/`medium`/`low` correspond to approximately 100/75/50/25% CPU usage.
+    "C_Cpp.workspaceParsingPriority": "highest",
+
+    // The symbols to include in the query results when 'Go to Symbol in Workspace' is invoked.
+    "C_Cpp.workspaceSymbols": "Just My Code",
+
+    // Formatting
+    // Name of the predefined style used as a fallback in case `clang-format` is invoked with style `file` but the `.clang-format` file is not found. Possible values are `Visual Studio`, `LLVM`, `Google`, `Chromium`, `Mozilla`, `WebKit`, `Microsoft`, `GNU`, `none`, or use `{key: value, ...}` to set specific parameters. For example, the `Visual Studio` style is similar to: `{ BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 0, AccessModifierOffset: -4, NamespaceIndentation: All, FixNamespaceComments: false }`.
+    "C_Cpp.clang_format_fallbackStyle": "Visual Studio",
+
+    // The full path of the `clang-format` executable. If not specified, and `clang-format` is available in the environment path, that is used unless the version bundled with the extension is newer. If not found in the environment path, the `clang-format` bundled with the extension will be used.
+    "C_Cpp.clang_format_path": "",
+
+    // If set, overrides the include sorting behavior determined by the `SortIncludes` parameter.
+    "C_Cpp.clang_format_sortIncludes": null,
+
+    // Coding style, currently supports: `Visual Studio`, `LLVM`, `Google`, `Chromium`, `Mozilla`, `WebKit`, `Microsoft`, `GNU`. Use `file` to load the style from a `.clang-format` file in the current or parent directory, or use `file:<path>/.clang-format` to reference a specific path. Use `{key: value, ...}` to set specific parameters. For example, the `Visual Studio` style is similar to: `{ BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 0, AccessModifierOffset: -4, NamespaceIndentation: All, FixNamespaceComments: false }`.
+    "C_Cpp.clang_format_style": "file",
+
+    // Configures the formatting engine.
+    //  - clangFormat: `clang-format` will be used to format code.
+    //  - vcFormat: The Visual C++ formatting engine will be used to format code.
+    //  - default: By default, `clang-format` will be used to format the code. However, the Visual C++ formatting engine will be used if an `.editorconfig` file with relevant settings is found nearer to the code being formatted and `C_Cpp.clang_format_style` is the default value: `file`.
+    //  - disabled: Code formatting will be disabled.
+    "C_Cpp.formatting": "default",
 
     // Access specifiers are indented relative to class or struct definitions by the amount specified in the `editor.tabSize` setting.
     "C_Cpp.vcFormat.indent.accessSpecifiers": false,
@@ -15409,7 +15535,7 @@
     "C_Cpp.vcFormat.indent.caseLabels": false,
 
     // The position of goto labels.
-    //  - oneLeft: Position goto labels to the left of the current code indentation, by the amount specified in the `editor.tabSize` setting.
+    //  - oneLeft: Position goto labels to the left of the current code indentation by the amount specified in the `editor.tabSize` setting.
     //  - leftmostColumn: Position goto labels at the leftmost edge of the code.
     //  - none: Goto labels will not be formatted.
     "C_Cpp.vcFormat.indent.gotoLabels": "oneLeft",
@@ -15427,7 +15553,7 @@
     "C_Cpp.vcFormat.indent.namespaceContents": true,
 
     // The position of preprocessor directives.
-    //  - oneLeft: Preprocessor directives are positioned to the left of the current code indentation, by the amount specified in the `editor.tabSize` setting.
+    //  - oneLeft: Preprocessor directives are positioned to the left of the current code indentation by the amount specified in the `editor.tabSize` setting.
     //  - leftmostColumn: Preprocessor directives are positioned at the leftmost edge of the code.
     //  - none: Preprocessor directives will not be formatted.
     "C_Cpp.vcFormat.indent.preprocessor": "leftmostColumn",
@@ -15612,17 +15738,175 @@
     //  - never: Code blocks are always formatted based on the values of the `C_Cpp.vcFormat.newLine.*` settings.
     "C_Cpp.vcFormat.wrap.preserveBlocks": "oneLiners",
 
+    // Code Documentation
+    // Defines the editor behavior for when the Enter key is pressed inside a multiline or single line comment block.
+    "C_Cpp.commentContinuationPatterns": ["/**"],
+
+    // The string of characters used as the starting line of the Doxygen comment.
+    "C_Cpp.doxygen.generatedStyle": "///",
+
+    // Controls whether to automatically insert the Doxygen comment after typing the chosen comment style.
+    "C_Cpp.doxygen.generateOnType": true,
+
+    // Select the Doxygen section tags that you would like to appear on hover in the tooltip area when the 'Simplify Structured Comments' setting is enabled.
+    "C_Cpp.doxygen.sectionTags": [
+        "attention",
+        "tparam",
+        "param",
+        "result",
+        "returns",
+        "retval",
+        "exception",
+        "deprecated",
+        "warning",
+        "note"
+    ],
+
+    // Select whether markdown will be available in the hover tooltip. By default, only a subset of markdown will be applied to comments in the hover tooltip.
+    //  - subsetEnabled: Enable all markdown features in the hover tooltip except those that include the '_' and '*' characters.
+    //  - enabled: Enable all markdown features in the hover tooltip.
+    //  - disabled: Disable all markdown features in the hover tooltip.
+    "C_Cpp.markdownInComments": "subsetEnabled",
+
+    // If `true`, tooltips of hover and auto-complete will only display certain labels of structured comments. Otherwise, all comments are displayed.
+    "C_Cpp.simplifyStructuredComments": true,
+
+    // Code Analysis
+    // Additional command line arguments to pass to `clang-tidy`. These take precedence over the equivalent `C_Cpp.codeAnalysis.clangTidy.*` settings.
+    "C_Cpp.codeAnalysis.clangTidy.args": [],
+
+    // List of disabled `clang-tidy` checks. The values are appended to the `Checks` in a `.clang-tidy` file or `C_Cpp.codeAnalysis.clangTidy.config`, if any.
+    "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [],
+
+    // List of enabled `clang-tidy` checks. The values are appended to the `Checks` in a `.clang-tidy` file or `C_Cpp.codeAnalysis.clangTidy.config`, if any. The default check `clang-analyzer-*` is always used unless it is explicitly disabled.
+    "C_Cpp.codeAnalysis.clangTidy.checks.enabled": [],
+
+    // If `true`, formatting will be run on the lines changed by 'Fix' code actions.
+    "C_Cpp.codeAnalysis.clangTidy.codeAction.formatFixes": true,
+
+    // Controls which 'Clear' code analysis problem code action options are available. Changing the setting to show more options may require re-running code analysis.
+    //  - None: Show no 'Clear' code actions.
+    //  - AllOnly: Show only the 'Clear all' code action (or 'Clear all <type>' if there is only one type or 'Clear this' if there is only one problem).
+    //  - AllAndAllType: Show the 'Clear all' code action (if there are multiple problem types) and the 'Clear all <type>' code action (or 'Clear this' if there is only one problem for the <type>)
+    //  - AllAndAllTypeAndThis: Show the 'Clear all' (if there are multiple problem types), 'Clear all <type>' (if there are multiple problems for the <type>), and 'Clear this' code actions
+    "C_Cpp.codeAnalysis.clangTidy.codeAction.showClear": "AllAndAllTypeAndThis",
+
+    // If `true`, the 'Disable' code action will be shown when available (the next time code analysis is run). When the 'Disable' code action is used, it adds the warning code to the `C_Cpp.codeAnalysis.clangTidy.checks.disabled` setting.
+    "C_Cpp.codeAnalysis.clangTidy.codeAction.showDisable": true,
+
+    // If `true`, the 'Show Documentation for' code action will be shown when available (the next time code analysis is run).
+    "C_Cpp.codeAnalysis.clangTidy.codeAction.showDocumentation": true,
+
+    // Specifies a `clang-tidy` configuration in YAML/JSON format: `{Checks: '-*,clang-analyzer-*', CheckOptions: [{key: x, value: y}]}`. When the value is empty, `clang-tidy` will attempt to find a file named `.clang-tidy` for each source file in its parent directories.
+    "C_Cpp.codeAnalysis.clangTidy.config": "",
+
+    // If `true`, code analysis using `clang-tidy` will be enabled and will run after a file is opened or saved if `C_Cpp.codeAnalysis.runAutomatically` is `true` (the default).
+    "C_Cpp.codeAnalysis.clangTidy.enabled": false,
+
+    // Specifies a `clang-tidy` configuration in YAML/JSON format to be used as a fallback when `C_Cpp.codeAnalysis.clangTidy.config` is not set and no `.clang-tidy` file is found: `{Checks: '-*,clang-analyzer-*', CheckOptions: [{key: x, value: y}]}`.
+    "C_Cpp.codeAnalysis.clangTidy.fallbackConfig": "",
+
+    // A POSIX extended regular expression (ERE) matching the names of the headers to output diagnostics from. Diagnostics from the main file of each translation unit are always displayed. The `${workspaceFolder}` variable is supported (and is used as the default fallback value if no `.clang-tidy` file exists). If this option is not `null` (empty), it overrides the `HeaderFilterRegex` option in a `.clang-tidy` file, if any.
+    "C_Cpp.codeAnalysis.clangTidy.headerFilter": null,
+
+    // The full path of the `clang-tidy` executable. If not specified, and `clang-tidy` is available in the environment path, that is used unless the version bundled with the extension is newer. If not found in the environment path, the `clang-tidy` bundled with the extension will be used.
+    "C_Cpp.codeAnalysis.clangTidy.path": "",
+
+    // If `true` and `compileCommands` is set, the `-p=<build-path>` argument is passed to `clang-tidy` instead of build arguments being passed after `--`. This may not work if environment variables aren't set so that system includes can be found.
+    "C_Cpp.codeAnalysis.clangTidy.useBuildPath": false,
+
+    // Configure glob patterns for excluding folders and files for code analysis. Files not under the workspace folder are always excluded. Inherits values from `files.exclude#` and `#C_Cpp.files.exclude`. Learn more about [glob patterns](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).
+    "C_Cpp.codeAnalysis.exclude": {},
+
+    // The maximum number of concurrent threads to use for code analysis. The default of `null` (empty) uses half the value inherited from `C_Cpp.maxConcurrentThreads`.
+    "C_Cpp.codeAnalysis.maxConcurrentThreads": null,
+
+    // Fewer code analysis processes will run concurrently after this memory usage (in MB) is exceeded. The default of `null` (empty) uses the value inherited from `C_Cpp.maxMemory`.
+    "C_Cpp.codeAnalysis.maxMemory": null,
+
+    // If `true`, code analysis will run automatically on a file after it is opened or saved.
+    "C_Cpp.codeAnalysis.runAutomatically": true,
+
+    // Controls the delay in milliseconds before code analysis starts processing after a save is triggered from an edit when `files.autoSave#` is `afterDelay` and `#C_Cpp.codeAnalysis.runAutomatically` is `true`.
+    "C_Cpp.codeAnalysis.updateDelay": 2000,
+
+    // Debugging
+    // If `true`, debugger shell command substitution will use obsolete backtick ``(`)``.
+    "C_Cpp.debugger.useBacktickCommandSubstitution": false,
+
+    // Show the "Run and Debug" play button and "Add Debug Configuration" gear in the editor title bar for C++ files.
+    "C_Cpp.debugShortcut": true,
+
+    // Controls whether the SSH Targets view is visible. By default, enable the view when an SSH command is invoked.
+    "C_Cpp.sshTargetsView": "default",
+
+    // Resource Management
+    // The maximum number of IntelliSense processes to keep running. The default of `null` (empty) uses value inherited from `C_Cpp.maxCachedProcesses`.
+    "C_Cpp.intelliSense.maxCachedProcesses": null,
+
+    // Older IntelliSense processes will shut down before new processes are created after this memory usage (in MB) is exceeded. The default of `null` (empty) uses the value inherited from `C_Cpp.maxMemory`.
+    "C_Cpp.intelliSense.maxMemory": null,
+
+    // Defines the folder path for cached precompiled headers used by IntelliSense. The default cache path is `%LocalAppData%/Microsoft/vscode-cpptools` on Windows, `$XDG_CACHE_HOME/vscode-cpptools/` on Linux (or `$HOME/.cache/vscode-cpptools/` if `XDG_CACHE_HOME` is not defined), and `$HOME/Library/Caches/vscode-cpptools/` on macOS. The default path will be used if no path is specified or if a specified path is invalid.
+    "C_Cpp.intelliSenseCachePath": "",
+
+    // Maximum size of the per-workspace hard drive space in megabytes (MB) for cached precompiled headers; the actual usage may fluctuate around this value. The default size is `5120` MB. Precompiled header caching is disabled when the size is `0`.
+    "C_Cpp.intelliSenseCacheSize": 5120,
+
+    // Memory usage limit in megabytes (MB) of an IntelliSense process. The default is `4096` and the maximum is `16384`. The extension will shutdown and restart an IntelliSense process when it exceeds the limit.
+    "C_Cpp.intelliSenseMemoryLimit": 4096,
+
+    // The maximum number of cached processes to use for language service processing. The default of `null` (empty) uses twice the number of logical processors available.
+    "C_Cpp.maxCachedProcesses": null,
+
+    // The maximum number of concurrent threads to use for language service processing. The value is a hint and may not always be used. The default of `null` (empty) uses the number of logical processors available.
+    "C_Cpp.maxConcurrentThreads": null,
+
+    // The maximum memory (in MB) available for language service processing. Fewer processes will be cached and run concurrently after this memory usage is exceeded. The default of `null` (empty) uses the system's free memory.
+    "C_Cpp.maxMemory": null,
+
+    // The maximum number of results to show for 'Go to Symbol in Workspace'. The default is `5000`.
+    "C_Cpp.maxSymbolSearchResults": 5000,
+
+    // The maximum number of processes to keep in memory for 'Find All References' and 'Rename'. The default of `0` disables this feature. The value of `null` (empty) uses the value inherited from `C_Cpp.maxCachedProcesses`.
+    "C_Cpp.references.maxCachedProcesses": 0,
+
+    // The maximum number of concurrent threads to use for 'Find All References' and 'Rename'. The default of `null` (empty) uses the value inherited from `C_Cpp.maxConcurrentThreads`.
+    "C_Cpp.references.maxConcurrentThreads": null,
+
+    // Fewer 'Find All References' and 'Rename' processes will be cached and run concurrently after this memory usage (in MB) is exceeded. The default of `null` (empty) uses the value inherited from `C_Cpp.maxMemory`.
+    "C_Cpp.references.maxMemory": null,
+
+    // Miscellaneous
+    // Add include paths from `nan` and `node-addon-api` when they are dependencies.
+    "C_Cpp.addNodeAddonIncludePaths": false,
+
+    // Controls whether files are automatically added to `files.associations` when they are the target of a navigation operation from a C/C++ file.
+    "C_Cpp.autoAddFileAssociations": false,
+
+    // If set to `default`, the file system of the workspace is assumed to be case insensitive on Windows and case sensitive on macOS or Linux. If set to `enabled`, the file system of the workspace is assumed to be case sensitive on Windows.
+    "C_Cpp.caseSensitiveFileSupport": "default",
+
+    // If `disabled`, no 'Generate Copilot summary' option will appear on hover.
+    "C_Cpp.copilotHover": "default",
+
+    // Controls whether "experimental" features are usable.
+    "C_Cpp.experimentalFeatures": "disabled",
+
+    // The verbosity of logging in the Output Panel. The order of levels from least verbose to most verbose is: `None` < `Error` < `Warning` < `Information` < `Debug`.
+    "C_Cpp.loggingLevel": "Error",
+
+    // Remember the last used Visual Studio developer environment for the current workspace. This setting is only applicable for Windows.
+    "C_Cpp.persistVsDeveloperEnvironment": true,
+
+    // The character used as a path separator for generated user paths.
+    "C_Cpp.preferredPathSeparator": "Forward Slash",
+
     // Enable integration services for the [vcpkg dependency manager](https://aka.ms/vcpkg/).
     "C_Cpp.vcpkg.enabled": true,
 
     // If `disabled`, Windows Error Reporting will be disabled. If `default`, Windows Error Reporting will be enabled, but it becomes disabled after the first crash in the current session. Changing the setting doesn't affect currently running IntelliSense processes.
     "C_Cpp.windowsErrorReportingMode": "default",
-
-    // Controls whether parsing of the non-active workspace files uses sleeps to avoid using 100% CPU. The values `highest`/`high`/`medium`/`low` correspond to approximately 100/75/50/25% CPU usage.
-    "C_Cpp.workspaceParsingPriority": "highest",
-
-    // The symbols to include in the query results when 'Go to Symbol in Workspace' is invoked.
-    "C_Cpp.workspaceSymbols": "Just My Code",
 
     // Hex Editor
     // The number of bytes per row to show in the editor.
@@ -15745,13 +16029,6 @@
     "makefile.saveBeforeBuildOrConfigure": true,
 
     // Interface
-    // Specifies to search for references only within open documents instead of all workspace files. An alternative to `powershell.enableReferencesCodeLens` that allows large workspaces to support some references without the performance impact.
-    "powershell.analyzeOpenDocumentsOnly": false,
-
-    // **Deprecated:** This setting was never meant to be changed!
-    // **Deprecated:** Specifies the URL of the GitHub project in which to generate bug reports.
-    "powershell.bugReporting.project": "https://github.com/PowerShell/vscode-powershell",
-
     // Show buttons in the editor's title bar for moving the terminals pane (with the PowerShell Extension Terminal) around.
     "powershell.buttons.showPanelMovementButtons": false,
 
@@ -15764,6 +16041,44 @@
     // Shows the last line of a folded section similar to the default VS Code folding style. When disabled, the entire folded region is hidden.
     "powershell.codeFolding.showLastLine": true,
 
+    // Specifies if Code Lenses are displayed above function definitions, used to show the number of times the function is referenced in the workspace and navigate to those references. Large workspaces may want to disable this setting if performance is compromised. See also `powershell.analyzeOpenDocumentsOnly`.
+    "powershell.enableReferencesCodeLens": true,
+
+    // Specifies the [comment based help](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comment_based_help) completion style triggered by typing ` ##`.
+    //  - Disabled: Disables the feature.
+    //  - BlockComment: Inserts a block style help comment, for example:
+    //
+    // `<#`
+    //
+    // `.<help keyword>`
+    //
+    // `<help content>`
+    //
+    // `#>`
+    //  - LineComment: Inserts a line style help comment, for example:
+    //
+    // `# .<help keyword>`
+    //
+    // `# <help content>`
+    "powershell.helpCompletion": "BlockComment",
+
+    // **Deprecated:** This prompt has been removed as it's no longer strictly necessary to upgrade the `PackageManagement` module.
+    // **Deprecated:** Specifies whether you should be prompted to update your version of `PackageManagement` if it's under 1.4.6.
+    "powershell.promptToUpdatePackageManagement": false,
+
+    // Specifies whether you may be prompted to update your version of PowerShell.
+    "powershell.promptToUpdatePowerShell": true,
+
+    // Specifies an array of modules to exclude from Command Explorer listing.
+    "powershell.sideBar.CommandExplorerExcludeFilter": [],
+
+    // Specifies the visibility of the Command Explorer in the side bar.
+    "powershell.sideBar.CommandExplorerVisibility": false,
+
+    // Suppresses the warning message when any of `powershell.powerShellAdditionalExePaths` is not found.
+    "powershell.suppressAdditionalExeNotFoundWarning": false,
+
+    // Formatting
     // Adds a space before and after the pipeline operator (`|`) if it is missing.
     "powershell.codeFormatting.addWhitespaceAroundPipe": true,
 
@@ -15841,6 +16156,10 @@
     // Adds a space after an opening brace (`{`) and before a closing brace (`}`).
     "powershell.codeFormatting.whitespaceInsideBrace": true,
 
+    // Editor Services
+    // Specifies to search for references only within open documents instead of all workspace files. An alternative to `powershell.enableReferencesCodeLens` that allows large workspaces to support some references without the performance impact.
+    "powershell.analyzeOpenDocumentsOnly": false,
+
     // A path where the Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. Does not support variables, but does support the use of '~' and paths relative to a single workspace. **For multi-root workspaces, use the name of the folder you wish to have as the cwd.**
     "powershell.cwd": "",
 
@@ -15851,6 +16170,80 @@
     //  - DotSource: Use the Dot-Source operator `.` to launch the script, for example, `. 'C:\Data\MyScript.ps1'`
     //  - Call: Use the Call operator `&` to launch the script, for example, `& 'C:\Data\MyScript.ps1'`
     "powershell.debugging.executeMode": "DotSource",
+
+    // Specifies whether the extension loads [PowerShell profiles](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles). Note that the extension's "Current Host" profile is `Microsoft.VSCode_profile.ps1`, which will be loaded instead of the default "Current Host" profile of `Microsoft.PowerShell_profile.ps1`. Use the "All Hosts" profile `profile.ps1` for common configuration.
+    "powershell.enableProfileLoading": true,
+
+    // Specifies a list of Item / Value pairs where the **Item** is a user-chosen name and the **Value** is an absolute path to a PowerShell executable. The name appears in the [Session Menu Command](command:PowerShell.ShowSessionMenu) and is used to reference this executable in the `powershell.powerShellDefaultVersion` setting.
+    "powershell.powerShellAdditionalExePaths": {},
+
+    // Specifies the default PowerShell version started by the extension. The name must match what is displayed in the [Session Menu command](command:PowerShell.ShowSessionMenu), for example, `Windows PowerShell (x86)`. You can specify additional PowerShell executables with the `powershell.powerShellAdditionalExePaths` setting.
+    "powershell.powerShellDefaultVersion": "",
+
+    // **Deprecated:** Please use the `powershell.powerShellAdditionalExePaths` setting instead.
+    // **Deprecated:** Specifies the path to the PowerShell executable.
+    "powershell.powerShellExePath": "",
+
+    // Enables real-time script analysis using [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer) that populates the [Problems view](command:workbench.panel.markers.view.focus).
+    "powershell.scriptAnalysis.enable": true,
+
+    // Specifies the path to a [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer) settings file. **This setting may not work as expected currently!**
+    "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
+
+    // Starts the PowerShell extension's underlying PowerShell process as a login shell, if applicable.
+    "powershell.startAsLoginShell.linux": false,
+
+    // Starts the PowerShell extension's underlying PowerShell process as a login shell, if applicable.
+    "powershell.startAsLoginShell.osx": true,
+
+    // Starts the PowerShell extension automatically when a PowerShell file is opened. If `false`, to start the extension use the [Restart Session command](command:PowerShell.RestartSession). **IntelliSense, code navigation, the Extension Terminal, code formatting, and other features are not enabled until the extension starts.**
+    "powershell.startAutomatically": true,
+
+    // **Deprecated:** This setting was removed when the PowerShell installation searcher was added. Please use the `powershell.powerShellAdditionalExePaths` setting instead.
+    // **Deprecated:** Uses the 32-bit language service on 64-bit Windows. This setting has no effect on 32-bit Windows or on the PowerShell extension debugger, which has its own architecture configuration.
+    "powershell.useX86Host": false,
+
+    // Pester
+    // This setting controls the appearance of the `Run Tests` and `Debug Tests` CodeLenses that appears above Pester tests.
+    "powershell.pester.codeLens": true,
+
+    // Defines the verbosity of output to be used when debugging a test or a block. For Pester 5 and newer the default value `Diagnostic` will print additional information about discovery, skipped and filtered tests, mocking and more.
+    "powershell.pester.debugOutputVerbosity": "Diagnostic",
+
+    // Defines the verbosity of output to be used. For Pester 5 and newer the default value `FromPreference` will use the `Output` settings from the `$PesterPreference` defined in the caller's context, and will default to `Normal` if there is none. For Pester 4 the `FromPreference` and `Normal` options map to `All`, and `Minimal` option maps to `Fails`.
+    "powershell.pester.outputVerbosity": "FromPreference",
+
+    // Use a CodeLens that is compatible with Pester 4. Disabling this will show `Run Tests` on all `It`, `Describe` and `Context` blocks, and will correctly work only with Pester 5 and newer.
+    "powershell.pester.useLegacyCodeLens": true,
+
+    // Terminal
+    // Switches focus to the console when a script selection is run or a script file is debugged.
+    "powershell.integratedConsole.focusConsoleOnExecute": true,
+
+    // Use the VS Code API to clear the terminal since that's the only reliable way to clear the scrollback buffer. Turn this on if you're used to `Clear-Host` clearing scroll history. **This setting is not recommended and likely to be deprecated!**
+    "powershell.integratedConsole.forceClearScrollbackBuffer": false,
+
+    // Shows the Extension Terminal when the PowerShell extension is initialized. When disabled, the pane is not opened on startup, but the Extension Terminal is still created in order to power the extension's features.
+    "powershell.integratedConsole.showOnStartup": true,
+
+    // Starts the Extension Terminal in the background. **If this is enabled, to access the terminal you must run the [Show Extension Terminal command](command:PowerShell.ShowSessionConsole), and once shown it cannot be put back into the background.** This option completely hides the Extension Terminal from the terminals view. You are probably looking for the `powershell.integratedConsole.showOnStartup` option instead.
+    "powershell.integratedConsole.startInBackground": false,
+
+    // Sets the startup location for Extension Terminal.
+    //  - Editor: Creates the Extension Terminal in Editor area
+    //  - Panel: Creates the Extension Terminal in Panel area
+    "powershell.integratedConsole.startLocation": "Panel",
+
+    // Do not show the startup banner in the PowerShell Extension Terminal.
+    "powershell.integratedConsole.suppressStartupBanner": false,
+
+    // This will disable the use of PSReadLine in the PowerShell Extension Terminal and use a legacy implementation. **This setting is not recommended and likely to be deprecated!**
+    "powershell.integratedConsole.useLegacyReadLine": false,
+
+    // Developer
+    // **Deprecated:** This setting was never meant to be changed!
+    // **Deprecated:** Specifies the URL of the GitHub project in which to generate bug reports.
+    "powershell.bugReporting.project": "https://github.com/PowerShell/vscode-powershell",
 
     // Specifies an alternative path to the folder containing modules that are bundled with the PowerShell extension, that is: PowerShell Editor Services, PSScriptAnalyzer and PSReadLine. **This setting is only meant for extension developers and requires the extension to be run in development mode!**
     "powershell.developer.bundledModulesPath": "../../PowerShellEditorServices/module",
@@ -15879,112 +16272,8 @@
     // Specifies how many seconds the extension will wait for the LSP server, PowerShell Editor Services, to connect. The default is four minutes; try increasing this value if your computer is particularly slow (often caused by overactive anti-malware programs).
     "powershell.developer.waitForSessionFileTimeoutSeconds": 240,
 
-    // Specifies whether the extension loads [PowerShell profiles](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles). Note that the extension's "Current Host" profile is `Microsoft.VSCode_profile.ps1`, which will be loaded instead of the default "Current Host" profile of `Microsoft.PowerShell_profile.ps1`. Use the "All Hosts" profile `profile.ps1` for common configuration.
-    "powershell.enableProfileLoading": true,
-
-    // Specifies if Code Lenses are displayed above function definitions, used to show the number of times the function is referenced in the workspace and navigate to those references. Large workspaces may want to disable this setting if performance is compromised. See also `powershell.analyzeOpenDocumentsOnly`.
-    "powershell.enableReferencesCodeLens": true,
-
-    // Specifies the [comment based help](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comment_based_help) completion style triggered by typing ` ##`.
-    //  - Disabled: Disables the feature.
-    //  - BlockComment: Inserts a block style help comment, for example:
-    //
-    // `<#`
-    //
-    // `.<help keyword>`
-    //
-    // `<help content>`
-    //
-    // `#>`
-    //  - LineComment: Inserts a line style help comment, for example:
-    //
-    // `# .<help keyword>`
-    //
-    // `# <help content>`
-    "powershell.helpCompletion": "BlockComment",
-
-    // Switches focus to the console when a script selection is run or a script file is debugged.
-    "powershell.integratedConsole.focusConsoleOnExecute": true,
-
-    // Use the VS Code API to clear the terminal since that's the only reliable way to clear the scrollback buffer. Turn this on if you're used to `Clear-Host` clearing scroll history. **This setting is not recommended and likely to be deprecated!**
-    "powershell.integratedConsole.forceClearScrollbackBuffer": false,
-
-    // Shows the Extension Terminal when the PowerShell extension is initialized. When disabled, the pane is not opened on startup, but the Extension Terminal is still created in order to power the extension's features.
-    "powershell.integratedConsole.showOnStartup": true,
-
-    // Starts the Extension Terminal in the background. **If this is enabled, to access the terminal you must run the [Show Extension Terminal command](command:PowerShell.ShowSessionConsole), and once shown it cannot be put back into the background.** This option completely hides the Extension Terminal from the terminals view. You are probably looking for the `powershell.integratedConsole.showOnStartup` option instead.
-    "powershell.integratedConsole.startInBackground": false,
-
-    // Sets the startup location for Extension Terminal.
-    //  - Editor: Creates the Extension Terminal in Editor area
-    //  - Panel: Creates the Extension Terminal in Panel area
-    "powershell.integratedConsole.startLocation": "Panel",
-
-    // Do not show the startup banner in the PowerShell Extension Terminal.
-    "powershell.integratedConsole.suppressStartupBanner": false,
-
-    // This will disable the use of PSReadLine in the PowerShell Extension Terminal and use a legacy implementation. **This setting is not recommended and likely to be deprecated!**
-    "powershell.integratedConsole.useLegacyReadLine": false,
-
-    // This setting controls the appearance of the `Run Tests` and `Debug Tests` CodeLenses that appears above Pester tests.
-    "powershell.pester.codeLens": true,
-
-    // Defines the verbosity of output to be used when debugging a test or a block. For Pester 5 and newer the default value `Diagnostic` will print additional information about discovery, skipped and filtered tests, mocking and more.
-    "powershell.pester.debugOutputVerbosity": "Diagnostic",
-
-    // Defines the verbosity of output to be used. For Pester 5 and newer the default value `FromPreference` will use the `Output` settings from the `$PesterPreference` defined in the caller's context, and will default to `Normal` if there is none. For Pester 4 the `FromPreference` and `Normal` options map to `All`, and `Minimal` option maps to `Fails`.
-    "powershell.pester.outputVerbosity": "FromPreference",
-
-    // Use a CodeLens that is compatible with Pester 4. Disabling this will show `Run Tests` on all `It`, `Describe` and `Context` blocks, and will correctly work only with Pester 5 and newer.
-    "powershell.pester.useLegacyCodeLens": true,
-
-    // Specifies a list of Item / Value pairs where the **Item** is a user-chosen name and the **Value** is an absolute path to a PowerShell executable. The name appears in the [Session Menu Command](command:PowerShell.ShowSessionMenu) and is used to reference this executable in the `powershell.powerShellDefaultVersion` setting.
-    "powershell.powerShellAdditionalExePaths": {},
-
-    // Specifies the default PowerShell version started by the extension. The name must match what is displayed in the [Session Menu command](command:PowerShell.ShowSessionMenu), for example, `Windows PowerShell (x86)`. You can specify additional PowerShell executables with the `powershell.powerShellAdditionalExePaths` setting.
-    "powershell.powerShellDefaultVersion": "",
-
-    // **Deprecated:** Please use the `powershell.powerShellAdditionalExePaths` setting instead.
-    // **Deprecated:** Specifies the path to the PowerShell executable.
-    "powershell.powerShellExePath": "",
-
-    // **Deprecated:** This prompt has been removed as it's no longer strictly necessary to upgrade the `PackageManagement` module.
-    // **Deprecated:** Specifies whether you should be prompted to update your version of `PackageManagement` if it's under 1.4.6.
-    "powershell.promptToUpdatePackageManagement": false,
-
-    // Specifies whether you may be prompted to update your version of PowerShell.
-    "powershell.promptToUpdatePowerShell": true,
-
-    // Enables real-time script analysis using [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer) that populates the [Problems view](command:workbench.panel.markers.view.focus).
-    "powershell.scriptAnalysis.enable": true,
-
-    // Specifies the path to a [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer) settings file. **This setting may not work as expected currently!**
-    "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
-
-    // Specifies an array of modules to exclude from Command Explorer listing.
-    "powershell.sideBar.CommandExplorerExcludeFilter": [],
-
-    // Specifies the visibility of the Command Explorer in the side bar.
-    "powershell.sideBar.CommandExplorerVisibility": false,
-
-    // Starts the PowerShell extension's underlying PowerShell process as a login shell, if applicable.
-    "powershell.startAsLoginShell.linux": false,
-
-    // Starts the PowerShell extension's underlying PowerShell process as a login shell, if applicable.
-    "powershell.startAsLoginShell.osx": true,
-
-    // Starts the PowerShell extension automatically when a PowerShell file is opened. If `false`, to start the extension use the [Restart Session command](command:PowerShell.RestartSession). **IntelliSense, code navigation, the Extension Terminal, code formatting, and other features are not enabled until the extension starts.**
-    "powershell.startAutomatically": true,
-
-    // Suppresses the warning message when any of `powershell.powerShellAdditionalExePaths` is not found.
-    "powershell.suppressAdditionalExeNotFoundWarning": false,
-
     // Traces the communication between VS Code and the PowerShell Editor Services [LSP Server](https://microsoft.github.io/language-server-protocol/). The output will be logged and also visible in the Output pane, where the verbosity is configurable. **For extension developers and issue troubleshooting only!**
     "powershell.trace.server": "off",
-
-    // **Deprecated:** This setting was removed when the PowerShell installation searcher was added. Please use the `powershell.powerShellAdditionalExePaths` setting instead.
-    // **Deprecated:** Uses the 32-bit language service on 64-bit Windows. This setting has no effect on 32-bit Windows or on the PowerShell extension debugger, which has its own architecture configuration.
-    "powershell.useX86Host": false,
 
     // Remote Explorer
     // Collapse the recent folders under Remote targets in the Remote Explorer.
@@ -16714,11 +17003,11 @@
     // Disabled diagnostic (Use code in hover brackets).
     "Lua.diagnostics.disable": [],
 
-    // Do not diagnose Lua files that use the following scheme.
-    "Lua.diagnostics.disableScheme": ["git"],
-
     // Enable diagnostics.
     "Lua.diagnostics.enable": true,
+
+    // TODO: Needs documentation
+    "Lua.diagnostics.enableScheme": ["file"],
 
     // Defined global variables.
     "Lua.diagnostics.globals": [],
@@ -16936,6 +17225,7 @@
     //  - Lua 5.2: TODO: Needs documentation
     //  - Lua 5.3: TODO: Needs documentation
     //  - Lua 5.4: TODO: Needs documentation
+    //  - Lua 5.5: TODO: Needs documentation
     //  - LuaJIT: TODO: Needs documentation
     "Lua.runtime.version": "Lua 5.4",
 
@@ -17397,6 +17687,9 @@
     "java.test.defaultConfig": "",
 
     // Maven for Java
+    // Enable GAV (GroupId, ArtifactId, Version) completions in pom.xml
+    "maven.completion.gavEnabled": true,
+
     // Specify whether to show diagnostics for conflict dependencies.
     "maven.dependency.enableConflictDiagnostics": "true",
 
@@ -17517,6 +17810,12 @@
 
     // If set to 'true', the extension will disable the project detection.
     "vsicons.projectDetection.disableDetect": false,
+
+    // RC Script
+    // Specifies the full path to the RC Editor executable.
+    // Note: If editor is located in your Path variable
+    // you can just enter the name of the executable.
+    "rc-script.fullPathToEditor": "",
 
     // VimL
     // Force use 8-spaces-size and tab as Vim Help file's indentation style (Even higher priority than EditorConfig, etc.)

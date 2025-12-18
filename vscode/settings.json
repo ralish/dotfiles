@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code settings
      *
-     * Last reviewed release: v1.106.0
+     * Last reviewed release: v1.107.1
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
@@ -245,6 +245,15 @@
     "autopep8.importStrategy": "fromEnvironment",
 
     // AWS Toolkit
+    /*
+     * It appears that this extension will ultimately absorb the functionality of
+     * the CloudFormation Linter extension, but right now they're not at feature
+     * parity (particularly for template formatting), so disable this for now.
+     */
+    "aws.cloudformation.completion.enabled": false,
+    "aws.cloudformation.diagnostics.cfnGuard.enabled": false,
+    "aws.cloudformation.diagnostics.cfnLint.enabled": false,
+    "aws.cloudformation.hover.enabled": false,
     "aws.cloudformation.telemetry.enabled": false,
     "aws.telemetry": false,
 
@@ -310,7 +319,6 @@
     // C# Dev Kit
     "dotnet.automaticallyCreateSolutionInWorkspace": false,
     "dotnet.testWindow.enableTestExplorerDiff": true,
-    "dotnet.testWindow.useTestingPlatformProtocol": true,
 
     // CloudFormation Linter
     "cfnLint.format.singleQuote": true,
@@ -393,6 +401,8 @@
     // GitLens: Launchpad
     "gitlens.launchpad.indicator.enabled": false,
     "gitlens.launchpad.indicator.label": "counts",
+    // GitLens: Interactive Rebase Editor
+    "gitlens.rebaseEditor.openOnPausedRebase": false,
     // GitLens: Terminal
     "gitlens.gitkraken.mcp.autoEnabled": false,
     // GitLens: AI
