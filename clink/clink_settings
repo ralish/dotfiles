@@ -1,7 +1,7 @@
 # Clink configuration
 # https://chrisant996.github.io/clink/clink.html#configuring-clink
 #
-# Last reviewed release: v1.8.8
+# Last reviewed release: v1.9.5
 # Default file path: %LOCALAPPDATA%\clink\clink_settings
 
 # ---------------------------------- Clink ------------------------------------
@@ -449,6 +449,8 @@ terminal.east_asian_ambiguous = auto
 # - auto
 # - emulate
 # - native
+#
+# Overridden by the `CLINK_ANSI_HOST` environment variable.
 terminal.emulation = auto
 
 # Respond to mouse input instead of delegating to the terminal
@@ -468,6 +470,14 @@ terminal.raw_esc = False
 
 # Display list scrollbars using extended Unicode box drawing characters
 terminal.scrollbars = True
+
+# Send shell integration codes to the terminal
+#
+# Valid values:
+# - auto
+# - on
+# - off
+terminal.shell_integration = auto
 
 # Support the Windows Ctrl+Alt substitute for the AltGr key
 terminal.use_altgr_substitute = False
