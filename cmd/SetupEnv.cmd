@@ -108,10 +108,10 @@ IF DEFINED SetupEnvVerbose ECHO * [Clink] Not found.
 :PromptSetup
 SET CustomPrompt=
 IF DEFINED SetupEnvVerbose ECHO * [Prompt] Configuring ...
+IF DEFINED HasClink GOTO :PromptAnsi
 IF DEFINED HasWinTerm GOTO :PromptStartWinTerm
 IF DEFINED HasConEmu GOTO :PromptAnsi
 IF DEFINED HasAnsiCon GOTO :PromptAnsi
-IF DEFINED HasClink GOTO :PromptAnsi
 
 :PromptBasic
 @REM Setup basic prompt
@@ -122,12 +122,14 @@ GOTO PromptApply
 
 :PromptStartWinTerm
 @REM Mark end of last command and start of prompt
-@REM Applies to: Windows Terminal
+@REM Applies to: Windows Terminal (unless Clink is loaded)
 @REM
 @REM The OSC code to pass the current working directory to the terminal was
 @REM initially introduced by ConEmu and is also supported by Windows Terminal.
-@REM We only apply it on Windows Terminal as modern ConEmu releases provide
-@REM this support through the ConEmuHk library which is injected into CMD.
+@REM
+@REM We skip applying this under ConEmu as modern releases provide this support
+@REM through the ConEmuHk library which is injected into CMD. Similarly, modern
+@REM releases of Clink have built-in support for outputting these sequences.
 @REM
 @REM OSC FinalTerm ; CmdEnd ST
 @REM OSC FinalTerm ; PromptStart ST
@@ -136,7 +138,7 @@ SET CustomPrompt=$E]133;D$E\$E]133;A$E\$E]9;9;$P$E\
 
 :PromptAnsi
 @REM Setup coloured prompt
-@REM Applies to: ANSICON, Clink, ConEmu, and Windows Terminal
+@REM Applies to: ANSICON, Clink, ConEmu, Windows Terminal
 @REM
 @REM SGR ResetAttributes
 @REM SGR SetBrightForegroundColour 2
@@ -146,13 +148,14 @@ SET CustomPrompt=$E]133;D$E\$E]133;A$E\$E]9;9;$P$E\
 @REM SGR ResetAttributes
 @REM $S (" ")
 SET CustomPrompt=%CustomPrompt%$E[m$E[92m$P$E[90m$G$E[m$S
+IF DEFINED HasClink GOTO :PromptApply
 IF DEFINED HasWinTerm GOTO PromptEndWinTerm
 IF DEFINED HasConEmu GOTO PromptEndConEmu
 GOTO PromptApply
 
 :PromptEndWinTerm
 @REM Mark end of prompt
-@REM Applies to: Windows Terminal
+@REM Applies to: Windows Terminal (unless Clink is loaded)
 @REM
 @REM OSC FinalTerm ; CmdStart ST
 SET CustomPrompt=%CustomPrompt%$E]133;B$E\
