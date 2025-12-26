@@ -1,7 +1,7 @@
 # Clink Readline configuration
 # https://chrisant996.github.io/clink/clink.html#configuring-readline
 #
-# Last reviewed release: v1.9.5
+# Last reviewed release: v1.9.6
 # Default file paths in preference order:
 # - %CLINK_INPUTRC%
 # - Clink profile directory
