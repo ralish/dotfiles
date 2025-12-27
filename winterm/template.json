@@ -281,7 +281,7 @@
                 "pathTranslationStyle": "msys2"
             },
             {
-                "name": "VS 2022 - Cmd",
+                "name": "VS - Cmd",
                 "source": "Windows.Terminal.VisualStudio",
                 // Generated from VS instance ID which is unique to an install
                 "guid": "{00000000-0000-0000-0000-000000000000}",
@@ -290,7 +290,7 @@
                 "closeOnExit": "always"
             },
             {
-                "name": "VS 2022 - PowerShell",
+                "name": "VS - PowerShell",
                 "source": "Windows.Terminal.VisualStudio",
                 // Generated from VS instance ID which is unique to an install
                 "guid": "{00000000-0000-0000-0000-000000000000}",
