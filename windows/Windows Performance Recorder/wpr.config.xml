@@ -15,6 +15,6 @@
     <SaveRecordingKeyboardShortcut WinKey="true" CtrlKey="true" ShiftKey="true" AltKey="false" CharKey="r" VirtualKeyCode="0" />
     <SaveWaypointsKeyboardShortcut WinKey="true" CtrlKey="true" ShiftKey="false" AltKey="true" CharKey="w" VirtualKeyCode="0" />
     <FireEventKeyboardShortcut WinKey="true" CtrlKey="true" ShiftKey="false" AltKey="true" CharKey="x" VirtualKeyCode="0" />
-    <NGenPdbsCachePath Value="%ProgramData%\WindowsPerformanceRecorder\NGenPdbs_Cache" />
+    <NGenPdbsCachePath Value="D:\Cache\WPR\NGen PDBs" />
   </Configuration>
 </WindowsPerformanceRecorder>
