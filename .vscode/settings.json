@@ -51,6 +51,8 @@
         ".lesskey": "properties",
         // markdownlint
         ".markdownlint.json": "jsonc",
+        // mstsc
+        "*.rdp": "ini",
         // mysql
         ".my.cnf": "ini",
         // npm
@@ -176,7 +178,7 @@
         },
         {
             "icon": "config",
-            "extensions": [".dircolors"],
+            "extensions": [".dircolors", ".rdp"],
             "filename": true,
             "format": "svg"
         },

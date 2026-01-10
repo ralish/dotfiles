@@ -112,6 +112,9 @@ temp/
 /posh/Settings/
 /pwsh/.config/powershell/
 
+# Remote Desktop Connection
+/mstsc/Default.rdp
+
 # Shell secrets
 /sh/secrets.sh
 
