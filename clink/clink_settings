@@ -95,14 +95,14 @@ autosuggest.hint = True
 # Use original capitalisation from suggestions
 autosuggest.original_case = True
 
-# Strategy for choosing suggestions
+# Strategies for choosing suggestions (space-separated)
 #
 # Valid values:
 # - completion
 # - history
 # - match_prev_cmd
 #
-# Multiple strategies are attempted in listed order (space-separated).
+# Multiple strategies are attempted in listed order.
 autosuggest.strategy = match_prev_cmd history completion
 
 # --------------------------------- Colours -----------------------------------

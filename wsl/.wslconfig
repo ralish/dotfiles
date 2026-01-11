@@ -303,7 +303,7 @@
 # Support: WSL 2.6.0
 #loadDefaultKernelModules =
 
-# List of kernel modules to load (comma-separated) [UNDOCUMENTED]
+# Kernel modules to load (comma-separated) [UNDOCUMENTED]
 #
 # Default: (empty)
 # Support: WSL 2.6.0
