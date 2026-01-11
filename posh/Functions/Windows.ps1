@@ -715,6 +715,59 @@ Function Search-Registry {
 
 #endregion
 
+#region Remote Desktop Connection
+
+# Update RDC default configuration
+Function Update-RdcDefaultConfig {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
+
+    $RdcDir = Join-Path -Path $DotFilesPath -ChildPath 'mstsc'
+    $RdcTemplateFile = Join-Path -Path $RdcDir -ChildPath 'Template.ini'
+    $RdcDefaultFile = Join-Path -Path $RdcDir -ChildPath 'Default.rdp'
+
+    $RdcDefaultSettings = Get-Content -LiteralPath $RdcTemplateFile |
+        # Exclude comments and blank lines
+        Where-Object { $_ -match '^[a-z]' } |
+        # RDC always lowercases setting names
+        ForEach-Object { $_.ToLower() }
+
+    # Encoding: UTF-16LE
+    # Arguments: bigEndian, byteOrderMark
+    $Encoder = [Text.UnicodeEncoding]::new($false, $true)
+
+    # We do this slightly convoluted dance to handle the case where the file
+    # already exists and has the Hidden and/or System attributes.
+    try {
+        $FileStream = [IO.File]::Open($RdcDefaultFile, [IO.FileMode]::OpenOrCreate)
+
+        try {
+            # Arguments: stream, encoding, bufferSize, leaveOpen
+            $StreamWriter = [IO.StreamWriter]::new($FileStream, $Encoder, 1024, $true)
+
+            foreach ($Line in $RdcDefaultSettings) {
+                $StreamWriter.WriteLine($Line)
+            }
+
+            $StreamWriter.Flush()
+        } finally {
+            $StreamWriter.Dispose()
+        }
+
+        # Truncate any trailing data if the file already existed
+        $FileStream.SetLength($FileStream.Position)
+    } finally {
+        $FileStream.Dispose()
+    }
+
+    # Match what RDC sets
+    $RdcDefaultFileAttributes = [IO.FileAttributes]::Archive + [IO.FileAttributes]::Hidden + [IO.FileAttributes]::System
+    [IO.File]::SetAttributes($RdcDefaultFile, $RdcDefaultFileAttributes)
+}
+
+#endregion
+
 #region Security
 
 # Convert security descriptors between different formats
