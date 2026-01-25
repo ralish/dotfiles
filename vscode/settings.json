@@ -168,6 +168,7 @@
     "security.allowedUNCHosts": ["wsl$"],
 
     // Security: Workspace
+    "security.workspace.trust.banner": "never",
     "security.workspace.trust.startupPrompt": "always",
 
     // ##################################################
