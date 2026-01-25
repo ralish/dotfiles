@@ -130,13 +130,13 @@
 
     // Excludes for search & quick open
     "search.exclude": {
-        "**/dotfiles/modules/**": true,
-        "**/dotfiles/posh/Help/**": true,
-        "**/dotfiles/posh/Modules/**": true,
-        "**/dotfiles/pwsh/**": true,
-        "**/dotfiles/vim/.vim/**": true,
-        "**/dotfiles/zsh/.oh-my-zsh/**": true,
-        "**/dotfiles/zsh/oh-my-zsh/**": true
+        "**/modules/": true,
+        "**/posh/Help/": true,
+        "**/posh/Modules/": true,
+        "**/pwsh/": true,
+        "**/vim/.vim/": true,
+        "**/zsh/.oh-my-zsh/": true,
+        "**/zsh/oh-my-zsh/": true
     },
 
     // Markdown table of contents generation
