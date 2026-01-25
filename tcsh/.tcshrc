@@ -339,7 +339,7 @@ set edit
 # Prompt for confirmation before executing `rm *`
 #set rmstar
 
-# Use `vi`-style key bindings instead of `emacs`-style
+# Use vi-style key bindings instead of Emacs-style
 #
 # If set, word boundaries are determined by `wordchars` versus whitespace
 # versus other characters, and the behaviour of the cursor depends upon the
