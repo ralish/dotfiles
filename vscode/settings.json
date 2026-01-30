@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code settings
      *
-     * Last reviewed release: v1.107.1
+     * Last reviewed release: v1.108.2
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
@@ -82,6 +82,7 @@
     "workbench.editor.revealIfOpen": true,
 
     // Workbench: Settings Editor
+    "workbench.settings.alwaysShowAdvancedSettings": true,
     "workbench.settings.editor": "json",
     "workbench.settings.enableNaturalLanguageSearch": false,
     "workbench.settings.showAISearchToggle": false,
@@ -387,6 +388,7 @@
     "githubIssues.issueBranchTitle": "issue${issueNumber}",
     "githubIssues.useBranchForIssues": "prompt",
     "githubPullRequests.defaultCreateOption": "create",
+    "githubPullRequests.deleteBranchAfterMerge": true,
 
     // GitHub Repositories
     "githubRepositories.autoFetch.enabled": false,
@@ -452,6 +454,10 @@
     "markdown.extension.print.theme": "dark",
     "markdown.extension.showActionButtons": true,
     "markdown.extension.toc.levels": "1..3",
+
+    // markdownlint
+    "markdownlint.severityForError": "Error",
+    "markdownlint.severityForWarning": "Warning",
 
     // Maven
     "maven.showInExplorerContextMenu": false,

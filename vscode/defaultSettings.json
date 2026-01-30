@@ -488,7 +488,7 @@
     //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
     //  - esbenp.prettier-vscode: Code formatter using prettier
-    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
+    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -524,6 +524,7 @@
     //  - ms-vscode-remote.remote-ssh-edit: Edit SSH configuration files
     //  - dnut.rewrap-revived: Hard word wrapping for comments and other text at a given column.
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
+    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - timonwong.shellcheck: Integrates ShellCheck into VS Code, a linter for Shell scripts.
     //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
     //  - XadillaX.viml: Vim Script language server protocol and highlighting support for VSCode.
@@ -536,7 +537,6 @@
     //  - bmewburn.vscode-intelephense-client: PHP code intelligence for Visual Studio Code
     //  - vscjava.vscode-java-debug: A lightweight Java debugger for Visual Studio Code
     //  - vscjava.vscode-java-pack: Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven/Gradle support, project management and more
-    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
@@ -738,8 +738,8 @@
 
     // Controls if format on save formats the whole file or only modifications. Only applies when `editor.formatOnSave` is enabled.
     //  - file: Format the whole file.
-    //  - modifications: Format modifications (requires source control).
-    //  - modificationsIfAvailable: Will attempt to format modifications only (requires source control). If source control can't be used, then the whole file will be formatted.
+    //  - modifications: Format modifications. Requires source control and a formatter that supports 'Format Selection'.
+    //  - modificationsIfAvailable: Will attempt to format modifications only (requires source control and a formatter that supports 'Format Selection'). If source control can't be used, then the whole file will be formatted.
     "editor.formatOnSaveMode": "file",
 
     // Controls whether the editor should automatically format the line after typing.
@@ -1439,6 +1439,7 @@
 
     // Controls whether completions should be computed based on words in the document and from which documents they are computed.
     //  - off: Turn off Word Based Suggestions.
+    //  - offWithInlineSuggestions: Turn off Word Based Suggestions when Inline Suggestions are present.
     //  - currentDocument: Only suggest words from the active document.
     //  - matchingDocuments: Suggest words from all open documents of the same language.
     //  - allDocuments: Suggest words from all open documents.
@@ -2105,6 +2106,9 @@
     // Controls whether activity items in the secondary side bar title are shown as label or icon. This setting only has an effect when `workbench.activityBar.location` is not set to `top`.
     "workbench.secondarySideBar.showLabels": true,
 
+    // Controls whether advanced settings are always shown in the settings editor without requiring the `@tag:advanced` filter.
+    "workbench.settings.alwaysShowAdvancedSettings": false,
+
     // Configure settings to be applied for all profiles.
     "workbench.settings.applyToAllProfiles": [],
 
@@ -2456,6 +2460,7 @@
     // - `${activeEditorShort}`: the file name (e.g. myFile.txt).
     // - `${activeEditorMedium}`: the path of the file relative to the workspace folder (e.g. myFolder/myFileFolder/myFile.txt).
     // - `${activeEditorLong}`: the full path of the file (e.g. /Users/Development/myFolder/myFileFolder/myFile.txt).
+    // - `${activeEditorLanguageId}`: the language identifier of the active editor (e.g. typescript).
     // - `${activeFolderShort}`: the name of the folder the file is contained in (e.g. myFileFolder).
     // - `${activeFolderMedium}`: the path of the folder the file is contained in, relative to the workspace folder (e.g. myFolder/myFileFolder).
     // - `${activeFolderLong}`: the full path of the folder the file is contained in (e.g. /Users/Development/myFolder/myFileFolder).
@@ -2792,7 +2797,7 @@
     // Controls whether the Explorer should render folders in a compact form. In such a form, single child folders will be compressed in a combined tree element. Useful for Java package structures, for example.
     "explorer.compactFolders": true,
 
-    // Controls whether the Explorer should ask for confirmation when deleting a file via the trash.
+    // Controls whether the Explorer should ask for confirmation when deleting files and folders.
     "explorer.confirmDelete": true,
 
     // Controls whether the Explorer should ask for confirmation to move files and folders via drag and drop.
@@ -3098,6 +3103,9 @@
 
     // [Experimental] Enable Java AppCDS (Application Class Data Sharing) for improvements to extension activation. When set to `auto`, AppCDS will be enabled in Visual Studio Code - Insiders, and for pre-release versions.
     "java.jdt.ls.appcds.enabled": "auto",
+
+    // Specify whether to enable `io.freefair.aspectj` plugin in Gradle projects. Defaults to `false`.
+    "java.jdt.ls.aspectjSupport.enabled": false,
 
     // Specifies the folder path to the JDK (21 or more recent) used to launch the Java Language Server. This setting will replace the Java extension's embedded JRE to start the Java Language Server.
     //
@@ -3674,6 +3682,9 @@
     //  - on: Always automatically expand lazy variables.
     //  - off: Never automatically expand lazy variables.
     "debug.autoExpandLazyVariables": "auto",
+
+    // Controls whether breakpoints are displayed in a tree view grouped by file, or as a flat list.
+    "debug.breakpointsView.presentation": "list",
 
     // At the end of a debug session, all the read-only tabs associated with that session will be closed
     "debug.closeReadonlyTabsOnEnd": false,
@@ -5781,13 +5792,14 @@
         "sleep": true,
         "nl": true,
         "grep": true,
-        "git status": true,
-        "git log": true,
-        "git show": true,
-        "git diff": true,
-        "git grep": true,
-        "git branch": true,
-        "/^git branch\\b.*-(d|D|m|M|-delete|-force)\\b/": false,
+        "/^git(\\s+(-C\\s+\\S+|--no-pager))*\\s+status\\b/": true,
+        "/^git(\\s+(-C\\s+\\S+|--no-pager))*\\s+log\\b/": true,
+        "/^git(\\s+(-C\\s+\\S+|--no-pager))*\\s+show\\b/": true,
+        "/^git(\\s+(-C\\s+\\S+|--no-pager))*\\s+diff\\b/": true,
+        "/^git(\\s+(-C\\s+\\S+|--no-pager))*\\s+ls-files\\b/": true,
+        "/^git(\\s+(-C\\s+\\S+|--no-pager))*\\s+grep\\b/": true,
+        "/^git(\\s+(-C\\s+\\S+|--no-pager))*\\s+branch\\b/": true,
+        "/^git(\\s+(-C\\s+\\S+|--no-pager))*\\s+branch\\b.*-(d|D|m|M|-delete|-force)\\b/": false,
         "Get-ChildItem": true,
         "Get-Content": true,
         "Get-Date": true,
@@ -5795,6 +5807,7 @@
         "Get-Location": true,
         "Write-Host": true,
         "Write-Output": true,
+        "Out-String": true,
         "Split-Path": true,
         "Join-Path": true,
         "Start-Sleep": true,
@@ -5810,6 +5823,11 @@
         "/^date\\b.*(-s|--set)\\b/": false,
         "find": true,
         "/^find\\b.*-(delete|exec|execdir|fprint|fprintf|fls|ok|okdir)\\b/": false,
+        "rg": true,
+        "/^rg\\b.*(--pre|--hostname-bin)\\b/": false,
+        "sed": true,
+        "/^sed\\b.*(-[a-zA-Z]*(e|i|I|f)[a-zA-Z]*|--expression|--file|--in-place)\\b/": false,
+        "/^sed\\b.*(/e|/w|;W)/": false,
         "sort": true,
         "/^sort\\b.*-(o|S)\\b/": false,
         "tree": true,
@@ -5847,6 +5865,9 @@
         "iex": false
     },
 
+    // Whether to automatically approve npm, yarn, and pnpm run commands when the script is defined in a workspace package.json file. Since the workspace is trusted, scripts defined in package.json are considered safe to run without explicit approval.
+    "chat.tools.terminal.autoApproveWorkspaceNpmScripts": true,
+
     // Whether to automatically respond to prompts in the terminal such as `Confirm? y/n`. This is an experimental feature and may not work in all scenarios.
     "chat.tools.terminal.autoReplyToPrompts": false,
 
@@ -5868,6 +5889,13 @@
     //  - terminal: Reveal the terminal when running the command.
     //  - none: Do not reveal the terminal automatically.
     "chat.tools.terminal.outputLocation": "terminal",
+
+    // Whether to exclude commands run by the terminal tool from the shell history. See below for the supported shells and the method used for each:
+    // - `bash`: Sets `HISTCONTROL=ignorespace` and prepends the command with space
+    // - `zsh`: Sets `HIST_IGNORE_SPACE` option and prepends the command with space
+    // - `fish`: Sets `fish_private_mode` to prevent any command from entering history
+    // - `pwsh`: Sets a custom history handler via PSReadLine's `AddToHistoryHandler` to prevent any command from entering history
+    "chat.tools.terminal.preventShellHistory": true,
 
     // Use `terminal.integrated.shellIntegration.timeout` instead
     // Configures the duration in milliseconds to wait for shell integration to be detected when the run in terminal tool launches a new terminal. Set to `0` to wait the minimum time, the default value `-1` means the wait time is variable based on the value of `terminal.integrated.shellIntegration.enabled` and whether it's a remote window. A large value can be useful if your shell starts very slowly and a low value if you're intentionally not using shell integration.
@@ -6144,7 +6172,17 @@
     // Controls the width of the cursor when `terminal.integrated.cursorStyle` is set to `line`.
     "terminal.integrated.cursorWidth": 1,
 
-    // Whether to draw custom glyphs for block element and box drawing characters instead of using the font, which typically yields better rendering with continuous lines. Note that this doesn't work when `terminal.integrated.gpuAcceleration` is disabled.
+    // Whether to draw custom glyphs instead of using the font for the following unicode ranges:
+    //
+    // - Box Drawing (U+2500-U+257F)
+    // - Block Elements (U+2580-U+259F)
+    // - Braille Patterns (U+2800-U+28FF)
+    // - Powerline Symbols (U+E0A0-U+E0D4, Private Use Area)
+    // - Progress Indicators (U+EE00-U+EE0B, Private Use Area)
+    // - Git Branch Symbols (U+F5D0-U+F60D, Private Use Area)
+    // - Symbols for Legacy Computing (U+1FB00-U+1FBFF)
+    //
+    // This will typically result in better rendering with continuous lines, even when line height and letter spacing is used. This feature only works when `terminal.integrated.gpuAcceleration` is enabled.
     "terminal.integrated.customGlyphs": true,
 
     // An explicit start path where the terminal will be launched, this is used as the current working directory (cwd) for the shell process. This may be particularly useful in workspace settings if the root directory is not a convenient cwd.
@@ -6526,9 +6564,7 @@
                 "${env:windir}\\System32\\cmd.exe"
             ],
             "args": [],
-            "icon": {
-                "id": "terminal-cmd"
-            }
+            "icon": "terminal-cmd"
         },
         "Git Bash": {
             "source": "Git Bash",
@@ -6616,12 +6652,12 @@
     //  - absolute: Enable the feature and use absolute paths. This is useful when the shell doesn't natively support `$CDPATH`.
     "terminal.integrated.suggest.cdPath": "absolute",
 
-    // Enables terminal intellisense suggestions (preview) for supported shells (PowerShell v7+, zsh, bash, fish) when `terminal.integrated.shellIntegration.enabled` is set to `true`.
-    "terminal.integrated.suggest.enabled": false,
+    // Enables terminal IntelliSense suggestions (also known as autocomplete) for supported shells (Windows PowerShell, PowerShell v7+, zsh, bash, fish). This requires `terminal.integrated.shellIntegration.enabled` to be enabled and working or [manually installed](https://code.visualstudio.com/docs/terminal/shell-integration#_manual-installation-install).
+    "terminal.integrated.suggest.enabled": true,
 
     // Controls whether the shell's inline suggestion should be detected and how it is scored.
     //  - off: Disable the feature.
-    //  - alwaysOnTopExceptExactMatch: Enable the feature and sort the inline suggestion without forcing it to be on top. This means that exact matches will be will be above the inline suggestion.
+    //  - alwaysOnTopExceptExactMatch: Enable the feature and sort the inline suggestion without forcing it to be on top. This means that exact matches will be above the inline suggestion.
     //  - alwaysOnTop: Enable the feature and always put the inline suggestion on top.
     "terminal.integrated.suggest.inlineSuggestion": "alwaysOnTop",
 
@@ -6629,11 +6665,7 @@
     "terminal.integrated.suggest.insertTrailingSpace": false,
 
     // Controls whether suggestions should automatically show up while typing. Also be aware of the `terminal.integrated.suggest.suggestOnTriggerCharacters`-setting which controls if suggestions are triggered by special characters.
-    "terminal.integrated.suggest.quickSuggestions": {
-        "commands": "on",
-        "arguments": "on",
-        "unknown": "off"
-    },
+    "terminal.integrated.suggest.quickSuggestions": false,
 
     // Controls whether suggestions should run immediately when `Enter` (not `Tab`) is used to accept the result.
     //  - never: Never run on `Enter`.
@@ -6652,7 +6684,7 @@
     "terminal.integrated.suggest.showStatusBar": true,
 
     // Controls whether suggestions should automatically show up when typing trigger characters.
-    "terminal.integrated.suggest.suggestOnTriggerCharacters": true,
+    "terminal.integrated.suggest.suggestOnTriggerCharacters": false,
 
     // Determines whether the up arrow key navigates the command history when focus is on the first suggestion and navigation has not yet occurred. When set to false, the up arrow will move focus to the last suggestion instead.
     "terminal.integrated.suggest.upArrowNavigatesHistory": true,
@@ -6935,6 +6967,7 @@
     //  - italic: $(italic)
     //  - jersey: $(jersey)
     //  - json: $(json)
+    //  - bracket: $(bracket)
     //  - kebab-vertical: $(kebab-vertical)
     //  - key: $(key)
     //  - law: $(law)
@@ -7161,7 +7194,6 @@
     //  - graph-line: $(graph-line)
     //  - graph-scatter: $(graph-scatter)
     //  - pie-chart: $(pie-chart)
-    //  - bracket: $(bracket)
     //  - bracket-dot: $(bracket-dot)
     //  - bracket-error: $(bracket-error)
     //  - lock-small: $(lock-small)
@@ -7292,7 +7324,6 @@
     //  - cursor: $(cursor)
     //  - eraser: $(eraser)
     //  - file-text: $(file-text)
-    //  - git-lens: $(git-lens)
     //  - quotes: $(quotes)
     //  - rename: $(rename)
     //  - run-with-deps: $(run-with-deps)
@@ -7322,6 +7353,10 @@
     //  - collection-small: $(collection-small)
     //  - vm-small: $(vm-small)
     //  - cloud-small: $(cloud-small)
+    //  - add-small: $(add-small)
+    //  - remove-small: $(remove-small)
+    //  - worktree-small: $(worktree-small)
+    //  - worktree: $(worktree)
     //  - dialog-error: $(dialog-error)
     //  - dialog-warning: $(dialog-warning)
     //  - dialog-info: $(dialog-info)
@@ -7437,7 +7472,7 @@
     // Whether to use ConPTY for Windows terminal process communication (requires Windows 10 build number 18309+). Winpty will be used if this is false.
     "terminal.integrated.windowsEnableConpty": true,
 
-    // Whether to use the experimental conpty.dll (v1.22.250204002) shipped with VS Code, instead of the one bundled with Windows.
+    // Whether to use the experimental conpty.dll (v1.23.251008001) shipped with VS Code, instead of the one bundled with Windows.
     "terminal.integrated.windowsUseConptyDll": false,
 
     // A string containing all characters to be considered word separators when double-clicking to select word and in the fallback 'word' link detection. Since this is used for link detection, including characters such as `:` that are used when detecting links will cause the line and column part of links like `file:10:5` to be ignored.
@@ -7488,7 +7523,7 @@
     //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
     //  - esbenp.prettier-vscode: Code formatter using prettier
-    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
+    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -7524,6 +7559,7 @@
     //  - ms-vscode-remote.remote-ssh-edit: Edit SSH configuration files
     //  - dnut.rewrap-revived: Hard word wrapping for comments and other text at a given column.
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
+    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - timonwong.shellcheck: Integrates ShellCheck into VS Code, a linter for Shell scripts.
     //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
     //  - XadillaX.viml: Vim Script language server protocol and highlighting support for VSCode.
@@ -7536,7 +7572,6 @@
     //  - bmewburn.vscode-intelephense-client: PHP code intelligence for Visual Studio Code
     //  - vscjava.vscode-java-debug: A lightweight Java debugger for Visual Studio Code
     //  - vscjava.vscode-java-pack: Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven/Gradle support, project management and more
-    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
@@ -7798,7 +7833,7 @@
     // Terminal Suggest Providers
     // Controls which suggestions automatically show up while typing. Suggestion providers are enabled by default.
     "terminal.integrated.suggest.providers": {
-        "lsp": true
+        "lsp": false
     },
 
     // Views
@@ -8039,6 +8074,9 @@
     //  - off: Do not show symbols in the breadcrumbs view.
     //  - last: Only show the current symbol in the breadcrumbs view.
     "breadcrumbs.symbolPath": "on",
+
+    // The separator used when copying the breadcrumb symbol path.
+    "breadcrumbs.symbolPathSeparator": ".",
 
     // Controls how symbols are sorted in the breadcrumbs outline view.
     //  - position: Show symbol outline in file position order.
@@ -9014,7 +9052,15 @@
     "gitlens.views.workspaces.worktrees.viewAs": "name",
 
     // Interactive Rebase Editor
+    // Specifies the layout density of the _Interactive Rebase Editor_
+    //  - compact: Compact layout with minimal spacing
+    //  - comfortable: Comfortable layout with more space between rows
+    "gitlens.rebaseEditor.density": "compact",
+
     // Specifies whether to automatically open the _Interactive Rebase Editor_ when a paused rebase is detected
+    //  - false: Never automatically open the editor
+    //  - interactive: Only automatically open the editor when an interactive rebase is detected
+    //  - true: Automatically open the editor when any paused rebase is detected
     "gitlens.rebaseEditor.openOnPausedRebase": true,
 
     // Specifies how Git commits are displayed in the _Interactive Rebase Editor_
@@ -9022,11 +9068,10 @@
     //  - desc: Shows newest commit first
     "gitlens.rebaseEditor.ordering": "desc",
 
-    // Specifies when to automatically reveal commits in the preferred location
-    //  - never: Never automatically reveals commits
-    //  - onOpen: Automatically reveals commits only when opening the editor
-    //  - onSelection: Automatically reveals commits when selection changes
-    "gitlens.rebaseEditor.revealBehavior": "onOpen",
+    // Specifies when to automatically reveal commits in the `gitlens.rebaseEditor.revealLocation` location
+    //  - onDoubleClick: Automatically reveals commits when double-clicking on a row
+    //  - onSelection: Automatically reveals commits when selection changes or when double-clicking on a row
+    "gitlens.rebaseEditor.revealBehavior": "onDoubleClick",
 
     // Specifies where to reveal commits and references
     //  - graph: Reveals commits in the _Commit Graph_
@@ -9816,12 +9861,6 @@
     // Overrides editor syntax colors and font style from the currently selected color theme.
     "editor.tokenColorCustomizations": {},
 
-    // Whether the inline chat also renders an accessible diff viewer for its changes.
-    //  - auto: The accessible diff viewer is based on screen reader mode being enabled.
-    //  - on: The accessible diff viewer is always enabled.
-    //  - off: The accessible diff viewer is never enabled.
-    "inlineChat.accessibleDiffView": "auto",
-
     // Whether to use the next version of inline chat.
     "inlineChat.enableV2": false,
 
@@ -9858,9 +9897,6 @@
     //  - collapsedPreview: Thinking parts will be expanded first, then collapse once we reach a part that is not thinking.
     //  - fixedScrolling: Show thinking in a fixed-height streaming panel that auto-scrolls; click header to expand to full height.
     "chat.agent.thinkingStyle": "fixedScrolling",
-
-    // Controls where to show the agent sessions menu.
-    "chat.agentSessionsViewLocation": "disabled",
 
     // Controls whether anonymous access is allowed in chat.
     "chat.allowAnonymousAccess": false,
@@ -10007,7 +10043,7 @@
     "chat.renderRelatedFiles": false,
 
     // Controls whether the last session is restored in panel after restart.
-    "chat.restoreLastPanelSession": true,
+    "chat.restoreLastPanelSession": false,
 
     // Controls whether CSS of the selected element will be added to the chat. `chat.sendElementsToChat.enabled` must be enabled.
     "chat.sendElementsToChat.attachCSS": true,
@@ -10017,9 +10053,6 @@
 
     // Controls whether elements can be sent to chat from the Simple Browser.
     "chat.sendElementsToChat.enabled": true,
-
-    // Controls whether session descriptions are displayed on a second row in the Chat Sessions view.
-    "chat.showAgentSessionsViewDescription": true,
 
     // Controls which user type should see the status widget in new chat sessions when quota is exceeded.
     //  - free: Show status widget for free tier users.
@@ -10068,22 +10101,21 @@
     // Controls whether the input of the chat should be restored when an undo request is made. The input will be filled with the text of the request that was restored.
     "chat.undoRequests.restoreInput": true,
 
-    // Controls whether instructions from `AGENTS.MD` file found in a workspace roots are attached to all chat requests.
+    // Controls whether skills are provided as specialized capabilities to the chat requests. Skills are loaded from `.github/skills`, `~/.copilot/skills`, `.claude/skills`, and `~/.claude/skills`. The language model can load these skills on-demand if the `read` tool is available. Learn more about [Agent Skills](https://aka.ms/vscode-agent-skills).
+    "chat.useAgentSkills": false,
+
+    // Controls whether instructions from `AGENTS.md` file found in a workspace roots are attached to all chat requests.
     "chat.useAgentsMdFile": true,
 
-    // Controls whether Claude skills found in the workspace and user home directories under `.claude/skills` are listed in all chat requests. The language model can load these skills on-demand if the `read` tool is available.
-    "chat.useClaudeSkills": false,
-
-    // Controls whether instructions from nested `AGENTS.MD` files found in the workspace are listed in all chat requests. The language model can load these skills on-demand if the `read` tool is available.
+    // Controls whether instructions from nested `AGENTS.md` files found in the workspace are listed in all chat requests. The language model can load these skills on-demand if the `read` tool is available.
     "chat.useNestedAgentsMdFiles": false,
 
     // Show chat agent sessions when chat is empty or to the side when chat view is wide enough.
     "chat.viewSessions.enabled": true,
 
     // Controls the orientation of the chat agent sessions view when it is shown alongside the chat.
-    //  - auto: Automatically determine the orientation based on available space.
-    //  - stacked: Display sessions vertically stacked unless a chat session is visible.
-    //  - sideBySide: Display sessions side by side if space is sufficient, otherwise stacked.
+    //  - stacked: Display chat sessions vertically stacked above the chat input unless a chat session is visible.
+    //  - sideBySide: Display chat sessions side by side if space is sufficient, otherwise fallback to stacked above the chat input unless a chat session is visible.
     "chat.viewSessions.orientation": "sideBySide",
 
     // Show the title of the chat above the chat in the chat view.
@@ -10102,9 +10134,6 @@
 
     // Controls if deletions in base or one of the inputs should be indicated by a vertical bar.
     "mergeEditor.showDeletionMarkers": true,
-
-    // Enable experimental multi diff editor.
-    "multiDiffEditor.experimental.enabled": true,
 
     // Remote
     // When enabled, new running processes are detected and ports that they listen on are automatically forwarded. Disabling this setting will not prevent all ports from being forwarded. Even when disabled, extensions will still be able to cause ports to be forwarded, and opening some URLs will still cause ports to forwarded. Also see `remote.autoForwardPortsSource`.
@@ -10554,6 +10583,9 @@
     // Stash any changes before pulling and restore them after successful pull.
     "git.autoStash": false,
 
+    // Controls whether to disable the blame information editor decoration hover.
+    "git.blame.editorDecoration.disableHover": false,
+
     // Controls whether to show blame information in the editor using editor decorations.
     "git.blame.editorDecoration.enabled": false,
 
@@ -10575,6 +10607,9 @@
     //
     //
     "git.blame.editorDecoration.template": "${subject}, ${authorName} (${authorDateAgo})",
+
+    // Controls whether to ignore whitespace changes when computing blame information.
+    "git.blame.ignoreWhitespace": false,
 
     // Controls whether to show blame information in the status bar.
     "git.blame.statusBarItem.enabled": true,
@@ -11782,6 +11817,12 @@
     // Run the linter on save (onSave) or on type (onType)
     "markdownlint.run": "onType",
 
+    // VS Code diagnostic level to use for issues with severity "error"
+    "markdownlint.severityForError": "Warning",
+
+    // VS Code diagnostic level to use for issues with severity "warning"
+    "markdownlint.severityForWarning": "Information",
+
     // ESLint
     // The setting is deprecated. Use editor.codeActionsOnSave instead with a source.fixAll.eslint member.
     // Turns auto fix on save on or off.
@@ -12018,6 +12059,12 @@
     // Specify the end of line used by prettier.
     "prettier.endOfLine": "lf",
 
+    // Controls where to break lines around binary operators.
+    // Valid options:
+    // - `end` - Break lines after operators.
+    // - `start` - Break lines before operators.
+    "prettier.experimentalOperatorPosition": "end",
+
     // Try prettier's [new ternary formatting](https://github.com/prettier/prettier/pull/13183) before it becomes the default behavior.
     "prettier.experimentalTernaries": false,
 
@@ -12040,6 +12087,12 @@
 
     // Use single quotes instead of double quotes in JSX.
     "prettier.jsxSingleQuote": false,
+
+    // Controls how object literals are wrapped.
+    // Valid options:
+    // - `preserve` - Preserve the original wrapping of object literals.
+    // - `collapse` - Collapse object literals to fit on one line when possible.
+    "prettier.objectWrap": "preserve",
 
     // Package manager is now automatically detected by VS Code. This setting is no longer used.
     // The package manager you use to install node modules.
@@ -12090,7 +12143,7 @@
     // - `none` - No trailing commas
     // - `es5` - Trailing commas where valid in ES5 (objects, arrays, etc)
     // - `all` - Trailing commas wherever possible (function arguments)
-    "prettier.trailingComma": "es5",
+    "prettier.trailingComma": "all",
 
     // Whether or not to take `.editorconfig` into account when parsing configuration. See the [`prettier.resolveConfig`](https://prettier.io/docs/en/api.html) docs for details.
     "prettier.useEditorConfig": true,
@@ -12161,6 +12214,9 @@
     // Use prompt caching for agent history summarization.
     "github.copilot.chat.agentHistorySummarizationWithPromptCache": false,
 
+    // Enables an experimental alternate prompt for Gemini Model F instead of the default prompt.
+    "github.copilot.chat.alternateGeminiModelFPrompt.enabled": false,
+
     // Enables an experimental alternate prompt for GPT models instead of the default prompt.
     "github.copilot.chat.alternateGptPrompt.enabled": false,
 
@@ -12186,6 +12242,11 @@
     // User location for personalizing web search results based on geographic context. All fields (city, region, country, timezone) are optional. Example: `{"city": "San Francisco", "region": "California", "country": "US", "timezone": "America/Los_Angeles"}`
     "github.copilot.chat.anthropic.tools.websearch.userLocation": null,
 
+    // Use the Messages API instead of the Chat Completions API when supported.
+    //
+    // **Note**: This is an experimental feature that is not yet activated for all users.
+    "github.copilot.chat.anthropic.useMessagesApi": false,
+
     // Authentication method for Azure OpenAI models. Entra ID is recommended for enterprise security and uses your Azure credentials.
     //  - entraId: Use Entra ID (Azure AD) authentication with your Microsoft account credentials
     //  - apiKey: Use API key authentication. Not recommended as this is less secure than token based authentication.
@@ -12193,6 +12254,9 @@
 
     // Configure custom Azure OpenAI models. Each key should be a unique model ID, and the value should be an object with model configuration including name, url, toolCalling, vision, maxInputTokens, and maxOutputTokens properties.
     "github.copilot.chat.azureModels": {},
+
+    // Enable the Background Agent. When disabled, the Background Agent will not be available in 'Continue In' context menus.
+    "github.copilot.chat.backgroundAgent.enabled": true,
 
     // The endpoint to use for the Ollama when accessed via bring your own key. Defaults to localhost.
     "github.copilot.chat.byok.ollamaEndpoint": "http://localhost:11434",
@@ -12203,11 +12267,17 @@
     // Enable Claude Code agent.
     "github.copilot.chat.claudeCode.enabled": false,
 
+    // Enable automatic commit for Background Agents.
+    "github.copilot.chat.cli.autoCommit.enabled": false,
+
     // Enable Custom Agents for Background Agents.
     "github.copilot.chat.cli.customAgents.enabled": false,
 
     // Enable Model Context Protocol (MCP) server for Background Agents.
     "github.copilot.chat.cli.mcp.enabled": false,
+
+    // Enable the Cloud Agent. When disabled, the Cloud Agent will not be available in 'Continue In' context menus.
+    "github.copilot.chat.cloudAgent.enabled": true,
 
     // Use instructions files instead. See https://aka.ms/vscode-ghcp-custom-instructions for more information.
     // A set of instructions that will be added to Copilot requests that generate code.
@@ -12287,13 +12357,13 @@
     // Enable built-in support for the GitHub MCP Server.
     "github.copilot.chat.githubMcpServer.enabled": false,
 
-    // Enable lockdown mode for the GitHub MCP Server. When enabled, hides public issue details created by users without push access.
+    // Enable lockdown mode for the GitHub MCP Server. When enabled, hides public issue details created by users without push access. [Learn more](https://aka.ms/vscode-gh-mcp-lockdown).
     "github.copilot.chat.githubMcpServer.lockdown": false,
 
-    // Enable read-only mode for the GitHub MCP Server. When enabled, only read tools are available.
+    // Enable read-only mode for the GitHub MCP Server. When enabled, only read tools are available. [Learn more](https://aka.ms/vscode-gh-mcp-readonly).
     "github.copilot.chat.githubMcpServer.readonly": false,
 
-    // Specify toolsets to use from the GitHub MCP Server.
+    // Specify toolsets to use from the GitHub MCP Server. [Learn more](https://aka.ms/vscode-gh-mcp-toolsets).
     "github.copilot.chat.githubMcpServer.toolsets": ["default"],
 
     // Enable GPT-5 alternative patch format.
@@ -12315,7 +12385,7 @@
     "github.copilot.chat.inlineEdits.nextCursorPrediction.displayLine": true,
 
     // Enable rename symbol suggestions in inline edits.
-    "github.copilot.chat.inlineEdits.renameSymbolSuggestions": false,
+    "github.copilot.chat.inlineEdits.renameSymbolSuggestions": true,
 
     // Trigger inline edits after editor has been idle for this many seconds.
     "github.copilot.chat.inlineEdits.triggerOnEditorChangeAfterSeconds": 0,
@@ -12531,6 +12601,9 @@
     // NES can propose a next edit based on your recent changes. [Learn more](https://aka.ms/vscode-nes) about next edit suggestions.
     "github.copilot.nextEditSuggestions.enabled": false,
 
+    // Whether to allow next edit suggestions (NES) to modify code farther away from the cursor position.
+    "github.copilot.nextEditSuggestions.extendedRange": false,
+
     // Whether to offer fixes for diagnostics via next edit suggestions (NES).
     "github.copilot.nextEditSuggestions.fixes": true,
 
@@ -12636,15 +12709,15 @@
         "yaml"
     ],
 
-    // An array of milestones titles to never show issues from.
+    // An array of milestone titles to never show issues from.
     "githubIssues.ignoreMilestones": [],
 
     // Languages that the '@' character should not be used to trigger user completion suggestions.
     "githubIssues.ignoreUserCompletionTrigger": [],
 
     // Controls which avatar to display in the issue list.
-    //  - author: Show the avatar of the issue creator
-    //  - assignee: Show the avatar of the first assignee (show GitHub icon if no assignees)
+    //  - author: Show the avatar of the issue creator.
+    //  - assignee: Show the avatar of the first assignee (show GitHub icon if no assignees).
     "githubIssues.issueAvatarDisplay": "author",
 
     // Advanced settings for the name of the branch that is created when you start working on an issue.
@@ -12688,6 +12761,12 @@
     // Controls whether completion suggestions are shown for users.
     "githubIssues.userCompletions.enabled": true,
 
+    // Determines which branch to use as the base when creating a new branch for an issue. This setting controls what branch the new issue branch is created from.
+    //  - currentBranch: Create the issue branch from the current branch without switching to the default branch first.
+    //  - defaultBranch: Always switch to the default branch before creating the issue branch.
+    //  - prompt: Prompt which branch to use as the base when creating an issue branch.
+    "githubIssues.workingBaseBranch": "currentBranch",
+
     // Sets the format of the commit message that is set in the SCM inputbox when you **Start Working on an Issue**. Defaults to `${issueTitle}
     // Fixes ${issueNumberLabel}`
     "githubIssues.workingIssueFormatScm": "${issueTitle} \nFixes ${issueNumberLabel}",
@@ -12701,7 +12780,7 @@
     // Maximum time in milliseconds to wait when fetching the list of branches for pull request creation. Repositories with thousands of branches may need a higher value to ensure all branches (including the default branch) are retrieved. Minimum value is 1000 (1 second).
     "githubPullRequests.branchListTimeout": 5000,
 
-    // Allow automatic git operations (commit, push) to be performed when starting a coding agent session
+    // Allow automatic git operations (commit, push) to be performed when starting a coding agent session.
     "githubPullRequests.codingAgent.autoCommitAndPush": true,
 
     // Show the 'Delegate to agent' CodeLens actions above TODO comments for delegating to coding agent.
@@ -12718,12 +12797,13 @@
 
     // Controls whether comments are expanded when a document with comments is opened. Requires a reload to take effect for comments that have already been added.
     //  - expandUnresolved: All unresolved comments will be expanded.
-    //  - collapseAll: All comments will be collapsed
+    //  - collapseAll: All comments will be collapsed.
+    //  - collapsePreexisting: Only pre-existing comments will be collapsed. Newly added comments will remain expanded.
     "githubPullRequests.commentExpandState": "expandUnresolved",
 
-    // Controls what the base branch picker defaults to when creating a pull request
-    //  - repositoryDefault: The default branch of the repository
-    //  - createdFromBranch: The branch that the current branch was created from, if known
+    // Controls what the base branch picker defaults to when creating a pull request.
+    //  - repositoryDefault: The default branch of the repository.
+    //  - createdFromBranch: The branch that the current branch was created from, if known.
     //  - auto: When the current repository is a fork, this will work like "repositoryDefault". Otherwise, it will work like "createdFromBranch".
     "githubPullRequests.createDefaultBaseBranch": "auto",
 
@@ -12734,11 +12814,12 @@
     // Create a pull request when a branch is published.
     //  - never: Never create a pull request when a branch is published.
     //  - ask: Ask if you want to create a pull request when a branch is published.
+    //  - always: Always create a pull request when a branch is published.
     "githubPullRequests.createOnPublishBranch": "ask",
 
-    // The default comment type to use when submitting a comment and there is no active review
-    //  - single: Submits the comment as a single comment that will be immediately visible to other users
-    //  - review: Submits the comment as a review comment that will be visible to other users once the review is submitted
+    // The default comment type to use when submitting a comment and there is no active review.
+    //  - single: Submits the comment as a single comment that will be immediately visible to other users.
+    //  - review: Submits the comment as a review comment that will be visible to other users once the review is submitted.
     "githubPullRequests.defaultCommentType": "review",
 
     // The create option that the "Create" button will default to when creating a pull request.
@@ -12757,6 +12838,12 @@
     // The method to use when merging pull requests.
     "githubPullRequests.defaultMergeMethod": "merge",
 
+    // Automatically delete the branch after merging a pull request. This setting only applies when the pull request is merged through this extension.
+    "githubPullRequests.deleteBranchAfterMerge": false,
+
+    // When enabled, limits expensive API calls to prevent hitting rate limits during extension development. Disables automatic Copilot PR status polling, collapses all PR query results, and disables issue fetching.
+    "githubPullRequests.devMode": false,
+
     // Enables the `@githubpr` Copilot chat participant in the chat view. `@githubpr` can help search for issues and pull requests, suggest fixes for issues, and summarize issues, pull requests, and notifications.
     "githubPullRequests.experimental.chat": true,
 
@@ -12765,6 +12852,9 @@
 
     // Controls whether the Copilot "Summarize" commands in the Pull Requests, Issues, and Notifications views will use quick chat. Only has an effect if `githubPullRequests.experimental.chat` is enabled.
     "githubPullRequests.experimental.useQuickChat": false,
+
+    // Automatically reveal open files in the pull request changes tree.
+    "githubPullRequests.fileAutoReveal": true,
 
     // The layout to use when displaying changed files list.
     "githubPullRequests.fileListLayout": "tree",
@@ -12793,7 +12883,7 @@
     "githubPullRequests.labelCreated": [],
 
     // Log level is now controlled by the [Developer: Set Log Level...](command:workbench.action.setLogLevel) command. You can set the log level for the current session and also the default log level from there.
-    // Logging for GitHub Pull Request extension. The log is emitted to the output channel named as GitHub Pull Request.
+    // Logging for GitHub Pull Request extension. The log is emitted to the output channel named GitHub Pull Request.
     "githubPullRequests.logLevel": "info",
 
     // Never offer to ignore a pull request associated with the default branch of a repository.
@@ -12807,15 +12897,17 @@
 
     // The action to take after creating a pull request.
     //  - none: No action
-    //  - openOverview: Open the overview page of the pull request
-    //  - checkoutDefaultBranch: Checkout the default branch of the repository
-    //  - checkoutDefaultBranchAndShow: Checkout the default branch of the repository and show the pull request in the Pull Requests view
-    //  - checkoutDefaultBranchAndCopy: Checkout the default branch of the repository and copy a link to the pull request to the clipboard
+    //  - openOverview: Open the overview page of the pull request.
+    //  - checkoutDefaultBranch: Checkout the default branch of the repository.
+    //  - checkoutDefaultBranchAndShow: Checkout the default branch of the repository and show the pull request in the Pull Requests view.
+    //  - checkoutDefaultBranchAndCopy: Checkout the default branch of the repository and copy a link to the pull request to the clipboard.
     "githubPullRequests.postCreate": "openOverview",
 
     // The action to take after using the 'checkout default branch' or 'delete branch' actions on a currently checked out pull request.
-    //  - checkoutDefaultBranch: Checkout the default branch of the repository
-    //  - checkoutDefaultBranchAndPull: Checkout the default branch of the repository and pull the latest changes
+    //  - checkoutDefaultBranch: Checkout the default branch of the repository.
+    //  - checkoutDefaultBranchAndPull: Checkout the default branch of the repository and pull the latest changes.
+    //  - checkoutPullRequestBaseBranch: Checkout the pull request's base branch
+    //  - checkoutPullRequestBaseBranchAndPull: Checkout the pull request's base branch and pull the latest changes
     "githubPullRequests.postDone": "checkoutDefaultBranch",
 
     // Pull changes from the remote when a pull request branch is checked out locally. Changes are detected when the pull request is manually refreshed and during periodic background updates.
@@ -12824,7 +12916,7 @@
     //  - always: Always pull a pull request branch when changes are detected in the pull request. When `"git.autoStash": true` this will instead `prompt` to prevent unexpected file changes.
     "githubPullRequests.pullBranch": "prompt",
 
-    // Controls whether the pull request branch is pulled before checkout. Can also be set to additionally merge updates from the base branch.
+    // Controls whether the pull request branch is pulled before checkout. It can also be set to additionally merge updates from the base branch.
     //  - never: Never pull the pull request branch before checkout.
     //  - pull: Pull the pull request branch before checkout.
     //  - pullAndMergeBase: Pull the pull request branch before checkout, fetch the base branch, and merge the base branch into the pull request branch.
@@ -12832,9 +12924,10 @@
     "githubPullRequests.pullPullRequestBranchBeforeCheckout": "pull",
 
     // The description used when creating pull requests.
-    //  - template: Use a pull request template and commit description, or just use the commit description if no templates were found
-    //  - commit: Use the latest commit message only
-    //  - none: Do not have a default description
+    //  - template: Use a pull request template and commit description, or just use the commit description if no templates were found.
+    //  - commit: Use the latest commit message only.
+    //  - branchName: Use the branch name as the pull request title
+    //  - none: Do not have a default description.
     //  - Copilot: Generate a pull request title and description from GitHub Copilot. Requires that the GitHub Copilot extension is installed and authenticated. Will fall back to `commit` if Copilot is not set up.
     "githubPullRequests.pullRequestDescription": "template",
 
@@ -12879,7 +12972,7 @@
     "githubPullRequests.queries": [
         {
             "label": "Copilot on My Behalf",
-            "query": "repo:${owner}/${repository} is:open author:copilot involves:${user}"
+            "query": "repo:${owner}/${repository} is:open author:copilot assignee:${user}"
         },
         {
             "label": "Local Pull Request Branches",
@@ -12917,14 +13010,14 @@
     "githubPullRequests.showPullRequestNumberInTree": false,
 
     // Default handler for terminal links.
-    //  - github: Create the pull request on GitHub
-    //  - vscode: Create the pull request in VS Code
-    //  - ask: Ask which method to use
+    //  - github: Create the pull request on GitHub.
+    //  - vscode: Create the pull request in VS Code.
+    //  - ask: Ask which method to use.
     "githubPullRequests.terminalLinksHandler": "ask",
 
-    // Controls whether an `upstream` remote is automatically added for forks
-    //  - add: An `upstream` remote will be automatically added for forks
-    //  - never: An `upstream` remote will never be automatically added for forks
+    // Controls whether an `upstream` remote is automatically added for forks.
+    //  - add: An `upstream` remote will be automatically added for forks.
+    //  - never: An `upstream` remote will never be automatically added for forks.
     "githubPullRequests.upstreamRemote": "add",
 
     // Choose which pull request states will use review mode. "Open" pull requests will always use review mode. Setting to "auto" will use review mode for open, closed, and merged pull requests in web, but only open pull requests on desktop.
@@ -12998,7 +13091,9 @@
     //
     //  - Off: `"Off"`: Disable vulnerability analysis.
     //
-    "go.diagnostic.vulncheck": "Off",
+    //  - Prompt: `"Prompt"`: Vulncheck can be triggered via prompt.
+    //
+    "go.diagnostic.vulncheck": "Prompt",
 
     // If true, tests will not run concurrently. When a new test run is started, the previous will be cancelled.
     "go.disableConcurrentTests": false,
@@ -13019,7 +13114,8 @@
         "testCoverage": true,
         "playground": true,
         "debugTestAtCursor": true,
-        "benchmarkAtCursor": false
+        "benchmarkAtCursor": false,
+        "compilerDetails": false
     },
 
     // Feature level setting to enable/disable code lens for references and run/debug tests
@@ -13035,13 +13131,13 @@
     // Flags to pass to format tool (e.g. ["-s"]). Not applicable when using the language server.
     "go.formatFlags": [],
 
-    // When the language server is enabled and one of `default`/`gofmt`/`goimports`/`gofumpt` is chosen, the language server will handle formatting. If `custom` tool is selected, the extension will use the `customFormatter` tool in the `go.alternateTools` section.
-    //  - default: If the language server is enabled, format via the language server, which already supports gofmt, goimports, goreturns, and gofumpt. Otherwise, goimports.
-    //  - gofmt: Formats the file according to the standard Go style. (not applicable when the language server is enabled)
-    //  - goimports: Organizes imports and formats the file with gofmt. (not applicable when the language server is enabled)
-    //  - goformat: Configurable gofmt, see https://github.com/mbenkmann/goformat. (Deprecated due to the lack of generics support)
-    //  - gofumpt: Stricter version of gofmt, see https://github.com/mvdan/gofumpt. . Use `gopls.format.gofumpt` instead)
-    //  - custom: Formats using the custom tool specified as `customFormatter` in the `go.alternateTools` setting. The tool should take the input as STDIN and output the formatted code as STDOUT.
+    // Specifies the tool for formatting Go code. The default is `default`, which uses the language server `gopls` as formatting provider. To configure gopls's formatting, see the 'gopls.formatting' settings. When a specific tool (e.g., `gofmt`, `goimports`) is selected, the extension will run it instead.
+    //  - default: Formatting is performed by the language server, gopls. (recommended)
+    //  - gofmt: Formats using `gofmt`, the standard Go formatter. See https://pkg.go.dev/cmd/gofmt.
+    //  - goimports: Formats using `goimports`, which organizes imports and applies `gofmt`. See https://pkg.go.dev/golang.org/x/tools/cmd/goimports.
+    //  - goformat: Formats using `goformat`, a configurable version of `gofmt`. See https://github.com/mbenkmann/goformat. (Deprecated due to lack of generics support)
+    //  - gofumpt: Formats using `gofumpt`, a stricter version of `gofmt`. See https://github.com/mvdan/gofumpt. Note: `gopls` can also be configured to use `gofumpt` via the `gopls.formatting.gofumpt` setting.
+    //  - custom: Formats using a custom tool. The tool's path must be specified in the `go.alternateTools` setting under the `customFormatter` key.
     "go.formatTool": "default",
 
     // Additional command line flags to pass to `gotests` for generating tests.
@@ -13148,8 +13244,13 @@
     //  - off: do not run lint automatically
     "go.lintOnSave": "package",
 
-    // Specifies Lint tool name.
-    "go.lintTool": "staticcheck",
+    // Specifies an additional client-side linting tool that should be run by the Go extension. By default (unset), no additional linter is run. This feature is additional to diagnostics reported by the language server, gopls. Since Gopls incorporates the entire staticcheck analyzer suite, it is typically unnecessary to run the staticcheck tool as well. To configure gopls's linting, see the 'gopls.ui.diagnostic' settings.
+    //  - staticcheck: Run `staticcheck`.
+    //  - golint: Run `golint`.
+    //  - golangci-lint: Run `golangci-lint` v1.
+    //  - golangci-lint-v2: Run `golangci-lint` v2.
+    //  - revive: Run `revive`.
+    "go.lintTool": "",
 
     // This setting is deprecated. Use 'Developer: Set Log Level...' command to control logging level instead.
     //
@@ -13704,7 +13805,7 @@
     // The primary property to display for a container: ContainerId, ContainerName, CreatedTime, FullTag, ImageId, Networks, Ports, Registry, RegistryAndPath, Repository, RepositoryName, RepositoryNameShort, RepositoryNameAndTag, State, Status, or Tag
     "containers.containers.label": "FullTag",
 
-    // The property to use to sort containers in the Containers view: CreatedTime or Label
+    // The property to use to sort containers in the Containers view: CreatedTime, CreatedTimeReverse, Label, or LabelReverse
     "containers.containers.sortBy": "CreatedTime",
 
     // Any secondary properties to display for a Docker context (an array). Possible elements include: Name, Description and DockerEndpoint
@@ -13737,7 +13838,7 @@
     // The primary property to display for a image: CreatedTime, FullTag, ImageId, Registry, RegistryAndPath, Repository, RepositoryName, RepositoryNameShort, RepositoryNameAndTag, Tag, or Size
     "containers.images.label": "Tag",
 
-    // The property to use to sort images in Container Images view: CreatedTime, Label, or Size
+    // The property to use to sort images in Container Images view: CreatedTime, CreatedTimeReverse, Label, LabelReverse, Size, or SizeReverse
     "containers.images.sortBy": "CreatedTime",
 
     // Any secondary properties to display for a container network (an array). Possible elements include CreatedTime, NetworkDriver, NetworkId, and NetworkName
@@ -13752,7 +13853,7 @@
     // Show the built-in networks in the explorer.
     "containers.networks.showBuiltInNetworks": true,
 
-    // The property to use to sort networks in Container Networks view: CreatedTime or Label
+    // The property to use to sort networks in Container Networks view: CreatedTime, CreatedTimeReverse, Label, or LabelReverse
     "containers.networks.sortBy": "CreatedTime",
 
     // Which container orchestrator client to use. If not specified, Docker Compose will be used. Changing requires a restart to take effect.
@@ -13782,7 +13883,7 @@
     // The primary property to display for a container volume: CreatedTime or VolumeName
     "containers.volumes.label": "VolumeName",
 
-    // The property to use to sort volumes in the Container Volumes view: CreatedTime or Label
+    // The property to use to sort volumes in the Container Volumes view: CreatedTime, CreatedTimeReverse, Label, or LabelReverse
     "containers.volumes.sortBy": "CreatedTime",
 
     // Controls the diagnostic severity for the deprecated MAINTAINER instruction
@@ -15084,6 +15185,29 @@
     // Target name from launch.json to start when debugging a test with CTest. By default and in case of a non-existing target, this will show a picker with all available targets.
     "cmake.ctest.debugLaunchTarget": null,
 
+    // Regular expressions for searching CTest output for additional details about failures. All patterns are tried and test failure details from each are collected.
+    //
+    // Patterns must have at minimum one capture group to match the name of the `file` where the failure occurred. They can optionally also capture `line`, `message`, `expected`, and `actual`.
+    //
+    // For example, to match a failure line like `path/to/file:47: text of error message`, this pattern matcher could be used:
+    // ```json
+    // {
+    //   "regexp": "(.+):(\\d+): ?(.*)",
+    //   "file": 1,
+    //   "line": 2,
+    //   "message": 3
+    // }
+    // ```
+    //
+    "cmake.ctest.failurePatterns": [
+        {
+            "regexp": "(.*?):(\\d+): *(?:error: *)(.*)"
+        },
+        {
+            "regexp": "(.*?)\\((\\d+)\\): *(?:error: *)(.*)"
+        }
+    ],
+
     // The number of parallel test jobs. Use zero to use the value of `cmake.parallelJobs#`. This only applies when `#cmake.ctest.allowParallelJobs` is set to `true`.
     "cmake.ctest.parallelJobs": 0,
 
@@ -15155,7 +15279,7 @@
     // Enable automatic scanning for kits when a kit isn't selected. This will only take affect when CMake Presets aren't being used.
     "cmake.enableAutomaticKitScan": true,
 
-    // Output parsers to use. Supported parsers `cmake`, `gcc`, `gnuld` for GNULD-style linker output, `msvc` for Microsoft Visual C++, `ghs` for the Green Hills compiler with --no_wrap_diagnostics --brief_diagnostics, and `diab` for the Wind River Diab compiler.
+    // Output parsers to use. Supported parsers `cmake`, `gcc`, `gnuld` for GNULD-style linker output, `msvc` for Microsoft Visual C++, `ghs` for the Green Hills compiler with --no_wrap_diagnostics --brief_diagnostics, `diab` for the Wind River Diab compiler, and `iwyu` for include-what-you-use diagnostics.
     "cmake.enabledOutputParsers": [
         "cmake",
         "gcc",
@@ -16981,6 +17105,9 @@
     //  - Both: Shows `keyword` and `syntax snippet`.
     //  - Replace: Only shows `syntax snippet`.
     "Lua.completion.keywordSnippet": "Replace",
+
+    // Maximum number of fields to analyze for completions. When an object has more fields than this limit, completions will require more specific input to appear.
+    "Lua.completion.maxSuggestCount": 100,
 
     // The symbol used to trigger the postfix suggestion.
     "Lua.completion.postfix": "@",
