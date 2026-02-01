@@ -1,6 +1,5 @@
 # Files to convert to a different encoding on checkout/commit
 *.rdp                                       working-tree-encoding=UTF-16LE-BOM
-*.reg                                       working-tree-encoding=UTF-16LE-BOM
 
 # Script files should always be LF terminated
 *.sh                            text        eol=lf
@@ -20,6 +19,9 @@ git/bin/*                       text        eol=lf
 git/hooks/*                     text        eol=lf
 openssh/bin/*                   text        eol=lf
 scripts/bin/*                   text        eol=lf
+
+# Windows Registry files should be UTF-16LE
+*.reg                                       working-tree-encoding=UTF-16LE-BOM
 
 # Override Linguist detected language for certain files
 .vscode/*.json                  linguist-language=jsonc

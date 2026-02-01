@@ -22,6 +22,7 @@ trim_trailing_whitespace = false
 
 # Windows Registry
 [*.reg]
+charset = utf-16le
 indent_size = 2
 
 # XML documents & schemas
