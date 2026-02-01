@@ -1,5 +1,59 @@
 Start-DotFilesSection -Type 'Functions' -Name 'Maintenance'
 
+# Retrieves a report containing:
+# - Name and version for all vendored components
+# - Path and last reviewed version for all configuration files
+Function Get-DotFilesLastUpdated {
+    [CmdletBinding()]
+    [OutputType([PSCustomObject[]])]
+    Param()
+
+    Test-CommandAvailable -Name 'git', 'rg'
+
+    $ComponentVersions = [Collections.Generic.List[PSCustomObject]]::new()
+
+    # Exclude the file containing this function from being matched by rg
+    $RgGlobExclude = '!{0}' -f [IO.Path]::GetFileName($PSCommandPath)
+
+    $LastReviewedReleases = & rg --hidden -g "$RgGlobExclude" 'Last reviewed release: '
+    foreach ($LastReviewedRelease in $LastReviewedReleases) {
+        if ($LastReviewedRelease -notmatch '^(.+):.*Last reviewed release: (.+)') {
+            Write-Error -Message 'Unexpected match returned by rg: {0}' -f $LastReviewedRelease
+            continue
+        }
+
+        $FilePath = $Matches[1]
+        $Version = $Matches[2]
+
+        if ($Version -match '^v[0-9]') {
+            $Version = $Version.Substring(1)
+        }
+
+        $ComponentVersions.Add([PSCustomObject]@{
+                Name    = $FilePath
+                Version = $Version
+            })
+    }
+
+    $LastReviewedVersions = & git ls-files | Where-Object { $_ -match '[\\/]VERSION$' }
+    foreach ($LastReviewedVersion in $LastReviewedVersions) {
+        $ComponentDir = [IO.Path]::GetDirectoryName($LastReviewedVersion)
+        $ComponentName = [IO.Path]::GetFileName($ComponentDir)
+        $Version = Get-Content -LiteralPath $LastReviewedVersion -ReadCount 1
+
+        if ($Version -match '^v[0-9]') {
+            $Version = $Version.Substring(1)
+        }
+
+        $ComponentVersions.Add([PSCustomObject]@{
+                Name    = $ComponentName
+                Version = $Version
+            })
+    }
+
+    return $ComponentVersions | Sort-Object -Property Name
+}
+
 # Clear caches used by development environments & tooling
 Function Clear-AllDevCaches {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
