@@ -1,6 +1,3 @@
-# Files to convert to a different encoding on checkout/commit
-*.rdp                                       working-tree-encoding=UTF-16LE-BOM
-
 # Script files should always be LF terminated
 *.sh                            text        eol=lf
 *.bash                          text        eol=lf
@@ -19,6 +16,10 @@ git/bin/*                       text        eol=lf
 git/hooks/*                     text        eol=lf
 openssh/bin/*                   text        eol=lf
 scripts/bin/*                   text        eol=lf
+
+# Remote Desktop Connection files should be UTF-16LE
+*.rdp                                       working-tree-encoding=UTF-16LE-BOM
+mstsc/Template.ini                          working-tree-encoding=UTF-16LE-BOM
 
 # Windows Registry files should be UTF-16LE
 *.reg                                       working-tree-encoding=UTF-16LE-BOM

@@ -50,6 +50,10 @@ insert_final_newline = false
 [*.ps1xml]
 insert_final_newline = false
 
+# Remote Desktop Connection
+[{*.rdp,mstsc/Template.ini}]
+charset = utf-16le
+
 # Shell scripts
 [{*.sh,*.bash,.bashrc,.mk-sbuild.rc,.quiltrc,.startxwinrc,user-dirs.dirs}]
 max_line_length = 79
