@@ -1,7 +1,7 @@
 # Clink configuration
 # https://chrisant996.github.io/clink/clink.html#configuring-clink
 #
-# Last reviewed release: v1.9.11
+# Last reviewed release: v1.9.13
 # Default file path: %LOCALAPPDATA%\clink\clink_settings
 
 # ---------------------------------- Clink ------------------------------------
@@ -406,6 +406,18 @@ exec.path = True
 # Bypass executable matching (`exec.path`) if the line begins with whitespace
 exec.space_prefix = True
 
+# ----------------------------- Suggestion List -------------------------------
+
+# Start Clink sessions with the suggestion list enabled
+suggestionlist.default = False
+
+# Suppress input hints controlled by `comment_row.show_hints`
+suggestionlist.hide_hints = True
+
+# Maximum history suggestions when the suggestion list shows suggestions from
+# multiple sources. The valid number of suggestions is an integer from 1 to 8.
+suggestionlist.num_history = 3
+
 # -------------------------------- Terminal -----------------------------------
 
 # Adjust cursor shape and visibility
@@ -535,6 +547,3 @@ prompt.transient = off
 
 # Suppress standard error output from Readline
 readline.hide_stderr = False
-
-# Start Clink sessions with the suggestion list enabled
-suggestionlist.default = False
