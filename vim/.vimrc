@@ -785,6 +785,9 @@ let g:vim_json_syntax_conceal = 0
 
 " ################################ nerdtree ###################################
 
+" Show hidden files by default
+let NERDTreeShowHidden = 1
+
 " Key mapping to toggle NERDTree
 nnoremap <C-N> :NERDTreeToggle<CR>
 
