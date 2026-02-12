@@ -58,7 +58,8 @@ function dl_shellcheck() {
     esac
 
     local latest_contains
-    latest_contains="${kernel_name}.${machine_hw_name}"
+    # Match on `.tar.xz` required due to existence of `.tar.gz` variant
+    latest_contains="${kernel_name}.${machine_hw_name}.tar.xz"
     verbose_print "[$APP_NAME] Filtering for release containing: $latest_contains"
 
     local latest_url
