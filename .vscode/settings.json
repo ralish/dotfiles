@@ -125,6 +125,7 @@
         "**/~$*.doc*": true,
         "**/~$*.ppt*": true,
         "**/~$*.xls*": true,
+        "**/clink_errorlevel_*.txt": true,
         "**/desktop.ini": true
     },
 
