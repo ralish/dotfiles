@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code settings
      *
-     * Last reviewed release: v1.108.2
+     * Last reviewed release: v1.109.3
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
@@ -159,6 +159,7 @@
     "chat.notifyWindowOnConfirmation": false,
     "chat.notifyWindowOnResponseReceived": false,
     "chat.tools.terminal.enableAutoApprove": false,
+    "chat.tools.terminal.sandbox.enabled": true,
     "inlineChat.holdToSpeech": false,
 
     // Application: Telemetry
@@ -191,6 +192,7 @@
     "git.autoStash": true,
     "git.blame.editorDecoration.enabled": false, // Handled by GitLens
     "git.blame.statusBarItem.enabled": false, // Handled by GitLens
+    "git.confirmCommittedDelete": false,
     "git.confirmSync": false,
     "git.enableSmartCommit": true,
     "git.fetchOnPull": true,

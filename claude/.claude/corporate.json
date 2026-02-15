@@ -1,0 +1,32 @@
+{
+    // Corporate
+    "companyAnnouncements": [],
+
+    "forceLoginMethod": "claudeai",
+    "forceLoginOrgUUID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+
+    "model": "",
+    "availableModels": ["sonnet", "haiku"],
+
+    "allowManagedMcpServersOnly": false,
+    "allowedMcpServers": [],
+    "deniedMcpServers": [],
+
+    "allowManagedHooksOnly": false,
+
+    "allowManagedPermissionRulesOnly": false,
+
+    "otelHeadersHelper": "",
+
+    "blockedMarketplaces": [],
+    "strictKnownMarketplaces": [
+        {
+            "source": "github",
+            "repo": "acme-corp/approved-plugins"
+        },
+        {
+            "source": "npm",
+            "package": "@acme-corp/compliance-plugins"
+        }
+    ]
+}

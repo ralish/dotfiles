@@ -1,0 +1,73 @@
+{
+  "$help": "https://code.claude.com/docs/en/settings",
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+
+  "autoUpdatesChannel": "latest",
+  "cleanupPeriodDays": 30,
+
+  "outputStyle": "default",
+  "terminalProgressBarEnabled": true,
+  "spinnerTipsEnabled": true,
+  "showTurnDuration": true,
+  "prefersReducedMotion": false,
+
+  "respectGitignore": true,
+  "attribution": { "commit": "", "pr": "" },
+
+  "env": {
+    "DISABLE_BUG_COMMAND": "1",
+    "DISABLE_ERROR_REPORTING": "1",
+    "DISABLE_INSTALLATION_CHECKS": "1",
+    "DISABLE_TELEMETRY": "1"
+  },
+
+  "fastMode": false,
+  "effortLevel": "high",
+  "alwaysThinkingEnabled": true,
+
+  "enableAllProjectMcpServers": false,
+  "enabledMcpjsonServers": ["github", "memory"],
+  "disabledMcpjsonServers": ["filesystem"],
+
+  "disableAllHooks": false,
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "prettier --write",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+
+  "permissions": {
+    "defaultMode": "default",
+    "allow": ["Bash(git add:*)"],
+    "ask": ["Bash(gh pr create:*)", "Bash(git commit:*)"],
+    "deny": ["Read(*.env)", "Bash(rm:*)", "Bash(curl:*)"],
+    "disableBypassPermissionsMode": "disable"
+  },
+
+  "sandbox": {
+    "enabled": true,
+    "enableWeakerNestedSandbox": false,
+    "allowUnsandboxedCommands": false,
+    "autoAllowBashIfSandboxed": true,
+    "excludedCommands": [],
+    "ignoreViolations": {},
+
+    "network": {
+      "allowedDomains": [],
+      "allowUnixSockets": [],
+      "allowAllUnixSockets": false,
+      "allowLocalBinding": false
+    }
+  },
+
+  "teammateMode": "auto"
+}
