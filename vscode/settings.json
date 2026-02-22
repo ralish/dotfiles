@@ -6,6 +6,8 @@
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
+    "$help": "https://code.visualstudio.com/docs/configure/settings",
+
     // Explicitly set schema for directly editing in repository
     "$schema": "vscode://schemas/settings/user",
 
@@ -249,11 +251,10 @@
     "autopep8.importStrategy": "fromEnvironment",
 
     // AWS Toolkit
-    /*
-     * It appears that this extension will ultimately absorb the functionality of
-     * the CloudFormation Linter extension, but right now they're not at feature
-     * parity (particularly for template formatting), so disable this for now.
-     */
+    //
+    // It appears that this extension will absorb the functionality of the
+    // CloudFormation Linter extension, but right now they're not at feature
+    // parity (particularly for template formatting), so disable this for now.
     "aws.cloudformation.completion.enabled": false,
     "aws.cloudformation.diagnostics.cfnGuard.enabled": false,
     "aws.cloudformation.diagnostics.cfnLint.enabled": false,
@@ -288,12 +289,11 @@
     "C_Cpp.vcFormat.newLine.closeBraceSameLine.emptyFunction": true,
     "C_Cpp.vcFormat.newLine.closeBraceSameLine.emptyType": true,
     // C/C++: Resource Management
-    /*
-     * Default path varies by platform:
-     * - Linux: ${XDG_CACHE_HOME:-$HOME/.cache}/vscode-cpp-tools
-     * - macOS: $HOME/Library/Caches/vscode-cpptools
-     * - Windows: %LocalAppData%/Microsoft/vscode-cpptools
-     */
+    //
+    // Default path varies by platform:
+    // - Linux: ${XDG_CACHE_HOME:-$HOME/.cache}/vscode-cpp-tools
+    // - macOS: $HOME/Library/Caches/vscode-cpptools
+    // - Windows: %LocalAppData%/Microsoft/vscode-cpptools
     //"C_Cpp.intelliSenseCachePath": "D:/Cache/VS Code/cpp-tools"
     // C/C++: Miscellanous
     "C_Cpp.autoAddFileAssociations": false,
@@ -303,20 +303,17 @@
     // C#: Text Editor
     "dotnet.formatting.organizeImportsOnFormat": true,
     // C#: Debugger
-    /*
-     * Default path varies by platform:
-     * - Windows: %TEMP%/SymbolCache
-     * - Linux & macOS: $HOME/.dotnet/symbolcache
-     */
+    //
+    // Default path varies by platform:
+    // - Windows: %TEMP%/SymbolCache
+    // - Linux & macOS: $HOME/.dotnet/symbolcache
     //"csharp.debug.symbolOptions.cachePath": "D:/Symbols/Cache",
     "csharp.debug.symbolOptions.searchMicrosoftSymbolServer": true,
     "csharp.debug.symbolOptions.searchNuGetOrgSymbolServer": true,
     // C#: OmniSharp
     "csharp.suppressHiddenDiagnostics": false,
-    /*
-     * EditorConfig support may conflict with Visual Studio if running
-     * See: https://github.com/OmniSharp/omnisharp-roslyn/issues/2230
-     */
+    // EditorConfig support may conflict with Visual Studio if running
+    // See: https://github.com/OmniSharp/omnisharp-roslyn/issues/2230
     //"omnisharp.enableEditorConfigSupport": false,
     "omnisharp.sdkIncludePrereleases": false,
 
