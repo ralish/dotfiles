@@ -948,40 +948,47 @@ Function Update-PythonPackages {
     Param()
 
     $UpdatePipPackages = $false
-    if (!(Get-Command -Name 'pip' -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to update Python packages as pip command not found.'
-    } elseif (!(Get-Command -Name 'pipdeptree' -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to update Python packages as pipdeptree command not found.'
-    } elseif (!((Test-IsWindows) -or ![String]::IsNullOrWhiteSpace($env:VIRTUAL_ENV))) {
-        Write-Warning -Message 'Skipping update of Python packages as not in a virtualenv.'
+    $null = & python -m pip 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error -Message 'Unable to update Python packages as pip module not found.'
     } else {
-        $UpdatePipPackages = $true
+        $null = & python -m pipdeptree 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error -Message 'Unable to update Python packages as pipdeptree module not found.'
+        } elseif (!((Test-IsWindows) -or ![String]::IsNullOrWhiteSpace($env:VIRTUAL_ENV))) {
+            Write-Warning -Message 'Skipping update of Python packages as not in a virtualenv.'
+        } else {
+            $UpdatePipPackages = $true
+        }
     }
 
     if ($UpdatePipPackages) {
-        [String[]]$UpdateArgs = 'install', '--upgrade', '--upgrade-strategy', 'eager'
-        [String[]]$PipUpdateArgs = '-m', 'pip', 'install', '--upgrade'
-
-        $PipVersionRaw = (& pip --version) -join [String]::Empty
+        $PipVersionRaw = (& python -m pip --version) -join [String]::Empty
         if ($PipVersionRaw -notmatch '^pip ([0-9]+\.[0-9]+(\.[0-9]+)?)') {
             throw 'Unable to determine pip package version.'
         }
 
         $PipVersion = [Version]$Matches[1]
+
+        [String[]]$UpdateArgs = 'install', '--upgrade'
+
+        if ($PipVersion -ge '10.0') {
+            $UpdateArgs = $UpdateArgs + '--no-warn-script-location'
+        }
+
         if ($PipVersion -lt '25.0') {
-            $UpdateArgs += '--no-python-version-warning'
-            $PipUpdateArgs += '--no-python-version-warning'
+            $UpdateArgs = @('--no-python-version-warning') + $UpdateArgs
         }
 
         if ($PSCmdlet.ShouldProcess('pip', 'Update')) {
-            Write-Verbose -Message ('Updating pip: python {0} pip' -f ($PipUpdateArgs -join ' '))
-            & python @PipUpdateArgs pip
+            Write-Verbose -Message ('Updating pip: python -m pip {0} pip' -f ($UpdateArgs -join ' '))
+            & python -m pip @UpdateArgs pip
         }
 
-        Write-Verbose -Message 'Enumerating Python packages: pipdeptree'
+        Write-Verbose -Message 'Enumerating Python packages: python -m pipdeptree'
         $Packages = [Collections.Generic.List[String]]::new()
         $PackageRegex = [Regex]::new('^(\S+)==')
-        & pipdeptree | ForEach-Object {
+        & python -m pipdeptree | ForEach-Object {
             $Package = $PackageRegex.Match($_)
             if ($Package.Success) {
                 $Packages.Add($Package.Groups[1].Value)
@@ -989,12 +996,15 @@ Function Update-PythonPackages {
         }
 
         if ($PSCmdlet.ShouldProcess('Python packages', 'Update')) {
-            Write-Verbose -Message ('Updating Python packages: pip {0} {1}' -f ($UpdateArgs -join ' '), ($Packages -join ' '))
-            & pip @UpdateArgs @Packages
+            [String[]]$EagerUpdateArgs = $UpdateArgs + '--upgrade-strategy', 'eager'
+            Write-Verbose -Message ('Updating Python packages: python -m pip {0} {1}' -f ($EagerUpdateArgs -join ' '), ($Packages -join ' '))
+            & python -m pip @EagerUpdateArgs @Packages
         }
     }
 
-    if (Get-Command -Name 'pipx' -ErrorAction Ignore) {
+    # Use `list` as invoking without a command will return a non-zero exit code
+    $null = & python -m pipx list 2>&1
+    if ($LASTEXITCODE -eq 0) {
         [String[]]$PipxUpdateArgs = 'upgrade-all'
 
         if ($PSCmdlet.ShouldProcess('pipx packages', 'Update')) {
@@ -1011,8 +1021,8 @@ Function Update-PythonPackages {
             }
             $env:USE_EMOJI = 0
 
-            Write-Verbose -Message ('Updating pipx packages: pipx {0}' -f ($PipxUpdateArgs -join ' '))
-            & pipx @PipxUpdateArgs
+            Write-Verbose -Message ('Updating pipx packages: python -m pipx {0}' -f ($PipxUpdateArgs -join ' '))
+            & python -m pipx @PipxUpdateArgs
 
             if ($UseEmoji) {
                 $env:USE_EMOJI = $UseEmoji
