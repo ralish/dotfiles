@@ -756,15 +756,16 @@ Function Clear-PipCache {
     [OutputType([Void], [String[]])]
     Param()
 
-    if (!(Get-Command -Name 'pip' -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to clear pip cache as pip command not found.'
+    $null = & python -m pip
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error -Message 'Unable to clear pip cache as pip module not found.'
         return
     }
 
     [String[]]$GetArgs = 'cache', 'info'
     [String[]]$ClearArgs = 'cache', 'purge', '-qqq'
 
-    $PipVersionRaw = (& pip --version) -join [String]::Empty
+    $PipVersionRaw = (& python -m pip --version) -join [String]::Empty
     if ($PipVersionRaw -notmatch '^pip ([0-9]+\.[0-9]+(\.[0-9]+)?)') {
         throw 'Unable to determine pip package version.'
     }
@@ -772,8 +773,8 @@ Function Clear-PipCache {
     $PipVersion = [Version]$Matches[1]
     $PipSupportsCacheIndexV2 = $PipVersion -ge '23.3'
 
-    Write-Verbose -Message ('Determining pip cache path: pip {0}' -f ($GetArgs -join ' '))
-    $PipCacheInfo = & pip @GetArgs
+    Write-Verbose -Message ('Determining pip cache path: python -m pip {0}' -f ($GetArgs -join ' '))
+    $PipCacheInfo = & python -m pip @GetArgs
 
     $PipCachePaths = [Collections.Generic.List[String]]::new()
     $PipCacheIndex = $false
@@ -810,8 +811,8 @@ Function Clear-PipCache {
     }
 
     if ($PSCmdlet.ShouldProcess($PipCachePaths -join ', ', 'Clear')) {
-        Write-Verbose -Message ('Clearing pip cache: pip {0}' -f ($ClearArgs -join ' '))
-        & pip @ClearArgs
+        Write-Verbose -Message ('Clearing pip cache: python -m pip {0}' -f ($ClearArgs -join ' '))
+        & python -m pip @ClearArgs
     }
 }
 
