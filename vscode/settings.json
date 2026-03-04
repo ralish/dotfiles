@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code settings
      *
-     * Last reviewed release: v1.109.3
+     * Last reviewed release: v1.110.0
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
@@ -59,7 +59,6 @@
     "files.trimTrailingWhitespace": true,
 
     // Workbench
-    "workbench.commandPalette.showAskInChat": false,
     "workbench.editorAssociations": {
         // Disable GitLens interactive rebase editor
         "git-rebase-todo": "default"
@@ -69,6 +68,7 @@
     "workbench.navigationControl.enabled": false,
     "workbench.secondarySideBar.defaultVisibility": "hidden",
     "workbench.startupEditor": "readme",
+    "workbench.commandPalette.showAskInChat": false,
 
     // Workbench: Appearance
     "workbench.iconTheme": "vscode-icons",
@@ -101,6 +101,16 @@
     // Window: New Window
     "window.newWindowDimensions": "inherit",
 
+    // Chat
+    //"chat.upvoteAnimation": "pulseWave",
+
+    // Chat: Tools
+    "chat.tools.terminal.enableAutoApprove": false,
+    "chat.tools.terminal.sandbox.enabled": true,
+
+    // Chat: Inline Chat
+    "inlineChat.holdToSpeech": false,
+
     // Features: Explorer
     "explorer.autoReveal": "focusNoScroll",
     "explorer.confirmDelete": false,
@@ -126,6 +136,7 @@
     "terminal.integrated.cursorBlinking": true,
     "terminal.integrated.cursorStyle": "line",
     "terminal.integrated.cursorStyleInactive": "underline",
+    "terminal.integrated.enableImages": true,
     "terminal.integrated.fontFamily": "Hack Nerd Font",
     "terminal.integrated.fontLigatures.enabled": true,
     "terminal.integrated.fontSize": 12,
@@ -137,6 +148,7 @@
     "terminal.integrated.rightClickBehavior": "paste",
     "terminal.integrated.smoothScrolling": true,
     "terminal.integrated.tabs.showActions": "always",
+    "terminal.integrated.textBlinking": true,
     "terminal.sourceControlRepositoriesKind": "both",
 
     // Features: Task
@@ -156,13 +168,6 @@
     "notebook.formatOnSave.enabled": true,
     "notebook.inlineValues": "auto",
     "notebook.lineNumbers": "on",
-
-    // Features: Chat
-    "chat.notifyWindowOnConfirmation": false,
-    "chat.notifyWindowOnResponseReceived": false,
-    "chat.tools.terminal.enableAutoApprove": false,
-    "chat.tools.terminal.sandbox.enabled": true,
-    "inlineChat.holdToSpeech": false,
 
     // Application: Telemetry
     "telemetry.feedback.enabled": false,
@@ -207,6 +212,9 @@
     "git.timeline.date": "authored",
     "git.untrackedChanges": "separate",
 
+    // JavaScript and TypeScript: Formatting
+    "js/ts.format.semicolons": "remove",
+
     // JSON
     "json.format.keepLines": true,
     "json.maxItemsComputed": 10000,
@@ -217,10 +225,6 @@
 
     // PHP
     "php.validate.executablePath": "C:\\DevEnvs\\PHP\\php.exe",
-
-    // TypeScript and JavaScript: Formatting
-    "javascript.format.semicolons": "remove",
-    "typescript.format.semicolons": "remove",
 
     // ##################################################
     // ###                 Extensions                 ###
@@ -265,7 +269,7 @@
     // Azure Repos
     "azureRepos.autoFetch.enabled": false,
 
-    // Azure Resources
+    // Azure Resources (Settings UI: Azure)
     "azureResourceGroups.deleteConfirmation": "ClickButton",
     "azureResourceGroups.enableChatStandIn": false,
     "azureResourceGroups.showHiddenTypes": true,
@@ -294,9 +298,8 @@
     // - Linux: ${XDG_CACHE_HOME:-$HOME/.cache}/vscode-cpp-tools
     // - macOS: $HOME/Library/Caches/vscode-cpptools
     // - Windows: %LocalAppData%/Microsoft/vscode-cpptools
-    //"C_Cpp.intelliSenseCachePath": "D:/Cache/VS Code/cpp-tools"
+    //"C_Cpp.intelliSenseCachePath": "D:/Cache/VS Code/cpp-tools",
     // C/C++: Miscellanous
-    "C_Cpp.autoAddFileAssociations": false,
     "C_Cpp.loggingLevel": "Warning",
     "C_Cpp.windowsErrorReportingMode": "disabled",
 
@@ -336,7 +339,7 @@
     "containers.networks.sortBy": "Label",
     "containers.volumes.sortBy": "Label",
 
-    // Debugger for Java
+    // Debugger for Java (Settings UI: Java Debugger)
     "java.debug.settings.showStaticVariables": true,
     "java.silentNotification": true,
 
@@ -375,7 +378,7 @@
     // Flake8
     "flake8.importStrategy": "fromEnvironment",
 
-    // GitHub Copilot
+    // GitHub Copilot Chat
     "github.copilot.enable": {
         "*": false,
         "plaintext": false,
@@ -418,10 +421,10 @@
     "go.survey.prompt": false,
     "go.testExplorer.packageDisplayMode": "nested",
 
-    // Gradle
+    // Gradle for Java
     "gradle.showStoppedDaemons": true,
 
-    // HTML CSS Support
+    // HTML CSS Support (Settings UI: CSS Settings)
     "css.autoValidation": "Always",
 
     // isort
@@ -433,19 +436,47 @@
     // Lua
     "Lua.codeLens.enable": true,
 
-    // Language Support for Java: Project Import/Update
+    // Language Support for Java(TM) by Red Hat: Project Import/Update
     "java.project.encoding": "warning",
-    // Language Support for Java: Build
+    // Language Support for Java(TM) by Red Hat: Build
     "java.autobuild.enabled": false,
-    // Language Support for Java: Code Completion
+    // Language Support for Java(TM) by Red Hat: Code Completion
     "java.completion.chain.enabled": true,
     "java.completion.matchCase": "off",
     "java.signatureHelp.description.enabled": true,
-    // Language Support for Java: Code Generation
+    // Language Support for Java(TM) by Red Hat: Code Generation
     "java.codeGeneration.useBlocks": true,
-    // Language Support for Java: Code Action
-    "java.saveActions.organizeImports": true,
-    // Language Support for Java: Code Navigation
+    // Language Support for Java(TM) by Red Hat: Code Action
+    "java.cleanup.actions": [
+        "addDeprecated",
+        "addFinalModifier",
+        "addOverride",
+        //"invertEquals",
+        "lambdaExpression",
+        "organizeImports",
+        //"qualifyMembers",
+        //"qualifyStaticMembers",
+        "redundantComparisonStatement",
+        "redundantFallingThroughBlockEnd",
+        "redundantIfCondition",
+        "redundantModifiers",
+        "redundantSuperCall",
+        "renameFileToType", // Unused?
+        "renameUnusedLocalVariables",
+        "stringConcatToTextBlock",
+        "tryWithResource",
+        "useSwitchForInstanceofPattern",
+
+        // Java 8+
+        "lambdaExpressionFromAnonymousClass",
+
+        // Java 14+
+        "switchExpression",
+
+        // Java 15+
+        "instanceofPatternMatch"
+    ],
+    // Language Support for Java(TM) by Red Hat: Code Navigation
     "java.referencesCodeLens.enabled": true,
     "java.implementationCodeLens": "all",
 
@@ -458,7 +489,7 @@
     "markdownlint.severityForError": "Error",
     "markdownlint.severityForWarning": "Warning",
 
-    // Maven
+    // Maven for Java
     "maven.showInExplorerContextMenu": false,
     "maven.view": "hierarchical",
 
@@ -471,7 +502,7 @@
     // Mypy Type Checker
     "mypy-type-checker.importStrategy": "fromEnvironment",
 
-    // PHP Intelephense
+    // PHP Intelephense (Settings UI: intelephense)
     "intelephense.codeLens.implementations.enable": true,
     "intelephense.codeLens.overrides.enable": true,
     "intelephense.codeLens.parent.enable": true,
@@ -501,7 +532,7 @@
     "prettier.endOfLine": "auto",
     "prettier.singleQuote": true,
 
-    // Project Manager for Java
+    // Project Manager for Java (Settings UI: Java Project Manager)
     "java.dependency.packagePresentation": "hierarchical",
 
     // Pylance
@@ -537,8 +568,8 @@
         // Select Line Status Bar
         "tomoki1207.selectline-statusbar"
     ],
-    "remote.SSH.experimental.chat": false,
     "remote.SSH.suppressWindowsSshWarning": true,
+    "remote.SSH.experimental.chat": false,
 
     // Remote - Tunnels
     "remote.tunnels.alwaysUpdateCLI": true,
@@ -625,16 +656,9 @@
     // ##################################################
 
     "[dockercompose]": {
-        "editor.defaultFormatter": "redhat.vscode-yaml",
-        "editor.tabSize": 2,
-        "editor.autoIndent": "advanced",
-        "editor.insertSpaces": true,
         "editor.rulers": [79],
-        "editor.quickSuggestions": {
-            "other": "on",
-            "comments": "off",
-            "strings": "on"
-        }
+
+        "editor.defaultFormatter": "redhat.vscode-yaml"
     },
 
     "[dynamic csv]": {
