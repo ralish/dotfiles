@@ -218,6 +218,10 @@
     // JSON
     "json.format.keepLines": true,
     "json.maxItemsComputed": 10000,
+    "json.schemaDownload.trustedDomains": {
+        "https://aka.ms/": true,
+        "https://raw.githubusercontent.com/": true
+    },
 
     // Markdown
     "markdown.updateLinksOnFileMove.enabled": "prompt",
