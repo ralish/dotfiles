@@ -2,7 +2,7 @@
     /*
      * Windows Terminal settings
      *
-     * Last reviewed release: v1.23.20211.0
+     * Last reviewed release: v1.24.10621.0
      * Default file path: %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
      *
      * Many Windows Terminal profiles are automatically generated and assigned
@@ -43,6 +43,8 @@
     "snapToGridOnResize": true,
     "tabSwitcherMode": "inOrder",
     "focusFollowMouse": false,
+    "experimental.scrollToZoom": true,
+    "experimental.scrollToChangeOpacity": true,
     "experimental.detectURLs": true,
     "searchWebDefaultQueryUrl": "https://kagi.com/search?q=%22%s%22",
     "experimental.enableColorSelection": false,
@@ -50,7 +52,7 @@
     "warning.confirmCloseAllTabs": false,
     "warning.inputService": true,
     "warning.largePaste": true,
-    "warning.multiLinePaste": true,
+    "warning.multiLinePaste": "automatic",
 
     // Appearance
     "theme": {
@@ -119,7 +121,7 @@
         }
     ],
 
-    // Key bindings
+    // Key bindings (not in UI)
     "keybindings": [
         { "id": "User.scrollToMarkNext", "keys": "ctrl+down" },
         { "id": "User.scrollToMarkPrevious", "keys": "ctrl+up" },
@@ -136,8 +138,8 @@
             "name": "Visual Studio",
             "icon": "ms-appx:///ProfileIcons/{550ce7b8-d500-50ad-8a1a-c400c3262db3}.png",
 
-            "allowEmpty": false,
             "inline": "never",
+            "allowEmpty": false,
 
             "entries": [
                 {
@@ -150,8 +152,10 @@
         }
     ],
 
-    // Advanced (not in UI)
+    // Extensions
     "disabledProfileSources": ["Windows.Terminal.Azure"],
+
+    // Advanced (not in UI)
     "startupActions": "", // None
     "experimental.useBackgroundImageForWindow": false,
 
