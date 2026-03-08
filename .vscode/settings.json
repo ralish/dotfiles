@@ -250,6 +250,11 @@
 
     // XML schema file associations
     "xml.fileAssociations": [
+        // Windows PowerShell doesn't permit attributes in `<Configuration>`
+        {
+            "pattern": "**/*.format.ps1xml",
+            "systemId": "https://raw.githubusercontent.com/PowerShell/PowerShell/refs/heads/master/src/Schemas/Format.xsd"
+        },
         {
             "pattern": "**/windows/Event Viewer/**.xml",
             "systemId": "windows/Event Viewer/Schemas/Viewer.xsd"
