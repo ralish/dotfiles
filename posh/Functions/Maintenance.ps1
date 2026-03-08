@@ -15,10 +15,13 @@ Function Get-DotFilesLastUpdated {
 
     $ComponentVersions = [Collections.Generic.List[PSCustomObject]]::new()
 
-    # Exclude the file containing this function from being matched by rg
-    $RgGlobExclude = '!{0}' -f [IO.Path]::GetFileName($PSCommandPath)
+    # Exclude the `.git` directory
+    $RgGlobExcludeGit = '!.git/'
 
-    $LastReviewedReleases = & rg --hidden -g "$RgGlobExclude" 'Last reviewed release: '
+    # Exclude the file containing this function from being matched by rg
+    $RgGlobExcludeThis = '!{0}' -f [IO.Path]::GetFileName($PSCommandPath)
+
+    $LastReviewedReleases = & rg --hidden -g $RgGlobExcludeGit -g $RgGlobExcludeThis 'Last reviewed release: '
     foreach ($LastReviewedRelease in $LastReviewedReleases) {
         if ($LastReviewedRelease -notmatch '^(.+):.*Last reviewed release: (.+)') {
             Write-Error -Message 'Unexpected match returned by rg: {0}' -f $LastReviewedRelease
