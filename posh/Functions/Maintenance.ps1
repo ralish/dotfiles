@@ -176,14 +176,18 @@ Function Update-AllTheThings {
     [OutputType([PSCustomObject])]
     Param()
 
+    # The ordering of elements in the arrays defined in the `DynamicParam`
+    # block is important as it determines the order in which the members
+    # corresponding to each selected tasks are added to the returned
+    # `PSCustomObject` containing all the task execution results.
     DynamicParam {
         $TasksApps = @('PowerShell')
         $TasksDevel = @('DotNetTools', 'GoExecutables', 'NodejsPackages', 'PythonPackages', 'RubyGems', 'RustToolchains')
         $TasksSystem = @()
 
         if (Test-IsWindows) {
-            $TasksApps += @('MicrosoftStore', 'Office', 'Scoop', 'VisualStudio')
-            $TasksDevel += @('QtComponents')
+            $TasksApps = @('Office', 'VisualStudio', $TasksApps, 'MicrosoftStore', 'Scoop')
+            $TasksDevel = ($TasksDevel + @('QtComponents')) | Sort-Object
             $TasksSystem += @('Windows', 'WSL')
         } else {
             $TasksApps += @('Homebrew')
@@ -192,8 +196,8 @@ Function Update-AllTheThings {
         $AllTasks = $TasksApps + $TasksDevel + $TasksSystem
         $TasksVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]$AllTasks)
 
-        $AllCategories = @('Apps', 'Devel', 'System')
-        $CategoriesVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]$AllCategories)
+        $AllCategories = @('System', 'Apps', 'Devel')
+        $CategoriesVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]($AllCategories | Sort-Object))
 
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
