@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/PowerShell/PowerShell/refs/heads/master/src/Schemas/Format.xsd">
+    <ViewDefinitions>
+        <View>
+            <Name>DotFiles.MaintenanceWin.UpdateScoop</Name>
+            <ViewSelectedBy>
+                <TypeName>DotFiles.MaintenanceWin.UpdateScoop</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <Label>Scoop</Label>
+                                <ScriptBlock>'{0} lines' -f $_.Scoop.Count</ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Apps</Label>
+                                <ScriptBlock>'{0} lines' -f $_.Apps.Count</ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Cleanup</Label>
+                                <ScriptBlock>'{0} lines' -f $_.Cleanup.Count</ScriptBlock>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+        <View>
+            <Name>DotFiles.MaintenanceWin.UpdateWSL</Name>
+            <ViewSelectedBy>
+                <TypeName>DotFiles.MaintenanceWin.UpdateWSL</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Version</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>PreviousVersion</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Updated</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Output</Label>
+                                <ScriptBlock>'{0} lines' -f $_.Output.Count</ScriptBlock>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>

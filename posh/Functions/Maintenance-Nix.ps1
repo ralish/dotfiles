@@ -9,6 +9,9 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
     return
 }
 
+# Load custom formatting data
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Maintenance-Nix.format.ps1xml'))
+
 # Update Homebrew & installed apps
 Function Update-Homebrew {
     [CmdletBinding(SupportsShouldProcess)]
@@ -37,6 +40,7 @@ Function Update-Homebrew {
         Upgrade = $null
         Cleanup = $null
     }
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceNix.UpdateHomebrew')
 
     [String[]]$UpdateArgs = 'update'
     [String[]]$UpgradeArgs = 'upgrade'

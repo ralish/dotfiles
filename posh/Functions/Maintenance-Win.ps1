@@ -9,6 +9,9 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
     return
 }
 
+# Load custom formatting data
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Maintenance-Win.format.ps1xml'))
+
 # Update Google Chrome
 Function Update-GoogleChrome {
     [CmdletBinding(SupportsShouldProcess)]
@@ -329,6 +332,7 @@ Function Update-Scoop {
         Apps    = $null
         Cleanup = $null
     }
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateScoop')
 
     [String[]]$UpdateScoopArgs = 'update', '--quiet'
     [String[]]$UpdateAppsArgs = 'update', '*', '--quiet'
@@ -618,11 +622,12 @@ Function Update-WSL {
     }
 
     $Result = [PSCustomObject]@{
-        Status          = $null
         Version         = $null
         PreviousVersion = $null
         Updated         = $false
+        Output          = $null
     }
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateWSL')
 
     $Result.PreviousVersion = Get-WslVersion
 
@@ -634,7 +639,7 @@ Function Update-WSL {
     try {
         Write-Verbose -Message 'Updating WSL: wsl --update'
         [Console]::OutputEncoding = [Text.Encoding]::Unicode
-        $Result.Status = & wsl --update
+        $Result.Output = & wsl --update
     } finally {
         [Console]::OutputEncoding = $DefaultOutputEncoding
     }

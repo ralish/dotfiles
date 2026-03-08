@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/PowerShell/PowerShell/refs/heads/master/src/Schemas/Format.xsd">
+    <ViewDefinitions>
+        <View>
+            <Name>DotFiles.MaintenanceNix.UpdateHomebrew</Name>
+            <ViewSelectedBy>
+                <TypeName>DotFiles.MaintenanceNix.UpdateHomebrew</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <Label>Update</Label>
+                                <ScriptBlock>'{0} lines' -f $_.Update.Count</ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Upgrade</Label>
+                                <ScriptBlock>'{0} lines' -f $_.Upgrade.Count</ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Cleanup</Label>
+                                <ScriptBlock>'{0} lines' -f $_.Cleanup.Count</ScriptBlock>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>

@@ -1,5 +1,8 @@
 Start-DotFilesSection -Type 'Functions' -Name 'Maintenance'
 
+# Load custom formatting data
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Maintenance.format.ps1xml'))
+
 # Retrieves a report containing:
 # - Name and version for all vendored components
 # - Path and last reviewed version for all configuration files
@@ -245,7 +248,25 @@ Function Update-AllTheThings {
     }
 
     End {
-        $Results = [PSCustomObject]@{}
+        $Results = [PSCustomObject]@{
+            Windows        = $null
+            WSL            = $null
+            Office         = $null
+            VisualStudio   = $null
+            PowerShell     = $null
+            MicrosoftStore = $null
+            Homebrew       = $null
+            Scoop          = $null
+            DotNetTools    = $null
+            GoExecutables  = $null
+            NodejsPackages = $null
+            PythonPackages = $null
+            QtComponents   = $null
+            RubyGems       = $null
+            RustToolchains = $null
+        }
+        $Results.PSObject.TypeNames.Insert(0, 'DotFiles.Maintenance.UpdateAllTheThings')
+
         $Tasks = [Collections.Generic.List[String]]::new()
         $TasksDone = 0
         $TasksTotal = 0
@@ -270,9 +291,6 @@ Function Update-AllTheThings {
         }
 
         $TasksTotal = $Tasks.Count
-        foreach ($Task in $Tasks) {
-            $Results | Add-Member -Name $Task -MemberType NoteProperty -Value $null
-        }
 
         if ($Tasks -contains 'Windows' -or $Tasks -contains 'Office' -or $Tasks -contains 'VisualStudio' -or $Tasks -contains 'MicrosoftStore') {
             $IsAdministrator = Test-IsAdministrator
