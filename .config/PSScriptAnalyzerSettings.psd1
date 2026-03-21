@@ -1,6 +1,6 @@
 # PSScriptAnalyzer settings
 #
-# Last reviewed release: v1.24.0
+# Last reviewed release: v1.25.0
 
 @{
     IncludeRules = @('*')
@@ -9,6 +9,7 @@
         'PSAvoidUsingInvokeExpression',
         'PSAvoidUsingWriteHost',
         'PSReviewUnusedParameter',
+        'PSUseConstrainedLanguageMode',
         'PSUseShouldProcessForStateChangingFunctions',
         'PSUseSingularNouns'
     )
@@ -22,8 +23,12 @@
 
         # General rules
         PSAlignAssignmentStatement = @{
-            Enable         = $true
-            CheckHashtable = $true
+            Enable                                  = $true
+            CheckHashtable                          = $true
+            AlignHashtableKvpWithInterveningComment = $true
+            CheckEnum                               = $true
+            AlignEnumMemberWithInterveningComment   = $true
+            IncludeValuelessEnumMembers             = $true
         }
 
         PSAvoidUsingCmdletAliases = @{
