@@ -52,7 +52,6 @@ Function Get-AzureAuthHeader {
 # Connecting to Microsoft Graph with a Native App using PowerShell
 # https://learn.microsoft.com/en-au/archive/blogs/cloudlojik/connecting-to-microsoft-graph-with-a-native-app-using-powershell
 Function Get-AzureAuthToken {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '')]
     [CmdletBinding()]
     [OutputType([Threading.Tasks.Task])]
     Param(

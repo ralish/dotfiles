@@ -50,7 +50,6 @@ if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
 # - Get-Module -ListAvailable
 #   Assume the module exists instead of checking
 if (!(Get-Variable -Name 'DotFilesFastLoad' -ErrorAction Ignore)) {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     $Global:DotFilesFastLoad = $true
 }
 

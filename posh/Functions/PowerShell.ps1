@@ -44,6 +44,7 @@ Function Get-ArgumentCompleter {
 
 # Uninstalls obsolete PowerShell modules
 Function Uninstall-ObsoleteModule {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseCompatibleCmdlets', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(
@@ -225,6 +226,7 @@ Function Uninstall-ObsoleteModule {
 
 # Update PowerShell modules & built-in help
 Function Update-PowerShell {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseCompatibleCmdlets', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(

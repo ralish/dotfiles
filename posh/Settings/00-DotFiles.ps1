@@ -42,7 +42,6 @@ Function Initialize-DotFiles {
         throw [ComponentModel.Win32Exception]::new()
     }
 
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     $Global:DotFiles = Split-Path -Path $ProfileDirFinalPath.ToString().TrimStart('\', '?') -Parent
 }
 

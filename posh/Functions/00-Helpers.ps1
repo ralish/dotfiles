@@ -48,7 +48,6 @@ Function Get-DotFilesMessage {
 
 # Retrieve the elapsed time in milliseconds from a starting time
 Function Get-DotFilesTiming {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void], [String])]
     Param(
@@ -136,13 +135,10 @@ Function Start-DotFilesSection {
         [Switch]$ForceTestModule
     )
 
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     $Global:DotFilesSectionType = $Type
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     $Global:DotFilesSectionName = $Name
 
     if ($DotFilesShowTimings) {
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
         $Global:DotFilesSectionStart = Get-Date
     }
 
@@ -295,7 +291,6 @@ Function Test-IsWindows {
 
 # Confirm a PowerShell module is available
 Function Test-ModuleAvailable {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void], [PSModuleInfo[]])]
     Param(

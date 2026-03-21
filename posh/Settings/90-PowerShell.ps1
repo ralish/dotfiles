@@ -1,7 +1,6 @@
 Start-DotFilesSection -Type 'Settings' -Name 'PowerShell'
 
 # Number of elements to enumerate when displaying arrays
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $FormatEnumerationLimit = 5
 
 # Out-File: Default to UTF-8 encoding

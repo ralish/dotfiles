@@ -240,7 +240,6 @@ Function Invoke-GitRepoCommand {
 
 # Invoke a linter on matching repository files
 Function Invoke-GitLinter {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPositionalParameters', '')]
     [CmdletBinding()]
     #[OutputType([Void], [String[]], ParameterSetName = 'DevSkim')]
     #[OutputType([Void], [Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.DiagnosticRecord[]], ParameterSetName = 'PSScriptAnalyzer')]
