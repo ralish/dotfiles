@@ -190,7 +190,7 @@ Function Update-AllTheThings {
 
         if (Test-IsWindows) {
             $TasksApps = @('Office', 'VisualStudio', $TasksApps, 'MicrosoftStore', 'Scoop')
-            $TasksDevel = ($TasksDevel + @('QtComponents')) | Sort-Object
+            $TasksDevel = ($TasksDevel + @('Python', 'QtComponents')) | Sort-Object
             $TasksSystem += @('Windows', 'WSL')
         } else {
             $TasksApps += @('Homebrew')
@@ -267,6 +267,7 @@ Function Update-AllTheThings {
             DotNetTools    = $null
             GoExecutables  = $null
             NodejsPackages = $null
+            Python         = $null
             PythonPackages = $null
             QtComponents   = $null
             RubyGems       = $null
@@ -383,6 +384,12 @@ Function Update-AllTheThings {
         if ($Tasks -contains 'NodejsPackages') {
             Write-Progress @WriteProgressParams -Status 'Node.js packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
             $Results.NodejsPackages = Update-NodejsPackages
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'Python') {
+            Write-Progress @WriteProgressParams -Status 'Python' -PercentComplete ($TasksDone / $TasksTotal * 100)
+            $Results.Python = Update-Python
             $TasksDone++
         }
 

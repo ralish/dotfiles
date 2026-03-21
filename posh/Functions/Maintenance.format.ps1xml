@@ -59,6 +59,9 @@
                                 <PropertyName>NodejsPackages</PropertyName>
                             </ListItem>
                             <ListItem>
+                                <PropertyName>Python</PropertyName>
+                            </ListItem>
+                            <ListItem>
                                 <PropertyName>PythonPackages</PropertyName>
                             </ListItem>
                             <ListItem>

@@ -304,6 +304,29 @@ Function Update-Office {
     return $Result
 }
 
+# Update Python
+Function Update-Python {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
+    Param()
+
+    if (!(Get-Command -Name 'pymanager' -ErrorAction Ignore)) {
+        Write-Error -Message 'Unable to update Python as pymanager command not found.'
+        return
+    }
+
+    $UpdatePythonArgs = @('install', '--update')
+    if ($WhatIfPreference) {
+        $UpdatePythonArgs += '--dry-run'
+    }
+
+    if ($WhatIfPreference -or $PSCmdlet.ShouldProcess('Python', 'Update')) {
+        Write-Verbose -Message ('Updating Python: pymanager {0}' -f ($UpdatePythonArgs -join ' '))
+        $Result = & pymanager @UpdatePythonArgs 2>&1
+        return $Result
+    }
+}
+
 # Update Scoop & installed apps
 Function Update-Scoop {
     [CmdletBinding(SupportsShouldProcess)]
