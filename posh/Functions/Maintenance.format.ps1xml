@@ -16,6 +16,7 @@
                             <ListItem>
                                 <Label>WSL</Label>
                                 <ScriptBlock>
+                                    if ($null -eq $_.WSL) { return }
                                     if (!$_.WSL.Updated) { return 'No update (current: v{0})' -f $_.WSL.Version }
                                     return 'Updated to v{0} (previous: v{1})' -f $_.WSL.Version, $_.WSL.PreviousVersion
                                 </ScriptBlock>
@@ -23,6 +24,7 @@
                             <ListItem>
                                 <Label>Office</Label>
                                 <ScriptBlock>
+                                    if ($null -eq $_.Office) { return }
                                     if (!$_.Office.Updated) { return 'No update (current: v{0})' -f $_.Office.Version }
                                     return 'Updated to v{0} (previous: v{1})' -f $_.Office.Version, $_.Office.PreviousVersion
                                 </ScriptBlock>
@@ -30,6 +32,8 @@
                             <ListItem>
                                 <Label>VisualStudio</Label>
                                 <ScriptBlock>
+                                    if ($null -eq $_.VisualStudio) { return }
+
                                     $Versions = [String]::Join(', v', $_.VisualStudio.Versions)
                                     if (!$_.VisualStudio.Updated) {return 'No update (current: v{0})' -f $Versions }
 
