@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code settings
      *
-     * Last reviewed release: v1.110.0
+     * Last reviewed release: v1.112.0
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
@@ -107,9 +107,6 @@
     // Chat: Tools
     "chat.tools.terminal.enableAutoApprove": false,
     "chat.tools.terminal.sandbox.enabled": true,
-
-    // Chat: Inline Chat
-    "inlineChat.holdToSpeech": false,
 
     // Features: Explorer
     "explorer.autoReveal": "focusNoScroll",
