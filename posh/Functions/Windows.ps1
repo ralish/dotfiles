@@ -354,7 +354,7 @@ Function Find-WinEvent {
         $Time = $WinEvent.TimeCreated.ToString($DateFormat)
         $Level = $EventLevelToName[$WinEvent.Level].ToUpper()
         $Provider = $WinEvent.ProviderName
-        $Message = $WinEvent.Message
+        $Msg = $WinEvent.Message
 
         $ReplaceChars = [Char[]]@(
             # Left-to-right mark
@@ -362,19 +362,19 @@ Function Find-WinEvent {
         )
 
         foreach ($Char in $ReplaceChars) {
-            $Message = $Message.Replace([String]$Char, [String]::Empty)
+            $Msg = $Msg.Replace([String]$Char, [String]::Empty)
         }
 
         if ($WinEvent.Message) {
-            $Message = $Message.Split("`r`n", $StringSplitOptions).Split("`n", $StringSplitOptions)
+            $Msg = $Msg.Split("`r`n", $StringSplitOptions).Split("`n", $StringSplitOptions)
         } else {
-            $Message = [String]::Empty
+            $Msg = [String]::Empty
         }
 
         if ($OutputFormat -eq 'PlainText') {
-            $Text = '[{0}] {1,-8} -> {2}{3}{4}' -f $Time, $Level, $Provider, $MultilinePrefix, ($Message -join $MultilinePrefix)
+            $Text = '[{0}] {1,-8} -> {2}{3}{4}' -f $Time, $Level, $Provider, $MultilinePrefix, ($Msg -join $MultilinePrefix)
         } else {
-            $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, ($Message -join $MultilinePrefix)
+            $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, ($Msg -join $MultilinePrefix)
         }
 
         $WinEvents.Add($Text)

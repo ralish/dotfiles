@@ -19,11 +19,11 @@ Function Update-GoogleChrome {
     Param()
 
     if (!(Test-IsAdministrator)) {
-        $Message = 'You must have administrator privileges to perform Chrome updates.'
+        $Msg = 'You must have administrator privileges to perform Chrome updates.'
         if ($WhatIfPreference) {
-            Write-Warning -Message $Message
+            Write-Warning -Message $Msg
         } else {
-            throw $Message
+            throw $Msg
         }
     }
 
@@ -95,11 +95,11 @@ Function Update-MicrosoftEdge {
     Param()
 
     if (!(Test-IsAdministrator)) {
-        $Message = 'You must have administrator privileges to perform Edge updates.'
+        $Msg = 'You must have administrator privileges to perform Edge updates.'
         if ($WhatIfPreference) {
-            Write-Warning -Message $Message
+            Write-Warning -Message $Msg
         } else {
-            throw $Message
+            throw $Msg
         }
     }
 
@@ -166,11 +166,11 @@ Function Update-MicrosoftStore {
     Param()
 
     if (!(Test-IsAdministrator)) {
-        $Message = 'You must have administrator privileges to perform Microsoft Store updates.'
+        $Msg = 'You must have administrator privileges to perform Microsoft Store updates.'
         if ($WhatIfPreference) {
-            Write-Warning -Message $Message
+            Write-Warning -Message $Msg
         } else {
-            throw $Message
+            throw $Msg
         }
     }
 
@@ -205,11 +205,11 @@ Function Update-Office {
     )
 
     if (!(Test-IsAdministrator)) {
-        $Message = 'You must have administrator privileges to perform Office updates.'
+        $Msg = 'You must have administrator privileges to perform Office updates.'
         if ($WhatIfPreference) {
-            Write-Warning -Message $Message
+            Write-Warning -Message $Msg
         } else {
-            throw $Message
+            throw $Msg
         }
     }
 
@@ -405,11 +405,11 @@ Function Update-VisualStudio {
     )
 
     if (!(Test-IsAdministrator)) {
-        $Message = 'You must have administrator privileges to perform Visual Studio updates.'
+        $Msg = 'You must have administrator privileges to perform Visual Studio updates.'
         if ($WhatIfPreference) {
-            Write-Warning -Message $Message
+            Write-Warning -Message $Msg
         } else {
-            throw $Message
+            throw $Msg
         }
     }
 

@@ -92,13 +92,13 @@ Remove-Variable -Name 'PoshScriptsPath'
 if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
     # Output total profile load time
     if ($DotFilesShowTimings) {
-        $MessageParams = @{
+        $MsgParams = @{
             Message     = (Get-DotFilesTiming -StartTime $DotFilesLoadStart)
             SectionType = 'Profile'
             SectionName = 'End'
         }
-        Write-Verbose -Message (Get-DotFilesMessage @MessageParams)
-        Remove-Variable -Name 'DotFilesLoadStart', 'MessageParams'
+        Write-Verbose -Message (Get-DotFilesMessage @MsgParams)
+        Remove-Variable -Name 'DotFilesLoadStart', 'MsgParams'
     }
 
     $Global:VerbosePreference = $DotFilesVerboseOriginal

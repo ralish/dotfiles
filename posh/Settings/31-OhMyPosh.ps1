@@ -30,22 +30,22 @@ Function Get-OmpConfig {
 
     if ($env:POSH_THEMES_PATH) {
         $OmpThemeDir = $env:POSH_THEMES_PATH
-        $Message = 'Using POSH_THEMES_PATH environment variable: {0}' -f $env:POSH_THEMES_PATH
+        $Msg = 'Using POSH_THEMES_PATH environment variable: {0}' -f $env:POSH_THEMES_PATH
     } else {
         $OmpBinFilePath = (Get-Command -Name 'oh-my-posh').Source
         $OmpPathElements = $OmpBinFilePath.Split([IO.Path]::DirectorySeparatorChar)
 
         if ($OmpPathElements -contains 'scoop') {
             $OmpBasePath = Split-Path -Path (Split-Path -Path $OmpBinFilePath)
-            $Message = 'Detected Scoop installation of Oh My Posh.'
+            $Msg = 'Detected Scoop installation of Oh My Posh.'
         } elseif ($OmpPathElements -contains '.linuxbrew') {
             $OmpBinFileItem = Get-Item -LiteralPath $OmpBinFilePath
             $OmpBinRealPath = Resolve-Path -Path (Join-Path -Path (Split-Path -Path $OmpBinFileItem.FullName -Parent) -ChildPath $OmpBinFileItem.Target)
             $OmpBasePath = Split-Path -Path (Split-Path -Path $OmpBinRealPath.Path)
-            $Message = 'Detected Homebrew installation of Oh My Posh.'
+            $Msg = 'Detected Homebrew installation of Oh My Posh.'
         } else {
-            $Message = 'Unable to determine Oh My Posh themes path.'
-            Write-Warning -Message (Get-DotFilesMessage -Message $Message)
+            $Msg = 'Unable to determine Oh My Posh themes path.'
+            Write-Warning -Message (Get-DotFilesMessage -Message $Msg)
             return
         }
 
@@ -53,13 +53,13 @@ Function Get-OmpConfig {
     }
 
     # Output the detected Oh My Posh themes path
-    Write-Verbose -Message (Get-DotFilesMessage -Message $Message)
+    Write-Verbose -Message (Get-DotFilesMessage -Message $Msg)
 
     $OmpThemePath = Join-Path -Path $OmpThemeDir -ChildPath ('{0}.omp.json' -f $ThemeName)
     $OmpThemeFile = Get-Item -LiteralPath $OmpThemePath -ErrorAction Ignore
     if ($OmpThemeFile -isnot [IO.FileInfo]) {
-        $Message = 'Expected Oh My Posh theme path is not a file: {0}' -f $OmpThemePath
-        Write-Warning -Message (Get-DotFilesMessage -Message $Message)
+        $Msg = 'Expected Oh My Posh theme path is not a file: {0}' -f $OmpThemePath
+        Write-Warning -Message (Get-DotFilesMessage -Message $Msg)
         return
     }
 
