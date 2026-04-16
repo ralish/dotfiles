@@ -628,47 +628,84 @@ Function Update-Windows {
 # Update Windows Subsystem for Linux
 Function Update-WSL {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [PSCustomObject])]
+    [OutputType([PSCustomObject])]
     Param()
 
     Function Get-WslVersion {
         [CmdletBinding()]
-        [OutputType([PSCustomObject])]
-        Param()
+        [OutputType([Void], [PSCustomObject])]
+        Param(
+            [Switch]$Fatal
+        )
 
         $Result = [PSCustomObject]@{}
+
+        $StatusArgs = [String[]]@('--status')
+        $VersionArgs = [String[]]@('--version')
+
         $DefaultOutputEncoding = [Console]::OutputEncoding
 
+        Write-Verbose -Message ('Retrieving WSL status: wsl {0}' -f ($StatusArgs -join ' '))
+        # We can't immediately launch `wsl --version` as if WSL is available
+        # but not installed it will prompt the user to press any key to start
+        # the install with a 60 second time-out. Instead we can first use `wsl
+        # --status` which seems to exit with code 50 when WSL is not installed.
         try {
             [Console]::OutputEncoding = [Text.Encoding]::Unicode
-            $WslVersion = & wsl --version
-
-            foreach ($Line in $WslVersion) {
-                if ([String]::IsNullOrWhiteSpace($Line)) {
-                    continue
-                }
-
-                if ($Line -notmatch '^([A-Za-z0-9]+) version: (.+)') {
-                    Write-Warning -Message ('Unable to parse line in version output: {0}' -f $Line)
-                    continue
-                }
-
-                $Component = $Matches[1]
-                $RawVersion = $Matches[2]
-
-                $Version = $null
-                if (![Version]::TryParse($RawVersion, [ref]$Version)) {
-                    $Version = $RawVersion
-                }
-
-                $Result | Add-Member -MemberType NoteProperty -Name $Component -Value $Version
-            }
+            $null = & wsl @StatusArgs 2>&1
+        } catch {
+            $Msg = 'Failed to check WSL status: {0}' -f $PSItem.Exception.Message
+            if ($Fatal) { throw $Msg } else { Write-Error -Message $Msg; return }
         } finally {
             [Console]::OutputEncoding = $DefaultOutputEncoding
         }
 
+        switch ($LASTEXITCODE) {
+            0 { }
+            50 {
+                $Msg = 'WSL is not installed.'
+                if ($Fatal) { throw $Msg } else { Write-Error -Message $Msg; return }
+            }
+            default {
+                $Msg = 'Unknown exit code return by WSL: {0}' -f $LASTEXITCODE
+                if ($Fatal) { throw $Msg } else { Write-Error -Message $Msg; return }
+            }
+        }
+
+        Write-Verbose -Message ('Retrieving WSL version: wsl {0}' -f ($VersionArgs -join ' '))
+        try {
+            [Console]::OutputEncoding = [Text.Encoding]::Unicode
+            $WslVersion = & wsl @VersionArgs
+        } catch {
+            $Msg = 'Failed to check WSL version: {0}' -f $PSItem.Exception.Message
+            if ($Fatal) { throw $Msg } else { Write-Error -Message $Msg; return }
+        } finally {
+            [Console]::OutputEncoding = $DefaultOutputEncoding
+        }
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning -Message 'WSL returned non-zero exit code on requesting version details: {0}' -f $LASTEXITCODE
+        }
+
+        foreach ($Line in $WslVersion) {
+            if ([String]::IsNullOrWhiteSpace($Line)) { continue }
+
+            if ($Line -notmatch '^([A-Za-z0-9]+) version: (.+)') {
+                Write-Warning -Message ('Unable to parse line in version output: {0}' -f $Line)
+                continue
+            }
+
+            $Component = $Matches[1]
+            $RawVersion = $Matches[2]
+
+            $Version = $null
+            if (![Version]::TryParse($RawVersion, [ref]$Version)) { $Version = $RawVersion }
+
+            $Result | Add-Member -MemberType NoteProperty -Name $Component -Value $Version
+        }
+
         if ($Result.PSObject.Properties.Name -contains 'WSL') {
-            $Result | Add-Member -MemberType ScriptMethod -Name ToString -Value { $this.WSL } -Force
+            $Result | Add-Member -MemberType ScriptMethod -Name 'ToString' -Value { $this.WSL } -Force
         } else {
             Write-Warning -Message 'No WSL version identified in version output.'
         }
@@ -677,45 +714,53 @@ Function Update-WSL {
     }
 
     if (!(Get-Command -Name 'wsl' -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to update WSL as wsl command not found.'
-        return
+        throw 'Unable to update WSL as wsl command not found.'
     }
 
     $Result = [PSCustomObject]@{
-        Version         = $null
-        PreviousVersion = $null
-        Updated         = $false
-        Output          = $null
+        Success      = $false
+        BeforeUpdate = [String[]]@()
+        AfterUpdate  = [String[]]@()
+        Output       = [String[]]@()
+        ExitCode     = -1
+        WhatIf       = $false
     }
     $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateWSL')
 
-    $Result.PreviousVersion = Get-WslVersion
+    $UpdateArgs = [String[]]@('--update')
+
+    $Result.BeforeUpdate = Get-WslVersion -Fatal
 
     if (!$PSCmdlet.ShouldProcess('WSL', 'Update')) {
+        $Result.Success = $true
+        $Result.WhatIf = $true
         return $Result
     }
 
+    Write-Verbose -Message ('Updating WSL: wsl {0}' -f ($UpdateArgs -join ' '))
     $DefaultOutputEncoding = [Console]::OutputEncoding
+
     try {
-        Write-Verbose -Message 'Updating WSL: wsl --update'
         [Console]::OutputEncoding = [Text.Encoding]::Unicode
-        $Result.Output = & wsl --update
+        $Result.Output = [String[]]@(& wsl @UpdateArgs 2>&1)
+        $Result.ExitCode = $LASTEXITCODE
+
+        if ($Result.ExitCode -ne 0) {
+            Write-Error -Message ('WSL returned non-zero exit code on performing update: {0}' -f $Result.ExitCode)
+        }
+    } catch {
+        $Msg = 'Failed to start WSL update: {0}' -f $PSItem.Exception.Message
+        $Result.Output = [String[]]@($Msg)
+        Write-Eror -Message $Msg
     } finally {
         [Console]::OutputEncoding = $DefaultOutputEncoding
     }
 
-    $Result.Version = Get-WslVersion
-
-    foreach ($Component in $Result.Version.PSObject.Properties.Name) {
-        if ($Component -notin $Result.PreviousVersion.PSObject.Properties.Name) {
-            $Result.Updated = $true
-            break
-        }
-
-        if ($Result.Version.$Component -ne $Result.PreviousVersion.$Component) {
-            $Result.Updated = $true
-            break
-        }
+    $Result.AfterUpdate = Get-WslVersion
+    if ($null -ne $Result.AfterUpdate) {
+        if ($Result.ExitCode -eq 0) { $Result.Success = $true }
+    } else {
+        Write-Error -Message 'Unable to detect WSL version after updating.'
     }
 
     return $Result

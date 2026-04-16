@@ -329,7 +329,14 @@ Function Update-AllTheThings {
 
         if ($Tasks -contains 'WSL') {
             Write-Progress @WriteProgressParams -Status 'Windows Subsystem for Linux' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.WSL = Update-WSL
+
+            try {
+                $Results.WSL = Update-WSL
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.WSL = $PSItem.Exception.Message
+            }
+
             $TasksDone++
         }
 

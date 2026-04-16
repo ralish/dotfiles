@@ -22,8 +22,17 @@
                                 <Label>WSL</Label>
                                 <ScriptBlock>
                                     if ($null -eq $_.WSL) { return }
-                                    if (!$_.WSL.Updated) { return 'No update (current: v{0})' -f $_.WSL.Version }
-                                    return 'Updated to v{0} (previous: v{1})' -f $_.WSL.Version, $_.WSL.PreviousVersion
+                                    if ($_.WSL -is [String]) { return $_.WSL }
+                                    if (!$_.WSL.Success) { 'Error during operation (view property for details)' }
+                                    if ($_.WSL.WhatIf) { return '{0} (current version)' -f $_.WSL.BeforeUpdate }
+
+                                    if ($null -ne $_.WSL.AfterUpdate) {
+                                        if ($_.WSL.BeforeUpdate.WSL -eq $_.WSL.AfterUpdate.WSL) {
+                                            return '{0} (no update)' -f $_.WSL.BeforeUpdate.WSL
+                                        }
+                                    }
+
+                                    '{0} (previous: {1})' -f $_.WSL.AfterUpdate.WSL, $_.WSL.BeforeUpdate.WSL
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>

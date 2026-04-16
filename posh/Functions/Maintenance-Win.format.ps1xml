@@ -67,17 +67,30 @@
                     <ListEntry>
                         <ListItems>
                             <ListItem>
-                                <PropertyName>Version</PropertyName>
+                                <PropertyName>Success</PropertyName>
                             </ListItem>
                             <ListItem>
-                                <PropertyName>PreviousVersion</PropertyName>
+                                <PropertyName>BeforeUpdate</PropertyName>
                             </ListItem>
                             <ListItem>
-                                <PropertyName>Updated</PropertyName>
+                                <PropertyName>AfterUpdate</PropertyName>
                             </ListItem>
                             <ListItem>
                                 <Label>Output</Label>
-                                <ScriptBlock>'{0} lines' -f $_.Output.Count</ScriptBlock>
+                                <ScriptBlock>
+                                    $Wsl = $_
+                                    switch ($Wsl.Output.Count) {
+                                        0 { '(no output)' }
+                                        1 { $Wsl.Output }
+                                        default { '{0} lines (view property for full output)' -f $Wsl.Output.Count }
+                                    }
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>ExitCode</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>WhatIf</PropertyName>
                             </ListItem>
                         </ListItems>
                     </ListEntry>
