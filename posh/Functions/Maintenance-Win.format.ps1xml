@@ -28,6 +28,43 @@
             </ListControl>
         </View>
         <View>
+            <Name>DotFiles.MaintenanceWin.UpdateVisualStudio</Name>
+            <ViewSelectedBy>
+                <TypeName>DotFiles.MaintenanceWin.UpdateVisualStudio</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Success</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>BeforeUpdate</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>AfterUpdate</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Errors</Label>
+                                <ScriptBlock>
+                                    $Vs = $_
+                                    switch ($Vs.Errors.Count) {
+                                        0 { [String]::Empty }
+                                        1 { $Vs.Errors }
+                                        default { '{0} errors (view property for full output)' -f $Vs.Errors.Count }
+                                    }
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>WhatIf</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+        <View>
             <Name>DotFiles.MaintenanceWin.UpdateWindows</Name>
             <ViewSelectedBy>
                 <TypeName>DotFiles.MaintenanceWin.UpdateWindows</TypeName>

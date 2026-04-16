@@ -300,10 +300,10 @@ Function Update-AllTheThings {
 
         $TasksTotal = $Tasks.Count
 
-        if ($Tasks -contains 'VisualStudio' -or $Tasks -contains 'MicrosoftStore') {
+        if ($Tasks -contains 'MicrosoftStore') {
             $IsAdministrator = Test-IsAdministrator
             if (!$IsAdministrator -and !$WhatIfPreference) {
-                throw 'You must have administrator privileges to perform Visual Studio or Microsoft Store updates.'
+                throw 'You must have administrator privileges to perform Microsoft Store updates.'
             }
         }
 
@@ -355,7 +355,14 @@ Function Update-AllTheThings {
 
         if ($Tasks -contains 'VisualStudio') {
             Write-Progress @WriteProgressParams -Status 'Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.VisualStudio = Update-VisualStudio -ProgressParentId $WriteProgressParams['Id']
+
+            try {
+                $Results.VisualStudio = Update-VisualStudio -ProgressParentId $WriteProgressParams['Id']
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.VisualStudio = $PSItem.Exception.Message
+            }
+
             $TasksDone++
         }
 

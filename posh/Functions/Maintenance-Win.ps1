@@ -390,65 +390,71 @@ Function Update-Scoop {
 # https://learn.microsoft.com/en-au/visualstudio/install/use-command-line-parameters-to-install-visual-studio
 Function Update-VisualStudio {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [PSCustomObject])]
+    [OutputType([PSCustomObject])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
 
     if (!(Test-IsAdministrator)) {
-        $Msg = 'You must have administrator privileges to perform Visual Studio updates.'
-        if ($WhatIfPreference) {
-            Write-Warning -Message $Msg
-        } else {
-            throw $Msg
-        }
+        throw 'You must have administrator privileges to update Visual Studio.'
     }
 
-    if ([Environment]::Is64BitOperatingSystem) {
-        $ProgramFiles = ${env:ProgramFiles(x86)}
-    } else {
-        $ProgramFiles = $env:ProgramFiles
+    try {
+        Import-Module -Name 'VSSetup' -ErrorAction Stop -Verbose:$false
+    } catch {
+        throw 'Unable to update Visual Studio as VSSetup module not available.'
     }
 
-    $VsInstallerExe = Join-Path -Path $ProgramFiles -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
-    if (!(Test-Path -LiteralPath $VsInstallerExe -PathType Leaf)) {
-        Write-Error -Message 'Unable to update Visual Studio as VSInstaller not found.'
-        return
-    }
-
-    Test-ModuleAvailable -Name 'VSSetup'
-
-    $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property 'InstallationVersion')
-    if ($VsSetupInstances.Count -eq 0) {
-        Write-Error -Message 'Get-VSSetupInstance returned no instances.'
-        return
-    }
-
-    $WriteProgressParams = @{
-        Activity = 'Updating Visual Studio'
-    }
-
+    $WriteProgressParams = @{ Activity = 'Updating Visual Studio' }
     if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
         $WriteProgressParams['ParentId'] = $ProgressParentId
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
     $Result = [PSCustomObject]@{
-        # Set to false if an unexpected exit code is returned for any update
-        Status           = $true
-        Versions         = @()
-        PreviousVersions = $VsSetupInstances
-        Updated          = $false
+        # Set to false later if anything goes wrong during the update
+        Success      = $true
+        BeforeUpdate = @()
+        AfterUpdate  = @()
+        Errors       = [String[]]@()
+        WhatIf       = $false
+    }
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateVisualStudio')
+
+    # Visual Studio Installer is always(?) installed under the 32-bit path
+    if ([Environment]::Is64BitOperatingSystem) {
+        $ProgramFiles = ${env:ProgramFiles(x86)}
+    } else {
+        $ProgramFiles = $env:ProgramFiles
     }
 
-    $VersionToString = { $this.InstallationVersion }
-    $Result.PreviousVersions | Add-Member -MemberType ScriptMethod -Name ToString -Value $VersionToString -Force
+    $VsInstallerPath = Join-Path -Path $ProgramFiles -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
+    if (!(Test-Path -LiteralPath $VsInstallerPath -PathType Leaf)) {
+        throw 'Unable to update Visual Studio as VS Installer not found: {0}' -f $VsInstallerPath
+    }
+
+    $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property 'InstallationVersion')
+    if ($VsSetupInstances.Count -eq 0) {
+        throw 'Get-VSSetupInstance returned no Visual Studio installations.'
+    }
+
+    $VersionToStringMemberParams = @{
+        MemberType = 'ScriptMethod'
+        Name       = 'ToString'
+        Value      = { $this.InstallationVersion }
+        Force      = $true
+    }
+
+    $Result.BeforeUpdate = $VsSetupInstances
+    $Result.BeforeUpdate | Add-Member @VersionToStringMemberParams
 
     if (!$PSCmdlet.ShouldProcess('Visual Studio', 'Update')) {
+        $Result.WhatIf = $true
         return $Result
     }
 
+    $VsUpdateErrors = [Collections.Generic.List[String]]::new()
     for ($Idx = 0; $Idx -lt $VsSetupInstances.Count; $Idx++) {
         $VsSetupInstance = $VsSetupInstances[$Idx]
         $VsDisplayName = $VsSetupInstance.DisplayName
@@ -459,10 +465,10 @@ Function Update-VisualStudio {
         # need to be updated. In the latter case, the original setup process
         # will exit while the update continues using the updated installer.
         #
-        # Contrary to the official documentation the "--wait" parameter doesn't
+        # Contrary to the official documentation the `--wait` parameter doesn't
         # work, and in fact, doesn't appear to even be a valid option. The best
         # approach I've found is to try to acquire the named mutex used by the
-        # installer: DevdivInstallerUI. While undocumented and a hack, all of
+        # installer: `DevdivInstallerUI`. While undocumented and a hack, all of
         # the other approaches I've found have more serious downsides. We use
         # this approach later after the original setup process has exited.
         #
@@ -478,23 +484,32 @@ Function Update-VisualStudio {
         # will often overlap earlier debug output from the installer.
         #
         # The workaround is to launch the installer from a separate console. We
-        # do that by launching a cmd instance and then the installer within it.
-        # cmd will return the exit code of the installer once it has exited.
+        # do that by launching `cmd` and then the installer within it. `cmd`
+        # will return the exit code of the installer once it has exited.
         #
-        # Also, the argument quoting for cmd looks weird and wrong. It's not;
-        # cmd itself is weird and wrong. See its documentation for specifics.
+        # Also, the argument quoting for `cmd` looks weird and wrong. It's not;
+        # `cmd` itself is weird and wrong. See its documentation for specifics.
         Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $VsDisplayName) -PercentComplete ($Idx / $VsSetupInstances.Count * 100)
         $VsInstallerArgs = 'update --installPath "{0}" --passive --norestart' -f $VsSetupInstance.InstallationPath
-        $CmdArgs = '/D /C ""{0}" {1}"' -f $VsInstallerExe, $VsInstallerArgs
-        $VsInstaller = Start-Process -FilePath $env:ComSpec -ArgumentList $CmdArgs -PassThru -Wait
+        $CmdArgs = '/D /C ""{0}" {1}"' -f $VsInstallerPath, $VsInstallerArgs
+
+        try {
+            $VsInstaller = Start-Process -FilePath $env:ComSpec -ArgumentList $CmdArgs -PassThru -Wait
+        } catch {
+            $Result.Success = $false
+            $Msg = 'Failed to start Visual Studio Installer: {0}' -f $PSItem.Exception.Message
+            Write-Error -Message $Msg
+            $VsUpdateErrors.Add($Msg)
+            break
+        }
 
         # If the mutex existed at any point while running this loop the exit
         # code we have from the original installer is not meaningful for the
         # update of Visual Studio itself. We'll output a warning later on.
         $VsInstallerUpdated = $false
 
-        # Set to true initially to avoid the subsequent Write-Progress call on
-        # the first (and possibly only) iteration of the loop.
+        # Set to true initially to avoid the subsequent `Write-Progress` call
+        # on the first (and possibly only) iteration of the loop.
         $VsInstallerMutexCreated = $true
         do {
             # Wait a few seconds in the event the original installer process
@@ -509,9 +524,7 @@ Function Update-VisualStudio {
             # existing may cause problems for the installer (even if unheld).
             [Threading.Mutex]::new($false, 'DevdivInstallerUI', [Ref]$VsInstallerMutexCreated).Close()
 
-            if (!$VsInstallerMutexCreated) {
-                $VsInstallerUpdated = $true
-            }
+            if (!$VsInstallerMutexCreated) { $VsInstallerUpdated = $true }
         } while (!$VsInstallerMutexCreated)
 
         if ($VsInstallerUpdated) {
@@ -519,29 +532,24 @@ Function Update-VisualStudio {
         }
 
         switch ($VsInstaller.ExitCode) {
-            3010 { Write-Warning -Message ('{0} successfully updated but requires a reboot.' -f $VsDisplayName) }
             0 { }
+            3010 { Write-Warning -Message ('{0} successfully updated but requires a reboot.' -f $VsDisplayName) }
             Default {
-                Write-Error -Message ('Update of {0} returned exit code: {1}' -f $VsDisplayName, $VsInstaller.ExitCode)
-                $Result.Status = $false
+                $Result.Success = $false
+                $Msg = 'Update of {0} returned exit code: {1}' -f $VsDisplayName, $VsInstaller.ExitCode
+                Write-Error -Message $Msg
+                $VsUpdateErrors.Add($Msg)
             }
         }
     }
 
-    $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property 'InstallationVersion')
-    $Result.Versions = $VsSetupInstances
-    $Result.Versions | Add-Member -MemberType ScriptMethod -Name ToString -Value $VersionToString -Force
+    $Result.Errors = $VsUpdateErrors.ToArray()
 
-    foreach ($UpdatedInstance in $VsSetupInstances) {
-        $PreviousInstance = $Result.PreviousVersions | Where-Object InstanceId -EQ $UpdatedInstance.InstanceId
-        if ($PreviousInstance.InstallationVersion -ne $UpdatedInstance.InstallationVersion) {
-            $Result.Updated = $true
-            break
-        }
-    }
+    $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property 'InstallationVersion')
+    $Result.AfterUpdate = $VsSetupInstances
+    $Result.AfterUpdate | Add-Member @VersionToStringMemberParams
 
     Write-Progress @WriteProgressParams -Completed
-
     return $Result
 }
 

@@ -51,12 +51,21 @@
                                 <Label>VisualStudio</Label>
                                 <ScriptBlock>
                                     if ($null -eq $_.VisualStudio) { return }
+                                    if ($_.VisualStudio -is [String]) { return $_.VisualStudio }
+                                    if (!$_.VisualStudio.Success) { 'Error during operation (view property for details)' }
+                                    if ($_.VisualStudio.WhatIf) { return '{0} (current versions)' -f [String]::Join(', ', ($_.VisualStudio.BeforeUpdate.InstallationVersion | Sort-Object)) }
 
-                                    $Versions = [String]::Join(', v', $_.VisualStudio.Versions)
-                                    if (!$_.VisualStudio.Updated) {return 'No update (current: v{0})' -f $Versions }
+                                    $Updated = $false
+                                    foreach ($VsBefore in $_.VisualStudio.BeforeUpdate) {
+                                        $VsAfter = $_.VisualStudio.AfterUpdate | Where-Object InstanceId -EQ $VsBefore.InstanceId
+                                        if ($VsBefore.InstallationVersion -ne $VsAfter.InstallationVersion) { $Updated = $true; break }
+                                    }
 
-                                    $PreviousVersions = [String]::Join(', v', $_.VisualStudio.PreviousVersions)
-                                    return 'Updated to v{0} (previous: v{1})' -f $Versions, $PreviousVersions
+                                    $BeforeUpdate = [String]::Join(', ', ($_.VisualStudio.BeforeUpdate.InstallationVersion | Sort-Object))
+                                    if (!$Updated) { return '{0} (no updates)' -f $BeforeUpdate }
+
+                                    $AfterUpdate = [String]::Join(', ', ($_.VisualStudio.AfterUpdate.InstallationVersion | Sort-Object))
+                                    '{0} (previous: {1})' -f $AfterUpdate, $BeforeUpdate
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
