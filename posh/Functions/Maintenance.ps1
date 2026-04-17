@@ -189,7 +189,7 @@ Function Update-AllTheThings {
         $TasksSystem = @()
 
         if (Test-IsWindows) {
-            $TasksApps = @('Office', 'VisualStudio', $TasksApps, 'MicrosoftStore', 'Edge', 'Scoop')
+            $TasksApps = @('Office', 'VisualStudio', $TasksApps, 'MicrosoftStore', 'Edge', 'Chrome', 'Scoop')
             $TasksDevel = ($TasksDevel + @('Python', 'QtComponents')) | Sort-Object
             $TasksSystem += @('Windows', 'WSL')
         } else {
@@ -263,6 +263,7 @@ Function Update-AllTheThings {
             PowerShell     = $null
             MicrosoftStore = $null
             Edge           = $null
+            Chrome         = $null
             Homebrew       = $null
             Scoop          = $null
             DotNetTools    = $null
@@ -387,6 +388,19 @@ Function Update-AllTheThings {
             } catch {
                 Write-Error -Message $PSItem.Exception.Message
                 $Results.Edge = $PSItem.Exception.Message
+            }
+
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'Chrome') {
+            Write-Progress @WriteProgressParams -Status 'Chrome' -PercentComplete ($TasksDone / $TasksTotal * 100)
+
+            try {
+                $Results.Chrome = Update-Chrome -ProgressParentId $WriteProgressParams['Id']
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.Chrome = $PSItem.Exception.Message
             }
 
             $TasksDone++

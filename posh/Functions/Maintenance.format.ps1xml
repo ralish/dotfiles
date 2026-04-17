@@ -94,6 +94,18 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>Chrome</Label>
+                                <ScriptBlock>
+                                    if ($null -eq $_.Chrome) { return }
+                                    if ($_.Chrome -is [String]) { return $_.Chrome }
+                                    if (!$_.Chrome.Success) { 'Error during operation (view property for details)' }
+                                    if ($_.Chrome.WhatIf) { return '{0} (current version)' -f $_.Chrome.BeforeUpdate }
+
+                                    if ($_.Chrome.BeforeUpdate -eq $_.Chrome.AfterUpdate) { return '{0} (no update)' -f $_.Chrome.BeforeUpdate }
+                                    'Updated to {0} (previous: {1})' -f $_.Chrome.AfterUpdate, $_.Chrome.BeforeUpdate
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
                                 <PropertyName>Homebrew</PropertyName>
                             </ListItem>
                             <ListItem>

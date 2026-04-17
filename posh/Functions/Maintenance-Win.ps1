@@ -13,75 +13,253 @@ if (!(Start-DotFilesSection @DotFilesSection)) {
 $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Maintenance-Win.format.ps1xml'))
 
 # Update Google Chrome
-Function Update-GoogleChrome {
+#
+# Chromium Updater Functional Specification
+# https://chromium.googlesource.com/chromium/src/+/HEAD/docs/updater/functional_spec.md#Updates
+Function Update-Chrome {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [PSCustomObject])]
-    Param()
+    [OutputType([PSCustomObject])]
+    Param(
+        [ValidateSet('Stable', 'Beta', 'Dev', 'Canary')]
+        [String]$UpdateChannel = 'Stable',
 
-    if (!(Test-IsAdministrator)) {
-        $Msg = 'You must have administrator privileges to perform Chrome updates.'
-        if ($WhatIfPreference) {
-            Write-Warning -Message $Msg
-        } else {
-            throw $Msg
-        }
-    }
-
-    if ([Environment]::Is64BitOperatingSystem) {
-        $ProgramFiles = ${env:ProgramFiles(x86)}
-    } else {
-        $ProgramFiles = $env:ProgramFiles
-    }
-
-    $GoogleUpdatePath = Join-Path -Path $ProgramFiles -ChildPath 'Google\Update\GoogleUpdate.exe'
-    if (!(Test-Path -LiteralPath $GoogleUpdatePath -PathType Leaf)) {
-        Write-Error -Message 'Unable to install Chrome updates as Google Update not found.'
-        return
-    }
-
-    $GoogleUpdateArgs = @(
-        '/silent',
-        '/install',
-        # GUID corresponds to Stable channel
-        'appguid={8A69D345-D564-463C-AFF1-A69D9E530F96}&appname=Google%20Chrome&needsadmin=True'
+        [ValidateRange(-1, [Int]::MaxValue)]
+        [Int]$ProgressParentId
     )
 
+    Function Release-ComObjects {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
+        [CmdletBinding()]
+        [OutputType([Void])]
+        Param()
+
+        if ($NextVersionWeb) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($NextVersionWeb) }
+        if ($CurrentVersionWeb) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($CurrentVersionWeb) }
+        if ($AppUpdate) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($AppUpdate) }
+        if ($AppBundle) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($AppBundle) }
+        if ($GoogleUpdate) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($GoogleUpdate) }
+    }
+
+    $WriteProgressParams = @{ Activity = 'Updating Chrome' }
+    if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+        $WriteProgressParams['ParentId'] = $ProgressParentId
+        $WriteProgressParams['Id'] = $ProgressParentId + 1
+    }
+
     $Result = [PSCustomObject]@{
-        Status          = $true
-        Version         = $null
-        PreviousVersion = $null
-        Updated         = $false
+        Success       = $false
+        BeforeUpdate  = $null
+        AfterUpdate   = $null
+        UpdateState   = [String]::Empty
+        UpdateStateId = -1
+        WhatIf        = $false
     }
 
-    # Deliberately using $env:ProgramFiles as Chrome uses the 64-bit path on
-    # 64-bit systems while Google Update will always uses the 32-bit path.
-    $ChromePath = Join-Path -Path $env:ProgramFiles -ChildPath 'Google\Chrome\Application\chrome.exe'
+    switch ($UpdateChannel) {
+        Stable { $AppId = '{8A69D345-D564-463c-AFF1-A69D9E530F96}' }
+        Beta { $AppId = '{8237E44A-0054-442C-B6B6-EA0509993955}' }
+        Dev { $AppId = '{401C381F-E0DE-4B85-8BD8-3F3F14FBDA57}' }
+        Canary { $AppId = '{4EA16AC7-FD5A-47C3-875B-DBF4A2008C20}' }
+    }
+
+    # https://github.com/chromium/chromium/blob/main/chrome/updater/win/win_constants.h
+    $ComObjectName = 'GoogleUpdate.Update3WebMachine'
+
+    # https://github.com/chromium/chromium/blob/main/chrome/updater/app/server/win/updater_legacy_idl.template
+    $UpdateStates = @{
+        1  = 'Initialising'
+        2  = 'Waiting to check for update'
+        3  = 'Checking for update'
+        4  = 'Update available'
+        5  = 'Waiting to download'
+        6  = 'Retrying download'
+        7  = 'Downloading'
+        8  = 'Download complete'
+        9  = 'Extracting'
+        10 = 'Applying differential patch'
+        11 = 'Ready to install'
+        12 = 'Waiting to install'
+        13 = 'Installing'
+        14 = 'Install complete'
+        15 = 'Paused'
+        16 = 'No update'
+        17 = 'Error'
+    }
+
+    # So we don't free someone else's COM objects in the (extremely unlikely)
+    # case that they're using the same variable names in a parent scope.
+    $GoogleUpdate = $null
+    $AppBundle = $null
+    $AppUpdate = $null
+    $CurrentVersionWeb = $null
+    $NextVersionWeb = $null
+
+    # Errors returned from COM objects are surfaced by the .NET runtime as
+    # generic `RuntimeException`s (0x80131501 - COR_E_SYSTEM), requiring
+    # inspection of the exception message to determine what went wrong.
 
     try {
-        $Chrome = Get-Item -LiteralPath $ChromePath -ErrorAction Stop
-        $Result.PreviousVersion = $Chrome.VersionInfo.ProductVersion
+        $GoogleUpdate = New-Object -ComObject $ComObjectName
     } catch {
-        $Result.PreviousVersion = 'None found'
-    }
+        Release-ComObjects
 
-    if (!$PSCmdlet.ShouldProcess('Google Chrome', 'Update')) {
-        return
-    }
+        switch -RegEx ($PSItem.Exception.Message) {
+            # REGDB_E_CLASSNOTREG
+            '\b0x80040154\b' { throw 'Unable to update Chrome as Google Update is not available.' }
+        }
 
-    $GoogleUpdate = Start-Process -FilePath $GoogleUpdatePath -ArgumentList $GoogleUpdateArgs -PassThru -Wait
-
-    if ($GoogleUpdate.ExitCode -ne 0) {
-        Write-Error -Message ('Google Update returned exit code: {0}' -f $GoogleUpdate.ExitCode)
-        $Result.Status = $false
+        throw 'Google Update COM object failed to activate: {0}' -f $PSItem.Exception.Message
     }
 
     try {
-        $Chrome = Get-Item -LiteralPath $ChromePath -ErrorAction Stop
-        $Result.Version = $Chrome.VersionInfo.ProductVersion
+        $AppBundle = $GoogleUpdate.createAppBundleWeb()
     } catch {
-        $Result.Version = 'None found'
+        Release-ComObjects
+        throw 'Google Update failed to create Chrome app bundle: {0}' -f $PSItem.Exception.Message
     }
 
+    try {
+        $AppBundle.initialize()
+    } catch {
+        Release-ComObjects
+        throw 'Chrome app bundle failed to initialise: {0}' -f $PSItem.Exception.Message
+    }
+
+    try {
+        $AppBundle.createInstalledApp($AppId)
+    } catch {
+        Release-ComObjects
+
+        switch -RegEx ($PSItem.Exception.Message) {
+            # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY
+            '\b0x80040813\b' { throw 'Google Update reported updates are disabled by policy.' }
+            # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY_MANUAL
+            '\b0x8004081f\b' { throw 'Google Update reported updates are disabled by policy (manual).' }
+            # GOOPDATE_E_APP_USING_EXTERNAL_UPDATER
+            '\b0xA043081D\b' { throw 'Google Update reported an update is already in-progress.' }
+        }
+
+        throw 'Chrome app bundle failed to create installed app: {0}' -f $PSItem.Exception.Message
+    }
+
+    try {
+        # Parameter is index of created app
+        $AppUpdate = $AppBundle.appWeb(0)
+    } catch {
+        Release-ComObjects
+        throw 'Failed to retrieve app instance from Chrome app bundle: {0}' -f $PSItem.Exception.Message
+    }
+
+    try {
+        $CurrentVersionWeb = $AppUpdate.currentVersionWeb
+        $Result.BeforeUpdate = $CurrentVersionWeb.version
+    } catch {
+        Release-ComObjects
+        throw 'Failed to retrieve current version from Chrome app bundle: {0}' -f $PSItem.Exception.Message
+    }
+
+    if (!$PSCmdlet.ShouldProcess('Chrome', 'Update')) {
+        Release-ComObjects
+        $Result.Success = $true
+        $Result.WhatIf = $true
+        return $Result
+    }
+
+    $MaxWaitTime = 300 # 5 mins
+    $WaitTime = [Diagnostics.Stopwatch]::StartNew()
+
+    do {
+        $LastUpdateStateId = $AppUpdate.currentState.stateValue
+        if ($UpdateStates.ContainsKey($LastUpdateStateId)) {
+            $LastUpdateState = $UpdateStates[$LastUpdateStateId]
+        } else {
+            $LastUpdateState = 'Unknown'
+        }
+
+        $ElapsedSeconds = [Int]($WaitTime.ElapsedMilliseconds / 1000)
+        $StatusMsg = 'Update state: {0} (Waited {1} secs / time-out: {2} secs) ...' -f $LastUpdateState, $ElapsedSeconds, $MaxWaitTime
+        Write-Progress @WriteProgressParams -Status $StatusMsg
+
+        switch ($LastUpdateStateId) {
+            # Initialising
+            1 {
+                try {
+                    $AppBundle.checkForUpdate()
+                } catch {
+                    Release-ComObjects
+                    throw 'Failed to trigger Chrome update check: {0}' -f $PSItem.Exception.Message
+                }
+            }
+
+            # Update available
+            4 {
+                try {
+                    $AppBundle.download()
+                } catch {
+                    Release-ComObjects
+                    throw 'Failed to trigger Chrome update download: {0}' -f $PSItem.Exception.Message
+                }
+            }
+
+            # Ready to install
+            11 {
+                try {
+                    $AppBundle.install()
+                } catch {
+                    Release-ComObjects
+                    throw 'Failed to trigger Chrome update install: {0}' -f $PSItem.Exception.Message
+                }
+            }
+        }
+
+        # IDs >= 14 are final states
+        if ($LastUpdateStateId -ge 14) {
+            $Result.UpdateState = $LastUpdateState
+            $Result.UpdateStateId = $LastUpdateStateId
+            break
+        }
+
+        Start-Sleep -Seconds 1
+    } while ($ElapsedSeconds -lt $MaxWaitTime)
+
+    $WaitTime.Stop()
+    Write-Progress @WriteProgressParams -Completed
+
+    switch ($Result.UpdateStateId) {
+        # Install complete
+        14 {
+            try {
+                $NextVersionWeb = $AppUpdate.nextVersionWeb
+                $Result.AfterUpdate = $NextVersionWeb.version
+                $Result.Success = $true
+            } catch {
+                Write-Error -Message ('Failed to retrieve new version from Chrome app bundle: {0}' -f $PSItem.Exception.Message)
+            }
+        }
+
+        # Paused
+        15 { Write-Warning -Message 'Google Update reported the update is paused.' }
+
+        # No update
+        16 {
+            $Result.AfterUpdate = $Result.BeforeUpdate
+            $Result.Success = $true
+        }
+
+        # Error
+        17 { Write-Error -Message 'Google Update reported an error occurred.' }
+
+        # Timeout
+        -1 {
+            $LastUpdateStateMsg = 'Last update state: {1} [ID: {2}]' -f $LastUpdateState, $LastUpdateStateId
+            Write-Warning -Message ('Gave-up waiting on Chrome after {0} secs ({1})' -f $MaxWaitTime, $LastUpdateStateMsg)
+        }
+
+        # Unknown state ID
+        default { Write-Error -Message ('Google Update reported an unknown state ID: {0}' -f $Result.UpdateStateId) }
+    }
+
+    Release-ComObjects
     return $Result
 }
 
