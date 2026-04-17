@@ -162,34 +162,59 @@ Function Update-MicrosoftEdge {
 # Update Microsoft Store apps
 Function Update-MicrosoftStore {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Boolean])]
+    [OutputType([PSCustomObject])]
     Param()
 
     if (!(Test-IsAdministrator)) {
-        $Msg = 'You must have administrator privileges to perform Microsoft Store updates.'
-        if ($WhatIfPreference) {
-            Write-Warning -Message $Msg
-        } else {
-            throw $Msg
-        }
+        throw 'You must have administrator privileges to update Microsoft Store apps.'
     }
 
-    if (!$PSCmdlet.ShouldProcess('Microsoft Store', 'Update')) {
-        return
+    $Result = [PSCustomObject]@{
+        Success     = $false
+        ReturnValue = -1
+        WhatIf      = $false
     }
 
     $Namespace = 'root\CIMv2\mdm\dmmap'
-    $Class = 'MDM_EnterpriseModernAppManagement_AppManagement01'
-    $Method = 'UpdateScanMethod'
+    $ClassName = 'MDM_EnterpriseModernAppManagement_AppManagement01'
+    $MethodName = 'UpdateScanMethod'
 
-    $Session = New-CimSession
-    $Instance = Get-CimInstance -Namespace $Namespace -ClassName $Class
-    $UpdateScan = $Session.InvokeMethod($Namespace, $Instance, $Method, $null)
+    try {
+        $Session = New-CimSession -ErrorAction Stop -Verbose:$false
+    } catch {
+        throw 'Error creating new WMI session: {0}' -f $PSItem.Exception.Message
+    }
 
-    $Result = $true
-    if ($UpdateScan.ReturnValue.Value -ne 0) {
-        Write-Error -Message ('Update of Microsoft Store apps returned: {0}' -f $UpdateScan.ReturnValue.Value)
-        $Result = $false
+    try {
+        $Instance = Get-CimInstance -Namespace $Namespace -ClassName $ClassName -ErrorAction Stop
+    } catch {
+        throw 'Unable to update Microsoft Store apps as {0} WMI class is not available: {1}' -f $ClassName, $PSItem.Exception.Message
+    }
+
+    # Modern PowerShell releases throw an exception on trying to instantiate a
+    # non-existing class but older releases just return `null`. This includes
+    # PowerShell 5.1, which is still the latest inbox version.
+    if (!$Instance) {
+        throw 'Unable to update Microsoft Store apps as {0} WMI class is not available.' -f $ClassName
+    }
+
+    if (!$PSCmdlet.ShouldProcess('Microsoft Store apps', 'Update')) {
+        $Result.Success = $true
+        $Result.WhatIf = $true
+        return $Result
+    }
+
+    try {
+        $UpdateScan = $Session.InvokeMethod($Namespace, $Instance, $MethodName, $null)
+    } catch {
+        throw 'Error invoking {0} method of {1} WMI class: {2}' -f $MethodName, $ClassName, $PSItem.Exception.Message
+    }
+
+    $Result.ReturnValue = $UpdateScan.ReturnValue.Value
+    if ($Result.ReturnValue -eq 0) {
+        $Result.Success = $true
+    } else {
+        Write-Error 'Update of Microsoft Store apps returned: {0}' -f $Result.ReturnValue
     }
 
     return $Result

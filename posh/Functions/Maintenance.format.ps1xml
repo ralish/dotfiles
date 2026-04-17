@@ -72,7 +72,14 @@
                                 <PropertyName>PowerShell</PropertyName>
                             </ListItem>
                             <ListItem>
-                                <PropertyName>MicrosoftStore</PropertyName>
+                                <Label>MicrosoftStore</Label>
+                                <ScriptBlock>
+                                    if ($null -eq $_.MicrosoftStore) { return }
+                                    if ($_.MicrosoftStore -is [String]) { return $_.MicrosoftStore }
+                                    if (!$_.MicrosoftStore.Success) { return 'Error during operation (view property for details)' }
+                                    if ($_.MicrosoftStore.WhatIf) { return 'Did not run (WhatIf mode)' }
+                                    'Updated all apps'
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <PropertyName>Homebrew</PropertyName>

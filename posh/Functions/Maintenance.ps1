@@ -300,13 +300,6 @@ Function Update-AllTheThings {
 
         $TasksTotal = $Tasks.Count
 
-        if ($Tasks -contains 'MicrosoftStore') {
-            $IsAdministrator = Test-IsAdministrator
-            if (!$IsAdministrator -and !$WhatIfPreference) {
-                throw 'You must have administrator privileges to perform Microsoft Store updates.'
-            }
-        }
-
         Write-Verbose -Message ('Running updates for: {0}' -f ($Tasks -join ', '))
 
         $WriteProgressParams = @{
@@ -373,8 +366,15 @@ Function Update-AllTheThings {
         }
 
         if ($Tasks -contains 'MicrosoftStore') {
-            Write-Progress @WriteProgressParams -Status 'Microsoft Store' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.MicrosoftStore = Update-MicrosoftStore
+            Write-Progress @WriteProgressParams -Status 'Microsoft Store apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
+
+            try {
+                $Results.MicrosoftStore = Update-MicrosoftStore
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.MicrosoftStore = $PSItem.Exception.Message
+            }
+
             $TasksDone++
         }
 
