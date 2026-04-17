@@ -11,7 +11,12 @@
                     <ListEntry>
                         <ListItems>
                             <ListItem>
-                                <PropertyName>Windows</PropertyName>
+                                <Label>Windows</Label>
+                                <ScriptBlock>
+                                    if ($null -eq $_.Windows) { return }
+                                    if ($_.Windows -is [String]) { return $_.Windows }
+                                    $_.Windows.Summary
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>WSL</Label>

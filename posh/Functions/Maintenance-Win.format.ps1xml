@@ -28,6 +28,36 @@
             </ListControl>
         </View>
         <View>
+            <Name>DotFiles.MaintenanceWin.UpdateWindows</Name>
+            <ViewSelectedBy>
+                <TypeName>DotFiles.MaintenanceWin.UpdateWindows</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Success</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Summary</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Updates</Label>
+                                <ScriptBlock>
+                                    if ($_.Updates.Count -eq 0) { return 'None' }
+                                    @([String]::Join(', ', ($_.Updates.Title | Sort-Object)))
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>WhatIf</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+        <View>
             <Name>DotFiles.MaintenanceWin.UpdateWSL</Name>
             <ViewSelectedBy>
                 <TypeName>DotFiles.MaintenanceWin.UpdateWSL</TypeName>

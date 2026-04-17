@@ -555,37 +555,74 @@ Function Update-VisualStudio {
 
 # Update Microsoft Windows
 Function Update-Windows {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '')]
-    [CmdletBinding(SupportsShouldProcess)]
-    #[OutputType([Boolean], [PSWindowsUpdate.WindowsUpdateJob[]])]
+    [CmdletBinding(DefaultParameterSetName = 'Exclude', SupportsShouldProcess)]
+    [OutputType([PSCustomObject])]
     Param(
-        [Switch]$AcceptAll
+        [Parameter(ParameterSetName = 'Exclude')]
+        [ValidateSet('Critical Updates', 'Definition Updates', 'Driver Sets', 'Drivers', 'Feature Packs', 'Security Updates', 'Service Packs', 'Tools', 'Update Rollups', 'Updates', 'Upgrades')]
+        [String[]]$ExcludeCategories,
+
+        [Parameter(Mandatory, ParameterSetName = 'Include')]
+        [ValidateSet('Critical Updates', 'Definition Updates', 'Driver Sets', 'Drivers', 'Feature Packs', 'Security Updates', 'Service Packs', 'Tools', 'Update Rollups', 'Updates', 'Upgrades')]
+        [String[]]$IncludeCategories
     )
 
     if (!(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to perform Windows updates.'
+        throw 'You must have administrator privileges to update Windows.'
     }
 
     try {
         Import-Module -Name 'PSWindowsUpdate' -ErrorAction Stop -Verbose:$false
     } catch {
-        Write-Error -Message 'Unable to install Windows updates as PSWindowsUpdate module not available.'
-        return $false
+        throw 'Unable to update Windows as PSWindowsUpdate module not available.'
     }
 
-    # TODO: PSWindowsUpdate seems to return three copies of all results?
-    $Results = $false
-    if ($WhatIfPreference) {
-        $Results = Get-WindowsUpdate -AcceptAll:$AcceptAll -IgnoreReboot -NotTitle 'Silverlight'
-    } elseif ($PSCmdlet.ShouldProcess('Windows', 'Update')) {
-        $Results = Install-WindowsUpdate -AcceptAll:$AcceptAll -IgnoreReboot -NotTitle 'Silverlight'
+    $Result = [PSCustomObject]@{
+        # Set to false if any updates fail to download/install
+        Success = $true
+        Summary = [String]::Empty
+        Updates = @()
+        WhatIf  = $false
+    }
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateWindows')
+
+    switch ($PSCmdlet.ParameterSetName) {
+        'Exclude' { $UpdateParams = @{ 'NotCategory' = $ExcludeCategories } }
+        'Include' { $UpdateParams = @{ 'Category' = $IncludeCategories } }
     }
 
-    if ($Results) {
-        return $Results
+    # `Get-WindowsUpdate` doesn't properly support `-WhatIf`; it will install
+    # updates it finds when `-Install` is provided even if `-WhatIf` is set.
+    if ($PSCmdlet.ShouldProcess('Windows', 'Update')) {
+        $UpdateParams.Add('Install', $true)
+        $UpdateParams.Add('AcceptAll', $true)
+        $UpdateParams.Add('IgnoreReboot', $true)
+    } else {
+        $Result.WhatIf = $true
     }
 
-    return $true
+    # TODO: After install three copies of each update are returned?
+    $Result.Updates = Get-WindowsUpdate @UpdateParams
+
+    if ($Result.Updates.Count -eq 0) {
+        $Result.Summary = 'No updates found'
+    } elseif ($Result.WhatIf) {
+        $Result.Summary = 'Found {0} updates (scan only)' -f $Result.Updates.Count
+    } else {
+        $Failed = 0
+        $Installed = 0
+
+        foreach ($Update in $Result.Updates) {
+            if ($Update.Status -match 'F') { $Failed++ }
+            elseif ($Update.Status -match 'I') { $Installed++ }
+        }
+
+        if ($Failed -gt 0) { $Result.Success = $false }
+
+        $Result.Summary = '{0} installed, {1} failed, {2} total' -f $Installed, $Failed, $Result.Updates.Count
+    }
+
+    return $Result
 }
 
 # Update Windows Subsystem for Linux

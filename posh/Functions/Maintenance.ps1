@@ -300,10 +300,10 @@ Function Update-AllTheThings {
 
         $TasksTotal = $Tasks.Count
 
-        if ($Tasks -contains 'Windows' -or $Tasks -contains 'Office' -or $Tasks -contains 'VisualStudio' -or $Tasks -contains 'MicrosoftStore') {
+        if ($Tasks -contains 'Office' -or $Tasks -contains 'VisualStudio' -or $Tasks -contains 'MicrosoftStore') {
             $IsAdministrator = Test-IsAdministrator
             if (!$IsAdministrator -and !$WhatIfPreference) {
-                throw 'You must have administrator privileges to perform Windows, Office, Visual Studio, or Microsoft Store updates.'
+                throw 'You must have administrator privileges to perform Office, Visual Studio, or Microsoft Store updates.'
             }
         }
 
@@ -317,11 +317,11 @@ Function Update-AllTheThings {
         if ($Tasks -contains 'Windows') {
             Write-Progress @WriteProgressParams -Status 'Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
 
-            if ($IsAdministrator) {
-                $Results.Windows = Update-Windows -AcceptAll
-            } else {
-                # Only for -WhatIf without administrator privileges
-                Write-Warning -Message 'Retrieving available Windows Updates requires administrator privileges.'
+            try {
+                $Results.Windows = Update-Windows -ExcludeCategories @('Drivers', 'Driver Sets')
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.Windows = $PSItem.Exception.Message
             }
 
             $TasksDone++
