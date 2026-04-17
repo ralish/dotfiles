@@ -39,8 +39,12 @@
                                 <Label>Office</Label>
                                 <ScriptBlock>
                                     if ($null -eq $_.Office) { return }
-                                    if (!$_.Office.Updated) { return 'No update (current: v{0})' -f $_.Office.Version }
-                                    return 'Updated to v{0} (previous: v{1})' -f $_.Office.Version, $_.Office.PreviousVersion
+                                    if ($_.Office -is [String]) { return $_.Office }
+                                    if (!$_.Office.Success) { 'Error during operation (view property for details)' }
+                                    if ($_.Office.WhatIf) { return '{0} (current version)' -f $_.Office.BeforeUpdate }
+
+                                    if ($_.Office.BeforeUpdate -eq $_.Office.AfterUpdate) { return '{0} (no update)' -f $_.Office.BeforeUpdate }
+                                    '{0} (previous: {1})' -f $_.Office.AfterUpdate, $_.Office.BeforeUpdate
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>

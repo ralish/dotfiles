@@ -198,108 +198,100 @@ Function Update-MicrosoftStore {
 # Update Microsoft Office (Click-to-Run only)
 Function Update-Office {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [PSCustomObject])]
+    [OutputType([PSCustomObject])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
 
-    if (!(Test-IsAdministrator)) {
-        $Msg = 'You must have administrator privileges to perform Office updates.'
-        if ($WhatIfPreference) {
-            Write-Warning -Message $Msg
-        } else {
-            throw $Msg
-        }
-    }
-
-    $OfficeC2RClient = Join-Path -Path $env:ProgramFiles -ChildPath 'Common Files\Microsoft Shared\ClickToRun\OfficeC2RClient.exe'
-    if (!(Test-Path -LiteralPath $OfficeC2RClient -PathType Leaf)) {
-        Write-Error -Message 'Unable to install Office updates as Click-to-Run client not found.'
-        return
-    }
-
-    $WriteProgressParams = @{
-        Activity = 'Updating Office'
-    }
-
+    $WriteProgressParams = @{ Activity = 'Updating Office' }
     if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
         $WriteProgressParams['ParentId'] = $ProgressParentId
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
     $Result = [PSCustomObject]@{
-        Status          = $null
-        Version         = $null
-        PreviousVersion = $null
-        Updated         = $false
+        Success        = $false
+        BeforeUpdate   = $null
+        AfterUpdate    = $null
+        ScenarioResult = [String]::Empty
+        WhatIf         = $false
     }
 
-    $OfficeRegPath = 'HKLM:\Software\Microsoft\Office\ClickToRun'
-    $OfficeRegKey = Get-Item -LiteralPath $OfficeRegPath
+    $UpdateArgs = [String[]]@('/update', 'user', 'updatepromptuser=True')
 
-    $ConfigRegPath = Join-Path -Path $OfficeRegPath -ChildPath 'Configuration'
-    $ConfigRegKey = Get-Item -LiteralPath $ConfigRegPath
+    $OfficeC2RClient = Join-Path -Path $env:ProgramFiles -ChildPath 'Common Files\Microsoft Shared\ClickToRun\OfficeC2RClient.exe'
+    if (!(Test-Path -LiteralPath $OfficeC2RClient -PathType Leaf)) {
+        throw 'Unable to update Office as Click-to-Run client not found: {0}' -f $OfficeC2RClient
+    }
 
-    $RawVersion = $ConfigRegKey.GetValue('VersionToReport')
+    $C2RRegPath = 'HKLM:\Software\Microsoft\Office\ClickToRun'
+    try {
+        $C2RRegKey = Get-Item -LiteralPath $C2RRegPath -ErrorAction Stop
+    } catch {
+        throw 'Error retrieving Office Click-to-Run registry key: {0}' -f $PSItem.Exception.Message
+    }
+
+    $ConfigRegPath = Join-Path -Path $C2RRegPath -ChildPath 'Configuration'
+    try {
+        $ConfigRegKey = Get-Item -LiteralPath $ConfigRegPath
+    } catch {
+        throw 'Error retrieving Office Click-to-Run configuration registry key: {0}' -f $PSItem.Exception.Message
+    }
+
     $Version = $null
-    if (![Version]::TryParse($RawVersion, [ref]$Version)) {
-        $Version = $RawVersion
-    }
-    $Result.PreviousVersion = $Version
+    $RawVersion = $ConfigRegKey.GetValue('VersionToReport')
+    if (![Version]::TryParse($RawVersion, [ref]$Version)) { $Version = $RawVersion }
+    $Result.BeforeUpdate = $Version
 
     if (!$PSCmdlet.ShouldProcess('Office', 'Update')) {
+        $Result.Success = $true
+        $Result.WhatIf = $true
         return $Result
     }
 
     Write-Progress @WriteProgressParams
-    & $OfficeC2RClient /update user updatepromptuser=True
-    Start-Sleep -Seconds 3
+    try {
+        Start-Process -FilePath $OfficeC2RClient -ArgumentList $UpdateArgs
+    } catch {
+        throw 'Error starting Office Click-To-Run client process: {0}' -f $PSItem.Exception.Message
+    }
 
     do {
-        $ExecutingScenario = $OfficeRegKey.GetValue('ExecutingScenario')
-        if ($ExecutingScenario) {
-            Write-Progress @WriteProgressParams -Status ('Executing scenario: {0}' -f $ExecutingScenario)
-        } else {
-            $LastScenario = $OfficeRegKey.GetValue('LastScenario')
-            $LastScenarioResult = $OfficeRegKey.GetValue('LastScenarioResult')
+        Start-Sleep -Seconds 5
+
+        $ExecutingScenario = $C2RRegKey.GetValue('ExecutingScenario')
+        if (!$ExecutingScenario) {
+            $LastScenario = $C2RRegKey.GetValue('LastScenario')
+            $LastScenarioResult = $C2RRegKey.GetValue('LastScenarioResult')
             break
         }
 
-        $TasksRegPath = Join-Path -Path $OfficeRegPath -ChildPath ('Scenario\{0}\TasksState' -f $ExecutingScenario)
+        Write-Progress @WriteProgressParams -Status ('Executing scenario: {0}' -f $ExecutingScenario)
+        $TasksRegPath = Join-Path -Path $C2RRegPath -ChildPath ('Scenario\{0}\TasksState' -f $ExecutingScenario)
         $TasksRegKey = Get-Item -LiteralPath $TasksRegPath
 
         foreach ($Task in $TasksRegKey.GetValueNames()) {
             $TaskName = $Task.Split(':')[0]
             $TaskStatus = $TasksRegKey.GetValue($Task)
 
-            if ($TaskStatus -eq 'TASKSTATE_FAILED') {
-                Write-Warning -Message ('Office update task failed in {0} scenario: {1}' -f $ExecutingScenario, $TaskName)
-            }
-
-            if ($TaskStatus -eq 'TASKSTATE_CANCELLED') {
-                Write-Warning -Message ('Office update task cancelled in {0} scenario: {1}' -f $ExecutingScenario, $TaskName)
+            switch ($TaskStatus) {
+                'TASKSTATE_CANCELLED' { Write-Warning -Message ('Office update task cancelled in {0} scenario: {1}' -f $ExecutingScenario, $TaskName) }
+                'TASKSTATE_FAILED' { Write-Warning -Message ('Office update task failed in {0} scenario: {1}' -f $ExecutingScenario, $TaskName) }
             }
         }
-
-        Start-Sleep -Seconds 5
     } while ($true)
-
-    $RawVersion = $ConfigRegKey.GetValue('VersionToReport')
-    $Version = $null
-    if (![Version]::TryParse($RawVersion, [ref]$Version)) {
-        $Version = $RawVersion
-    }
-    $Result.Version = $Version
-
-    if ($Result.Version -ne $Result.PreviousVersion) {
-        $Result.Updated = $true
-    }
-
-    $Result.Status = $LastScenarioResult
 
     Write-Verbose -Message ('Office update finished {0} scenario with result: {1}' -f $LastScenario, $LastScenarioResult)
     Write-Progress @WriteProgressParams -Completed
+
+    $Result.ScenarioResult = $LastScenarioResult
+    if ($Result.ScenarioResult -eq 'Success') { $Result.Success = $true }
+
+    $Version = $null
+    $RawVersion = $ConfigRegKey.GetValue('VersionToReport')
+    if (![Version]::TryParse($RawVersion, [ref]$Version)) { $Version = $RawVersion }
+    $Result.AfterUpdate = $Version
 
     return $Result
 }
