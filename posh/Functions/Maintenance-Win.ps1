@@ -86,76 +86,250 @@ Function Update-GoogleChrome {
 }
 
 # Update Microsoft Edge
-#
-# Deploy Microsoft Edge with Windows 10 updates
-# https://learn.microsoft.com/en-au/deployedge/deploy-edge-with-windows-10-updates
-Function Update-MicrosoftEdge {
+Function Update-Edge {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [PSCustomObject])]
-    Param()
+    [OutputType([PSCustomObject])]
+    Param(
+        [ValidateSet('Stable', 'Beta', 'Dev', 'Canary')]
+        [String]$UpdateChannel = 'Stable',
 
-    if (!(Test-IsAdministrator)) {
-        $Msg = 'You must have administrator privileges to perform Edge updates.'
-        if ($WhatIfPreference) {
-            Write-Warning -Message $Msg
-        } else {
-            throw $Msg
-        }
-    }
-
-    if ([Environment]::Is64BitOperatingSystem) {
-        $ProgramFiles = ${env:ProgramFiles(x86)}
-    } else {
-        $ProgramFiles = $env:ProgramFiles
-    }
-
-    $EdgeUpdatePath = Join-Path -Path $ProgramFiles -ChildPath 'Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe'
-    if (!(Test-Path -LiteralPath $EdgeUpdatePath -PathType Leaf)) {
-        Write-Error -Message 'Unable to install Edge updates as Edge Update not found.'
-        return
-    }
-
-    $EdgeUpdateArgs = @(
-        '/silent',
-        '/install',
-        # GUID corresponds to Stable channel
-        'appguid={56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}&appname=Microsoft%20Edge&needsadmin=True'
+        [ValidateRange(-1, [Int]::MaxValue)]
+        [Int]$ProgressParentId
     )
 
+    Function Release-ComObjects {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
+        [CmdletBinding()]
+        [OutputType([Void])]
+        Param()
+
+        if ($NextVersionWeb) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($NextVersionWeb) }
+        if ($CurrentVersionWeb) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($CurrentVersionWeb) }
+        if ($AppUpdate) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($AppUpdate) }
+        if ($AppBundle) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($AppBundle) }
+        if ($EdgeUpdate) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($EdgeUpdate) }
+    }
+
+    $WriteProgressParams = @{ Activity = 'Updating Edge' }
+    if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+        $WriteProgressParams['ParentId'] = $ProgressParentId
+        $WriteProgressParams['Id'] = $ProgressParentId + 1
+    }
+
     $Result = [PSCustomObject]@{
-        Status          = $true
-        Version         = $null
-        PreviousVersion = $null
-        Updated         = $false
+        Success       = $false
+        BeforeUpdate  = $null
+        AfterUpdate   = $null
+        UpdateState   = [String]::Empty
+        UpdateStateId = -1
+        WhatIf        = $false
     }
 
-    $EdgePath = Join-Path -Path $ProgramFiles -ChildPath 'Microsoft\Edge\Application\msedge.exe'
+    switch ($UpdateChannel) {
+        Stable { $AppId = '{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}' }
+        Beta { $AppId = '{2CD8A007-E189-409D-A2C8-9AF4EF3C72AA}' }
+        Dev { $AppId = '{0D50BFEC-CD6A-4F9A-964C-C7416E3ACB10}' }
+        Canary { $AppId = '{65C35B14-6C1D-4122-AC46-7148CC9D6497}' }
+    }
+
+    # https://github.com/chromium/chromium/blob/main/chrome/updater/win/win_constants.h
+    $ComObjectName = 'MicrosoftEdgeUpdate.Update3WebMachine'
+
+    # https://github.com/chromium/chromium/blob/main/chrome/updater/app/server/win/updater_legacy_idl.template
+    $UpdateStates = @{
+        1  = 'Initialising'
+        2  = 'Waiting to check for update'
+        3  = 'Checking for update'
+        4  = 'Update available'
+        5  = 'Waiting to download'
+        6  = 'Retrying download'
+        7  = 'Downloading'
+        8  = 'Download complete'
+        9  = 'Extracting'
+        10 = 'Applying differential patch'
+        11 = 'Ready to install'
+        12 = 'Waiting to install'
+        13 = 'Installing'
+        14 = 'Install complete'
+        15 = 'Paused'
+        16 = 'No update'
+        17 = 'Error'
+    }
+
+    # So we don't free someone else's COM objects in the (extremely unlikely)
+    # case that they're using the same variable names in a parent scope.
+    $EdgeUpdate = $null
+    $AppBundle = $null
+    $AppUpdate = $null
+    $CurrentVersionWeb = $null
+    $NextVersionWeb = $null
+
+    # Errors returned from COM objects are surfaced by the .NET runtime as
+    # generic `RuntimeException`s (0x80131501 - COR_E_SYSTEM), requiring
+    # inspection of the exception message to determine what went wrong.
 
     try {
-        $Edge = Get-Item -LiteralPath $EdgePath -ErrorAction Stop
-        $Result.PreviousVersion = $Edge.VersionInfo.ProductVersion
+        $EdgeUpdate = New-Object -ComObject $ComObjectName
     } catch {
-        $Result.PreviousVersion = 'None found'
-    }
+        Release-ComObjects
 
-    if (!$PSCmdlet.ShouldProcess('Microsoft Edge', 'Update')) {
-        return
-    }
+        switch -RegEx ($PSItem.Exception.Message) {
+            # REGDB_E_CLASSNOTREG
+            '\b0x80040154\b' { throw 'Unable to update Edge as Edge Update is not available.' }
+        }
 
-    $EdgeUpdate = Start-Process -FilePath $EdgeUpdatePath -ArgumentList $EdgeUpdateArgs -PassThru -Wait
-
-    if ($EdgeUpdate.ExitCode -ne 0) {
-        Write-Error -Message ('Edge Update returned exit code: {0}' -f $EdgeUpdate.ExitCode)
-        $Result.Status = $false
+        throw 'Edge Update COM object failed to activate: {0}' -f $PSItem.Exception.Message
     }
 
     try {
-        $Edge = Get-Item -LiteralPath $EdgePath -ErrorAction Stop
-        $Result.Version = $Edge.VersionInfo.ProductVersion
+        $AppBundle = $EdgeUpdate.createAppBundleWeb()
     } catch {
-        $Result.Version = 'None found'
+        Release-ComObjects
+        throw 'Edge Update failed to create Edge app bundle: {0}' -f $PSItem.Exception.Message
     }
 
+    try {
+        $AppBundle.initialize()
+    } catch {
+        Release-ComObjects
+        throw 'Edge app bundle failed to initialise: {0}' -f $PSItem.Exception.Message
+    }
+
+    try {
+        $AppBundle.createInstalledApp($AppId)
+    } catch {
+        Release-ComObjects
+
+        switch -RegEx ($PSItem.Exception.Message) {
+            # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY
+            '\b0x80040813\b' { throw 'Edge Update reported updates are disabled by policy.' }
+            # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY_MANUAL
+            '\b0x8004081f\b' { throw 'Edge Update reported updates are disabled by policy (manual).' }
+            # GOOPDATE_E_APP_USING_EXTERNAL_UPDATER
+            '\b0xA043081D\b' { throw 'Edge Update reported an update is already in-progress.' }
+        }
+
+        throw 'Edge app bundle failed to create installed app: {0}' -f $PSItem.Exception.Message
+    }
+
+    try {
+        # Parameter is index of created app
+        $AppUpdate = $AppBundle.appWeb(0)
+    } catch {
+        Release-ComObjects
+        throw 'Failed to retrieve app instance from Edge app bundle: {0}' -f $PSItem.Exception.Message
+    }
+
+    try {
+        $CurrentVersionWeb = $AppUpdate.currentVersionWeb
+        $Result.BeforeUpdate = $CurrentVersionWeb.version
+    } catch {
+        Release-ComObjects
+        throw 'Failed to retrieve current version from Edge app bundle: {0}' -f $PSItem.Exception.Message
+    }
+
+    if (!$PSCmdlet.ShouldProcess('Edge', 'Update')) {
+        Release-ComObjects
+        $Result.Success = $true
+        $Result.WhatIf = $true
+        return $Result
+    }
+
+    $MaxWaitTime = 300 # 5 mins
+    $WaitTime = [Diagnostics.Stopwatch]::StartNew()
+
+    do {
+        $LastUpdateStateId = $AppUpdate.currentState.stateValue
+        if ($UpdateStates.ContainsKey($LastUpdateStateId)) {
+            $LastUpdateState = $UpdateStates[$LastUpdateStateId]
+        } else {
+            $LastUpdateState = 'Unknown'
+        }
+
+        $ElapsedSeconds = [Int]($WaitTime.ElapsedMilliseconds / 1000)
+        $StatusMsg = 'Update state: {0} (Waited {1} secs / time-out: {2} secs) ...' -f $LastUpdateState, $ElapsedSeconds, $MaxWaitTime
+        Write-Progress @WriteProgressParams -Status $StatusMsg
+
+        switch ($LastUpdateStateId) {
+            # Initialising
+            1 {
+                try {
+                    $AppBundle.checkForUpdate()
+                } catch {
+                    Release-ComObjects
+                    throw 'Failed to trigger Edge update check: {0}' -f $PSItem.Exception.Message
+                }
+            }
+
+            # Update available
+            4 {
+                try {
+                    $AppBundle.download()
+                } catch {
+                    Release-ComObjects
+                    throw 'Failed to trigger Edge update download: {0}' -f $PSItem.Exception.Message
+                }
+            }
+
+            # Ready to install
+            11 {
+                try {
+                    $AppBundle.install()
+                } catch {
+                    Release-ComObjects
+                    throw 'Failed to trigger Edge update install: {0}' -f $PSItem.Exception.Message
+                }
+            }
+        }
+
+        # IDs >= 14 are final states
+        if ($LastUpdateStateId -ge 14) {
+            $Result.UpdateState = $LastUpdateState
+            $Result.UpdateStateId = $LastUpdateStateId
+            break
+        }
+
+        Start-Sleep -Seconds 1
+    } while ($ElapsedSeconds -lt $MaxWaitTime)
+
+    $WaitTime.Stop()
+    Write-Progress @WriteProgressParams -Completed
+
+    switch ($Result.UpdateStateId) {
+        # Install complete
+        14 {
+            try {
+                $NextVersionWeb = $AppUpdate.nextVersionWeb
+                $Result.AfterUpdate = $NextVersionWeb.version
+                $Result.Success = $true
+            } catch {
+                Write-Error -Message ('Failed to retrieve new version from Edge app bundle: {0}' -f $PSItem.Exception.Message)
+            }
+        }
+
+        # Paused
+        15 { Write-Warning -Message 'Edge Update reported the update is paused.' }
+
+        # No update
+        16 {
+            $Result.AfterUpdate = $Result.BeforeUpdate
+            $Result.Success = $true
+        }
+
+        # Error
+        17 { Write-Error -Message 'Edge Update reported an error occurred.' }
+
+        # Timeout
+        -1 {
+            $LastUpdateStateMsg = 'Last update state: {1} [ID: {2}]' -f $LastUpdateState, $LastUpdateStateId
+            Write-Warning -Message ('Gave-up waiting on Edge update after {0} secs ({1})' -f $MaxWaitTime, $LastUpdateStateMsg)
+        }
+
+        # Unknown state ID
+        default { Write-Error -Message ('Edge Update reported an unknown state ID: {0}' -f $Result.UpdateStateId) }
+    }
+
+    Release-ComObjects
     return $Result
 }
 

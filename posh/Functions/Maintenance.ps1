@@ -189,7 +189,7 @@ Function Update-AllTheThings {
         $TasksSystem = @()
 
         if (Test-IsWindows) {
-            $TasksApps = @('Office', 'VisualStudio', $TasksApps, 'MicrosoftStore', 'Scoop')
+            $TasksApps = @('Office', 'VisualStudio', $TasksApps, 'MicrosoftStore', 'Edge', 'Scoop')
             $TasksDevel = ($TasksDevel + @('Python', 'QtComponents')) | Sort-Object
             $TasksSystem += @('Windows', 'WSL')
         } else {
@@ -262,6 +262,7 @@ Function Update-AllTheThings {
             VisualStudio   = $null
             PowerShell     = $null
             MicrosoftStore = $null
+            Edge           = $null
             Homebrew       = $null
             Scoop          = $null
             DotNetTools    = $null
@@ -373,6 +374,19 @@ Function Update-AllTheThings {
             } catch {
                 Write-Error -Message $PSItem.Exception.Message
                 $Results.MicrosoftStore = $PSItem.Exception.Message
+            }
+
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'Edge') {
+            Write-Progress @WriteProgressParams -Status 'Edge' -PercentComplete ($TasksDone / $TasksTotal * 100)
+
+            try {
+                $Results.Edge = Update-Edge -ProgressParentId $WriteProgressParams['Id']
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.Edge = $PSItem.Exception.Message
             }
 
             $TasksDone++

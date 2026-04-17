@@ -82,6 +82,18 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>Edge</Label>
+                                <ScriptBlock>
+                                    if ($null -eq $_.Edge) { return }
+                                    if ($_.Edge -is [String]) { return $_.Edge }
+                                    if (!$_.Edge.Success) { 'Error during operation (view property for details)' }
+                                    if ($_.Edge.WhatIf) { return '{0} (current version)' -f $_.Edge.BeforeUpdate }
+
+                                    if ($_.Edge.BeforeUpdate -eq $_.Edge.AfterUpdate) { return '{0} (no update)' -f $_.Edge.BeforeUpdate }
+                                    'Updated to {0} (previous: {1})' -f $_.Edge.AfterUpdate, $_.Edge.BeforeUpdate
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
                                 <PropertyName>Homebrew</PropertyName>
                             </ListItem>
                             <ListItem>
