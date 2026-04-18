@@ -106,7 +106,23 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
-                                <PropertyName>Homebrew</PropertyName>
+                                <Label>Homebrew</Label>
+                                <ScriptBlock>
+                                    if ($null -eq $_.Homebrew) { return }
+                                    if ($_.Homebrew -is [String]) { return $_.Homebrew }
+
+                                    $Actions = [Collections.Generic.List[String]]::new()
+                                    if ($_.Homebrew.Update.Count -gt 0) { $Actions.Add('Updated Homebrew') }
+                                    if ($_.Homebrew.Upgrade.Count -gt 0) {
+                                        $Action = 'Upgraded apps'
+                                        if ($_.Homebrew.WhatIf) { $Action += ' (dry-run)' }
+                                        $Actions.Add($Action)
+                                    }
+                                    if ($_.Homebrew.Cleanup.Count -gt 0) { $Actions.Add('Cleaned-up outdated data') }
+
+                                    if ($Actions.Count -eq 0) { return 'Performed no actions' }
+                                    [String]::Join(', ', $Actions)
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>Scoop</Label>

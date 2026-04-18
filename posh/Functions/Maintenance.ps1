@@ -408,7 +408,14 @@ Function Update-AllTheThings {
 
         if ($Tasks -contains 'Homebrew') {
             Write-Progress @WriteProgressParams -Status 'Homebrew' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.Homebrew = Update-Homebrew -ProgressParentId $WriteProgressParams['Id']
+
+            try {
+                $Results.Homebrew = Update-Homebrew -ProgressParentId $WriteProgressParams['Id']
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.Homebrew = $PSItem.Exception.Message
+            }
+
             $TasksDone++
         }
 

@@ -11,16 +11,40 @@
                     <ListEntry>
                         <ListItems>
                             <ListItem>
-                                <Label>Update</Label>
-                                <ScriptBlock>'{0} lines' -f $_.Update.Count</ScriptBlock>
+                                <Label>Brew</Label>
+                                <ScriptBlock>
+                                    $Homebrew = $_
+                                    switch ($Homebrew.Brew.Count) {
+                                        0 { '(no output)' }
+                                        1 { $Homebrew.Brew }
+                                        default { '{0} lines (view property for full output)' -f $Homebrew.Brew.Count }
+                                    }
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
-                                <Label>Upgrade</Label>
-                                <ScriptBlock>'{0} lines' -f $_.Upgrade.Count</ScriptBlock>
+                                <Label>Apps</Label>
+                                <ScriptBlock>
+                                    $Homebrew = $_
+                                    switch ($Homebrew.Apps.Count) {
+                                        0 { '(no output)' }
+                                        1 { $Homebrew.Apps }
+                                        default { '{0} lines (view property for full output)' -f $Homebrew.Apps.Count }
+                                    }
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>Cleanup</Label>
-                                <ScriptBlock>'{0} lines' -f $_.Cleanup.Count</ScriptBlock>
+                                <ScriptBlock>
+                                    $Homebrew = $_
+                                    switch ($Homebrew.Cleanup.Count) {
+                                        0 { '(no output)' }
+                                        1 { $Homebrew.Cleanup }
+                                        default { '{0} lines (view property for full output)' -f $Homebrew.Cleanup.Count }
+                                    }
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>WhatIf</PropertyName>
                             </ListItem>
                         </ListItems>
                     </ListEntry>
