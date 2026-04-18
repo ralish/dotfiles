@@ -434,7 +434,14 @@ Function Update-AllTheThings {
 
         if ($Tasks -contains 'DotNetTools') {
             Write-Progress @WriteProgressParams -Status '.NET tools' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.DotNetTools = Update-DotNetTools -ProgressParentId $WriteProgressParams['Id']
+
+            try {
+                $Results.DotNetTools = Update-DotNetTools -ProgressParentId $WriteProgressParams['Id']
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.DotNetTools = $PSItem.Exception.Message
+            }
+
             $TasksDone++
         }
 

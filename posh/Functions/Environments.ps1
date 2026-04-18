@@ -1,5 +1,8 @@
 Start-DotFilesSection -Type 'Functions' -Name 'Environments'
 
+# Load custom formatting data
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Environments.format.ps1xml'))
+
 #region .NET
 
 # Clear NuGet cache
@@ -53,55 +56,88 @@ Function Clear-NuGetCache {
     }
 }
 
-# Update .NET tools
+# Update .NET global tools
+#
+# TODO: Add support for local tools
+# TODO: Add dependency cooldown support when available
 Function Update-DotNetTools {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [String[]])]
+    [OutputType([PSCustomObject])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
 
+    Function Restore-DotNetNoLogo {
+        [CmdletBinding()]
+        [OutputType([Void])]
+        Param()
+
+        if ($OriginalNoLogo) { $env:DOTNET_NOLOGO = $OriginalNoLogo }
+        else { $env:DOTNET_NOLOGO = $null }
+    }
+
     if (!(Get-Command -Name 'dotnet' -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to update .NET tools as dotnet command not found.'
-        return
+        throw 'Unable to update .NET global tools as dotnet command not found.'
     }
 
-    [String[]]$ListArgs = 'tool', 'list', '--global'
-    [String[]]$UpdateArgs = 'tool', 'update', '--global'
-
-    # If we're running this version of dotnet for the first time the welcome
-    # banner will display. Make sure we suppress it or it'll break the regex.
-    if ($env:DOTNET_NOLOGO) {
-        $OriginalNoLogo = $env:DOTNET_NOLOGO
+    $WriteProgressParams = @{ Activity = 'Updating .NET global tools' }
+    if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
+        $WriteProgressParams['ParentId'] = $ProgressParentId
+        $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
+
+    $Result = [PSCustomObject]@{
+        Success      = $false
+        WhatIf       = $false
+        BeforeUpdate = [String[]]@()
+        AfterUpdate  = [String[]]@()
+        Output       = [String[]]@()
+        ExitCode     = -1
+    }
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.Environments.UpdateDotNetTools')
+
+    $ListArgs = [String[]]@('tool', 'list', '--global')
+    $UpdateArgs = [String[]]@('tool', 'update', '--global')
+
+    # If we're running this version of `dotnet` for the first time the welcome
+    # banner will display which may cause issues issues with output parsing.
+    if ($env:DOTNET_NOLOGO) { $OriginalNoLogo = $env:DOTNET_NOLOGO }
+    else { $OriginalNoLogo = $null } # In case it's already set
     $env:DOTNET_NOLOGO = 'true'
 
-    # .NET 8.0.400 added the "--all" parameter to update all tools, but it was
+    $CliVersionRaw = & dotnet --version
+    $CliVersion = $null
+    if (![Version]::TryParse($CliVersionRaw, [ref]$CliVersion)) {
+        Restore-DotNetNoLogo
+        throw 'Failed to parse .NET CLI version: {0}' -f $CliVersionRaw
+    }
+
+    Write-Progress @WriteProgressParams -Status 'Enumerating .NET global tools' -PercentComplete 1
+    Write-Verbose -Message ('Enumerating .NET global tools: dotnet {0}' -f ($ListArgs -join ' '))
+    $Result.BeforeUpdate = [String[]]@(& dotnet @ListArgs)
+
+    if (!$PSCmdlet.ShouldProcess('.NET global tools', 'Update')) {
+        $Result.Success = $true
+        $Result.WhatIf = $true
+        return $Result
+    }
+
+    # .NET 8.0.400 added the `--all` parameter to update all tools but it was
     # effectively broken until the 8.0.403 release. For details see the issue:
     # https://github.com/dotnet/sdk/issues/42598
-    #
-    # For earlier releases we enumerate the installed tools and update each
-    # individually.
-    $CliVersion = [Version](& dotnet --version)
     if ($CliVersion -ge '8.0.403') {
         $UpdateArgs += '--all'
-        Write-Verbose -Message ('Updating .NET tools: dotnet {0}' -f ($UpdateArgs -join ' '))
-        & dotnet @UpdateArgs
+
+        Write-Progress @WriteProgressParams -Status 'Updating .NET global tools' -PercentComplete 10
+        Write-Verbose -Message ('Updating .NET global tools: dotnet {0}' -f ($UpdateArgs -join ' '))
+        $Result.Output = [String[]]@(& dotnet @UpdateArgs 2>&1)
+        $Result.ExitCode = $LASTEXITCODE
     } else {
-        $WriteProgressParams = @{
-            Activity = 'Updating .NET tools'
-        }
-
-        if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
-            $WriteProgressParams['ParentId'] = $ProgressParentId
-            $WriteProgressParams['Id'] = $ProgressParentId + 1
-        }
-
-        Write-Progress @WriteProgressParams -Status 'Enumerating .NET tools' -PercentComplete 1
-        Write-Verbose -Message ('Enumerating .NET tools: dotnet {0}' -f ($ListArgs -join ' '))
+        # Fallback approach for .NET versions prior to 8.0.403 (see above). We
+        # have to enumerate the installed tools and update each individually.
         $Tools = [Collections.Generic.List[String]]::new()
-        & dotnet @ListArgs | ForEach-Object {
+        $Result.BeforeUpdate | ForEach-Object {
             if ($_ -notmatch '^(Package Id|-)' -and $_ -match '^(\S+)') {
                 $Tools.Add($Matches[1])
             }
@@ -109,23 +145,30 @@ Function Update-DotNetTools {
 
         $ToolsUpdated = 0
         foreach ($Tool in $Tools) {
-            Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $Tool) -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
-            if ($PSCmdlet.ShouldProcess($Tool, 'Update')) {
-                Write-Verbose -Message ('Updating {0}: dotnet {1} {0}' -f $Tool, ($UpdateArgs -join ' '))
-                & dotnet @UpdateArgs $Tool
-                $ToolsUpdated++
+            Write-Progress @WriteProgressParams -Status ('Updating .NET global tool: {0}' -f $Tool) -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
+            Write-Verbose -Message ('Updating {0}: dotnet {1} {0}' -f $Tool, ($UpdateArgs -join ' '))
+            $Result.Output += [String[]]@(& dotnet @UpdateArgs $Tool)
+
+            # Only the first non-zero exit code is retained
+            if ($Result.ExitCode -eq -1 -and $LASTEXITCODE -ne 0) {
+                $Result.ExitCode = $LASTEXITCODE
             }
+
+            $ToolsUpdated++
         }
 
+        if ($Result.ExitCode -eq -1) { $Result.ExitCode = 0 }
         Write-Progress @WriteProgressParams -Completed
     }
 
-    # Restore the original value of the DOTNET_NOLOGO environment variable
-    if ($OriginalNoLogo) {
-        $env:DOTNET_NOLOGO = $OriginalNoLogo
-    } else {
-        $env:DOTNET_NOLOGO = $null
-    }
+    if ($Result.ExitCode -eq 0) { $Result.Success = $true }
+
+    Write-Progress @WriteProgressParams -Status 'Enumerating .NET global tools' -PercentComplete 90
+    Write-Verbose -Message ('Enumerating .NET global tools: dotnet {0}' -f ($ListArgs -join ' '))
+    $Result.AfterUpdate = [String[]]@(& dotnet @ListArgs)
+
+    Restore-DotNetNoLogo
+    return $Result
 }
 
 #endregion
