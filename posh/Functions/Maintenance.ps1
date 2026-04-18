@@ -189,7 +189,7 @@ Function Update-AllTheThings {
         $TasksSystem = @()
 
         if (Test-IsWindows) {
-            $TasksApps = @('Office', 'VisualStudio', $TasksApps, 'MicrosoftStore', 'Edge', 'Chrome', 'Scoop')
+            $TasksApps = @('Office', 'VisualStudio', $TasksApps, 'MicrosoftStore', 'Edge', 'Chrome', 'WinGet', 'Scoop')
             $TasksDevel = ($TasksDevel + @('Python', 'QtComponents')) | Sort-Object
             $TasksSystem += @('Windows', 'WSL')
         } else {
@@ -264,6 +264,7 @@ Function Update-AllTheThings {
             MicrosoftStore = $null
             Edge           = $null
             Chrome         = $null
+            WinGet         = $null
             Homebrew       = $null
             Scoop          = $null
             DotNetTools    = $null
@@ -401,6 +402,19 @@ Function Update-AllTheThings {
             } catch {
                 Write-Error -Message $PSItem.Exception.Message
                 $Results.Chrome = $PSItem.Exception.Message
+            }
+
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'WinGet') {
+            Write-Progress @WriteProgressParams -Status 'WinGet' -PercentComplete ($TasksDone / $TasksTotal * 100)
+
+            try {
+                $Results.WinGet = Update-WinGet
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.WinGet = $PSItem.Exception.Message
             }
 
             $TasksDone++

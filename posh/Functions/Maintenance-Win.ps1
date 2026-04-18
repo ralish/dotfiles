@@ -1119,6 +1119,70 @@ Function Update-Windows {
     return $Result
 }
 
+# Update Microsoft WinGet
+#
+# TODO: Add dependency cooldown support when available
+Function Update-WinGet {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([PSCustomObject])]
+    Param()
+
+    if (!(Get-Command -Name 'winget' -ErrorAction Ignore)) {
+        throw 'Unable to update WinGet as winget command not found.'
+    }
+
+    try {
+        Import-Module -Name 'Microsoft.WinGet.Client' -ErrorAction Stop -Verbose:$false
+    } catch {
+        throw 'Unable to update WinGet as Microsoft.WinGet.Client module not available.'
+    }
+
+    $Result = [PSCustomObject]@{
+        # Set to false if any updates fail
+        Success   = $true
+        Available = @()
+        Results   = @()
+        WhatIf    = $false
+    }
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateWinGet')
+
+    Write-Verbose -Message 'Retrieving all WinGet packages ...'
+    try {
+        $Packages = Get-WinGetPackage
+    } catch {
+        throw 'Failed to enumerate installed WinGet packages: {0}' -f $PSItem.Exception.Message
+    }
+
+    $Result.Available = @($Packages | Where-Object IsUpdateAvailable)
+    Write-Verbose -Message ('Found {0} updates across {1} installed packages.' -f $Result.Available.Count, $Packages.Count)
+
+    # `Update-WinGetPackage` doesn't properly support `-WhatIf`; it will
+    # install package updates even if `-WhatIf` is set.
+    if (!$PSCmdlet.ShouldProcess('WinGet apps', 'Update')) {
+        $Result.WhatIf = $true
+        return $Result
+    }
+
+    $InstallResults = [Collections.Generic.List[Object]]::new()
+    foreach ($Update in $Result.Available) {
+        try {
+            $InstallResult = Update-WinGetPackage -Id $Update.Id -Verbose:$false
+            $InstallResults.Add($InstallResult)
+        } catch {
+            Write-Error -Message ('Failed to update package {0}: {1}' -f $Update.Name, $PSItem.Exception.Message)
+            $Result.Success = $false
+        }
+    }
+
+    if ($Result.Success) {
+        $Failed = @($InstallResults | Where-Object Status -NE 'OK')
+        if ($Failed) { $Result.Success = $false }
+    }
+
+    $Result.Results = $InstallResults.ToArray()
+    return $Result
+}
+
 # Update Windows Subsystem for Linux
 Function Update-WSL {
     [CmdletBinding(SupportsShouldProcess)]

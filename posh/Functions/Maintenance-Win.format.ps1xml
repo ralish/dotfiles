@@ -159,6 +159,44 @@
             </ListControl>
         </View>
         <View>
+            <Name>DotFiles.MaintenanceWin.UpdateWinGet</Name>
+            <ViewSelectedBy>
+                <TypeName>DotFiles.MaintenanceWin.UpdateWinGet</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Success</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Available</Label>
+                                <ScriptBlock>
+                                    if ($_.Available.Count -eq 0) { return 'No available updates' }
+                                    '{0} available updates' -f $_.Available.Count
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Results</Label>
+                                <ScriptBlock>
+                                    if ($_.WhatIf) { return 'Did not run (WhatIf mode)' }
+
+                                    $Updated = ($_.Results | Where-Object Status -eq 'OK' | Measure-Object).Count
+                                    $Failed = $_.Results.Count - $Updated
+                                    $Unknown = $_.Available.Count - $_.Results.Count
+                                    '{0} packages updated ({1} failed, {2} missing)' -f $Updated, $Failed, $Unknown
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>WhatIf</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+        <View>
             <Name>DotFiles.MaintenanceWin.UpdateWSL</Name>
             <ViewSelectedBy>
                 <TypeName>DotFiles.MaintenanceWin.UpdateWSL</TypeName>

@@ -106,6 +106,20 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>WinGet</Label>
+                                <ScriptBlock>
+                                    if ($null -eq $_.WinGet) { return }
+                                    if ($_.WinGet -is [String]) { return $_.WinGet }
+                                    if (!$_.WinGet.Success) { 'Error during operation (view property for details)' }
+                                    if ($_.WinGet.WhatIf) { return '{0} available updates' -f $_.WinGet.Available.Count }
+
+                                    $Updated = ($_.WinGet.Results | Where-Object Status -eq 'OK' | Measure-Object).Count
+                                    $Failed = $_.WinGet.Results.Count - $Updated
+                                    $Unknown = $_.WinGet.Available.Count - $_.WinGet.Results.Count
+                                    '{0} packages updated ({1} failed, {2} missing)' -f $Updated, $Failed, $Unknown
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
                                 <Label>Homebrew</Label>
                                 <ScriptBlock>
                                     if ($null -eq $_.Homebrew) { return }
