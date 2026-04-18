@@ -137,7 +137,24 @@
                                 <PropertyName>NodejsPackages</PropertyName>
                             </ListItem>
                             <ListItem>
-                                <PropertyName>Python</PropertyName>
+                                <Label>Python</Label>
+                                <ScriptBlock>
+                                    if ($null -eq $_.Python) { return }
+                                    if ($_.Python -is [String]) { return $_.Python }
+                                    if (!$_.Python.Success) { 'Error during operation (view property for details)' }
+                                    if ($_.Python.WhatIf) { return '{0} (current versions)' -f [String]::Join(', ', $_.Python.BeforeUpdate) }
+
+                                    $Updated = $false
+                                    foreach ($PyBefore in $_.Python.BeforeUpdate) {
+                                        if ($PyBefore -notin $_.Python.AfterUpdate) { $Updated = $true; break }
+                                    }
+
+                                    $BeforeUpdate = [String]::Join(', ', ($_.Python.BeforeUpdate | Sort-Object))
+                                    if (!$Updated) { return '{0} (no updates)' -f $BeforeUpdate }
+
+                                    $AfterUpdate = [String]::Join(', ', ($_.Python.AfterUpdate | Sort-Object))
+                                    '{0} (previous: {1})' -f $AfterUpdate, $BeforeUpdate
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <PropertyName>PythonPackages</PropertyName>

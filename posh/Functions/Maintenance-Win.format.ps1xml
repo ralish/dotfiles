@@ -2,6 +2,46 @@
 <Configuration>
     <ViewDefinitions>
         <View>
+            <Name>DotFiles.MaintenanceWin.UpdatePython</Name>
+            <ViewSelectedBy>
+                <TypeName>DotFiles.MaintenanceWin.UpdatePython</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Success</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>BeforeUpdate</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>AfterUpdate</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Output</Label>
+                                <ScriptBlock>
+                                    $Python = $_
+                                    switch ($Python.Output.Count) {
+                                        0 { '(no output)' }
+                                        1 { $Python.Output }
+                                        default { '{0} lines (view property for full output)' -f $Python.Output.Count }
+                                    }
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>ExitCode</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>WhatIf</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+        <View>
             <Name>DotFiles.MaintenanceWin.UpdateScoop</Name>
             <ViewSelectedBy>
                 <TypeName>DotFiles.MaintenanceWin.UpdateScoop</TypeName>

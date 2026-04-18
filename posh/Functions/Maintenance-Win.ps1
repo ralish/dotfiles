@@ -673,27 +673,85 @@ Function Update-Office {
     return $Result
 }
 
-# Update Python
+# Update Python runtimes
 Function Update-Python {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [String[]])]
+    [OutputType([PSCustomObject])]
     Param()
 
+    Function Get-PythonRuntimes {
+        [CmdletBinding()]
+        [OutputType([String[]])]
+        Param()
+
+        $ListArgs = [String[]]@('list', '--format=json')
+
+        Write-Verbose -Message ('Listing Python runtimes: pymanager {0}' -f ($ListArgs -join ' '))
+        try {
+            $VersionsJsonRaw = & pymanager @ListArgs 2>&1
+        } catch {
+            $Msg = 'Failed to retrieve Python runtimes: {0}' -f $PSItem.Exception.Message
+            Write-Error -Message $Msg
+            return [String[]]@($Msg)
+        }
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error -Message ('Pymanager returned non-zero exit code listing Python runtimes: {0}' -f $LASTEXITCODE)
+            return [String[]]@($VersionsJsonRaw)
+        }
+
+        try {
+            $VersionsJson = $VersionsJsonRaw | ConvertFrom-Json
+        } catch {
+            Write-Error -Message ('Failed to parse JSON listing Python runtimes: {0}' -f $PSItem.Exception.Message)
+            return [String[]]@($VersionsJsonRaw)
+        }
+
+        return [String[]]@($VersionsJson.versions.'display-name')
+    }
+
     if (!(Get-Command -Name 'pymanager' -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to update Python as pymanager command not found.'
-        return
+        throw 'Unable to update Python runtimes as pymanager command not found.'
     }
 
-    $UpdatePythonArgs = @('install', '--update')
-    if ($WhatIfPreference) {
-        $UpdatePythonArgs += '--dry-run'
+    $Result = [PSCustomObject]@{
+        Success      = $false
+        BeforeUpdate = [String[]]@()
+        AfterUpdate  = [String[]]@()
+        Output       = [String[]]@()
+        ExitCode     = -1
+        WhatIf       = $false
+    }
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdatePython')
+
+    $UpdateArgs = [String[]]@('install', '--update')
+
+    $Result.BeforeUpdate = Get-PythonRuntimes
+
+    $DryrunMsg = ''
+    if (!$PSCmdlet.ShouldProcess('Python runtimes', 'Update')) {
+        $UpdateArgs += '--dry-run'
+        $DryrunMsg = ' (dry-run)'
+        $Result.WhatIf = $true
     }
 
-    if ($WhatIfPreference -or $PSCmdlet.ShouldProcess('Python', 'Update')) {
-        Write-Verbose -Message ('Updating Python: pymanager {0}' -f ($UpdatePythonArgs -join ' '))
-        $Result = & pymanager @UpdatePythonArgs 2>&1
-        return $Result
+    Write-Verbose -Message ('Updating Python runtimes{0}: pymanager {1}' -f $DryrunMsg, ($UpdateArgs -join ' '))
+    try {
+        $Result.Output = [String[]]@(& pymanager @UpdateArgs 2>&1)
+        $Result.ExitCode = $LASTEXITCODE
+
+        if ($Result.ExitCode -ne 0) {
+            Write-Error -Message ('Pymanager returned non-zero exit code updating Python runtimes: {0}' -f $Result.ExitCode)
+        } else { $Result.Success = $true }
+    } catch {
+        $Msg = 'Failed to start Python runtimes update{0}: {1}' -f $DryrunMsg, $PSItem.Exception.Message
+        $Result.Output = [String[]]@($Msg)
+        Write-Eror -Message $Msg
     }
+
+    $Result.AfterUpdate = Get-PythonRuntimes
+
+    return $Result
 }
 
 # Update Scoop, installed apps, and perform clean-up

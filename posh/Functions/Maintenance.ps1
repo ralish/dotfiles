@@ -444,8 +444,15 @@ Function Update-AllTheThings {
         }
 
         if ($Tasks -contains 'Python') {
-            Write-Progress @WriteProgressParams -Status 'Python' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.Python = Update-Python
+            Write-Progress @WriteProgressParams -Status 'Python runtimes' -PercentComplete ($TasksDone / $TasksTotal * 100)
+
+            try {
+                $Results.Python = Update-Python
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.Python = $PSItem.Exception.Message
+            }
+
             $TasksDone++
         }
 
