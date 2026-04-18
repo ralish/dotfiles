@@ -400,9 +400,7 @@ Function Get-S3BucketSize {
         throw $_
     }
 
-    if (!$Buckets) {
-        return
-    }
+    if (!$Buckets) { return }
 
     try {
         Write-Verbose -Message 'Retrieving enabled regions ...'

@@ -133,7 +133,7 @@ Function Get-AzureAuthToken {
 # The Azure AD Enterprise Applications pane can filter results on whether a
 # registration is an "Enterprise Application" or a "Microsoft Application".
 # These options aren't exposed via the AzureAD PowerShell module command:
-# Get-AzureADServicePrincipal. The same functionality can be obtained in
+# `Get-AzureADServicePrincipal`. The same functionality can be obtained in
 # PowerShell by calling the undocumented Azure Portal API.
 Function Get-AzureEnterpriseApplications {
     [CmdletBinding()]
@@ -276,10 +276,10 @@ Function Connect-AzureAD {
         throw 'AzureAD module is incompatible with PowerShell Core.'
     }
 
-    # Both modules may be present but the AzureAD module is newer. Often this
-    # is due to a specific version of the AzureADPreview module being listed as
-    # a dependency in another module which has yet to be updated. As such, we
-    # shouldn't just naively import AzureADPreview assuming it's the latest.
+    # Both modules may be present but the `AzureAD` module is newer. Often this
+    # is due to a specific version of the `AzureADPreview` module being listed
+    # as a dependency in another module which has yet to be updated. As such,
+    # we shouldn't naively import `AzureADPreview` assuming it's the latest.
     $ModuleNames = 'AzureAD', 'AzureADPreview'
     $CandidateModules = Get-Module -Name $ModuleNames -ListAvailable -Verbose:$false
     if (!$CandidateModules) {

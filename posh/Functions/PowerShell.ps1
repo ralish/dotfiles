@@ -247,13 +247,8 @@ Function Update-PowerShell {
         [OutputType([Boolean])]
         Param()
 
-        if ($Script:PsGetV2) {
-            return $true
-        }
-
-        if ($Script:PsGetV2AttemptedSxS) {
-            return $false
-        }
+        if ($Script:PsGetV2) { return $true }
+        if ($Script:PsGetV2AttemptedSxS) { return $false }
 
         Write-Verbose -Message 'Attempting to import PowerShellGet v2 side-by-side ...'
         $Script:PsGetV2AttemptedSxS = $true
@@ -318,12 +313,12 @@ Function Update-PowerShell {
 
         $InstalledModules = Get-InstalledModule -Verbose:$false
 
-        # Restore the original $VerbosePreference setting
+        # Restore the original `$VerbosePreference` setting
         $VerbosePreference = $VerboseOriginal
     }
 
-    # Get-PSResource returns all module versions while Get-InstalledModule only
-    # returns the latest version, making this redundant with PowerShellGet v3.
+    # `Get-PSResource` returns all module versions while `Get-InstalledModule`
+    # only returns the latest version, so it's redundant with PowerShellGet v3.
     $UniqueModules = $InstalledModules.Name | Sort-Object -Unique
 
     # Percentage of the total progress for updating modules
@@ -337,16 +332,16 @@ Function Update-PowerShell {
     if (!$IncludeDscModules -and $DscSupported) {
         Write-Progress @WriteProgressParams -Status 'Enumerating DSC modules for exclusion' -PercentComplete 5
 
-        # Get-DscResource likes to output multiple progress bars but doesn't
+        # `Get-DscResource` likes to output multiple progress bars but doesn't
         # have the good manners to clean them up. The result is a visual mess
         # when we've got our own progress bars.
         $OriginalProgressPreference = $ProgressPreference
         Set-Variable -Name 'ProgressPreference' -Scope Global -Value 'Ignore' -WhatIf:$false
 
         try {
-            # Get-DscResource may output various errors, most often due to
+            # `Get-DscResource` may output various errors, most often due to
             # duplicate resources. That's often the case with, for example, the
-            # PackageManagement module being available in multiple locations.
+            # `PackageManagement` module being available in multiple locations.
             $DscModules = @(Get-DscResource -Module * -ErrorAction Ignore -Verbose:$false | Select-Object -ExpandProperty 'ModuleName' -Unique)
         } finally {
             Set-Variable -Name 'ProgressPreference' -Scope Global -Value $OriginalProgressPreference -WhatIf:$false
@@ -420,7 +415,7 @@ Function Update-PowerShell {
 
     # The modular AWS Tools for PowerShell has its own mechanism
     if ($UniqueModules -contains 'AWS.Tools.Installer' -and 'AWS.Tools.Installer' -notmatch $ExcludedModuleRegex) {
-        # The Update-AWSToolsModule function is not yet compatible with
+        # The `Update-AWSToolsModule` function is not yet compatible with
         # PowerShellGet v3. If we're currently using PowerShellGet v3 but
         # PowerShellGet v2 is available attempt to import it side-by-side.
         if (!$Script:PsGetV2) {
@@ -493,12 +488,12 @@ Function Compare-Hashtable {
             $Identical = $false
 
             switch ($CaseMatching) {
-                'Insensitive' {
+                Insensitive {
                     if ($Reference[$Key] -ieq $Difference[$Key]) {
                         $Identical = $true
                     }
                 }
-                'Sensitive' {
+                Sensitive {
                     if ($Reference[$Key] -ceq $Difference[$Key]) {
                         $Identical = $true
                     }
@@ -510,9 +505,7 @@ Function Compare-Hashtable {
                 }
             }
 
-            if ($Identical) {
-                continue
-            }
+            if ($Identical) { continue }
 
             $Result.Reference = $Reference[$Key]
             $Result.Difference = $Difference[$Key]
@@ -615,9 +608,7 @@ Function Compare-ObjectPropertiesMatrix {
             $Comparison = Compare-ObjectProperties -ReferenceObject $ReferenceObject -DifferenceObject $Object
             $NumProcessed++
 
-            if (!$Comparison) {
-                continue
-            }
+            if (!$Comparison) { continue }
 
             foreach ($PropertyName in $Comparison.PropertyName) {
                 if ($DifferentProperties -notcontains $PropertyName) {
@@ -722,7 +713,7 @@ namespace DotFiles {
 
 #region Shortcut functions
 
-# Invoke Format-List selecting all properties
+# Invoke `Format-List` selecting all properties
 Function fla {
     [CmdletBinding()]
     [OutputType($null)]
@@ -747,7 +738,7 @@ Function fla {
     }
 }
 
-# Invoke Format-Table selecting all properties
+# Invoke `Format-Table` selecting all properties
 Function fta {
     [CmdletBinding()]
     [OutputType($null)]
@@ -772,7 +763,7 @@ Function fta {
     }
 }
 
-# Invoke Get-Help with -Detailed
+# Invoke `Get-Help` with `-Detailed`
 Function ghd {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
@@ -784,7 +775,7 @@ Function ghd {
     Get-Help -Detailed @PSBoundParameters
 }
 
-# Invoke Get-Help with -Examples
+# Invoke `Get-Help` with `-Examples`
 Function ghe {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
@@ -796,7 +787,7 @@ Function ghe {
     Get-Help -Examples @PSBoundParameters
 }
 
-# Invoke Get-Help with -Full
+# Invoke `Get-Help` with `-Full`
 Function ghf {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
@@ -808,7 +799,7 @@ Function ghf {
     Get-Help -Full @PSBoundParameters
 }
 
-# Retrieve FileVersionInfo from a file
+# Retrieve `FileVersionInfo` from a file
 Function gvi {
     [CmdletBinding()]
     [OutputType([Diagnostics.FileVersionInfo])]

@@ -1,6 +1,6 @@
 #region Profile utilities
 
-# Complete a dotfiles section by running any final tasks
+# Complete a `dotfiles` section and potentially output timings
 Function Complete-DotFilesSection {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
@@ -19,7 +19,7 @@ Function Complete-DotFilesSection {
     Remove-Variable -Name 'DotFilesSection*' -Scope Global
 }
 
-# Retrieve a formatted dotfiles message
+# Retrieve a formatted `dotfiles` message
 Function Get-DotFilesMessage {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
@@ -46,7 +46,7 @@ Function Get-DotFilesMessage {
     return '[dotfiles | {0,-10} | {1,-25}] {2}' -f $SectionType, $SectionName, $Message
 }
 
-# Retrieve the elapsed time in milliseconds from a starting time
+# Retrieve the elapsed time for a `dotfiles` section
 Function Get-DotFilesTiming {
     [CmdletBinding()]
     [OutputType([Void], [String])]
@@ -61,9 +61,7 @@ Function Get-DotFilesTiming {
         [Int]$UltraSlowThresholdMs = 300
     )
 
-    if (!$DotFilesShowTimings) {
-        return
-    }
+    if (!$DotFilesShowTimings) { return }
 
     $ElapsedTime = (Get-Date) - $StartTime
     $Timing = 'Elapsed time: {0} ms' -f [Int]($ElapsedTime.TotalMilliseconds)
@@ -77,7 +75,7 @@ Function Get-DotFilesTiming {
     return $Timing
 }
 
-# Remove dotfiles helper functions
+# Remove `dotfiles` helper functions
 Function Remove-DotFilesHelpers {
     [CmdletBinding()]
     [OutputType([Void])]
@@ -96,7 +94,7 @@ Function Remove-DotFilesHelpers {
     }
 }
 
-# Start a dotfiles section with optional prerequisite checks
+# Start a `dotfiles` section with optional prerequisite checks
 Function Start-DotFilesSection {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
@@ -142,30 +140,22 @@ Function Start-DotFilesSection {
         $Global:DotFilesSectionStart = Get-Date
     }
 
-    if ($Platform -eq 'Windows') {
-        if (!(Test-IsWindows)) {
-            Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as platform is not Windows.')
-            return $false
-        }
-    } elseif ($Platform -eq 'Unix') {
-        if (Test-IsWindows) {
-            Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as platform is not Unix-like.')
-            return $false
-        }
+    if ($Platform -eq 'Windows' -and !(Test-IsWindows)) {
+        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as platform is not Windows.')
+        return $false
+    } elseif ($Platform -eq 'Unix' -and (Test-IsWindows)) {
+        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as platform is not Unix-like.')
+        return $false
     }
 
-    if ($PwshMinVersion) {
-        if ($PwshMinVersion -gt $PSVersionTable.PSVersion) {
-            Write-Verbose -Message (Get-DotFilesMessage -Message ('Skipping as PowerShell version is below minimum: {0}' -f $PwshMinVersion))
-            return $false
-        }
+    if ($PwshMinVersion -and $PwshMinVersion -gt $PSVersionTable.PSVersion) {
+        Write-Verbose -Message (Get-DotFilesMessage -Message ('Skipping as PowerShell version is below minimum: {0}' -f $PwshMinVersion))
+        return $false
     }
 
-    if ($PwshHostName) {
-        if ($Host.Name -notin $PwshHostName) {
-            Write-Verbose -Message (Get-DotFilesMessage -Message ('Skipping as PowerShell host is not supported: {0}' -f $Host.Name))
-            return $false
-        }
+    if ($PwshHostName -and $Host.Name -notin $PwshHostName) {
+        Write-Verbose -Message (Get-DotFilesMessage -Message ('Skipping as PowerShell host is not supported: {0}' -f $Host.Name))
+        return $false
     }
 
     if ($Command) {
@@ -200,10 +190,7 @@ Function Start-DotFilesSection {
     }
 
     Write-Verbose -Message (Get-DotFilesMessage -Message 'All prerequisites met.')
-
-    if ($Platform -or $Command -or $Module) {
-        return $true
-    }
+    if ($Platform -or $Command -or $Module) { return $true }
 }
 
 #endregion
@@ -256,6 +243,7 @@ Function Test-EnvironmentMatch {
                 if ($null -ne $EnvCurrentValue) {
                     throw 'Environment variable exists: {0}' -f $EnvName
                 }
+
                 continue
             }
 
@@ -263,6 +251,7 @@ Function Test-EnvironmentMatch {
             if ($null -eq $EnvCurrentValue) {
                 throw 'Environment variable not set: {0}' -f $EnvName
             }
+
             continue
         }
 
@@ -325,7 +314,7 @@ Function Test-ModuleAvailable {
             } catch {
                 throw $_
             } finally {
-                # Restore the original $VerbosePreference setting
+                # Restore the original `$VerbosePreference` setting
                 $Global:VerbosePreference = $VerboseOriginal
             }
 
@@ -339,25 +328,21 @@ Function Test-ModuleAvailable {
                 $ModuleInfo.Add(($ModuleAvailable | Sort-Object -Property 'Version' -Descending | Select-Object -First 1))
             }
 
-            if ($Require -eq 'Any') {
-                break
-            }
+            if ($Require -eq 'Any') { break }
         } else {
             $MissingModule = $true
             $MissingModuleName = $Module
 
-            if ($Require -eq 'All') {
-                break
-            }
+            if ($Require -eq 'All') { break }
         }
     }
 
     if ($MissingModule) {
         if ($Require -eq 'Any') {
             throw 'Suitable module not available: {0}' -f ($Name -join ', ')
-        } else {
-            throw 'Required module not available: {0}' -f $MissingModuleName
         }
+
+        throw 'Required module not available: {0}' -f $MissingModuleName
     }
 
     if ($PassThru) {

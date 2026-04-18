@@ -72,7 +72,7 @@ Function Get-KerberosTokenSize {
         throw $_
     }
 
-    # There appears to be a bug in the Get-ADPrincipalGroupMembership cmdlet
+    # There appears to be a bug in the `Get-ADPrincipalGroupMembership` cmdlet
     # where it may construct an incorrect LDAP path when an explicit AD server
     # is provided. What appears to be happening internally is the DC Locator
     # service is used to locate a DC, which is populated into the LDAP path to
@@ -184,9 +184,7 @@ Function Resolve-ADGuid {
     }
 
     Process {
-        if ($PSCmdlet.ParameterSetName -ne 'Guid') {
-            return
-        }
+        if ($PSCmdlet.ParameterSetName -ne 'Guid') { return }
 
         foreach ($ADGuid in $Guid) {
             switch ($Type) {
@@ -257,7 +255,9 @@ Function Add-ADShadowPrincipalMember {
     $ShadowPrincipal = Get-ADObject @CommonParams -Filter { CN -eq $Name } -SearchBase $ShadowPrincipalContainer -SearchScope Subtree
     if (!$ShadowPrincipal) {
         throw 'No shadow principal found for filter on CN: {0}' -f $Name
-    } elseif ($ShadowPrincipal -is [Array]) {
+    }
+
+    if ($ShadowPrincipal -is [Array]) {
         throw 'Expected a single shadow principal but found {0} for filter on CN: {1}' -f $ShadowPrincipal.Count, $Name
     }
 

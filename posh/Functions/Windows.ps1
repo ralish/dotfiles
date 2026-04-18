@@ -247,14 +247,10 @@ Function Find-WinEvent {
             }
 
             # Log already included by log filter
-            if ($LogFiltered) {
-                continue
-            }
+            if ($LogFiltered) { continue }
 
             # Log previously enumerated and inaccessible or irrelevant
-            if ($SkippedLogs -contains $LogName) {
-                continue
-            }
+            if ($SkippedLogs -contains $LogName) { continue }
 
             if (!$ProviderLogs.ContainsKey($LogName)) {
                 try {
@@ -383,7 +379,7 @@ Function Find-WinEvent {
     return $WinEvents.ToArray()
 }
 
-# Watch an Event Log (similar to Unix "tail")
+# Watch an Event Log (similar to Unix `tail`)
 # Slightly improved from: https://stackoverflow.com/a/15262376/8787985
 Function Watch-EventLog {
     [CmdletBinding()]
@@ -453,9 +449,7 @@ Function Get-NonInheritedACL {
         $ACL = Get-Acl -LiteralPath $Directory.FullName
         $ACLNonInherited = $ACL.Access | Where-Object { $_.IsInherited -eq $false }
 
-        if (!$ACLNonInherited) {
-            continue
-        }
+        if (!$ACLNonInherited) { continue }
 
         if ($User) {
             if ($ACLNonInherited.IdentityReference -notcontains $User) {

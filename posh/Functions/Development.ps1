@@ -285,7 +285,7 @@ Function Invoke-GitLinter {
                 if ($Item.LinkType -eq 'SymbolicLink') { return }
 
                 Write-Verbose -Message ('Invoking DevSkim on: {0}' -f $_)
-                devskim analyze -I $_ -o '%F:%L [%S] %R %N'
+                & devskim analyze -I $_ -o '%F:%L [%S] %R %N'
             }
         }
 
@@ -365,7 +365,7 @@ Function Invoke-GitLinter {
                 Invoke-ScriptAnalyzer -Path $_ @ScriptAnalyzerParams | Where-Object {
                     # HACK: The statement alignment rule does horrible things
                     # to the PSScriptAnalyzer hashtable, but the suppression
-                    # facility doesn't work for ".psd1" files.
+                    # facility doesn't work for `.psd1` files.
                     $_.ScriptName -ne 'PSScriptAnalyzerSettings.psd1' -and
                     $_.RuleName -ne 'PSAlignAssignmentStatement'
                 }
@@ -400,7 +400,7 @@ Function Invoke-GitLinter {
 
             $Files | ForEach-Object {
                 Write-Verbose -Message ('Invoking ShellCheck on: {0}' -f $_)
-                shellcheck -x $_
+                & shellcheck -x $_
             }
         }
     }
@@ -415,15 +415,15 @@ Function Invoke-GitMergeAllBranches {
         [String]$SourceBranch
     )
 
-    $GitOutput = git branch
+    $GitOutput = & git branch
     if ($LASTEXITCODE -ne 0) { return }
 
     if (!$SourceBranch) {
-        $null = git rev-parse -q --verify main
+        $null = & git rev-parse -q --verify main
         if ($LASTEXITCODE -eq 0) {
             $SourceBranch = 'main'
         } else {
-            $null = git rev-parse -q --verify master
+            $null = & git rev-parse -q --verify master
             if ($LASTEXITCODE -eq 0) {
                 $SourceBranch = 'master'
             } else {
