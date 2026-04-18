@@ -267,7 +267,7 @@ Function Update-AllTheThings {
             Homebrew       = $null
             Scoop          = $null
             DotNetTools    = $null
-            GoExecutables  = $null
+            GoBinaries     = $null
             NodejsPackages = $null
             Python         = $null
             PythonPackages = $null
@@ -445,9 +445,16 @@ Function Update-AllTheThings {
             $TasksDone++
         }
 
-        if ($Tasks -contains 'GoExecutables') {
-            Write-Progress @WriteProgressParams -Status 'Go executables' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.GoExecutables = Update-GoExecutables
+        if ($Tasks -contains 'GoBinaries') {
+            Write-Progress @WriteProgressParams -Status 'Go binaries' -PercentComplete ($TasksDone / $TasksTotal * 100)
+
+            try {
+                $Results.GoBinaries = Update-GoBinaries
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.GoBinaries = $PSItem.Exception.Message
+            }
+
             $TasksDone++
         }
 

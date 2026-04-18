@@ -287,37 +287,66 @@ Function Switch-Go {
     }
 }
 
-# Update Go executable packages installed by "go install"
-Function Update-GoExecutables {
+# Update Go binaries installed by `go install`
+#
+# TODO: Add dependency cooldown support when available
+Function Update-GoBinaries {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [String[]])]
+    [OutputType([PSCustomObject])]
     Param()
 
     if (!(Get-Command -Name 'gup' -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to update Go executables as gup command not found.'
-        return
+        throw 'Unable to update Go binaries as gup command not found.'
     }
 
-    $GupExecName = 'gup'
-    if (Test-IsWindows) {
-        $GupExecName = '{0}.exe' -f $GupExecName
+    $Result = [PSCustomObject]@{
+        Success  = $false
+        WhatIf   = $false
+        Gup      = [String[]]@()
+        Binaries = [String[]]@()
+        ExitCode = -1
+    }
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.Environments.UpdateGoBinaries')
+
+    $CheckArgs = [String[]]@('check')
+    $UpdateArgs = [String[]]@('update')
+
+    $GupBinName = 'gup'
+    if (Test-IsWindows) { $GupBinName += '.exe' }
+
+    $CheckOnly = $false
+    if ($PSCmdlet.ShouldProcess('gup', 'Update')) {
+        $GupArgs = $UpdateArgs + $GupBinName
+        $CheckMsg = ''
+    } else {
+        $Result.WhatIf = $true
+        $CheckOnly = $true
+        $GupArgs = $CheckArgs + $GupBinName
+        $CheckMsg = ' (check)'
     }
 
-    $GupOperation = 'update'
-    if (!$PSCmdlet.ShouldProcess('gup', 'Update')) {
-        $GupOperation = 'check'
+    Write-Verbose -Message ('Updating gup{0}: gup {1}' -f $CheckMsg, ($GupArgs -join ' '))
+    $Result.Gup = [String[]]@(& gup @GupArgs)
+    $Result.ExitCode = $LASTEXITCODE
+
+    if ($CheckOnly) {
+        $GupArgs = $CheckArgs
+        $CheckMsg = ' (check)'
+    } else {
+        $GupArgs = $UpdateArgs
+        $CheckMsg = ''
     }
 
-    Write-Verbose -Message ('Updating gup: gup {0} {1}' -f $GupOperation, $GupExecName)
-    & gup $GupOperation $GupExecName
+    Write-Verbose -Message ('Updating Go binaries{0}: gup {1}' -f $CheckMsg, ($GupArgs -join ' '))
+    $Result.Binaries = [String[]]@(& gup @GupArgs)
 
-    $GupOperation = 'update'
-    if (!$PSCmdlet.ShouldProcess('Go executables', 'Update')) {
-        $GupOperation = 'check'
-    }
+    # Only the first non-zero exit code is retained
+    if ($Result.ExitCode -le 0) { $Result.ExitCode = $LASTEXITCODE }
 
-    Write-Verbose -Message ('Updating Go executables: gup {0}' -f $GupOperation)
-    & gup $GupOperation
+    # Only true if both `gup` runs completed successfully
+    if ($Result.ExitCode -eq 0) { $Result.Success = $true }
+
+    return $Result
 }
 
 #endregion

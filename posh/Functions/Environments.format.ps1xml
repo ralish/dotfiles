@@ -57,5 +57,77 @@
                 </ListEntries>
             </ListControl>
         </View>
+        <View>
+            <Name>DotFiles.Environments.UpdateGoBinaries</Name>
+            <ViewSelectedBy>
+                <TypeName>DotFiles.Environments.UpdateGoBinaries</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Success</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>WhatIf</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Gup</Label>
+                                <ScriptBlock>
+                                    if ($_.Gup.Count -eq 0) { return '(no output)' }
+
+                                    foreach ($Line in $_.Gup) {
+                                        if ($Line -match '^\[1/1\] .+') {
+                                            switch -Regex ($Line) {
+                                                'Already up-to-date: v(\S+)' { return '{0} (up-to-date)' -f $Matches[1] }
+                                                'v(\S+) to v(\S+),' { return '{0} (previous: {1})' -f $Matches[2], $Matches[1] }
+                                                'current: v(\S+), latest: v(\S+)' { return '{0} (available: {1})' -f $Matches[1], $Matches[2] }
+                                            }
+                                        }
+                                    }
+
+                                    'Parse error (view property for full output)'
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Binaries</Label>
+                                <ScriptBlock>
+                                    if ($_.Binaries.Count -eq 0) { return '(no output)' }
+                                    $ParseError = 'Parse error (view property for full output)'
+
+                                    $Current = $Available = $Updated = $Total = 0
+                                    foreach ($Line in $_.Binaries) {
+                                        if ($Line -match '^\[[1-9][0-9]*/([1-9][0-9]*)\] .+') {
+                                            if ($Total -eq 0) { $Total = $Matches[1] }
+                                            elseif ($Total -ne $Matches[1]) { return $ParseError }
+
+                                            switch -Regex ($Line) {
+                                                'Already up-to-date: v\S+' { $Current++ }
+                                                'v\S+ to v\S+' { $Updated++ }
+                                                'current: v\S+, latest: v\S+' { $Available++ }
+                                            }
+                                        }
+                                    }
+
+                                    if ($Updated -gt 0 -and $Available -gt 0) { return $ParseError }
+
+                                    if ($_.WhatIf) {
+                                        if ($Current + $Available -ne $Total) { return $ParseError }
+                                        return '{0} update available (view property for full output)' -f $Available
+                                    }
+
+                                    if ($Current + $Updated -ne $Total) { return $ParseError }
+                                    '{0} binaries updated (view property for full output)' -f $Updated
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>ExitCode</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
     </ViewDefinitions>
 </Configuration>
