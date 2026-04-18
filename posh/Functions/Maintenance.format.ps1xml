@@ -85,7 +85,23 @@
                                 <PropertyName>Homebrew</PropertyName>
                             </ListItem>
                             <ListItem>
-                                <PropertyName>Scoop</PropertyName>
+                                <Label>Scoop</Label>
+                                <ScriptBlock>
+                                    if ($null -eq $_.Scoop) { return }
+                                    if ($_.Scoop -is [String]) { return $_.Scoop }
+
+                                    $Actions = [Collections.Generic.List[String]]::new()
+                                    if ($_.Scoop.Scoop.Count -gt 0) { $Actions.Add('Updated Scoop') }
+                                    if ($_.Scoop.Apps.Count -gt 0) {
+                                        $Action = 'Updated apps'
+                                        if ($_.Scoop.WhatIf) { $Action += ' (dry-run)' }
+                                        $Actions.Add($Action)
+                                    }
+                                    if ($_.Scoop.Cleanup.Count -gt 0) { $Actions.Add('Cleaned-up outdated data') }
+
+                                    if ($Actions.Count -eq 0) { return 'Performed no actions' }
+                                    [String]::Join(', ', $Actions)
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <PropertyName>DotNetTools</PropertyName>

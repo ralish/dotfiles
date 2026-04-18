@@ -12,15 +12,39 @@
                         <ListItems>
                             <ListItem>
                                 <Label>Scoop</Label>
-                                <ScriptBlock>'{0} lines' -f $_.Scoop.Count</ScriptBlock>
+                                <ScriptBlock>
+                                    $Scoop = $_
+                                    switch ($Scoop.Scoop.Count) {
+                                        0 { '(no output)' }
+                                        1 { $Scoop.Scoop }
+                                        default { '{0} lines (view property for full output)' -f $Scoop.Scoop.Count }
+                                    }
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>Apps</Label>
-                                <ScriptBlock>'{0} lines' -f $_.Apps.Count</ScriptBlock>
+                                <ScriptBlock>
+                                    $Scoop = $_
+                                    switch ($Scoop.Apps.Count) {
+                                        0 { '(no output)' }
+                                        1 { $Scoop.Apps }
+                                        default { '{0} lines (view property for full output)' -f $Scoop.Apps.Count }
+                                    }
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>Cleanup</Label>
-                                <ScriptBlock>'{0} lines' -f $_.Cleanup.Count</ScriptBlock>
+                                <ScriptBlock>
+                                    $Scoop = $_
+                                    switch ($Scoop.Cleanup.Count) {
+                                        0 { '(no output)' }
+                                        1 { $Scoop.Cleanup }
+                                        default { '{0} lines (view property for full output)' -f $Scoop.Cleanup.Count }
+                                    }
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>WhatIf</PropertyName>
                             </ListItem>
                         </ListItems>
                     </ListEntry>

@@ -344,68 +344,127 @@ Function Update-Python {
     }
 }
 
-# Update Scoop & installed apps
+# Update Scoop, installed apps, and perform clean-up
+#
+# TODO: Add dependency cooldown support when available
 Function Update-Scoop {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [PSCustomObject])]
+    [OutputType([PSCustomObject])]
     Param(
         [ValidateRange(-1, [Int]::MaxValue)]
         [Int]$ProgressParentId
     )
 
     if (!(Get-Command -Name 'scoop' -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to update Scoop as scoop command not found.'
-        return
+        throw 'Unable to update Scoop as scoop command not found.'
     }
 
-    $WriteProgressParams = @{
-        Activity = 'Updating Scoop'
-    }
-
+    $WriteProgressParams = @{ Activity = 'Updating Scoop' }
     if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
         $WriteProgressParams['ParentId'] = $ProgressParentId
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
     $Result = [PSCustomObject]@{
-        Scoop   = $null
-        Apps    = $null
-        Cleanup = $null
+        Scoop        = [String[]]@()
+        Apps         = @()
+        Cleanup      = [String[]]@()
+        LastExitCode = -1
+        WhatIf       = $false
     }
     $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateScoop')
 
-    [String[]]$UpdateScoopArgs = 'update', '--quiet'
-    [String[]]$UpdateAppsArgs = 'update', '*', '--quiet'
-    [String[]]$CleanupArgs = 'cleanup', '*', '--cache'
-    if ($WhatIfPreference) {
-        $UpdateAppsArgs = 'status', '--local'
-    }
+    $UpdateScoopArgs = [String[]]@('update', '--quiet')
+    $UpdateAppsArgs = [String[]]@('update', '*', '--quiet')
+    $UpdateAppsReportOnlyArgs = [String[]]@('status', '--local')
+    $CleanupArgs = [String[]]@('cleanup', '*', '--cache')
 
     # There's no simple way to disable the output of the download progress bar
     # during Scoop updates. It adds a lot of noise to the captured output, so
     # we filter out relevant lines using a regular expression match.
     $ProgressBarRegex = '\[=*(> *)?\] +[0-9]{1,3}%'
 
-    if ($WhatIfPreference -or $PSCmdlet.ShouldProcess('Scoop', 'Update')) {
-        Write-Progress @WriteProgressParams -Status 'Updating Scoop' -PercentComplete 1
+    if ($PSCmdlet.ShouldProcess('Scoop', 'Update')) {
+        Write-Progress @WriteProgressParams -Status 'Updating Scoop to latest version' -PercentComplete 1
         Write-Verbose -Message ('Updating Scoop: scoop {0}' -f ($UpdateScoopArgs -join ' '))
-        $Result.Scoop = & scoop @UpdateScoopArgs 6>&1
+
+        try {
+            # Suppress useless verbose output from Scoop
+            $VerboseOriginal = $Global:VerbosePreference
+            $VerbosePreference = 'SilentlyContinue'
+            $Result.Scoop = [String[]]@(& scoop @UpdateScoopArgs 6>&1)
+        } catch {
+            $LASTEXITCODE = -1
+            $Msg = 'Failed to start Scoop update: {0}' -f $PSItem.Exception.Message
+            $Result.Scoop = [String[]]@($Msg)
+            Write-Eror -Message $Msg
+        } finally {
+            $VerbosePreference = $VerboseOriginal
+        }
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error -Message ('Scoop update returned non-zero exit code: {0}' -f $LASTEXITCODE)
+            Write-Progress @WriteProgressParams -Completed
+            return $Result
+        }
     }
 
-    if ($WhatIfPreference -or $PSCmdlet.ShouldProcess('Scoop apps', 'Update')) {
-        Write-Progress @WriteProgressParams -Status 'Updating apps' -PercentComplete 20
-        Write-Verbose -Message ('Updating apps: scoop {0}' -f ($UpdateAppsArgs -join ' '))
-        $Result.Apps = & scoop @UpdateAppsArgs 6>&1 | Where-Object { $_ -notmatch $ProgressBarRegex }
+    $ReportOnlyMsg = ''
+    if (!$PSCmdlet.ShouldProcess('Scoop apps', 'Update')) {
+        $UpdateAppsArgs = $UpdateAppsReportOnlyArgs
+        $ReportOnlyMsg = ' (report only)'
+        $Result.WhatIf = $true
     }
 
-    if ($PSCmdlet.ShouldProcess('Scoop obsolete files', 'Remove')) {
-        Write-Progress @WriteProgressParams -Status 'Cleaning-up obsolete files' -PercentComplete 80
-        Write-Verbose -Message ('Cleaning-up obsolete files: scoop {0}' -f ($CleanupArgs -join ' '))
-        $Result.Cleanup = & scoop @CleanupArgs 6>&1
+    Write-Progress @WriteProgressParams -Status 'Updating apps' -PercentComplete 20
+    Write-Verbose -Message ('Updating Scoop apps{0}: scoop {1}' -f $ReportOnlyMsg, ($UpdateAppsArgs -join ' '))
+
+    try {
+        # Suppress useless verbose output from Scoop
+        $VerboseOriginal = $Global:VerbosePreference
+        $VerbosePreference = 'SilentlyContinue'
+        $Result.Apps = @(& scoop @UpdateAppsArgs 6>&1 | Where-Object { $_ -notmatch $ProgressBarRegex })
+    } catch {
+        $LASTEXITCODE = -1
+        $Msg = 'Failed to start Scoop apps update{0}: {1}' -f $ReportOnlyMsg, $PSItem.Exception.Message
+        $Result.Apps = [String[]]@($Msg)
+        Write-Eror -Message $Msg
+    } finally {
+        $VerbosePreference = $VerboseOriginal
+    }
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error -Message ('Scoop apps update returned non-zero exit code: {0}' -f $LASTEXITCODE)
+        Write-Progress @WriteProgressParams -Completed
+        return $Result
+    }
+
+    if ($PSCmdlet.ShouldProcess('Scoop outdated data', 'Remove')) {
+        Write-Progress @WriteProgressParams -Status 'Cleaning-up outdated data' -PercentComplete 80
+        Write-Verbose -Message ('Cleaning-up outdated Scoop data: scoop {0}' -f ($CleanupArgs -join ' '))
+
+        try {
+            # Suppress useless verbose output from Scoop
+            $VerboseOriginal = $Global:VerbosePreference
+            $VerbosePreference = 'SilentlyContinue'
+            $Result.Cleanup = [String[]]@(& scoop @CleanupArgs 6>&1)
+        } catch {
+            $LASTEXITCODE = -1
+            $Msg = 'Failed to start Scoop clean-up: {0}' -f $PSItem.Exception.Message
+            $Result.Cleanup = [String[]]@($Msg)
+            Write-Eror -Message $Msg
+        } finally {
+            $VerbosePreference = $VerboseOriginal
+        }
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error -Message ('Scoop clean-up returned non-zero exit code: {0}' -f $LASTEXITCODE)
+            Write-Progress @WriteProgressParams -Completed
+            return $Result
+        }
     }
 
     Write-Progress @WriteProgressParams -Completed
-
     return $Result
 }
 

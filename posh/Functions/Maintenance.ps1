@@ -386,7 +386,14 @@ Function Update-AllTheThings {
 
         if ($Tasks -contains 'Scoop') {
             Write-Progress @WriteProgressParams -Status 'Scoop' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.Scoop = Update-Scoop -ProgressParentId $WriteProgressParams['Id']
+
+            try {
+                $Results.Scoop = Update-Scoop -ProgressParentId $WriteProgressParams['Id']
+            } catch {
+                Write-Error -Message $PSItem.Exception.Message
+                $Results.Scoop = $PSItem.Exception.Message
+            }
+
             $TasksDone++
         }
 
