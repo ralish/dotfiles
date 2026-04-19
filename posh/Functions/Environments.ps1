@@ -229,15 +229,17 @@ Function Switch-Go {
     )
 
     if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
-        throw 'Provided Go path is not a directory: {0}' -f $Path
+        throw 'Go path is not a directory: {0}' -f $Path
     }
 
     $PathParams = @{}
-    if (!$Disable) {
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Removed from PATH: '
+    } else {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
-    } else {
-        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Prepended to PATH: '
     }
 
     $Path = [IO.Path]::GetFullPath($Path)
@@ -257,21 +259,23 @@ Function Switch-Go {
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $BinPath
 
+    Write-Host -ForegroundColor Green -NoNewline $PathChangesDesc
+    Write-Host $BinPath
+
     if ($GoPaths) {
         foreach ($GoPath in $GoPaths) {
             $env:Path = $env:Path |
                 & $Operation @PathParams -Element $GoPath
+
+            Write-Host -ForegroundColor Green -NoNewline $PathChangesDesc
+            Write-Host $GoPath
         }
     }
 
     if ($Persist) {
-        $EnvParams = @{
-            Name = 'Path'
-        }
+        $EnvParams = @{ Name = 'Path' }
 
-        if (!$Disable) {
-            $PathParams['Action'] = 'Append'
-        }
+        if (!$Disable) { $PathParams['Action'] = 'Append' }
 
         if ($GoPaths) {
             foreach ($GoPath in $GoPaths) {
@@ -353,7 +357,7 @@ Function Update-GoBinaries {
 
 #region Google
 
-# Configure environment for Google depot_tools usage
+# Configure environment for Google `depot_tools` usage
 Function Switch-GoogleDepotTools {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
@@ -375,24 +379,29 @@ Function Switch-GoogleDepotTools {
     }
 
     if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
-        throw 'Provided depot_tools path is not a directory: {0}' -f $Path
+        throw 'depot_tools path is not a directory: {0}' -f $Path
     }
 
     $PathParams = @{}
-    if (!$Disable) {
-        $Operation = 'Add-PathStringElement'
-        $PathParams['Action'] = 'Prepend'
-        $DepotToolsWinToolchain = 0
-    } else {
+    if ($Disable) {
         $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Removed from PATH: '
         $DepotToolsWinToolchain = [String]::Empty
         $VsVersion = [String]::Empty
+    } else {
+        $Operation = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
+        $PathChangesDesc = 'Prepended to PATH: '
+        $DepotToolsWinToolchain = 0
     }
 
     $Path = [IO.Path]::GetFullPath($Path)
 
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $Path
+
+    Write-Host -ForegroundColor Green -NoNewline $PathChangesDesc
+    Write-Host $Path
 
     $env:DEPOT_TOOLS_WIN_TOOLCHAIN = $DepotToolsWinToolchain
     if ($env:DEPOT_TOOLS_WIN_TOOLCHAIN) {
@@ -407,13 +416,9 @@ Function Switch-GoogleDepotTools {
     }
 
     if ($Persist) {
-        $EnvParams = @{
-            Name = 'Path'
-        }
+        $EnvParams = @{ Name = 'Path' }
 
-        if (!$Disable) {
-            $PathParams['Action'] = 'Append'
-        }
+        if (!$Disable) { $PathParams['Action'] = 'Append' }
 
         Get-EnvironmentVariable @EnvParams |
             & $Operation @PathParams -Element $Path |
@@ -492,17 +497,19 @@ Function Switch-Java {
     )
 
     if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
-        throw 'Provided Java path is not a directory: {0}' -f $Path
+        throw 'Java path is not a directory: {0}' -f $Path
     }
 
     $PathParams = @{}
-    if (!$Disable) {
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Removed from PATH: '
+        $JavaHome = [String]::Empty
+    } else {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
+        $PathChangesDesc = 'Prepended to PATH: '
         $JavaHome = $Path
-    } else {
-        $Operation = 'Remove-PathStringElement'
-        $JavaHome = [String]::Empty
     }
 
     $Path = [IO.Path]::GetFullPath($Path)
@@ -511,6 +518,9 @@ Function Switch-Java {
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $BinPath
 
+    Write-Host -ForegroundColor Green -NoNewline $PathChangesDesc
+    Write-Host $BinPath
+
     $env:JAVA_HOME = $JavaHome
     if ($env:JAVA_HOME) {
         Write-Host -ForegroundColor Green -NoNewline 'Set JAVA_HOME to: '
@@ -518,13 +528,9 @@ Function Switch-Java {
     }
 
     if ($Persist) {
-        $EnvParams = @{
-            Name = 'Path'
-        }
+        $EnvParams = @{ Name = 'Path' }
 
-        if (!$Disable) {
-            $PathParams['Action'] = 'Append'
-        }
+        if (!$Disable) { $PathParams['Action'] = 'Append' }
 
         Get-EnvironmentVariable @EnvParams |
             & $Operation @PathParams -Element $BinPath |
@@ -583,15 +589,17 @@ Function Switch-Nodejs {
     )
 
     if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
-        throw 'Provided Node.js path is not a directory: {0}' -f $Path
+        throw 'Node.js path is not a directory: {0}' -f $Path
     }
 
     $PathParams = @{}
-    if (!$Disable) {
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Removed from PATH: '
+    } else {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
-    } else {
-        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Prepended to PATH: '
     }
 
     if ($env:NPM_CONFIG_PREFIX) {
@@ -604,19 +612,21 @@ Function Switch-Nodejs {
     }
 
     $Path = [IO.Path]::GetFullPath($Path)
+    $PathChanges = @($GlobalNpmPath, $Path)
 
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $Path |
         & $Operation @PathParams -Element $GlobalNpmPath
 
-    if ($Persist) {
-        $EnvParams = @{
-            Name = 'Path'
-        }
+    foreach ($PathChange in $PathChanges) {
+        Write-Host -ForegroundColor Green -NoNewline $PathChangesDesc
+        Write-Host $PathChange
+    }
 
-        if (!$Disable) {
-            $PathParams['Action'] = 'Append'
-        }
+    if ($Persist) {
+        $EnvParams = @{ Name = 'Path' }
+
+        if (!$Disable) { $PathParams['Action'] = 'Append' }
 
         Get-EnvironmentVariable @EnvParams |
             & $Operation @PathParams -Element $GlobalNpmPath |
@@ -673,15 +683,17 @@ Function Switch-Perl {
     )
 
     if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
-        throw 'Provided Perl path is not a directory: {0}' -f $Path
+        throw 'Perl path is not a directory: {0}' -f $Path
     }
 
     $PathParams = @{}
-    if (!$Disable) {
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Removed from PATH: '
+    } else {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
-    } else {
-        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Prepended to PATH: '
     }
 
     if ($env:PERL5LIB) {
@@ -703,14 +715,15 @@ Function Switch-Perl {
     }
 
     $Path = [IO.Path]::GetFullPath($Path)
-    if ($env:PERL5LIB) {
-        $UserBinPath = Join-Path -Path $UserBasePath -ChildPath 'bin'
-    }
     $RootBinPath = Join-Path -Path $Path -ChildPath 'c\bin'
     $SiteBinPath = Join-Path -Path $Path -ChildPath 'perl\site\bin'
     $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
+    $PathChanges = @($RootBinPath, $SiteBinPath, $PerlBinPath)
 
     if ($env:PERL5LIB) {
+        $UserBinPath = Join-Path -Path $UserBasePath -ChildPath 'bin'
+        $PathChanges += $UserBinPath
+
         $env:Path = $env:Path |
             & $Operation @PathParams -Element $UserBinPath
     }
@@ -719,6 +732,11 @@ Function Switch-Perl {
         & $Operation @PathParams -Element $PerlBinPath |
         & $Operation @PathParams -Element $SiteBinPath |
         & $Operation @PathParams -Element $RootBinPath
+
+    foreach ($PathChange in $PathChanges) {
+        Write-Host -ForegroundColor Green -NoNewline $PathChangesDesc
+        Write-Host $PathChange
+    }
 
     if ($env:PERL5LIB) {
         # Extra options for Module::Build
@@ -741,13 +759,9 @@ Function Switch-Perl {
     }
 
     if ($Persist) {
-        $EnvParams = @{
-            Name = 'Path'
-        }
+        $EnvParams = @{ Name = 'Path' }
 
-        if (!$Disable) {
-            $PathParams['Action'] = 'Append'
-        }
+        if (!$Disable) { $PathParams['Action'] = 'Append' }
 
         if ($env:PERL5LIB) {
             Get-EnvironmentVariable @EnvParams |
@@ -787,15 +801,17 @@ Function Switch-PHP {
     )
 
     if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
-        throw 'Provided PHP path is not a directory: {0}' -f $Path
+        throw 'PHP path is not a directory: {0}' -f $Path
     }
 
     $PathParams = @{}
-    if (!$Disable) {
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Removed from PATH: '
+    } else {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
-    } else {
-        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Prepended to PATH: '
     }
 
     $Path = [IO.Path]::GetFullPath($Path)
@@ -803,14 +819,13 @@ Function Switch-PHP {
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $Path
 
-    if ($Persist) {
-        $EnvParams = @{
-            Name = 'Path'
-        }
+    Write-Host -ForegroundColor Green -NoNewline $PathChangesDesc
+    Write-Host $Path
 
-        if (!$Disable) {
-            $PathParams['Action'] = 'Append'
-        }
+    if ($Persist) {
+        $EnvParams = @{ Name = 'Path' }
+
+        if (!$Disable) { $PathParams['Action'] = 'Append' }
 
         Get-EnvironmentVariable @EnvParams |
             & $Operation @PathParams -Element $Path |
@@ -917,7 +932,7 @@ Function Switch-Python {
     )
 
     if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
-        throw 'Provided Python path is not a directory: {0}' -f $Path
+        throw 'Python path is not a directory: {0}' -f $Path
     }
 
     if (!$Version) {
@@ -942,17 +957,20 @@ Function Switch-Python {
     $StrippedVersion = $Version -replace '\.'
 
     $PathParams = @{}
-    if (!$Disable) {
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Removed from PATH: '
+    } else {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
-    } else {
-        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Prepended to PATH: '
     }
 
     if ($env:PYTHONUSERBASE) {
         if (![IO.Path]::IsPathFullyQualified($env:PYTHONUSERBASE)) {
             throw 'PYTHONUSERBASE is set but is not a fully qualified path: {0}' -f $env:PYTHONUSERBASE
         }
+
         $PythonUserBase = $env:PYTHONUSERBASE
     } else {
         $PythonUserBase = $env:APPDATA
@@ -962,12 +980,18 @@ Function Switch-Python {
     $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
     $LocalScriptsSharedPath = Join-Path -Path $PythonUserBase -ChildPath 'Python\Scripts'
     $LocalScriptsVersionedPath = Join-Path -Path $PythonUserBase -ChildPath ('Python\Python{0}\Scripts' -f $StrippedVersion)
+    $PathChanges = @($LocalScriptsVersionedPath, $LocalScriptsSharedPath, $ScriptsPath, $Path)
 
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $Path |
         & $Operation @PathParams -Element $ScriptsPath |
         & $Operation @PathParams -Element $LocalScriptsSharedPath |
         & $Operation @PathParams -Element $LocalScriptsVersionedPath
+
+    foreach ($PathChange in $PathChanges) {
+        Write-Host -ForegroundColor Green -NoNewline $PathChangesDesc
+        Write-Host $PathChange
+    }
 
     # Python Development Mode
     if ($Features -contains 'Dev' -and $NativeVersion -ge '3.7') {
@@ -986,13 +1010,9 @@ Function Switch-Python {
     }
 
     if ($Persist) {
-        $EnvParams = @{
-            Name = 'Path'
-        }
+        $EnvParams = @{ Name = 'Path' }
 
-        if (!$Disable) {
-            $PathParams['Action'] = 'Append'
-        }
+        if (!$Disable) { $PathParams['Action'] = 'Append' }
 
         Get-EnvironmentVariable @EnvParams |
             & $Operation @PathParams -Element $LocalScriptsVersionedPath |
@@ -1235,16 +1255,18 @@ Function Switch-Ruby {
     )
 
     if (!$Disable -and !(Test-Path -LiteralPath $Path -PathType Container)) {
-        throw 'Provided Ruby path is not a directory: {0}' -f $Path
+        throw 'Ruby path is not a directory: {0}' -f $Path
     }
 
     $PathParams = @{}
-    if (!$Disable) {
+    if ($Disable) {
+        $Operation = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Removed from PATH: '
+        $Options = [String]::Empty
+    } else {
         $Operation = 'Add-PathStringElement'
         $PathParams['Action'] = 'Prepend'
-    } else {
-        $Operation = 'Remove-PathStringElement'
-        $Options = [String]::Empty
+        $PathChangesDesc = 'Prepended to PATH: '
     }
 
     $Path = [IO.Path]::GetFullPath($Path)
@@ -1253,6 +1275,9 @@ Function Switch-Ruby {
     $env:Path = $env:Path |
         & $Operation @PathParams -Element $BinPath
 
+    Write-Host -ForegroundColor Green -NoNewline $PathChangesDesc
+    Write-Host $BinPath
+
     $env:RUBYOPT = $Options
     if ($env:RUBYOPT) {
         Write-Host -ForegroundColor Green -NoNewline 'Set RUBYOPT to: '
@@ -1260,13 +1285,9 @@ Function Switch-Ruby {
     }
 
     if ($Persist) {
-        $EnvParams = @{
-            Name = 'Path'
-        }
+        $EnvParams = @{ Name = 'Path' }
 
-        if (!$Disable) {
-            $PathParams['Action'] = 'Append'
-        }
+        if (!$Disable) { $PathParams['Action'] = 'Append' }
 
         Get-EnvironmentVariable @EnvParams |
             & $Operation @PathParams -Element $BinPath |
