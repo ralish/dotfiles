@@ -13,6 +13,9 @@ Function Get-DotFilesLastUpdated {
 
     Test-CommandAvailable -Name 'git', 'rg'
 
+    Push-Location
+    Set-Location -LiteralPath $DotFiles
+
     $ComponentVersions = [Collections.Generic.List[PSCustomObject]]::new()
 
     # Exclude the `.git` directory
@@ -56,6 +59,8 @@ Function Get-DotFilesLastUpdated {
                 Version = $Version
             })
     }
+
+    Pop-Location
 
     return $ComponentVersions | Sort-Object -Property Name
 }
