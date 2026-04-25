@@ -2,7 +2,7 @@ $DotFilesSection = @{
     Type     = 'Functions'
     Name     = 'Active Directory'
     Platform = 'Windows'
-    Module   = @('ActiveDirectory')
+    Module   = 'ActiveDirectory'
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) {
@@ -23,6 +23,7 @@ Function Get-KerberosTokenSize {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     Param(
+        # Only the `DOMAIN\Username` format is supported (domain is optional)
         [Parameter(Mandatory)]
         [String]$Username,
 
@@ -38,13 +39,9 @@ Function Get-KerberosTokenSize {
 
     Test-ModuleAvailable -Name 'ActiveDirectory'
 
-    $CommonParams = @{
-        ErrorAction = 'Stop'
-    }
-
-    if ($Username.Split('\').Count -ne 1) {
-        if ($Username.Split('\').Count -gt 2) {
-            throw 'Only a single backslash may be present in username.'
+    if ($Username.Split('\').Count -ge 2) {
+        if ($Username.Split('\').Count -ne 2) {
+            throw 'Expected only a single "\" character to be present in username.'
         }
 
         $Domain = $Username.Split('\')[0]
@@ -56,35 +53,20 @@ Function Get-KerberosTokenSize {
 
     try {
         if ($Server) {
-            $ADDomain = Get-ADDomain @CommonParams -Identity $Domain -Server $Server
-            $CommonParams['Server'] = $Server
+            $ADDomain = Get-ADDomain -Server $Server -Identity $Domain
         } else {
-            $ADDomain = Get-ADDomain @CommonParams -Identity $Domain
-            $CommonParams['Server'] = $ADDomain.PDCEmulator
+            $ADDomain = Get-ADDomain -Identity $Domain
+            $Server = $ADDomain.PDCEmulator
         }
-    } catch {
-        throw $_
-    }
 
-    try {
-        $ADUser = Get-ADUser @CommonParams -Identity $User -Properties 'SIDHistory', 'TrustedForDelegation'
-    } catch {
-        throw $_
-    }
+        $ADUser = Get-ADUser -Server $Server -Identity $User -Properties 'SIDHistory', 'TrustedForDelegation'
 
-    # There appears to be a bug in the `Get-ADPrincipalGroupMembership` cmdlet
-    # where it may construct an incorrect LDAP path when an explicit AD server
-    # is provided. What appears to be happening internally is the DC Locator
-    # service is used to locate a DC, which is populated into the LDAP path to
-    # search. The connection will be made to the specified AD server, but if
-    # the AD server returned by the DC Locator is different then an error will
-    # be returned by the AD server. This manifests on the client as a generic
-    # "An unspecified error has occurred" exception.
-    try {
-        $ADGroups = Get-ADPrincipalGroupMembership @CommonParams -Identity $User
-    } catch {
-        throw $_
-    }
+        # There's a bug in the `Get-ADPrincipalGroupMembership` cmdlet where it
+        # returns a generic "An unspecified error has occurred" exception when
+        # the request is for a user account with delegation disabled. The
+        # workaround is to provide the `ResourceContextServer` parameter.
+        $ADGroups = Get-ADPrincipalGroupMembership -Server $Server -ResourceContextServer $ADDomain.DNSRoot -Identity $User
+    } catch { throw $_ }
 
     $SIDHistory = $ADUser.$SIDHistory.Count
     $DomainLocal = @($ADGroups | Where-Object GroupScope -EQ 'DomainLocal').Count
@@ -92,10 +74,14 @@ Function Get-KerberosTokenSize {
     $UniversalInside = @($ADGroups | Where-Object { $_.GroupScope -eq 'Universal' -and $_.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
     $UniversalOutside = @($ADGroups | Where-Object { $_.GroupScope -eq 'Universal' -and !$_.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
 
-    if ($OperatingSystem -eq 'Windows Server 2012 (or later)') {
-        $TokenSizeBytes = (40 * ($SIDHistory + $UniversalOutside)) + (8 * ($DomainLocal + $Global + $UniversalInside))
-    } else {
-        $TokenSizeBytes = (40 * ($SIDHistory + $DomainLocal + $UniversalOutside)) + (8 * ($Global + $UniversalInside))
+    switch ($OperatingSystem) {
+        'Windows Server 2012 (or later)' {
+            $TokenSizeBytes = (40 * ($SIDHistory + $UniversalOutside)) + (8 * ($DomainLocal + $Global + $UniversalInside))
+        }
+
+        'Windows Server 2008 R2 (or earlier)' {
+            $TokenSizeBytes = (40 * ($SIDHistory + $DomainLocal + $UniversalOutside)) + (8 * ($Global + $UniversalInside))
+        }
     }
 
     if ($ADUser.TrustedForDelegation) {
@@ -122,16 +108,19 @@ Function Get-KerberosTokenSize {
 
 #region Schema
 
-# Resolve various types of AD GUIDs
+# Resolve AD GUIDs corresponding to extended rights or schema objects
 Function Resolve-ADGuid {
-    [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '')]
+    [CmdletBinding(DefaultParameterSetName = 'Guid')]
+    # The AD type may not be available at the time the function is sourced due
+    # to lazy import of the `ActiveDirectory` module.
     #[OutputType([Void], [Microsoft.ActiveDirectory.Management.ADObject[]])]
     Param(
         [Parameter(Mandatory)]
         [ValidateSet('ExtendedRight', 'SchemaObject')]
         [String]$Type,
 
-        [Parameter(ParameterSetName = 'Guid', ValueFromPipeline)]
+        [Parameter(ParameterSetName = 'Guid', Mandatory, ValueFromPipeline)]
         [Guid[]]$Guid,
 
         [Parameter(ParameterSetName = 'All')]
@@ -144,19 +133,14 @@ Function Resolve-ADGuid {
     Begin {
         Test-ModuleAvailable -Name 'ActiveDirectory'
 
-        $CommonParams = @{
-            ErrorAction = 'Stop'
-        }
-
+        $CommonParams = @{}
         if ($Server) {
             $CommonParams['Server'] = $Server
         }
 
         try {
             $RootDse = Get-ADRootDSE @CommonParams
-        } catch {
-            throw $_
-        }
+        } catch { throw $_ }
 
         switch ($Type) {
             'ExtendedRight' {
@@ -177,6 +161,8 @@ Function Resolve-ADGuid {
                 }
             }
         }
+
+        Write-Verbose -Message ('Using search base: {0}' -f $SearchBase)
 
         if ($PSCmdlet.ParameterSetName -eq 'Guid') {
             $LDAPFilters = [Collections.Generic.List[String]]::new()
@@ -205,8 +191,10 @@ Function Resolve-ADGuid {
             $LDAPFilter = '(|{0})' -f ($LDAPFilters -join [String]::Empty)
         }
 
-        Write-Debug -Message ('Retrieving AD objects using LDAP filter: {0}' -f $LDAPFilter)
-        $ADObjects = Get-ADObject @CommonParams -SearchBase $SearchBase -LDAPFilter $LDAPFilter -Properties *
+        Write-Verbose -Message ('Using LDAP filter: {0}' -f $LDAPFilter)
+        try {
+            $ADObjects = @(Get-ADObject @CommonParams -SearchBase $SearchBase -LDAPFilter $LDAPFilter -Properties *)
+        } catch { throw $_ }
 
         foreach ($ADObject in $ADObjects) {
             $ADObject.PSObject.TypeNames.Insert(0, $TypeName)
@@ -222,7 +210,10 @@ Function Resolve-ADGuid {
 
 # Add members to a shadow principal
 Function Add-ADShadowPrincipalMember {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '')]
     [CmdletBinding(SupportsShouldProcess)]
+    # The AD type may not be available at the time the function is sourced due
+    # to lazy import of the `ActiveDirectory` module.
     #[OutputType([Void], [Microsoft.ActiveDirectory.Management.ADObject[]])]
     Param(
         [Parameter(Mandatory)]
@@ -242,17 +233,17 @@ Function Add-ADShadowPrincipalMember {
 
     Test-ModuleAvailable -Name 'ActiveDirectory'
 
-    $CommonParams = @{
-        ErrorAction = 'Stop'
-    }
-
+    $CommonParams = @{}
     if ($Server) {
         $CommonParams['Server'] = $Server
     }
 
     $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer @CommonParams
 
-    $ShadowPrincipal = Get-ADObject @CommonParams -Filter { CN -eq $Name } -SearchBase $ShadowPrincipalContainer -SearchScope Subtree
+    try {
+        $ShadowPrincipal = Get-ADObject @CommonParams -Filter { CN -eq $Name } -SearchBase $ShadowPrincipalContainer -SearchScope 'Subtree'
+    } catch { throw $_ }
+
     if (!$ShadowPrincipal) {
         throw 'No shadow principal found for filter on CN: {0}' -f $Name
     }
@@ -262,12 +253,19 @@ Function Add-ADShadowPrincipalMember {
     }
 
     foreach ($Member in $Members) {
-        $User = Get-ADUser @CommonParams -Filter { CN -eq $Member }
+        try {
+            $User = Get-ADUser @CommonParams -Filter { CN -eq $Member }
+        } catch {
+            Write-Error -Message $PSItem.Exception.Message
+            continue
+        }
 
         if (!$User) {
             Write-Error -Message ('No AD user found for filter on CN: {0}' -f $Member)
             continue
-        } elseif ($User -is [Array]) {
+        }
+
+        if ($User -is [Array]) {
             Write-Error -Message ('Expected a single user but found {0} for filter on CN: {1}' -f $User.Count, $Member)
             continue
         }
@@ -278,11 +276,13 @@ Function Add-ADShadowPrincipalMember {
             $MemberValue = $User.DistinguishedName
         }
 
-        Set-ADObject @CommonParams -Identity $ShadowPrincipal -Add @{ member = $MemberValue } -PassThru:$PassThru
+        try {
+            Set-ADObject @CommonParams -Identity $ShadowPrincipal -Add @{ member = $MemberValue } -PassThru:$PassThru
+        } catch { throw $_ }
     }
 }
 
-# Retrieve the DN for the Shadow Principal Configuration container
+# Retrieve the `DN` for the "Shadow Principal Configuration" container
 Function Get-ADShadowPrincipalContainer {
     [CmdletBinding()]
     [OutputType([String])]
@@ -293,40 +293,31 @@ Function Get-ADShadowPrincipalContainer {
 
     Test-ModuleAvailable -Name 'ActiveDirectory'
 
-    $CommonParams = @{
-        ErrorAction = 'Stop'
-    }
-
-    if ($Server) {
-        $CommonParams['Server'] = $Server
-    } else {
-        try {
-            $DC = Get-ADDomainController @CommonParams -Discover -NextClosestSite
-            $CommonParams['Server'] = $DC.HostName.Value
-        } catch {
-            throw $_
-        }
-    }
-
     try {
-        $RootDse = Get-ADRootDSE @CommonParams
-    } catch {
-        throw $_
-    }
+        if (!$Server) {
+            $DC = Get-ADDomainController -Discover -NextClosestSite
+            $Server = $DC.HostName.Value
+        }
+
+        $RootDse = Get-ADRootDSE -Server $Server
+    } catch { throw $_ }
 
     return 'CN=Shadow Principal Configuration,CN=Services,{0}' -f $RootDse.configurationNamingContext
 }
 
 # Create a shadow principal
 Function New-ADShadowPrincipal {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '')]
     [CmdletBinding(SupportsShouldProcess)]
+    # The AD type may not be available at the time the function is sourced due
+    # to lazy import of the `ActiveDirectory` module.
     #[OutputType([Void], [Microsoft.ActiveDirectory.Management.ADObject])]
     Param(
         [Parameter(Mandatory)]
         [String]$Name,
 
         [Parameter(Mandatory)]
-        [Security.Principal.SecurityIdentifier]$Sid,
+        [Security.Principal.SecurityIdentifier]$SID,
 
         [ValidateNotNullOrEmpty()]
         [String]$Server,
@@ -336,20 +327,27 @@ Function New-ADShadowPrincipal {
 
     Test-ModuleAvailable -Name 'ActiveDirectory'
 
-    $CommonParams = @{
-        ErrorAction = 'Stop'
-    }
-
+    $CommonParams = @{}
     if ($Server) {
         $CommonParams['Server'] = $Server
     }
 
     $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer @CommonParams
 
-    $SidByteArray = [byte[]]::new($Sid.BinaryLength)
-    $Sid.GetBinaryForm($SidByteArray, 0)
+    $SidByteArray = [byte[]]::new($SID.BinaryLength)
+    $SID.GetBinaryForm($SidByteArray, 0)
 
-    New-ADObject @CommonParams -Type 'msDS-ShadowPrincipal' -Path $ShadowPrincipalContainer -Name $Name -OtherAttributes @{ 'msDS-ShadowPrincipalSid' = $SidByteArray } -PassThru:$PassThru
+    $SpParams = @{
+        Type            = 'msDS-ShadowPrincipal'
+        Path            = $ShadowPrincipalContainer
+        Name            = $Name
+        OtherAttributes = @{
+            'msDS-ShadowPrincipalSid' = $SidByteArray
+        }
+        PassThru        = $PassThru
+    }
+
+    New-ADObject @CommonParams @SpParams
 }
 
 #endregion
