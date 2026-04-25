@@ -2,7 +2,7 @@
 <Configuration>
     <ViewDefinitions>
         <View>
-            <Name>Amazon.S3.Model.S3Bucket.Size</Name>
+            <Name>S3BucketSize</Name>
             <ViewSelectedBy>
                 <TypeName>Amazon.S3.Model.S3Bucket.Size</TypeName>
             </ViewSelectedBy>

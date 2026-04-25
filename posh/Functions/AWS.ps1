@@ -1,7 +1,7 @@
 $DotFilesSection = @{
     Type          = 'Functions'
     Name          = 'AWS'
-    Module        = @('AWS.Tools.Installer', 'AWSPowerShell.NetCore', 'AWSPowerShell')
+    Module        = 'AWS.Tools.Installer', 'AWSPowerShell.NetCore', 'AWSPowerShell'
     ModuleRequire = 'Any'
 }
 
@@ -22,8 +22,10 @@ Function Set-AWSCredentialEnvironment {
     [CmdletBinding()]
     [OutputType([Void])]
     Param(
+        # The AWS type may not be available at the time the function is sourced
+        # due to lazy import of the appropriate AWS module.
         [Parameter(ParameterSetName = 'AWSCredentials', Mandatory, ValueFromPipeline)]
-        [Object]$Credential,
+        [Object]$Credential, # Amazon.SecurityToken.Model.Credentials
 
         [Parameter(ParameterSetName = 'PlainText', Mandatory)]
         [String]$AccessKey,
@@ -41,18 +43,14 @@ Function Set-AWSCredentialEnvironment {
             $env:AWS_ACCESS_KEY_ID = $AccessKey
             $env:AWS_SECRET_ACCESS_KEY = $SecretKey
             $env:AWS_SESSION_TOKEN = $SessionToken
-
             return
         }
 
-        try {
-            $CorrectType = $Credential -is [Amazon.SecurityToken.Model.Credentials]
-        } catch {
-            throw 'Unable to locate Amazon.SecurityToken.Model.Credentials type.'
-        }
+        $Module = Test-ModuleAvailable -Name 'AWS.Tools.SecurityToken', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
+        $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
 
-        if (!$CorrectType) {
-            throw 'Credential must be an Amazon.SecurityToken.Model.Credentials type.'
+        if ($Credential -isnot [Amazon.SecurityToken.Model.Credentials]) {
+            throw 'Credential is not an Amazon.SecurityToken.Model.Credentials type.'
         }
 
         $env:AWS_ACCESS_KEY_ID = $Credential.AccessKeyId
@@ -65,18 +63,20 @@ Function Set-AWSCredentialEnvironment {
 
 #region Route 53
 
-# Set the Name tag for a Route 53 hosted zone to the zone name
+# Set the `Name` tag for a Route 53 hosted zone to the zone name
 Function Set-R53HostedZoneNameTag {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(
+        # The AWS type may not be available at the time the function is sourced
+        # due to lazy import of the appropriate AWS module.
         [Parameter(Mandatory, ValueFromPipeline)]
-        [Array]$HostedZone
+        [Array]$HostedZone # Amazon.Route53.Model.HostedZone[]
     )
 
     Begin {
-        $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require Any -PassThru
-        $Module | Import-Module -ErrorAction Stop -Verbose:$false
+        $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
+        $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = 'Name'
@@ -93,15 +93,17 @@ Function Set-R53HostedZoneNameTag {
             $Tag.Value = $Zone.Name.TrimEnd('.')
 
             if ($PSCmdlet.ShouldProcess($Tag.Value, 'Set Name tag')) {
-                Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType hostedzone -AddTag $Tag
+                Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType 'hostedzone' -AddTag $Tag
             }
         }
     }
 }
 
-# Set records on a Route 53 hosted zone for a parked domain
+# Set records on a Route 53 hosted zone suitable for a parked domain
 Function Set-R53HostedZoneParkedRecords {
     [CmdletBinding(SupportsShouldProcess)]
+    # The AWS type may not be available at the time the function is sourced due
+    # to lazy import of the appropriate AWS module.
     #[OutputType([Void], [Amazon.Route53.Model.ChangeInfo[]])]
     Param(
         [Parameter(Mandatory)]
@@ -114,6 +116,7 @@ Function Set-R53HostedZoneParkedRecords {
         # E.g. mailto:dmarc-rua@domain.com
         [ValidateNotNullOrEmpty()]
         [String[]]$DmarcRua,
+
         # E.g. mailto:dmarc-ruf@domain.com
         [ValidateNotNullOrEmpty()]
         [String[]]$DmarcRuf,
@@ -121,9 +124,11 @@ Function Set-R53HostedZoneParkedRecords {
         # E.g. amazon.com
         [ValidateNotNullOrEmpty()]
         [String[]]$CaaIssue,
+
         # E.g. digicert.com
         [ValidateNotNullOrEmpty()]
         [String[]]$CaaIssueWild,
+
         # E.g. mailto:netops@domain.com
         [ValidateNotNullOrEmpty()]
         [String[]]$CaaIoDef,
@@ -131,20 +136,22 @@ Function Set-R53HostedZoneParkedRecords {
         # E.g. 1234567890ABCD.cloudfront.net.
         [ValidateNotNullOrEmpty()]
         [String]$RedirectCloudFrontDomainName,
+
         [ValidateSet('A', 'AAAA')]
         [String[]]$RedirectCloudFrontRecordTypes = 'A'
     )
 
-    $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require Any -PassThru
-    $Module | Import-Module -ErrorAction Stop -Verbose:$false
+    $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
+    $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
 
     try {
-        $Zones = Get-R53HostedZoneList -ErrorAction Stop
-    } catch {
-        throw $_
-    }
+        $Zones = Get-R53HostedZoneList
+    } catch { throw $_ }
 
+    # Always the hosted zone ID for creating alias records that route traffic
+    # to a CloudFront distribution.
     $CloudFrontHostedZoneId = 'Z2FDTNDATAQYW2'
+
     $Changes = [Collections.Generic.List[Amazon.Route53.Model.ChangeInfo]]::new()
 
     # Construct the DMARC record
@@ -163,13 +170,8 @@ Function Set-R53HostedZoneParkedRecords {
     } elseif ($DmarcRua -or $DmarcRuf) {
         $IgnoredParams = @()
 
-        if ($DmarcRua) {
-            $IgnoredParams += 'DmarcRua'
-        }
-
-        if ($DmarcRuf) {
-            $IgnoredParams += 'DmarcRuf'
-        }
+        if ($DmarcRua) { $IgnoredParams += 'DmarcRua' }
+        if ($DmarcRuf) { $IgnoredParams += 'DmarcRuf' }
 
         if ($IgnoredParams.Count -ge 1) {
             Write-Warning -Message ('Parameter(s) will be ignored as not setting DMARC record: {0}' -f ($IgnoredParams -join ', '))
@@ -202,20 +204,12 @@ Function Set-R53HostedZoneParkedRecords {
     } elseif ($CaaIssue -or $CaaIssueWild -or $CaaIoDef) {
         $IgnoredParams = @()
 
-        if ($CaaIssue) {
-            $IgnoredParams += 'CaaIssue'
-        }
-
-        if ($CaaIssueWild) {
-            $IgnoredParams += 'CaaIssueWild'
-        }
-
-        if ($CaaIoDef) {
-            $IgnoredParams += 'CaaIoDef'
-        }
+        if ($CaaIssue) { $IgnoredParams += 'CaaIssue' }
+        if ($CaaIssueWild) { $IgnoredParams += 'CaaIssueWild' }
+        if ($CaaIoDef) { $IgnoredParams += 'CaaIoDef' }
 
         if ($IgnoredParams.Count -ge 1) {
-            Write-Warning -Message ('Parameter(s) will be ignored as not setting CAA record: {0}' -f ($IgnoredParams -join ', '))
+            Write-Warning -Message ('Parameter(s) will be ignored as not setting CAA record(s): {0}' -f ($IgnoredParams -join ', '))
         }
     }
 
@@ -223,9 +217,7 @@ Function Set-R53HostedZoneParkedRecords {
     if ($Records -notcontains 'Redirect' -and ($RedirectCloudFrontDomainName -or $PSBoundParameters.ContainsKey('RedirectCloudFrontRecordTypes'))) {
         $IgnoredParams = @()
 
-        if ($RedirectCloudFrontDomainName) {
-            $IgnoredParams += 'RedirectCloudFrontDomainName'
-        }
+        if ($RedirectCloudFrontDomainName) { $IgnoredParams += 'RedirectCloudFrontDomainName' }
 
         if ($PSBoundParameters.ContainsKey('RedirectCloudFrontRecordTypes')) {
             $IgnoredParams += 'RedirectCloudFrontRecordTypes'
@@ -340,8 +332,10 @@ Function Set-R53HostedZoneTag {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(
+        # The AWS type may not be available at the time the function is sourced
+        # due to lazy import of the appropriate AWS module.
         [Parameter(Mandatory, ValueFromPipeline)]
-        [Array]$HostedZone,
+        [Array]$HostedZone, # Amazon.Route53.Model.HostedZone[]
 
         [Parameter(Mandatory)]
         [String]$Key,
@@ -352,8 +346,8 @@ Function Set-R53HostedZoneTag {
     )
 
     Begin {
-        $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require Any -PassThru
-        $Module | Import-Module -ErrorAction Stop -Verbose:$false
+        $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
+        $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = $Key
@@ -370,7 +364,7 @@ Function Set-R53HostedZoneTag {
             $ResourceId = $Zone.Id -replace '/hostedzone/'
 
             if ($PSCmdlet.ShouldProcess($Zone.Name.TrimEnd('.'), 'Set {0} tag' -f $Tag.Key)) {
-                Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType hostedzone -AddTag $Tag
+                Edit-R53TagsForResource -ResourceId $ResourceId -ResourceType 'hostedzone' -AddTag $Tag
             }
         }
     }
@@ -380,44 +374,45 @@ Function Set-R53HostedZoneTag {
 
 #region S3
 
-# Retrieve the size of each S3 bucket
+# Retrieve the size of every AWS S3 bucket
 Function Get-S3BucketSize {
     [CmdletBinding()]
+    # The AWS type may not be available at the time the function is sourced due
+    # to lazy import of the appropriate AWS module.
     #[OutputType([Void], [Amazon.S3.Model.S3Bucket[]])]
     Param()
 
     try {
         $Module = Test-ModuleAvailable -Name 'AWS.Tools.CloudWatch', 'AWS.Tools.EC2', 'AWS.Tools.S3' -PassThru
     } catch {
-        $Module = Test-ModuleAvailable -Name 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require Any -PassThru
+        $Module = Test-ModuleAvailable -Name 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
     }
-    $Module | Import-Module -ErrorAction Stop -Verbose:$false
+    $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
 
+    Write-Verbose -Message 'Retrieving S3 buckets ...'
     try {
-        Write-Verbose -Message 'Retrieving S3 buckets ...'
-        $Buckets = Get-S3Bucket -ErrorAction Stop -Verbose:$false
-    } catch {
-        throw $_
-    }
+        $Buckets = Get-S3Bucket -Verbose:$false
+    } catch { throw $_ }
 
-    if (!$Buckets) { return }
-
-    try {
-        Write-Verbose -Message 'Retrieving enabled regions ...'
-        $Regions = Get-EC2Region -ErrorAction Stop -Verbose:$false
-    } catch {
-        throw $_
+    if (!$Buckets) {
+        Write-Warning -Message 'Retrieved no S3 buckets.'
+        return
     }
 
     foreach ($Bucket in $Buckets) {
         $Bucket.PSObject.TypeNames.Insert(0, 'Amazon.S3.Model.S3Bucket.Size')
     }
 
+    Write-Verbose -Message 'Retrieving enabled regions ...'
+    try {
+        $Regions = Get-EC2Region -Verbose:$false
+    } catch { throw $_ }
+
     Write-Verbose -Message 'Retrieving BucketSizeBytes metrics for enabled regions ...'
     $Metrics = @{}
     foreach ($Region in $Regions.RegionName) {
         try {
-            $Result = Get-CWMetricList -Region $Region -MetricName 'BucketSizeBytes' -ErrorAction Stop -Verbose:$false
+            $Result = Get-CWMetricList -Region $Region -MetricName 'BucketSizeBytes' -Verbose:$false
         } catch {
             Write-Warning -Message ('Failed to retrieve BucketSizeBytes metrics for region: {0}' -f $Region)
             continue
@@ -429,17 +424,16 @@ Function Get-S3BucketSize {
     }
 
     $CwMetricStatisticParams = @{
-        Namespace   = 'AWS/S3'
-        MetricName  = 'BucketSizeBytes'
-        Statistic   = 'Average'
-        Period      = 86400
-        ErrorAction = 'Stop'
-        Verbose     = $false
+        Namespace  = 'AWS/S3'
+        MetricName = 'BucketSizeBytes'
+        Statistic  = 'Average'
+        Period     = 86400
+        Verbose    = $false
     }
     $CwMetricStatisticParams['UtcEndTime'] = (Get-Date).ToUniversalTime()
     $CwMetricStatisticParams['UtcStartTime'] = $CwMetricStatisticParams['UtcEndTime'].AddDays(-2)
 
-    Write-Verbose -Message 'Retrieving BucketSizeBytes metric for each bucket ...'
+    Write-Verbose -Message 'Retrieving BucketSizeBytes metric for each S3 bucket ...'
     foreach ($Region in $Metrics.Keys) {
         foreach ($Metric in $Metrics[$Region]) {
             $BucketName = ($Metric.Dimensions | Where-Object Name -EQ 'BucketName').Value
@@ -447,7 +441,7 @@ Function Get-S3BucketSize {
             try {
                 $Result = Get-CWMetricStatistic @CwMetricStatisticParams -Region $Region -Dimension $Metric.Dimensions
             } catch {
-                Write-Warning -Message ('Failed to retrieve BucketSizeBytes metric for bucket: {0}' -f $BucketName)
+                Write-Warning -Message ('Failed to retrieve BucketSizeBytes metric for S3 bucket: {0}' -f $BucketName)
                 continue
             }
 
@@ -455,17 +449,18 @@ Function Get-S3BucketSize {
             $BucketSize = $BucketSizeBytes | Format-SizeDigital
 
             $Bucket = $Buckets | Where-Object BucketName -EQ $BucketName
-            $Bucket | Add-Member -MemberType NoteProperty -Name 'BucketSizeBytes' -Value $BucketSizeBytes
-            $Bucket | Add-Member -MemberType NoteProperty -Name 'BucketSize' -Value $BucketSize
+            $Bucket | Add-Member -MemberType 'NoteProperty' -Name 'BucketSizeBytes' -Value $BucketSizeBytes
+            $Bucket | Add-Member -MemberType 'NoteProperty' -Name 'BucketSize' -Value $BucketSize
         }
     }
 
     $BucketSizeBytes = 0
     $BucketSize = $BucketSizeBytes | Format-SizeDigital
+
     foreach ($Bucket in $Buckets) {
         if (!$Bucket.PSObject.Properties['BucketSize']) {
-            $Bucket | Add-Member -MemberType NoteProperty -Name 'BucketSizeBytes' -Value $BucketSizeBytes
-            $Bucket | Add-Member -MemberType NoteProperty -Name 'BucketSize' -Value $BucketSize
+            $Bucket | Add-Member -MemberType 'NoteProperty' -Name 'BucketSizeBytes' -Value $BucketSizeBytes
+            $Bucket | Add-Member -MemberType 'NoteProperty' -Name 'BucketSize' -Value $BucketSize
         }
     }
 
