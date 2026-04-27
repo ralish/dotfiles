@@ -43,10 +43,6 @@ Function Test-EnvironmentMatch {
             throw 'Environment variable "{0}" cannot be set to an empty string on Windows.' -f $EnvName
         }
 
-        if ($null -eq $EnvCurrentValue) {
-            throw 'Environment variable "{0}" is not set but expected "{1}".' -f $EnvName, $EnvExpectedValue
-        }
-
         if ($EnvExpectedValue -is [Boolean]) {
             # Environment variable must not exist
             if ($EnvExpectedValue -eq $false) {
