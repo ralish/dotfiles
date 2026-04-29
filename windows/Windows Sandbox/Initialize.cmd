@@ -40,3 +40,10 @@ SETX /M PATH "%PATH_MACHINE%;%ProgramFiles(x86)%\Sysinternals"
 @REM Process Monitor options
 @REM Filter -> Drop Filtered Events
 REG ADD "HKCU\Software\Sysinternals\Process Monitor" /v DestructiveFilter /t REG_DWORD /d 1 /f
+
+@REM Workaround for slow MSI installations
+@REM https://github.com/microsoft/Windows-Sandbox/issues/68
+@REM
+@REM Should no longer be necessary from Windows 11 26H2.
+REG ADD "HKLM\System\CurrentControlSet\Control\CI\Policy" /v VerifiedAndReputablePolicyState /t REG_DWORD /d 0 /f
+ECHO "" | CiTool --refresh
