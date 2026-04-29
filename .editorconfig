@@ -51,7 +51,7 @@ insert_final_newline = false
 insert_final_newline = false
 
 # Remote Desktop Connection
-[{*.rdp,mstsc/Template.ini}]
+[{**.rdp,mstsc/Template.ini}]
 charset = utf-16le
 
 # Shell scripts
