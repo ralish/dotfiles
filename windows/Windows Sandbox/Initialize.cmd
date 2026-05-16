@@ -41,6 +41,12 @@ SETX /M PATH "%PATH_MACHINE%;%ProgramFiles(x86)%\Sysinternals"
 @REM Filter -> Drop Filtered Events
 REG ADD "HKCU\Software\Sysinternals\Process Monitor" /v DestructiveFilter /t REG_DWORD /d 1 /f
 
+@REM Set PowerShell execution policy to RemoteSigned
+@REM
+@REM We could do this in PowerShell via `Set-ExecutionPolicy` but then we pay
+@REM the initial startup cost which is substantial due to the first-time JIT.
+REG ADD "HKLM\Software\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" /v ExecutionPolicy /t REG_SZ /d RemoteSigned /f
+
 @REM Workaround for slow MSI installations
 @REM https://github.com/microsoft/Windows-Sandbox/issues/68
 @REM
