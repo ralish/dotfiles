@@ -7,8 +7,8 @@
 Param()
 
 $BasePaths = @(
-    'HKCU:\Software\Microsoft\Windows\Shell',
-    'HKCU:\Software\Microsoft\Windows\ShellNoRoam',
+    'HKCU:\Software\Microsoft\Windows\Shell'
+    'HKCU:\Software\Microsoft\Windows\ShellNoRoam'
     'HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell'
 )
 
@@ -23,11 +23,11 @@ foreach ($BasePath in $BasePaths) {
     foreach ($BagPath in @($BagsPath, $BagMRUPath)) {
         if ($PSCmdlet.ShouldProcess($BagPath, 'Remove')) {
             try {
-                Remove-Item -Path $BagPath -Recurse -ErrorAction Stop
+                Remove-Item -LiteralPath $BagPath -Recurse -ErrorAction 'Stop'
             } catch {
                 switch -Regex ($PSItem.FullyQualifiedErrorId) {
                     '^PathNotFound,' { }
-                    Default { throw }
+                    Default { $PSCmdlet.WriteError($PSItem) }
                 }
             }
         }
