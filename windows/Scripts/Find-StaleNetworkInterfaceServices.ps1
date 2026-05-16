@@ -18,19 +18,23 @@
 [CmdletBinding()]
 [OutputType([Void], [PSCustomObject[]])]
 Param(
-    [Switch]$SkipGuidRefSearch
+    [Switch]$GuidRefSearch
 )
 
-$Results = [Collections.Generic.List[PSCustomObject]]::new()
-
-$NetIPAddresses = Get-NetIPAddress
-
 $ServicesPath = 'HKLM:\System\CurrentControlSet\Services'
-$ServicesKey = Get-Item -Path $ServicesPath
-
 $GuidRegex = '^\{[a-z0-9]{8}(-[a-z0-9]{4}){3}-[a-z0-9]{12}\}$'
+
+$Results = [Collections.Generic.List[PSCustomObject]]::new()
+$NetIPAddresses = Get-NetIPAddress
+$ServicesKey = Get-Item -LiteralPath $ServicesPath
 $GuidServices = $ServicesKey.GetSubKeyNames() | Where-Object { $_ -match $GuidRegex }
 
+if ($GuidServices.Count -eq 0) {
+    Write-Verbose -Message 'No network interface services keys found.'
+    return
+}
+
+Write-Verbose -Message "Enumerating $($GuidServices.Count) network interface services keys ..."
 foreach ($GuidService in $GuidServices) {
     $ServiceGuid = [Guid]($GuidService -replace '[\{\}]')
     $ServicePath = Join-Path -Path $ServicesPath -ChildPath $GuidService
@@ -39,14 +43,14 @@ foreach ($GuidService in $GuidServices) {
         Guid    = $ServiceGuid
         Path    = $ServicePath
         Status  = 'Unknown'
-        Details = [String]::Empty
+        Details = ''
         Matches = $null
     }
     $Results.Add($ServiceInfo)
 
-    $TcpipParamsPath = Join-Path $ServicePath -ChildPath 'Parameters\Tcpip'
     try {
-        $TcpipParamsKey = Get-Item -Path $TcpipParamsPath -ErrorAction Stop
+        $TcpipParamsPath = Join-Path $ServicePath -ChildPath 'Parameters\Tcpip'
+        $TcpipParamsKey = Get-Item -LiteralPath $TcpipParamsPath -ErrorAction 'Stop'
     } catch {
         $ServiceInfo.Details = 'Tcpip registry key missing'
         continue
@@ -61,7 +65,7 @@ foreach ($GuidService in $GuidServices) {
         }
 
         if ($EnableDHCP -ne 0) {
-            Write-Warning -Message ('[{0}] Unexpected value for EnableDHCP: {1}' -f $ServiceGuid, $EnableDHCP)
+            Write-Warning -Message "[$ServiceGuid] Unexpected value for EnableDHCP: $EnableDHCP"
         }
     }
 
@@ -71,13 +75,13 @@ foreach ($GuidService in $GuidServices) {
         continue
     }
 
-    if ($IPAddresses[0].Count -eq 0) {
+    if ($IPAddresses.Count -eq 0) {
         $ServiceInfo.Details = 'IPAddress registry value empty'
         continue
     }
 
     $MissingIPAddresses = @()
-    foreach ($IPAddress in $IPAddresses[0]) {
+    foreach ($IPAddress in $IPAddresses) {
         if ($IPAddress -notin $NetIPAddresses.IPAddress) {
             $MissingIPAddresses += $IPAddress
         }
@@ -85,28 +89,28 @@ foreach ($GuidService in $GuidServices) {
 
     if ($MissingIPAddresses.Count -ne 0) {
         $ServiceInfo.Status = 'Orphaned'
-        $ServiceInfo.Details = 'IP address(es) not present: {0}' -f ($MissingIPAddresses -join ',')
+        $ServiceInfo.Details = "IP address(es) not present: $($MissingIPAddresses -join ',')"
         continue
     }
 
     $ServiceInfo.Status = 'OK'
-    $ServiceInfo.Details = 'All static IPs present ({0} total)' -f $IPAddresses[0].Count
+    $ServiceInfo.Details = "All static IPs present ($($IPAddresses.Count) total)"
 }
 
-if ($SkipGuidRefSearch) { return $Results }
+if ($GuidRefSearch) {
+    foreach ($GuidService in $Results) {
+        if ($GuidService.Status -eq 'OK') { continue }
 
-foreach ($GuidService in $Results) {
-    if ($GuidService.Status -eq 'OK') { continue }
+        $SearchParams = @{
+            Hive        = 'HKLM'
+            Path        = 'System\CurrentControlSet'
+            SimpleMatch = "*$($GuidService.Guid)*"
+            Verbose     = $false
+        }
 
-    $SearchParams = @{
-        Hive        = 'HKLM'
-        Path        = 'System\CurrentControlSet'
-        SimpleMatch = '*{0}*' -f $GuidService.Guid
-        Verbose     = $false
+        Write-Verbose -Message "Searching registry for references to GUID: $($GuidService.Guid)"
+        $GuidService.Matches = Search-Registry @SearchParams
     }
-
-    Write-Verbose -Message ('Searching registry for references to GUID: {0}' -f $GuidService.Guid)
-    $GuidService.Matches = Search-Registry @SearchParams
 }
 
 return $Results
