@@ -6,19 +6,16 @@
 [OutputType([Void])]
 Param()
 
-if (![Environment]::OSVersion.Version -eq 10) {
-    throw 'Script is only valid for Windows 10 or later.'
+if ([Environment]::OSVersion.Version.Major -lt 10) {
+    $ErrMsg = 'Script is only valid for Windows 10 or later.'
+    $ErrCat = [Management.Automation.ErrorCategory]::NotInstalled
+    $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NotWin10OrLater', $ErrCat, $null)
+    $PSCmdlet.ThrowTerminatingError($ErrRec)
 }
 
 $RegPath = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell\StateStore'
 $ValueName = 'ResetCache'
 
-try {
-    $null = Get-ItemProperty -Path $RegPath -ErrorAction Stop
-} catch {
-    throw 'Failed to retrieve registry key for Windows Live Tile cache.'
-}
-
 if ($PSCmdlet.ShouldProcess("$RegPath\$ValueName", 'Set')) {
-    Set-ItemProperty -Path $RegPath -Name $ValueName -Value 1
+    Set-ItemProperty -LiteralPath $RegPath -Name $ValueName -Type 'DWord' -Value 1 -ErrorAction 'Stop'
 }
