@@ -8,45 +8,117 @@
 [CmdletBinding(SupportsShouldProcess)]
 [OutputType([Void])]
 Param(
+    [Parameter(Mandatory)]
     [ValidateSet('Enable', 'Disable')]
     [String]$Operation
 )
 
-if (![Environment]::OSVersion.Version -eq 10) {
-    throw 'Script is only valid for Windows 10 or later.'
+if ([Environment]::OSVersion.Version.Major -lt 10) {
+    $ErrMsg = 'Script is only valid for Windows 10 or later.'
+    $ErrCat = [Management.Automation.ErrorCategory]::NotInstalled
+    $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NotWin10OrLater', $ErrCat, $null)
+    $PSCmdlet.ThrowTerminatingError($ErrRec)
 }
 
-$TypeLibPath = 'HKCR:\TypeLib\{8cec5860-07a1-11d9-b15e-000d56bfe6ee}'
 $Architectures = @('win32')
 if ([Environment]::Is64BitOperatingSystem) {
     $Architectures += 'win64'
 }
 
 $RemoveHKCRDrive = $false
-if (!(Get-PSDrive -Name 'HKCR' -ErrorAction Ignore)) {
+if (!(Get-PSDrive -Name 'HKCR' -ErrorAction 'Ignore')) {
     $RemoveHKCRDrive = $true
     $null = New-PSDrive -Name 'HKCR' -PSProvider 'Registry' -Root 'HKEY_CLASSES_ROOT' -WhatIf:$false
 }
 
 foreach ($Architecture in $Architectures) {
-    $ArchPath = '{0}\1.0\0\{1}' -f $TypeLibPath, $Architecture
+    $RegSubKeyPath = "TypeLib\{8cec5860-07a1-11d9-b15e-000d56bfe6ee}\1.0\0\$Architecture"
+    $RegPath = "HKCR:\$RegSubKeyPath"
 
     try {
-        $null = Get-ItemProperty -Path $ArchPath -ErrorAction Stop
+        # Incredibly slow as it enumerates every key as it traverses the path
+        $null = Get-Item -LiteralPath $RegPath -ErrorAction 'Stop'
     } catch {
-        Write-Warning -Message ('Failed to retrieve {0} registry key for AP Client 1.0 Type Library.' -f $Architecture)
+        Write-Warning -Message "Failed to retrieve $Architecture registry key for AP Client 1.0 Type Library."
         continue
+    }
+
+    try {
+        $RegKey = [Microsoft.Win32.Registry]::ClassesRoot.OpenSubKey($RegSubKeyPath, $true)
+        $UpdateRegKeySecurity = $false
+        $RegKey.Close()
+    } catch {
+        $UpdateRegKeySecurity = $true
+    }
+
+    if ($UpdateRegKeySecurity -and $PSCmdlet.ShouldProcess($RegPath, 'Update ACL')) {
+        # Cheeky but much easier than doing it through the Win32 API
+        $NtDllImport = '[DllImport("ntdll.dll")] public static extern int RtlAdjustPrivilege(ulong Privilege, bool Enable, bool CurrentThread, ref bool PreviousValue);'
+        $NtDll = Add-Type -Member $NtDllImport -Name 'NtDll' -PassThru
+
+        # Enable required privileges
+        $Privileges = @{ SeTakeOwnership = 9; SeBackup = 17; SeRestore = 18 }
+        foreach ($Privilege in $Privileges.Keys) {
+            $Result = $NtDll::RtlAdjustPrivilege($Privileges[$Privilege], $true, $false, [ref]$null)
+            if ($Result -eq 0) { continue }
+
+            $ErrMsg = "Failure calling RtlAdjustPrivilege to enable $Privilege privilege (NTSTATUS: $Result)."
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'RtlAdjustPrivilegeFailed', $ErrCat, $Result)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
+        # Save original ACL
+        $RegKeyOriginalAcl = Get-Acl -Path $RegPath -ErrorAction 'Stop'
+
+        # Update the owner
+        $UserNTAccount = [Security.Principal.NTAccount]([Security.Principal.WindowsIdentity]::GetCurrent().Name)
+        $RegKey = [Microsoft.Win32.Registry]::ClassesRoot.OpenSubKey($RegSubKeyPath,
+            [Microsoft.Win32.RegistryKeyPermissionCheck]::ReadWriteSubTree,
+            [Security.AccessControl.RegistryRights]::TakeOwnership)
+        $RegKeyAcl = $RegKey.GetAccessControl([Security.AccessControl.AccessControlSections]::Owner)
+        $RegKeyAcl.SetOwner($UserNTAccount)
+        $RegKey.SetAccessControl($RegKeyAcl)
+        $RegKey.Close()
+
+        # Grant full control
+        $RegKey = [Microsoft.Win32.Registry]::ClassesRoot.OpenSubKey($RegSubKeyPath,
+            [Microsoft.Win32.RegistryKeyPermissionCheck]::ReadWriteSubTree,
+            [Security.AccessControl.RegistryRights]::ChangePermissions)
+        $RegKeyAcl = $RegKey.GetAccessControl()
+        $RegKeyAce = New-Object Security.AccessControl.RegistryAccessRule($UserNTAccount,
+            [Security.AccessControl.RegistryRights]::FullControl,
+            [Security.AccessControl.InheritanceFlags]'ContainerInherit,ObjectInherit',
+            [Security.AccessControl.PropagationFlags]::None,
+            [Security.AccessControl.AccessControlType]::Allow)
+        $RegKeyAcl.SetAccessRule($RegKeyAce)
+        $RegKey.SetAccessControl($RegKeyAcl)
+        $RegKey.Close()
     }
 
     if ($Operation -eq 'Enable') {
         if ($PSCmdlet.ShouldProcess('Enable F1 key opening web browser search for help')) {
-            $HelpPanePath = Join-Path -Path $env:SystemRoot -ChildPath 'HelpPane.exe'
-            Set-ItemProperty -Path $ArchPath -Name '(default)' -Value $HelpPanePath
+            try {
+                $HelpPanePath = Join-Path -Path $env:SystemRoot -ChildPath 'HelpPane.exe'
+                Set-ItemProperty -LiteralPath $RegPath -Name '(default)' -Type 'String' -Value $HelpPanePath -ErrorAction 'Stop'
+            } catch { $PSCmdlet.WriteError($PSItem) }
         }
-    } else {
-        if ($PSCmdlet.ShouldProcess('Disable F1 key opening web browser search for help')) {
-            Set-ItemProperty -Path $ArchPath -Name '(default)' -Value [String]::Empty
-        }
+    } elseif ($PSCmdlet.ShouldProcess('Disable F1 key opening web browser search for help')) {
+        try {
+            # `Remove-ItemProperty` doesn't seem to support deleting the
+            # `(default)` value, so we take this alternative approach.
+            $RegKey = [Microsoft.Win32.Registry]::ClassesRoot.OpenSubKey($RegSubKeyPath, $true)
+            $RegKey.DeleteValue('', $false)
+            $RegKey.Close()
+        } catch { $PSCmdlet.WriteError($PSItem) }
+    }
+
+    if ($UpdateRegKeySecurity -and $PSCmdlet.ShouldProcess($RegPath, 'Restore ACL')) {
+        # Restore original ACL
+        $AclSections = [Security.AccessControl.AccessControlSections]::Owner -bor [Security.AccessControl.AccessControlSections]::Group -bor [Security.AccessControl.AccessControlSections]::Access
+        $RegKeyAcl = [Security.AccessControl.RegistrySecurity]::new()
+        $RegKeyAcl.SetSecurityDescriptorSddlForm($RegKeyOriginalAcl.Sddl, $AclSections)
+        $RegKeyAcl | Set-Acl -Path $RegPath
     }
 }
 
