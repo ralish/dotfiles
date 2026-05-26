@@ -1,7 +1,7 @@
 # Clink configuration
 # https://chrisant996.github.io/clink/clink.html#configuring-clink
 #
-# Last reviewed release: v1.9.24
+# Last reviewed release: v1.9.25
 # Default file path: %LOCALAPPDATA%\clink\clink_settings
 
 # ---------------------------------- Clink ------------------------------------
@@ -416,6 +416,9 @@ exec.space_prefix = True
 
 # Start Clink sessions with the suggestion list enabled
 suggestionlist.default = True
+
+# Automatically disable the suggestion list after every use (Enter or Esc)
+suggestionlist.autooff = False
 
 # Suppress input hints controlled by `comment_row.show_hints`
 suggestionlist.hide_hints = True
