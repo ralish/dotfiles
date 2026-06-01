@@ -23,23 +23,35 @@ Param(
     [Switch]$GuidRefSearch
 )
 
+if ($GuidRefSearch) {
+    if (!(Test-Path -LiteralPath 'Function:\Search-Registry')) {
+        $ErrMsg = 'Missing Search-Registry function required for -GuidRefSearch parameter.'
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'FunctionNotFound', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+}
+
 $ServicesPath = 'HKLM:\System\CurrentControlSet\Services'
 $GuidRegex = '^\{[a-z0-9]{8}(-[a-z0-9]{4}){3}-[a-z0-9]{12}\}$'
 
-$Results = [Collections.Generic.List[PSCustomObject]]::new()
-$NetIPAddresses = Get-NetIPAddress
+Write-Verbose -Message 'Retrieving network interface services registry keys ...'
 $ServicesKey = Get-Item -LiteralPath $ServicesPath
-$GuidServices = $ServicesKey.GetSubKeyNames() | Where-Object { $_ -match $GuidRegex }
-
+$GuidServices = $ServicesKey.GetSubKeyNames() | Where-Object { $PSItem -match $GuidRegex }
 if ($GuidServices.Count -eq 0) {
-    Write-Verbose -Message 'No network interface services keys found.'
+    Write-Warning -Message 'No network interface services registry keys found.'
     return
 }
 
-Write-Verbose -Message "Enumerating $($GuidServices.Count) network interface services keys ..."
+Write-Verbose -Message 'Retrieving network adapter IP addresses ...'
+$NetIPAddresses = Get-NetIPAddress
+
+Write-Verbose -Message "Processing $($GuidServices.Count) network interface services registry keys ..."
+$Results = [Collections.Generic.List[PSCustomObject]]::new()
 foreach ($GuidService in $GuidServices) {
     $ServiceGuid = [Guid]($GuidService -replace '[\{\}]')
     $ServicePath = Join-Path -Path $ServicesPath -ChildPath $GuidService
+    Write-Debug -Message "Processing network interface service registry key: ${ServiceGuid}"
 
     $ServiceInfo = [PSCustomObject]@{
         Guid    = $ServiceGuid
@@ -51,7 +63,7 @@ foreach ($GuidService in $GuidServices) {
     $Results.Add($ServiceInfo)
 
     try {
-        $TcpipParamsPath = Join-Path $ServicePath -ChildPath 'Parameters\Tcpip'
+        $TcpipParamsPath = Join-Path -Path $ServicePath -ChildPath 'Parameters\Tcpip'
         $TcpipParamsKey = Get-Item -LiteralPath $TcpipParamsPath -ErrorAction 'Stop'
     } catch {
         $ServiceInfo.Details = 'Tcpip registry key missing'
@@ -67,7 +79,7 @@ foreach ($GuidService in $GuidServices) {
         }
 
         if ($EnableDHCP -ne 0) {
-            Write-Warning -Message "[$ServiceGuid] Unexpected value for EnableDHCP: $EnableDHCP"
+            Write-Warning -Message "[${ServiceGuid}] Unexpected value for EnableDHCP: ${EnableDHCP}"
         }
     }
 

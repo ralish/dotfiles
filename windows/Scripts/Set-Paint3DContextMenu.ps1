@@ -29,36 +29,38 @@ if (!(Get-PSDrive -Name 'HKCR' -ErrorAction 'Ignore')) {
     $null = New-PSDrive -Name 'HKCR' -PSProvider 'Registry' -Root 'HKEY_CLASSES_ROOT' -WhatIf:$false
 }
 
-foreach ($Extension in $Extensions) {
-    $Extension = $Extension.ToLower()
-    $ContextMenuPath = "HKCR:\SystemFileAssociations\.$Extension\Shell\3D Edit"
+try {
+    foreach ($Extension in $Extensions) {
+        $Extension = $Extension.ToLower()
+        $ContextMenuPath = "HKCR:\SystemFileAssociations\.${Extension}\Shell\3D Edit"
 
-    try {
-        # Incredibly slow as it enumerates every key as it traverses the path
-        $null = Get-Item -LiteralPath $ContextMenuPath -ErrorAction 'Stop'
-    } catch {
-        Write-Warning -Message "Skipping extension due to missing registry key: $Extension"
-        continue
-    }
+        try {
+            # Incredibly slow as it enumerates every key as it traverses the path
+            $null = Get-Item -LiteralPath $ContextMenuPath -ErrorAction 'Stop'
+        } catch {
+            Write-Warning -Message "Skipping extension due to missing registry key: ${Extension}"
+            continue
+        }
 
-    if ($Operation -eq 'Enable') {
-        if ($PSCmdlet.ShouldProcess($Extension, 'Enable Paint 3D extension context menu')) {
-            try {
-                Remove-ItemProperty -LiteralPath $ContextMenuPath -Name 'LegacyDisable' -ErrorAction 'Stop'
-            } catch {
-                switch -Regex ($PSItem.FullyQualifiedErrorId) {
-                    '^PathNotFound,' { }
-                    Default { $PSCmdlet.WriteError($PSItem) }
+        if ($Operation -eq 'Enable') {
+            if ($PSCmdlet.ShouldProcess($Extension, 'Enable Paint 3D extension context menu')) {
+                try {
+                    Remove-ItemProperty -LiteralPath $ContextMenuPath -Name 'LegacyDisable' -ErrorAction 'Stop'
+                } catch {
+                    switch -Regex ($PSItem.FullyQualifiedErrorId) {
+                        '^PathNotFound,' { }
+                        Default { $PSCmdlet.WriteError($PSItem) }
+                    }
                 }
             }
+        } elseif ($PSCmdlet.ShouldProcess($Extension, 'Disable Paint 3D extension context menu')) {
+            try {
+                Set-ItemProperty -LiteralPath $ContextMenuPath -Name 'LegacyDisable' -Type 'String' -Value '' -ErrorAction 'Stop'
+            } catch { $PSCmdlet.WriteError($PSItem) }
         }
-    } elseif ($PSCmdlet.ShouldProcess($Extension, 'Disable Paint 3D extension context menu')) {
-        try {
-            Set-ItemProperty -LiteralPath $ContextMenuPath -Name 'LegacyDisable' -Type 'String' -Value '' -ErrorAction 'Stop'
-        } catch { $PSCmdlet.WriteError($PSItem) }
     }
-}
-
-if ($RemoveHKCRDrive) {
-    Remove-PSDrive -Name 'HKCR' -WhatIf:$false
+} finally {
+    if ($RemoveHKCRDrive) {
+        Remove-PSDrive -Name 'HKCR' -WhatIf:$false
+    }
 }

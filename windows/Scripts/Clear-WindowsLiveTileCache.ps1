@@ -18,6 +18,8 @@ if ([Environment]::OSVersion.Version.Major -lt 10) {
 $RegPath = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ImmersiveShell\StateStore'
 $ValueName = 'ResetCache'
 
-if ($PSCmdlet.ShouldProcess("$RegPath\$ValueName", 'Set')) {
-    Set-ItemProperty -LiteralPath $RegPath -Name $ValueName -Type 'DWord' -Value 1 -ErrorAction 'Stop'
+if ($PSCmdlet.ShouldProcess("${RegPath}\${ValueName}", 'Set')) {
+    try {
+        Set-ItemProperty -LiteralPath $RegPath -Name $ValueName -Type 'DWord' -Value 1 -ErrorAction 'Stop'
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 }
