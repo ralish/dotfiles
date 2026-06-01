@@ -2,6 +2,7 @@
     Enable/Disable the "Edit with Paint 3D" context menu entry.
 #>
 
+#Requires -Version 5.0
 #Requires -RunAsAdministrator
 
 [CmdletBinding(SupportsShouldProcess)]

@@ -3,6 +3,9 @@
     operating system component.
 #>
 
+#Requires -Version 5.0
+#Requires -RunAsAdministrator
+
 [CmdletBinding(SupportsShouldProcess)]
 [OutputType([Void], [String[]])]
 Param(

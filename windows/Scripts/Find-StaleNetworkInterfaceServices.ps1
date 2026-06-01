@@ -15,6 +15,8 @@
     - The `IPAddress` value data is an IP address no network interface has
 #>
 
+#Requires -Version 5.0
+
 [CmdletBinding()]
 [OutputType([Void], [PSCustomObject[]])]
 Param(

@@ -2,6 +2,8 @@
     Clear Windows Live Tile cache.
 #>
 
+#Requires -Version 5.0
+
 [CmdletBinding(SupportsShouldProcess)]
 [OutputType([Void])]
 Param()

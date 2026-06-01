@@ -3,6 +3,7 @@
     help" on Bing.
 #>
 
+#Requires -Version 5.0
 #Requires -RunAsAdministrator
 
 [CmdletBinding(SupportsShouldProcess)]

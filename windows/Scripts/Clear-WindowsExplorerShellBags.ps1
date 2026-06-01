@@ -2,6 +2,8 @@
     Clear Windows Explorer shell bags.
 #>
 
+#Requires -Version 3.0
+
 [CmdletBinding(SupportsShouldProcess)]
 [OutputType([Void])]
 Param()

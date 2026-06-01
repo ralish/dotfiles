@@ -2,6 +2,7 @@
     Enable/Disable the "Share with Skype" context menu entry.
 #>
 
+#Requires -Version 5.0
 #Requires -RunAsAdministrator
 
 [CmdletBinding(SupportsShouldProcess)]
