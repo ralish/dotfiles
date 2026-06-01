@@ -597,7 +597,7 @@
 
 	n   = notes
 
-	opt = "!git reflog expire --expire=now --all && git gc --prune=now --aggressive"
+	opt = "!git reflog expire --expire=all --all && git gc --prune=now --aggressive"
 
 	p   = push
 	pa  = push --all
