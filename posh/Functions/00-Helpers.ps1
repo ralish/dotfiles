@@ -1,4 +1,4 @@
-#region Environment tests
+#region Environment
 
 # Confirm a command is available
 Function Test-CommandAvailable {
@@ -10,10 +10,11 @@ Function Test-CommandAvailable {
     )
 
     foreach ($Command in $Name) {
-        Write-Debug -Message ('Checking command is available: {0}' -f $Command)
-
-        if (!(Get-Command -Name $Command -ErrorAction 'Ignore')) {
-            throw 'Required command not available: {0}' -f $Command
+        try {
+            Write-Debug -Message "Checking command is available: ${Command}"
+            $null = Get-Command -Name $Command -ErrorAction 'Stop'
+        } catch {
+            $PSCmdlet.ThrowTerminatingError($PSItem)
         }
     }
 }
@@ -24,39 +25,55 @@ Function Test-EnvironmentMatch {
     [OutputType([Void])]
     Param(
         [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [Hashtable]$Environment
     )
 
     foreach ($EnvName in $Environment.Keys) {
-        Write-Debug -Message ('Checking for environment variable: {0}' -f $EnvName)
+        Write-Debug -Message "Checking for environment variable: ${EnvName}"
 
         $EnvExpectedValue = $Environment[$EnvName]
         $EnvCurrentValue = [Environment]::GetEnvironmentVariable($EnvName)
 
         if (!($EnvExpectedValue -is [Boolean] -or $EnvExpectedValue -is [String])) {
-            throw 'Value for key "{0}" is not a Boolean or String type.' -f $EnvName
+            $ErrMsg = 'Value for key "{0}" is not a Boolean or String type.' -f $EnvName
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
+            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NotBooleanOrString', $ErrCat, $EnvExpectedValue)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
         # An empty string is an invalid environment variable value on Windows
-        if ((Test-IsWindows) -and $EnvExpectedValue -is [String] -and $EnvExpectedValue -eq [String]::Empty) {
-            throw 'Environment variable "{0}" cannot be set to an empty string on Windows.' -f $EnvName
+        if ((Test-IsWindows) -and $EnvExpectedValue -is [String] -and $EnvExpectedValue -eq '') {
+            $ErrMsg = 'Environment variable "{0}" cannot be set to an empty string on Windows.' -f $EnvName
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
+            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'EmptyEnvVarIsInvalid', $ErrCat, $EnvExpectedValue)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
         if ($EnvExpectedValue -is [Boolean]) {
             # Environment variable must not exist
             if ($EnvExpectedValue -eq $false) {
                 if ($null -eq $EnvCurrentValue) { continue }
-                throw 'Environment variable exists: {0}' -f $EnvName
+
+                $ErrMsg = "Environment variable exists: ${EnvName}"
+                $ErrCat = [Management.Automation.ErrorCategory]::ResourceExists
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'EnvVarExists', $ErrCat, $EnvName)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
             # Environment variable must exist (any value)
             if ($null -ne $EnvCurrentValue) { continue }
-            throw 'Environment variable not set: {0}' -f $EnvName
+
+            $ErrMsg = "Environment variable not set: ${EnvName}"
+            $ErrCat = [Management.Automation.ErrorCategory]::ResourceUnavailable
+            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'EnvVarNotFound', $ErrCat, $EnvName)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
         if ($EnvExpectedValue -ne $EnvCurrentValue) {
-            throw 'Environment variable "{0}" set to "{1}" but expected "{2}".' -f $EnvName, $EnvCurrentValue, $EnvExpectedValue
+            $ErrMsg = 'Environment variable "{0}" set to "{1}" but expected "{2}".' -f $EnvName, $EnvCurrentValue, $EnvExpectedValue
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'UnexpectedEnvVarValue', $ErrCat, $EnvName)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
     }
 }
@@ -67,11 +84,7 @@ Function Test-IsWindows {
     [OutputType([Boolean])]
     Param()
 
-    if ($PSVersionTable.PSEdition -eq 'Desktop' -or $PSVersionTable.Platform -eq 'Win32NT') {
-        return $true
-    }
-
-    return $false
+    return $PSVersionTable.PSEdition -eq 'Desktop' -or $PSVersionTable.Platform -eq 'Win32NT'
 }
 
 # Confirm a PowerShell module is available
@@ -96,7 +109,7 @@ Function Test-ModuleAvailable {
     }
 
     foreach ($Module in $Name) {
-        Write-Debug -Message ('Checking module is available: {0}' -f $Module)
+        Write-Debug -Message "Checking module is available: ${Module}"
 
         if ($Operation -eq 'Get') {
             $ModuleAvailable = @(Get-Module -Name $Module -ListAvailable -Verbose:$false)
@@ -133,10 +146,16 @@ Function Test-ModuleAvailable {
 
     if ($MissingModule) {
         if ($Require -eq 'Any') {
-            throw 'Suitable module not available: {0}' -f ($Name -join ', ')
+            $ErrTgtObj = $Name -join ', '
+            $ErrMsg = "Suitable module not available: ${ErrTgtObj}"
+        } else {
+            $ErrTgtObj = $MissingModuleName
+            $ErrMsg = "Required module not available: ${ErrTgtObj}"
         }
 
-        throw 'Required module not available: {0}' -f $MissingModuleName
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'ModuleNotFound', $ErrCat, $ErrTgtObj)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if ($PassThru) {
@@ -146,7 +165,7 @@ Function Test-ModuleAvailable {
 
 #endregion
 
-#region Profile utilities
+#region Profile
 
 # Complete a `dotfiles` section and conditionally output timings
 Function Complete-DotFilesSection {
@@ -159,7 +178,10 @@ Function Complete-DotFilesSection {
 
     if ($DotFilesShowTimings) {
         if ($Global:DotFilesSectionStart -isnot [DateTime]) {
-            throw 'No start time found for section timing.'
+            $ErrMsg = 'No start time found for section timing.'
+            $ErrCat = [Management.Automation.ErrorCategory]::MetadataError
+            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NoSectionStartTime', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
         $Timing = Get-DotFilesTiming -StartTime $Global:DotFilesSectionStart
@@ -204,17 +226,17 @@ Function Get-DotFilesTiming {
         [Parameter(Mandatory)]
         [DateTime]$StartTime,
 
-        [ValidateRange(0, [Int]::MaxValue)]
-        [Int]$SlowThresholdMs = 100,
+        [ValidateRange(0, [UInt16]::MaxValue)]
+        [UInt16]$SlowThresholdMs = 100,
 
-        [ValidateRange(0, [Int]::MaxValue)]
-        [Int]$UltraSlowThresholdMs = 300
+        [ValidateRange(0, [UInt16]::MaxValue)]
+        [UInt16]$UltraSlowThresholdMs = 300
     )
 
     if (!$DotFilesShowTimings) { return }
 
     $ElapsedTime = (Get-Date) - $StartTime
-    $Timing = 'Elapsed time: {0} ms' -f [Int]($ElapsedTime.TotalMilliseconds)
+    $Timing = "Elapsed time: $([Int]($ElapsedTime.TotalMilliseconds)) ms"
 
     if ($ElapsedTime.TotalMilliseconds -ge $UltraSlowThresholdMs) {
         $Timing += ' [ULTRA SLOW]'
@@ -240,8 +262,9 @@ Function Remove-DotFilesHelpers {
     )
 
     foreach ($Helper in $Helpers) {
-        $Path = 'Function:\{0}' -f $Helper
-        Remove-Item -Path $Path
+        try {
+            Remove-Item -LiteralPath "Function:\${Helper}" -ErrorAction 'Stop'
+        } catch { Write-Warning -Message "Failed to remove dotfiles helper function: ${Helper}" }
     }
 }
 
@@ -296,6 +319,10 @@ Function Start-DotFilesSection {
 
     Write-Debug -Message (Get-DotFilesMessage -Message 'Starting section processing ...')
 
+    if (!($Platform -or $PwshMinVersion -or $PwshHostName -or $Command -or $Environment -or $Module)) {
+        return $null
+    }
+
     if ($Platform) {
         if ($Platform -eq 'Windows' -and !(Test-IsWindows)) {
             Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as platform is not Windows.')
@@ -309,12 +336,12 @@ Function Start-DotFilesSection {
     }
 
     if ($PwshMinVersion -and $PwshMinVersion -gt $PSVersionTable.PSVersion) {
-        Write-Verbose -Message (Get-DotFilesMessage -Message ('Skipping as PowerShell version is below minimum: {0}' -f $PwshMinVersion))
+        Write-Verbose -Message (Get-DotFilesMessage -Message "Skipping as PowerShell version is below minimum: ${PwshMinVersion}")
         return $false
     }
 
     if ($PwshHostName -and $Host.Name -notin $PwshHostName) {
-        Write-Verbose -Message (Get-DotFilesMessage -Message ('Skipping as PowerShell host is not supported: {0}' -f $Host.Name))
+        Write-Verbose -Message (Get-DotFilesMessage -Message "Skipping as PowerShell host is not supported: $($Host.Name)")
         return $false
     }
 
@@ -322,7 +349,7 @@ Function Start-DotFilesSection {
         try {
             Test-CommandAvailable -Name $Command
         } catch {
-            Write-Verbose -Message (Get-DotFilesMessage -Message $_.Exception.Message)
+            Write-Verbose -Message (Get-DotFilesMessage -Message $PSItem.Exception.Message)
             $Error.RemoveAt(0)
             return $false
         }
@@ -332,7 +359,7 @@ Function Start-DotFilesSection {
         try {
             Test-EnvironmentMatch -Environment $Environment
         } catch {
-            Write-Verbose -Message (Get-DotFilesMessage -Message $_.Exception.Message)
+            Write-Verbose -Message (Get-DotFilesMessage -Message $PSItem.Exception.Message)
             $Error.RemoveAt(0)
             return $false
         }
@@ -343,14 +370,14 @@ Function Start-DotFilesSection {
         try {
             Test-ModuleAvailable -Name $Module -Operation $ModuleOperation -Require $ModuleRequire
         } catch {
-            Write-Verbose -Message (Get-DotFilesMessage -Message $_.Exception.Message)
+            Write-Verbose -Message (Get-DotFilesMessage -Message $PSItem.Exception.Message)
             $Error.RemoveAt(0)
             return $false
         }
     }
 
     Write-Verbose -Message (Get-DotFilesMessage -Message 'All prerequisites met.')
-    if ($Platform -or $Command -or $Module) { return $true }
+    return $true
 }
 
 #endregion
