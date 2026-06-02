@@ -2,7 +2,7 @@
 <Configuration>
     <ViewDefinitions>
         <View>
-            <Name>ADControlAccessRight</Name>
+            <Name>Microsoft.ActiveDirectory.Management.ADObject.ControlAccessRight</Name>
             <ViewSelectedBy>
                 <TypeName>Microsoft.ActiveDirectory.Management.ADObject.ControlAccessRight</TypeName>
             </ViewSelectedBy>
@@ -32,7 +32,7 @@
             </TableControl>
         </View>
         <View>
-            <Name>ADSchemaObject</Name>
+            <Name>Microsoft.ActiveDirectory.Management.ADObject.SchemaObject</Name>
             <ViewSelectedBy>
                 <TypeName>Microsoft.ActiveDirectory.Management.ADObject.SchemaObject</TypeName>
             </ViewSelectedBy>
