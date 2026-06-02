@@ -64,7 +64,7 @@ Function Repair-ConHostVT100Bug {
     if (!('DotFiles.Console' -as [Type])) {
         $ConsoleCode = Join-Path -Path $PoshSettingsPath -ChildPath '10-Windows.cs'
         $ConsoleAPI = Get-Content -LiteralPath $ConsoleCode -Raw
-        Add-Type -Namespace 'DotFiles' -Name 'Console' -MemberDefinition $ConsoleAPI
+        Add-Type -TypeDefinition $ConsoleAPI
     }
 
     # The STD_INPUT_HANDLE shouldn't be relevant to this issue

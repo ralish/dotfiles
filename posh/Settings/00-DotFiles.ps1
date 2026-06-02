@@ -15,7 +15,7 @@ Function Initialize-DotFiles {
     if (!('DotFiles.FinalPath' -as [Type])) {
         $FinalPathCode = Join-Path -Path $PoshSettingsPath -ChildPath '00-DotFiles.cs'
         $FinalPathAPI = Get-Content -LiteralPath $FinalPathCode -Raw
-        Add-Type -Namespace 'DotFiles' -Name 'FinalPath' -MemberDefinition $FinalPathAPI
+        Add-Type -TypeDefinition $FinalPathAPI
     }
 
     Write-Debug -Message (Get-DotFilesMessage -Message 'Opening handle to PowerShell profile directory ...')
