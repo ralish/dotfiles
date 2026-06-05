@@ -109,47 +109,41 @@
             </TableControl>
         </View>
         <View>
-            <Name>Microsoft.M365.EntityUsageSummary.Group</Name>
+            <Name>M365UsageSummaryGroup</Name>
             <ViewSelectedBy>
-                <TypeName>Microsoft.M365.EntityUsageSummary.Group</TypeName>
+                <TypeName>Microsoft.M365.UsageSummary.Group</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableHeaders>
                     <TableColumnHeader>
-                        <Label>GroupName</Label>
+                        <Label>Group</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>EmailAddress</Label>
+                        <Label>Mailbox</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>MailboxItems</Label>
+                        <Label>MailboxStatistics</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>MailboxSize</Label>
+                        <Label>Calendar</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>CalendarItems</Label>
+                        <Label>Site</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>CalendarSize</Label>
+                        <Label>Teams</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>SiteSize</Label>
+                        <Label>Notebooks</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>TeamsCount</Label>
+                        <Label>NotebookSections</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>NotebookCount</Label>
+                        <Label>NotebookPages</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>NotebookSectionCount</Label>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>NotebookPageCount</Label>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>PlanCount</Label>
+                        <Label>Plans</Label>
                     </TableColumnHeader>
                 </TableHeaders>
                 <TableRowEntries>
@@ -162,34 +156,43 @@
                                 <ScriptBlock>$_.Group.PrimarySmtpAddress</ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.MailboxStatistics.ItemCount</ScriptBlock>
-                            </TableColumnItem>
-                            <TableColumnItem>
                                 <ScriptBlock>$_.MailboxStatistics.TotalItemSize</ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <ScriptBlock>$_.Calendar.VisibleItemsInFolder</ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.Calendar.FolderSize</ScriptBlock>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <ScriptBlock>'{0} MB' -f $_.Site.StorageUsageCurrent</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($_.Site) { return '{0} MB' -f $_.Site.StorageUsageCurrent }
+                                    return 'Not provisioned'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <ScriptBlock>$_.Teams.Count</ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.Notebooks.Count</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($null -ne $_.Notebooks) { return $_.Notebooks.Count }
+                                    return 'Not provisioned'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.NotebookSections.Count</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($null -ne $_.NotebookSections) { return $_.NotebookSections.Count }
+                                    return 'Not provisioned'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.NotebookPages.Count</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($null -ne $_.NotebookPages) { return $_.NotebookPages.Count }
+                                    return 'Not provisioned'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.Plans.Count</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($null -ne $_.Plans) { return $_.Plans.Count }
+                                    return 'Not provisioned'
+                                </ScriptBlock>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>
@@ -197,75 +200,93 @@
             </TableControl>
         </View>
         <View>
-            <Name>Microsoft.M365.EntityUsageSummary.User</Name>
+            <Name>M365UsageSummaryUser</Name>
             <ViewSelectedBy>
-                <TypeName>Microsoft.M365.EntityUsageSummary.User</TypeName>
+                <TypeName>Microsoft.M365.UsageSummary.User</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableHeaders>
                     <TableColumnHeader>
-                        <Label>UserName</Label>
+                        <Label>User</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>EmailAddress</Label>
+                        <Label>Mailbox</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>MailboxItems</Label>
+                        <Label>MailboxStatistics</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>MailboxSize</Label>
+                        <Label>Calendar</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>CalendarItems</Label>
+                        <Label>Groups</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>CalendarSize</Label>
+                        <Label>OneDrive</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>SiteSize</Label>
+                        <Label>Notebooks</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>NotebookCount</Label>
+                        <Label>NotebookSections</Label>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>NotebookSectionCount</Label>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>NotebookPageCount</Label>
+                        <Label>NotebookPages</Label>
                     </TableColumnHeader>
                 </TableHeaders>
                 <TableRowEntries>
                     <TableRowEntry>
                         <TableColumnItems>
                             <TableColumnItem>
-                                <ScriptBlock>$_.Mailbox.DisplayName</ScriptBlock>
+                                <ScriptBlock>$_.User.DisplayName</ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.Mailbox.PrimarySmtpAddress</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($_.Mailbox) { return $_.Mailbox.PrimarySmtpAddress }
+                                    return 'Not available'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.MailboxStatistics.ItemCount</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($_.MailboxStatistics) { return $_.MailboxStatistics.TotalItemSize }
+                                    return 'Not available'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.MailboxStatistics.TotalItemSize</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($_.Calendar) { return $_.Calendar.VisibleItemsInFolder }
+                                    return 'Not available'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.Calendar.VisibleItemsInFolder</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($null -ne $_.Groups) { return $_.Groups.Count }
+                                    return 'Not available'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.Calendar.FolderSize</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($_.OneDrive) { return '{0} MB' -f $_.OneDrive.StorageUsageCurrent }
+                                    return 'Not available'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>'{0} MB' -f $_.Site.StorageUsageCurrent</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($null -ne $_.Notebooks) { return $_.Notebooks.Count }
+                                    return 'Not available'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.Notebooks.Count</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($null -ne $_.NotebookSections) { return $_.NotebookSections.Count }
+                                    return 'Not available'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.NotebookSections.Count</ScriptBlock>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <ScriptBlock>$_.NotebookPages.Count</ScriptBlock>
+                                <ScriptBlock>
+                                    if ($null -ne $_.NotebookPages) { return $_.NotebookPages.Count }
+                                    return 'Not available'
+                                </ScriptBlock>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>

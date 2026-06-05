@@ -228,8 +228,8 @@ Function Get-MailboxActivitySummary {
 
 #region Reporting
 
-# Retrieve a usage summary for an entity
-Function Get-Microsoft365EntityUsageSummary {
+# Retrieve a usage summary for a M365 user or group
+Function Get-M365UsageSummary {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     Param(
@@ -240,13 +240,8 @@ Function Get-Microsoft365EntityUsageSummary {
         [String]$GroupIdentity
     )
 
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        throw 'This function uses modules incompatible with PowerShell Core.'
-    }
-
-    $Type = $PSCmdlet.ParameterSetName.ToLower()
-
-    $Modules = @(
+    $RequiredModules = @(
+        'ExchangeOnlineManagement'
         'Microsoft.Graph.Authentication'
         'Microsoft.Graph.Notes'
         'Microsoft.Graph.Planner'
@@ -254,200 +249,211 @@ Function Get-Microsoft365EntityUsageSummary {
         'MicrosoftTeams'
     )
 
-    if ($Type -eq 'User') {
-        $Modules += 'MSOnline'
+    if ($PSCmdlet.ParameterSetName -eq 'User') {
+        $RequiredModules += @(
+            'Microsoft.Graph.Identity.DirectoryManagement'
+            'Microsoft.Graph.Users'
+        )
     }
 
     Write-Verbose -Message 'Checking required modules are present ...'
-    Test-ModuleAvailable -Name $Modules
-    Test-CommandAvailable -Name 'Get-OrganizationConfig'
+    Test-ModuleAvailable -Name $RequiredModules
 
-    if ($Type -eq 'User') {
-        Write-Verbose -Message 'Checking Microsoft Online connection ...'
-        try {
-            $CompanyInfo = Get-MsolCompanyInformation -ErrorAction Stop
-        } catch {
-            throw $_
-        }
-    }
-
-    Write-Verbose -Message 'Checking Exchange Online connection ...'
     try {
-        $null = Get-OrganizationConfig -ErrorAction Stop
-    } catch {
-        throw $_
-    }
+        Write-Verbose -Message 'Connecting to Microsoft Graph API ...'
+        $null = Connect-MgGraph -Scopes 'Group.Read.All', 'Notes.Read.All' -ErrorAction 'Stop'
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
-    Write-Verbose -Message 'Checking SharePoint Online connection ...'
     try {
-        $null = Get-SPOTenant -ErrorAction Stop
+        Write-Verbose -Message 'Checking Exchange Online connection ...'
+        $null = Get-OrganizationConfig -ErrorAction 'Stop'
     } catch {
-        throw $_
-    }
-
-    Write-Verbose -Message 'Checking Microsoft Teams connection ...'
-    try {
-        $null = Get-TeamsApp -ErrorAction Stop -Verbose:$false
-    } catch {
-        throw $_
-    }
-
-    Write-Verbose -Message 'Connecting to Microsoft Graph API ...'
-    try {
-        $null = Connect-MgGraph -Scopes 'Group.Read.All', 'Notes.Read.All' -ErrorAction Stop
-    } catch {
-        throw $_
-    }
-
-    # Base entity
-    Write-Verbose -Message ('Retrieving {0} ...' -f $Type)
-    if ($Type -eq 'User') {
-        try {
-            $User = Get-MsolUser -UserPrincipalName $UserPrincipalName -ErrorAction Stop
-        } catch {
-            throw $_
-        }
-
-        $ExoIdentity = $UserPrincipalName
-    } else {
-        try {
-            $Group = Get-UnifiedGroup -Identity $GroupIdentity -IncludeAllProperties -ErrorAction Stop
-        } catch {
-            throw $_
-        }
-
-        $ExoIdentity = $Group.PrimarySmtpAddress
-    }
-
-    # Mailbox
-    Write-Verbose -Message ('Retrieving {0} mailbox ...' -f $Type)
-    try {
-        if ($Type -eq 'User') {
-            $Mailbox = Get-Mailbox -Identity $ExoIdentity -ErrorAction Stop
-        } else {
-            $Mailbox = Get-Mailbox -Identity $ExoIdentity -GroupMailbox -ErrorAction Stop
-        }
-        $Mailbox | Add-Member -MemberType ScriptMethod -Name 'ToString' -Value { $this.PrimarySmtpAddress } -Force
-    } catch {
-        throw $_
-    }
-
-    # Mailbox statistics
-    Write-Verbose -Message ('Retrieving {0} mailbox statistics ...' -f $Type)
-    try {
-        $MailboxStatistics = Get-MailboxStatistics -Identity $ExoIdentity -ErrorAction Stop
-        $MailboxStatistics | Add-Member -MemberType ScriptMethod -Name 'ToString' -Value { '{0} items / {1}' -f $this.ItemCount, $this.TotalItemSize } -Force
-    } catch {
-        throw $_
-    }
-
-    # Calendar
-    Write-Verbose -Message ('Retrieving {0} calendar ...' -f $Type)
-    try {
-        $Calendar = Get-MailboxFolderStatistics -Identity $ExoIdentity -FolderScope Calendar -ErrorAction Stop | Where-Object FolderType -EQ 'Calendar'
-        $Calendar | Add-Member -MemberType ScriptMethod -Name 'ToString' -Value { $this.VisibleItemsInFolder } -Force
-    } catch {
-        throw $_
-    }
-
-    # Groups
-    if ($Type -eq 'User') {
-        Write-Verbose -Message 'Retrieving user group ownership ...'
-        try {
-            $ExoRecipientFilter = 'ManagedBy -eq "{0}"' -f $Mailbox.DistinguishedName
-            $Groups = Get-Recipient -Filter $ExoRecipientFilter -RecipientTypeDetails GroupMailbox -ErrorAction Stop
-        } catch {
-            throw $_
-        }
-    }
-
-    # Site
-    Write-Verbose -Message ('Retrieving {0} site ...' -f $Type)
-    try {
-        if ($Type -eq 'User') {
-            $TenantName = $CompanyInfo.InitialDomain.Split('.')[0]
-            $SPOSiteFilter = 'Url -like "https://{0}-my.sharepoint.com/personal/*" -and Owner -eq "{1}"' -f $TenantName, $UserPrincipalName
-            $PersonalSite = Get-SPOSite -Filter $SPOSiteFilter -IncludePersonalSite:$true -ErrorAction Stop
-            $Site = Get-SPOSite -Identity $PersonalSite.Url -Detailed -ErrorAction Stop
-        } else {
-            $Site = Get-SPOSite -Identity $Group.SharePointSiteUrl -Detailed -ErrorAction Stop
-        }
-        $Site | Add-Member -MemberType ScriptMethod -Name 'ToString' -Value { $this.StorageUsageCurrent } -Force
-    } catch {
-        throw $_
-    }
-
-    # Teams
-    if ($Type -eq 'Group') {
-        Write-Verbose -Message 'Retrieving group teams ...'
-        if ($Group.ResourceProvisioningOptions -contains 'Team') {
-            try {
-                $Teams = @(Get-Team -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
-            } catch {
-                throw $_
+        switch ($PSItem.FullyQualifiedErrorId) {
+            'CommandNotFoundException' {
+                $ErrMsg = 'Expected command not found: Get-OrganizationConfig. Have you run Connect-ExchangeOnline?'
+                $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'CommandNotFound', $ErrCat, $null)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
+
+            Default { $PSCmdlet.ThrowTerminatingError($PSItem) }
         }
     }
 
-    # OneNote
-    # https://learn.microsoft.com/en-au/graph/api/resources/onenote-api-overview
-    Write-Verbose -Message ('Retrieving {0} notebooks ...' -f $Type)
     try {
-        if ($Type -eq 'User') {
-            $Notebooks = @(Get-MgUserOnenoteNotebook -UserId $User.UserPrincipalName -ErrorAction Stop)
-            $NotebookSections = @(Get-MgUserOnenoteSection -UserId $User.UserPrincipalName -ErrorAction Stop)
-            $NotebookPages = @(Get-MgUserOnenotePage -UserId $User.UserPrincipalName -ErrorAction Stop)
-        } else {
-            $Notebooks = @(Get-MgGroupOnenoteNotebook -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
-            $NotebookSections = @(Get-MgGroupOnenoteSection -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
-            $NotebookPages = @(Get-MgGroupOnenotePage -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
-        }
-    } catch {
-        Write-Warning -Message $_.ErrorDetails
-    }
+        Write-Verbose -Message 'Checking SharePoint Online connection ...'
 
-    # Planner
-    # https://learn.microsoft.com/en-au/graph/api/resources/planner-overview
-    if ($Type -eq 'Group') {
-        Write-Verbose -Message ('Retrieving {0} plans ...' -f $Type)
-        try {
-            $Plans = @(Get-MgGroupPlannerPlan -GroupId $Group.ExternalDirectoryObjectId -ErrorAction Stop)
-        } catch {
-            Write-Warning -Message $_.ErrorDetails
+        if ($PSVersionTable.PSEdition -eq 'Core') {
+            Write-Warning -Message 'Microsoft.Online.SharePoint.PowerShell is only supported under Windows PowerShell.'
+            Import-Module -Name 'Microsoft.Online.SharePoint.PowerShell' -DisableNameChecking -ErrorAction 'Stop' -Verbose:$false
         }
-    }
 
-    switch ($Type) {
+        $null = Get-SPOTenant -ErrorAction 'Stop'
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+
+    try {
+        Write-Verbose -Message 'Checking Microsoft Teams connection ...'
+        $null = Get-TeamsApp -ErrorAction 'Stop' -Verbose:$false
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+
+    switch ($PSCmdlet.ParameterSetName) {
         'User' {
             $Summary = [PSCustomObject]@{
-                User              = $User
-                Mailbox           = $Mailbox
-                MailboxStatistics = $MailboxStatistics
-                Calendar          = $Calendar
-                Groups            = $Groups
-                Site              = $Site
-                Notebooks         = $Notebooks
-                NotebookSections  = $NotebookSections
-                NotebookPages     = $NotebookPages
+                User              = $null
+                Mailbox           = $null
+                MailboxStatistics = $null
+                Calendar          = $null
+                Groups            = $null
+                OneDrive          = $null
+                Notebooks         = $null
+                NotebookSections  = $null
+                NotebookPages     = $null
             }
-            $Summary.PSObject.TypeNames.Insert(0, 'Microsoft.M365.EntityUsageSummary.User')
+            $Summary.PSObject.TypeNames.Insert(0, 'Microsoft.M365.UsageSummary.User')
         }
 
         'Group' {
             $Summary = [PSCustomObject]@{
-                Group             = $Group
-                Mailbox           = $Mailbox
-                MailboxStatistics = $MailboxStatistics
-                Calendar          = $Calendar
-                Site              = $Site
-                Teams             = $Teams
-                Notebooks         = $Notebooks
-                NotebookSections  = $NotebookSections
-                NotebookPages     = $NotebookPages
-                Plans             = $Plans
+                Group             = $null
+                Mailbox           = $null
+                MailboxStatistics = $null
+                Calendar          = $null
+                Site              = $null
+                Teams             = $null
+                Notebooks         = $null
+                NotebookSections  = $null
+                NotebookPages     = $null
+                Plans             = $null
             }
-            $Summary.PSObject.TypeNames.Insert(0, 'Microsoft.M365.EntityUsageSummary.Group')
+            $Summary.PSObject.TypeNames.Insert(0, 'Microsoft.M365.UsageSummary.Group')
         }
+    }
+
+    # User / Group
+    try {
+        Write-Verbose -Message "Retrieving $($PSCmdlet.ParameterSetName.ToLower()) information ..."
+        switch ($PSCmdlet.ParameterSetName) {
+            'User' {
+                $Summary.User = Get-MgUser -UserId $UserPrincipalName -ErrorAction 'Stop'
+                $ExoIdentity = $Summary.User.UserPrincipalName
+            }
+
+            'Group' {
+                $Summary.Group = Get-UnifiedGroup -Identity $GroupIdentity -IncludeAllProperties -ErrorAction 'Stop'
+                $ExoIdentity = $Summary.Group.PrimarySmtpAddress
+            }
+        }
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+
+    # Mailbox
+    try {
+        Write-Verbose -Message "Retrieving $($PSCmdlet.ParameterSetName.ToLower()) mailbox ..."
+        switch ($PSCmdlet.ParameterSetName) {
+            'User' { $Summary.Mailbox = Get-Mailbox -Identity $ExoIdentity -ErrorAction 'Stop' }
+            'Group' { $Summary.Mailbox = Get-Mailbox -Identity $ExoIdentity -GroupMailbox -ErrorAction 'Stop' }
+        }
+
+        $Summary.Mailbox | Add-Member -MemberType 'ScriptMethod' -Name 'ToString' -Value { $this.PrimarySmtpAddress } -Force
+    } catch {
+        Write-Warning -Message "Unable to retrieve $($PSCmdlet.ParameterSetName.ToLower()) mailbox: $($PSItem.Exception.Message.TrimStart('|'))"
+    }
+
+    # Mailbox statistics
+    if ($Summary.Mailbox) {
+        try {
+            Write-Verbose -Message "Retrieving $($PSCmdlet.ParameterSetName.ToLower()) mailbox statistics ..."
+            $Summary.MailboxStatistics = Get-MailboxStatistics -Identity $ExoIdentity -ErrorAction 'Stop'
+            $Summary.MailboxStatistics | Add-Member -MemberType 'ScriptMethod' -Name 'ToString' -Value { '{0} items / {1}' -f $this.ItemCount, $this.TotalItemSize } -Force
+        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+    }
+
+    # Calendar
+    if ($Summary.Mailbox) {
+        try {
+            Write-Verbose -Message "Retrieving $($PSCmdlet.ParameterSetName.ToLower()) calendar ..."
+            $Summary.Calendar = Get-MailboxFolderStatistics -Identity $ExoIdentity -FolderScope 'Calendar' -ErrorAction 'Stop' | Where-Object FolderType -EQ 'Calendar'
+            $Summary.Calendar | Add-Member -MemberType 'ScriptMethod' -Name 'ToString' -Value { $this.VisibleItemsInFolder } -Force
+        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+    }
+
+    # Groups
+    if ($PSCmdlet.ParameterSetName -eq 'User' -and $Summary.Mailbox) {
+        try {
+            Write-Verbose -Message 'Retrieving user group ownership ...'
+            $ExoRecipientFilter = 'ManagedBy -eq "{0}"' -f $Summary.Mailbox.DistinguishedName
+            $Summary.Groups = @(Get-Recipient -Filter $ExoRecipientFilter -RecipientTypeDetails 'GroupMailbox' -ErrorAction 'Stop')
+        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+    }
+
+    # OneDrive / SharePoint site
+    try {
+        Write-Verbose -Message "Retrieving $($PSCmdlet.ParameterSetName.ToLower()) site ..."
+        $SpsProvisioned = $false
+        switch ($PSCmdlet.ParameterSetName) {
+            'User' {
+                $OrgInfo = Get-MgOrganization -ErrorAction 'Stop'
+                $DefaultDomain = $OrgInfo.VerifiedDomains | Where-Object IsDefault -EQ $true
+                $TenantName = $DefaultDomain.Name.Split('.')[0]
+                $SPOSiteFilter = 'Url -like "https://{0}-my.sharepoint.com/personal/*" -and Owner -eq "{1}"' -f $TenantName, $Summary.User.UserPrincipalName
+                $PersonalSite = Get-SPOSite -Filter $SPOSiteFilter -IncludePersonalSite:$true -ErrorAction 'Stop'
+
+                if ($PersonalSite) {
+                    $Summary.OneDrive = Get-SPOSite -Identity $PersonalSite.Url -Detailed -ErrorAction 'Stop'
+                    $Summary.OneDrive | Add-Member -MemberType 'ScriptMethod' -Name 'ToString' -Value { $this.StorageUsageCurrent } -Force
+                    $SpsProvisioned = $true
+                } else {
+                    Write-Warning -Message 'OneDrive has not yet been provisioned or user is not licensed.'
+                }
+            }
+
+            'Group' {
+                if ($Summary.Group.SharePointSiteUrl) {
+                    $Summary.Site = Get-SPOSite -Identity $Summary.Group.SharePointSiteUrl -Detailed -ErrorAction 'Stop'
+                    $Summary.Site | Add-Member -MemberType 'ScriptMethod' -Name 'ToString' -Value { $this.StorageUsageCurrent } -Force
+                    $SpsProvisioned = $true
+                } else {
+                    Write-Warning -Message 'SharePoint site for group has not yet been provisioned.'
+                }
+            }
+        }
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+
+    # Teams
+    if ($PSCmdlet.ParameterSetName -eq 'Group' -and $Summary.Group.ResourceProvisioningOptions -contains 'Team') {
+        try {
+            Write-Verbose -Message 'Retrieving group teams ...'
+            $Summary.Teams = @(Get-Team -GroupId $Summary.Group.ExternalDirectoryObjectId -ErrorAction 'Stop')
+        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+    }
+
+    # OneNote
+    # https://learn.microsoft.com/en-au/graph/api/resources/onenote-api-overview
+    if ($SpsProvisioned) {
+        try {
+            Write-Verbose -Message "Retrieving $($PSCmdlet.ParameterSetName.ToLower()) notebooks ..."
+            switch ($PSCmdlet.ParameterSetName) {
+                'User' {
+                    $Summary.Notebooks = @(Get-MgUserOnenoteNotebook -UserId $Summary.User.UserPrincipalName -ErrorAction 'Stop')
+                    $Summary.NotebookSections = @(Get-MgUserOnenoteSection -UserId $Summary.User.UserPrincipalName -ErrorAction 'Stop')
+                    $Summary.NotebookPages = @(Get-MgUserOnenotePage -UserId $Summary.User.UserPrincipalName -ErrorAction 'Stop')
+                }
+
+                'Group' {
+                    $Summary.Notebooks = @(Get-MgGroupOnenoteNotebook -GroupId $Summary.Group.ExternalDirectoryObjectId -ErrorAction 'Stop')
+                    $Summary.NotebookSections = @(Get-MgGroupOnenoteSection -GroupId $Summary.Group.ExternalDirectoryObjectId -ErrorAction 'Stop')
+                    $Summary.NotebookPages = @(Get-MgGroupOnenotePage -GroupId $Summary.Group.ExternalDirectoryObjectId -ErrorAction 'Stop')
+                }
+            }
+        } catch { Write-Warning -Message $_.ErrorDetails }
+    }
+
+    # Planner
+    # https://learn.microsoft.com/en-au/graph/api/resources/planner-overview
+    if ($PSCmdlet.ParameterSetName -eq 'Group' -and $SpsProvisioned) {
+        try {
+            Write-Verbose -Message 'Retrieving group plans ...'
+            $Summary.Plans = @(Get-MgGroupPlannerPlan -GroupId $Summary.Group.ExternalDirectoryObjectId -ErrorAction 'Stop')
+        } catch { Write-Warning -Message $_.ErrorDetails }
     }
 
     return $Summary
