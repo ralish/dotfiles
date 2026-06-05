@@ -601,26 +601,6 @@ Function Connect-AzureRM {
     Login-AzureRmAccount @PSBoundParameters
 }
 
-# Helper function to connect to Azure Active Directory (MSOnline module)
-Function Connect-MSOnline {
-    [CmdletBinding()]
-    [OutputType([Void])]
-    Param(
-        [ValidateNotNull()]
-        [System.Management.Automation.Credential()]
-        [PSCredential]$Credential
-    )
-
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        throw 'MSOnline module is incompatible with PowerShell Core.'
-    }
-
-    Test-ModuleAvailable -Name 'MSOnline'
-
-    Write-Host -ForegroundColor Green 'Connecting to Azure AD (v1) ...'
-    Connect-MsolService @PSBoundParameters
-}
-
 #endregion
 
 Complete-DotFilesSection
