@@ -30,11 +30,24 @@
             </TableControl>
         </View>
         <View>
-            <Name>Microsoft.Online.Administration.User.Licenses</Name>
+            <Name>Microsoft.Entra.User.LicenseReport</Name>
             <ViewSelectedBy>
-                <TypeName>Microsoft.Online.Administration.User.Licenses</TypeName>
+                <TypeName>Microsoft.Entra.User.LicenseReport</TypeName>
             </ViewSelectedBy>
             <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader />
+                    <TableColumnHeader />
+                    <TableColumnHeader>
+                        <Label>AssignedLicenses</Label>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>EnabledServices</Label>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>DisabledServices</Label>
+                    </TableColumnHeader>
+                </TableHeaders>
                 <TableRowEntries>
                     <TableRowEntry>
                         <TableColumnItems>
@@ -42,7 +55,16 @@
                                 <PropertyName>UserPrincipalName</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>LicensingSummary</PropertyName>
+                                <PropertyName>DisplayName</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>$_.AssignedLicenses.Count</ScriptBlock>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>$_.EnabledServices.Count</ScriptBlock>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>$_.DisabledServices.Count</ScriptBlock>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>

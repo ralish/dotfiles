@@ -198,64 +198,351 @@ Function Get-AzureEnterpriseApplications {
     return $Response.appList
 }
 
-# Retrieve Azure AD users with disabled services
-Function Get-AzureUsersDisabledServices {
-    [CmdletBinding()]
-    [OutputType([Void], [PSCustomObject[]])]
+# Retrieve licensing information for Entra users
+Function Get-EntraUserLicenseReport {
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
+    [OutputType([PSCustomObject[]])]
+    [OutputType(ParameterSetName = ('ParsedLicenses', 'ParsedServices'), [Hashtable])]
     Param(
-        [Switch]$ReturnAllUsers
+        # Product names and service plan identifiers for licensing
+        # https://learn.microsoft.com/en-us/entra/identity/users/licensing-service-plan-reference
+        [Parameter(ParameterSetName = 'LicensingInfo', Mandatory)]
+        [Parameter(ParameterSetName = 'ParsedLicenses', Mandatory)]
+        [Parameter(ParameterSetName = 'ParsedServices', Mandatory)]
+        [String]$LicensingInfoCsv,
+
+        [Switch]$PrefixServicesWithLicense,
+
+        [Parameter(ParameterSetName = 'ParsedLicenses', Mandatory)]
+        [Switch]$ReturnParsedLicenses,
+
+        [Parameter(ParameterSetName = 'ParsedServices', Mandatory)]
+        [Switch]$ReturnParsedServices
     )
 
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        throw 'MSOnline module is incompatible with PowerShell Core.'
+    $RequiredModules = @(
+        'Microsoft.Graph.Authentication'
+        'Microsoft.Graph.Identity.DirectoryManagement'
+        'Microsoft.Graph.Users'
+    )
+    Test-ModuleAvailable -Name $RequiredModules
+
+    if ($LicensingInfoCsv) {
+        try {
+            $LicensingInfo = Import-Csv -LiteralPath $LicensingInfoCsv -ErrorAction 'Stop'
+        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+
+        if ($LicensingInfo.Count -eq 0) {
+            $ErrMsg = 'Imported licensing information CSV has no entries.'
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'CsvImportEmpty', $ErrCat, $LicensingInfoCsv)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
+        $ColumnNames = 'Product_Display_Name', 'String_Id', 'Guid', 'Service_Plan_Name', 'Service_Plan_Id', 'Service_Plans_Included_Friendly_Names'
+        foreach ($ColumnName in $ColumnNames) {
+            if (!($LicensingInfo[0].PSObject.Properties.Name -contains $ColumnName)) {
+                $ErrMsg = "Imported CSV is missing expected column: ${ColumnName}"
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'CsvMissingColumn', $ErrCat, $LicensingInfoCsv)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+        }
     }
 
-    Test-ModuleAvailable -Name 'MSOnline'
+    # Scopes to request if there's no existing context or missing scopes
+    $DefaultScopes = 'User.Read.All', 'LicenseAssignment.Read.All'
+    # Acceptable user scopes
+    $UserScopes = 'User.Read.All', 'Directory.Read.All'
+    # Acceptable licensing scopes
+    $LicensingScopes = 'LicenseAssignment.Read.All', 'Organization.Read.All', 'Directory.Read.All'
+
+    # Check any existing context has acceptable scopes
+    $MgContext = Get-MgContext
+    $HasRequiredScopes = $false
+    if ($MgContext) {
+        $HasUserScope = $false
+        foreach ($Scope in $UserScopes) {
+            if ($Scope -in $MgContext.Scopes) {
+                $HasUserScope = $true
+                break
+            }
+        }
+
+        $HasLicensingScope = $false
+        foreach ($Scope in $LicensingScopes) {
+            if ($Scope -in $MgContext.Scopes) {
+                $HasLicensingScope = $true
+                break
+            }
+        }
+
+        $HasRequiredScopes = $HasUserScope -and $HasLicensingScope
+    }
+
+    if (!$HasRequiredScopes) {
+        try {
+            Write-Verbose -Message 'Connecting to Microsoft Graph ...'
+            Connect-MgGraph -Scopes $DefaultScopes -NoWelcome -ErrorAction 'Stop'
+        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+    }
+
+    try {
+        Write-Verbose -Message 'Retrieving subscribed licensing SKUs ...'
+        $SubscribedSKUs = Get-MgSubscribedSku -All -ErrorAction 'Stop' | Where-Object AppliesTo -EQ 'User'
+
+        Write-Verbose -Message 'Retrieving user license assignments ...'
+        $Users = Get-MgUser -All -Property 'Id', 'UserPrincipalName', 'DisplayName', 'AssignedLicenses' -ErrorAction 'Stop'
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+
+    $LicenseSkuIdLookup = @{}
+    $ServicePlanIdLookup = @{}
+
+    if ($LicensingInfoCsv) {
+        # Populate the mapping of license SKU IDs to display names
+        $ConflictingNames = 0
+        foreach ($Entry in $LicensingInfo) {
+            # E.g. dcf0408c-aaec-446c-afd4-43e3683943ea
+            $LicenseSkuId = [Guid]::new($Entry.Guid)
+            # E.g. Microsoft 365 E3 (no Teams)
+            $LicenseCandidateName = $Entry.Product_Display_Name
+            # Find/replace pairs to clean-up names
+            $CleanupNameFragments = [Ordered]@{
+                '_'                             = ' '
+                '\bTEST\b'                      = 'Test'
+                '\bTELSTRA\b'                   = 'Telstra'
+                '\bGCCHIGH\b'                   = 'GCC High'
+                '\bGCCHigh Tenant\b'            = $null
+                '\bDOD\b'                       = 'DoD'
+                '( GCC High)? USGOV GCC High\b' = ' GCC High'
+                '( \(DoD\))? USGOV DoD\b'       = ' DoD'
+            }
+
+            # Perform initial clean-up of the name
+            foreach ($Fragment in $CleanupNameFragments.Keys) {
+                if ($LicenseCandidateName -cmatch $Fragment) {
+                    $LicenseCandidateName = $LicenseCandidateName -creplace $Fragment, $CleanupNameFragments[$Fragment]
+                    Write-Debug -Message 'Updating "{0}" to: {1}' -f $Entry.Product_Display_Name, $LicenseCandidateName
+                }
+            }
+
+            # If the license SKU isn't present add it
+            if (!$LicenseSkuIdLookup.ContainsKey($LicenseSkuId)) {
+                $LicenseSkuIdLookup[$LicenseSkuId] = $LicenseCandidateName
+                continue
+            }
+
+            # Skip identical names
+            $LicenseCurrentName = $LicenseSkuIdLookup[$LicenseSkuId]
+            if ($LicenseCurrentName -ceq $LicenseCandidateName) { continue }
+
+            # Prefer name which does not reference an outdated license name:
+            # - Power Virtual Agent(s) -> Copilot Studio
+            $TestRegex = '\b(Power Virtual Agents?)\b'
+            if ($LicenseCandidateName -match $TestRegex) { continue }
+            if ($LicenseCurrentName -match $TestRegex) {
+                $LicenseSkuIdLookup[$LicenseSkuId] = $LicenseCandidateName
+                continue
+            }
+
+            $ConflictingNames++
+            Write-Debug -Message ('Display name for license "{0}" differs from existing entry: {1} != {2}' -f $LicenseSkuId, $LicenseCurrentName, $LicenseCandidateName)
+        }
+
+        if ($ConflictingNames) {
+            Write-Warning "${ConflictingNames} licenses had conflicting names which were not reconciled."
+        }
+
+        if ($ReturnParsedLicenses) {
+            return $LicenseSkuIdLookup
+        }
+
+        # Populate the mapping of service plan IDs to display names
+        $ConflictingNames = 0
+        foreach ($Entry in $LicensingInfo) {
+            # E.g. eec0eb4f-6444-4f95-aba0-50c24d67f998
+            $ServicePlanId = $Entry.Service_Plan_Id
+            # E.g. Microsoft Entra ID P2
+            $ServicePlanCandidateName = $Entry.Service_Plans_Included_Friendly_Names
+            # Find/replace pairs to clean-up names
+            $CleanupNameFragments = [Ordered]@{
+                '_'                     = ' '
+                '\bGCCHigh( Tenant)?\b' = 'GCC High'
+                '\bDOD\b'               = 'DoD'
+            }
+
+            # Perform initial clean-up of the name
+            foreach ($Fragment in $CleanupNameFragments.Keys) {
+                if ($LicenseCandidateName -cmatch $Fragment) {
+                    $ServicePlanCandidateName = $ServicePlanCandidateName -creplace $Fragment, $CleanupNameFragments[$Fragment]
+                    Write-Debug -Message 'Updating "{0}" to: {1}' -f $Entry.Service_Plans_Included_Friendly_Names, $ServicePlanCandidateName
+                }
+            }
+
+            # If the plan ID isn't present add it
+            if (!$ServicePlanIdLookup.ContainsKey($ServicePlanId)) {
+                $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
+                continue
+            }
+
+            # Skip identical names
+            $LicenseCurrentName = $LicenseSkuIdLookup[$LicenseSkuId]
+            if ($LicenseCurrentName -ceq $LicenseCandidateName) { continue }
+
+            $ServicePlanCurrentName = $ServicePlanIdLookup[$ServicePlanId]
+            $UpdatedCurrentName = $false
+            $IgnoredCandidateName = $false
+
+            # Prefer name which is not upper-case
+            if ($ServicePlanCandidateName -ceq $ServicePlanCandidateName.ToUpper()) { continue }
+            if ($ServicePlanCurrentName -ceq $ServicePlanCurrentName.ToUpper()) {
+                $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
+                $UpdatedCurrentName = $true
+            }
+
+            # Prefer name which does not contain specific capitalised words
+            $TestRegex = '\b(EDU|RIGHTS)\b'
+            if ($ServicePlanCandidateName -cmatch $TestRegex) { continue }
+            if ($ServicePlanCurrentName -cmatch $TestRegex) {
+                $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
+                $UpdatedCurrentName = $true
+            }
+
+            # Replace current name with candidate name if the candidate name
+            # does not match the regex but the current name does.
+            $CandidateNoMatchRegexes = @(
+                # Grammar/spelling mistakes
+                '\b(Microsoft Microsoft|PowerApps)\b'
+                # Deprecated services
+                '\b(Do Not Use|Retired)\b'
+                # Outdated service names:
+                # - Azure      -> Entra
+                # - Flow       -> Power Automate
+                # - Office 365 -> Microsoft 365
+                '\b(Azure|Flow|O(ffice )?365)\b'
+            )
+
+            foreach ($TestRegex in $CandidateNoMatchRegexes) {
+                if ($ServicePlanCandidateName -match $TestRegex) {
+                    $IgnoredCandidateName = $true
+                    break
+                }
+
+                if ($ServicePlanCurrentName -match $TestRegex) {
+                    $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
+                    $UpdatedCurrentName = $true
+                }
+            }
+
+            if ($IgnoredCandidateName) { continue }
+
+            # Replace current name with candidate name if the current name
+            # does not match the regex but the candidate name does not.
+            $CandidateMatchRegexes = @(
+                # References a plan (e.g. Plan 2)
+                '\bPlan\b'
+            )
+
+            foreach ($TestRegex in $CandidateMatchRegexes) {
+                if ($ServicePlanCurrentName -match $TestRegex) {
+                    $IgnoredCandidateName = $true
+                    break
+                }
+
+                if ($ServicePlanCandidateName -match $TestRegex) {
+                    $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
+                    $UpdatedCurrentName = $true
+                }
+            }
+
+            if ($IgnoredCandidateName -or $UpdatedCurrentName) { continue }
+
+            $ConflictingNames++
+            Write-Debug -Message ('Display name for service "{0}" differs from existing entry: {1} != {2}' -f $ServicePlanId, $ServicePlanCurrentName, $ServicePlanCandidateName)
+        }
+
+        if ($ConflictingNames) {
+            Write-Warning "${ConflictingNames} services had conflicting names which were not reconciled."
+        }
+
+        # Convert remaining names which are entirely upper-case to title-case
+        $TitleCaseNames = 0
+        $CultureTextInfo = (Get-Culture).TextInfo
+        foreach ($ServicePlanId in $($ServicePlanIdLookup.Keys)) {
+            $ServicePlanName = $ServicePlanIdLookup[$ServicePlanId]
+            if ($ServicePlanName -cne $ServicePlanName.ToUpper()) { continue }
+
+            # Convert to lower-case first as `ToTitleCase()` treats upper-case
+            # words as acronyms and skips processing them.
+            $ServicePlanIdLookup[$ServicePlanId] = $CultureTextInfo.ToTitleCase($ServicePlanName.ToLower())
+            $TitleCaseNames++
+        }
+
+        if ($TitleCaseNames) {
+            Write-Warning -Message "${TitleCaseNames} service had display names converted to title-case."
+        }
+
+        if ($ReturnParsedServices) {
+            return $ServicePlanIdLookup
+        }
+    } else {
+        # Populate the mapping of license SKU IDs to names
+        foreach ($SubscribedSKU in $SubscribedSKUs) {
+            $LicenseSkuIdLookup[$SubscribedSKU.SkuId] = $SubscribedSKU.SkuPartNumber
+
+            # Populate the mapping of service plan IDs to names
+            foreach ($ServicePlan in $SubscribedSKU.ServicePlans) {
+                $ServicePlanIdLookup[$ServicePlan.ServicePlanId] = $ServicePlan.ServicePlanName
+            }
+        }
+    }
 
     $Results = [Collections.Generic.List[PSCustomObject]]::new()
-    $Users = Get-MsolUser -ErrorAction Stop | Where-Object IsLicensed
-
     foreach ($User in $Users) {
-        $DisabledServices = @($User.Licenses.ServiceStatus | Where-Object ProvisioningStatus -EQ 'Disabled')
-        if ($DisabledServices -or $ReturnAllUsers) {
-            $Result = [PSCustomObject]@{
-                User    = $User.DisplayName
-                Service = [Array]$DisabledServices.ServicePlan
+        $AssignedLicenses = [Collections.Generic.List[String]]::new()
+        $DisabledServices = [Collections.Generic.List[String]]::new()
+        $EnabledServices = [Collections.Generic.List[String]]::new()
+
+        foreach ($AssignedLicense in $User.AssignedLicenses) {
+            $SubscribedSKU = $SubscribedSKUs | Where-Object SkuId -EQ $AssignedLicense.SkuId
+            $ServicePlans = $SubscribedSKU.ServicePlans | Where-Object AppliesTo -EQ 'User'
+
+            $LicenseName = $LicenseSkuIdLookup[$SubscribedSKU.SkuId]
+            $AssignedLicenses.Add($LicenseName)
+
+            foreach ($PlanId in $AssignedLicense.DisabledPlans) {
+                $PlanName = $ServicePlanIdLookup[$PlanId]
+                if ($PrefixServicesWithLicense) {
+                    $PlanName = "${LicenseName}:${PlanName}"
+                }
+
+                $DisabledServices.Add($PlanName)
             }
-            $Results.Add($Result)
+
+            foreach ($ServicePlan in $ServicePlans) {
+                $PlanName = $ServicePlanIdLookup[$ServicePlan.ServicePlanId]
+                if ($PrefixServicesWithLicense) {
+                    $PlanName = "${LicenseName}:${PlanName}"
+                }
+
+                if ($PlanName -notin $DisabledServices) {
+                    $EnabledServices.Add($PlanName)
+                }
+            }
         }
+
+        $Result = [PSCustomObject]@{
+            UserPrincipalName = $User.UserPrincipalName
+            DisplayName       = $User.DisplayName
+            AssignedLicenses  = [String[]]@($AssignedLicenses | Sort-Object)
+            EnabledServices   = [String[]]@($EnabledServices | Sort-Object -Unique)
+            DisabledServices  = [String[]]@($DisabledServices | Sort-Object -Unique)
+        }
+        $Result.PSObject.TypeNames.Insert(0, 'Microsoft.Entra.User.LicenseReport')
+        $Results.Add($Result)
     }
 
     return $Results.ToArray()
-}
-
-# Retrieve licensing summary for Azure AD users
-Function Get-AzureUsersLicensingSummary {
-    [CmdletBinding()]
-    #[OutputType([Microsoft.Online.Administration.User[]])]
-    Param()
-
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        throw 'MSOnline module is incompatible with PowerShell Core.'
-    }
-
-    Test-ModuleAvailable -Name 'MSOnline'
-
-    $Users = Get-MsolUser -ErrorAction Stop | Where-Object UserType -NE 'Guest'
-
-    foreach ($User in $Users) {
-        if ($User.Licenses) {
-            $SkuPartNumbers = @($User.Licenses.AccountSku.SkuPartNumber | Sort-Object)
-            $LicensingSummary = $SkuPartNumbers -join ', '
-        } else {
-            $LicensingSummary = [String]::Empty
-        }
-
-        Add-Member -InputObject $User -MemberType NoteProperty -Name 'LicensingSummary' -Value $LicensingSummary
-        $User.PSObject.TypeNames.Insert(0, 'Microsoft.Online.Administration.User.Licenses')
-    }
-
-    return $Users
 }
 
 #endregion

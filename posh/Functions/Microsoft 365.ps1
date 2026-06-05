@@ -453,41 +453,6 @@ Function Get-Microsoft365EntityUsageSummary {
     return $Summary
 }
 
-# Retrieve a matrix of user licenses
-Function Get-Microsoft365UserLicensingMatrix {
-    [CmdletBinding()]
-    [OutputType([Void], [PSCustomObject[]])]
-    Param()
-
-    Test-CommandAvailable -Name 'Get-MsolUser'
-
-    $Users = Get-MsolUser -All
-    $Licenses = $Users.Licenses.AccountSkuId | Sort-Object -Unique | ForEach-Object { $_.Split(':')[1] }
-
-    $Matrix = [Collections.Generic.List[PSCustomObject]]::new()
-    $MatrixEntry = [PSCustomObject]@{ UserPrincipalName = [String]::Empty }
-    foreach ($License in $Licenses) {
-        $MatrixEntry | Add-Member -MemberType NoteProperty -Name $License -Value $false
-    }
-
-    foreach ($User in $Users) {
-        if (!$User.isLicensed) {
-            continue
-        }
-
-        $UserLicensing = $MatrixEntry.PSObject.Copy()
-        $UserLicensing.UserPrincipalName = $User.UserPrincipalName
-        foreach ($License in $User.Licenses) {
-            $LicenseName = $License.AccountSkuId.Split(':')[1]
-            $UserLicensing.$LicenseName = $true
-        }
-
-        $Matrix.Add($UserLicensing)
-    }
-
-    return $Matrix.ToArray()
-}
-
 # Retrieve a security report for all users
 # Improved version of: https://github.com/OfficeDev/O365-InvestigationTooling/blob/master/DumpDelegatesandForwardingRules.ps1
 Function Get-Microsoft365UserSecurityReport {
