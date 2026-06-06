@@ -14,27 +14,39 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1
 
 #region Authentication
 
-# Retrieve an Azure AD authorization header
+# Construct a HTTP authorization header for Azure
 Function Get-AzureAuthHeader {
     [CmdletBinding()]
     [OutputType([Hashtable])]
     Param(
         [Parameter(Mandatory)]
-        [Object]$AuthToken
+        [PSObject]$AccessToken
     )
 
-    try {
-        $CorrectType = $AuthToken -is [Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult]
-    } catch {
-        throw 'Unable to locate Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult type.'
-    }
+    switch ($AccessToken.GetType().FullName) {
+        'Microsoft.Azure.Commands.Profile.Models.PSSecureAccessToken' {
+            $SecureStringPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($AccessToken.Token)
+            try {
+                $BearerToken = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($SecureStringPtr)
+            } finally {
+                [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($SecureStringPtr)
+            }
+        }
 
-    if (!$CorrectType) {
-        throw 'AuthToken must be an Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationResult type.'
+        'Microsoft.Azure.Commands.Profile.Models.PSAccessToken' {
+            $BearerToken = $AccessToken.Token
+        }
+
+        Default {
+            $ErrMsg = "Unexpected type for AccessToken argument: $($AccessToken.GetType().FullName)"
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
+            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'InvalidType', $ErrCat, $AccessToken)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
     }
 
     $AuthHeader = @{
-        Authorization  = $AuthToken.CreateAuthorizationHeader()
+        Authorization  = $BearerToken
         'Content-Type' = 'application/json'
     }
 
