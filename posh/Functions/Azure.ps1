@@ -478,38 +478,6 @@ Function Get-EntraUserLicenseReport {
 
 #region Service connection helpers
 
-# Helper function to connect to Azure Active Directory (AzureAD module)
-Function Connect-AzureAD {
-    [CmdletBinding()]
-    #[OutputType([Microsoft.Open.Azure.AD.CommonLibrary.PSAzureContext])]
-    Param(
-        [ValidateNotNull()]
-        [System.Management.Automation.Credential()]
-        [PSCredential]$Credential
-    )
-
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        throw 'AzureAD module is incompatible with PowerShell Core.'
-    }
-
-    # Both modules may be present but the `AzureAD` module is newer. Often this
-    # is due to a specific version of the `AzureADPreview` module being listed
-    # as a dependency in another module which has yet to be updated. As such,
-    # we shouldn't naively import `AzureADPreview` assuming it's the latest.
-    $ModuleNames = 'AzureAD', 'AzureADPreview'
-    $CandidateModules = Get-Module -Name $ModuleNames -ListAvailable -Verbose:$false
-    if (!$CandidateModules) {
-        # Redundant but ensures consistent error messages
-        Test-ModuleAvailable -Name $ModuleNames -Require Any
-    }
-
-    $Module = $CandidateModules | Sort-Object -Property 'Version' | Select-Object -Last 1
-    $ModuleName = $Module.Name
-
-    Write-Host -ForegroundColor Green 'Connecting to Azure AD (v2) ...'
-    & $ModuleName\Connect-AzureAD @PSBoundParameters
-}
-
 # Helper function to connect to Azure Resource Manager
 Function Connect-AzureRM {
     [CmdletBinding()]
