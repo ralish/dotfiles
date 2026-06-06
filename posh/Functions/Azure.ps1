@@ -406,28 +406,4 @@ Function Get-EntraUserLicenseReport {
 
 #endregion
 
-#region Service connection helpers
-
-# Helper function to connect to Azure Resource Manager
-Function Connect-AzureRM {
-    [CmdletBinding()]
-    #[OutputType([Microsoft.Azure.Commands.Profile.Models.PSAzureProfile])]
-    Param(
-        [ValidateNotNull()]
-        [System.Management.Automation.Credential()]
-        [PSCredential]$Credential
-    )
-
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        throw 'AzureRM module is incompatible with PowerShell Core.'
-    }
-
-    Test-ModuleAvailable -Name 'AzureRM'
-
-    Write-Host -ForegroundColor Green 'Connecting to Azure RM ...'
-    Login-AzureRmAccount @PSBoundParameters
-}
-
-#endregion
-
 Complete-DotFilesSection
