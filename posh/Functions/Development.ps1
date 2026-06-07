@@ -1,31 +1,5 @@
 Start-DotFilesSection -Type 'Functions' -Name 'Development'
 
-#region Docker
-
-# Clear Docker cache
-Function Clear-DockerCache {
-    [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [String[]])]
-    Param()
-
-    if (!(Get-Command -Name 'docker' -ErrorAction Ignore)) {
-        Write-Error -Message 'Unable to clear Docker cache as docker command not found.'
-        return
-    }
-
-    $null = & docker system df
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error -Message 'Failed to retrieve Docker disk usage (is daemon running?).'
-        return
-    }
-
-    if ($PSCmdlet.ShouldProcess('docker system prune', 'Clear')) {
-        & docker system prune --force
-    }
-}
-
-#endregion
-
 #region Git
 
 # Print summary information about a Git repository
