@@ -1,5 +1,73 @@
 Start-DotFilesSection -Type 'Functions' -Name 'PowerShell'
 
+#region .NET
+
+# Retrieve all type accelerators
+Function Get-TypeAccelerator {
+    [CmdletBinding()]
+    [OutputType([Collections.Generic.Dictionary[String, Type]])]
+    Param()
+
+    [PSObject].Assembly.GetType('System.Management.Automation.TypeAccelerators')::get_Get()
+}
+
+# Retrieve the constructors for a type
+Function Get-TypeConstructor {
+    [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [Type]$Type
+    )
+
+    Process {
+        $Constructors = $Type.GetConstructors()
+        foreach ($Constructor in $Constructors) {
+            $ConstructorParams = $Constructor.GetParameters()
+            if ($ConstructorParams.Count -gt 0) {
+                $FormattedConstructorParams = @($ConstructorParams | ForEach-Object { $PSItem.ToString() })
+                $FormattedParams = "$($Type.FullName)($($FormattedConstructorParams -join ', '))"
+            } else {
+                $FormattedParams = "$($Type.FullName)()"
+            }
+
+            [PSCustomObject]@{
+                Constructor = $FormattedParams
+            }
+        }
+    }
+}
+
+# Retrieve the methods for a type
+Function Get-TypeMethod {
+    [CmdletBinding()]
+    [OutputType([Void], [PSCustomObject[]])]
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [Type]$Type
+    )
+
+    Process {
+        $Methods = $Type.GetMethods() | Sort-Object -Property 'Name'
+        foreach ($Method in $Methods) {
+            $MethodParams = $Method.GetParameters()
+            if ($MethodParams.Count -gt 0) {
+                $FormattedMethodParams = @($MethodParams | ForEach-Object { $PSItem.ToString() })
+                $FormattedParams = "$($Type.FullName)($($FormattedMethodParams -join ', '))"
+            } else {
+                $FormattedParams = "$($Type.FullName)()"
+            }
+
+            [PSCustomObject]@{
+                Method     = $Method.Name
+                Parameters = $FormattedParams
+            }
+        }
+    }
+}
+
+#endregion
+
 #region Internals
 
 # Retrieve custom argument completers
