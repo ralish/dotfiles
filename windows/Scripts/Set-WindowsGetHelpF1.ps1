@@ -74,7 +74,8 @@ try {
                 }
 
                 # Save original ACL
-                $RegKeyOriginalAcl = Get-Acl -LiteralPath $RegPath -ErrorAction 'Stop'
+                # `-LiteralPath` is broken on at least Windows PowerShell 5.1.
+                $RegKeyOriginalAcl = Get-Acl -Path $RegPath -ErrorAction 'Stop'
 
                 # Update the owner
                 $UserNTAccount = [Security.Principal.NTAccount]([Security.Principal.WindowsIdentity]::GetCurrent().Name)
@@ -124,7 +125,8 @@ try {
                 $AclSections = [Security.AccessControl.AccessControlSections]::Owner -bor [Security.AccessControl.AccessControlSections]::Group -bor [Security.AccessControl.AccessControlSections]::Access
                 $RegKeyAcl = [Security.AccessControl.RegistrySecurity]::new()
                 $RegKeyAcl.SetSecurityDescriptorSddlForm($RegKeyOriginalAcl.Sddl, $AclSections)
-                $RegKeyAcl | Set-Acl -LiteralPath $RegPath
+                # `-LiteralPath` is broken on at least Windows PowerShell 5.1.
+                $RegKeyAcl | Set-Acl -Path $RegPath
             }
         }
     }
