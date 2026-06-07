@@ -2,9 +2,9 @@
 <Configuration>
     <ViewDefinitions>
         <View>
-            <Name>DotFiles.Environments.UpdateDotNetTools</Name>
+            <Name>DotFiles.DevEnv.UpdateDotNetTools</Name>
             <ViewSelectedBy>
-                <TypeName>DotFiles.Environments.UpdateDotNetTools</TypeName>
+                <TypeName>DotFiles.DevEnv.UpdateDotNetTools</TypeName>
             </ViewSelectedBy>
             <ListControl>
                 <ListEntries>
@@ -20,16 +20,16 @@
                                 <Label>BeforeUpdate</Label>
                                 <ScriptBlock>
                                     if ($_.BeforeUpdate.Count -eq 0) { return '(no output)' }
-                                    if ($_.BeforeUpdate.Count -le 2) { return 'Parse error (view property for full output)' }
-                                    '{0} tools installed' -f ($_.BeforeUpdate.Count - 2)
+                                    if ($_.BeforeUpdate.Count -eq 1) { return 'Parse error (view property for output)' }
+                                    "$($_.BeforeUpdate.Count - 2) tools installed"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>AfterUpdate</Label>
                                 <ScriptBlock>
                                     if ($_.AfterUpdate.Count -eq 0) { return '(no output)' }
-                                    if ($_.AfterUpdate.Count -le 2) { return 'Parse error (view property for full output)' }
-                                    '{0} tools installed' -f ($_.AfterUpdate.Count - 2)
+                                    if ($_.AfterUpdate.Count -eq 1) { return 'Parse error (view property for output)' }
+                                    "$($_.AfterUpdate.Count - 2) tools installed"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -42,11 +42,11 @@
                                         switch -Regex ($Line) {
                                             'is already installed' { }
                                             'was successfully updated' { $Updated++ }
-                                            Default { return 'Parse error (view property for full output)' }
+                                            Default { return 'Parse error (view property for output)' }
                                         }
                                     }
 
-                                    '{0} tools updated (view property for full output)' -f $Updated
+                                    "${Updated} tools updated (view property for output)"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -58,9 +58,9 @@
             </ListControl>
         </View>
         <View>
-            <Name>DotFiles.Environments.UpdateGoBinaries</Name>
+            <Name>DotFiles.DevEnv.UpdateGoBinaries</Name>
             <ViewSelectedBy>
-                <TypeName>DotFiles.Environments.UpdateGoBinaries</TypeName>
+                <TypeName>DotFiles.DevEnv.UpdateGoBinaries</TypeName>
             </ViewSelectedBy>
             <ListControl>
                 <ListEntries>
@@ -80,21 +80,21 @@
                                     foreach ($Line in $_.Gup) {
                                         if ($Line -match '^\[1/1\] .+') {
                                             switch -Regex ($Line) {
-                                                'Already up-to-date: v(\S+)' { return '{0} (up-to-date)' -f $Matches[1] }
-                                                'v(\S+) to v(\S+),' { return '{0} (previous: {1})' -f $Matches[2], $Matches[1] }
-                                                'current: v(\S+), latest: v(\S+)' { return '{0} (available: {1})' -f $Matches[1], $Matches[2] }
+                                                'Already up-to-date: v(\S+)' { return "$($Matches[1]) (up-to-date)" }
+                                                'v(\S+) to v(\S+),' { return "$($Matches[2]) (previous: $($Matches[1]))" }
+                                                'current: v(\S+), latest: v(\S+)' { return "$($Matches[1]) (available: $($Matches[2]))" }
                                             }
                                         }
                                     }
 
-                                    'Parse error (view property for full output)'
+                                    'Parse error (view property for output)'
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>Binaries</Label>
                                 <ScriptBlock>
                                     if ($_.Binaries.Count -eq 0) { return '(no output)' }
-                                    $ParseError = 'Parse error (view property for full output)'
+                                    $ParseError = 'Parse error (view property for output)'
 
                                     $Current = $Available = $Updated = $Total = 0
                                     foreach ($Line in $_.Binaries) {
@@ -114,11 +114,11 @@
 
                                     if ($_.WhatIf) {
                                         if ($Current + $Available -ne $Total) { return $ParseError }
-                                        return '{0} update available (view property for full output)' -f $Available
+                                        return "${Available} updates available (view property for output)"
                                     }
 
                                     if ($Current + $Updated -ne $Total) { return $ParseError }
-                                    '{0} binaries updated (view property for full output)' -f $Updated
+                                    "${Updated} binaries updated (view property for output)"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
