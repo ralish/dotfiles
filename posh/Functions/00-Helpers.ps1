@@ -165,6 +165,46 @@ Function Test-ModuleAvailable {
 
 #endregion
 
+#region Filesystem
+
+# Test if a path is fully qualified
+#
+# We can't simply use `[IO.Path]::IsPathFullyQualified()` in all cases as it's
+# not available in .NET Framework (i.e. not available in Windows PowerShell).
+Function Test-IsPathFullyQualified {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Path
+    )
+
+    # PowerShell 6 or later is guaranteed to have `IsPathFullyQualified()` as
+    # it won't be running under .NET Framework.
+    if ($PSVersionTable.Version -ge 6) {
+        return [IO.Path]::IsPathFullyQualified($Path)
+    }
+
+    # PowerShell 5 or earlier is .NET Framework so we have to do it ourselves.
+    # The below logic is taken from the .NET Core source code. It's very well
+    # commented so check the original method for understanding these checks.
+    if ($Path.Length -lt 2) {
+        return $false
+    }
+
+    if ($Path[0] -eq [IO.Path]::DirectorySeparatorChar -or $Path[0] -eq [IO.Path]::AltDirectorySeparatorChar) {
+        return $Path[1] -eq '?' -or $Path[1] -eq [IO.Path]::DirectorySeparatorChar -or $Path[1] -eq [IO.Path]::AltDirectorySeparatorChar
+    }
+
+    if ($Path.Length -lt 3) {
+        return $false
+    }
+
+    return $Path[0] -match '[A-Za-z]' -and $Path[1] -eq ':' -and ($Path[2] -eq [IO.Path]::DirectorySeparatorChar -or $Path[2] -eq [IO.Path]::AltDirectorySeparatorChar)
+}
+
+#endregion
+
 #region Profile
 
 # Complete a `dotfiles` section and conditionally output timings
