@@ -13,9 +13,7 @@ Function Test-CommandAvailable {
         try {
             Write-Debug -Message "Checking command is available: ${Command}"
             $null = Get-Command -Name $Command -ErrorAction 'Stop'
-        } catch {
-            $PSCmdlet.ThrowTerminatingError($PSItem)
-        }
+        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
     }
 }
 
@@ -36,16 +34,18 @@ Function Test-EnvironmentMatch {
 
         if (!($EnvExpectedValue -is [Boolean] -or $EnvExpectedValue -is [String])) {
             $ErrMsg = 'Value for key "{0}" is not a Boolean or String type.' -f $EnvName
+            $ErrExc = [ArgumentException]::new($ErrMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NotBooleanOrString', $ErrCat, $EnvExpectedValue)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $EnvExpectedValue)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
         # An empty string is an invalid environment variable value on Windows
         if ((Test-IsWindows) -and $EnvExpectedValue -is [String] -and $EnvExpectedValue -eq '') {
             $ErrMsg = 'Environment variable "{0}" cannot be set to an empty string on Windows.' -f $EnvName
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'EmptyEnvVarIsInvalid', $ErrCat, $EnvExpectedValue)
+            $ErrExc = [NotSupportedException]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'EnvironmentVariableInvalid', $ErrCat, $EnvExpectedValue)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
@@ -55,8 +55,9 @@ Function Test-EnvironmentMatch {
                 if ($null -eq $EnvCurrentValue) { continue }
 
                 $ErrMsg = "Environment variable exists: ${EnvName}"
+                $ErrExc = [InvalidOperationException]::new($ErrMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::ResourceExists
-                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'EnvVarExists', $ErrCat, $EnvName)
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'EnvironmentVariableExists', $ErrCat, $EnvName)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
@@ -64,15 +65,17 @@ Function Test-EnvironmentMatch {
             if ($null -ne $EnvCurrentValue) { continue }
 
             $ErrMsg = "Environment variable not set: ${EnvName}"
-            $ErrCat = [Management.Automation.ErrorCategory]::ResourceUnavailable
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'EnvVarNotFound', $ErrCat, $EnvName)
+            $ErrExc = [InvalidOperationException]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'EnvironmentVariableNotFound', $ErrCat, $EnvName)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
         if ($EnvExpectedValue -ne $EnvCurrentValue) {
             $ErrMsg = 'Environment variable "{0}" set to "{1}" but expected "{2}".' -f $EnvName, $EnvCurrentValue, $EnvExpectedValue
+            $ErrExc = [InvalidOperationException]::new($ErrMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'UnexpectedEnvVarValue', $ErrCat, $EnvName)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'EnvironmentVariableMismatch', $ErrCat, $EnvName)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
     }
@@ -117,28 +120,28 @@ Function Test-ModuleAvailable {
         $ModuleInfo = [Collections.Generic.List[PSModuleInfo]]::new()
     }
 
+    $FoundModule = $false
+    $MissingModule = $false
     foreach ($Module in $Name) {
         Write-Debug -Message "Checking module is available: ${Module}"
 
         if ($Operation -eq 'Get') {
             $ModuleAvailable = @(Get-Module -Name $Module -ListAvailable -Verbose:$false)
         } else {
-            # Suppress verbose output on import
-            $VerboseOriginal = $Global:VerbosePreference
-            $Global:VerbosePreference = 'SilentlyContinue'
-
             try {
-                Import-Module -Name $Module -ErrorAction 'Stop' -Verbose:$false
+                # Suppress verbose output on import
+                $VerboseOriginal = $VerbosePreference
+                $VerbosePreference = 'SilentlyContinue'
+                Import-Module -Name $Module -ErrorAction 'Ignore' -Verbose:$false
             } finally {
-                # Restore the original `$VerbosePreference` setting
-                $Global:VerbosePreference = $VerboseOriginal
+                $VerbosePreference = $VerboseOriginal
             }
 
             $ModuleAvailable = @(Get-Module -Name $Module -Verbose:$false)
         }
 
         if ($ModuleAvailable) {
-            $MissingModule = $false
+            $FoundModule = $true
 
             if ($PassThru) {
                 $ModuleInfo.Add(($ModuleAvailable | Sort-Object -Property 'Version' -Descending | Select-Object -First 1))
@@ -153,17 +156,21 @@ Function Test-ModuleAvailable {
         }
     }
 
-    if ($MissingModule) {
-        if ($Require -eq 'Any') {
-            $ErrTgtObj = $Name -join ', '
-            $ErrMsg = "Suitable module not available: ${ErrTgtObj}"
-        } else {
-            $ErrTgtObj = $MissingModuleName
-            $ErrMsg = "Required module not available: ${ErrTgtObj}"
-        }
+    $ThrowError = $false
+    if ($Require -eq 'Any' -and !$FoundModule) {
+        $ThrowError = $true
+        $ErrObj = $Name -join ', '
+        $ErrMsg = "Suitable module not available: ${ErrObj}"
+    } elseif ($Require -eq 'All' -and $MissingModule) {
+        $ThrowError = $true
+        $ErrObj = $MissingModuleName
+        $ErrMsg = "Required module not available: ${ErrObj}"
+    }
 
+    if ($ThrowError) {
+        $ErrExc = [IO.FileNotFoundException]::new($ErrMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-        $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'ModuleNotFound', $ErrCat, $ErrTgtObj)
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, $ErrObj)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
@@ -190,7 +197,7 @@ Function Test-IsPathFullyQualified {
 
     # PowerShell 6 or later is guaranteed to have `IsPathFullyQualified()` as
     # it won't be running under .NET Framework.
-    if ($PSVersionTable.Version -ge 6) {
+    if ($PSVersionTable.PSVersion.Major -ge 6) {
         return [IO.Path]::IsPathFullyQualified($Path)
     }
 
@@ -228,8 +235,9 @@ Function Complete-DotFilesSection {
     if ($DotFilesShowTimings) {
         if ($Global:DotFilesSectionStart -isnot [DateTime]) {
             $ErrMsg = 'No start time found for section timing.'
+            $ErrExc = [InvalidOperationException]::new($ErrMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::MetadataError
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NoSectionStartTime', $ErrCat, $null)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesInvalidState', $ErrCat, $null)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
@@ -275,10 +283,7 @@ Function Get-DotFilesTiming {
         [Parameter(Mandatory)]
         [DateTime]$StartTime,
 
-        [ValidateRange(0, [UInt16]::MaxValue)]
         [UInt16]$SlowThresholdMs = 100,
-
-        [ValidateRange(0, [UInt16]::MaxValue)]
         [UInt16]$UltraSlowThresholdMs = 300
     )
 
@@ -313,7 +318,7 @@ Function Remove-DotFilesHelpers {
     foreach ($Helper in $Helpers) {
         try {
             Remove-Item -LiteralPath "Function:\${Helper}" -ErrorAction 'Stop'
-        } catch { Write-Warning -Message "Failed to remove dotfiles helper function: ${Helper}" }
+        } catch { $PSCmdlet.WriteError($PSItem) }
     }
 }
 
