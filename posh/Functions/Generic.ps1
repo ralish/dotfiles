@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type 'Functions' -Name 'Generic'
+$null = Start-DotFilesSection -Type 'Functions' -Name 'Generic'
 
 # Load custom formatting data
 $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Generic.format.ps1xml'))

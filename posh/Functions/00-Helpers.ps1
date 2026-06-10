@@ -326,7 +326,7 @@ Function Remove-DotFilesHelpers {
 Function Start-DotFilesSection {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
-    [OutputType([Void], [Boolean])]
+    [OutputType([Boolean])]
     Param(
         [Parameter(Mandatory)]
         [String]$Type,
@@ -372,10 +372,6 @@ Function Start-DotFilesSection {
     }
 
     Write-Debug -Message (Get-DotFilesMessage -Message 'Starting section processing ...')
-
-    if (!($Platform -or $PwshMinVersion -or $PwshHostName -or $Command -or $Environment -or $Module)) {
-        return $null
-    }
 
     if ($Platform) {
         if ($Platform -eq 'Windows' -and !(Test-IsWindows)) {

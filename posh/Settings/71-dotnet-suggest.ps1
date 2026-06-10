@@ -1,13 +1,10 @@
 $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'dotnet-suggest'
-    Command = @('dotnet-suggest')
+    Command = 'dotnet-suggest'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Tab completion for System.CommandLine
 # https://learn.microsoft.com/en-au/dotnet/standard/commandline/how-to-enable-tab-completion

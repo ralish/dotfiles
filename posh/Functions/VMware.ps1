@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type 'Functions' -Name 'VMware'
+$null = Start-DotFilesSection -Type 'Functions' -Name 'VMware'
 
 # Optimises VMware virtual machines
 Function Optimize-VMwareVirtualMachine {

@@ -1,13 +1,10 @@
 $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'Oh My Posh'
-    Command = @('oh-my-posh')
+    Command = 'oh-my-posh'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Name of theme to use
 $OmpThemeName = 'oh-my-posh'

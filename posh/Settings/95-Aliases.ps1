@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type 'Settings' -Name 'Aliases'
+$null = Start-DotFilesSection -Type 'Settings' -Name 'Aliases'
 
 # Some useful aliases
 Set-Alias -Name 'cop' -Value 'Compare-ObjectProperties'

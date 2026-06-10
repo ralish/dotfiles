@@ -1,15 +1,12 @@
 $DotFilesSection = @{
     Type            = 'Settings'
     Name            = 'PSReadLine'
-    PwshHostName    = @('ConsoleHost')
-    Module          = @('PSReadLine')
+    PwshHostName    = 'ConsoleHost'
+    Module          = 'PSReadLine'
     ModuleOperation = 'Import'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Disable terminal bell
 Set-PSReadLineOption -BellStyle None

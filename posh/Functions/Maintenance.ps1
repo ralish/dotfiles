@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type 'Functions' -Name 'Maintenance'
+$null = Start-DotFilesSection -Type 'Functions' -Name 'Maintenance'
 
 # Load custom formatting data
 $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Maintenance.format.ps1xml'))

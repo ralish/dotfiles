@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type 'Functions' -Name 'PowerShell'
+$null = Start-DotFilesSection -Type 'Functions' -Name 'PowerShell'
 
 #region .NET
 

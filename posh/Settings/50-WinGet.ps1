@@ -2,13 +2,10 @@ $DotFilesSection = @{
     Type     = 'Settings'
     Name     = 'WinGet'
     Platform = 'Windows'
-    Command  = @('winget')
+    Command  = 'winget'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Tab completion (winget)
 # https://learn.microsoft.com/en-au/windows/package-manager/winget/tab-completion

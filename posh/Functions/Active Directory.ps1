@@ -4,10 +4,7 @@ $DotFilesSection = @{
     Module = 'ActiveDirectory'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Load custom formatting data
 $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml'))

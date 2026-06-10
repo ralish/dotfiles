@@ -4,10 +4,7 @@ $DotFilesSection = @{
     Command = 'git'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Print summary information about a Git repository
 Function Get-GitRepoSummary {

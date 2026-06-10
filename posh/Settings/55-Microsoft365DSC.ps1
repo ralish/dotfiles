@@ -2,14 +2,11 @@ $DotFilesSection = @{
     Type            = 'Settings'
     Name            = 'Microsoft 365 DSC'
     Platform        = 'Windows'
-    Module          = @('Microsoft365DSC')
+    Module          = 'Microsoft365DSC'
     ForceTestModule = $true
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Opt-out of telemetry
 $TelemetryStatus = Get-EnvironmentVariable -Name 'M365DSCTelemetryEnabled' -Scope Machine

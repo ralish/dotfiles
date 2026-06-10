@@ -4,10 +4,7 @@ $DotFilesSection = @{
     Platform = 'Windows'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 #region Cygwin
 

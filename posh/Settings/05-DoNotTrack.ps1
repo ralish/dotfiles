@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type 'Settings' -Name 'DoNotTrack'
+$null = Start-DotFilesSection -Type 'Settings' -Name 'DoNotTrack'
 
 # Console Do Not Track (DNT)
 # https://consoledonottrack.com/

@@ -4,10 +4,7 @@ $DotFilesSection = @{
     Command = 'docker'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Clear Docker cache
 Function Clear-DockerCache {

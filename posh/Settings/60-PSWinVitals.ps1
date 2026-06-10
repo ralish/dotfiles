@@ -2,13 +2,10 @@ $DotFilesSection = @{
     Type     = 'Settings'
     Name     = 'PSWinVitals'
     Platform = 'Windows'
-    Module   = @('PSWinVitals')
+    Module   = 'PSWinVitals'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Get-VitalInformation: Exclude Silverlight updates
 $PSDefaultParameterValues['Get-VitalInformation:WUParameters'] = @{ NotTitle = 'Silverlight' }

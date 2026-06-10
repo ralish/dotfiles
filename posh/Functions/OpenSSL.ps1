@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type 'Functions' -Name 'OpenSSL'
+$null = Start-DotFilesSection -Type 'Functions' -Name 'OpenSSL'
 
 #region Certificate creation
 

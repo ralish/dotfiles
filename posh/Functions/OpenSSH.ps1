@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type 'Functions' -Name 'OpenSSH'
+$null = Start-DotFilesSection -Type 'Functions' -Name 'OpenSSH'
 
 # Update OpenSSH configuration
 Function Update-OpenSSHConfig {

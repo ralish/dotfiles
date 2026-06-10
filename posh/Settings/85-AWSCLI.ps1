@@ -1,13 +1,10 @@
 $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'AWS CLI'
-    Command = @('aws')
+    Command = 'aws'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Output format
 $env:AWS_DEFAULT_OUTPUT = 'table'

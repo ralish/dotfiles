@@ -2,13 +2,10 @@ $DotFilesSection = @{
     Type     = 'Settings'
     Name     = 'PuTTY'
     Platform = 'Windows'
-    Command  = @('putty')
+    Command  = 'putty'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 Register-ArgumentCompleter -Native -CommandName 'plink', 'pscp', 'psftp', 'putty' -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)

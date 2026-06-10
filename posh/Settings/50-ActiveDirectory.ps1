@@ -2,13 +2,10 @@ $DotFilesSection = @{
     Type     = 'Settings'
     Name     = 'Active Directory'
     Platform = 'Windows'
-    Module   = @('ActiveDirectory')
+    Module   = 'ActiveDirectory'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # AD class properties we may want to ignore: top
 $ADClassIgnoredPropertiesTop = @(

@@ -1,16 +1,10 @@
 $DotFilesSection = @{
     Type        = 'Settings'
     Name        = 'Basic Prompt'
-    Environment = @{
-        # Set by Oh My Posh but unclear if stable
-        POSH_SESSION_ID = $false
-    }
+    Environment = @{ POSH_SESSION_ID = $false }
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 Function Prompt {
     $Prompt = [String]::Empty

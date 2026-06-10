@@ -1,14 +1,11 @@
 $DotFilesSection = @{
     Type            = 'Settings'
     Name            = 'posh-git'
-    Module          = @('posh-git')
+    Module          = 'posh-git'
     ModuleOperation = 'Import'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 $CurrentVersion = (Get-Module -Name 'posh-git' -Verbose:$false).Version
 $RequiredVersion = [Version]::new('1.0.0')

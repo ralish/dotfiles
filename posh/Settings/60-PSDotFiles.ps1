@@ -2,13 +2,10 @@ $DotFilesSection = @{
     Type     = 'Settings'
     Name     = 'PSDotFiles'
     Platform = 'Windows'
-    Module   = @('PSDotFiles')
+    Module   = 'PSDotFiles'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Path to our dotfiles directory
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]

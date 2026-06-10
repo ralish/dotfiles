@@ -1,4 +1,4 @@
-Start-DotFilesSection -Type 'Settings' -Name 'PowerShell'
+$null = Start-DotFilesSection -Type 'Settings' -Name 'PowerShell'
 
 # Number of elements to enumerate when displaying arrays
 $FormatEnumerationLimit = 5

@@ -4,10 +4,7 @@ $DotFilesSection = @{
     Platform = 'Windows'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Switch to the user profile directory if the current path is the Windows
 # System32 directory. This probably means we were launched elevated.

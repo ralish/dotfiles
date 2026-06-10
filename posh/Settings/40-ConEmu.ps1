@@ -5,10 +5,7 @@ $DotFilesSection = @{
     Environment = @{ ConEmuANSI = 'ON' }
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Extending PowerShell Prompt
 # https://conemu.github.io/en/PowershellPrompt.html

@@ -1,7 +1,7 @@
-Start-DotFilesSection -Type 'Functions' -Name 'Environments'
+$null = Start-DotFilesSection -Type 'Functions' -Name 'Dev Env'
 
 # Load custom formatting data
-$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Environments.format.ps1xml'))
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'DevEnv.format.ps1xml'))
 
 #region .NET
 

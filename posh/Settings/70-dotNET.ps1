@@ -1,13 +1,10 @@
 $DotFilesSection = @{
     Type    = 'Settings'
     Name    = '.NET'
-    Command = @('dotnet')
+    Command = 'dotnet'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Opt-out of telemetry
 $env:DOTNET_CLI_TELEMETRY_OPTOUT = 'true'

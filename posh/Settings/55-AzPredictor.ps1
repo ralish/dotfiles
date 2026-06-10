@@ -5,14 +5,11 @@ return
 $DotFilesSection = @{
     Type            = 'Settings'
     Name            = 'Az Predictor'
-    Module          = @('Az.Accounts', 'Az.Tools.Predictor')
+    Module          = 'Az.Accounts', 'Az.Tools.Predictor'
     ForceTestModule = $true
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Intelligent context-aware command completion with Az Predictor
 # https://learn.microsoft.com/en-au/powershell/azure/az-predictor

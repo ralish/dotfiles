@@ -1,13 +1,10 @@
 $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'ripgrep'
-    Command = @('rg')
+    Command = 'rg'
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Path to our ripgrep configuration
 $env:RIPGREP_CONFIG_PATH = Join-Path -Path $HOME -ChildPath '.ripgreprc'

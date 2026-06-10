@@ -5,10 +5,7 @@ $DotFilesSection = @{
     Environment = @{ WT_SESSION = $true }
 }
 
-if (!(Start-DotFilesSection @DotFilesSection)) {
-    Complete-DotFilesSection
-    return
-}
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Shell Integration: PowerShell
 # https://learn.microsoft.com/en-au/windows/terminal/tutorials/shell-integration#powershell-pwshexe

@@ -75,7 +75,7 @@ Remove-Variable -Name 'PoshSettingsPath'
 
 # Update formatting data
 if ($FormatDataPaths) {
-    Start-DotFilesSection -Type 'Profile' -Name 'Formatting'
+    $null = Start-DotFilesSection -Type 'Profile' -Name 'Formatting'
     Update-FormatData -PrependPath $FormatDataPaths
     Complete-DotFilesSection
 }
