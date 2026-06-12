@@ -1,7 +1,7 @@
 $DotFilesSection = @{
-    Type     = 'Functions'
-    Name     = 'Azure'
-    Platform = 'Windows'
+    Type   = 'Functions'
+    Name   = 'Azure'
+    Module = 'Microsoft.Graph*'
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) {
@@ -19,6 +19,9 @@ Function Get-AzureAuthHeader {
     [CmdletBinding()]
     [OutputType([Hashtable])]
     Param(
+        # Either:
+        # - Microsoft.Azure.Commands.Profile.Models.PSSecureAccessToken (>= 14.0.0)
+        # - Microsoft.Azure.Commands.Profile.Models.PSAccessToken (< 14.0.0)
         [Parameter(Mandatory)]
         [PSObject]$AccessToken
     )
@@ -37,16 +40,17 @@ Function Get-AzureAuthHeader {
             $BearerToken = $AccessToken.Token
         }
 
-        Default {
+        default {
             $ErrMsg = "Unexpected type for AccessToken argument: $($AccessToken.GetType().FullName)"
+            $ErrExc = [ArgumentException]::new($ErrMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'InvalidType', $ErrCat, $AccessToken)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $AccessToken)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
     }
 
     $AuthHeader = @{
-        Authorization  = $BearerToken
+        Authorization  = "Bearer ${BearerToken}"
         'Content-Type' = 'application/json'
     }
 
@@ -60,7 +64,7 @@ Function Get-AzureAuthHeader {
 # Retrieve licensing information for Entra users
 Function Get-EntraUserLicenseReport {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
-    [OutputType([PSCustomObject[]])]
+    [OutputType(ParameterSetName = ('Default', 'LicensingInfo'), [PSCustomObject[]])]
     [OutputType(ParameterSetName = ('ParsedLicenses', 'ParsedServices'), [Hashtable])]
     Param(
         # Product names and service plan identifiers for licensing
@@ -84,17 +88,19 @@ Function Get-EntraUserLicenseReport {
         'Microsoft.Graph.Identity.DirectoryManagement'
         'Microsoft.Graph.Users'
     )
+
     Test-ModuleAvailable -Name $RequiredModules
 
     if ($LicensingInfoCsv) {
         try {
-            $LicensingInfo = Import-Csv -LiteralPath $LicensingInfoCsv -ErrorAction 'Stop'
+            $LicensingInfo = @(Import-Csv -LiteralPath $LicensingInfoCsv -ErrorAction 'Stop')
         } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
         if ($LicensingInfo.Count -eq 0) {
             $ErrMsg = 'Imported licensing information CSV has no entries.'
+            $ErrExc = [IO.InvalidDataException]::new($ErrMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'CsvImportEmpty', $ErrCat, $LicensingInfoCsv)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvImportEmpty', $ErrCat, $LicensingInfoCsv)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
@@ -102,8 +108,9 @@ Function Get-EntraUserLicenseReport {
         foreach ($ColumnName in $ColumnNames) {
             if (!($LicensingInfo[0].PSObject.Properties.Name -contains $ColumnName)) {
                 $ErrMsg = "Imported CSV is missing expected column: ${ColumnName}"
+                $ErrExc = [IO.InvalidDataException]::new($ErrMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'CsvMissingColumn', $ErrCat, $LicensingInfoCsv)
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvMissingColumn', $ErrCat, $LicensingInfoCsv)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
         }
@@ -158,30 +165,41 @@ Function Get-EntraUserLicenseReport {
     $ServicePlanIdLookup = @{}
 
     if ($LicensingInfoCsv) {
+        # Find/replace pairs to clean-up license names
+        $LicenseCleanupNameFragments = [Ordered]@{
+            '_'                             = ' '
+            '\bTEST\b'                      = 'Test'
+            '\bTELSTRA\b'                   = 'Telstra'
+            '\bGCCHIGH\b'                   = 'GCC High'
+            '\bGCCHigh Tenant\b'            = $null
+            '\bDOD\b'                       = 'DoD'
+            '( GCC High)? USGOV GCC High\b' = ' GCC High'
+            '( \(DoD\))? USGOV DoD\b'       = ' DoD'
+        }
+
         # Populate the mapping of license SKU IDs to display names
         $ConflictingNames = 0
         foreach ($Entry in $LicensingInfo) {
-            # E.g. dcf0408c-aaec-446c-afd4-43e3683943ea
-            $LicenseSkuId = [Guid]::new($Entry.Guid)
-            # E.g. Microsoft 365 E3 (no Teams)
-            $LicenseCandidateName = $Entry.Product_Display_Name
-            # Find/replace pairs to clean-up names
-            $CleanupNameFragments = [Ordered]@{
-                '_'                             = ' '
-                '\bTEST\b'                      = 'Test'
-                '\bTELSTRA\b'                   = 'Telstra'
-                '\bGCCHIGH\b'                   = 'GCC High'
-                '\bGCCHigh Tenant\b'            = $null
-                '\bDOD\b'                       = 'DoD'
-                '( GCC High)? USGOV GCC High\b' = ' GCC High'
-                '( \(DoD\))? USGOV DoD\b'       = ' DoD'
+            try {
+                # Validate format and normalise
+                $LicenseSkuId = [Guid]::new($Entry.Guid).ToString()
+            } catch {
+                $ErrMsg = "Invalid GUID encountered for license entry: $($Entry.Guid)"
+                $ErrExc = [FormatException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvInvalidData', $ErrCat, $Entry.GUID)
+                $PSCmdlet.WriteError($ErrRec)
+                continue
             }
 
+            # E.g. `Microsoft 365 E3 (no Teams)`
+            $LicenseCandidateName = $Entry.Product_Display_Name
+
             # Perform initial clean-up of the name
-            foreach ($Fragment in $CleanupNameFragments.Keys) {
+            foreach ($Fragment in $LicenseCleanupNameFragments.Keys) {
                 if ($LicenseCandidateName -cmatch $Fragment) {
-                    $LicenseCandidateName = $LicenseCandidateName -creplace $Fragment, $CleanupNameFragments[$Fragment]
-                    Write-Debug -Message 'Updating "{0}" to: {1}' -f $Entry.Product_Display_Name, $LicenseCandidateName
+                    $LicenseCandidateName = $LicenseCandidateName -creplace $Fragment, $LicenseCleanupNameFragments[$Fragment]
+                    Write-Debug -Message ('Updating "{0}" to: {1}' -f $Entry.Product_Display_Name, $LicenseCandidateName)
                 }
             }
 
@@ -209,32 +227,43 @@ Function Get-EntraUserLicenseReport {
         }
 
         if ($ConflictingNames) {
-            Write-Warning "${ConflictingNames} licenses had conflicting names which were not reconciled."
+            Write-Warning -Message "${ConflictingNames} licenses had conflicting names which were not reconciled."
         }
 
         if ($ReturnParsedLicenses) {
             return $LicenseSkuIdLookup
         }
 
+        # Find/replace pairs to clean-up service plan names
+        $ServicePlanCleanupNameFragments = [Ordered]@{
+            '_'                     = ' '
+            '\bGCCHigh( Tenant)?\b' = 'GCC High'
+            '\bDOD\b'               = 'DoD'
+        }
+
         # Populate the mapping of service plan IDs to display names
         $ConflictingNames = 0
         foreach ($Entry in $LicensingInfo) {
-            # E.g. eec0eb4f-6444-4f95-aba0-50c24d67f998
-            $ServicePlanId = $Entry.Service_Plan_Id
-            # E.g. Microsoft Entra ID P2
-            $ServicePlanCandidateName = $Entry.Service_Plans_Included_Friendly_Names
-            # Find/replace pairs to clean-up names
-            $CleanupNameFragments = [Ordered]@{
-                '_'                     = ' '
-                '\bGCCHigh( Tenant)?\b' = 'GCC High'
-                '\bDOD\b'               = 'DoD'
+            try {
+                # Validate format and normalise
+                $ServicePlanId = [Guid]::new($Entry.Service_Plan_Id).ToString()
+            } catch {
+                $ErrMsg = "Invalid GUID encountered for service plan entry: $($Entry.Service_Plan_Id)"
+                $ErrExc = [FormatException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvInvalidData', $ErrCat, $Entry.Service_Plan_Id)
+                $PSCmdlet.WriteError($ErrRec)
+                continue
             }
 
+            # E.g. `Microsoft Entra ID P2`
+            $ServicePlanCandidateName = $Entry.Service_Plans_Included_Friendly_Names
+
             # Perform initial clean-up of the name
-            foreach ($Fragment in $CleanupNameFragments.Keys) {
-                if ($LicenseCandidateName -cmatch $Fragment) {
-                    $ServicePlanCandidateName = $ServicePlanCandidateName -creplace $Fragment, $CleanupNameFragments[$Fragment]
-                    Write-Debug -Message 'Updating "{0}" to: {1}' -f $Entry.Service_Plans_Included_Friendly_Names, $ServicePlanCandidateName
+            foreach ($Fragment in $ServicePlanCleanupNameFragments.Keys) {
+                if ($ServicePlanCandidateName -cmatch $Fragment) {
+                    $ServicePlanCandidateName = $ServicePlanCandidateName -creplace $Fragment, $ServicePlanCleanupNameFragments[$Fragment]
+                    Write-Debug -Message ('Updating "{0}" to: {1}' -f $Entry.Service_Plans_Included_Friendly_Names, $ServicePlanCandidateName)
                 }
             }
 
@@ -245,10 +274,9 @@ Function Get-EntraUserLicenseReport {
             }
 
             # Skip identical names
-            $LicenseCurrentName = $LicenseSkuIdLookup[$LicenseSkuId]
-            if ($LicenseCurrentName -ceq $LicenseCandidateName) { continue }
-
             $ServicePlanCurrentName = $ServicePlanIdLookup[$ServicePlanId]
+            if ($ServicePlanCurrentName -ceq $ServicePlanCandidateName) { continue }
+
             $UpdatedCurrentName = $false
             $IgnoredCandidateName = $false
 
@@ -298,7 +326,7 @@ Function Get-EntraUserLicenseReport {
             # Replace current name with candidate name if the current name
             # does not match the regex but the candidate name does not.
             $CandidateMatchRegexes = @(
-                # References a plan (e.g. Plan 2)
+                # References a plan (e.g. `Plan 2`)
                 '\bPlan\b'
             )
 
@@ -321,7 +349,7 @@ Function Get-EntraUserLicenseReport {
         }
 
         if ($ConflictingNames) {
-            Write-Warning "${ConflictingNames} services had conflicting names which were not reconciled."
+            Write-Warning -Message "${ConflictingNames} services had conflicting names which were not reconciled."
         }
 
         # Convert remaining names which are entirely upper-case to title-case
@@ -338,7 +366,7 @@ Function Get-EntraUserLicenseReport {
         }
 
         if ($TitleCaseNames) {
-            Write-Warning -Message "${TitleCaseNames} service had display names converted to title-case."
+            Write-Warning -Message "${TitleCaseNames} services had display names converted to title-case."
         }
 
         if ($ReturnParsedServices) {
@@ -357,35 +385,110 @@ Function Get-EntraUserLicenseReport {
     }
 
     $Results = [Collections.Generic.List[PSCustomObject]]::new()
+    $UnknownLicenseGuids = [Collections.Generic.List[String]]::new()
+    $UnknownServiceGuids = [Collections.Generic.List[String]]::new()
+
     foreach ($User in $Users) {
         $AssignedLicenses = [Collections.Generic.List[String]]::new()
         $DisabledServices = [Collections.Generic.List[String]]::new()
         $EnabledServices = [Collections.Generic.List[String]]::new()
 
+        # Start by collecting licenses and disabled services
         foreach ($AssignedLicense in $User.AssignedLicenses) {
-            $SubscribedSKU = $SubscribedSKUs | Where-Object SkuId -EQ $AssignedLicense.SkuId
-            $ServicePlans = $SubscribedSKU.ServicePlans | Where-Object AppliesTo -EQ 'User'
+            $SkuId = $AssignedLicense.SkuId
+            $SubscribedSKU = $SubscribedSKUs | Where-Object SkuId -EQ $SkuId
+            if (!$SubscribedSKU) {
+                Write-Warning -Message ('Skipping unknown license SKU "{0}" assigned to user: {1}' -f $SkuId, $User.UserPrincipalName)
+                continue
+            }
 
-            $LicenseName = $LicenseSkuIdLookup[$SubscribedSKU.SkuId]
+            $LicenseName = $LicenseSkuIdLookup[$SkuId]
+            if (!$LicenseName) {
+                if (!$UnknownLicenseGuids.Contains($SkuId)) {
+                    Write-Warning -Message "License name is unknown for GUID: ${SkuId}"
+                    $UnknownLicenseGuids.Add($SkuId)
+                }
+
+                $LicenseName = $SkuId
+            }
+
             $AssignedLicenses.Add($LicenseName)
 
             foreach ($PlanId in $AssignedLicense.DisabledPlans) {
                 $PlanName = $ServicePlanIdLookup[$PlanId]
-                if ($PrefixServicesWithLicense) {
-                    $PlanName = "${LicenseName}:${PlanName}"
+                if (!$PlanName) {
+                    if (!$UnknownServiceGuids.Contains($PlanId)) {
+                        Write-Warning -Message "Service name is unknown for GUID: ${PlanId}"
+                        $UnknownServiceGuids.Add($PlanId)
+                    }
+
+                    $PlanName = $PlanId
                 }
 
+                $PlanName = "${LicenseName}:${PlanName}"
                 $DisabledServices.Add($PlanName)
             }
+        }
 
+        # Enabled services are those which aren't listed in disabled services
+        foreach ($AssignedLicense in $User.AssignedLicenses) {
+            $SkuId = $AssignedLicense.SkuId
+            $SubscribedSKU = $SubscribedSKUs | Where-Object SkuId -EQ $SkuId
+            if (!$SubscribedSKU) { continue }
+
+            $LicenseName = $LicenseSkuIdLookup[$SkuId]
+            if (!$LicenseName) {
+                $LicenseName = $SkuId
+            }
+
+            $ServicePlans = $SubscribedSKU.ServicePlans | Where-Object AppliesTo -EQ 'User'
             foreach ($ServicePlan in $ServicePlans) {
-                $PlanName = $ServicePlanIdLookup[$ServicePlan.ServicePlanId]
-                if ($PrefixServicesWithLicense) {
-                    $PlanName = "${LicenseName}:${PlanName}"
+                $PlanId = $ServicePlan.ServicePlanId
+                $PlanName = $ServicePlanIdLookup[$PlanId]
+
+                if (!$PlanName) {
+                    if (!$UnknownServiceGuids.Contains($PlanId)) {
+                        Write-Warning -Message "Service name is unknown for GUID: ${PlanId}"
+                        $UnknownServiceGuids.Add($PlanId)
+                    }
+
+                    $PlanName = $PlanId
                 }
 
-                if ($PlanName -notin $DisabledServices) {
+                $PlanName = "${LicenseName}:${PlanName}"
+                if (!$DisabledServices.Contains($PlanName)) {
                     $EnabledServices.Add($PlanName)
+                }
+            }
+        }
+
+        # If we aren't prefixing each service with the license we need to do
+        # some extra work to figure out which services are really disabled.
+        if (!$PrefixServicesWithLicense) {
+            $EnabledServicesWithLicense = $EnabledServices
+            $EnabledServices = [Collections.Generic.List[String]]::new()
+
+            # Strip license prefix and remove duplicate enabled services
+            foreach ($EnabledService in $EnabledServicesWithLicense) {
+                $ServiceNameOnly = $EnabledService -replace '^.+?:'
+
+                if (!$EnabledServices.Contains($ServiceNameOnly)) {
+                    $EnabledServices.Add($ServiceNameOnly)
+                }
+            }
+
+            $DisabledServicesWithLicense = $DisabledServices
+            $DisabledServices = [Collections.Generic.List[String]]::new()
+
+            # Strip license prefix and check if the resulting service name is
+            # listed in enabled services. If it is, at least one license has
+            # the service enabled. Filter duplicate truly disabled services.
+            foreach ($DisabledService in $DisabledServicesWithLicense) {
+                $ServiceNameOnly = $DisabledService -replace '^.+?:'
+                if ($EnabledServices.Contains($ServiceNameOnly)) { continue }
+
+                if (!$DisabledServices.Contains($ServiceNameOnly)) {
+                    $DisabledServices.Add($ServiceNameOnly)
                 }
             }
         }
@@ -397,6 +500,7 @@ Function Get-EntraUserLicenseReport {
             EnabledServices   = [String[]]@($EnabledServices | Sort-Object -Unique)
             DisabledServices  = [String[]]@($DisabledServices | Sort-Object -Unique)
         }
+
         $Result.PSObject.TypeNames.Insert(0, 'Microsoft.Entra.User.LicenseReport')
         $Results.Add($Result)
     }
