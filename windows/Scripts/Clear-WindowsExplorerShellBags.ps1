@@ -29,7 +29,7 @@ foreach ($BasePath in $BasePaths) {
             } catch {
                 switch -Regex ($PSItem.FullyQualifiedErrorId) {
                     '^PathNotFound,' { }
-                    Default { $PSCmdlet.WriteError($PSItem) }
+                    default { $PSCmdlet.WriteError($PSItem) }
                 }
             }
         }

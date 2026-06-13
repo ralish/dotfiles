@@ -16,16 +16,21 @@ Param(
 # The implicit import of the `CimCmdlets` module that may occur below triggers
 # several "What if" outputs under Windows PowerShell, even though `Get-Command`
 # doesn't support `-WhatIf`. We can use `$WhatIfPreference` to suppress them.
-$WhatIfOriginal = $WhatIfPreference
-$WhatIfPreference = $false
-$Win32OpSys = Get-CimInstance -Class 'Win32_OperatingSystem' -Property 'BuildNumber' -Verbose:$false
-$WhatIfPreference = $WhatIfOriginal
+try {
+    $WhatIfOriginal = $WhatIfPreference
+    $WhatIfPreference = $false
 
-$DismExe = 'dism.exe'
+    $Win32OpSys = Get-CimInstance -Class 'Win32_OperatingSystem' -Property 'BuildNumber' -ErrorAction 'Stop' -Verbose:$false
+} catch {
+    $PSCmdlet.ThrowTerminatingError($PSItem)
+} finally {
+    $WhatIfPreference = $WhatIfOriginal
+}
+
 $DismArgs = '/Online', '/Enable-Feature', '/FeatureName:NetFx3'
 
 if ($SxsPath) {
-    $DismArgs += "/Source:${SxsPath}"
+    $DismArgs += '/Source:"{0}"' -f $SxsPath
 }
 
 # The `/All` parameter is only available from Windows 8 / Server 2012
@@ -33,12 +38,24 @@ if ([UInt32]$Win32OpSys.BuildNumber -ge 9200) {
     $DismArgs += '/All'
 }
 
-if ($PSCmdlet.ShouldProcess("${DismExe} $($DismArgs -join ' ')", 'Start')) {
-    $Dism = Start-Process -FilePath $DismExe -ArgumentList $DismArgs -NoNewWindow -Wait -PassThru
-    if ($Dism.ExitCode -ne 0) {
-        $ErrMsg = "${DismExe} exited with non-zero exit code: $($Dism.ExitCode)"
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'DismCmdFailed', $ErrCat, "${DismExe} $($DismArgs -join ' ')")
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
+$DismCmd = "dism $($DismArgs -join ' ')"
+
+if ($PSCmdlet.ShouldProcess($DismCmd, 'Start')) {
+    try {
+        $DismExe = Join-Path -Path $Env:SystemRoot -ChildPath 'System32\dism.exe'
+        $Dism = Start-Process -FilePath $DismExe -ArgumentList $DismArgs -NoNewWindow -Wait -PassThru -ErrorAction 'Stop'
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+
+    switch ($Dism.ExitCode) {
+        0 { } # Success
+        3010 { Write-Warning -Message 'DISM completed successfully but the changes require a reboot.' }
+
+        default {
+            $ErrMsg = "DISM exited with non-zero exit code: $($Dism.ExitCode)"
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $DismCmd)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
     }
 }

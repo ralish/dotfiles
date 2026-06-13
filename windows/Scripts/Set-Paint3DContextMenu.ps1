@@ -18,8 +18,9 @@ Param(
 
 if ([Environment]::OSVersion.Version.Major -lt 10) {
     $ErrMsg = 'Script is only valid for Windows 10 or later.'
-    $ErrCat = [Management.Automation.ErrorCategory]::NotInstalled
-    $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NotWin10OrLater', $ErrCat, $null)
+    $ErrExc = [PlatformNotSupportedException]::new($ErrMsg)
+    $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
+    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'OSNotSupported', $ErrCat, $null)
     $PSCmdlet.ThrowTerminatingError($ErrRec)
 }
 
@@ -31,32 +32,39 @@ if (!(Get-PSDrive -Name 'HKCR' -ErrorAction 'Ignore')) {
 
 try {
     foreach ($Extension in $Extensions) {
-        $Extension = $Extension.ToLower()
+        $Extension = $Extension.ToLowerInvariant()
         $ContextMenuPath = "HKCR:\SystemFileAssociations\.${Extension}\Shell\3D Edit"
 
         try {
             # Incredibly slow as it enumerates every key as it traverses the path
-            $null = Get-Item -LiteralPath $ContextMenuPath -ErrorAction 'Stop'
+            $ContextMenuKey = Get-Item -LiteralPath $ContextMenuPath -ErrorAction 'Stop'
         } catch {
             Write-Warning -Message "Skipping extension due to missing registry key: ${Extension}"
             continue
         }
 
         if ($Operation -eq 'Enable') {
+            if ($ContextMenuKey.GetValueNames() -notcontains 'LegacyDisable') {
+                Write-Verbose -Message "Context menu already enabled for extension: ${Extension}"
+                continue
+            }
+
             if ($PSCmdlet.ShouldProcess($Extension, 'Enable Paint 3D extension context menu')) {
                 try {
                     Remove-ItemProperty -LiteralPath $ContextMenuPath -Name 'LegacyDisable' -ErrorAction 'Stop'
-                } catch {
-                    switch -Regex ($PSItem.FullyQualifiedErrorId) {
-                        '^PathNotFound,' { }
-                        Default { $PSCmdlet.WriteError($PSItem) }
-                    }
-                }
+                } catch { $PSCmdlet.WriteError($PSItem) }
             }
-        } elseif ($PSCmdlet.ShouldProcess($Extension, 'Disable Paint 3D extension context menu')) {
-            try {
-                Set-ItemProperty -LiteralPath $ContextMenuPath -Name 'LegacyDisable' -Type 'String' -Value '' -ErrorAction 'Stop'
-            } catch { $PSCmdlet.WriteError($PSItem) }
+        } else {
+            if ($ContextMenuKey.GetValueNames() -contains 'LegacyDisable' -and $ContextMenuKey.GetValue('LegacyDisable').Length -eq 0) {
+                Write-Verbose -Message "Context menu already disabled for extension: ${Extension}"
+                continue
+            }
+
+            if ($PSCmdlet.ShouldProcess($Extension, 'Disable Paint 3D extension context menu')) {
+                try {
+                    Set-ItemProperty -LiteralPath $ContextMenuPath -Name 'LegacyDisable' -Type 'String' -Value '' -ErrorAction 'Stop'
+                } catch { $PSCmdlet.WriteError($PSItem) }
+            }
         }
     }
 } finally {

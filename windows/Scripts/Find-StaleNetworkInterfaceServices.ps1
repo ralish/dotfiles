@@ -10,9 +10,10 @@
     cleaned-up when the associated network interface no longer exists.
 
     The best logic I've found so far for determining which are stale is:
-    - The GUID service key has a `tcpip` sub-key
-    - The `tcpip` sub-key has an `IPAddress` value
-    - The `IPAddress` value data is an IP address no network interface has
+    - The GUID service key has a `Parameters\Tcpip` sub-key
+    - The interface is not configured to use DHCP (`EnableDHCP`)
+    - The interface is configured to use a static IP (`IPAddress`)
+    - At least one static IP addresses is not present on active interfaces
 #>
 
 #Requires -Version 5.0
@@ -26,25 +27,36 @@ Param(
 if ($GuidRefSearch) {
     if (!(Test-Path -LiteralPath 'Function:\Search-Registry')) {
         $ErrMsg = 'Missing Search-Registry function required for -GuidRefSearch parameter.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-        $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'FunctionNotFound', $ErrCat, $null)
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSFunctionNotFound', $ErrCat, 'Search-Registry')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 }
 
 $ServicesPath = 'HKLM:\System\CurrentControlSet\Services'
-$GuidRegex = '^\{[a-z0-9]{8}(-[a-z0-9]{4}){3}-[a-z0-9]{12}\}$'
+$GuidRegex = '^\{[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\}$'
 
 Write-Verbose -Message 'Retrieving network interface services registry keys ...'
-$ServicesKey = Get-Item -LiteralPath $ServicesPath
-$GuidServices = $ServicesKey.GetSubKeyNames() | Where-Object { $PSItem -match $GuidRegex }
+try {
+    $ServicesKey = Get-Item -LiteralPath $ServicesPath -ErrorAction 'Stop'
+} catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+
+$GuidServices = @($ServicesKey.GetSubKeyNames() | Where-Object { $PSItem -match $GuidRegex })
 if ($GuidServices.Count -eq 0) {
     Write-Warning -Message 'No network interface services registry keys found.'
     return
 }
 
 Write-Verbose -Message 'Retrieving network adapter IP addresses ...'
-$NetIPAddresses = Get-NetIPAddress
+try {
+    $NetIPAddresses = @(Get-NetIPAddress -ErrorAction 'Stop')
+} catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+
+if ($NetIPAddresses.Count -eq 0) {
+    Write-Warning -Message 'No network interface IP addresses found.'
+    return
+}
 
 Write-Verbose -Message "Processing $($GuidServices.Count) network interface services registry keys ..."
 $Results = [Collections.Generic.List[PSCustomObject]]::new()
@@ -94,10 +106,10 @@ foreach ($GuidService in $GuidServices) {
         continue
     }
 
-    $MissingIPAddresses = @()
+    $MissingIPAddresses = [Collections.Generic.List[String]]::new()
     foreach ($IPAddress in $IPAddresses) {
         if ($IPAddress -notin $NetIPAddresses.IPAddress) {
-            $MissingIPAddresses += $IPAddress
+            $MissingIPAddresses.Add($IPAddress)
         }
     }
 
@@ -127,4 +139,4 @@ if ($GuidRefSearch) {
     }
 }
 
-return $Results
+return $Results.ToArray()

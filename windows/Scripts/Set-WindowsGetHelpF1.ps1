@@ -16,8 +16,9 @@ Param(
 
 if ([Environment]::OSVersion.Version.Major -lt 10) {
     $ErrMsg = 'Script is only valid for Windows 10 or later.'
-    $ErrCat = [Management.Automation.ErrorCategory]::NotInstalled
-    $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NotWin10OrLater', $ErrCat, $null)
+    $ErrExc = [PlatformNotSupportedException]::new($ErrMsg)
+    $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
+    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'OSNotSupported', $ErrCat, $null)
     $PSCmdlet.ThrowTerminatingError($ErrRec)
 }
 
@@ -59,22 +60,23 @@ try {
             if ($UpdateRegKeySecurity -and $PSCmdlet.ShouldProcess($RegPath, 'Update ACL')) {
                 # Cheeky but much easier than doing it through the Win32 API
                 $NtDllImport = '[DllImport("ntdll.dll")] public static extern int RtlAdjustPrivilege(ulong Privilege, bool Enable, bool CurrentThread, ref bool PreviousValue);'
-                $NtDll = Add-Type -Member $NtDllImport -Name 'NtDll' -PassThru
+                $NtDll = Add-Type -MemberDefinition $NtDllImport -Name 'NtDll' -PassThru
 
                 # Enable required privileges
                 $Privileges = @{ SeTakeOwnership = 9; SeBackup = 17; SeRestore = 18 }
                 foreach ($Privilege in $Privileges.Keys) {
-                    $Result = $NtDll::RtlAdjustPrivilege($Privileges[$Privilege], $true, $false, [ref]$null)
-                    if ($Result -eq 0) { continue }
-
-                    $ErrMsg = "Failed calling RtlAdjustPrivilege to enable ${Privilege} privilege (NTSTATUS: ${Result})."
-                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-                    $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'RtlAdjustPrivilegeFailed', $ErrCat, $Result)
-                    $PSCmdlet.ThrowTerminatingError($ErrRec)
+                    $Result = $NtDll::RtlAdjustPrivilege($Privileges[$Privilege], $true, $false, [Ref]$null)
+                    if ($Result -ne 0) {
+                        $ErrMsg = "Failed calling RtlAdjustPrivilege to enable ${Privilege} privilege (NTSTATUS: ${Result})."
+                        $ErrExc = [Exception]::new($ErrMsg)
+                        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeApiFailed', $ErrCat, $Result)
+                        $PSCmdlet.ThrowTerminatingError($ErrRec)
+                    }
                 }
 
                 # Save original ACL
-                # `-LiteralPath` is broken on at least Windows PowerShell 5.1.
+                # `-LiteralPath` is broken on at least Windows PowerShell 5.1
                 $RegKeyOriginalAcl = Get-Acl -Path $RegPath -ErrorAction 'Stop'
 
                 # Update the owner
@@ -106,7 +108,7 @@ try {
             if ($Operation -eq 'Enable') {
                 if ($PSCmdlet.ShouldProcess($RegPath, 'Enable F1 key opening web browser search for help')) {
                     try {
-                        $HelpPanePath = Join-Path -Path $env:SystemRoot -ChildPath 'HelpPane.exe'
+                        $HelpPanePath = Join-Path -Path $Env:SystemRoot -ChildPath 'HelpPane.exe'
                         Set-ItemProperty -LiteralPath $RegPath -Name '(default)' -Type 'String' -Value $HelpPanePath -ErrorAction 'Stop'
                     } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
                 }
@@ -125,7 +127,7 @@ try {
                 $AclSections = [Security.AccessControl.AccessControlSections]::Owner -bor [Security.AccessControl.AccessControlSections]::Group -bor [Security.AccessControl.AccessControlSections]::Access
                 $RegKeyAcl = [Security.AccessControl.RegistrySecurity]::new()
                 $RegKeyAcl.SetSecurityDescriptorSddlForm($RegKeyOriginalAcl.Sddl, $AclSections)
-                # `-LiteralPath` is broken on at least Windows PowerShell 5.1.
+                # `-LiteralPath` is broken on at least Windows PowerShell 5.1
                 $RegKeyAcl | Set-Acl -Path $RegPath
             }
         }
