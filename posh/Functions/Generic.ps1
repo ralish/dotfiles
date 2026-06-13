@@ -15,14 +15,18 @@ Function Convert-BytesToHex {
         [Byte[]]$Bytes
     )
 
-    Process {
-        $Hex = [Text.StringBuilder]::new($Bytes.Count * 2)
+    Begin {
+        $Hex = [Text.StringBuilder]::new()
+    }
 
+    Process {
         foreach ($Byte in $Bytes) {
             $null = $Hex.AppendFormat('{0:x2}', $Byte)
         }
+    }
 
-        $Hex.ToString()
+    End {
+        return $Hex.ToString()
     }
 }
 
@@ -33,6 +37,7 @@ Function Convert-HexToBytes {
     [OutputType([Byte[]])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
+        [ValidatePattern('^([0-9a-fA-F]{2})*$')]
         [String]$Hex
     )
 
@@ -43,11 +48,11 @@ Function Convert-HexToBytes {
             $Bytes[$i / 2] = [Convert]::ToByte($Hex.Substring($i, 2), 16)
         }
 
-        $Bytes
+        return $Bytes
     }
 }
 
-# Convert a string from Base64 form
+# Convert a string from Base64 format
 Function ConvertFrom-Base64 {
     [CmdletBinding()]
     [OutputType([String])]
@@ -61,7 +66,7 @@ Function ConvertFrom-Base64 {
     }
 }
 
-# Convert a string from URL encoded form
+# Convert a string from URL encoded format
 Function ConvertFrom-URLEncoded {
     [CmdletBinding()]
     [OutputType([String])]
@@ -75,7 +80,7 @@ Function ConvertFrom-URLEncoded {
     }
 }
 
-# Convert a string to Base64 form
+# Convert a string to Base64 format
 Function ConvertTo-Base64 {
     [CmdletBinding()]
     [OutputType([String])]
@@ -94,7 +99,7 @@ Function ConvertTo-TextEncoding {
     [CmdletBinding()]
     [OutputType([Void])]
     Param(
-        [Parameter(ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [String[]]$Path,
 
         [ValidateSet('ASCII', 'UTF-7', 'UTF-8', 'UTF-16', 'UTF-16BE', 'UTF-32', 'UTF-32BE')]
@@ -122,6 +127,7 @@ Function ConvertTo-TextEncoding {
         }
 
         $EncoderParams = @()
+
         if ($Encoding -match '^UTF-[13]') {
             if ($Encoding -match 'BE$') {
                 $EncoderParams += $true
@@ -130,7 +136,8 @@ Function ConvertTo-TextEncoding {
             }
         }
 
-        if ($Encoding -match '^UTF-') {
+        # UTF-7 has no concept of a BOM
+        if ($Encoding -match '^UTF-' -and $Encoding -ne 'UTF-7') {
             $EncoderParams += $ByteOrderMark
         }
 
@@ -138,6 +145,7 @@ Function ConvertTo-TextEncoding {
 
         if ($SourceEncoding) {
             $SourceEncoderParams = @()
+
             if ($SourceEncoding -match '^UTF-[13]') {
                 if ($SourceEncoding -match 'BE$') {
                     $SourceEncoderParams += $true
@@ -157,14 +165,14 @@ Function ConvertTo-TextEncoding {
     Process {
         foreach ($TextFile in $Path) {
             try {
-                $Item = Get-Item -LiteralPath $TextFile -ErrorAction Stop
-                if ($SourceEncoder) {
+                $Item = Get-Item -LiteralPath $TextFile -ErrorAction 'Stop'
+                if ($SourceEncoding) {
                     $Content = [IO.File]::ReadAllLines($Item.FullName, $SourceEncoder)
                 } else {
                     $Content = [IO.File]::ReadAllLines($Item.FullName)
                 }
             } catch {
-                Write-Error -Message $_
+                $PSCmdlet.WriteError($PSItem)
                 continue
             }
 
@@ -172,11 +180,11 @@ Function ConvertTo-TextEncoding {
                 $Original = $Content
                 $Content = [Collections.Generic.List[String]]::new()
 
-                for ($Idx = 0; $Idx -lt $Original.Count; $Idx++) {
-                    $Line = $Original[$Idx]
+                for ($i = 0; $i -lt $Original.Count; $i++) {
+                    $Line = $Original[$i]
 
                     if ($ReplaceLeadingTabs) {
-                        # Line has leading whitespace & subsequent content
+                        # Line has leading whitespace and subsequent content
                         if ($Line -match '^(\s+)(.+)') {
                             $Whitespace = $Matches[1]
                             $Remainder = $Matches[2]
@@ -196,26 +204,37 @@ Function ConvertTo-TextEncoding {
                 }
             }
 
-            Write-Verbose -Message ('Converting: {0}' -f $Item.FullName)
+            Write-Verbose -Message "Converting: $($Item.FullName)"
             if ($NoEndOfFileNewline) {
-                $FileStream = [IO.File]::Open($Item.FullName, [IO.FileMode]::Truncate)
-                $StreamWriter = [IO.StreamWriter]::new($FileStream)
+                try {
+                    $FileStream = $StreamWriter = $null
 
-                for ($LineNum = 0; $LineNum -lt ($Content.Count - 1); $LineNum++) {
-                    $StreamWriter.WriteLine($Content[$LineNum])
+                    $FileStream = [IO.File]::Open($Item.FullName, [IO.FileMode]::Truncate)
+                    $StreamWriter = [IO.StreamWriter]::new($FileStream, $Encoder)
+
+                    if ($Content.Count -ne 0) {
+                        for ($LineNum = 0; $LineNum -lt ($Content.Count - 1); $LineNum++) {
+                            $StreamWriter.WriteLine($Content[$LineNum])
+                        }
+
+                        $StreamWriter.Write($Content[$LineNum])
+                    }
+                } catch {
+                    $PSCmdlet.WriteError($PSItem)
+                } finally {
+                    if ($StreamWriter) { $StreamWriter.Close() }
+                    if ($FileStream) { $FileStream.Close() }
                 }
-
-                $StreamWriter.Write($Content[$LineNum])
-                $StreamWriter.Close()
-                $FileStream.Close()
             } else {
-                [IO.File]::WriteAllLines($Item.FullName, $Content, $Encoder)
+                try {
+                    [IO.File]::WriteAllLines($Item.FullName, $Content, $Encoder)
+                } catch { $PSCmdlet.WriteError($PSItem) }
             }
         }
     }
 }
 
-# Convert a string to URL encoded form
+# Convert a string to URL encoded format
 Function ConvertTo-URLEncoded {
     [CmdletBinding()]
     [OutputType([String])]
@@ -234,14 +253,14 @@ Function Get-TextEncoding {
     [CmdletBinding()]
     [OutputType([Void], [PSCustomObject[]])]
     Param(
-        [Parameter(ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [String[]]$Path
     )
 
     Begin {
         $Results = [Collections.Generic.List[PSCustomObject]]::new()
 
-        # Non-printable characters used to determine if file is binary
+        # Non-printable characters used to guess if the file is binary
         $InvalidChars = [Char[]]@(0..8 + 10..31 + 127 + 129 + 141 + 143 + 144 + 157)
 
         # Construct an array of identifiable encodings by their preamble
@@ -249,13 +268,13 @@ Function Get-TextEncoding {
         foreach ($Encoding in [Text.Encoding]::GetEncodings()) {
             $Preamble = $Encoding.GetEncoding().GetPreamble()
             if ($Preamble) {
-                $Encoding | Add-Member -MemberType NoteProperty -Name 'Preamble' -Value $Preamble
-                $Encoding | Add-Member -MemberType NoteProperty -Name 'ByteOrderMark' -Value $true
+                $Encoding | Add-Member -MemberType 'NoteProperty' -Name 'Preamble' -Value $Preamble
+                $Encoding | Add-Member -MemberType 'NoteProperty' -Name 'ByteOrderMark' -Value $true
                 $Encodings.Add($Encoding)
             }
         }
 
-        # Special case for UTF-16LE encoded XML without BOM (this is legal!)
+        # Special case for UTF-16LE encoded XML without a BOM (this is legal!)
         $Encoding = [PSCustomObject]@{
             Name          = 'utf-16'
             DisplayName   = 'Unicode via XML declaration'
@@ -263,9 +282,10 @@ Function Get-TextEncoding {
             Preamble      = [Byte[]]@(60, 0, 63, 0)
             ByteOrderMark = $false
         }
+
         $Encodings.Add($Encoding)
 
-        # Special case for UTF-16BE encoded XML without BOM (this is legal!)
+        # Special case for UTF-16BE encoded XML without a BOM (this is legal!)
         $Encoding = [PSCustomObject]@{
             Name          = 'utf-16BE'
             DisplayName   = 'Unicode (Big-Endian) via XML declaration'
@@ -273,12 +293,14 @@ Function Get-TextEncoding {
             Preamble      = [Byte[]]@(0, 60, 0, 63)
             ByteOrderMark = $false
         }
+
         $Encodings.Add($Encoding)
 
-        # Sort the array by size of each preamble
+        # Sort the array by the size of each preamble
         foreach ($Encoding in $Encodings) {
-            $Encoding | Add-Member -MemberType ScriptProperty -Name 'PreambleSize' -Value { $this.Preamble.Count }
+            $Encoding | Add-Member -MemberType 'ScriptProperty' -Name 'PreambleSize' -Value { $this.Preamble.Count }
         }
+
         $Encodings = $Encodings | Sort-Object -Property 'PreambleSize' -Descending
 
         # PowerShell Core uses a different parameter to return a byte stream
@@ -293,14 +315,14 @@ Function Get-TextEncoding {
     Process {
         foreach ($TextFile in $Path) {
             try {
-                $Item = Get-Item -LiteralPath $TextFile -ErrorAction Stop
-                $Content = Get-Content -LiteralPath $Item.FullName -TotalCount 5 -ErrorAction Stop
+                $Item = Get-Item -LiteralPath $TextFile -ErrorAction 'Stop'
+                $Content = Get-Content -LiteralPath $Item.FullName -TotalCount 5 -ErrorAction 'Stop'
             } catch {
-                Write-Error -Message $_
+                $PSCmdlet.WriteError($PSItem)
                 continue
             }
 
-            Write-Verbose -Message ('Processing: {0}' -f $Item.FullName)
+            Write-Verbose -Message "Processing: $($Item.FullName)"
             $Result = [PSCustomObject]@{
                 File          = $Item
                 Encoding      = 'utf-8'
@@ -310,18 +332,10 @@ Function Get-TextEncoding {
             $FoundEncoding = $false
             foreach ($Encoding in $Encodings) {
                 [Byte[]]$Bytes = Get-Content -LiteralPath $Item.FullName -ReadCount $Encoding.Preamble.Count @GetContentBytesParam | Select-Object -First 1
+                if ($Bytes.Count -ne $Encoding.Preamble.Count) { continue }
 
-                if ($Bytes.Count -ne $Encoding.Preamble.Count) {
-                    continue
-                }
-
-                if ($Bytes.Count -eq 0) {
-                    $Result.Encoding = 'empty'
-                    $FoundEncoding = $true
-                    break
-                }
-
-                if ((Compare-Object -ReferenceObject $Encoding.Preamble -DifferenceObject $Bytes -SyncWindow 0).Count -eq 0) {
+                $ComparePreamble = Compare-Object -ReferenceObject $Encoding.Preamble -DifferenceObject $Bytes -SyncWindow 0
+                if ($ComparePreamble.Count -eq 0) {
                     $Result.Encoding = $Encoding.Name
                     $Result.ByteOrderMark = $Encoding.ByteOrderMark
                     $FoundEncoding = $true
@@ -330,7 +344,7 @@ Function Get-TextEncoding {
             }
 
             if (!$FoundEncoding) {
-                if ($Content | Where-Object { $_.IndexOfAny($InvalidChars) -ge 0 }) {
+                if ($Content | Where-Object { $PSItem.IndexOfAny($InvalidChars) -ge 0 }) {
                     $Result.Encoding = 'binary'
                 }
             }
@@ -360,58 +374,80 @@ Function Add-FileToEmptyDirectories {
         [String]$FileName = '.keepme',
 
         # Non-recursive (only direct descendents)
-        [String[]]$Exclude = '.git'
+        [String[]]$Exclude = '.git',
+
+        [Switch]$Force
     )
+
+    $CurrentLocation = Get-Location
 
     if (!$Path) {
         $Path += $PWD.Path
     }
 
-    $CurrentLocation = Get-Location
+    foreach ($DirPath in $Path) {
+        if (!(Test-IsPathFullyQualified -Path $DirPath)) {
+            if ($CurrentLocation.Provider.Name -ne 'FileSystem') {
+                $ErrMsg = "Skipping relative path as current path is not a file system: ${DirPath}"
+                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $DirPath)
+                $PSCmdlet.WriteError($ErrRec)
+                continue
+            }
 
-    foreach ($Item in $Path) {
-        if ($CurrentLocation.Provider.Name -ne 'FileSystem' -and ![IO.Path]::IsPathFullyQualified($Item)) {
-            Write-Error -Message ('Skipping relative path as current path is not a file system: {0}' -f $Item)
-            continue
+            $DirPath = Join-Path -Path $CurrentLocation -ChildPath $DirPath
         }
 
         try {
-            $DirPath = Get-Item -LiteralPath $Item -Force:$Force -ErrorAction Stop
+            $DirItem = Get-Item -LiteralPath $DirPath -Force:$Force -ErrorAction 'Stop'
         } catch {
-            Write-Error -Message $_.Message
+            $PSCmdlet.WriteError($PSItem)
             continue
         }
 
-        if ($DirPath -isnot [IO.DirectoryInfo]) {
-            Write-Error -Message ('Provided path is not a directory: {0}' -f $Item)
+        if ($DirItem -isnot [IO.DirectoryInfo]) {
+            $ErrMsg = "Path is not a directory: ${DirPath}"
+            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $DirPath)
+            $PSCmdlet.WriteError($ErrRec)
             continue
         }
 
         $FilesToCreate = [Collections.Generic.List[String]]::new()
-        Get-ChildItem -LiteralPath $DirPath.FullName -Directory -Exclude $Exclude -Force:$Force | ForEach-Object {
-            if ((Get-ChildItem -LiteralPath $_.FullName -Force:$Force | Measure-Object).Count -ne 0) {
-                Get-ChildItem -LiteralPath $_.FullName -Directory -Recurse -Force:$Force | ForEach-Object {
-                    if ((Get-ChildItem -LiteralPath $_.FullName -Force:$Force | Measure-Object).Count -eq 0) {
+        # Retrieve top-level directories in the path minus any exclusions
+        Get-ChildItem -LiteralPath $DirItem.FullName -Directory -Exclude $Exclude -Force:$Force | ForEach-Object {
+            # For each top-level subdirectory check if it has any children
+            $TopSubDirItems = Get-ChildItem -LiteralPath $PSItem.FullName -Force:$Force | Measure-Object
+            if ($TopSubDirItems.Count -ne 0) {
+                # Top-level subdirectory with children. Recursively retrieve
+                # all subdirectories under it for potential file creation.
+                Get-ChildItem -LiteralPath $PSItem.FullName -Directory -Recurse -Force:$Force | ForEach-Object {
+                    # For each subdirectory check if it has any children
+                    $SubDirItems = Get-ChildItem -LiteralPath $PSItem.FullName -Force:$Force | Measure-Object
+                    if ($SubDirItems.Count -eq 0) {
                         # Subdirectory (not top-level) with no children
-                        $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
+                        $FilesToCreate.Add((Join-Path -Path $PSItem.FullName -ChildPath $FileName))
                     }
                 }
             } else {
-                # Top-level subdirectory (minus exclusions) with no children
-                $FilesToCreate.Add((Join-Path -Path $_.FullName -ChildPath $FileName))
+                # Top-level subdirectory with no children
+                $FilesToCreate.Add((Join-Path -Path $PSItem.FullName -ChildPath $FileName))
             }
         }
 
         foreach ($FilePath in $FilesToCreate) {
-            $null = New-Item -Path $FilePath -ItemType File
+            # Handles `-Confirm` / `-WhatIf`
+            $null = New-Item -Path $FilePath -ItemType 'File'
         }
     }
 }
 
-# Summarize a directory by number of dirs/files and total size
+# Retrieve a directory summary containing item counts and total size
 Function Get-DirectorySummary {
     [CmdletBinding()]
-    [OutputType([PSCustomObject])]
+    [OutputType([Void], [PSCustomObject])]
     Param(
         [Parameter(ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
@@ -420,12 +456,17 @@ Function Get-DirectorySummary {
 
     Process {
         if (!$Path) {
-            $Path = Get-Location -PSProvider FileSystem
+            $Path = Get-Location -PSProvider 'FileSystem'
         }
 
-        $Directory = Get-Item -LiteralPath $Path -ErrorAction Ignore
+        $Directory = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($Directory -isnot [IO.DirectoryInfo]) {
-            throw 'Provided path is not a directory: {0}' -f $Path
+            $ErrMsg = "Path is not a directory: ${Path}"
+            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
+            $PSCmdlet.WriteError($ErrRec)
+            return
         }
 
         $TotalDirs = 0
@@ -433,7 +474,7 @@ Function Get-DirectorySummary {
         $TotalItems = 0
         $TotalSize = 0
 
-        $Items = Get-ChildItem -LiteralPath $Directory -Recurse
+        $Items = Get-ChildItem -LiteralPath $Directory.FullName -Recurse
         foreach ($Item in $Items) {
             $TotalItems++
             switch ($Item.PSTypeNames[0]) {
@@ -443,7 +484,7 @@ Function Get-DirectorySummary {
         }
 
         $Summary = [PSCustomObject]@{
-            Path  = $Directory
+            Path  = $Directory.FullName
             Dirs  = $TotalDirs
             Files = $TotalFiles
             Items = $TotalItems
@@ -517,17 +558,17 @@ Function Format-SizeDigital {
         }
 
         $Log = [Math]::Truncate([Math]::Log($Size, $LogBase))
-        if ($Log -eq 0) {
-            $Result = '{0} bytes' -f $Size
-        } else {
+        if ($Log -gt 0) {
             if ($Log -ge $LogMagnitudes.Count) {
                 $Log = $LogMagnitudes.Count - 1
             }
 
             $SizeConverted = $Size / [Math]::Pow($LogBase, $Log)
             $SizeRounded = [Math]::Round($SizeConverted, $Precision)
-            $SizeString = $SizeRounded.ToString('N{0}' -f $Precision)
-            $Result = '{0} {1}' -f $SizeString, $LogMagnitudes[$Log]
+            $SizeString = $SizeRounded.ToString("N${Precision}")
+            $Result = "${SizeString} $($LogMagnitudes[$Log])"
+        } else {
+            $Result = "${Size} bytes"
         }
 
         return $Result
@@ -545,7 +586,7 @@ Function Format-Xml {
         [String[]]$Xml,
 
         [ValidateRange(0, 8)]
-        [Int]$IndentSize = 4,
+        [Byte]$IndentSize = 4,
 
         [Switch]$OmitXmlDeclaration
     )
@@ -560,24 +601,36 @@ Function Format-Xml {
     }
 
     End {
-        $StringReader = [IO.StringReader]::new($Data)
+        try {
+            $StringReader = $StringWriter = $XmlWriter = $null
 
-        $StringWriter = [IO.StringWriter]::new()
-        $XmlWriterSettings = [Xml.XmlWriterSettings]::new()
-        if ($IndentSize -gt 0) {
-            $XmlWriterSettings.Indent = $true
-            $XmlWriterSettings.IndentChars = [String]::new(' ', $IndentSize)
+            $StringReader = [IO.StringReader]::new($Data -join '')
+            $StringWriter = [IO.StringWriter]::new()
+
+            $XmlWriterSettings = [Xml.XmlWriterSettings]::new()
+            $XmlWriterSettings.OmitXmlDeclaration = $OmitXmlDeclaration.ToBool()
+
+            if ($IndentSize -gt 0) {
+                $XmlWriterSettings.Indent = $true
+                $XmlWriterSettings.IndentChars = [String]::new(' ', $IndentSize)
+            }
+
+            $XmlWriter = [Xml.XmlWriter]::Create($StringWriter, $XmlWriterSettings)
+
+            $XmlDoc = [Xml.XmlDocument]::new()
+            $XmlDoc.Load($StringReader)
+            $XmlDoc.WriteContentTo($XmlWriter)
+
+            $XmlWriter.Flush()
+
+            return $StringWriter.ToString()
+        } catch {
+            $PSCmdlet.ThrowTerminatingError($PSItem)
+        } finally {
+            if ($XmlWriter) { $XmlWriter.Dispose() }
+            if ($StringWriter) { $StringWriter.Dispose() }
+            if ($StringReader) { $StringReader.Dispose() }
         }
-        $XmlWriterSettings.OmitXmlDeclaration = $OmitXmlDeclaration.ToBool()
-        $XmlWriter = [Xml.XmlWriter]::Create($StringWriter, $XmlWriterSettings)
-
-        $XmlDoc = [Xml.XmlDocument]::new()
-        $XmlDoc.Load($StringReader)
-        $XmlDoc.WriteContentTo($XmlWriter)
-
-        # Explicitly dispose to ensure buffer is flushed
-        $XmlWriter.Dispose()
-        $StringWriter.ToString()
     }
 }
 
@@ -593,16 +646,20 @@ Function Sort-XmlElement {
 
         [Switch]$SortAttributes,
 
-        [ValidateRange(0, [Int]::MaxValue)]
-        [Int]$Depth = 0,
+        [ValidateRange(0, [Byte]::MaxValue)]
+        [Byte]$Depth = 0,
 
-        [ValidateRange(0, [Int]::MaxValue)]
-        [Int]$MaxDepth = 25
+        [ValidateRange(0, [Byte]::MaxValue)]
+        [Byte]$MaxDepth = 25
     )
 
     Begin {
         if ($MaxDepth -lt $Depth) {
-            throw 'Maximum sorting depth cannot be less than current depth.'
+            $ErrMsg = "Maximum sorting depth (${MaxDepth}) cannot be less than current depth (${Depth})."
+            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, "${MaxDepth} < ${Depth}")
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
     }
 
@@ -647,6 +704,7 @@ Function Sort-XmlElement {
 
 #region Object properties
 
+# Add a `Computer` property to group objects
 Function Add-GroupObjectComputerProperty {
     [CmdletBinding()]
     [OutputType([Void], [Microsoft.PowerShell.Commands.GroupInfo[]])]
@@ -663,19 +721,22 @@ Function Add-GroupObjectComputerProperty {
             $SkipGroup = $false
 
             foreach ($GroupItem in $GroupInfo.Group) {
-                if ([String]::IsNullOrEmpty($GroupItem.PSComputerName)) {
-                    Write-Error -Message 'Group item has no PSComputerName property.'
+                if ($GroupItem.PSObject.Properties.Name -notcontains 'PSComputerName') {
                     $SkipGroup = $true
+
+                    $ErrMsg = 'Group item has no PSComputerName property.'
+                    $ErrExc = [Management.Automation.PropertyNotFoundException]::new($ErrMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSItemMissingProperty', $ErrCat, $GroupItem)
+                    $PSCmdlet.WriteError($ErrRec)
                     break
                 }
             }
 
-            if ($SkipGroup) {
-                continue
-            }
+            if ($SkipGroup) { continue }
 
             $Computers = ($GroupInfo.Group.PSComputerName | Sort-Object) -join ', '
-            $GroupInfo | Add-Member -Name 'Computer' -MemberType NoteProperty -Value $Computers -PassThru -Force:$Force
+            $GroupInfo | Add-Member -Name 'Computer' -MemberType 'NoteProperty' -Value $Computers -PassThru -Force:$Force
         }
     }
 }
@@ -684,7 +745,7 @@ Function Add-GroupObjectComputerProperty {
 
 #region Path management
 
-# Add an element to a Path type string
+# Add an element to a `Path` type string
 Function Add-PathStringElement {
     [CmdletBinding()]
     [OutputType([String])]
@@ -702,24 +763,25 @@ Function Add-PathStringElement {
         [Char]$DirectorySeparator = [IO.Path]::DirectorySeparatorChar,
 
         [Switch]$NoRepair,
-        [Switch]$SimpleAlgo
+        [Switch]$SimpleAlgorithm
     )
 
     Begin {
-        if (!$SimpleAlgo) {
+        if (!$SimpleAlgorithm) {
             if ($Element.EndsWith($DirectorySeparator)) {
                 $Element = $Element.TrimEnd($DirectorySeparator)
             }
+
             $Element += $DirectorySeparator
         }
 
         $RegExElement = [Regex]::Escape($Element)
 
-        if (!$SimpleAlgo) {
+        if (!$SimpleAlgorithm) {
             $RegExElement += '*'
         }
 
-        $SingleElement = '^{0}$' -f $RegExElement
+        $SingleElement = "^${RegExElement}$"
     }
 
     Process {
@@ -729,30 +791,25 @@ Function Add-PathStringElement {
 
         if ($Path -notmatch $SingleElement) {
             $RegExPathSeparator = [Regex]::Escape($PathSeparator)
-            $FirstElement = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
-            $LastElement = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
-            $MiddleElement = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
-
+            $FirstElement = "^${RegExElement}${RegExPathSeparator}"
+            $LastElement = "${RegExPathSeparator}${RegExElement}$"
+            $MiddleElement = "${RegExPathSeparator}${RegExElement}${RegExPathSeparator}"
             $Path = $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
-
-            if (!$SimpleAlgo) {
-                $Element = $PSBoundParameters.Item('Element')
-            }
 
             switch ($Action) {
                 'Append' {
                     if ($Path.EndsWith($PathSeparator)) {
-                        $Path = '{0}{1}' -f $Path, $Element
+                        $Path = "${Path}${Element}"
                     } else {
-                        $Path = '{0}{1}{2}' -f $Path, $PathSeparator, $Element
+                        $Path = "${Path}${PathSeparator}${Element}"
                     }
                 }
 
                 'Prepend' {
                     if ($Path.StartsWith($PathSeparator)) {
-                        $Path = '{0}{1}' -f $Element, $Path
+                        $Path = "${Element}${Path}"
                     } else {
-                        $Path = '{0}{1}{2}' -f $Element, $PathSeparator, $Path
+                        $Path = "${Element}${PathSeparator}${Path}"
                     }
                 }
             }
@@ -762,7 +819,7 @@ Function Add-PathStringElement {
     }
 }
 
-# Remove an element from a Path type string
+# Remove an element from a `Path` type string
 Function Remove-PathStringElement {
     [CmdletBinding()]
     [OutputType([String])]
@@ -777,24 +834,25 @@ Function Remove-PathStringElement {
         [Char]$DirectorySeparator = [IO.Path]::DirectorySeparatorChar,
 
         [Switch]$NoRepair,
-        [Switch]$SimpleAlgo
+        [Switch]$SimpleAlgorithm
     )
 
     Begin {
-        if (!$SimpleAlgo) {
+        if (!$SimpleAlgorithm) {
             if ($Element.EndsWith($DirectorySeparator)) {
                 $Element = $Element.TrimEnd($DirectorySeparator)
             }
+
             $Element += $DirectorySeparator
         }
 
         $RegExElement = [Regex]::Escape($Element)
 
-        if (!$SimpleAlgo) {
+        if (!$SimpleAlgorithm) {
             $RegExElement += '*'
         }
 
-        $SingleElement = '^{0}$' -f $RegExElement
+        $SingleElement = "^${RegExElement}$"
     }
 
     Process {
@@ -803,19 +861,19 @@ Function Remove-PathStringElement {
         }
 
         if ($Path -match $SingleElement) {
-            return [String]::Empty
+            return ''
         }
 
         $RegExPathSeparator = [Regex]::Escape($PathSeparator)
-        $FirstElement = '^{0}{1}' -f $RegExElement, $RegExPathSeparator
-        $LastElement = '{0}{1}$' -f $RegExPathSeparator, $RegExElement
-        $MiddleElement = '{0}{1}{2}' -f $RegExPathSeparator, $RegExElement, $RegExPathSeparator
+        $FirstElement = "^${RegExElement}${RegExPathSeparator}"
+        $LastElement = "${RegExPathSeparator}${RegExElement}$"
+        $MiddleElement = "${RegExPathSeparator}${RegExElement}${RegExPathSeparator}"
 
         return $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
     }
 }
 
-# Remove excess separators from a Path type string
+# Remove excess separators from a `Path` type string
 Function Repair-PathString {
     [CmdletBinding()]
     [OutputType([String])]
@@ -831,7 +889,7 @@ Function Repair-PathString {
     }
 
     Process {
-        $String -replace "^$RegExPathSeparator+" -replace "$RegExPathSeparator+$" -replace "$RegExPathSeparator{2,}", $PathSeparator
+        return $String -replace "^${RegExPathSeparator}+" -replace "${RegExPathSeparator}+$" -replace "${RegExPathSeparator}{2,}", $PathSeparator
     }
 }
 
