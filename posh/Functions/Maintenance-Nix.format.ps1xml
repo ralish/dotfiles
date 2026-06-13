@@ -17,7 +17,7 @@
                                     switch ($Homebrew.Brew.Count) {
                                         0 { '(no output)' }
                                         1 { $Homebrew.Brew }
-                                        default { '{0} lines (view property for full output)' -f $Homebrew.Brew.Count }
+                                        default { "$($Homebrew.Brew.Count) lines (view property for output)" }
                                     }
                                 </ScriptBlock>
                             </ListItem>
@@ -28,7 +28,7 @@
                                     switch ($Homebrew.Apps.Count) {
                                         0 { '(no output)' }
                                         1 { $Homebrew.Apps }
-                                        default { '{0} lines (view property for full output)' -f $Homebrew.Apps.Count }
+                                        default { "$($Homebrew.Apps.Count) lines (view property for output)" }
                                     }
                                 </ScriptBlock>
                             </ListItem>
@@ -39,7 +39,7 @@
                                     switch ($Homebrew.Cleanup.Count) {
                                         0 { '(no output)' }
                                         1 { $Homebrew.Cleanup }
-                                        default { '{0} lines (view property for full output)' -f $Homebrew.Cleanup.Count }
+                                        default { "$($Homebrew.Cleanup.Count) lines (view property for output)" }
                                     }
                                 </ScriptBlock>
                             </ListItem>
