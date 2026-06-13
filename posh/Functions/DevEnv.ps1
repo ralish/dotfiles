@@ -314,85 +314,97 @@ Function Switch-Go {
         [Parameter(ParameterSetName = 'Disable')]
         [Switch]$IncludeNonPathVars,
 
-        [Switch]$Persist,
         [Switch]$Force
     )
 
-    $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
-    if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $Msg = "Go path is inaccessible or not a directory: ${Path}"
+    DynamicParam {
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
-        if (!$Force) {
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        if (Test-IsWindows) {
+            $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $null)
+            $RuntimeParams.Add('Persist', $PersistParam)
         }
 
-        Write-Warning -Message $Msg
+        return $RuntimeParams
     }
 
-    $Enable = !$Disable
-    $PathParams = @{}
-    if ($Enable) {
-        $PathFunc = 'Add-PathStringElement'
-        $PathParams['Action'] = 'Prepend'
-        $PathChangesDesc = 'Prepended to PATH: '
-    } else {
-        $PathFunc = 'Remove-PathStringElement'
-        $PathChangesDesc = 'Removed from PATH: '
-    }
+    End {
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $Msg = "Go path is inaccessible or not a directory: ${Path}"
 
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
-    $BinPath = Join-Path -Path $Path -ChildPath 'bin'
-
-    $GoPaths = [Collections.Generic.List[String]]::new()
-    if ($Env:GOPATH) {
-        foreach ($GoPath in $Env:GOPATH.Split([IO.Path]::PathSeparator)) {
-            if (!(Test-IsPathFullyQualified -Path $GoPath)) {
-                $ErrMsg = "Found not fully qualified path while parsing GOPATH: ${GoPath}"
-                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'PathNotFullyQualified', $ErrCat, $GoPath)
+            if (!$Force) {
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
-            $GoPath = Join-Path -Path $GoPath -ChildPath 'bin'
-            $GoPaths.Insert(0, $GoPath)
+            Write-Warning -Message $Msg
         }
-    }
 
-    $PathChanges = @($BinPath) + $GoPaths
-    foreach ($PathChange in $PathChanges) {
-        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
-        Write-Host $PathChange
-    }
+        $Enable = !$Disable
+        $PathParams = @{}
+        if ($Enable) {
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
+        } else {
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
+        }
 
-    if ($Disable -and $IncludeNonPathVars) {
-        $Env:GOPATH = ''
-        Write-Host -ForegroundColor 'Green' 'Unset GOPATH.'
-    }
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
-    if ($Persist) {
-        Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+        $GoPaths = [Collections.Generic.List[String]]::new()
+        if ($Env:GOPATH) {
+            foreach ($GoPath in $Env:GOPATH.Split([IO.Path]::PathSeparator)) {
+                if (!(Test-IsPathFullyQualified -Path $GoPath)) {
+                    $ErrMsg = "Found not fully qualified path while parsing GOPATH: ${GoPath}"
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                    $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'PathNotFullyQualified', $ErrCat, $GoPath)
+                    $PSCmdlet.ThrowTerminatingError($ErrRec)
+                }
 
-        Get-EnvironmentVariable -Name 'Path' |
-            & $PathFunc @PathParams -Element $BinPath |
-            Set-EnvironmentVariable -Name 'Path'
-
-        if ($GoPaths) {
-            $GoPaths.Reverse()
-            foreach ($GoPath in $GoPaths) {
-                Get-EnvironmentVariable -Name 'Path' |
-                    & $PathFunc @PathParams -Element $GoPath |
-                    Set-EnvironmentVariable -Name 'Path'
+                $GoPath = Join-Path -Path $GoPath -ChildPath 'bin'
+                $GoPaths.Insert(0, $GoPath)
             }
         }
 
-        if ($Enable -and ![String]::IsNullOrEmpty($Env:GOPATH)) {
-            Set-EnvironmentVariable -Name 'GOPATH' -Value $Env:GOPATH
-        } elseif ($Disable -and $IncludeNonPathVars) {
-            Set-EnvironmentVariable -Name 'GOPATH' -Value ''
+        $PathChanges = @($BinPath) + $GoPaths
+        foreach ($PathChange in $PathChanges) {
+            $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
+            Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+            Write-Host $PathChange
+        }
+
+        if ($Disable -and $IncludeNonPathVars) {
+            $Env:GOPATH = ''
+            Write-Host -ForegroundColor 'Green' 'Unset GOPATH.'
+        }
+
+        if ($Persist) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) { $PathParams['Action'] = 'Append' }
+
+            Get-EnvironmentVariable -Name 'Path' |
+                & $PathFunc @PathParams -Element $BinPath |
+                Set-EnvironmentVariable -Name 'Path'
+
+            if ($GoPaths) {
+                $GoPaths.Reverse()
+                foreach ($GoPath in $GoPaths) {
+                    Get-EnvironmentVariable -Name 'Path' |
+                        & $PathFunc @PathParams -Element $GoPath |
+                        Set-EnvironmentVariable -Name 'Path'
+                }
+            }
+
+            if ($Enable -and ![String]::IsNullOrEmpty($Env:GOPATH)) {
+                Set-EnvironmentVariable -Name 'GOPATH' -Value $Env:GOPATH
+            } elseif ($Disable -and $IncludeNonPathVars) {
+                Set-EnvironmentVariable -Name 'GOPATH' -Value ''
+            }
         }
     }
 }
@@ -498,62 +510,74 @@ Function Switch-GoogleDepotTools {
         [Parameter(ParameterSetName = 'Disable')]
         [Switch]$IncludeNonPathVars,
 
-        [Switch]$Persist,
         [Switch]$Force
     )
 
-    $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
-    if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $Msg = "depot_tools path is inaccessible or not a directory: ${Path}"
+    DynamicParam {
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
-        if (!$Force) {
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        if (Test-IsWindows) {
+            $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $null)
+            $RuntimeParams.Add('Persist', $PersistParam)
         }
 
-        Write-Warning -Message $Msg
+        return $RuntimeParams
     }
 
-    $Enable = !$Disable
-    $PathParams = @{}
-    if ($Enable) {
-        $PathFunc = 'Add-PathStringElement'
-        $PathParams['Action'] = 'Prepend'
-        $PathChangesDesc = 'Prepended to PATH: '
-        $DepotToolsWinToolchain = 0
-    } else {
-        $PathFunc = 'Remove-PathStringElement'
-        $PathChangesDesc = 'Removed from PATH: '
-    }
+    End {
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $Msg = "depot_tools path is inaccessible or not a directory: ${Path}"
 
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+            if (!$Force) {
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
 
-    $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $Path
-    Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
-    Write-Host $Path
+            Write-Warning -Message $Msg
+        }
 
-    if ($Enable) {
-        $Env:DEPOT_TOOLS_WIN_TOOLCHAIN = $DepotToolsWinToolchain
-        Write-Host -ForegroundColor 'Green' -NoNewline 'Set DEPOT_TOOLS_WIN_TOOLCHAIN to: '
-        Write-Host $Env:DEPOT_TOOLS_WIN_TOOLCHAIN
-    } elseif ($Disable -and $IncludeNonPathVars) {
-        $Env:DEPOT_TOOLS_WIN_TOOLCHAIN = ''
-        Write-Host -ForegroundColor 'Green' 'Unset DEPOT_TOOLS_WIN_TOOLCHAIN.'
-    }
+        $Enable = !$Disable
+        $PathParams = @{}
+        if ($Enable) {
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
+            $DepotToolsWinToolchain = 0
+        } else {
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
+        }
 
-    if ($Persist) {
-        Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
 
-        Get-EnvironmentVariable -Name 'Path' |
-            & $PathFunc @PathParams -Element $Path |
-            Set-EnvironmentVariable -Name 'Path'
+        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $Path
+        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host $Path
 
         if ($Enable) {
-            Set-EnvironmentVariable -Name 'DEPOT_TOOLS_WIN_TOOLCHAIN' -Value $Env:DEPOT_TOOLS_WIN_TOOLCHAIN
+            $Env:DEPOT_TOOLS_WIN_TOOLCHAIN = $DepotToolsWinToolchain
+            Write-Host -ForegroundColor 'Green' -NoNewline 'Set DEPOT_TOOLS_WIN_TOOLCHAIN to: '
+            Write-Host $Env:DEPOT_TOOLS_WIN_TOOLCHAIN
         } elseif ($Disable -and $IncludeNonPathVars) {
-            Set-EnvironmentVariable -Name 'DEPOT_TOOLS_WIN_TOOLCHAIN' -Value ''
+            $Env:DEPOT_TOOLS_WIN_TOOLCHAIN = ''
+            Write-Host -ForegroundColor 'Green' 'Unset DEPOT_TOOLS_WIN_TOOLCHAIN.'
+        }
+
+        if ($Persist) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) { $PathParams['Action'] = 'Append' }
+
+            Get-EnvironmentVariable -Name 'Path' |
+                & $PathFunc @PathParams -Element $Path |
+                Set-EnvironmentVariable -Name 'Path'
+
+            if ($Enable) {
+                Set-EnvironmentVariable -Name 'DEPOT_TOOLS_WIN_TOOLCHAIN' -Value $Env:DEPOT_TOOLS_WIN_TOOLCHAIN
+            } elseif ($Disable -and $IncludeNonPathVars) {
+                Set-EnvironmentVariable -Name 'DEPOT_TOOLS_WIN_TOOLCHAIN' -Value ''
+            }
         }
     }
 }
@@ -646,62 +670,74 @@ Function Switch-Java {
         [Parameter(ParameterSetName = 'Disable')]
         [Switch]$IncludeNonPathVars,
 
-        [Switch]$Persist,
         [Switch]$Force
     )
 
-    $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
-    if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $Msg = "Java path is inaccessible or not a directory: ${Path}"
+    DynamicParam {
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
-        if (!$Force) {
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        if (Test-IsWindows) {
+            $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $null)
+            $RuntimeParams.Add('Persist', $PersistParam)
         }
 
-        Write-Warning -Message $Msg
+        return $RuntimeParams
     }
 
-    $Enable = !$Disable
-    $PathParams = @{}
-    if ($Enable) {
-        $PathFunc = 'Add-PathStringElement'
-        $PathParams['Action'] = 'Prepend'
-        $PathChangesDesc = 'Prepended to PATH: '
-    } else {
-        $PathFunc = 'Remove-PathStringElement'
-        $PathChangesDesc = 'Removed from PATH: '
-    }
+    End {
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $Msg = "Java path is inaccessible or not a directory: ${Path}"
 
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
-    $BinPath = Join-Path -Path $Path -ChildPath 'bin'
+            if (!$Force) {
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
 
-    $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
-    Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
-    Write-Host $BinPath
+            Write-Warning -Message $Msg
+        }
 
-    if ($Enable) {
-        $Env:JAVA_HOME = $Path
-        Write-Host -ForegroundColor 'Green' -NoNewline 'Set JAVA_HOME to: '
-        Write-Host $Env:JAVA_HOME
-    } elseif ($Disable -and $IncludeNonPathVars) {
-        $Env:JAVA_HOME = ''
-        Write-Host -ForegroundColor 'Green' 'Unset JAVA_HOME.'
-    }
+        $Enable = !$Disable
+        $PathParams = @{}
+        if ($Enable) {
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
+        } else {
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
+        }
 
-    if ($Persist) {
-        Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
-        Get-EnvironmentVariable -Name 'Path' |
-            & $PathFunc @PathParams -Element $BinPath |
-            Set-EnvironmentVariable -Name 'Path'
+        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
+        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host $BinPath
 
         if ($Enable) {
-            Set-EnvironmentVariable -Name 'JAVA_HOME' -Value $Env:JAVA_HOME
+            $Env:JAVA_HOME = $Path
+            Write-Host -ForegroundColor 'Green' -NoNewline 'Set JAVA_HOME to: '
+            Write-Host $Env:JAVA_HOME
         } elseif ($Disable -and $IncludeNonPathVars) {
-            Set-EnvironmentVariable -Name 'JAVA_HOME' -Value ''
+            $Env:JAVA_HOME = ''
+            Write-Host -ForegroundColor 'Green' 'Unset JAVA_HOME.'
+        }
+
+        if ($Persist) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) { $PathParams['Action'] = 'Append' }
+
+            Get-EnvironmentVariable -Name 'Path' |
+                & $PathFunc @PathParams -Element $BinPath |
+                Set-EnvironmentVariable -Name 'Path'
+
+            if ($Enable) {
+                Set-EnvironmentVariable -Name 'JAVA_HOME' -Value $Env:JAVA_HOME
+            } elseif ($Disable -and $IncludeNonPathVars) {
+                Set-EnvironmentVariable -Name 'JAVA_HOME' -Value ''
+            }
         }
     }
 }
@@ -767,74 +803,86 @@ Function Switch-Nodejs {
         [Parameter(ParameterSetName = 'Disable')]
         [Switch]$IncludeNonPathVars,
 
-        [Switch]$Persist,
         [Switch]$Force
     )
 
-    $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
-    if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $Msg = "Node.js path is inaccessible or not a directory: ${Path}"
+    DynamicParam {
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
-        if (!$Force) {
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        if (Test-IsWindows) {
+            $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $null)
+            $RuntimeParams.Add('Persist', $PersistParam)
         }
 
-        Write-Warning -Message $Msg
+        return $RuntimeParams
     }
 
-    $Enable = !$Disable
-    $PathParams = @{}
-    if ($Enable) {
-        $PathFunc = 'Add-PathStringElement'
-        $PathParams['Action'] = 'Prepend'
-        $PathChangesDesc = 'Prepended to PATH: '
-    } else {
-        $PathFunc = 'Remove-PathStringElement'
-        $PathChangesDesc = 'Removed from PATH: '
-    }
+    End {
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $Msg = "Node.js path is inaccessible or not a directory: ${Path}"
 
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+            if (!$Force) {
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
 
-    if ($Env:NPM_CONFIG_PREFIX) {
-        if (!(Test-IsPathFullyQualified -Path $Env:NPM_CONFIG_PREFIX)) {
-            $ErrMsg = "NPM_CONFIG_PREFIX is not set to a fully qualified path: ${Env:NPM_CONFIG_PREFIX}"
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'PathNotFullyQualified', $ErrCat, $Env:NPM_CONFIG_PREFIX)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+            Write-Warning -Message $Msg
         }
 
-        $GlobalNpmPath = $Env:NPM_CONFIG_PREFIX
-    } else {
-        $GlobalNpmPath = Join-Path -Path $Env:APPDATA -ChildPath 'npm'
-    }
+        $Enable = !$Disable
+        $PathParams = @{}
+        if ($Enable) {
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
+        } else {
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
+        }
 
-    $PathChanges = $GlobalNpmPath, $Path
-    foreach ($PathChange in $PathChanges) {
-        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
-        Write-Host $PathChange
-    }
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
 
-    if ($Disable -and $IncludeNonPathVars) {
-        $Env:NPM_CONFIG_PREFIX = ''
-        Write-Host -ForegroundColor 'Green' 'Unset NPM_CONFIG_PREFIX.'
-    }
+        if ($Env:NPM_CONFIG_PREFIX) {
+            if (!(Test-IsPathFullyQualified -Path $Env:NPM_CONFIG_PREFIX)) {
+                $ErrMsg = "NPM_CONFIG_PREFIX is not set to a fully qualified path: ${Env:NPM_CONFIG_PREFIX}"
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'PathNotFullyQualified', $ErrCat, $Env:NPM_CONFIG_PREFIX)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
 
-    if ($Persist) {
-        Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+            $GlobalNpmPath = $Env:NPM_CONFIG_PREFIX
+        } else {
+            $GlobalNpmPath = Join-Path -Path $Env:APPDATA -ChildPath 'npm'
+        }
 
-        Get-EnvironmentVariable -Name 'Path' |
-            & $PathFunc @PathParams -Element $GlobalNpmPath |
-            & $PathFunc @PathParams -Element $Path |
-            Set-EnvironmentVariable -Name 'Path'
+        $PathChanges = $GlobalNpmPath, $Path
+        foreach ($PathChange in $PathChanges) {
+            $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
+            Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+            Write-Host $PathChange
+        }
 
-        if ($Enable -and ![String]::IsNullOrEmpty($Env:NPM_CONFIG_PREFIX)) {
-            Set-EnvironmentVariable -Name 'NPM_CONFIG_PREFIX' -Value $Env:NPM_CONFIG_PREFIX
-        } elseif ($Disable -and $IncludeNonPathVars) {
-            Set-EnvironmentVariable -Name 'NPM_CONFIG_PREFIX' -Value ''
+        if ($Disable -and $IncludeNonPathVars) {
+            $Env:NPM_CONFIG_PREFIX = ''
+            Write-Host -ForegroundColor 'Green' 'Unset NPM_CONFIG_PREFIX.'
+        }
+
+        if ($Persist) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) { $PathParams['Action'] = 'Append' }
+
+            Get-EnvironmentVariable -Name 'Path' |
+                & $PathFunc @PathParams -Element $GlobalNpmPath |
+                & $PathFunc @PathParams -Element $Path |
+                Set-EnvironmentVariable -Name 'Path'
+
+            if ($Enable -and ![String]::IsNullOrEmpty($Env:NPM_CONFIG_PREFIX)) {
+                Set-EnvironmentVariable -Name 'NPM_CONFIG_PREFIX' -Value $Env:NPM_CONFIG_PREFIX
+            } elseif ($Disable -and $IncludeNonPathVars) {
+                Set-EnvironmentVariable -Name 'NPM_CONFIG_PREFIX' -Value ''
+            }
         }
     }
 }
@@ -905,118 +953,130 @@ Function Switch-Perl {
         [Parameter(ParameterSetName = 'Disable')]
         [Switch]$IncludeNonPathVars,
 
-        [Switch]$Persist,
         [Switch]$Force
     )
 
-    $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
-    if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $Msg = "Perl path is inaccessible or not a directory: ${Path}"
+    DynamicParam {
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
-        if (!$Force) {
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        if (Test-IsWindows) {
+            $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $null)
+            $RuntimeParams.Add('Persist', $PersistParam)
         }
 
-        Write-Warning -Message $Msg
+        return $RuntimeParams
     }
 
-    $Enable = !$Disable
-    $PathParams = @{}
-    if ($Enable) {
-        $PathFunc = 'Add-PathStringElement'
-        $PathParams['Action'] = 'Prepend'
-        $PathChangesDesc = 'Prepended to PATH: '
-    } else {
-        $PathFunc = 'Remove-PathStringElement'
-        $PathChangesDesc = 'Removed from PATH: '
-    }
+    End {
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $Msg = "Perl path is inaccessible or not a directory: ${Path}"
 
-    $PathChanges = [Collections.Generic.List[String]]::new()
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+            if (!$Force) {
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
 
-    $RootBinPath = Join-Path -Path $Path -ChildPath 'c\bin'
-    $PathChanges.Add($RootBinPath)
-
-    $SiteBinPath = Join-Path -Path $Path -ChildPath 'perl\site\bin'
-    $PathChanges.Insert(0, $SiteBinPath)
-
-    $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
-    $PathChanges.Insert(0, $PerlBinPath)
-
-    if ($Env:PERL5LIB) {
-        if (!(Test-IsPathFullyQualified -Path $Env:PERL5LIB)) {
-            $ErrMsg = "PERL5LIB is not set to a fully qualified path: ${Env:PERL5LIB}"
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'PathNotFullyQualified', $ErrCat, $Env:PERL5LIB)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+            Write-Warning -Message $Msg
         }
 
-        $UserBasePathElements = $Env:PERL5LIB.Split([IO.Path]::DirectorySeparatorChar)
-        if ($UserBasePathElements.Count -lt 3) {
-            $ErrMsg = "PERL5LIB has less than expected minimum of 3 path components: ${Env:PERL5LIB}"
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'InvalidPath', $ErrCat, $Env:PERL5LIB)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        $Enable = !$Disable
+        $PathParams = @{}
+        if ($Enable) {
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
+        } else {
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
         }
 
-        $UserBasePath = $UserBasePathElements[0..($UserBasePathElements.Count - 3)] -join [IO.Path]::DirectorySeparatorChar
-        $UserBasePathEsc = $UserBasePath
-        if ([IO.Path]::DirectorySeparatorChar -eq '\') {
-            $UserBasePathEsc = $UserBasePath.Replace('\', '\\')
-        }
+        $PathChanges = [Collections.Generic.List[String]]::new()
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
 
-        $UserBinPath = Join-Path -Path $UserBasePath -ChildPath 'bin'
-        $PathChanges.Insert(0, $UserBinPath)
-    }
+        $RootBinPath = Join-Path -Path $Path -ChildPath 'c\bin'
+        $PathChanges.Add($RootBinPath)
 
-    foreach ($PathChange in $PathChanges) {
-        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
-        Write-Host $PathChange
-    }
+        $SiteBinPath = Join-Path -Path $Path -ChildPath 'perl\site\bin'
+        $PathChanges.Insert(0, $SiteBinPath)
 
-    if ($Enable -and $Env:PERL5LIB) {
-        # Extra options for `Module::Build`
-        $Env:PERL_MB_OPT = "--install_base '${UserBasePathEsc}'"
-        Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MB_OPT to: '
-        Write-Host $Env:PERL_MB_OPT
-
-        # Extra options for `ExtUtils::MakeMaker`
-        $Env:PERL_MM_OPT = "INSTALL_BASE=`"${UserBasePathEsc}`""
-        Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MM_OPT to: '
-        Write-Host $Env:PERL_MM_OPT
-    } elseif ($Disable -and $IncludeNonPathVars) {
-        $Env:PERL_MB_OPT = ''
-        Write-Host -ForegroundColor 'Green' 'Unset PERL_MB_OPT.'
-
-        $Env:PERL_MM_OPT = ''
-        Write-Host -ForegroundColor 'Green' 'Unset PERL_MM_OPT.'
-    }
-
-    if ($Persist) {
-        Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+        $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
+        $PathChanges.Insert(0, $PerlBinPath)
 
         if ($Env:PERL5LIB) {
-            Get-EnvironmentVariable -Name 'Path' |
-                & $PathFunc @PathParams -Element $UserBinPath |
-                Set-EnvironmentVariable -Name 'Path'
+            if (!(Test-IsPathFullyQualified -Path $Env:PERL5LIB)) {
+                $ErrMsg = "PERL5LIB is not set to a fully qualified path: ${Env:PERL5LIB}"
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'PathNotFullyQualified', $ErrCat, $Env:PERL5LIB)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            $UserBasePathElements = $Env:PERL5LIB.Split([IO.Path]::DirectorySeparatorChar)
+            if ($UserBasePathElements.Count -lt 3) {
+                $ErrMsg = "PERL5LIB has less than expected minimum of 3 path components: ${Env:PERL5LIB}"
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'InvalidPath', $ErrCat, $Env:PERL5LIB)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            $UserBasePath = $UserBasePathElements[0..($UserBasePathElements.Count - 3)] -join [IO.Path]::DirectorySeparatorChar
+            $UserBasePathEsc = $UserBasePath
+            if ([IO.Path]::DirectorySeparatorChar -eq '\') {
+                $UserBasePathEsc = $UserBasePath.Replace('\', '\\')
+            }
+
+            $UserBinPath = Join-Path -Path $UserBasePath -ChildPath 'bin'
+            $PathChanges.Insert(0, $UserBinPath)
         }
 
-        Get-EnvironmentVariable -Name 'Path' |
-            & $PathFunc @PathParams -Element $RootBinPath |
-            & $PathFunc @PathParams -Element $SiteBinPath |
-            & $PathFunc @PathParams -Element $PerlBinPath |
-            Set-EnvironmentVariable -Name 'Path'
+        foreach ($PathChange in $PathChanges) {
+            $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
+            Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+            Write-Host $PathChange
+        }
 
-        if ($Enable -and ![String]::IsNullOrEmpty($Env:PERL5LIB)) {
-            Set-EnvironmentVariable -Name 'PERL_MB_OPT' -Value $Env:PERL_MB_OPT
-            Set-EnvironmentVariable -Name 'PERL_MM_OPT' -Value $Env:PERL_MM_OPT
+        if ($Enable -and $Env:PERL5LIB) {
+            # Extra options for `Module::Build`
+            $Env:PERL_MB_OPT = "--install_base '${UserBasePathEsc}'"
+            Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MB_OPT to: '
+            Write-Host $Env:PERL_MB_OPT
+
+            # Extra options for `ExtUtils::MakeMaker`
+            $Env:PERL_MM_OPT = "INSTALL_BASE=`"${UserBasePathEsc}`""
+            Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MM_OPT to: '
+            Write-Host $Env:PERL_MM_OPT
         } elseif ($Disable -and $IncludeNonPathVars) {
-            Set-EnvironmentVariable -Name 'PERL_MB_OPT' -Value ''
-            Set-EnvironmentVariable -Name 'PERL_MM_OPT' -Value ''
+            $Env:PERL_MB_OPT = ''
+            Write-Host -ForegroundColor 'Green' 'Unset PERL_MB_OPT.'
+
+            $Env:PERL_MM_OPT = ''
+            Write-Host -ForegroundColor 'Green' 'Unset PERL_MM_OPT.'
+        }
+
+        if ($Persist) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) { $PathParams['Action'] = 'Append' }
+
+            if ($Env:PERL5LIB) {
+                Get-EnvironmentVariable -Name 'Path' |
+                    & $PathFunc @PathParams -Element $UserBinPath |
+                    Set-EnvironmentVariable -Name 'Path'
+            }
+
+            Get-EnvironmentVariable -Name 'Path' |
+                & $PathFunc @PathParams -Element $RootBinPath |
+                & $PathFunc @PathParams -Element $SiteBinPath |
+                & $PathFunc @PathParams -Element $PerlBinPath |
+                Set-EnvironmentVariable -Name 'Path'
+
+            if ($Enable -and ![String]::IsNullOrEmpty($Env:PERL5LIB)) {
+                Set-EnvironmentVariable -Name 'PERL_MB_OPT' -Value $Env:PERL_MB_OPT
+                Set-EnvironmentVariable -Name 'PERL_MM_OPT' -Value $Env:PERL_MM_OPT
+            } elseif ($Disable -and $IncludeNonPathVars) {
+                Set-EnvironmentVariable -Name 'PERL_MB_OPT' -Value ''
+                Set-EnvironmentVariable -Name 'PERL_MM_OPT' -Value ''
+            }
         }
     }
 }
@@ -1036,47 +1096,59 @@ Function Switch-PHP {
         [Parameter(ParameterSetName = 'Disable', Mandatory)]
         [Switch]$Disable,
 
-        [Switch]$Persist,
         [Switch]$Force
     )
 
-    $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
-    if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $Msg = "PHP path is inaccessible or not a directory: ${Path}"
+    DynamicParam {
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
-        if (!$Force) {
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        if (Test-IsWindows) {
+            $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $null)
+            $RuntimeParams.Add('Persist', $PersistParam)
         }
 
-        Write-Warning -Message $Msg
+        return $RuntimeParams
     }
 
-    $Enable = !$Disable
-    $PathParams = @{}
-    if ($Enable) {
-        $PathFunc = 'Add-PathStringElement'
-        $PathParams['Action'] = 'Prepend'
-        $PathChangesDesc = 'Prepended to PATH: '
-    } else {
-        $PathFunc = 'Remove-PathStringElement'
-        $PathChangesDesc = 'Removed from PATH: '
-    }
+    End {
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $Msg = "PHP path is inaccessible or not a directory: ${Path}"
 
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+            if (!$Force) {
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
 
-    $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $Path
-    Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
-    Write-Host $Path
+            Write-Warning -Message $Msg
+        }
 
-    if ($Persist) {
-        Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+        $Enable = !$Disable
+        $PathParams = @{}
+        if ($Enable) {
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
+        } else {
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
+        }
 
-        Get-EnvironmentVariable -Name 'Path' |
-            & $PathFunc @PathParams -Element $Path |
-            Set-EnvironmentVariable -Name 'Path'
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+
+        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $Path
+        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host $Path
+
+        if ($Persist) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) { $PathParams['Action'] = 'Append' }
+
+            Get-EnvironmentVariable -Name 'Path' |
+                & $PathFunc @PathParams -Element $Path |
+                Set-EnvironmentVariable -Name 'Path'
+        }
     }
 }
 
@@ -1219,175 +1291,187 @@ Function Switch-Python {
         [Parameter(ParameterSetName = 'Disable')]
         [Switch]$IncludeNonPathVars,
 
-        [Switch]$Persist,
         [Switch]$Force
     )
 
-    if (!$Version) {
-        if (!(Get-Command -Name 'python' -ErrorAction 'Ignore')) {
-            $ErrMsg = 'Unable to detect Python version as python command not found.'
-            $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NativeCommandNotFound', $ErrCat, $null)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
-        }
-    }
+    DynamicParam {
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
-    $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
-    if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $Msg = "Python path is inaccessible or not a directory: ${Path}"
-
-        if (!$Force) {
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        if (Test-IsWindows) {
+            $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $null)
+            $RuntimeParams.Add('Persist', $PersistParam)
         }
 
-        Write-Warning -Message $Msg
+        return $RuntimeParams
     }
 
-    $Enable = !$Disable
-    $PathParams = @{}
-    $PathChanges = [Collections.Generic.List[String]]::new()
-    if ($Enable) {
-        $PathFunc = 'Add-PathStringElement'
-        $PathParams['Action'] = 'Prepend'
-        $PathChangesDesc = 'Prepended to PATH: '
-    } else {
-        $PathFunc = 'Remove-PathStringElement'
-        $PathChangesDesc = 'Removed from PATH: '
-    }
-
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
-    $PathChanges.Add($Path)
-
-    $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
-    $PathChanges.Add($ScriptsPath)
-
-    if ($Env:PYTHONUSERBASE) {
-        if (!(Test-IsPathFullyQualified -Path $Env:PYTHONUSERBASE)) {
-            $ErrMsg = "PYTHONUSERBASE is not set to a fully qualified path: ${Env:PYTHONUSERBASE}"
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'PathNotFullyQualified', $ErrCat, $Env:PYTHONUSERBASE)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
-        }
-
-        Write-Verbose -Message "Using explicit PYTHONUSERBASE: ${Env:PYTHONUSERBASE}"
-        $PythonUserBase = $Env:PYTHONUSERBASE
-    } else {
-        Write-Verbose -Message "Using default PYTHONUSERBASE: ${Env:APPDATA}"
-        $PythonUserBase = $Env:APPDATA
-    }
-
-    $LocalScriptsSharedPath = Join-Path -Path $PythonUserBase -ChildPath 'Python\Scripts'
-    $PathChanges.Add($LocalScriptsSharedPath)
-
-    if (!$Version) {
-        $PythonExe = Join-Path -Path $Path -ChildPath 'python.exe'
-
-        try {
-            $PythonFailed = $false
-            $PythonVersionRaw = & @PythonExe -V 2>&1
-            if ($LASTEXITCODE -ne 0) {
-                $PythonFailed = $true
-                $ErrMsg = "Failed to retrieve Python version (rc: ${LASTEXITCODE})."
-            }
-        } catch {
-            $PythonFailed = $true
-            $ErrMsg = "Python executable missing or could not be executed: ${PythonExe}"
-        } finally {
-            if ($PythonFailed) {
-                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NativeCommandFailed', $ErrCat, $PythonExe)
+    End {
+        if (!$Version) {
+            if (!(Get-Command -Name 'python' -ErrorAction 'Ignore')) {
+                $ErrMsg = 'Unable to detect Python version as python command not found.'
+                $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NativeCommandNotFound', $ErrCat, $null)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
         }
 
-        if ($PythonVersionRaw -notmatch '[0-9]+\.[0-9]+') {
-            $ErrMsg = "Failed to retrieve Python version: ${PythonVersionRaw}"
-            $ErrCat = [Management.Automation.ErrorCategory]::ParserError
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'VersionParseFailed', $ErrCat, $PythonVersionRaw)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $Msg = "Python path is inaccessible or not a directory: ${Path}"
+
+            if (!$Force) {
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            Write-Warning -Message $Msg
         }
 
-        $Version = $Matches[0]
-    }
-
-    $NativeVersion = [Version]$Version
-    $StrippedVersion = $Version -replace '\.'
-
-    $LocalScriptsVersionedPath = Join-Path -Path $PythonUserBase -ChildPath "Python\Python${StrippedVersion}\Scripts"
-    $PathChanges.Add($LocalScriptsVersionedPath)
-
-    foreach ($PathChange in $PathChanges) {
-        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
-        Write-Host $PathChange
-    }
-
-    # Python Development Mode
-    $DevMode = $false
-    if ($Features -contains 'Dev') {
+        $Enable = !$Disable
+        $PathParams = @{}
+        $PathChanges = [Collections.Generic.List[String]]::new()
         if ($Enable) {
-            if ($NativeVersion -ge '3.7') {
-                $DevMode = $true
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
+        } else {
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
+        }
+
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $PathChanges.Add($Path)
+
+        $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
+        $PathChanges.Add($ScriptsPath)
+
+        if ($Env:PYTHONUSERBASE) {
+            if (!(Test-IsPathFullyQualified -Path $Env:PYTHONUSERBASE)) {
+                $ErrMsg = "PYTHONUSERBASE is not set to a fully qualified path: ${Env:PYTHONUSERBASE}"
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'PathNotFullyQualified', $ErrCat, $Env:PYTHONUSERBASE)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            Write-Verbose -Message "Using explicit PYTHONUSERBASE: ${Env:PYTHONUSERBASE}"
+            $PythonUserBase = $Env:PYTHONUSERBASE
+        } else {
+            Write-Verbose -Message "Using default PYTHONUSERBASE: ${Env:APPDATA}"
+            $PythonUserBase = $Env:APPDATA
+        }
+
+        $LocalScriptsSharedPath = Join-Path -Path $PythonUserBase -ChildPath 'Python\Scripts'
+        $PathChanges.Add($LocalScriptsSharedPath)
+
+        if (!$Version) {
+            $PythonExe = Join-Path -Path $Path -ChildPath 'python.exe'
+
+            try {
+                $PythonFailed = $false
+                $PythonVersionRaw = & @PythonExe -V 2>&1
+                if ($LASTEXITCODE -ne 0) {
+                    $PythonFailed = $true
+                    $ErrMsg = "Failed to retrieve Python version (rc: ${LASTEXITCODE})."
+                }
+            } catch {
+                $PythonFailed = $true
+                $ErrMsg = "Python executable missing or could not be executed: ${PythonExe}"
+            } finally {
+                if ($PythonFailed) {
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                    $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'NativeCommandFailed', $ErrCat, $PythonExe)
+                    $PSCmdlet.ThrowTerminatingError($ErrRec)
+                }
+            }
+
+            if ($PythonVersionRaw -notmatch '[0-9]+\.[0-9]+') {
+                $ErrMsg = "Failed to retrieve Python version: ${PythonVersionRaw}"
+                $ErrCat = [Management.Automation.ErrorCategory]::ParserError
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($ErrMsg), 'VersionParseFailed', $ErrCat, $PythonVersionRaw)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            $Version = $Matches[0]
+        }
+
+        $NativeVersion = [Version]$Version
+        $StrippedVersion = $Version -replace '\.'
+
+        $LocalScriptsVersionedPath = Join-Path -Path $PythonUserBase -ChildPath "Python\Python${StrippedVersion}\Scripts"
+        $PathChanges.Add($LocalScriptsVersionedPath)
+
+        foreach ($PathChange in $PathChanges) {
+            $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
+            Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+            Write-Host $PathChange
+        }
+
+        # Python Development Mode
+        $DevMode = $false
+        if ($Features -contains 'Dev') {
+            if ($Enable) {
+                if ($NativeVersion -ge '3.7') {
+                    $DevMode = $true
+                } else {
+                    Write-Warning -Message 'Not enabling development mode as Python release is not >= 3.7.'
+                }
+            }
+
+            if ($DevMode) {
+                $Env:PYTHONDEVMODE = 1
+                Write-Host -ForegroundColor 'Green' -NoNewline 'Set PYTHONDEVMODE to: '
+                Write-Host $Env:PYTHONDEVMODE
             } else {
-                Write-Warning -Message 'Not enabling development mode as Python release is not >= 3.7.'
+                $Env:PYTHONDEVMODE = ''
+                Write-Host -ForegroundColor 'Green' 'Unset PYTHONDEVMODE.'
             }
         }
 
-        if ($DevMode) {
-            $Env:PYTHONDEVMODE = 1
-            Write-Host -ForegroundColor 'Green' -NoNewline 'Set PYTHONDEVMODE to: '
-            Write-Host $Env:PYTHONDEVMODE
-        } else {
-            $Env:PYTHONDEVMODE = ''
-            Write-Host -ForegroundColor 'Green' 'Unset PYTHONDEVMODE.'
-        }
-    }
+        # UTF-8 Mode (see PEP 540)
+        $Utf8Mode = $false
+        if ($Features -contains 'UTF-8') {
+            if ($Enable) {
+                if ($NativeVersion -ge '3.7') {
+                    $Utf8Mode = $true
+                } else {
+                    Write-Warning -Message 'Not enabling UTF-8 mode as Python release is not 3.7.'
+                }
+            }
 
-    # UTF-8 Mode (see PEP 540)
-    $Utf8Mode = $false
-    if ($Features -contains 'UTF-8') {
-        if ($Enable) {
-            if ($NativeVersion -ge '3.7') {
-                $Utf8Mode = $true
+            if ($Utf8Mode) {
+                $Env:PYTHONUTF8 = 1
+                Write-Host -ForegroundColor 'Green' 'Set PYTHONUTF8 to: '
+                Write-Host $Env:PYTHONUTF8
             } else {
-                Write-Warning -Message 'Not enabling UTF-8 mode as Python release is not 3.7.'
+                $Env:PYTHONUTF8 = ''
+                Write-Host -ForegroundColor 'Green' 'Unset PYTHONUTF8.'
             }
         }
 
-        if ($Utf8Mode) {
-            $Env:PYTHONUTF8 = 1
-            Write-Host -ForegroundColor 'Green' 'Set PYTHONUTF8 to: '
-            Write-Host $Env:PYTHONUTF8
-        } else {
-            $Env:PYTHONUTF8 = ''
-            Write-Host -ForegroundColor 'Green' 'Unset PYTHONUTF8.'
-        }
-    }
+        if ($Persist) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) { $PathParams['Action'] = 'Append' }
 
-    if ($Persist) {
-        Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+            Get-EnvironmentVariable -Name 'Path' |
+                & $PathFunc @PathParams -Element $LocalScriptsVersionedPath |
+                & $PathFunc @PathParams -Element $LocalScriptsSharedPath |
+                & $PathFunc @PathParams -Element $ScriptsPath |
+                & $PathFunc @PathParams -Element $Path |
+                Set-EnvironmentVariable -Name 'Path'
 
-        Get-EnvironmentVariable -Name 'Path' |
-            & $PathFunc @PathParams -Element $LocalScriptsVersionedPath |
-            & $PathFunc @PathParams -Element $LocalScriptsSharedPath |
-            & $PathFunc @PathParams -Element $ScriptsPath |
-            & $PathFunc @PathParams -Element $Path |
-            Set-EnvironmentVariable -Name 'Path'
+            if ($DevMode) {
+                Set-EnvironmentVariable -Name 'PYTHONDEVMODE' -Value $Env:PYTHONDEVMODE
+            }
 
-        if ($DevMode) {
-            Set-EnvironmentVariable -Name 'PYTHONDEVMODE' -Value $Env:PYTHONDEVMODE
-        }
+            if ($Utf8Mode) {
+                Set-EnvironmentVariable -Name 'PYTHONUTF8' -Value $Env:PYTHONUTF8
+            }
 
-        if ($Utf8Mode) {
-            Set-EnvironmentVariable -Name 'PYTHONUTF8' -Value $Env:PYTHONUTF8
-        }
-
-        if ($Disable -and $IncludeNonPathVars) {
-            Set-EnvironmentVariable -Name 'PYTHONDEVMODE' -Value ''
-            Set-EnvironmentVariable -Name 'PYTHONUTF8' -Value ''
+            if ($Disable -and $IncludeNonPathVars) {
+                Set-EnvironmentVariable -Name 'PYTHONDEVMODE' -Value ''
+                Set-EnvironmentVariable -Name 'PYTHONUTF8' -Value ''
+            }
         }
     }
 }
@@ -1719,64 +1803,76 @@ Function Switch-Ruby {
         [Parameter(ParameterSetName = 'Disable')]
         [Switch]$IncludeNonPathVars,
 
-        [Switch]$Persist,
         [Switch]$Force
     )
 
-    $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
-    if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $Msg = "Ruby path is inaccessible or not a directory: ${Path}"
+    DynamicParam {
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
-        if (!$Force) {
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        if (Test-IsWindows) {
+            $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $null)
+            $RuntimeParams.Add('Persist', $PersistParam)
         }
 
-        Write-Warning -Message $Msg
+        return $RuntimeParams
     }
 
-    $Enable = !$Disable
-    $PathParams = @{}
-    if ($Enable) {
-        $PathFunc = 'Add-PathStringElement'
-        $PathParams['Action'] = 'Prepend'
-        $PathChangesDesc = 'Prepended to PATH: '
-        $Options = $Options.Trim()
-    } else {
-        $PathFunc = 'Remove-PathStringElement'
-        $PathChangesDesc = 'Removed from PATH: '
-    }
+    End {
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $Msg = "Ruby path is inaccessible or not a directory: ${Path}"
 
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
-    $BinPath = Join-Path -Path $Path -ChildPath 'bin'
+            if (!$Force) {
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
 
-    $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
-    Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
-    Write-Host $BinPath
+            Write-Warning -Message $Msg
+        }
 
-    # TODO: Handle options properly
-    if ($Enable -and $Options) {
-        $Env:RUBYOPT = $Options
-        Write-Host -ForegroundColor 'Green' -NoNewline 'Set RUBYOPT to: '
-        Write-Host $Env:RUBYOPT
-    } elseif ($Disable -and $IncludeNonPathVars) {
-        $Env:RUBYOPT = ''
-        Write-Host -ForegroundColor 'Green' 'Unset RUBYOPT.'
-    }
+        $Enable = !$Disable
+        $PathParams = @{}
+        if ($Enable) {
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
+            $Options = $Options.Trim()
+        } else {
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
+        }
 
-    if ($Persist) {
-        Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
-        Get-EnvironmentVariable -Name 'Path' |
-            & $PathFunc @PathParams -Element $BinPath |
-            Set-EnvironmentVariable -Name 'Path'
+        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
+        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host $BinPath
 
-        if ($Enable -and ![String]::IsNullOrEmpty($Env:RUBYOPT)) {
-            Set-EnvironmentVariable -Name 'RUBYOPT' -Value $Env:RUBYOPT
+        # TODO: Handle options properly
+        if ($Enable -and $Options) {
+            $Env:RUBYOPT = $Options
+            Write-Host -ForegroundColor 'Green' -NoNewline 'Set RUBYOPT to: '
+            Write-Host $Env:RUBYOPT
         } elseif ($Disable -and $IncludeNonPathVars) {
-            Set-EnvironmentVariable -Name 'RUBYOPT' -Value ''
+            $Env:RUBYOPT = ''
+            Write-Host -ForegroundColor 'Green' 'Unset RUBYOPT.'
+        }
+
+        if ($Persist) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) { $PathParams['Action'] = 'Append' }
+
+            Get-EnvironmentVariable -Name 'Path' |
+                & $PathFunc @PathParams -Element $BinPath |
+                Set-EnvironmentVariable -Name 'Path'
+
+            if ($Enable -and ![String]::IsNullOrEmpty($Env:RUBYOPT)) {
+                Set-EnvironmentVariable -Name 'RUBYOPT' -Value $Env:RUBYOPT
+            } elseif ($Disable -and $IncludeNonPathVars) {
+                Set-EnvironmentVariable -Name 'RUBYOPT' -Value ''
+            }
         }
     }
 }
@@ -1899,68 +1995,80 @@ Function Switch-Rust {
         [Parameter(ParameterSetName = 'Disable')]
         [Switch]$IncludeNonPathVars,
 
-        [Switch]$Persist,
         [Switch]$Force
     )
 
-    if (!$Path) {
-        if ($Env:CARGO_HOME) {
-            $Path = $Env:CARGO_HOME
-            Write-Verbose -Message "Using CARGO_HOME path: ${Path}"
+    DynamicParam {
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
+
+        if (Test-IsWindows) {
+            $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $null)
+            $RuntimeParams.Add('Persist', $PersistParam)
+        }
+
+        return $RuntimeParams
+    }
+
+    End {
+        if (!$Path) {
+            if ($Env:CARGO_HOME) {
+                $Path = $Env:CARGO_HOME
+                Write-Verbose -Message "Using CARGO_HOME path: ${Path}"
+            } else {
+                $Path = Join-Path -Path $HOME -ChildPath '.cargo'
+                Write-Verbose -Message "Using default Cargo path: ${Path}"
+            }
+        }
+
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $Msg = "Cargo path is inaccessible or not a directory: ${Path}"
+
+            if (!$Force) {
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            Write-Warning -Message $Msg
+        }
+
+        $Enable = !$Disable
+        $PathParams = @{}
+        if ($Enable) {
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
         } else {
-            $Path = Join-Path -Path $HOME -ChildPath '.cargo'
-            Write-Verbose -Message "Using default Cargo path: ${Path}"
-        }
-    }
-
-    $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
-    if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $Msg = "Cargo path is inaccessible or not a directory: ${Path}"
-
-        if (!$Force) {
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-            $ErrRec = [Management.Automation.ErrorRecord]::new([Exception]::new($Msg), 'PSInvalidArgument', $ErrCat, $Path)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
         }
 
-        Write-Warning -Message $Msg
-    }
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
-    $Enable = !$Disable
-    $PathParams = @{}
-    if ($Enable) {
-        $PathFunc = 'Add-PathStringElement'
-        $PathParams['Action'] = 'Prepend'
-        $PathChangesDesc = 'Prepended to PATH: '
-    } else {
-        $PathFunc = 'Remove-PathStringElement'
-        $PathChangesDesc = 'Removed from PATH: '
-    }
+        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
+        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host $BinPath
 
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
-    $BinPath = Join-Path -Path $Path -ChildPath 'bin'
+        if ($Disable -and $IncludeNonPathVars) {
+            $Env:CARGO_HOME = ''
+            Write-Host -ForegroundColor 'Green' 'Unset CARGO_HOME.'
+        }
 
-    $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
-    Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
-    Write-Host $BinPath
+        if ($Persist) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) { $PathParams['Action'] = 'Append' }
 
-    if ($Disable -and $IncludeNonPathVars) {
-        $Env:CARGO_HOME = ''
-        Write-Host -ForegroundColor 'Green' 'Unset CARGO_HOME.'
-    }
+            Get-EnvironmentVariable -Name 'Path' |
+                & $PathFunc @PathParams -Element $BinPath |
+                Set-EnvironmentVariable -Name 'Path'
 
-    if ($Persist) {
-        Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
-
-        Get-EnvironmentVariable -Name 'Path' |
-            & $PathFunc @PathParams -Element $BinPath |
-            Set-EnvironmentVariable -Name 'Path'
-
-        if ($Enable -and ![String]::IsNullOrEmpty($Env:CARGO_HOME)) {
-            Set-EnvironmentVariable -Name 'CARGO_HOME' -Value $Path
-        } elseif ($Disable -and $IncludeNonPathVars) {
-            Set-EnvironmentVariable -Name 'CARGO_HOME' -Value ''
+            if ($Enable -and ![String]::IsNullOrEmpty($Env:CARGO_HOME)) {
+                Set-EnvironmentVariable -Name 'CARGO_HOME' -Value $Path
+            } elseif ($Disable -and $IncludeNonPathVars) {
+                Set-EnvironmentVariable -Name 'CARGO_HOME' -Value ''
+            }
         }
     }
 }
