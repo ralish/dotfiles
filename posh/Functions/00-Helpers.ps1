@@ -78,7 +78,16 @@ Function Test-EnvironmentMatch {
     }
 }
 
-# Naive check for running on Windows
+# Naive check for running on a Unix-like system
+Function Test-IsUnix {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    Param()
+
+    return !(Test-IsWindows)
+}
+
+# Naive check for running on a Windows system
 Function Test-IsWindows {
     [CmdletBinding()]
     [OutputType([Boolean])]
@@ -369,7 +378,7 @@ Function Start-DotFilesSection {
             return $false
         }
 
-        if ($Platform -eq 'Unix' -and (Test-IsWindows)) {
+        if ($Platform -eq 'Unix' -and !(Test-IsUnix)) {
             Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as platform is not Unix-like.')
             return $false
         }
