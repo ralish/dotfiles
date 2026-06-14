@@ -109,6 +109,354 @@ Function Switch-Cygwin {
 
 #endregion
 
+#region Perl
+
+# Configure environment for Perl development
+#
+# Environment variables
+# https://perldoc.perl.org/perlrun.html#ENVIRONMENT
+Function Switch-Perl {
+    [CmdletBinding(DefaultParameterSetName = 'Enable')]
+    [OutputType([Void])]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Path,
+
+        [Parameter(ParameterSetName = 'Disable', Mandatory)]
+        [Switch]$Disable,
+
+        [Parameter(ParameterSetName = 'Disable')]
+        [Switch]$IncludeNonPathVars,
+
+        [Switch]$Persist,
+        [Switch]$Force
+    )
+
+    End {
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $ErrMsg = "Perl path is inaccessible or not a directory: ${Path}"
+
+            if (!$Force) {
+                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            Write-Warning -Message $ErrMsg
+        }
+
+        $Enable = !$Disable
+        $PathParams = @{}
+        if ($Enable) {
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
+        } else {
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
+        }
+
+        $PathChanges = [Collections.Generic.List[String]]::new()
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+
+        $RootBinPath = Join-Path -Path $Path -ChildPath 'c\bin'
+        $PathChanges.Add($RootBinPath)
+
+        $SiteBinPath = Join-Path -Path $Path -ChildPath 'perl\site\bin'
+        $PathChanges.Insert(0, $SiteBinPath)
+
+        $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
+        $PathChanges.Insert(0, $PerlBinPath)
+
+        if ($Env:PERL5LIB) {
+            if (!(Test-IsPathFullyQualified -Path $Env:PERL5LIB)) {
+                $ErrMsg = "PERL5LIB is not set to a fully qualified path: ${Env:PERL5LIB}"
+                $ErrExc = [FormatException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $Env:PERL5LIB)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            $UserBasePathElements = $Env:PERL5LIB.Split('\')
+            if ($UserBasePathElements.Count -lt 3) {
+                $ErrMsg = "PERL5LIB has less than expected minimum of 3 path components: ${Env:PERL5LIB}"
+                $ErrExc = [FormatException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'InvalidPath', $ErrCat, $Env:PERL5LIB)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            $UserBasePath = $UserBasePathElements[0..($UserBasePathElements.Count - 3)] -join '\'
+            $UserBasePathEsc = $UserBasePath
+            $UserBasePathEsc = $UserBasePath.Replace('\', '\\')
+
+            $UserBinPath = Join-Path -Path $UserBasePath -ChildPath 'bin'
+            $PathChanges.Insert(0, $UserBinPath)
+        }
+
+        foreach ($PathChange in $PathChanges) {
+            $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
+            Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+            Write-Host $PathChange
+        }
+
+        if ($Enable -and $Env:PERL5LIB) {
+            # Extra options for `Module::Build`
+            $Env:PERL_MB_OPT = "--install_base '${UserBasePathEsc}'"
+            Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MB_OPT to: '
+            Write-Host $Env:PERL_MB_OPT
+
+            # Extra options for `ExtUtils::MakeMaker`
+            $Env:PERL_MM_OPT = "INSTALL_BASE=`"${UserBasePathEsc}`""
+            Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MM_OPT to: '
+            Write-Host $Env:PERL_MM_OPT
+        } elseif ($Disable -and $IncludeNonPathVars) {
+            $Env:PERL_MB_OPT = ''
+            Write-Host -ForegroundColor 'Green' 'Unset PERL_MB_OPT.'
+
+            $Env:PERL_MM_OPT = ''
+            Write-Host -ForegroundColor 'Green' 'Unset PERL_MM_OPT.'
+        }
+
+        if ($Persist) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) { $PathParams['Action'] = 'Append' }
+
+            if ($Env:PERL5LIB) {
+                Get-EnvironmentVariable -Name 'Path' |
+                    & $PathFunc @PathParams -Element $UserBinPath |
+                    Set-EnvironmentVariable -Name 'Path'
+            }
+
+            Get-EnvironmentVariable -Name 'Path' |
+                & $PathFunc @PathParams -Element $RootBinPath |
+                & $PathFunc @PathParams -Element $SiteBinPath |
+                & $PathFunc @PathParams -Element $PerlBinPath |
+                Set-EnvironmentVariable -Name 'Path'
+
+            if ($Enable -and ![String]::IsNullOrEmpty($Env:PERL5LIB)) {
+                Set-EnvironmentVariable -Name 'PERL_MB_OPT' -Value $Env:PERL_MB_OPT
+                Set-EnvironmentVariable -Name 'PERL_MM_OPT' -Value $Env:PERL_MM_OPT
+            } elseif ($Disable -and $IncludeNonPathVars) {
+                Set-EnvironmentVariable -Name 'PERL_MB_OPT' -Value ''
+                Set-EnvironmentVariable -Name 'PERL_MM_OPT' -Value ''
+            }
+        }
+    }
+}
+
+#endregion
+
+#region Python
+
+# Configure environment for Python development
+#
+# Environment variables
+# https://docs.python.org/3/using/cmdline.html#environment-variables
+Function Switch-Python {
+    [CmdletBinding(DefaultParameterSetName = 'Enable')]
+    [OutputType([Void])]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Path,
+
+        [ValidatePattern('[0-9]+\.[0-9]+')]
+        [String]$Version,
+
+        [Parameter(ParameterSetName = 'Enable')]
+        [ValidateSet('Dev', 'UTF-8')]
+        [String[]]$Features = @('UTF-8'),
+
+        [Parameter(ParameterSetName = 'Disable', Mandatory)]
+        [Switch]$Disable,
+
+        [Parameter(ParameterSetName = 'Disable')]
+        [Switch]$IncludeNonPathVars,
+
+        [Switch]$Persist,
+        [Switch]$Force
+    )
+
+    End {
+        if (!$Version) {
+            if (!(Get-Command -Name 'python' -ErrorAction 'Ignore')) {
+                $ErrMsg = 'Unable to detect Python version as python command not found.'
+                $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'python')
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+        }
+
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $ErrMsg = "Python path is inaccessible or not a directory: ${Path}"
+
+            if (!$Force) {
+                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            Write-Warning -Message $ErrMsg
+        }
+
+        $Enable = !$Disable
+        $PathParams = @{}
+        $PathChanges = [Collections.Generic.List[String]]::new()
+        if ($Enable) {
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
+        } else {
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
+        }
+
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $PathChanges.Add($Path)
+
+        $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
+        $PathChanges.Add($ScriptsPath)
+
+        if ($Env:PYTHONUSERBASE) {
+            if (!(Test-IsPathFullyQualified -Path $Env:PYTHONUSERBASE)) {
+                $ErrMsg = "PYTHONUSERBASE is not set to a fully qualified path: ${Env:PYTHONUSERBASE}"
+                $ErrExc = [FormatException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $Env:PYTHONUSERBASE)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            Write-Verbose -Message "Using explicit PYTHONUSERBASE: ${Env:PYTHONUSERBASE}"
+            $PythonUserBase = $Env:PYTHONUSERBASE
+        } else {
+            Write-Verbose -Message "Using default PYTHONUSERBASE: ${Env:APPDATA}"
+            $PythonUserBase = $Env:APPDATA
+        }
+
+        $LocalScriptsSharedPath = Join-Path -Path $PythonUserBase -ChildPath 'Python\Scripts'
+        $PathChanges.Add($LocalScriptsSharedPath)
+
+        if (!$Version) {
+            $PythonExe = Join-Path -Path $Path -ChildPath 'python.exe'
+
+            try {
+                $PythonFailed = $false
+                $PythonVersionRaw = & @PythonExe -V 2>&1
+                if ($LASTEXITCODE -ne 0) {
+                    $PythonFailed = $true
+                    $ErrMsg = "Failed to retrieve Python version (rc: ${LASTEXITCODE})."
+                }
+            } catch {
+                $PythonFailed = $true
+                $ErrMsg = "Python executable missing or could not be executed: ${PythonExe}"
+            } finally {
+                if ($PythonFailed) {
+                    $ErrExc = [Exception]::new($ErrMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $PythonExe)
+                    $PSCmdlet.ThrowTerminatingError($ErrRec)
+                }
+            }
+
+            if ($PythonVersionRaw -notmatch '[0-9]+\.[0-9]+') {
+                $ErrMsg = "Failed to retrieve Python version: ${PythonVersionRaw}"
+                $ErrExc = [FormatException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $PythonVersionRaw)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            $Version = $Matches[0]
+        }
+
+        $NativeVersion = [Version]$Version
+        $StrippedVersion = $Version -replace '\.'
+
+        $LocalScriptsVersionedPath = Join-Path -Path $PythonUserBase -ChildPath "Python\Python${StrippedVersion}\Scripts"
+        $PathChanges.Add($LocalScriptsVersionedPath)
+
+        foreach ($PathChange in $PathChanges) {
+            $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
+            Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+            Write-Host $PathChange
+        }
+
+        # Python Development Mode
+        $DevMode = $false
+        if ($Features -contains 'Dev') {
+            if ($Enable) {
+                if ($NativeVersion -ge '3.7') {
+                    $DevMode = $true
+                } else {
+                    Write-Warning -Message 'Not enabling development mode as Python release is not >= 3.7.'
+                }
+            }
+
+            if ($DevMode) {
+                $Env:PYTHONDEVMODE = 1
+                Write-Host -ForegroundColor 'Green' -NoNewline 'Set PYTHONDEVMODE to: '
+                Write-Host $Env:PYTHONDEVMODE
+            } else {
+                $Env:PYTHONDEVMODE = ''
+                Write-Host -ForegroundColor 'Green' 'Unset PYTHONDEVMODE.'
+            }
+        }
+
+        # UTF-8 Mode (see PEP 540)
+        $Utf8Mode = $false
+        if ($Features -contains 'UTF-8') {
+            if ($Enable) {
+                if ($NativeVersion -ge '3.7') {
+                    $Utf8Mode = $true
+                } else {
+                    Write-Warning -Message 'Not enabling UTF-8 mode as Python release is not >= 3.7.'
+                }
+            }
+
+            if ($Utf8Mode) {
+                $Env:PYTHONUTF8 = 1
+                Write-Host -ForegroundColor 'Green' -NoNewline 'Set PYTHONUTF8 to: '
+                Write-Host $Env:PYTHONUTF8
+            } else {
+                $Env:PYTHONUTF8 = ''
+                Write-Host -ForegroundColor 'Green' 'Unset PYTHONUTF8.'
+            }
+        }
+
+        if ($Persist) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) { $PathParams['Action'] = 'Append' }
+
+            Get-EnvironmentVariable -Name 'Path' |
+                & $PathFunc @PathParams -Element $LocalScriptsVersionedPath |
+                & $PathFunc @PathParams -Element $LocalScriptsSharedPath |
+                & $PathFunc @PathParams -Element $ScriptsPath |
+                & $PathFunc @PathParams -Element $Path |
+                Set-EnvironmentVariable -Name 'Path'
+
+            if ($DevMode) {
+                Set-EnvironmentVariable -Name 'PYTHONDEVMODE' -Value $Env:PYTHONDEVMODE
+            }
+
+            if ($Utf8Mode) {
+                Set-EnvironmentVariable -Name 'PYTHONUTF8' -Value $Env:PYTHONUTF8
+            }
+
+            if ($Disable -and $IncludeNonPathVars) {
+                Set-EnvironmentVariable -Name 'PYTHONDEVMODE' -Value ''
+                Set-EnvironmentVariable -Name 'PYTHONUTF8' -Value ''
+            }
+        }
+    }
+}
+
+#endregion
+
 #region Windows
 
 # Configure environment for Windows SDK tools
