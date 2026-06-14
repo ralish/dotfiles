@@ -13,59 +13,86 @@ Function Get-DotFilesLastUpdated {
 
     Test-CommandAvailable -Name 'git', 'rg'
 
-    Push-Location
-    Set-Location -LiteralPath $DotFiles
+    try {
+        Push-Location
+        Set-Location -LiteralPath $DotFiles -ErrorAction 'Stop'
 
-    $ComponentVersions = [Collections.Generic.List[PSCustomObject]]::new()
+        # Exclude the `.git` directory
+        $RgGlobExcludeGit = '!.git/'
 
-    # Exclude the `.git` directory
-    $RgGlobExcludeGit = '!.git/'
+        # Exclude the file containing this function from being matched by `rg`
+        $RgGlobExcludeThis = "!$([IO.Path]::GetFileName($PSCommandPath))"
 
-    # Exclude the file containing this function from being matched by rg
-    $RgGlobExcludeThis = '!{0}' -f [IO.Path]::GetFileName($PSCommandPath)
-
-    $LastReviewedReleases = & rg --hidden -g $RgGlobExcludeGit -g $RgGlobExcludeThis 'Last reviewed release: '
-    foreach ($LastReviewedRelease in $LastReviewedReleases) {
-        if ($LastReviewedRelease -notmatch '^(.+):.*Last reviewed release: (.+)') {
-            Write-Error -Message 'Unexpected match returned by rg: {0}' -f $LastReviewedRelease
-            continue
+        $RgArgs = '--hidden', '-g', $RgGlobExcludeGit, '-g', $RgGlobExcludeThis, 'Last reviewed release: '
+        $LastReviewedReleases = & rg @RgArgs
+        if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) {
+            $ErrMsg = "ripgrep exited with unexpected exit code: ${LASTEXITCODE}"
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "rg $($RgArgs -join ' ')")
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $FilePath = $Matches[1]
-        $Version = $Matches[2]
-
-        if ($Version -match '^v[0-9]') {
-            $Version = $Version.Substring(1)
+        $GitArgs = @('ls-files')
+        $LastReviewedVersions = & git @GitArgs | Where-Object { $PSItem -match '[\\/]VERSION$' }
+        if ($LASTEXITCODE -ne 0) {
+            $ErrMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $ComponentVersions.Add([PSCustomObject]@{
-                Name    = $FilePath
-                Version = $Version
-            })
-    }
+        $ComponentVersions = [Collections.Generic.List[PSCustomObject]]::new()
 
-    $LastReviewedVersions = & git ls-files | Where-Object { $_ -match '[\\/]VERSION$' }
-    foreach ($LastReviewedVersion in $LastReviewedVersions) {
-        $ComponentDir = [IO.Path]::GetDirectoryName($LastReviewedVersion)
-        $ComponentName = [IO.Path]::GetFileName($ComponentDir)
-        $Version = Get-Content -LiteralPath $LastReviewedVersion -ReadCount 1
+        foreach ($LastReviewedRelease in $LastReviewedReleases) {
+            if ($LastReviewedRelease -notmatch '^(.+):.*Last reviewed release: (.+)') {
+                $ErrMsg = "Unexpected match returned by rg: ${LastReviewedRelease}"
+                $ErrExc = [FormatException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::ParserError
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $LastReviewedRelease)
+                $PSCmdlet.WriteError($ErrRec)
+                continue
+            }
 
-        if ($Version -match '^v[0-9]') {
-            $Version = $Version.Substring(1)
+            $Result = [PSCustomObject]@{
+                Name    = $Matches[1]
+                Version = $Matches[2]
+            }
+
+            if ($Result.Version -match '^v[0-9]') {
+                $Result.Version = $Result.Version.Substring(1)
+            }
+
+            $ComponentVersions.Add($Result)
         }
 
-        $ComponentVersions.Add([PSCustomObject]@{
+        foreach ($LastReviewedVersion in $LastReviewedVersions) {
+            $ComponentDir = [IO.Path]::GetDirectoryName($LastReviewedVersion)
+            $ComponentName = [IO.Path]::GetFileName($ComponentDir)
+            $Version = Get-Content -LiteralPath $LastReviewedVersion -TotalCount 1
+
+            if ([String]::IsNullOrEmpty($Version)) {
+                $Version = '(empty)'
+            } elseif ($Version -match '^v[0-9]') {
+                $Version = $Version.Substring(1)
+            }
+
+            $Result = [PSCustomObject]@{
                 Name    = $ComponentName
                 Version = $Version
-            })
+            }
+
+            $ComponentVersions.Add($Result)
+        }
+    } finally {
+        Pop-Location
     }
 
-    Pop-Location
-
-    return $ComponentVersions | Sort-Object -Property Name
+    return [PSCustomObject[]]@($ComponentVersions | Sort-Object -Property 'Name')
 }
 
-# Clear caches used by development environments & tooling
+# Clear caches used by development environments and tooling
 Function Clear-AllDevCaches {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
     [CmdletBinding(DefaultParameterSetName = 'OptOut', SupportsShouldProcess)]
@@ -109,6 +136,11 @@ Function Clear-AllDevCaches {
         'pip'
     )
 
+    $WriteProgressParams = @{
+        Id       = 0
+        Activity = 'Clearing caches for development environments & tooling'
+    }
+
     $Tasks = [Collections.Generic.List[String]]::new()
     $TasksDone = 0
     $TasksTotal = 0
@@ -121,60 +153,89 @@ Function Clear-AllDevCaches {
         }
     }
 
-    Write-Verbose -Message ('Clearing caches for: {0}' -f ($Tasks -join ', '))
-
-    $WriteProgressParams = @{
-        Id       = 0
-        Activity = 'Clearing caches for development environments & tooling'
-    }
+    Write-Verbose -Message "Clearing caches for: $($Tasks -join ', ')"
 
     if ($Tasks -contains 'Docker') {
         Write-Progress @WriteProgressParams -Status 'Clearing Docker cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        Clear-DockerCache
+
+        try {
+            Clear-DockerCache
+        } catch { $PSCmdlet.WriteError($PSItem) }
+
         $TasksDone++
     }
 
     if ($Tasks -contains 'gem') {
         Write-Progress @WriteProgressParams -Status 'Clearing gem cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        Clear-GemCache
+
+        try {
+            Clear-GemCache
+        } catch { $PSCmdlet.WriteError($PSItem) }
+
         $TasksDone++
     }
 
     if ($Tasks -contains 'Go') {
         Write-Progress @WriteProgressParams -Status 'Clearing Go cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        Clear-GoCache
+
+        try {
+            Clear-GoCache
+        } catch { $PSCmdlet.WriteError($PSItem) }
+
         $TasksDone++
     }
 
     if ($Tasks -contains 'Gradle') {
         Write-Progress @WriteProgressParams -Status 'Clearing Gradle cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        Clear-GradleCache
+
+        try {
+            Clear-GradleCache
+        } catch { $PSCmdlet.WriteError($PSItem) }
+
         $TasksDone++
     }
 
     if ($Tasks -contains 'Maven') {
         Write-Progress @WriteProgressParams -Status 'Clearing Maven cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        Clear-MavenCache
+
+        try {
+            Clear-MavenCache
+        } catch { $PSCmdlet.WriteError($PSItem) }
+
         $TasksDone++
     }
 
     if ($Tasks -contains 'npm') {
         Write-Progress @WriteProgressParams -Status 'Clearing npm cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        Clear-NpmCache
+
+        try {
+            Clear-NpmCache
+        } catch { $PSCmdlet.WriteError($PSItem) }
+
         $TasksDone++
     }
 
     if ($Tasks -contains 'NuGet') {
         Write-Progress @WriteProgressParams -Status 'Clearing NuGet cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        Clear-NuGetCache
+
+        try {
+            Clear-NuGetCache
+        } catch { $PSCmdlet.WriteError($PSItem) }
+
         $TasksDone++
     }
 
     if ($Tasks -contains 'pip') {
         Write-Progress @WriteProgressParams -Status 'Clearing pip cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-        Clear-PipCache
+
+        try {
+            Clear-PipCache
+        } catch { $PSCmdlet.WriteError($PSItem) }
+
         $TasksDone++
     }
+
+    Write-Progress @WriteProgressParams -Completed
 }
 
 # Update everything!
@@ -184,136 +245,110 @@ Function Update-AllTheThings {
     [OutputType([PSCustomObject])]
     Param()
 
-    # The ordering of elements in the arrays defined in the `DynamicParam`
-    # block is important as it determines the order in which the members
-    # corresponding to each selected tasks are added to the returned
-    # `PSCustomObject` containing all the task execution results.
     DynamicParam {
+        $AllCategories = 'System', 'Apps', 'Devel'
+        $CategoryVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]($AllCategories | Sort-Object))
+
         $TasksApps = @('PowerShell')
-        $TasksDevel = @('DotNetTools', 'GoExecutables', 'NodejsPackages', 'PythonPackages', 'RubyGems', 'RustToolchains')
+        $TasksDevel = 'DotNetTools', 'GoBinaries', 'NodejsPackages', 'PythonPipPackages', 'PythonPipxPackages', 'RubyGems', 'RustToolchains'
         $TasksSystem = @()
 
         if (Test-IsWindows) {
-            $TasksApps = @('Office', 'VisualStudio', $TasksApps, 'MicrosoftStore', 'Edge', 'Chrome', 'WinGet', 'Scoop')
+            $TasksApps = @('Office', 'VisualStudio') + $TasksApps + @('MicrosoftStore', 'Edge', 'Chrome', 'WinGet', 'Scoop')
             $TasksDevel = ($TasksDevel + @('Python', 'QtComponents')) | Sort-Object
-            $TasksSystem += @('Windows', 'WSL')
+            $TasksSystem += 'Windows', 'WSL'
         } else {
-            $TasksApps += @('Homebrew')
+            $TasksApps += 'Homebrew'
         }
 
         $AllTasks = $TasksApps + $TasksDevel + $TasksSystem
         $TasksVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]$AllTasks)
 
-        $AllCategories = @('System', 'Apps', 'Devel')
-        $CategoriesVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]($AllCategories | Sort-Object))
-
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
-        # Category parameter set
-        $CategoryParamAttr = [Management.Automation.ParameterAttribute]@{
-            ParameterSetName = 'Category'
-            Mandatory        = $true
-        }
-
         $CategoryAttrs = [Collections.ObjectModel.Collection[Attribute]]::new()
-        $CategoryAttrs.Add($CategoriesVsa)
+        $CategoryParamAttr = [Management.Automation.ParameterAttribute]@{ ParameterSetName = 'Category'; Mandatory = $true }
         $CategoryAttrs.Add($CategoryParamAttr)
-
-        $CategoryParam = [Management.Automation.RuntimeDefinedParameter]::new(
-            'Category', [String[]], $CategoryAttrs
-        )
-
+        $CategoryAttrs.Add($CategoryVsa)
+        $CategoryParam = [Management.Automation.RuntimeDefinedParameter]::new('Category', [String[]], $CategoryAttrs)
         $RuntimeParams.Add('Category', $CategoryParam)
 
-        # OptIn parameter set
-        $OptInParamAttr = [Management.Automation.ParameterAttribute]@{
-            ParameterSetName = 'OptIn'
-            Mandatory        = $true
-        }
-
         $OptInAttrs = [Collections.ObjectModel.Collection[Attribute]]::new()
-        $OptInAttrs.Add($TasksVsa)
+        $OptInParamAttr = [Management.Automation.ParameterAttribute]@{ ParameterSetName = 'OptIn'; Mandatory = $true }
         $OptInAttrs.Add($OptInParamAttr)
-
-        $OptInParam = [Management.Automation.RuntimeDefinedParameter]::new(
-            'IncludeTasks', [String[]], $OptInAttrs
-        )
-
+        $OptInAttrs.Add($TasksVsa)
+        $OptInParam = [Management.Automation.RuntimeDefinedParameter]::new('IncludeTasks', [String[]], $OptInAttrs)
         $RuntimeParams.Add('IncludeTasks', $OptInParam)
 
-        # OptOut parameter set
-        $OptOutParamAttr = [Management.Automation.ParameterAttribute]@{
-            ParameterSetName = 'OptOut'
-        }
-
         $OptOutAttrs = [Collections.ObjectModel.Collection[Attribute]]::new()
-        $OptOutAttrs.Add($TasksVsa)
+        $OptOutParamAttr = [Management.Automation.ParameterAttribute]@{ ParameterSetName = 'OptOut' }
         $OptOutAttrs.Add($OptOutParamAttr)
-
-        $OptOutParam = [Management.Automation.RuntimeDefinedParameter]::new(
-            'ExcludeTasks', [String[]], $OptOutAttrs
-        )
-
+        $OptOutAttrs.Add($TasksVsa)
+        $OptOutParam = [Management.Automation.RuntimeDefinedParameter]::new('ExcludeTasks', [String[]], $OptOutAttrs)
         $RuntimeParams.Add('ExcludeTasks', $OptOutParam)
 
         return $RuntimeParams
     }
 
     End {
-        $Results = [PSCustomObject]@{
-            Windows        = $null
-            WSL            = $null
-            Office         = $null
-            VisualStudio   = $null
-            PowerShell     = $null
-            MicrosoftStore = $null
-            Edge           = $null
-            Chrome         = $null
-            WinGet         = $null
-            Homebrew       = $null
-            Scoop          = $null
-            DotNetTools    = $null
-            GoBinaries     = $null
-            NodejsPackages = $null
-            Python         = $null
-            PythonPackages = $null
-            QtComponents   = $null
-            RubyGems       = $null
-            RustToolchains = $null
-        }
-        $Results.PSObject.TypeNames.Insert(0, 'DotFiles.Maintenance.UpdateAllTheThings')
-
-        $Tasks = [Collections.Generic.List[String]]::new()
-        $TasksDone = 0
-        $TasksTotal = 0
-
-        if ($PSCmdlet.ParameterSetName -eq 'Category') {
-            foreach ($Category in $AllCategories) {
-                if ($PSBoundParameters['Category'] -contains $Category) {
-                    $CategoryVar = 'Tasks{0}' -f $Category
-                    $CategoryTasks = Get-Variable -Name $CategoryVar -ValueOnly
-                    foreach ($Task in $CategoryTasks) {
-                        $Tasks.Add($Task)
-                    }
-                }
-            }
-        } else {
-            foreach ($Task in $AllTasks) {
-                if (($PSCmdlet.ParameterSetName -eq 'OptOut' -and $PSBoundParameters['ExcludeTasks'] -notcontains $Task) -or
-                    ($PSCmdlet.ParameterSetName -eq 'OptIn' -and $PSBoundParameters['IncludeTasks'] -contains $Task)) {
-                    $Tasks.Add($Task)
-                }
-            }
-        }
-
-        $TasksTotal = $Tasks.Count
-
-        Write-Verbose -Message ('Running updates for: {0}' -f ($Tasks -join ', '))
-
         $WriteProgressParams = @{
             Id       = 0
             Activity = 'Updating all the things'
         }
+
+        $Results = [PSCustomObject]@{
+            Windows            = $null
+            WSL                = $null
+            Office             = $null
+            VisualStudio       = $null
+            PowerShell         = $null
+            MicrosoftStore     = $null
+            Edge               = $null
+            Chrome             = $null
+            WinGet             = $null
+            Homebrew           = $null
+            Scoop              = $null
+            DotNetTools        = $null
+            GoBinaries         = $null
+            NodejsPackages     = $null
+            Python             = $null
+            PythonPipPackages  = $null
+            PythonPipxPackages = $null
+            QtComponents       = $null
+            RubyGems           = $null
+            RustToolchains     = $null
+        }
+
+        $Results.PSObject.TypeNames.Insert(0, 'DotFiles.Maintenance.UpdateAllTheThings')
+
+        $Tasks = [Collections.Generic.List[String]]::new()
+
+        switch ($PSCmdlet.ParameterSetName) {
+            'Category' {
+                foreach ($Category in $AllCategories) {
+                    if ($PSBoundParameters['Category'] -contains $Category) {
+                        $CategoryVar = "Tasks${Category}"
+                        $CategoryTasks = Get-Variable -Name $CategoryVar -ValueOnly
+                        foreach ($Task in $CategoryTasks) {
+                            $Tasks.Add($Task)
+                        }
+                    }
+                }
+            }
+
+            default {
+                foreach ($Task in $AllTasks) {
+                    if (($PSCmdlet.ParameterSetName -eq 'OptOut' -and $PSBoundParameters['ExcludeTasks'] -notcontains $Task) -or
+                        ($PSCmdlet.ParameterSetName -eq 'OptIn' -and $PSBoundParameters['IncludeTasks'] -contains $Task)) {
+                        $Tasks.Add($Task)
+                    }
+                }
+            }
+        }
+
+        $TasksDone = 0
+        $TasksTotal = $Tasks.Count
+        Write-Verbose -Message "Running updates for: $($Tasks -join ', ')"
 
         if ($Tasks -contains 'Windows') {
             Write-Progress @WriteProgressParams -Status 'Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
@@ -321,8 +356,8 @@ Function Update-AllTheThings {
             try {
                 $Results.Windows = Update-Windows -ExcludeCategories @('Drivers', 'Driver Sets')
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.Windows = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -334,8 +369,8 @@ Function Update-AllTheThings {
             try {
                 $Results.WSL = Update-WSL
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.WSL = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -347,8 +382,8 @@ Function Update-AllTheThings {
             try {
                 $Results.Office = Update-Office -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.Office = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -360,8 +395,8 @@ Function Update-AllTheThings {
             try {
                 $Results.VisualStudio = Update-VisualStudio -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.VisualStudio = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -369,7 +404,14 @@ Function Update-AllTheThings {
 
         if ($Tasks -contains 'PowerShell') {
             Write-Progress @WriteProgressParams -Status 'PowerShell' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.PowerShell = Update-PowerShell -ProgressParentId $WriteProgressParams['Id']
+
+            try {
+                $Results.PowerShell = Update-PowerShell -ProgressParentId $WriteProgressParams['Id']
+            } catch {
+                $Results.PowerShell = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
+            }
+
             $TasksDone++
         }
 
@@ -379,8 +421,8 @@ Function Update-AllTheThings {
             try {
                 $Results.MicrosoftStore = Update-MicrosoftStore
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.MicrosoftStore = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -392,8 +434,8 @@ Function Update-AllTheThings {
             try {
                 $Results.Edge = Update-Edge -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.Edge = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -405,8 +447,8 @@ Function Update-AllTheThings {
             try {
                 $Results.Chrome = Update-Chrome -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.Chrome = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -418,8 +460,8 @@ Function Update-AllTheThings {
             try {
                 $Results.WinGet = Update-WinGet
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.WinGet = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -431,8 +473,8 @@ Function Update-AllTheThings {
             try {
                 $Results.Homebrew = Update-Homebrew -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.Homebrew = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -444,8 +486,8 @@ Function Update-AllTheThings {
             try {
                 $Results.Scoop = Update-Scoop -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.Scoop = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -457,8 +499,8 @@ Function Update-AllTheThings {
             try {
                 $Results.DotNetTools = Update-DotNetTools -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.DotNetTools = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -470,8 +512,8 @@ Function Update-AllTheThings {
             try {
                 $Results.GoBinaries = Update-GoBinaries
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.GoBinaries = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
@@ -479,7 +521,14 @@ Function Update-AllTheThings {
 
         if ($Tasks -contains 'NodejsPackages') {
             Write-Progress @WriteProgressParams -Status 'Node.js packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.NodejsPackages = Update-NodejsPackages
+
+            try {
+                $Results.NodejsPackages = Update-NodejsPackages
+            } catch {
+                $Results.NodejsPackages = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
+            }
+
             $TasksDone++
         }
 
@@ -489,39 +538,79 @@ Function Update-AllTheThings {
             try {
                 $Results.Python = Update-Python
             } catch {
-                Write-Error -Message $PSItem.Exception.Message
                 $Results.Python = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
             }
 
             $TasksDone++
         }
 
-        if ($Tasks -contains 'PythonPackages') {
-            Write-Progress @WriteProgressParams -Status 'Python packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.PythonPackages = Update-PythonPackages
+        if ($Tasks -contains 'PythonPipPackages') {
+            Write-Progress @WriteProgressParams -Status 'Python pip packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
+
+            try {
+                $Results.PythonPipPackages = Update-PythonPipPackages
+            } catch {
+                $Results.PythonPipPackages = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
+            }
+
+            $TasksDone++
+        }
+
+        if ($Tasks -contains 'PythonPipxPackages') {
+            Write-Progress @WriteProgressParams -Status 'Python pipx packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
+
+            try {
+                $Results.PythonPipxPackages = Update-PythonPipxPackages
+            } catch {
+                $Results.PythonPipxPackages = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
+            }
+
             $TasksDone++
         }
 
         if ($Tasks -contains 'QtComponents') {
             Write-Progress @WriteProgressParams -Status 'Qt components' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.QtComponents = Update-QtComponents
+
+            try {
+                $Results.QtComponents = Update-QtComponents
+            } catch {
+                $Results.QtComponents = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
+            }
+
             $TasksDone++
         }
 
         if ($Tasks -contains 'RubyGems') {
             Write-Progress @WriteProgressParams -Status 'Ruby gems' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.RubyGems = Update-RubyGems
+
+            try {
+                $Results.RubyGems = Update-RubyGems
+            } catch {
+                $Results.RubyGems = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
+            }
+
             $TasksDone++
         }
 
         if ($Tasks -contains 'RustToolchains') {
             Write-Progress @WriteProgressParams -Status 'Rust toolchains' -PercentComplete ($TasksDone / $TasksTotal * 100)
-            $Results.RustToolchains = Update-RustToolchains
+
+            try {
+                $Results.RustToolchains = Update-RustToolchains
+            } catch {
+                $Results.RustToolchains = $PSItem.Exception.Message
+                $PSCmdlet.WriteError($PSItem)
+            }
+
             $TasksDone++
         }
 
         Write-Progress @WriteProgressParams -Completed
-
         return $Results
     }
 }

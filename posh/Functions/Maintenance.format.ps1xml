@@ -24,15 +24,15 @@
                                     if ($null -eq $_.WSL) { return }
                                     if ($_.WSL -is [String]) { return $_.WSL }
                                     if (!$_.WSL.Success) { 'Error during operation (view property for details)' }
-                                    if ($_.WSL.WhatIf) { return '{0} (current version)' -f $_.WSL.BeforeUpdate }
+                                    if ($_.WSL.WhatIf) { return "$($_.WSL.BeforeUpdate) (current version)" }
 
                                     if ($null -ne $_.WSL.AfterUpdate) {
-                                        if ($_.WSL.BeforeUpdate.WSL -eq $_.WSL.AfterUpdate.WSL) {
-                                            return '{0} (no update)' -f $_.WSL.BeforeUpdate.WSL
+                                        if ($_.WSL.BeforeUpdate -eq $_.WSL.AfterUpdate) {
+                                            return "$($_.WSL.BeforeUpdate) (no update)"
                                         }
                                     }
 
-                                    '{0} (previous: {1})' -f $_.WSL.AfterUpdate.WSL, $_.WSL.BeforeUpdate.WSL
+                                    "$($_.WSL.AfterUpdate) (previous: $($_.WSL.BeforeUpdate))"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -41,10 +41,10 @@
                                     if ($null -eq $_.Office) { return }
                                     if ($_.Office -is [String]) { return $_.Office }
                                     if (!$_.Office.Success) { 'Error during operation (view property for details)' }
-                                    if ($_.Office.WhatIf) { return '{0} (current version)' -f $_.Office.BeforeUpdate }
+                                    if ($_.Office.WhatIf) { return "$($_.Office.BeforeUpdate) (current version)" }
 
-                                    if ($_.Office.BeforeUpdate -eq $_.Office.AfterUpdate) { return '{0} (no update)' -f $_.Office.BeforeUpdate }
-                                    '{0} (previous: {1})' -f $_.Office.AfterUpdate, $_.Office.BeforeUpdate
+                                    if ($_.Office.BeforeUpdate -eq $_.Office.AfterUpdate) { return "$($_.Office.BeforeUpdate) (no update)" }
+                                    "$($_.Office.AfterUpdate) (previous: $($_.Office.BeforeUpdate))"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -53,7 +53,7 @@
                                     if ($null -eq $_.VisualStudio) { return }
                                     if ($_.VisualStudio -is [String]) { return $_.VisualStudio }
                                     if (!$_.VisualStudio.Success) { 'Error during operation (view property for details)' }
-                                    if ($_.VisualStudio.WhatIf) { return '{0} (current versions)' -f [String]::Join(', ', ($_.VisualStudio.BeforeUpdate.InstallationVersion | Sort-Object)) }
+                                    if ($_.VisualStudio.WhatIf) { return "$([String]::Join(', ', ($_.VisualStudio.BeforeUpdate.InstallationVersion | Sort-Object))) (current versions)" }
 
                                     $Updated = $false
                                     foreach ($VsBefore in $_.VisualStudio.BeforeUpdate) {
@@ -62,10 +62,10 @@
                                     }
 
                                     $BeforeUpdate = [String]::Join(', ', ($_.VisualStudio.BeforeUpdate.InstallationVersion | Sort-Object))
-                                    if (!$Updated) { return '{0} (no updates)' -f $BeforeUpdate }
+                                    if (!$Updated) { return "${BeforeUpdate} (no updates)" }
 
                                     $AfterUpdate = [String]::Join(', ', ($_.VisualStudio.AfterUpdate.InstallationVersion | Sort-Object))
-                                    '{0} (previous: {1})' -f $AfterUpdate, $BeforeUpdate
+                                    "${AfterUpdate} (previous: ${BeforeUpdate})"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -87,10 +87,10 @@
                                     if ($null -eq $_.Edge) { return }
                                     if ($_.Edge -is [String]) { return $_.Edge }
                                     if (!$_.Edge.Success) { 'Error during operation (view property for details)' }
-                                    if ($_.Edge.WhatIf) { return '{0} (current version)' -f $_.Edge.BeforeUpdate }
+                                    if ($_.Edge.WhatIf) { return "$($_.Edge.BeforeUpdate) (current version)" }
 
-                                    if ($_.Edge.BeforeUpdate -eq $_.Edge.AfterUpdate) { return '{0} (no update)' -f $_.Edge.BeforeUpdate }
-                                    'Updated to {0} (previous: {1})' -f $_.Edge.AfterUpdate, $_.Edge.BeforeUpdate
+                                    if ($_.Edge.BeforeUpdate -eq $_.Edge.AfterUpdate) { return "$($_.Edge.BeforeUpdate) (no update)" }
+                                    "Updated to $($_.Edge.AfterUpdate) (previous: $($_.Edge.BeforeUpdate))"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -99,10 +99,10 @@
                                     if ($null -eq $_.Chrome) { return }
                                     if ($_.Chrome -is [String]) { return $_.Chrome }
                                     if (!$_.Chrome.Success) { 'Error during operation (view property for details)' }
-                                    if ($_.Chrome.WhatIf) { return '{0} (current version)' -f $_.Chrome.BeforeUpdate }
+                                    if ($_.Chrome.WhatIf) { return "$($_.Chrome.BeforeUpdate) (current version)" }
 
-                                    if ($_.Chrome.BeforeUpdate -eq $_.Chrome.AfterUpdate) { return '{0} (no update)' -f $_.Chrome.BeforeUpdate }
-                                    'Updated to {0} (previous: {1})' -f $_.Chrome.AfterUpdate, $_.Chrome.BeforeUpdate
+                                    if ($_.Chrome.BeforeUpdate -eq $_.Chrome.AfterUpdate) { return "$($_.Chrome.BeforeUpdate) (no update)" }
+                                    "Updated to $($_.Chrome.AfterUpdate) (previous: $($_.Chrome.BeforeUpdate))"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -111,12 +111,12 @@
                                     if ($null -eq $_.WinGet) { return }
                                     if ($_.WinGet -is [String]) { return $_.WinGet }
                                     if (!$_.WinGet.Success) { 'Error during operation (view property for details)' }
-                                    if ($_.WinGet.WhatIf) { return '{0} available updates' -f $_.WinGet.Available.Count }
+                                    if ($_.WinGet.WhatIf) { return "$($_.WinGet.Available.Count) available updates" }
 
                                     $Updated = ($_.WinGet.Results | Where-Object Status -eq 'OK' | Measure-Object).Count
                                     $Failed = $_.WinGet.Results.Count - $Updated
                                     $Unknown = $_.WinGet.Available.Count - $_.WinGet.Results.Count
-                                    '{0} packages updated ({1} failed, {2} missing)' -f $Updated, $Failed, $Unknown
+                                    "${Updated} packages updated (${Failed} failed, ${Unknown} missing)"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -172,7 +172,7 @@
                                     if ($null -eq $_.Python) { return }
                                     if ($_.Python -is [String]) { return $_.Python }
                                     if (!$_.Python.Success) { 'Error during operation (view property for details)' }
-                                    if ($_.Python.WhatIf) { return '{0} (current versions)' -f [String]::Join(', ', $_.Python.BeforeUpdate) }
+                                    if ($_.Python.WhatIf) { return "$([String]::Join(', ', $_.Python.BeforeUpdate)) (current versions)" }
 
                                     $Updated = $false
                                     foreach ($PyBefore in $_.Python.BeforeUpdate) {
@@ -180,10 +180,10 @@
                                     }
 
                                     $BeforeUpdate = [String]::Join(', ', ($_.Python.BeforeUpdate | Sort-Object))
-                                    if (!$Updated) { return '{0} (no updates)' -f $BeforeUpdate }
+                                    if (!$Updated) { return "${BeforeUpdate} (no updates)" }
 
                                     $AfterUpdate = [String]::Join(', ', ($_.Python.AfterUpdate | Sort-Object))
-                                    '{0} (previous: {1})' -f $AfterUpdate, $BeforeUpdate
+                                    "${AfterUpdate} (previous: ${BeforeUpdate})"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
