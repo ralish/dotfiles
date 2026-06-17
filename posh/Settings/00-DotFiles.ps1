@@ -6,8 +6,8 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Retrieve `dotfiles` directory path resolving all symlinks and junctions
-Function Get-DotFilesFinalPath {
+# Find `dotfiles` directory path and resolve all symlinks and junctions
+Function Set-DotFilesFinalPath {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
@@ -67,7 +67,7 @@ Function Get-DotFilesFinalPath {
     }
 }
 
-Get-DotFilesFinalPath
+Set-DotFilesFinalPath
 
-Remove-Item -LiteralPath 'Function:\Get-DotFilesFinalPath'
+Remove-Item -LiteralPath 'Function:\Set-DotFilesFinalPath'
 Complete-DotFilesSection
