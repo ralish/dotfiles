@@ -6,6 +6,34 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
+# Validate `dotfiles` directory path from `DOTFILES` environment variable
+Function Set-DotFilesEnvPath {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
+
+    if (!(Test-IsPathFullyQualified -Path $Env:DOTFILES)) {
+        $ErrMsg = "DOTFILES is not set to a fully qualified path: ${Env:DOTFILES}"
+        $ErrExc = [FormatException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $Env:DOTFILES)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    $DotFiles = Get-Item -LiteralPath $Env:DOTFILES -ErrorAction 'Ignore'
+    if ($DotFiles -isnot [IO.DirectoryInfo]) {
+        $ErrMsg = "Dotfiles path is inaccessible or not a directory: ${Env:DOTFILES}"
+        $ErrExc = [IO.IOException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotDirectory', $ErrCat, $Env:DOTFILES)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    $Global:DotFiles = $Env:DOTFILES
+    Write-DotFilesMessage -Type 'Verbose' -Message "dotfiles directory from environment variable: ${Global:DotFiles}"
+}
+
 # Find `dotfiles` directory path and resolve all symlinks and junctions
 Function Set-DotFilesFinalPath {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
@@ -67,7 +95,11 @@ Function Set-DotFilesFinalPath {
     }
 }
 
-Set-DotFilesFinalPath
+if ($Env:DOTFILES) {
+    Set-DotFilesEnvPath
+} else {
+    Set-DotFilesFinalPath
+}
 
-Remove-Item -LiteralPath 'Function:\Set-DotFilesFinalPath'
+Remove-Item -LiteralPath 'Function:\Set-DotFilesEnvPath', 'Function:\Set-DotFilesFinalPath'
 Complete-DotFilesSection
