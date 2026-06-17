@@ -13,15 +13,99 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 # Disable telemetry
 $Env:DOTNET_CLI_TELEMETRY_OPTOUT = 'true'
 
+# Determine the type of argument completions to use
+Function Get-DotNetCliCompletionsType {
+    [CmdletBinding()]
+    [OutputType([String])]
+    Param()
+
+    $VersionArgs = @('--version')
+    $VersionCmd = "dotnet $($VersionArgs -join ' ')"
+
+    try {
+        # If we're running this version of `dotnet` for the first time the
+        # welcome banner will display which may cause issues issues with output
+        # parsing.
+        if ($Env:DOTNET_NOLOGO) { $OriginalNoLogo = $Env:DOTNET_NOLOGO } else { $OriginalNoLogo = '' }
+        $Env:DOTNET_NOLOGO = 'true'
+
+        $CliVersionRaw = & dotnet @VersionArgs
+        if ($LASTEXITCODE -ne 0) {
+            $ErrMsg = "Failed to retrieve .NET version (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $VersionCmd)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
+        $CliVersion = $null
+        if (![Version]::TryParse($CliVersionRaw, [Ref]$CliVersion)) {
+            $ErrMsg = "Failed to parse .NET version: ${CliVersionRaw}"
+            $ErrExc = [FormatException]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::ParserError
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'VersionParseFailed', $ErrCat, $CliVersionRaw)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+    } finally {
+        if ($OriginalNoLogo) { $Env:DOTNET_NOLOGO = $OriginalNoLogo } else { $Env:DOTNET_NOLOGO = '' }
+    }
+
+    # From .NET 10 we can use native completions which are much faster
+    if ($CliVersion -ge '10.0') {
+        return 'Native'
+    }
+
+    # Only dynamic completions are available prior to .NET 10
+    return 'Dynamic'
+}
+
 # How to enable tab completion for the .NET CLI
 # https://learn.microsoft.com/en-au/dotnet/core/tools/enable-tab-autocomplete
-Write-Verbose -Message (Get-DotFilesMessage 'Registering dynamic argument completer ...')
-Register-ArgumentCompleter -Native -CommandName 'dotnet' -ScriptBlock {
-    Param($wordToComplete, $commandAst, $cursorPosition)
+Function Import-DotNetCliCompletions {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param(
+        [ValidateSet('Dynamic', 'Native')]
+        [String]$Type
+    )
 
-    & dotnet complete --position $cursorPosition $commandAst.ToString() | ForEach-Object {
-        [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
+    switch ($Type) {
+        'Dynamic' {
+            Write-Verbose -Message (Get-DotFilesMessage 'Registering dynamic argument completer ...')
+            Register-ArgumentCompleter -Native -CommandName 'dotnet' -ScriptBlock {
+                Param($wordToComplete, $commandAst, $cursorPosition)
+
+                & dotnet complete --position $cursorPosition $commandAst.ToString() | ForEach-Object {
+                    [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
+                }
+            }
+        }
+
+        'Native' {
+            if ($Env:DOTFILES_REBUILD_COMPLETIONS -or !(Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
+                Write-Verbose -Message (Get-DotFilesMessage 'Building native completions script ...')
+                & dotnet completions script pwsh | Out-File -FilePath $CompletionsFile -Encoding 'utf8'
+            }
+
+            Write-Verbose -Message (Get-DotFilesMessage 'Registering native argument completer ...')
+            Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
+        }
     }
 }
 
+# Assume if there's an existing native completions script we can use it. This
+# avoids a potentially expensive process launch of `dotnet` to retrieve the
+# version, which tells us whether to use dynamic or native completions.
+$CompletionsFile = Join-Path -Path $PoShCompletionsPath -ChildPath 'dotnet.ps1'
+if (!$Env:DOTFILES_REBUILD_COMPLETIONS -and (Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
+    $CompletionsType = 'Native'
+} else {
+    $CompletionsType = Get-DotNetCliCompletionsType
+}
+
+# Import the appropriate type of completions
+Import-DotNetCliCompletions -Type $CompletionsType
+
+Remove-Item -LiteralPath 'Function:\Get-DotNetCliCompletionsType', 'Function:\Import-DotNetCliCompletions'
+Remove-Variable -Name 'CompletionsFile'
 Complete-DotFilesSection
