@@ -106,6 +106,7 @@ temp/
 /openssh/
 
 # PowerShell
+/posh/Completions/
 /posh/Help/
 /posh/Modules/
 /posh/Scripts/

@@ -717,11 +717,19 @@ Function Update-Profile {
     [CmdletBinding()]
     [OutputType([Void])]
     Param(
+        [Switch]$RebuildCompletions,
+
         [Switch]$AllUsersAllHosts,
         [Switch]$AllUsersCurrentHost,
         [Switch]$CurrentUserAllHosts,
         [Switch]$CurrentUserCurrentHost
     )
+
+    if ($RebuildCompletions) {
+        $Env:DOTFILES_REBUILD_COMPLETIONS = $true
+    } else {
+        $Env:DOTFILES_REBUILD_COMPLETIONS = $null
+    }
 
     if (!($AllUsersAllHosts -or $AllUsersCurrentHost -or $CurrentUserAllHosts -or $CurrentUserCurrentHost)) {
         $CurrentUserCurrentHost = $true
@@ -730,16 +738,17 @@ Function Update-Profile {
     $ProfileTypes = 'AllUsersAllHosts', 'AllUsersCurrentHost', 'CurrentUserAllHosts', 'CurrentUserCurrentHost'
     foreach ($ProfileType in $ProfileTypes) {
         if (Get-Variable -Name $ProfileType -ValueOnly) {
-            if (Test-Path -LiteralPath $profile.$ProfileType -PathType Leaf) {
-                Write-Verbose -Message ('Sourcing {0} from: {1}' -f $ProfileType, $profile.$ProfileType)
+            if (Test-Path -LiteralPath $profile.$ProfileType -PathType 'Leaf') {
+                Write-Verbose -Message "Sourcing ${ProfileType} from: $($profile.$ProfileType)"
                 . $profile.$ProfileType
             } else {
-                Write-Warning -Message ("Skipping {0} as it doesn't exist: {1}" -f $ProfileType, $profile.$ProfileType)
+                Write-Warning -Message "Skipping ${ProfileType} as it doesn't exist: $($profile.ProfileType)"
             }
         }
     }
 
-    Remove-Variable -Name ($ProfileTypes + @('ProfileType', 'ProfileTypes'))
+    $Env:DOTFILES_REBUILD_COMPLETIONS = $null
+    Remove-Variable -Name 'ProfileType', 'ProfileTypes'
 }
 
 #endregion

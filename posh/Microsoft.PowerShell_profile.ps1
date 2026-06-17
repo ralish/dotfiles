@@ -61,6 +61,10 @@ if (!(Get-Variable -Name 'DotFilesFastLoad' -ErrorAction Ignore)) {
 # and settings we'll call Update-FormatData with all specified paths.
 $FormatDataPaths = [Collections.Generic.List[String]]::new()
 
+# Path to cached completion scripts for native argument completers
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+$PoShCompletionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Completions'
+
 # Source custom functions
 $PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
 # PowerShell <= 5.1: Using -LiteralPath breaks wildcards in -Include
