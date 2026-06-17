@@ -13,36 +13,15 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 # Configuration file path
 $Env:RIPGREP_CONFIG_PATH = Join-Path -Path $HOME -ChildPath '.ripgreprc'
 
-Function Get-RipgrepCompletionPath {
-    [CmdletBinding()]
-    [OutputType([Void], [IO.FileInfo])]
-    Param()
-
-    try {
-        $RgCommand = Get-Command -Name 'rg'
-        $RgScriptPath = Get-Item -LiteralPath $RgCommand.Path
-        if (!$RgScriptPath.Directory.Name -eq 'shims') {
-            return
-        }
-
-        $RgCompletionPath = Join-Path -Path $RgScriptPath.Directory.Parent.FullName -ChildPath 'apps\ripgrep\current\complete\_rg.ps1'
-        $RgCompletion = Get-Item -LiteralPath $RgCompletionPath
-        if ($RgCompletion -is [IO.FileInfo]) {
-            return $RgCompletion
-        }
-    } catch {
-        Write-Warning -Message (Get-DotFilesMessage -Message 'Skipping ripgrep completion as unable to locate _rg.ps1.')
-    }
+# (Re)build the native completions script
+$CompletionsFile = Join-Path -Path $PoShCompletionsPath -ChildPath 'rg.ps1'
+if ($Env:DOTFILES_REBUILD_COMPLETIONS -or !(Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
+    Write-Verbose -Message (Get-DotFilesMessage 'Building native completions script ...')
+    & rg --generate=complete-powershell | Out-File -FilePath $CompletionsFile -Encoding 'utf8'
 }
 
-# Attempt to load ripgrep completion (Windows only)
-if (Test-IsWindows) {
-    $RgCompletion = Get-RipgrepCompletionPath
-    if ($RgCompletion) {
-        . $RgCompletion
-    }
-    Remove-Variable -Name 'RgCompletion'
-}
+Write-Verbose -Message (Get-DotFilesMessage 'Registering native argument completer ...')
+Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
 
-Remove-Item -Path 'Function:\Get-RipgrepCompletionPath'
+Remove-Variable -Name 'CompletionsFile'
 Complete-DotFilesSection
