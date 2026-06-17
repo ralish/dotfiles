@@ -24,7 +24,7 @@ $RegisteredApps = $RegisteredAppsSplit | Where-Object {
     $PSItem -notmatch '^dotnet '
 }
 
-Write-Verbose -Message (Get-DotFilesMessage "Registering dynamic argument completer for $($RegisteredApps.Count) command(s).")
+Write-DotFilesMessage -Type 'Verbose' -Message "Registering dynamic argument completer for $($RegisteredApps.Count) command(s)."
 Register-ArgumentCompleter -Native -CommandName $RegisteredApps -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
 

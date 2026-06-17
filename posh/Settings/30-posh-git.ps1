@@ -20,7 +20,7 @@ if ($CurrentVersion -ge $RequiredVersion) {
     # Prefix prompt with username and hostname
     $GitPromptSettings.DefaultPromptPrefix.Text = "${Env:USERNAME}@${Env:COMPUTERNAME}"
 } else {
-    Write-Warning -Message (Get-DotFilesMessage -Message "Expected at least v${RequiredVersion} but found v${CurrentVersion}.")
+    Write-DotFilesMessage -Type 'Warning' -Message "Expected at least v${RequiredVersion} but found v${CurrentVersion}."
 }
 
 Remove-Variable -Name 'CurrentVersion', 'RequiredVersion'

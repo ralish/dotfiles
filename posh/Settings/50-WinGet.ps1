@@ -13,7 +13,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Tab completion (winget)
 # https://learn.microsoft.com/en-au/windows/package-manager/winget/tab-completion
-Write-Verbose -Message (Get-DotFilesMessage 'Registering dynamic argument completer ...')
+Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
 Register-ArgumentCompleter -Native -CommandName 'winget' -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
 

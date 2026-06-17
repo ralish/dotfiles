@@ -13,7 +13,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 # Custom argument completer to complete session names using sessions stored in
 # the Windows registry. This of course only works on Windows, as on non-Windows
 # platforms PuTTY stores session configurations in files.
-Write-Verbose -Message (Get-DotFilesMessage 'Registering native argument completer ...')
+Write-DotFilesMessage -Type 'Verbose' -Message 'Registering native argument completer ...'
 $PuttyCmds = 'plink', 'pscp', 'psftp', 'putty'
 Register-ArgumentCompleter -Native -CommandName $PuttyCmds -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)

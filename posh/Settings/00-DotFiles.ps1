@@ -19,7 +19,7 @@ Function Get-DotFilesFinalPath {
         Add-Type -TypeDefinition $FinalPathAPI
     }
 
-    Write-Debug -Message (Get-DotFilesMessage -Message 'Opening handle to PowerShell profile directory ...')
+    Write-DotFilesMessage -Type 'Debug' -Message 'Opening handle to PowerShell profile directory ...'
     $ProfileDirPath = Split-Path -Path $PROFILE -Parent
     $ProfileDirHandle = [DotFiles.FinalPath]::CreateFile($ProfileDirPath, 0, 0, 0, [DotFiles.FinalPath+CreateFileCreationDisposition]::OPEN_EXISTING, [DotFiles.FinalPath+CreateFileFlagsAndAttributes]::FILE_FLAG_BACKUP_SEMANTICS, 0)
     if ($ProfileDirHandle -eq [DotFiles.FinalPath]::INVALID_HANDLE_VALUE) {
@@ -30,7 +30,7 @@ Function Get-DotFilesFinalPath {
     }
 
     try {
-        Write-Debug -Message (Get-DotFilesMessage -Message 'Retrieving final path to PowerShell profile directory ...')
+        Write-DotFilesMessage -Type 'Debug' -Message 'Retrieving final path to PowerShell profile directory ...'
         $ProfileDirFinalPath = [Text.StringBuilder]::new(1023)
         # The `Capacity + 1` is because the marshaler allocates a buffer with
         # an extra character to account for a terminating null. The native
@@ -55,9 +55,9 @@ Function Get-DotFilesFinalPath {
         }
 
         $Global:DotFiles = Split-Path -Path $ProfileDirFinalPath.ToString().TrimStart('\', '?') -Parent
-        Write-Verbose -Message (Get-DotFilesMessage -Message "Final path of dotfiles directory: ${Global:DotFiles}")
+        Write-DotFilesMessage -Type 'Verbose' -Message "Final path of dotfiles directory: ${Global:DotFiles}"
     } finally {
-        Write-Debug -Message (Get-DotFilesMessage -Message 'Closing PowerShell profile directory handle ...')
+        Write-DotFilesMessage -Type 'Debug' -Message 'Closing PowerShell profile directory handle ...'
         if (![DotFiles.FinalPath]::CloseHandle($ProfileDirHandle)) {
             $ErrExc = [ComponentModel.Win32Exception]::new()
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult

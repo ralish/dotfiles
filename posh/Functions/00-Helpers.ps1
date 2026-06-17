@@ -238,7 +238,7 @@ Function Complete-DotFilesSection {
     [OutputType([Void])]
     Param()
 
-    Write-Debug -Message (Get-DotFilesMessage -Message 'Completing section processing ...')
+    Write-DotFilesMessage -Type 'Debug' -Message 'Completing section processing ...'
 
     if ($DotFilesShowTimings) {
         if ($Global:DotFilesSectionStart -isnot [DateTime]) {
@@ -250,37 +250,10 @@ Function Complete-DotFilesSection {
         }
 
         $Timing = Get-DotFilesTiming -StartTime $Global:DotFilesSectionStart
-        Write-Verbose -Message (Get-DotFilesMessage -Message $Timing)
+        Write-DotFilesMessage -Type 'Verbose' -Message $Timing
     }
 
     Remove-Variable -Name 'DotFilesSection*' -Scope 'Global'
-}
-
-# Retrieve a formatted `dotfiles` message
-Function Get-DotFilesMessage {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
-    [CmdletBinding()]
-    [OutputType([String])]
-    Param(
-        [Parameter(Mandatory)]
-        [String]$Message,
-
-        [ValidateNotNullOrEmpty()]
-        [String]$SectionType,
-
-        [ValidateNotNullOrEmpty()]
-        [String]$SectionName
-    )
-
-    if (!$SectionType) {
-        $SectionType = $Global:DotFilesSectionType
-    }
-
-    if (!$SectionName) {
-        $SectionName = $Global:DotFilesSectionName
-    }
-
-    return '[dotfiles | {0,-10} | {1,-25}] {2}' -f $SectionType, $SectionName, $Message
 }
 
 # Retrieve the elapsed time for a `dotfiles` section
@@ -317,10 +290,10 @@ Function Remove-DotFilesHelpers {
 
     $Helpers = @(
         'Complete-DotFilesSection'
-        'Get-DotFilesMessage'
         'Get-DotFilesTiming'
         'Remove-DotFilesHelpers'
         'Start-DotFilesSection'
+        'Write-DotFilesMessage'
     )
 
     foreach ($Helper in $Helpers) {
@@ -379,27 +352,27 @@ Function Start-DotFilesSection {
         $Global:DotFilesSectionStart = Get-Date
     }
 
-    Write-Debug -Message (Get-DotFilesMessage -Message 'Starting section processing ...')
+    Write-DotFilesMessage -Type 'Debug' -Message 'Starting section processing ...'
 
     if ($Platform) {
         if ($Platform -eq 'Windows' -and !(Test-IsWindows)) {
-            Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as platform is not Windows.')
+            Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as platform is not Windows.'
             return $false
         }
 
         if ($Platform -eq 'Unix' -and !(Test-IsUnix)) {
-            Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as platform is not Unix-like.')
+            Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as platform is not Unix-like.'
             return $false
         }
     }
 
     if ($PwshMinVersion -and $PwshMinVersion -gt $PSVersionTable.PSVersion) {
-        Write-Verbose -Message (Get-DotFilesMessage -Message "Skipping as PowerShell version is below minimum: ${PwshMinVersion}")
+        Write-DotFilesMessage -Type 'Verbose' -Message "Skipping as PowerShell version is below minimum: ${PwshMinVersion}"
         return $false
     }
 
     if ($PwshHostName -and $Host.Name -notin $PwshHostName) {
-        Write-Verbose -Message (Get-DotFilesMessage -Message "Skipping as PowerShell host is not supported: $($Host.Name)")
+        Write-DotFilesMessage -Type 'Verbose' -Message "Skipping as PowerShell host is not supported: $($Host.Name)"
         return $false
     }
 
@@ -407,7 +380,7 @@ Function Start-DotFilesSection {
         try {
             Test-CommandAvailable -Name $Command
         } catch {
-            Write-Verbose -Message (Get-DotFilesMessage -Message $PSItem.Exception.Message)
+            Write-DotFilesMessage -Type 'Verbose' -Message "Command(s) not available: $($Command -join ', ')"
             $Error.RemoveAt(0)
             return $false
         }
@@ -417,7 +390,7 @@ Function Start-DotFilesSection {
         try {
             Test-EnvironmentMatch -Environment $Environment
         } catch {
-            Write-Verbose -Message (Get-DotFilesMessage -Message $PSItem.Exception.Message)
+            Write-DotFilesMessage -Type 'Verbose' -Message $PSItem.Exception.Message
             $Error.RemoveAt(0)
             return $false
         }
@@ -428,14 +401,51 @@ Function Start-DotFilesSection {
         try {
             Test-ModuleAvailable -Name $Module -Operation $ModuleOperation -Require $ModuleRequire
         } catch {
-            Write-Verbose -Message (Get-DotFilesMessage -Message $PSItem.Exception.Message)
+            Write-DotFilesMessage -Type 'Verbose' -Message $PSItem.Exception.Message
             $Error.RemoveAt(0)
             return $false
         }
     }
 
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'All prerequisites met.')
+    Write-DotFilesMessage -Type 'Verbose' -Message 'All prerequisites met.'
     return $true
+}
+
+# Write a formatted `dotfiles` message
+Function Write-DotFilesMessage {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param(
+        [Parameter(Mandatory)]
+        [ValidateSet('Debug', 'Verbose', 'Warning')]
+        [String]$Type,
+
+        [Parameter(Mandatory)]
+        [String]$Message,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$SectionType,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$SectionName
+    )
+
+    if (!$SectionType) {
+        $SectionType = $Global:DotFilesSectionType
+    }
+
+    if (!$SectionName) {
+        $SectionName = $Global:DotFilesSectionName
+    }
+
+    $Msg = '[dotfiles | {0,-10} | {1,-25}] {2}' -f $SectionType, $SectionName, $Message
+
+    switch ($Type) {
+        'Debug' { Write-Debug -Message $Msg }
+        'Verbose' { Write-Verbose -Message $Msg }
+        'Warning' { Write-Warning -Message $Msg }
+    }
 }
 
 #endregion

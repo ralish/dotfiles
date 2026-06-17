@@ -9,7 +9,7 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-Write-Verbose -Message (Get-DotFilesMessage 'Registering dynamic argument completer ...')
+Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
 Register-ArgumentCompleter -Native -CommandName 's5cmd' -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
 

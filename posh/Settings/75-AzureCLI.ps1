@@ -15,7 +15,7 @@ $Env:AZURE_CORE_COLLECT_TELEMETRY = 'false'
 
 # Install the Azure CLI on Windows
 # https://learn.microsoft.com/en-au/cli/azure/install-azure-cli-windows
-Write-Verbose -Message (Get-DotFilesMessage 'Registering dynamic argument completer ...')
+Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
 Register-ArgumentCompleter -Native -CommandName 'az' -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
 

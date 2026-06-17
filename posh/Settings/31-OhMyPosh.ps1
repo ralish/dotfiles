@@ -47,7 +47,7 @@ Function Get-OmpThemePath {
             $Msg = 'Detected Homebrew installation.'
         } else {
             $Msg = 'Unable to determine themes directory.'
-            Write-Warning -Message (Get-DotFilesMessage -Message $Msg)
+            Write-DotFilesMessage -Type 'Warning' -Message $Msg
             return
         }
 
@@ -55,14 +55,14 @@ Function Get-OmpThemePath {
     }
 
     # Output the detected installation type and themes directory
-    Write-Verbose -Message (Get-DotFilesMessage -Message $Msg)
-    Write-Verbose -Message (Get-DotFilesMessage -Message "Themes directory: ${ThemeDir}")
+    Write-DotFilesMessage -Type 'Verbose' -Message $Msg
+    Write-DotFilesMessage -Type 'Verbose' -Message "Themes directory: ${ThemeDir}"
 
     $ThemePath = Join-Path -Path $ThemeDir -ChildPath "${ThemeName}.omp.json"
     $ThemeFile = Get-Item -LiteralPath $ThemePath -ErrorAction 'Ignore'
     if ($ThemeFile -isnot [IO.FileInfo]) {
         $Msg = "Expected theme path is not a file: ${ThemePath}"
-        Write-Warning -Message (Get-DotFilesMessage -Message $Msg)
+        Write-DotFilesMessage -Type 'Warning' -Message $Msg
         return
     }
 
@@ -72,7 +72,7 @@ Function Get-OmpThemePath {
 # Retrieve Oh My Posh theme path
 $ThemePath = Get-OmpThemePath -ThemeName $ThemeName
 if ($ThemePath) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message "Theme path: ${ThemePath}")
+    Write-DotFilesMessage -Type 'Verbose' -Message "Theme path: ${ThemePath}"
 }
 
 try {

@@ -71,7 +71,7 @@ Function Import-DotNetCliCompletions {
 
     switch ($Type) {
         'Dynamic' {
-            Write-Verbose -Message (Get-DotFilesMessage 'Registering dynamic argument completer ...')
+            Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
             Register-ArgumentCompleter -Native -CommandName 'dotnet' -ScriptBlock {
                 Param($wordToComplete, $commandAst, $cursorPosition)
 
@@ -83,11 +83,11 @@ Function Import-DotNetCliCompletions {
 
         'Native' {
             if ($Env:DOTFILES_REBUILD_COMPLETIONS -or !(Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
-                Write-Verbose -Message (Get-DotFilesMessage 'Building native completions script ...')
+                Write-DotFilesMessage -Type 'Verbose' -Message 'Building native completions script ...'
                 & dotnet completions script pwsh | Out-File -FilePath $CompletionsFile -Encoding 'utf8'
             }
 
-            Write-Verbose -Message (Get-DotFilesMessage 'Registering native argument completer ...')
+            Write-DotFilesMessage -Type 'Verbose' -Message 'Registering native argument completer ...'
             Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
         }
     }

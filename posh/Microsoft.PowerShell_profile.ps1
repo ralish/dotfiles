@@ -97,11 +97,12 @@ if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
     # Output total profile load time
     if ($DotFilesShowTimings) {
         $MsgParams = @{
+            Type        = 'Verbose'
             Message     = (Get-DotFilesTiming -StartTime $DotFilesLoadStart)
             SectionType = 'Profile'
             SectionName = 'End'
         }
-        Write-Verbose -Message (Get-DotFilesMessage @MsgParams)
+        Write-DotFilesMessage @MsgParams
         Remove-Variable -Name 'DotFilesLoadStart', 'MsgParams'
     }
 

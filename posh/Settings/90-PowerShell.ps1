@@ -34,7 +34,7 @@ switch ($PSVersionTable.PSEdition) {
     }
 
     Default {
-        Write-Warning -Message (Get-DotFilesMessage -Message 'Unknown PowerShell edition.')
+        Write-DotFilesMessage -Type 'Warning' -Message 'Unknown PowerShell edition.'
     }
 }
 

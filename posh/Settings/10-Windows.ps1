@@ -58,7 +58,7 @@ Function Repair-ConHostVT100Bug {
         if ($VirtualTerminalLevel -ne 1) { return }
     } catch { return }
 
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Applying fix for ConHost VT100 tab stop width bug ...')
+    Write-DotFilesMessage -Type 'Verbose' -Message 'Applying fix for ConHost VT100 tab stop width bug ...'
 
     if (!('DotFiles.Console' -as [Type])) {
         $ConsoleCode = Join-Path -Path $PoshSettingsPath -ChildPath '10-Windows.cs'
@@ -69,7 +69,7 @@ Function Repair-ConHostVT100Bug {
     # The `STD_INPUT_HANDLE` isn't relevant to this issue
     $ConStdHandleNames = 'STD_OUTPUT_HANDLE', 'STD_ERROR_HANDLE'
     foreach ($ConStdHandleName in $ConStdHandleNames) {
-        Write-Debug -Message (Get-DotFilesMessage -Message "Operating on console handle: ${ConStdHandleName}")
+        Write-DotFilesMessage -Type 'Debug' -Message "Operating on console handle: ${ConStdHandleName}"
         $ConStdHandle = [DotFiles.Console]::GetStdHandle([DotFiles.Console+StdHandleDevices]::$ConStdHandleName)
         if ($ConStdHandle -eq -1) {
             $ErrExc = [ComponentModel.Win32Exception]::new()
@@ -85,15 +85,15 @@ Function Repair-ConHostVT100Bug {
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'Win32ApiFailed', $ErrCat, $null)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
-        Write-Debug -Message (Get-DotFilesMessage -Message ("Current console output mode: $([DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode)"))
+        Write-DotFilesMessage -Type 'Debug' -Message "Current console output mode: $([DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode)"
 
         $ConStdVT100 = [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -band [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING
         if (!$ConStdVT100) {
-            Write-Debug -Message (Get-DotFilesMessage -Message 'VT100 processing is not enabled on this handle.')
+            Write-DotFilesMessage -Type 'Debug' -Message 'VT100 processing is not enabled on this handle.'
             continue
         }
 
-        Write-Debug -Message (Get-DotFilesMessage -Message 'Disabling console VT100 support ...')
+        Write-DotFilesMessage -Type 'Debug' -Message 'Disabling console VT100 support ...'
         if (!([DotFiles.Console]::SetConsoleMode($ConStdHandle, [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -bxor [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
             $ErrExc = [ComponentModel.Win32Exception]::new()
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
@@ -101,7 +101,7 @@ Function Repair-ConHostVT100Bug {
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        Write-Debug -Message (Get-DotFilesMessage -Message 'Enabling console VT100 support ...')
+        Write-DotFilesMessage -Type 'Debug' -Message 'Enabling console VT100 support ...'
         if (!([DotFiles.Console]::SetConsoleMode($ConStdHandle, [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -bor [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING))) {
             $ErrExc = [ComponentModel.Win32Exception]::new()
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
