@@ -1,3 +1,6 @@
+# PSDotFiles
+# https://github.com/ralish/PSDotFiles
+
 $DotFilesSection = @{
     Type     = 'Settings'
     Name     = 'PSDotFiles'
@@ -7,7 +10,7 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Path to our dotfiles directory
+# Path to `dotfiles` directory
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesPath = $DotFiles
 

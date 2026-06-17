@@ -1,3 +1,6 @@
+# dotnet-suggest
+# https://github.com/dotnet/command-line-api
+
 $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'dotnet-suggest'
@@ -8,26 +11,27 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Tab completion for System.CommandLine
 # https://learn.microsoft.com/en-au/dotnet/standard/commandline/how-to-enable-tab-completion
-$env:DOTNET_SUGGEST_SCRIPT_VERSION = '1.0.2'
+$Env:DOTNET_SUGGEST_SCRIPT_VERSION = '1.0.2'
 
-# Determine the list of apps registered for suggestions and exclude the .NET
-# CLI (dotnet) as it has its own built-in support.
-$RegisteredAppsRaw = (dotnet-suggest list) | Out-String
+# Determine the list of apps registered for suggestions
+$RegisteredAppsRaw = (& dotnet-suggest list) | Out-String
 $RegisteredAppsSplit = $RegisteredAppsRaw.Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries)
 $RegisteredApps = $RegisteredAppsSplit | Where-Object {
-    # dotnet has its own argument completion support
-    $_ -ne 'dotnet' -and
-    # Almost always "dotnet <x>" aliases which don't work anyway
+    # `dotnet` has its own argument completion support
+    $PSItem -ne 'dotnet' -and
+    # Almost always `dotnet <x>` aliases which don't work anyway
     # https://github.com/dotnet/command-line-api/issues/2302
-    $_ -notmatch ' '
+    $PSItem -notmatch '^dotnet '
 }
 
+Write-Verbose -Message (Get-DotFilesMessage "Registering dynamic argument completer for $($RegisteredApps.Count) command(s).")
 Register-ArgumentCompleter -Native -CommandName $RegisteredApps -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
-    $Local:CommandPath = (Get-Command -Name $commandAst.CommandElements[0]).Source
-    $Local:CommandArgs = $CommandAst.Extent.ToString().Replace('"', '\"')
-    dotnet-suggest get -e $Local:CommandPath --position $cursorPosition -- $Local:CommandArgs | ForEach-Object {
-        [Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+
+    $CommandPath = (Get-Command -Name $commandAst.CommandElements[0]).Source
+    $CommandArgs = $CommandAst.Extent.ToString().Replace('"', '\"')
+    & dotnet-suggest get -e $CommandPath --position $cursorPosition -- $CommandArgs | ForEach-Object {
+        [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
     }
 }
 

@@ -1,3 +1,7 @@
+# vcpkg
+# https://vcpkg.io/en/
+# https://github.com/microsoft/vcpkg/
+
 $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'vcpkg'
@@ -7,6 +11,6 @@ $DotFilesSection = @{
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Disable telemetry
-$env:VCPKG_DISABLE_METRICS = 'true'
+$Env:VCPKG_DISABLE_METRICS = 'true'
 
 Complete-DotFilesSection

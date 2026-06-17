@@ -1,3 +1,7 @@
+# AzCopy
+# https://learn.microsoft.com/en-au/azure/storage/common/storage-use-azcopy-v10
+# https://github.com/Azure/azure-storage-azcopy
+
 $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'AzCopy'
@@ -6,7 +10,7 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Disable logging to Event Log
-$env:AZCOPY_DISABLE_SYSLOG = 'true'
+# Disable logging to the system log
+$Env:AZCOPY_DISABLE_SYSLOG = 'true'
 
 Complete-DotFilesSection

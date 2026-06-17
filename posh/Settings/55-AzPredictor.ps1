@@ -1,3 +1,7 @@
+# Az Predictor
+# https://learn.microsoft.com/en-au/powershell/azure/predictor-overview
+# https://github.com/Azure/azure-powershell
+
 # Temporarily disabled because it is so slow! On average it takes almost a full
 # second to load. Need to find a way to load this on-demand or asynchronously.
 return
@@ -5,7 +9,7 @@ return
 $DotFilesSection = @{
     Type            = 'Settings'
     Name            = 'Az Predictor'
-    Module          = 'Az.Accounts', 'Az.Tools.Predictor'
+    Module          = 'Az.Tools.Predictor', 'PSReadLine'
     ForceTestModule = $true
 }
 
@@ -13,37 +17,39 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Intelligent context-aware command completion with Az Predictor
 # https://learn.microsoft.com/en-au/powershell/azure/az-predictor
-if ($PSVersionTable.PSVersion -lt [Version]::new('7.2')) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as PowerShell is not v7.2 or later.')
-    return
+Function Import-AzPredictor {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
+
+    if ($PSVersionTable.PSVersion -lt [Version]::new('7.2')) {
+        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as PowerShell is not v7.2 or later.')
+        return
+    }
+
+    if ((Get-Module -Name 'PSReadLine').Version -lt [Version]::new('2.2.2')) {
+        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as PSReadLine module is not v2.2.2 or later.')
+        return
+    }
+
+    if ((Get-PSReadLineOption).PredictionSource -ne 'HistoryAndPlugin') {
+        Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as PredictionSource option of PSReadLine is not set to "HistoryAndPlugin".')
+        return
+    }
+
+    try {
+        # Suppress verbose output on import
+        $VerboseOriginal = $VerbosePreference
+        $VerbosePreference = 'SilentlyContinue'
+        Import-Module -Name 'Az.Tools.Predictor' -ErrorAction 'Stop' -Verbose:$false
+    } catch {
+        Write-Warning -Message (Get-DotFilesMessage -Message 'Failed to import Az.Tools.Predictor module.')
+    } finally {
+        $VerbosePreference = $VerboseOriginal
+    }
 }
 
-if (!(Get-Module -Name 'PSReadLine')) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as PSReadLine module is not present.')
-    return
-}
+Import-AzPredictor
 
-if ((Get-Module -Name 'PSReadLine').Version -lt [Version]::new('2.2.2')) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as PSReadLine module is not v2.2.2 or later.')
-    return
-}
-
-if ((Get-PSReadLineOption).PredictionSource -ne 'HistoryAndPlugin') {
-    Write-Verbose -Message (Get-DotFilesMessage -Message 'Skipping as PSReadLine PredictionSource option is not set to "HistoryAndPlugin".')
-    return
-}
-
-# Suppress verbose output on import
-$VerboseOriginal = $Global:VerbosePreference
-$Global:VerbosePreference = 'SilentlyContinue'
-
-try {
-    Import-Module -Name 'Az.Tools.Predictor' -ErrorAction Stop -Verbose:$false
-} catch {
-    Write-Warning -Message (Get-DotFilesMessage -Message 'Failed to import Az.Tools.Predictor module.')
-} finally {
-    # Restore the original $VerbosePreference setting
-    $Global:VerbosePreference = $VerboseOriginal
-}
-
+Remove-Item -LiteralPath 'Function:\Import-AzPredictor'
 Complete-DotFilesSection

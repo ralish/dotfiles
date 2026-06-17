@@ -1,3 +1,6 @@
+# PuTTY
+# https://www.chiark.greenend.org.uk/~sgtatham/putty/
+
 $DotFilesSection = @{
     Type     = 'Settings'
     Name     = 'PuTTY'
@@ -7,19 +10,26 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-Register-ArgumentCompleter -Native -CommandName 'plink', 'pscp', 'psftp', 'putty' -ScriptBlock {
+# Custom argument completer to complete session names using sessions stored in
+# the Windows registry. This of course only works on Windows, as on non-Windows
+# platforms PuTTY stores session configurations in files.
+Write-Verbose -Message (Get-DotFilesMessage 'Registering native argument completer ...')
+$PuttyCmds = 'plink', 'pscp', 'psftp', 'putty'
+Register-ArgumentCompleter -Native -CommandName $PuttyCmds -ScriptBlock {
     Param($wordToComplete, $commandAst, $cursorPosition)
 
+    # Registry key for saved sessions
+    $SessionsPath = 'HKCU:\Software\SimonTatham\PuTTY\Sessions'
+
+    # No saved sessions
     try {
-        $SessionsKey = Get-Item -Path 'HKCU:\Software\SimonTatham\PuTTY\Sessions' -ErrorAction Stop
-    } catch {
-        return
-    }
+        $SessionsKey = Get-Item -LiteralPath $SessionsPath -ErrorAction 'Stop'
+    } catch { return }
 
     # PowerShell implementation to match PuTTY internal method:
-    # void unescape_registry_key(const char *in, strbuf *out)
+    # `void unescape_registry_key(const char *in, strbuf *out)`
     $Sessions = $SessionsKey.GetSubKeyNames() | ForEach-Object {
-        $SessionName = $_
+        $SessionName = $PSItem
         $Result = [Text.StringBuilder]::new($SessionName.Length)
 
         for ($Index = 0; $Index -lt $SessionName.Length) {
@@ -36,15 +46,17 @@ Register-ArgumentCompleter -Native -CommandName 'plink', 'pscp', 'psftp', 'putty
     }
 
     $SessionName = $wordToComplete.Trim('"', "'")
-    $Sessions | Where-Object { $_.StartsWith($SessionName, [StringComparison]::CurrentCultureIgnoreCase) } | ForEach-Object {
-        $completionText = $listItemText = $toolTip = $_
-
-        if ($listItemText.Contains(' ')) {
-            $completionText = "'{0}'" -f $listItemText
+    $Sessions | Where-Object {
+        $PSItem.StartsWith($SessionName, [StringComparison]::CurrentCultureIgnoreCase)
+    } | ForEach-Object {
+        $completionText = $PSItem
+        if ($completionText.Contains(' ')) {
+            $completionText = "'${completionText}'"
         }
 
-        [Management.Automation.CompletionResult]::new($completionText, $listItemText, 'ParameterValue', $toolTip)
+        [Management.Automation.CompletionResult]::new($completionText, $PSItem, 'ParameterValue', $PSItem)
     }
 }
 
+Remove-Variable -Name 'PuttyCmds'
 Complete-DotFilesSection

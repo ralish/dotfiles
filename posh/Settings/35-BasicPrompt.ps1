@@ -7,9 +7,12 @@ $DotFilesSection = @{
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 Function Prompt {
-    $Prompt = [String]::Empty
+    [OutputType([String])]
+    Param()
 
-    # posh-git
+    $Prompt = ''
+
+    # `posh-git`
     if ($GitPromptScriptBlock) {
         $Prompt += & $GitPromptScriptBlock
     }
@@ -17,7 +20,7 @@ Function Prompt {
     # Default
     if (-not $Prompt) {
         $CurLoc = $ExecutionContext.SessionState.Path.CurrentLocation
-        $Prompt = 'PS {0}{1} ' -f $CurLoc, '>' * ($NestedPromptLevel + 1)
+        $Prompt = "PS ${CurLoc}$('>' * ($NestedPromptLevel + 1))"
     }
 
     # ConEmu

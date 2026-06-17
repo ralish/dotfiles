@@ -1,3 +1,7 @@
+# ripgrep
+# https://ripgrep.org/
+# https://github.com/BurntSushi/ripgrep
+
 $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'ripgrep'
@@ -6,8 +10,8 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Path to our ripgrep configuration
-$env:RIPGREP_CONFIG_PATH = Join-Path -Path $HOME -ChildPath '.ripgreprc'
+# Configuration file path
+$Env:RIPGREP_CONFIG_PATH = Join-Path -Path $HOME -ChildPath '.ripgreprc'
 
 Function Get-RipgrepCompletionPath {
     [CmdletBinding()]

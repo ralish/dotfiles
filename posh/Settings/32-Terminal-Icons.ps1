@@ -1,3 +1,6 @@
+# Terminal-Icons
+# https://github.com/devblackops/terminal-icons
+
 $DotFilesSection = @{
     Type            = 'Settings'
     Name            = 'Terminal-Icons'

@@ -1,3 +1,7 @@
+# Oh My Posh
+# https://ohmyposh.dev/
+# https://github.com/JanDeDobbeleer/oh-my-posh
+
 $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'Oh My Posh'
@@ -7,9 +11,10 @@ $DotFilesSection = @{
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Name of theme to use
-$OmpThemeName = 'oh-my-posh'
+$ThemeName = 'oh-my-posh'
 
-Function Get-OmpConfig {
+# Attempt to retrieve the path to a theme given its name
+Function Get-OmpThemePath {
     [CmdletBinding()]
     [OutputType([Void], [String])]
     Param(
@@ -19,76 +24,77 @@ Function Get-OmpConfig {
 
     # Check if the theme exists in our profile directory. If it does, we can
     # immediately return and skip figuring out where the bundled themes are.
-    $OmpThemePath = Join-Path -Path (Split-Path -Path $PROFILE -Parent) -ChildPath ('{0}.omp.json' -f $ThemeName)
-    $OmpThemeFile = Get-Item -LiteralPath $OmpThemePath -ErrorAction Ignore
-    if ($OmpThemeFile -is [IO.FileInfo]) {
-        return $OmpThemePath
+    $ThemePath = Join-Path -Path (Split-Path -Path $PROFILE -Parent) -ChildPath "${ThemeName}.omp.json"
+    $ThemeFile = Get-Item -LiteralPath $ThemePath -ErrorAction 'Ignore'
+    if ($ThemeFile -is [IO.FileInfo]) {
+        return $ThemePath
     }
 
-    if ($env:POSH_THEMES_PATH) {
-        $OmpThemeDir = $env:POSH_THEMES_PATH
-        $Msg = 'Using POSH_THEMES_PATH environment variable: {0}' -f $env:POSH_THEMES_PATH
+    if ($Env:POSH_THEMES_PATH) {
+        $ThemeDir = $Env:POSH_THEMES_PATH
+        $Msg = 'Using POSH_THEMES_PATH environment variable.'
     } else {
-        $OmpBinFilePath = (Get-Command -Name 'oh-my-posh').Source
-        $OmpPathElements = $OmpBinFilePath.Split([IO.Path]::DirectorySeparatorChar)
+        $BinFilePath = (Get-Command -Name 'oh-my-posh').Source
+        $PathElements = $BinFilePath.Split([IO.Path]::DirectorySeparatorChar)
 
-        if ($OmpPathElements -contains 'scoop') {
-            $OmpBasePath = Split-Path -Path (Split-Path -Path $OmpBinFilePath)
-            $Msg = 'Detected Scoop installation of Oh My Posh.'
-        } elseif ($OmpPathElements -contains '.linuxbrew') {
-            $OmpBinFileItem = Get-Item -LiteralPath $OmpBinFilePath
-            $OmpBinRealPath = Resolve-Path -Path (Join-Path -Path (Split-Path -Path $OmpBinFileItem.FullName -Parent) -ChildPath $OmpBinFileItem.Target)
-            $OmpBasePath = Split-Path -Path (Split-Path -Path $OmpBinRealPath.Path)
-            $Msg = 'Detected Homebrew installation of Oh My Posh.'
+        if ($PathElements -contains 'scoop') {
+            $BasePath = Split-Path -Path (Split-Path -Path $BinFilePath)
+            $Msg = 'Detected Scoop installation.'
+        } elseif ($PathElements -contains '.linuxbrew') {
+            $BinFileItem = Get-Item -LiteralPath $BinFilePath
+            $BinRealPath = Resolve-Path -Path (Join-Path -Path (Split-Path -Path $BinFileItem.FullName -Parent) -ChildPath $BinFileItem.Target)
+            $BasePath = Split-Path -Path (Split-Path -Path $BinRealPath.Path)
+            $Msg = 'Detected Homebrew installation.'
         } else {
-            $Msg = 'Unable to determine Oh My Posh themes path.'
+            $Msg = 'Unable to determine themes directory.'
             Write-Warning -Message (Get-DotFilesMessage -Message $Msg)
             return
         }
 
-        $OmpThemeDir = Join-Path -Path $OmpBasePath -ChildPath 'themes'
+        $ThemeDir = Join-Path -Path $BasePath -ChildPath 'themes'
     }
 
-    # Output the detected Oh My Posh themes path
+    # Output the detected installation type and themes directory
     Write-Verbose -Message (Get-DotFilesMessage -Message $Msg)
+    Write-Verbose -Message (Get-DotFilesMessage -Message "Themes directory: ${ThemeDir}")
 
-    $OmpThemePath = Join-Path -Path $OmpThemeDir -ChildPath ('{0}.omp.json' -f $ThemeName)
-    $OmpThemeFile = Get-Item -LiteralPath $OmpThemePath -ErrorAction Ignore
-    if ($OmpThemeFile -isnot [IO.FileInfo]) {
-        $Msg = 'Expected Oh My Posh theme path is not a file: {0}' -f $OmpThemePath
+    $ThemePath = Join-Path -Path $ThemeDir -ChildPath "${ThemeName}.omp.json"
+    $ThemeFile = Get-Item -LiteralPath $ThemePath -ErrorAction 'Ignore'
+    if ($ThemeFile -isnot [IO.FileInfo]) {
+        $Msg = "Expected theme path is not a file: ${ThemePath}"
         Write-Warning -Message (Get-DotFilesMessage -Message $Msg)
         return
     }
 
-    return $OmpThemePath
+    return $ThemePath
 }
 
-# Retrieve Oh My Posh config
-$OmpConfig = Get-OmpConfig -ThemeName $OmpThemeName
-if ($OmpConfig) {
-    Write-Verbose -Message (Get-DotFilesMessage -Message ('Using theme file: {0}' -f $OmpConfig))
+# Retrieve Oh My Posh theme path
+$ThemePath = Get-OmpThemePath -ThemeName $ThemeName
+if ($ThemePath) {
+    Write-Verbose -Message (Get-DotFilesMessage -Message "Theme path: ${ThemePath}")
 }
 
-# Suppress verbose output on loading
-$VerboseOriginal = $Global:VerbosePreference
-$Global:VerbosePreference = 'SilentlyContinue'
+try {
+    # Suppress verbose output on loading
+    $VerboseOriginal = $VerbosePreference
+    $VerbosePreference = 'SilentlyContinue'
 
-# Load Oh My Posh
-if ($OmpConfig) {
-    & oh-my-posh init pwsh --config $OmpConfig | Invoke-Expression # DevSkim: ignore DS104456
-} else {
-    & oh-my-posh init pwsh | Invoke-Expression # DevSkim: ignore DS104456
+    # Load Oh My Posh
+    if ($ThemePath) {
+        & oh-my-posh init pwsh --config $ThemePath | Invoke-Expression # DevSkim: ignore DS104456
+    } else {
+        & oh-my-posh init pwsh | Invoke-Expression # DevSkim: ignore DS104456
+    }
+} finally {
+    $VerbosePreference = $VerboseOriginal
 }
 
-# Restore the original $VerbosePreference setting
-$Global:VerbosePreference = $VerboseOriginal
-Remove-Variable -Name 'VerboseOriginal'
-
-# Enable posh-git support if previously imported
+# Enable `posh-git` support if imported
 if (Get-Module -Name 'posh-git' -Verbose:$false) {
-    $env:POSH_GIT_ENABLED = $true
+    $Env:POSH_GIT_ENABLED = $true
 }
 
-Remove-Item -Path 'Function:\Get-OmpConfig'
-Remove-Variable -Name 'OmpConfig', 'OmpThemeName'
+Remove-Item -LiteralPath 'Function:\Get-OmpThemePath'
+Remove-Variable -Name 'ThemeName', 'ThemePath', 'VerboseOriginal'
 Complete-DotFilesSection

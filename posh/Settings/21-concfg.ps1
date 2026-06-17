@@ -1,3 +1,6 @@
+# concfg
+# https://github.com/lukesampson/concfg
+
 $DotFilesSection = @{
     Type         = 'Settings'
     Name         = 'ConCfg'
@@ -9,7 +12,7 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Set PSReadLine colours based on theme
+# Set `PSReadLine` colours based on theme
 & concfg tokencolor -n enable
 
 Complete-DotFilesSection

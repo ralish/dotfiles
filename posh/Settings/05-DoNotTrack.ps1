@@ -1,7 +1,9 @@
-$null = Start-DotFilesSection -Type 'Settings' -Name 'DoNotTrack'
+# Do Not Track (DNT)
+# https://donottrack.sh/
 
-# Console Do Not Track (DNT)
-# https://consoledonottrack.com/
-$env:DO_NOT_TRACK = '1'
+$null = Start-DotFilesSection -Type 'Settings' -Name 'Do Not Track'
+
+# Opt out of tracking (ads, crash reporting, telemetry, usage data, etc ...)
+$Env:DO_NOT_TRACK = '1'
 
 Complete-DotFilesSection

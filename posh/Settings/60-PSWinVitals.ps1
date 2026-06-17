@@ -1,3 +1,6 @@
+# PSWinVitals
+# https://github.com/ralish/PSWinVitals
+
 $DotFilesSection = @{
     Type     = 'Settings'
     Name     = 'PSWinVitals'
@@ -7,10 +10,10 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Get-VitalInformation: Exclude Silverlight updates
+# `Get-VitalInformation`: Exclude Silverlight updates
 $PSDefaultParameterValues['Get-VitalInformation:WUParameters'] = @{ NotTitle = 'Silverlight' }
 
-# Invoke-VitalMaintenance: Exclude Silverlight updates
+# `Invoke-VitalMaintenance`: Exclude Silverlight updates
 $PSDefaultParameterValues['Invoke-VitalMaintenance:WUParameters'] = @{ NotTitle = 'Silverlight' }
 
 Complete-DotFilesSection

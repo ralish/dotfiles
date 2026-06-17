@@ -1,3 +1,6 @@
+# DockerCompletion
+# https://github.com/matt9ucci/DockerCompletion
+
 $DotFilesSection = @{
     Type            = 'Settings'
     Name            = 'Docker'

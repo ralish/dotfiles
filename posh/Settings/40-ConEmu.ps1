@@ -1,3 +1,7 @@
+# ConEmu
+# https://conemu.github.io/
+# https://github.com/ConEmu/ConEmu
+
 $DotFilesSection = @{
     Type        = 'Settings'
     Name        = 'ConEmu'
@@ -7,19 +11,19 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Extending PowerShell Prompt
+# Extending the PowerShell Prompt
 # https://conemu.github.io/en/PowershellPrompt.html
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $ConEmuPrompt = {
     # Mark end of prompt
-    # OSC ConEmu ; PromptStart ST
-    $Prompt = "{0}]9;12`a" -f [Char]27
+    # `OSC ConEmu ; PromptStart ST`
+    $Prompt = "$([Char]27)]9;12`a"
 
     # Mark current working directory
     $CurLoc = $ExecutionContext.SessionState.Path.CurrentLocation
     if ($CurLoc.Provider.Name -eq 'FileSystem') {
-        # OSC ConEmu ; CurrentDir ; "<Cwd>" ST
-        $Prompt += "{0}]9;9;`"{1}`"`a" -f [Char]27, $CurLoc
+        # `OSC ConEmu ; CurrentDir ; "<Cwd>" ST`
+        $Prompt += "$([Char]27)]9;9;`"${CurLoc}`"`a"
     }
 
     return $Prompt

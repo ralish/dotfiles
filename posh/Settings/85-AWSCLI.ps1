@@ -1,3 +1,7 @@
+# AWS CLI
+# https://aws.amazon.com/cli/
+# https://github.com/aws/aws-cli
+
 $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'AWS CLI'
@@ -6,30 +10,33 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Output format
-$env:AWS_DEFAULT_OUTPUT = 'table'
+# Default output format
+$Env:AWS_DEFAULT_OUTPUT = 'table'
 
-# Configuring the AWS CLI - Command Completion
+# Configuring command completion in the AWS CLI
 # https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html
-if (Get-Command -Name 'aws_completer' -ErrorAction Ignore) {
+if (Get-Command -Name 'aws_completer' -ErrorAction 'Ignore') {
+    Write-Verbose -Message (Get-DotFilesMessage 'Registering dynamic argument completer ...')
     Register-ArgumentCompleter -Native -CommandName 'aws' -ScriptBlock {
         Param($wordToComplete, $commandAst, $cursorPosition)
-        $env:COMP_LINE = $commandAst.ToString()
-        $env:COMP_POINT = $cursorPosition
 
-        # ToString() in System.Management.Automation.Language.CommandAst trims
-        # trailing whitespace from the command, which breaks our emulated bash
-        # style command completion. Handle it by appending a single whitespace
-        # character if the cursor position is greater than the command length.
-        if ($cursorPosition -gt $env:COMP_LINE.Length) {
-            $env:COMP_LINE = '{0} ' -f $env:COMP_LINE
+        $Env:COMP_LINE = $commandAst.ToString()
+        $Env:COMP_POINT = $cursorPosition
+
+        # `ToString()` in `System.Management.Automation.Language.CommandAst`
+        # trims any trailing whitespace from the command which will break our
+        # emulated `bash`-style command completion. Append a single whitespace
+        # character if the cursor position is beyond the length of the entered
+        # command as a simple workaround.
+        if ($cursorPosition -gt $Env:COMP_LINE.Length) {
+            $Env:COMP_LINE = "${Env:COMP_LINE} "
         }
 
-        aws_completer | ForEach-Object {
-            [Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+        & aws_completer | ForEach-Object {
+            [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
         }
 
-        $env:COMP_LINE = $env:COMP_POINT = $null
+        $Env:COMP_LINE = $Env:COMP_POINT = $null
     }
 } else {
     Write-Warning -Message (Get-DotFilesMessage -Message 'Skipping AWS CLI completion as unable to locate aws_completer.')
