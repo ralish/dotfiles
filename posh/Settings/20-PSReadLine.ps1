@@ -33,6 +33,9 @@ Function Initialize-PSReadLine {
     # https://github.com/PowerShell/PSReadLine/pull/3351
     #Set-PSReadLineOption -PredictionSource 'HistoryAndPlugin'
 
+    # Display predictions as a list under the prompt
+    Set-PSReadLineOption -PredictionViewStyle 'ListView'
+
     if (Test-IsUnix) {
         # The default for non-Windows platforms is Emacs
         Set-PSReadLineOption -EditMode 'Vi'
