@@ -175,21 +175,21 @@ Function Get-KerberosTokenSize {
     $GroupsUniversalInside = @($ADGroups | Where-Object { $PSItem.GroupScope -eq 'Universal' -and $PSItem.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
     $GroupsUniversalOutside = @($ADGroups | Where-Object { $PSItem.GroupScope -eq 'Universal' -and !$PSItem.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
 
+    $TokenSizeBytes = $TicketOverheadBytes
+
     switch ($OperatingSystem) {
         'Windows Server 2012 (or later)' {
-            $TokenSizeBytes = (40 * ($SIDHistory + $GroupsUniversalOutside)) + (8 * ($GroupsDomainLocal + $GroupsGlobal + $GroupsUniversalInside))
+            $TokenSizeBytes += (40 * ($SIDHistory + $GroupsUniversalOutside)) + (8 * ($GroupsDomainLocal + $GroupsGlobal + $GroupsUniversalInside))
         }
 
         'Windows Server 2008 R2 (or earlier)' {
-            $TokenSizeBytes = (40 * ($SIDHistory + $GroupsDomainLocal + $GroupsUniversalOutside)) + (8 * ($GroupsGlobal + $GroupsUniversalInside))
+            $TokenSizeBytes += (40 * ($SIDHistory + $GroupsDomainLocal + $GroupsUniversalOutside)) + (8 * ($GroupsGlobal + $GroupsUniversalInside))
         }
     }
 
     if ($ADUser.TrustedForDelegation) {
         $TokenSizeBytes = $TokenSizeBytes * 2
     }
-
-    $TokenSizeBytes += $TicketOverheadBytes
 
     $TokenSize = [PSCustomObject]@{
         SIDHistory           = $SIDHistory
