@@ -80,7 +80,7 @@ Function Test-EnvironmentMatch {
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        if ($EnvExpectedValue -ne $EnvCurrentValue) {
+        if ($EnvExpectedValue -cne $EnvCurrentValue) {
             $ErrMsg = 'Environment variable "{0}" set to "{1}" but expected "{2}".' -f $EnvName, $EnvCurrentValue, $EnvExpectedValue
             $ErrExc = [InvalidOperationException]::new($ErrMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
