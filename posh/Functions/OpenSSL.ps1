@@ -1,4 +1,10 @@
-$null = Start-DotFilesSection -Type 'Functions' -Name 'OpenSSL'
+$DotFilesSection = @{
+    Type    = 'Functions'
+    Name    = 'OpenSSL'
+    Command = 'openssl'
+}
+
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 #region Certificate creation
 
@@ -6,7 +12,7 @@ $null = Start-DotFilesSection -Type 'Functions' -Name 'OpenSSL'
 # https://docs.openssl.org/master/man1/openssl-req/
 Function New-OpenSSLCertificate {
     [CmdletBinding()]
-    [OutputType([Void])]
+    [OutputType([String[]])]
     Param(
         [Parameter(ParameterSetName = 'CsrGenerateKey', Mandatory)]
         [Parameter(ParameterSetName = 'CsrExistingKey', Mandatory)]
@@ -47,13 +53,12 @@ Function New-OpenSSLCertificate {
 
         [Parameter(ParameterSetName = 'CsrExistingKey', Mandatory)]
         [Parameter(ParameterSetName = 'SelfSignedExistingKey', Mandatory)]
-        [ValidateNotNullOrEmpty()]
         [String]$ExistingKeyPath,
 
         [Parameter(ParameterSetName = 'CsrGenerateKey')]
         [Parameter(ParameterSetName = 'SelfSignedGenerateKey')]
-        [ValidateRange(1, [Int]::MaxValue)]
-        [Int]$KeySize,
+        [ValidateRange(1, 16384)]
+        [UInt16]$KeySize,
 
         [Parameter(ParameterSetName = 'CsrGenerateKey')]
         [Parameter(ParameterSetName = 'SelfSignedGenerateKey')]
@@ -61,14 +66,13 @@ Function New-OpenSSLCertificate {
 
         [Parameter(ParameterSetName = 'SelfSignedExistingKey')]
         [Parameter(ParameterSetName = 'SelfSignedGenerateKey')]
-        [ValidateRange(1, [Int]::MaxValue)]
-        [Int]$ValidDays = 365,
+        [ValidateRange(1, [UInt32]::MaxValue)]
+        [UInt32]$ValidDays = 365,
 
         [ValidateNotNullOrEmpty()]
         [String]$Config
     )
 
-    Test-CommandAvailable -Name 'openssl'
     $OpenSSLVersion = Get-OpenSSLVersion
 
     $Params = [Collections.Generic.List[String]]::new()
@@ -76,10 +80,10 @@ Function New-OpenSSLCertificate {
 
     if ($PSCmdlet.ParameterSetName -match '^Csr') {
         $Params.Add('-new')
-        $Out = '{0}.csr' -f $Name
+        $Out = "${Name}.csr"
     } else {
         $Params.Add('-x509')
-        $Out = '{0}.cer' -f $Name
+        $Out = "${Name}.cer"
     }
 
     $Params.Add('-out')
@@ -87,11 +91,11 @@ Function New-OpenSSLCertificate {
 
     if ($PSCmdlet.ParameterSetName -match 'GenerateKey$') {
         $Params.Add('-keyout')
-        $Params.Add(('{0}.key' -f $Name))
+        $Params.Add("${Name}.key")
 
         $Params.Add('-newkey')
         if ($KeySize) {
-            $Params.Add(('rsa:{0}' -f $KeySize))
+            $Params.Add("rsa:${KeySize}")
         } else {
             $Params.Add('rsa')
         }
@@ -112,41 +116,41 @@ Function New-OpenSSLCertificate {
     $SANs = [Collections.Generic.List[String]]::new()
 
     if ($EmailAddress) {
-        $Subjects.Add(('emailAddress={0}' -f $EmailAddress))
+        $Subjects.Add("emailAddress=${EmailAddress}")
     }
 
     if ($CommonName) {
-        $Subjects.Add(('commonName={0}' -f $CommonName))
+        $Subjects.Add("commonName=${CommonName}")
         if (!$NoMatchingSAN) {
-            $SANs.Add(('DNS:{0}' -f $CommonName))
+            $SANs.Add("DNS:${CommonName}")
         }
     } else {
         Write-Warning -Message 'No Common Name (CN) was specified so a matching SAN will not be added.'
     }
 
     if ($OrganisationalUnit) {
-        $Subjects.Add(('organizationalUnitName={0}' -f $OrganisationalUnit))
+        $Subjects.Add("organizationalUnitName=${OrganisationalUnit}")
     }
 
     if ($Organisation) {
-        $Subjects.Add(('organizationName={0}' -f $Organisation))
+        $Subjects.Add("organizationName=${Organisation}")
     }
 
     if ($City) {
-        $Subjects.Add(('localityName={0}' -f $City))
+        $Subjects.Add("localityName=${City}")
     }
 
     if ($State) {
-        $Subjects.Add(('stateOrProvinceName={0}' -f $State))
+        $Subjects.Add("stateOrProvinceName=${State}")
     }
 
     if ($Country) {
-        $Subjects.Add(('countryName={0}' -f $Country))
+        $Subjects.Add("countryName=${Country}")
     }
 
     if ($AdditionalDomains.Count -gt 0) {
         foreach ($Domain in $AdditionalDomains) {
-            $SANs.Add(('DNS:{0}' -f $Domain))
+            $SANs.Add("DNS:${Domain}")
         }
     }
 
@@ -154,21 +158,24 @@ Function New-OpenSSLCertificate {
         foreach ($IPAddress in $IPAddresses) {
             if ($IPAddress.AddressFamily -ne [Net.Sockets.AddressFamily]::InterNetwork -and
                 $IPAddress.AddressFamily -ne [Net.Sockets.AddressFamily]::InterNetworkV6) {
-                Write-Error -Message ('Provided IP address is neither IPv4 or IPv6: {0}' -f $IPAddress)
-                return
+                $ErrMsg = "Provided IP address is neither IPv4 or IPv6: ${IPAddress}"
+                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $IPAddress)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
-            $SANs.Add(('IP:{0}' -f $IPAddress))
+            $SANs.Add("IP:${IPAddress}")
         }
     }
 
     if ($Subjects.Count -gt 0) {
-        $Subject = '/{0}' -f ($Subjects -join '/')
+        $Subject = "/$($Subjects -join '/')"
         $Params.Add('-subj')
         $Params.Add($Subject)
 
         if ($SANs.Count -gt 0) {
-            $SAN = 'subjectAltName = {0}' -f ($SANs -join ', ')
+            $SAN = "subjectAltName = $($SANs -join ', ')"
             $Params.Add('-addext')
             $Params.Add($SAN)
         }
@@ -185,8 +192,8 @@ Function New-OpenSSLCertificate {
         $Params.Add($Config)
     }
 
-    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f (($Params.ToArray() | Add-QuotesToStringWithSpace) -join ' '))
+    Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
+    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
     & openssl @Params
 }
 
@@ -198,7 +205,7 @@ Function New-OpenSSLCertificate {
 # https://docs.openssl.org/master/man1/openssl-x509/
 Function Get-OpenSSLCertificate {
     [CmdletBinding()]
-    [OutputType([Void], [String[]])]
+    [OutputType([String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Certificate,
@@ -223,8 +230,8 @@ Function Get-OpenSSLCertificate {
         $Params.Add($NameOptions -join ',')
     }
 
-    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f (($Params.ToArray() | Add-QuotesToStringWithSpace) -join ' '))
+    Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
+    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
     & openssl @Params
 }
 
@@ -232,7 +239,7 @@ Function Get-OpenSSLCertificate {
 # https://docs.openssl.org/master/man1/openssl-req/
 Function Get-OpenSSLCsr {
     [CmdletBinding()]
-    [OutputType([Void], [String[]])]
+    [OutputType([String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Csr,
@@ -245,7 +252,7 @@ Function Get-OpenSSLCsr {
         [String[]]@(
             'req',
             '-in', $Csr,
-            # Verify the self-signature on the request
+            # Verify the signature on the request
             '-verify',
             # Suppress default certificate request output
             '-noout',
@@ -259,8 +266,8 @@ Function Get-OpenSSLCsr {
         $Params.Add($NameOptions -join ',')
     }
 
-    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f (($Params.ToArray() | Add-QuotesToStringWithSpace) -join ' '))
+    Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
+    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
     & openssl @Params
 }
 
@@ -268,7 +275,7 @@ Function Get-OpenSSLCsr {
 # https://docs.openssl.org/master/man1/openssl-pkcs12/
 Function Get-OpenSSLPkcs12 {
     [CmdletBinding()]
-    [OutputType([Void], [String[]])]
+    [OutputType([String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Pkcs12File,
@@ -287,7 +294,6 @@ Function Get-OpenSSLPkcs12 {
         [Switch]$VerifyOnly
     )
 
-    Test-CommandAvailable -Name 'openssl'
     $OpenSSLVersion = Get-OpenSSLVersion
 
     $Params = [Collections.Generic.List[String]]::new(
@@ -301,7 +307,7 @@ Function Get-OpenSSLPkcs12 {
 
     if (!$VerifyOnly) {
         if ($PrivateKeyEncryption) {
-            $Params.Add(('-{0}' -f $PrivateKeyEncryption.ToLower()))
+            $Params.Add("-$($PrivateKeyEncryption.ToLower())")
         } else {
             if ($OpenSSLVersion -ge '3.0') {
                 $Params.Add('-noenc')
@@ -313,8 +319,8 @@ Function Get-OpenSSLPkcs12 {
         $Params.Add('-noout')
     }
 
-    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f (($Params | Add-QuotesToStringWithSpace) -join ' '))
+    Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
+    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
     & openssl @Params
 }
 
@@ -326,7 +332,7 @@ Function Get-OpenSSLPkcs12 {
 # https://docs.openssl.org/master/man1/openssl-s_client/
 Function Get-OpenSSLServerCertificate {
     [CmdletBinding()]
-    [OutputType([String])]
+    [OutputType([String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Hostname,
@@ -341,16 +347,18 @@ Function Get-OpenSSLServerCertificate {
 
         [ValidateSet(
             'FTP', 'IMAP', 'IRC', 'LDAP', 'LMTP', 'MySQL', 'NNTP', 'POP3',
-            'Postgres', 'Sieve', 'SMTP', 'XMPP', 'XmppServer'
+            'Postgres', 'Sieve', 'SMTP', 'Telnet', 'XMPP', 'Xmpp-Server'
         )]
         [String]$StartTls,
 
         [Switch]$KeepStdinOpen
     )
 
-    $Params = @(
-        's_client',
-        '-connect', ('{0}:{1}' -f $Hostname, $Port)
+    $Params = [Collections.Generic.List[String]]::new(
+        [String[]]@(
+            's_client',
+            '-connect', "${Hostname}:${Port}"
+        )
     )
 
     if ($IpVersion) {
@@ -371,12 +379,12 @@ Function Get-OpenSSLServerCertificate {
         $Params.Add($StartTls.ToLower())
     }
 
-    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f (($Params | Add-QuotesToStringWithSpace) -join ' '))
+    Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
+    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
 
-    # The s_client command keeps the connection open in anticipation of further
-    # commands. Piping $null will effectively close standard input, gracefully
-    # closing the connection after it's established.
+    # The `s_client` command keeps the connection open for further commands.
+    # Piping `$null` will effectively close standard input, gracefully closing
+    # the connection after it's established.
     if ($KeepStdinOpen) {
         & openssl @Params
     } else {
@@ -392,7 +400,7 @@ Function Get-OpenSSLServerCertificate {
 # https://docs.openssl.org/master/man1/openssl-x509/
 Function Convert-OpenSSLDerToPem {
     [CmdletBinding()]
-    [OutputType([Void])]
+    [OutputType([String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$DerFile,
@@ -409,8 +417,8 @@ Function Convert-OpenSSLDerToPem {
         '-outform', 'PEM'
     )
 
-    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f (($Params | Add-QuotesToStringWithSpace) -join ' '))
+    Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
+    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
     & openssl @Params
 }
 
@@ -418,7 +426,7 @@ Function Convert-OpenSSLDerToPem {
 # https://docs.openssl.org/master/man1/openssl-x509/
 Function Convert-OpenSSLPemToDer {
     [CmdletBinding()]
-    [OutputType([Void])]
+    [OutputType([String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$PemFile,
@@ -435,8 +443,8 @@ Function Convert-OpenSSLPemToDer {
         '-outform', 'DER'
     )
 
-    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f (($Params | Add-QuotesToStringWithSpace) -join ' '))
+    Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
+    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
     & openssl @Params
 }
 
@@ -444,13 +452,13 @@ Function Convert-OpenSSLPemToDer {
 # https://docs.openssl.org/master/man1/openssl-pkcs12/
 Function Convert-OpenSSLPemToPkcs12 {
     [CmdletBinding()]
-    [OutputType([Void])]
+    [OutputType([String[]])]
     Param(
         [Parameter(Mandatory)]
-        [String]$Pkcs12File,
+        [String]$PemFile,
 
         [Parameter(Mandatory)]
-        [String]$PemFile,
+        [String]$Pkcs12File,
 
         # Path to private key when not present in the PEM file
         [ValidateNotNullOrEmpty()]
@@ -468,17 +476,17 @@ Function Convert-OpenSSLPemToPkcs12 {
         # Encrypt the certificate using 3DES-CBC instead of AES256-CBC
         [Switch]$CertificateDesEncryption,
 
-        # Use the legacy made of operation
+        # Use the legacy mode of operation
         #
-        # When *not* set, the private key is encrypted with AES256-CBC, as is
-        # the certificate unless -CertificateDesEncryption is provided.
+        # When *not* set the private key is encrypted with AES256-CBC, as is
+        # the certificate unless `-CertificateDesEncryption` is provided.
         #
-        # When set, the private key is encrypted with 3DES-CBC. The certificate
+        # When set the private key is encrypted with 3DES-CBC. The certificate
         # is encrypted with RC2-CBC, if it was enabled in the OpenSSL build,
         # otherwise 3DES-CBC (matching the private key).
         #
-        # Note that Windows releases prior to Windows Server 2019 and Windows
-        # 10, version 1803 only support 3DES encryption for PKCS #12 files.
+        # Windows releases prior to Windows Server 2019 and Windows 10 v1803
+        # only support 3DES encryption for PKCS #12 files.
         [Switch]$LegacyEncryption
     )
 
@@ -512,8 +520,8 @@ Function Convert-OpenSSLPemToPkcs12 {
         $Params.Add('-legacy')
     }
 
-    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f (($Params.ToArray() | Add-QuotesToStringWithSpace) -join ' '))
+    Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
+    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
     & openssl @Params
 }
 
@@ -521,7 +529,7 @@ Function Convert-OpenSSLPemToPkcs12 {
 # https://docs.openssl.org/master/man1/openssl-pkcs12/
 Function Convert-OpenSSLPkcs12ToPem {
     [CmdletBinding(DefaultParameterSetName = 'Both')]
-    [OutputType([Void])]
+    [OutputType([String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Pkcs12File,
@@ -547,7 +555,6 @@ Function Convert-OpenSSLPkcs12ToPem {
         [Switch]$PrivateKeyOnly
     )
 
-    Test-CommandAvailable -Name 'openssl'
     $OpenSSLVersion = Get-OpenSSLVersion
 
     $Params = [Collections.Generic.List[String]]::new(
@@ -566,7 +573,7 @@ Function Convert-OpenSSLPkcs12ToPem {
 
     if ($PSCmdlet.ParameterSetName -ne 'CertificatesOnly') {
         if ($PrivateKeyEncryption) {
-            $Params.Add(('-{0}' -f $PrivateKeyEncryption.ToLower()))
+            $Params.Add("-$($PrivateKeyEncryption.ToLower())")
         } else {
             if ($OpenSSLVersion -ge '3.0') {
                 $Params.Add('-noenc')
@@ -576,8 +583,8 @@ Function Convert-OpenSSLPkcs12ToPem {
         }
     }
 
-    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f (($Params.ToArray() | Add-QuotesToStringWithSpace) -join ' '))
+    Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
+    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
     & openssl @Params
 }
 
@@ -589,7 +596,7 @@ Function Convert-OpenSSLPkcs12ToPem {
 # https://docs.openssl.org/master/man1/openssl-ecparam/
 Function Get-OpenSSLEccCurves {
     [CmdletBinding()]
-    [OutputType([Void], [String[]])]
+    [OutputType([String[]])]
     Param()
 
     $Params = @(
@@ -597,8 +604,8 @@ Function Get-OpenSSLEccCurves {
         '-list_curves'
     )
 
-    Write-Host -NoNewline -ForegroundColor Green 'Invoking: '
-    Write-Host ('openssl {0}' -f (($Params | Add-QuotesToStringWithSpace) -join ' '))
+    Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
+    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
     & openssl @Params
 }
 
@@ -613,9 +620,24 @@ Function Get-OpenSSLVersion {
     [OutputType([Version])]
     Param()
 
-    $OpenSSLVersionRaw = (& openssl version -v) -join [String]::Empty
-    if ($OpenSSLVersionRaw -notmatch '^OpenSSL ([0-9]+\.[0-9]+(\.[0-9]+)?)') {
-        throw 'Unable to determine OpenSSL version.'
+    $VersionArgs = 'version', '-v'
+    $VersionCmd = "openssl $($VersionArgs -join ' ')"
+
+    $Version = & openssl @VersionArgs 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) {
+        $ErrMsg = "Failed to retrieve OpenSSL version (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $VersionCmd)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    if ($Version -notmatch '^OpenSSL ([0-9]+\.[0-9]+(\.[0-9]+)?)') {
+        $ErrMsg = "Failed to extract OpenSSL version: ${Version}"
+        $ErrExc = [FormatException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ParserError
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $Version)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     return [Version]$Matches[1]
