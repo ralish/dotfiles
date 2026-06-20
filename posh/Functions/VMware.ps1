@@ -9,9 +9,13 @@ Function Optimize-VMwareVirtualMachine {
         [String]$Path
     )
 
-    $BaseDir = Get-Item -LiteralPath $Path -ErrorAction Ignore
+    $BaseDir = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
     if ($BaseDir -isnot [IO.DirectoryInfo]) {
-        throw 'Provided path is not a directory: {0}' -f $Path
+        $ErrMsg = "Path is not a directory: ${Path}"
+        $ErrExc = [ArgumentException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $WriteProgressParams = @{
@@ -19,57 +23,63 @@ Function Optimize-VMwareVirtualMachine {
     }
 
     Write-Progress @WriteProgressParams -Status 'Enumerating directories' -PercentComplete 1
-    $AllDirs = Get-ChildItem -LiteralPath $BaseDir.FullName -Directory -Recurse
-    $DirsProcessed = 0
+    $SubDirs = Get-ChildItem -LiteralPath $BaseDir.FullName -Directory -Recurse
     $NoRecurseDirs = [Collections.Generic.List[String]]::new()
+    $DirsProcessed = 0
 
-    foreach ($Dir in $AllDirs) {
+    foreach ($SubDir in $SubDirs) {
         $DirsProcessed++
-        $DirPathTerminated = $Dir.FullName + [IO.Path]::DirectorySeparatorChar
+        $DirPathTerminated = $SubDir.FullName + [IO.Path]::DirectorySeparatorChar
 
+        $NoRecurse = $false
         foreach ($NoRecurseDir in $NoRecurseDirs) {
-            if ($DirPathTerminated.StartsWith($NoRecurseDir)) {
-                Write-Debug -Message ('Ignoring directory: {0}' -f $DirPathTerminated)
-                continue
+            if ($DirPathTerminated, [StringComparison]::CurrentCultureIgnoreCase) {
+                Write-Debug -Message "Ignoring directory: ${DirPathTerminated}"
+                $NoRecurse = $true
+                break
             }
         }
 
+        if ($NoRecurse) { continue }
+
         # Never recurse into these directories
-        $NoRecurseDirs.Add((Join-Path -Path $Dir.FullName -ChildPath 'caches'))
+        $CachesDir = (Join-Path -Path $SubDir.FullName -ChildPath 'caches') + [IO.Path]::DirectorySeparatorChar
+        $NoRecurseDirs.Add($CachesDir)
 
         # Check if directory has a single VM
-        $VmxFiles = @(Get-ChildItem -LiteralPath $Dir.FullName -File | Where-Object Extension -EQ '.vmx' )
-        if ($VmxFiles.Count -eq 0) {
-            continue
-        } elseif ($VmxFiles.Count -gt 1) {
-            $NoRecurseDirs.Add($DirPathTerminated)
-            Write-Warning -Message ('Skipping directory with multiple VMX files: {0}' -f $Dir.FullName)
+        $VmxFiles = @(Get-ChildItem -LiteralPath $SubDir.FullName -File | Where-Object Extension -EQ '.vmx')
+        if ($VmxFiles.Count -eq 0 -or $VmxFiles.Count -ge 2) {
+            if ($VmxFiles.Count -ge 2) {
+                $NoRecurseDirs.Add($DirPathTerminated)
+                Write-Warning -Message "Skipping directory with multiple VMX files: $($SubDir.FullName)"
+            }
+
             continue
         }
 
         # Attempt to retrieve the VM name
         $VmxFile = $VmxFiles[0]
-        $VmDisplayName = Get-Content -LiteralPath $VmxFile.FullName | Where-Object { $_ -match '^displayName = "(.+)"' }
+        $VmDisplayName = Get-Content -LiteralPath $VmxFile.FullName | Where-Object { $PSItem -match '^displayName = "(.+)"' }
         if ($VmDisplayName) {
             $VmName = $Matches[1]
         } else {
             $VmName = $VmxFile.Name
         }
 
-        Write-Progress @WriteProgressParams -Status ('Optimizing VM: {0}' -f $VmName) -PercentComplete ($DirsProcessed / $AllDirs.Count * 100)
-        Write-Verbose -Message ('Optimizing VM: {0}' -f $VmName)
+        Write-Progress @WriteProgressParams -Status "Optimizing VM: ${VmName}" -PercentComplete ($DirsProcessed / $SubDirs.Count * 100)
+        Write-Verbose -Message "Optimizing VM: ${VmName}"
 
         # Check if the VM is locked
-        $LckDirs = @(Get-ChildItem -LiteralPath $Dir.FullName -Directory | Where-Object Name -Match '\.lck$')
+        $LckDirs = @(Get-ChildItem -LiteralPath $SubDir.FullName -Directory | Where-Object Name -Match '\.lck$')
         if ($LckDirs.Count -ne 0) {
             $NoRecurseDirs.Add($DirPathTerminated)
-            Write-Warning -Message ('Skipping locked VM: {0}' -f $VmName)
+            Write-Warning -Message "Skipping locked VM: ${VmName}"
             continue
         }
 
-        # Remove temporary data
-        Get-ChildItem -LiteralPath $Dir.FullName -Directory | Where-Object Name -EQ 'caches' | Remove-Item -Recurse
-        Get-ChildItem -LiteralPath $Dir.Fullname -File | Where-Object Extension -Match '\.(log|scoreboard)$' | Remove-Item
+        # Remove temporary data (handles `-Confirm` / `-WhatIf`)
+        Get-ChildItem -LiteralPath $SubDir.FullName -Directory | Where-Object Name -EQ 'caches' | Remove-Item -Recurse
+        Get-ChildItem -LiteralPath $SubDir.FullName -File | Where-Object Extension -Match '\.(log|scoreboard)$' | Remove-Item
     }
 
     Write-Progress @WriteProgressParams -Completed
