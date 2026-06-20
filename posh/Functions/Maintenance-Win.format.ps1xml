@@ -26,7 +26,7 @@
                                     switch ($Python.Output.Count) {
                                         0 { '(no output)' }
                                         1 { $Python.Output }
-                                        default { '{0} lines (view property for full output)' -f $Python.Output.Count }
+                                        default { "$($Python.Output.Count) lines (view property for output)" }
                                     }
                                 </ScriptBlock>
                             </ListItem>
@@ -57,7 +57,7 @@
                                     switch ($Scoop.Scoop.Count) {
                                         0 { '(no output)' }
                                         1 { $Scoop.Scoop }
-                                        default { '{0} lines (view property for full output)' -f $Scoop.Scoop.Count }
+                                        default { "$($Scoop.Scoop.Count) lines (view property for output)" }
                                     }
                                 </ScriptBlock>
                             </ListItem>
@@ -68,7 +68,7 @@
                                     switch ($Scoop.Apps.Count) {
                                         0 { '(no output)' }
                                         1 { $Scoop.Apps }
-                                        default { '{0} lines (view property for full output)' -f $Scoop.Apps.Count }
+                                        default { "$($Scoop.Apps.Count) lines (view property for output)" }
                                     }
                                 </ScriptBlock>
                             </ListItem>
@@ -79,7 +79,7 @@
                                     switch ($Scoop.Cleanup.Count) {
                                         0 { '(no output)' }
                                         1 { $Scoop.Cleanup }
-                                        default { '{0} lines (view property for full output)' -f $Scoop.Cleanup.Count }
+                                        default { "$($Scoop.Cleanup.Count) lines (view property for output)" }
                                     }
                                 </ScriptBlock>
                             </ListItem>
@@ -116,7 +116,7 @@
                                     switch ($Vs.Errors.Count) {
                                         0 { [String]::Empty }
                                         1 { $Vs.Errors }
-                                        default { '{0} errors (view property for full output)' -f $Vs.Errors.Count }
+                                        default { "$($Vs.Errors.Count) errors (view property for output)" }
                                     }
                                 </ScriptBlock>
                             </ListItem>
@@ -174,7 +174,7 @@
                                 <Label>Available</Label>
                                 <ScriptBlock>
                                     if ($_.Available.Count -eq 0) { return 'No available updates' }
-                                    '{0} available updates' -f $_.Available.Count
+                                    "$($_.Available.Count) available updates"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -185,7 +185,7 @@
                                     $Updated = ($_.Results | Where-Object Status -eq 'OK' | Measure-Object).Count
                                     $Failed = $_.Results.Count - $Updated
                                     $Unknown = $_.Available.Count - $_.Results.Count
-                                    '{0} packages updated ({1} failed, {2} missing)' -f $Updated, $Failed, $Unknown
+                                    "${Updated} packages updated (${Failed} failed, ${Unknown} missing)"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -221,7 +221,7 @@
                                     switch ($Wsl.Output.Count) {
                                         0 { '(no output)' }
                                         1 { $Wsl.Output }
-                                        default { '{0} lines (view property for full output)' -f $Wsl.Output.Count }
+                                        default { "$($Wsl.Output.Count) lines (view property for output)" }
                                     }
                                 </ScriptBlock>
                             </ListItem>

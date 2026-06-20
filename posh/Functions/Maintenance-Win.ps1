@@ -20,12 +20,11 @@ Function Update-Chrome {
         [ValidateSet('Stable', 'Beta', 'Dev', 'Canary')]
         [String]$UpdateChannel = 'Stable',
 
-        [ValidateRange(-1, [Int]::MaxValue)]
-        [Int]$ProgressParentId
+        [ValidateRange(-1, [SByte]::MaxValue)]
+        [SByte]$ProgressParentId
     )
 
-    Function Release-ComObjects {
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
+    Function Clear-ComObjects {
         [CmdletBinding()]
         [OutputType([Void])]
         Param()
@@ -45,18 +44,18 @@ Function Update-Chrome {
 
     $Result = [PSCustomObject]@{
         Success       = $false
-        BeforeUpdate  = $null
-        AfterUpdate   = $null
-        UpdateState   = [String]::Empty
+        BeforeUpdate  = ''
+        AfterUpdate   = ''
+        UpdateState   = ''
         UpdateStateId = -1
         WhatIf        = $false
     }
 
     switch ($UpdateChannel) {
-        Stable { $AppId = '{8A69D345-D564-463c-AFF1-A69D9E530F96}' }
-        Beta { $AppId = '{8237E44A-0054-442C-B6B6-EA0509993955}' }
-        Dev { $AppId = '{401C381F-E0DE-4B85-8BD8-3F3F14FBDA57}' }
-        Canary { $AppId = '{4EA16AC7-FD5A-47C3-875B-DBF4A2008C20}' }
+        'Stable' { $AppId = '{8A69D345-D564-463c-AFF1-A69D9E530F96}' }
+        'Beta' { $AppId = '{8237E44A-0054-442C-B6B6-EA0509993955}' }
+        'Dev' { $AppId = '{401C381F-E0DE-4B85-8BD8-3F3F14FBDA57}' }
+        'Canary' { $AppId = '{4EA16AC7-FD5A-47C3-875B-DBF4A2008C20}' }
     }
 
     # https://github.com/chromium/chromium/blob/main/chrome/updater/win/win_constants.h
@@ -83,8 +82,8 @@ Function Update-Chrome {
         17 = 'Error'
     }
 
-    # So we don't free someone else's COM objects in the (extremely unlikely)
-    # case that they're using the same variable names in a parent scope.
+    # So we don't free existing COM objects in the (extremely unlikely) case
+    # that they're using the same variable names in a parent scope.
     $GoogleUpdate = $null
     $AppBundle = $null
     $AppUpdate = $null
@@ -92,71 +91,101 @@ Function Update-Chrome {
     $NextVersionWeb = $null
 
     # Errors returned from COM objects are surfaced by the .NET runtime as
-    # generic `RuntimeException`s (0x80131501 - COR_E_SYSTEM), requiring
-    # inspection of the exception message to determine what went wrong.
+    # a generic `RuntimeException` (`0x80131501` / `COR_E_SYSTEM`), which
+    # requires inspection of the exception message to determine the failure.
 
     try {
         $GoogleUpdate = New-Object -ComObject $ComObjectName
     } catch {
-        Release-ComObjects
+        Clear-ComObjects
 
-        switch -RegEx ($PSItem.Exception.Message) {
+        $Exc = $PSItem
+        switch -RegEx ($Exc.Exception.Message) {
             # REGDB_E_CLASSNOTREG
-            '\b0x80040154\b' { throw 'Unable to update Chrome as Google Update is not available.' }
+            '\b0x80040154\b' { $ErrMsg = 'Unable to update Chrome as Google Update is not available.' }
+            default { $ErrMsg = "Google Update COM object failed to activate: $($Exc.Exception.Message)" }
         }
 
-        throw 'Google Update COM object failed to activate: {0}' -f $PSItem.Exception.Message
+        $ErrExc = [Exception]::new($ErrMsg, $Exc.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
         $AppBundle = $GoogleUpdate.createAppBundleWeb()
     } catch {
-        Release-ComObjects
-        throw 'Google Update failed to create Chrome app bundle: {0}' -f $PSItem.Exception.Message
+        Clear-ComObjects
+
+        $ErrMsg = "Google Update failed to create Chrome app bundle: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
         $AppBundle.initialize()
     } catch {
-        Release-ComObjects
-        throw 'Chrome app bundle failed to initialise: {0}' -f $PSItem.Exception.Message
+        Clear-ComObjects
+
+        $ErrMsg = "Chrome app bundle failed to initialise: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
         $AppBundle.createInstalledApp($AppId)
     } catch {
-        Release-ComObjects
+        Clear-ComObjects
 
-        switch -RegEx ($PSItem.Exception.Message) {
+        $Exc = $PSItem
+        switch -RegEx ($Exc.Exception.Message) {
             # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY
-            '\b0x80040813\b' { throw 'Google Update reported updates are disabled by policy.' }
+            '\b0x80040813\b' { $ErrMsg = 'Google Update reported updates are disabled by policy.' }
             # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY_MANUAL
-            '\b0x8004081f\b' { throw 'Google Update reported updates are disabled by policy (manual).' }
+            '\b0x8004081f\b' { $ErrMsg = 'Google Update reported updates are disabled by policy (manual).' }
             # GOOPDATE_E_APP_USING_EXTERNAL_UPDATER
-            '\b0xA043081D\b' { throw 'Google Update reported an update is already in-progress.' }
+            '\b0xA043081D\b' { $ErrMsg = 'Google Update reported an update is already in-progress.' }
+            default { $ErrMsg = "Chrome app bundle failed to create installed app: $($Exc.Exception.Message)" }
         }
 
-        throw 'Chrome app bundle failed to create installed app: {0}' -f $PSItem.Exception.Message
+        $ErrExc = [Exception]::new($ErrMsg, $Exc.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
         # Parameter is index of created app
         $AppUpdate = $AppBundle.appWeb(0)
     } catch {
-        Release-ComObjects
-        throw 'Failed to retrieve app instance from Chrome app bundle: {0}' -f $PSItem.Exception.Message
+        Clear-ComObjects
+
+        $ErrMsg = "Failed to retrieve app instance from Chrome app bundle: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
         $CurrentVersionWeb = $AppUpdate.currentVersionWeb
         $Result.BeforeUpdate = $CurrentVersionWeb.version
     } catch {
-        Release-ComObjects
-        throw 'Failed to retrieve current version from Chrome app bundle: {0}' -f $PSItem.Exception.Message
+        Clear-ComObjects
+
+        $ErrMsg = "Failed to retrieve current version from Chrome app bundle: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if (!$PSCmdlet.ShouldProcess('Chrome', 'Update')) {
-        Release-ComObjects
+        Clear-ComObjects
         $Result.Success = $true
         $Result.WhatIf = $true
         return $Result
@@ -174,7 +203,7 @@ Function Update-Chrome {
         }
 
         $ElapsedSeconds = [Int]($WaitTime.ElapsedMilliseconds / 1000)
-        $StatusMsg = 'Update state: {0} (Waited {1} secs / time-out: {2} secs) ...' -f $LastUpdateState, $ElapsedSeconds, $MaxWaitTime
+        $StatusMsg = "Update state: ${LastUpdateState} (Waited ${ElapsedSeconds} secs / time-out: ${MaxWaitTime} secs) ..."
         Write-Progress @WriteProgressParams -Status $StatusMsg
 
         switch ($LastUpdateStateId) {
@@ -183,8 +212,13 @@ Function Update-Chrome {
                 try {
                     $AppBundle.checkForUpdate()
                 } catch {
-                    Release-ComObjects
-                    throw 'Failed to trigger Chrome update check: {0}' -f $PSItem.Exception.Message
+                    Clear-ComObjects
+
+                    $ErrMsg = "Failed to trigger Chrome update check: $($PSItem.Exception.Message)"
+                    $ErrExc = [Exception]::new($ErrMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+                    $PSCmdlet.ThrowTerminatingError($ErrRec)
                 }
             }
 
@@ -193,8 +227,13 @@ Function Update-Chrome {
                 try {
                     $AppBundle.download()
                 } catch {
-                    Release-ComObjects
-                    throw 'Failed to trigger Chrome update download: {0}' -f $PSItem.Exception.Message
+                    Clear-ComObjects
+
+                    $ErrMsg = "Failed to trigger Chrome update download: $($PSItem.Exception.Message)"
+                    $ErrExc = [Exception]::new($ErrMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+                    $PSCmdlet.ThrowTerminatingError($ErrRec)
                 }
             }
 
@@ -203,8 +242,13 @@ Function Update-Chrome {
                 try {
                     $AppBundle.install()
                 } catch {
-                    Release-ComObjects
-                    throw 'Failed to trigger Chrome update install: {0}' -f $PSItem.Exception.Message
+                    Clear-ComObjects
+
+                    $ErrMsg = "Failed to trigger Chrome update install: $($PSItem.Exception.Message)"
+                    $ErrExc = [Exception]::new($ErrMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+                    $PSCmdlet.ThrowTerminatingError($ErrRec)
                 }
             }
         }
@@ -230,7 +274,11 @@ Function Update-Chrome {
                 $Result.AfterUpdate = $NextVersionWeb.version
                 $Result.Success = $true
             } catch {
-                Write-Error -Message ('Failed to retrieve new version from Chrome app bundle: {0}' -f $PSItem.Exception.Message)
+                $ErrMsg = "Failed to retrieve new version from Chrome app bundle: $($PSItem.Exception.Message)"
+                $ErrExc = [Exception]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+                $PSCmdlet.WriteError($ErrRec)
             }
         }
 
@@ -244,19 +292,31 @@ Function Update-Chrome {
         }
 
         # Error
-        17 { Write-Error -Message 'Google Update reported an error occurred.' }
+        17 {
+            $ErrMsg = 'Google Update reported an error occurred.'
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.WriteError($ErrRec)
+        }
 
         # Timeout
         -1 {
-            $LastUpdateStateMsg = 'Last update state: {1} [ID: {2}]' -f $LastUpdateState, $LastUpdateStateId
-            Write-Warning -Message ('Gave-up waiting on Chrome after {0} secs ({1})' -f $MaxWaitTime, $LastUpdateStateMsg)
+            $LastUpdateStateMsg = "Last update state: ${LastUpdateState} [ID: ${LastUpdateStateId}]"
+            Write-Warning -Message "Gave-up waiting on Chrome update after ${MaxWaitTime} secs (${LastUpdateStateMsg})"
         }
 
         # Unknown state ID
-        default { Write-Error -Message ('Google Update reported an unknown state ID: {0}' -f $Result.UpdateStateId) }
+        default {
+            $ErrMsg = "Google Update reported an unknown state ID: $($Result.UpdateStateId)"
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.WriteError($ErrRec)
+        }
     }
 
-    Release-ComObjects
+    Clear-ComObjects
     return $Result
 }
 
@@ -268,12 +328,11 @@ Function Update-Edge {
         [ValidateSet('Stable', 'Beta', 'Dev', 'Canary')]
         [String]$UpdateChannel = 'Stable',
 
-        [ValidateRange(-1, [Int]::MaxValue)]
-        [Int]$ProgressParentId
+        [ValidateRange(-1, [SByte]::MaxValue)]
+        [SByte]$ProgressParentId
     )
 
-    Function Release-ComObjects {
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
+    Function Clear-ComObjects {
         [CmdletBinding()]
         [OutputType([Void])]
         Param()
@@ -293,24 +352,22 @@ Function Update-Edge {
 
     $Result = [PSCustomObject]@{
         Success       = $false
-        BeforeUpdate  = $null
-        AfterUpdate   = $null
-        UpdateState   = [String]::Empty
+        BeforeUpdate  = ''
+        AfterUpdate   = ''
+        UpdateState   = ''
         UpdateStateId = -1
         WhatIf        = $false
     }
 
     switch ($UpdateChannel) {
-        Stable { $AppId = '{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}' }
-        Beta { $AppId = '{2CD8A007-E189-409D-A2C8-9AF4EF3C72AA}' }
-        Dev { $AppId = '{0D50BFEC-CD6A-4F9A-964C-C7416E3ACB10}' }
-        Canary { $AppId = '{65C35B14-6C1D-4122-AC46-7148CC9D6497}' }
+        'Stable' { $AppId = '{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}' }
+        'Beta' { $AppId = '{2CD8A007-E189-409D-A2C8-9AF4EF3C72AA}' }
+        'Dev' { $AppId = '{0D50BFEC-CD6A-4F9A-964C-C7416E3ACB10}' }
+        'Canary' { $AppId = '{65C35B14-6C1D-4122-AC46-7148CC9D6497}' }
     }
 
-    # https://github.com/chromium/chromium/blob/main/chrome/updater/win/win_constants.h
     $ComObjectName = 'MicrosoftEdgeUpdate.Update3WebMachine'
 
-    # https://github.com/chromium/chromium/blob/main/chrome/updater/app/server/win/updater_legacy_idl.template
     $UpdateStates = @{
         1  = 'Initialising'
         2  = 'Waiting to check for update'
@@ -331,8 +388,8 @@ Function Update-Edge {
         17 = 'Error'
     }
 
-    # So we don't free someone else's COM objects in the (extremely unlikely)
-    # case that they're using the same variable names in a parent scope.
+    # So we don't free existing COM objects in the (extremely unlikely) case
+    # that they're using the same variable names in a parent scope.
     $EdgeUpdate = $null
     $AppBundle = $null
     $AppUpdate = $null
@@ -340,71 +397,98 @@ Function Update-Edge {
     $NextVersionWeb = $null
 
     # Errors returned from COM objects are surfaced by the .NET runtime as
-    # generic `RuntimeException`s (0x80131501 - COR_E_SYSTEM), requiring
-    # inspection of the exception message to determine what went wrong.
+    # a generic `RuntimeException` (`0x80131501` / `COR_E_SYSTEM`), which
+    # requires inspection of the exception message to determine the failure.
 
     try {
         $EdgeUpdate = New-Object -ComObject $ComObjectName
     } catch {
-        Release-ComObjects
+        Clear-ComObjects
 
-        switch -RegEx ($PSItem.Exception.Message) {
+        $Exc = $PSItem
+        switch -RegEx ($Exc.Exception.Message) {
             # REGDB_E_CLASSNOTREG
-            '\b0x80040154\b' { throw 'Unable to update Edge as Edge Update is not available.' }
+            '\b0x80040154\b' { $ErrMsg = 'Unable to update Edge as Edge Update is not available.' }
+            default { $ErrMsg = "Edge Update COM object failed to activate: $($Exc.Exception.Message)" }
         }
 
-        throw 'Edge Update COM object failed to activate: {0}' -f $PSItem.Exception.Message
+        $ErrExc = [Exception]::new($ErrMsg, $Exc.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
         $AppBundle = $EdgeUpdate.createAppBundleWeb()
     } catch {
-        Release-ComObjects
-        throw 'Edge Update failed to create Edge app bundle: {0}' -f $PSItem.Exception.Message
+        Clear-ComObjects
+
+        $ErrMsg = "Edge Update failed to create Edge app bundle: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
         $AppBundle.initialize()
     } catch {
-        Release-ComObjects
-        throw 'Edge app bundle failed to initialise: {0}' -f $PSItem.Exception.Message
+        Clear-ComObjects
+
+        $ErrMsg = "Edge app bundle failed to initialise: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
         $AppBundle.createInstalledApp($AppId)
     } catch {
-        Release-ComObjects
+        Clear-ComObjects
 
-        switch -RegEx ($PSItem.Exception.Message) {
-            # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY
-            '\b0x80040813\b' { throw 'Edge Update reported updates are disabled by policy.' }
-            # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY_MANUAL
-            '\b0x8004081f\b' { throw 'Edge Update reported updates are disabled by policy (manual).' }
-            # GOOPDATE_E_APP_USING_EXTERNAL_UPDATER
-            '\b0xA043081D\b' { throw 'Edge Update reported an update is already in-progress.' }
+        $Exc = $PSItem
+        switch -RegEx ($Exc.Exception.Message) {
+            '\b0x80040813\b' { $ErrMsg = 'Edge Update reported updates are disabled by policy.' }
+            '\b0x8004081f\b' { $ErrMsg = 'Edge Update reported updates are disabled by policy (manual).' }
+            '\b0xA043081D\b' { $ErrMsg = 'Edge Update reported an update is already in-progress.' }
+            default { $ErrMsg = "Edge app bundle failed to create installed app: $($Exc.Exception.Message)" }
         }
 
-        throw 'Edge app bundle failed to create installed app: {0}' -f $PSItem.Exception.Message
+        $ErrExc = [Exception]::new($ErrMsg, $Exc.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
         # Parameter is index of created app
         $AppUpdate = $AppBundle.appWeb(0)
     } catch {
-        Release-ComObjects
-        throw 'Failed to retrieve app instance from Edge app bundle: {0}' -f $PSItem.Exception.Message
+        Clear-ComObjects
+
+        $ErrMsg = "Failed to retrieve app instance from Edge app bundle: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
         $CurrentVersionWeb = $AppUpdate.currentVersionWeb
         $Result.BeforeUpdate = $CurrentVersionWeb.version
     } catch {
-        Release-ComObjects
-        throw 'Failed to retrieve current version from Edge app bundle: {0}' -f $PSItem.Exception.Message
+        Clear-ComObjects
+
+        $ErrMsg = "Failed to retrieve current version from Edge app bundle: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if (!$PSCmdlet.ShouldProcess('Edge', 'Update')) {
-        Release-ComObjects
+        Clear-ComObjects
         $Result.Success = $true
         $Result.WhatIf = $true
         return $Result
@@ -422,7 +506,7 @@ Function Update-Edge {
         }
 
         $ElapsedSeconds = [Int]($WaitTime.ElapsedMilliseconds / 1000)
-        $StatusMsg = 'Update state: {0} (Waited {1} secs / time-out: {2} secs) ...' -f $LastUpdateState, $ElapsedSeconds, $MaxWaitTime
+        $StatusMsg = "Update state: ${LastUpdateState} (Waited ${ElapsedSeconds} secs / time-out: ${MaxWaitTime} secs) ..."
         Write-Progress @WriteProgressParams -Status $StatusMsg
 
         switch ($LastUpdateStateId) {
@@ -431,8 +515,13 @@ Function Update-Edge {
                 try {
                     $AppBundle.checkForUpdate()
                 } catch {
-                    Release-ComObjects
-                    throw 'Failed to trigger Edge update check: {0}' -f $PSItem.Exception.Message
+                    Clear-ComObjects
+
+                    $ErrMsg = "Failed to trigger Edge update check: $($PSItem.Exception.Message)"
+                    $ErrExc = [Exception]::new($ErrMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+                    $PSCmdlet.ThrowTerminatingError($ErrRec)
                 }
             }
 
@@ -441,8 +530,13 @@ Function Update-Edge {
                 try {
                     $AppBundle.download()
                 } catch {
-                    Release-ComObjects
-                    throw 'Failed to trigger Edge update download: {0}' -f $PSItem.Exception.Message
+                    Clear-ComObjects
+
+                    $ErrMsg = "Failed to trigger Edge update download: $($PSItem.Exception.Message)"
+                    $ErrExc = [Exception]::new($ErrMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+                    $PSCmdlet.ThrowTerminatingError($ErrRec)
                 }
             }
 
@@ -451,8 +545,13 @@ Function Update-Edge {
                 try {
                     $AppBundle.install()
                 } catch {
-                    Release-ComObjects
-                    throw 'Failed to trigger Edge update install: {0}' -f $PSItem.Exception.Message
+                    Clear-ComObjects
+
+                    $ErrMsg = "Failed to trigger Edge update install: $($PSItem.Exception.Message)"
+                    $ErrExc = [Exception]::new($ErrMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+                    $PSCmdlet.ThrowTerminatingError($ErrRec)
                 }
             }
         }
@@ -478,7 +577,11 @@ Function Update-Edge {
                 $Result.AfterUpdate = $NextVersionWeb.version
                 $Result.Success = $true
             } catch {
-                Write-Error -Message ('Failed to retrieve new version from Edge app bundle: {0}' -f $PSItem.Exception.Message)
+                $ErrMsg = "Failed to retrieve new version from Edge app bundle: $($PSItem.Exception.Message)"
+                $ErrExc = [Exception]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+                $PSCmdlet.WriteError($ErrRec)
             }
         }
 
@@ -492,19 +595,31 @@ Function Update-Edge {
         }
 
         # Error
-        17 { Write-Error -Message 'Edge Update reported an error occurred.' }
+        17 {
+            $ErrMsg = 'Edge Update reported an error occurred.'
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.WriteError($ErrRec)
+        }
 
         # Timeout
         -1 {
-            $LastUpdateStateMsg = 'Last update state: {1} [ID: {2}]' -f $LastUpdateState, $LastUpdateStateId
-            Write-Warning -Message ('Gave-up waiting on Edge update after {0} secs ({1})' -f $MaxWaitTime, $LastUpdateStateMsg)
+            $LastUpdateStateMsg = "Last update state: ${LastUpdateState} [ID: ${LastUpdateStateId}]"
+            Write-Warning -Message "Gave-up waiting on Edge update after ${MaxWaitTime} secs (${LastUpdateStateMsg})"
         }
 
         # Unknown state ID
-        default { Write-Error -Message ('Edge Update reported an unknown state ID: {0}' -f $Result.UpdateStateId) }
+        default {
+            $ErrMsg = "Edge Update reported an unknown state ID: $($Result.UpdateStateId)"
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.WriteError($ErrRec)
+        }
     }
 
-    Release-ComObjects
+    Clear-ComObjects
     return $Result
 }
 
@@ -515,7 +630,11 @@ Function Update-MicrosoftStore {
     Param()
 
     if (!(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to update Microsoft Store apps.'
+        $ErrMsg = 'You must have administrator privileges to update Microsoft Store apps.'
+        $ErrExc = [UnauthorizedAccessException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::PermissionDenied
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NoAdminPrivileges', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $Result = [PSCustomObject]@{
@@ -529,22 +648,34 @@ Function Update-MicrosoftStore {
     $MethodName = 'UpdateScanMethod'
 
     try {
-        $Session = New-CimSession -ErrorAction Stop -Verbose:$false
+        $Session = New-CimSession -ErrorAction 'Stop' -Verbose:$false
     } catch {
-        throw 'Error creating new WMI session: {0}' -f $PSItem.Exception.Message
+        $ErrMsg = "Error creating new WMI session: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'WmiApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
-        $Instance = Get-CimInstance -Namespace $Namespace -ClassName $ClassName -ErrorAction Stop
+        $Instance = Get-CimInstance -Namespace $Namespace -ClassName $ClassName -ErrorAction 'Stop'
     } catch {
-        throw 'Unable to update Microsoft Store apps as {0} WMI class is not available: {1}' -f $ClassName, $PSItem.Exception.Message
+        $ErrMsg = "Unable to update Microsoft Store apps as ${ClassName} WMI class is not available: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'WmiApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     # Modern PowerShell releases throw an exception on trying to instantiate a
     # non-existing class but older releases just return `null`. This includes
     # PowerShell 5.1, which is still the latest inbox version.
     if (!$Instance) {
-        throw 'Unable to update Microsoft Store apps as {0} WMI class is not available.' -f $ClassName
+        $ErrMsg = "Unable to update Microsoft Store apps as ${ClassName} WMI class is not available."
+        $ErrExc = [Exception]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'WmiApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if (!$PSCmdlet.ShouldProcess('Microsoft Store apps', 'Update')) {
@@ -556,14 +687,22 @@ Function Update-MicrosoftStore {
     try {
         $UpdateScan = $Session.InvokeMethod($Namespace, $Instance, $MethodName, $null)
     } catch {
-        throw 'Error invoking {0} method of {1} WMI class: {2}' -f $MethodName, $ClassName, $PSItem.Exception.Message
+        $ErrMsg = "Error invoking ${MethodName} method of ${ClassName} WMI class: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'WmiApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $Result.ReturnValue = $UpdateScan.ReturnValue.Value
     if ($Result.ReturnValue -eq 0) {
         $Result.Success = $true
     } else {
-        Write-Error 'Update of Microsoft Store apps returned: {0}' -f $Result.ReturnValue
+        $ErrMsg = "Update of Microsoft Store apps returned: $($Result.ReturnValue)"
+        $ErrExc = [Exception]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'WmiApiFailed', $ErrCat, $null)
+        $PSCmdlet.WriteError($ErrRec)
     }
 
     return $Result
@@ -574,8 +713,8 @@ Function Update-Office {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
-        [ValidateRange(-1, [Int]::MaxValue)]
-        [Int]$ProgressParentId
+        [ValidateRange(-1, [SByte]::MaxValue)]
+        [SByte]$ProgressParentId
     )
 
     $WriteProgressParams = @{ Activity = 'Updating Office' }
@@ -586,36 +725,49 @@ Function Update-Office {
 
     $Result = [PSCustomObject]@{
         Success        = $false
-        BeforeUpdate   = $null
-        AfterUpdate    = $null
-        ScenarioResult = [String]::Empty
+        BeforeUpdate   = ''
+        AfterUpdate    = ''
+        ScenarioResult = ''
         WhatIf         = $false
     }
 
-    $UpdateArgs = [String[]]@('/update', 'user', 'updatepromptuser=True')
-
-    $OfficeC2RClient = Join-Path -Path $env:ProgramFiles -ChildPath 'Common Files\Microsoft Shared\ClickToRun\OfficeC2RClient.exe'
-    if (!(Test-Path -LiteralPath $OfficeC2RClient -PathType Leaf)) {
-        throw 'Unable to update Office as Click-to-Run client not found: {0}' -f $OfficeC2RClient
+    $OfficeC2RClient = Join-Path -Path ${Env:ProgramFiles} -ChildPath 'Common Files\Microsoft Shared\ClickToRun\OfficeC2RClient.exe'
+    if (!(Test-Path -LiteralPath $OfficeC2RClient -PathType 'Leaf')) {
+        $ErrMsg = "Unable to update Office as Click-to-Run client not found: ${OfficeC2RClient}"
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, $OfficeC2RClient)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $C2RRegPath = 'HKLM:\Software\Microsoft\Office\ClickToRun'
     try {
-        $C2RRegKey = Get-Item -LiteralPath $C2RRegPath -ErrorAction Stop
+        $C2RRegPath = 'HKLM:\Software\Microsoft\Office\ClickToRun'
+        $C2RRegKey = Get-Item -LiteralPath $C2RRegPath -ErrorAction 'Stop'
     } catch {
-        throw 'Error retrieving Office Click-to-Run registry key: {0}' -f $PSItem.Exception.Message
+        $ErrMsg = "Error retrieving Office Click-to-Run registry key: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegistryKeyNotFound', $ErrCat, $C2RRegPath)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $ConfigRegPath = Join-Path -Path $C2RRegPath -ChildPath 'Configuration'
     try {
-        $ConfigRegKey = Get-Item -LiteralPath $ConfigRegPath
+        $ConfigRegPath = Join-Path -Path $C2RRegPath -ChildPath 'Configuration'
+        $ConfigRegKey = Get-Item -LiteralPath $ConfigRegPath -ErrorAction 'Stop'
     } catch {
-        throw 'Error retrieving Office Click-to-Run configuration registry key: {0}' -f $PSItem.Exception.Message
+        $ErrMsg = "Error retrieving Office Click-to-Run configuration registry key: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegistryKeyNotFound', $ErrCat, $ConfigRegPath)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $Version = $null
     $RawVersion = $ConfigRegKey.GetValue('VersionToReport')
-    if (![Version]::TryParse($RawVersion, [ref]$Version)) { $Version = $RawVersion }
+    if (![Version]::TryParse($RawVersion, [Ref]$Version)) {
+        Write-Warning -Message "Failed to parse pre-update Office version: ${RawVersion}"
+    }
+
     $Result.BeforeUpdate = $Version
 
     if (!$PSCmdlet.ShouldProcess('Office', 'Update')) {
@@ -624,15 +776,25 @@ Function Update-Office {
         return $Result
     }
 
-    Write-Progress @WriteProgressParams
     try {
-        Start-Process -FilePath $OfficeC2RClient -ArgumentList $UpdateArgs
+        Write-Progress @WriteProgressParams
+        $UpdateArgs = '/update', 'user', 'updatepromptuser=True'
+        $UpdateCmd = "${OfficeC2RClient} $($UpdateArgs -join ' ')"
+        Start-Process -FilePath $OfficeC2RClient -ArgumentList $UpdateArgs -ErrorAction 'Stop'
     } catch {
-        throw 'Error starting Office Click-To-Run client process: {0}' -f $PSItem.Exception.Message
+        $ErrMsg = "Failed to start Office Click-To-Run Client: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
+
+    $MaxWaitTime = 900 # 15 mins
+    $WaitTime = [Diagnostics.Stopwatch]::StartNew()
 
     do {
         Start-Sleep -Seconds 5
+        $ElapsedSeconds = [Int]($WaitTime.ElapsedMilliseconds / 1000)
 
         $ExecutingScenario = $C2RRegKey.GetValue('ExecutingScenario')
         if (!$ExecutingScenario) {
@@ -641,32 +803,46 @@ Function Update-Office {
             break
         }
 
-        Write-Progress @WriteProgressParams -Status ('Executing scenario: {0}' -f $ExecutingScenario)
-        $TasksRegPath = Join-Path -Path $C2RRegPath -ChildPath ('Scenario\{0}\TasksState' -f $ExecutingScenario)
-        $TasksRegKey = Get-Item -LiteralPath $TasksRegPath
+        $StatusMsg = "Executing Scenario: ${ExecutingScenario} (Waited ${ElapsedSeconds} secs / time-out: ${MaxWaitTime} secs) ..."
+        Write-Progress @WriteProgressParams -Status $StatusMsg
 
+        $TasksRegPath = Join-Path -Path $C2RRegPath -ChildPath "Scenario\${ExecutingScenario}\TasksState"
+        $TasksRegKey = Get-Item -LiteralPath $TasksRegPath
         foreach ($Task in $TasksRegKey.GetValueNames()) {
             $TaskName = $Task.Split(':')[0]
             $TaskStatus = $TasksRegKey.GetValue($Task)
 
             switch ($TaskStatus) {
-                'TASKSTATE_CANCELLED' { Write-Warning -Message ('Office update task cancelled in {0} scenario: {1}' -f $ExecutingScenario, $TaskName) }
-                'TASKSTATE_FAILED' { Write-Warning -Message ('Office update task failed in {0} scenario: {1}' -f $ExecutingScenario, $TaskName) }
+                'TASKSTATE_CANCELLED' { Write-Warning -Message "Office update task cancelled in ${ExecutingScenario} scenario: ${TaskName}" }
+                'TASKSTATE_FAILED' { Write-Warning -Message "Office update task failed in ${ExecutingScenario} scenario: ${TaskName}" }
             }
         }
-    } while ($true)
+    } while ($ElapsedSeconds -lt $MaxWaitTime)
 
-    Write-Verbose -Message ('Office update finished {0} scenario with result: {1}' -f $LastScenario, $LastScenarioResult)
+    $WaitTime.Stop()
     Write-Progress @WriteProgressParams -Completed
 
+    if ($ElapsedSeconds -ge $MaxWaitTime) {
+        $ErrMsg = "Office update exceeded maximum wait time of ${MaxWaitTime} seconds."
+        $ErrExc = [TimeoutException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::OperationTimeout
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandTimeout', $ErrCat, $UpdateCmd)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    Write-Verbose -Message "Office update finished ${LastScenario} scenario with result: ${LastScenarioResult}"
     $Result.ScenarioResult = $LastScenarioResult
-    if ($Result.ScenarioResult -eq 'Success') { $Result.Success = $true }
+    if ($Result.ScenarioResult -eq 'Success') {
+        $Result.Success = $true
+    }
 
     $Version = $null
     $RawVersion = $ConfigRegKey.GetValue('VersionToReport')
-    if (![Version]::TryParse($RawVersion, [ref]$Version)) { $Version = $RawVersion }
-    $Result.AfterUpdate = $Version
+    if (![Version]::TryParse($RawVersion, [Ref]$Version)) {
+        Write-Warning -Message "Failed to parse post-update Office version: ${RawVersion}"
+    }
 
+    $Result.AfterUpdate = $Version
     return $Result
 }
 
@@ -681,73 +857,81 @@ Function Update-Python {
         [OutputType([String[]])]
         Param()
 
-        $ListArgs = [String[]]@('list', '--format=json')
+        $ListArgs = 'list', '--format=json'
+        $ListCmd = "pymanager $($ListArgs -join ' ')"
 
-        Write-Verbose -Message ('Listing Python runtimes: pymanager {0}' -f ($ListArgs -join ' '))
-        try {
-            $VersionsJsonRaw = & pymanager @ListArgs 2>&1
-        } catch {
-            $Msg = 'Failed to retrieve Python runtimes: {0}' -f $PSItem.Exception.Message
-            Write-Error -Message $Msg
-            return [String[]]@($Msg)
-        }
-
+        Write-Verbose -Message "Listing Python runtimes: ${ListCmd}"
+        $VersionsJsonRaw = & pymanager @ListArgs 2>&1 | Out-String
         if ($LASTEXITCODE -ne 0) {
-            Write-Error -Message ('Pymanager returned non-zero exit code listing Python runtimes: {0}' -f $LASTEXITCODE)
+            $ErrMsg = "Pymanager exited with non-zero exit code listing Python runtimes: ${LASTEXITCODE}"
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ListCmd)
+            $PSCmdlet.WriteError($ErrRec)
             return [String[]]@($VersionsJsonRaw)
         }
 
         try {
-            $VersionsJson = $VersionsJsonRaw | ConvertFrom-Json
+            $VersionsJson = $VersionsJsonRaw | ConvertFrom-Json -ErrorAction 'Stop'
         } catch {
-            Write-Error -Message ('Failed to parse JSON listing Python runtimes: {0}' -f $PSItem.Exception.Message)
+            $ErrMsg = "Failed to parse JSON listing Python runtimes: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'JsonParseFailed', $ErrCat, $VersionsJsonRaw)
+            $PSCmdlet.WriteError($ErrRec)
             return [String[]]@($VersionsJsonRaw)
         }
 
         return [String[]]@($VersionsJson.versions.'display-name')
     }
 
-    if (!(Get-Command -Name 'pymanager' -ErrorAction Ignore)) {
-        throw 'Unable to update Python runtimes as pymanager command not found.'
+    if (!(Get-Command -Name 'pymanager' -ErrorAction 'Ignore')) {
+        $ErrMsg = 'Unable to update Python runtimes as pymanager command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'pymanager')
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $Result = [PSCustomObject]@{
         Success      = $false
-        BeforeUpdate = [String[]]@()
-        AfterUpdate  = [String[]]@()
+        BeforeUpdate = ''
+        AfterUpdate  = ''
         Output       = [String[]]@()
         ExitCode     = -1
         WhatIf       = $false
     }
+
     $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdatePython')
 
-    $UpdateArgs = [String[]]@('install', '--update')
+    $UpdateArgs = 'install', '--update'
+    $UpdateCmd = "pymanager $($UpdateArgs -join ' ')"
 
     $Result.BeforeUpdate = Get-PythonRuntimes
 
     $DryrunMsg = ''
     if (!$PSCmdlet.ShouldProcess('Python runtimes', 'Update')) {
-        $UpdateArgs += '--dry-run'
         $DryrunMsg = ' (dry-run)'
+        $UpdateArgs += '--dry-run'
+        $UpdateCmd += ' --dry-run'
         $Result.WhatIf = $true
     }
 
-    Write-Verbose -Message ('Updating Python runtimes{0}: pymanager {1}' -f $DryrunMsg, ($UpdateArgs -join ' '))
-    try {
-        $Result.Output = [String[]]@(& pymanager @UpdateArgs 2>&1)
-        $Result.ExitCode = $LASTEXITCODE
+    Write-Verbose -Message "Updating Python runtimes${DryrunMsg}: ${UpdateCmd}"
+    $Result.Output = [String[]]@(& pymanager @UpdateArgs 2>&1)
+    $Result.ExitCode = $LASTEXITCODE
 
-        if ($Result.ExitCode -ne 0) {
-            Write-Error -Message ('Pymanager returned non-zero exit code updating Python runtimes: {0}' -f $Result.ExitCode)
-        } else { $Result.Success = $true }
-    } catch {
-        $Msg = 'Failed to start Python runtimes update{0}: {1}' -f $DryrunMsg, $PSItem.Exception.Message
-        $Result.Output = [String[]]@($Msg)
-        Write-Eror -Message $Msg
+    if ($Result.ExitCode -eq 0) {
+        $Result.Success = $true
+    } else {
+        $ErrMsg = "Pymanager exited with non-zero exit code updating Python runtimes: $($Result.ExitCode)"
+        $ErrExc = [Exception]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $null)
+        $PSCmdlet.WriteError($ErrRec)
     }
 
     $Result.AfterUpdate = Get-PythonRuntimes
-
     return $Result
 }
 
@@ -758,12 +942,16 @@ Function Update-Scoop {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
-        [ValidateRange(-1, [Int]::MaxValue)]
-        [Int]$ProgressParentId
+        [ValidateRange(-1, [SByte]::MaxValue)]
+        [SByte]$ProgressParentId
     )
 
-    if (!(Get-Command -Name 'scoop' -ErrorAction Ignore)) {
-        throw 'Unable to update Scoop as scoop command not found.'
+    if (!(Get-Command -Name 'scoop' -ErrorAction 'Ignore')) {
+        $ErrMsg = 'Unable to update Scoop as scoop command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptNotFound', $ErrCat, 'scoop')
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $WriteProgressParams = @{ Activity = 'Updating Scoop' }
@@ -774,99 +962,117 @@ Function Update-Scoop {
 
     $Result = [PSCustomObject]@{
         Scoop        = [String[]]@()
-        Apps         = @()
+        Apps         = [String[]]@()
         Cleanup      = [String[]]@()
         LastExitCode = -1
         WhatIf       = $false
     }
+
     $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateScoop')
 
-    $UpdateScoopArgs = [String[]]@('update', '--quiet')
-    $UpdateAppsArgs = [String[]]@('update', '*', '--quiet')
-    $UpdateAppsReportOnlyArgs = [String[]]@('status', '--local')
-    $CleanupArgs = [String[]]@('cleanup', '*', '--cache')
+    $UpdateScoopArgs = 'update', '--quiet'
+    $UpdateScoopCmd = "scoop $($UpdateScoopArgs -join ' ')"
+
+    $UpdateAppsArgs = 'update', '*', '--quiet'
+    $UpdateAppsCmd = "scoop $($UpdateAppsArgs -join ' ')"
+
+    $UpdateAppsReportOnlyArgs = 'status', '--local'
+    $UpdateAppsReportOnlyCmd = "scoop $($UpdateAppsReportOnlyArgs -join ' ')"
+
+    $CleanupArgs = 'cleanup', '*', '--cache'
+    $CleanupCmd = "scoop $($CleanupArgs -join ' ')"
 
     # There's no simple way to disable the output of the download progress bar
     # during Scoop updates. It adds a lot of noise to the captured output, so
-    # we filter out relevant lines using a regular expression match.
+    # we filter out relevant lines using a regular expression.
     $ProgressBarRegex = '\[=*(> *)?\] +[0-9]{1,3}%'
 
     if ($PSCmdlet.ShouldProcess('Scoop', 'Update')) {
         Write-Progress @WriteProgressParams -Status 'Updating Scoop to latest version' -PercentComplete 1
-        Write-Verbose -Message ('Updating Scoop: scoop {0}' -f ($UpdateScoopArgs -join ' '))
+        Write-Verbose -Message "Updating Scoop: ${UpdateScoopCmd}"
 
         try {
             # Suppress useless verbose output from Scoop
             $VerboseOriginal = $Global:VerbosePreference
-            $VerbosePreference = 'SilentlyContinue'
+            $Global:VerbosePreference = 'SilentlyContinue'
+
             $Result.Scoop = [String[]]@(& scoop @UpdateScoopArgs 6>&1)
         } catch {
             $LASTEXITCODE = -1
-            $Msg = 'Failed to start Scoop update: {0}' -f $PSItem.Exception.Message
-            $Result.Scoop = [String[]]@($Msg)
-            Write-Eror -Message $Msg
         } finally {
-            $VerbosePreference = $VerboseOriginal
+            $Global:VerbosePreference = $VerboseOriginal
         }
 
         if ($LASTEXITCODE -ne 0) {
-            Write-Error -Message ('Scoop update returned non-zero exit code: {0}' -f $LASTEXITCODE)
             Write-Progress @WriteProgressParams -Completed
+
+            $ErrMsg = "Scoop update exited with non-zero exit code: ${LASTEXITCODE}"
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $UpdateScoopCmd)
+            $PSCmdlet.WriteError($ErrRec)
             return $Result
         }
     }
 
     $ReportOnlyMsg = ''
     if (!$PSCmdlet.ShouldProcess('Scoop apps', 'Update')) {
-        $UpdateAppsArgs = $UpdateAppsReportOnlyArgs
         $ReportOnlyMsg = ' (report only)'
+        $UpdateAppsArgs = $UpdateAppsReportOnlyArgs
+        $UpdateAppsCmd = $UpdateAppsReportOnlyCmd
         $Result.WhatIf = $true
     }
 
     Write-Progress @WriteProgressParams -Status 'Updating apps' -PercentComplete 20
-    Write-Verbose -Message ('Updating Scoop apps{0}: scoop {1}' -f $ReportOnlyMsg, ($UpdateAppsArgs -join ' '))
+    Write-Verbose -Message "Updating Scoop apps${ReportOnlyMsg}: ${UpdateAppsCmd}"
 
     try {
         # Suppress useless verbose output from Scoop
         $VerboseOriginal = $Global:VerbosePreference
-        $VerbosePreference = 'SilentlyContinue'
-        $Result.Apps = @(& scoop @UpdateAppsArgs 6>&1 | Where-Object { $_ -notmatch $ProgressBarRegex })
+        $Global:VerbosePreference = 'SilentlyContinue'
+
+        $Result.Apps = [String[]]@(& scoop @UpdateAppsArgs 6>&1 | Where-Object { $PSItem -notmatch $ProgressBarRegex })
     } catch {
         $LASTEXITCODE = -1
-        $Msg = 'Failed to start Scoop apps update{0}: {1}' -f $ReportOnlyMsg, $PSItem.Exception.Message
-        $Result.Apps = [String[]]@($Msg)
-        Write-Eror -Message $Msg
     } finally {
-        $VerbosePreference = $VerboseOriginal
+        $Global:VerbosePreference = $VerboseOriginal
     }
 
     if ($LASTEXITCODE -ne 0) {
-        Write-Error -Message ('Scoop apps update returned non-zero exit code: {0}' -f $LASTEXITCODE)
         Write-Progress @WriteProgressParams -Completed
+
+        $ErrMsg = "Scoop apps update exited with non-zero exit code: ${LASTEXITCODE}"
+        $ErrExc = [Exception]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $UpdateAppsCmd)
+        $PSCmdlet.WriteError($ErrRec)
         return $Result
     }
 
     if ($PSCmdlet.ShouldProcess('Scoop outdated data', 'Remove')) {
         Write-Progress @WriteProgressParams -Status 'Cleaning-up outdated data' -PercentComplete 80
-        Write-Verbose -Message ('Cleaning-up outdated Scoop data: scoop {0}' -f ($CleanupArgs -join ' '))
+        Write-Verbose -Message "Cleaning-up outdated Scoop data: ${CleanupCmd}"
 
         try {
             # Suppress useless verbose output from Scoop
             $VerboseOriginal = $Global:VerbosePreference
-            $VerbosePreference = 'SilentlyContinue'
+            $Global:VerbosePreference = 'SilentlyContinue'
+
             $Result.Cleanup = [String[]]@(& scoop @CleanupArgs 6>&1)
         } catch {
             $LASTEXITCODE = -1
-            $Msg = 'Failed to start Scoop clean-up: {0}' -f $PSItem.Exception.Message
-            $Result.Cleanup = [String[]]@($Msg)
-            Write-Eror -Message $Msg
         } finally {
-            $VerbosePreference = $VerboseOriginal
+            $Global:VerbosePreference = $VerboseOriginal
         }
 
         if ($LASTEXITCODE -ne 0) {
-            Write-Error -Message ('Scoop clean-up returned non-zero exit code: {0}' -f $LASTEXITCODE)
             Write-Progress @WriteProgressParams -Completed
+
+            $ErrMsg = "Scoop clean-up exited with non-zero exit code: ${LASTEXITCODE}"
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $CleanupCmd)
+            $PSCmdlet.WriteError($ErrRec)
             return $Result
         }
     }
@@ -883,18 +1089,26 @@ Function Update-VisualStudio {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
-        [ValidateRange(-1, [Int]::MaxValue)]
-        [Int]$ProgressParentId
+        [ValidateRange(-1, [SByte]::MaxValue)]
+        [SByte]$ProgressParentId
     )
 
     if (!(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to update Visual Studio.'
+        $ErrMsg = 'You must have administrator privileges to update Visual Studio.'
+        $ErrExc = [UnauthorizedAccessException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::PermissionDenied
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NoAdminPrivileges', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
-        Import-Module -Name 'VSSetup' -ErrorAction Stop -Verbose:$false
+        Import-Module -Name 'VSSetup' -ErrorAction 'Stop' -Verbose:$false
     } catch {
-        throw 'Unable to update Visual Studio as VSSetup module not available.'
+        $ErrMsg = 'Unable to update Visual Studio as VSSetup module not available.'
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'VSSetup')
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $WriteProgressParams = @{ Activity = 'Updating Visual Studio' }
@@ -904,30 +1118,38 @@ Function Update-VisualStudio {
     }
 
     $Result = [PSCustomObject]@{
-        # Set to false later if anything goes wrong during the update
         Success      = $true
-        BeforeUpdate = @()
-        AfterUpdate  = @()
+        BeforeUpdate = @() # `Microsoft.VisualStudio.Setup.Instance[]`
+        AfterUpdate  = @() # `Microsoft.VisualStudio.Setup.Instance[]`
         Errors       = [String[]]@()
         WhatIf       = $false
     }
+
     $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateVisualStudio')
 
     # Visual Studio Installer is always(?) installed under the 32-bit path
     if ([Environment]::Is64BitOperatingSystem) {
-        $ProgramFiles = ${env:ProgramFiles(x86)}
+        $ProgramFiles = ${Env:ProgramFiles(x86)}
     } else {
-        $ProgramFiles = $env:ProgramFiles
+        $ProgramFiles = ${Env:ProgramFiles}
     }
 
     $VsInstallerPath = Join-Path -Path $ProgramFiles -ChildPath 'Microsoft Visual Studio\Installer\vs_installer.exe'
-    if (!(Test-Path -LiteralPath $VsInstallerPath -PathType Leaf)) {
-        throw 'Unable to update Visual Studio as VS Installer not found: {0}' -f $VsInstallerPath
+    if (!(Test-Path -LiteralPath $VsInstallerPath -PathType 'Leaf')) {
+        $ErrMsg = "Unable to update Visual Studio as VS Installer not found: ${VsInstallerPath}"
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, $VsInstallerPath)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property 'InstallationVersion')
     if ($VsSetupInstances.Count -eq 0) {
-        throw 'Get-VSSetupInstance returned no Visual Studio installations.'
+        $ErrMsg = 'Get-VSSetupInstance returned no Visual Studio installations.'
+        $ErrExc = [InvalidOperationException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ApplicationNotFound', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $VersionToStringMemberParams = @{
@@ -946,8 +1168,8 @@ Function Update-VisualStudio {
     }
 
     $VsUpdateErrors = [Collections.Generic.List[String]]::new()
-    for ($Idx = 0; $Idx -lt $VsSetupInstances.Count; $Idx++) {
-        $VsSetupInstance = $VsSetupInstances[$Idx]
+    for ($i = 0; $i -lt $VsSetupInstances.Count; $i++) {
+        $VsSetupInstance = $VsSetupInstances[$i]
         $VsDisplayName = $VsSetupInstance.DisplayName
 
         # Waiting on the Visual Studio Installer to complete is more difficult
@@ -970,27 +1192,33 @@ Function Update-VisualStudio {
         # it's doing something nefarious if it detects it was launched from a
         # console environment. This also occurs for any child processes which
         # it launches, presumably due to the inheritance of process handles.
-        # Whatever it's doing seriously confuses PowerShell and/or PSReadLine,
-        # which seemingly lose track of the console state; subsequent output
+        # Whatever it does seriously confuses PowerShell and/or `PSReadLine`,
+        # which seemingly loses track of the console state; subsequent output
         # will often overlap earlier debug output from the installer.
         #
-        # The workaround is to launch the installer from a separate console. We
+        # A workaround is to launch the installer from a separate console. We
         # do that by launching `cmd` and then the installer within it. `cmd`
-        # will return the exit code of the installer once it has exited.
+        # will return the exit code of the installer when it itself exits.
         #
         # Also, the argument quoting for `cmd` looks weird and wrong. It's not;
         # `cmd` itself is weird and wrong. See its documentation for specifics.
-        Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $VsDisplayName) -PercentComplete ($Idx / $VsSetupInstances.Count * 100)
+        Write-Progress @WriteProgressParams -Status "Updating ${VsDisplayName}" -PercentComplete ($i / $VsSetupInstances.Count * 100)
         $VsInstallerArgs = 'update --installPath "{0}" --passive --norestart' -f $VsSetupInstance.InstallationPath
         $CmdArgs = '/D /C ""{0}" {1}"' -f $VsInstallerPath, $VsInstallerArgs
+        $UpdateCmd = "cmd $($CmdArgs -join ' ')"
 
         try {
-            $VsInstaller = Start-Process -FilePath $env:ComSpec -ArgumentList $CmdArgs -PassThru -Wait
+            $VsInstaller = Start-Process -FilePath ${Env:ComSpec} -ArgumentList $CmdArgs -PassThru -Wait -ErrorAction 'Stop'
         } catch {
             $Result.Success = $false
-            $Msg = 'Failed to start Visual Studio Installer: {0}' -f $PSItem.Exception.Message
-            Write-Error -Message $Msg
-            $VsUpdateErrors.Add($Msg)
+
+            $ErrMsg = "Failed to start Visual Studio Installer: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
+            $PSCmdlet.WriteError($ErrRec)
+
+            $VsUpdateErrors.Add($ErrMsg)
             break
         }
 
@@ -1015,26 +1243,37 @@ Function Update-VisualStudio {
             # existing may cause problems for the installer (even if unheld).
             [Threading.Mutex]::new($false, 'DevdivInstallerUI', [Ref]$VsInstallerMutexCreated).Close()
 
-            if (!$VsInstallerMutexCreated) { $VsInstallerUpdated = $true }
+            if (!$VsInstallerMutexCreated) {
+                $VsInstallerUpdated = $true
+            }
         } while (!$VsInstallerMutexCreated)
 
         if ($VsInstallerUpdated) {
-            Write-Warning -Message ('{0} update exit code may be unreliable.' -f $VsDisplayName)
+            Write-Warning -Message "${VsDisplayName} update exit code may be unreliable."
         }
 
         switch ($VsInstaller.ExitCode) {
-            0 { }
-            3010 { Write-Warning -Message ('{0} successfully updated but requires a reboot.' -f $VsDisplayName) }
-            Default {
+            0 { } # Success
+
+            3010 {
+                Write-Warning -Message "${VsDisplayName} successfully updated but requires a reboot."
+            }
+
+            default {
                 $Result.Success = $false
-                $Msg = 'Update of {0} returned exit code: {1}' -f $VsDisplayName, $VsInstaller.ExitCode
-                Write-Error -Message $Msg
-                $VsUpdateErrors.Add($Msg)
+
+                $ErrMsg = "Update of ${VsDisplayName} exited with non-zero exit code: $($VsInstaller.ExitCode)"
+                $ErrExc = [Exception]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
+                $PSCmdlet.WriteError($ErrRec)
+
+                $VsUpdateErrors.Add($ErrMsg)
             }
         }
     }
 
-    $Result.Errors = $VsUpdateErrors.ToArray()
+    $Result.Errors = [String[]]@($VsUpdateErrors.ToArray())
 
     $VsSetupInstances = @(Get-VSSetupInstance | Sort-Object -Property 'InstallationVersion')
     $Result.AfterUpdate = $VsSetupInstances
@@ -1053,28 +1292,37 @@ Function Update-Windows {
         [ValidateSet('Critical Updates', 'Definition Updates', 'Driver Sets', 'Drivers', 'Feature Packs', 'Security Updates', 'Service Packs', 'Tools', 'Update Rollups', 'Updates', 'Upgrades')]
         [String[]]$ExcludeCategories,
 
-        [Parameter(Mandatory, ParameterSetName = 'Include')]
+        [Parameter(ParameterSetName = 'Include', Mandatory)]
         [ValidateSet('Critical Updates', 'Definition Updates', 'Driver Sets', 'Drivers', 'Feature Packs', 'Security Updates', 'Service Packs', 'Tools', 'Update Rollups', 'Updates', 'Upgrades')]
         [String[]]$IncludeCategories
     )
 
     if (!(Test-IsAdministrator)) {
-        throw 'You must have administrator privileges to update Windows.'
+        $ErrMsg = 'You must have administrator privileges to update Windows.'
+        $ErrExc = [UnauthorizedAccessException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::PermissionDenied
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NoAdminPrivileges', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
-        Import-Module -Name 'PSWindowsUpdate' -ErrorAction Stop -Verbose:$false
+        Import-Module -Name 'PSWindowsUpdate' -ErrorAction 'Stop' -Verbose:$false
     } catch {
-        throw 'Unable to update Windows as PSWindowsUpdate module not available.'
+        $ErrMsg = 'Unable to update Windows as PSWindowsUpdate module not available.'
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'PSWindowsUpdate')
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $Result = [PSCustomObject]@{
         # Set to false if any updates fail to download/install
         Success = $true
-        Summary = [String]::Empty
-        Updates = @()
+        Summary = ''
+        Updates = @() # `__ComObject[]`
         WhatIf  = $false
     }
+
     $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateWindows')
 
     switch ($PSCmdlet.ParameterSetName) {
@@ -1082,8 +1330,8 @@ Function Update-Windows {
         'Include' { $UpdateParams = @{ 'Category' = $IncludeCategories } }
     }
 
-    # `Get-WindowsUpdate` doesn't properly support `-WhatIf`; it will install
-    # updates it finds when `-Install` is provided even if `-WhatIf` is set.
+    # `Get-WindowsUpdate` doesn't correctly support `-WhatIf`; it will install
+    # Windows updates when `-Install` is provided even if `-WhatIf` is set.
     if ($PSCmdlet.ShouldProcess('Windows', 'Update')) {
         $UpdateParams.Add('Install', $true)
         $UpdateParams.Add('AcceptAll', $true)
@@ -1092,25 +1340,48 @@ Function Update-Windows {
         $Result.WhatIf = $true
     }
 
-    # TODO: After install three copies of each update are returned?
-    $Result.Updates = Get-WindowsUpdate @UpdateParams
+    # HACK: `PSWindowsUpdate` returns three instances of each update result.
+    # Keep only unique KBs on the grounds the installation of a given update
+    # will only be attempted once for a given invocation.
+    $Result.Updates = Get-WindowsUpdate @UpdateParams | Sort-Object -Property 'KB' -Unique
 
     if ($Result.Updates.Count -eq 0) {
         $Result.Summary = 'No updates found'
     } elseif ($Result.WhatIf) {
-        $Result.Summary = 'Found {0} updates (scan only)' -f $Result.Updates.Count
+        $Result.Summary = "Found $($Result.Updates.Count) updates (scan only)"
     } else {
+        # STATUS        DESC
+        # A------       Accepted
+        # R------       Rejected
+        # -D-----       Downloaded
+        # -F-----       Download failed
+        # --I----       Installed
+        # --F----       Install failed
+        # --R----       Reboot required
+        # ---M---       Mandatory
+        # ----H--       Hidden
+        # -----U-       Uninstallable
+        # ------B       Beta
         $Failed = 0
         $Installed = 0
+        $NeedReboot = $false
 
         foreach ($Update in $Result.Updates) {
-            if ($Update.Status -match 'F') { $Failed++ }
-            elseif ($Update.Status -match 'I') { $Installed++ }
+            if ($Update.Status -match '^.(F.|.F)....$') { $Failed++; continue }
+            if ($Update.Status -match '^..I....$') { $Installed++; continue }
+            if ($Update.Status -match '^..R....$') { $Installed++; $NeedReboot = $true }
         }
 
-        if ($Failed -gt 0) { $Result.Success = $false }
+        if ($Failed -gt 0) {
+            $Result.Success = $false
+        }
 
-        $Result.Summary = '{0} installed, {1} failed, {2} total' -f $Installed, $Failed, $Result.Updates.Count
+        $RebootMsg = ''
+        if ($NeedReboot) {
+            $RebootMsg = ' (reboot required)'
+        }
+
+        $Result.Summary = "${Installed} installed${RebootMsg}, ${Failed} failed, $($Result.Updates.Count) total"
     }
 
     return $Result
@@ -1124,56 +1395,76 @@ Function Update-WinGet {
     [OutputType([PSCustomObject])]
     Param()
 
-    if (!(Get-Command -Name 'winget' -ErrorAction Ignore)) {
-        throw 'Unable to update WinGet as winget command not found.'
+    if (!(Get-Command -Name 'winget' -ErrorAction 'Ignore')) {
+        $ErrMsg = 'Unable to update WinGet packages as winget command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'winget')
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     try {
-        Import-Module -Name 'Microsoft.WinGet.Client' -ErrorAction Stop -Verbose:$false
+        Import-Module -Name 'Microsoft.WinGet.Client' -ErrorAction 'Stop' -Verbose:$false
     } catch {
-        throw 'Unable to update WinGet as Microsoft.WinGet.Client module not available.'
+        $ErrMsg = 'Unable to update WinGet as Microsoft.WinGet.Client module not available.'
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'Microsoft.WinGet.Client')
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $Result = [PSCustomObject]@{
         # Set to false if any updates fail
         Success   = $true
-        Available = @()
-        Results   = @()
+        Available = @() # `Microsoft.WinGet.Client.Engine.PSObjects.PSCatalogPackage[]`
+        Results   = @() # `Microsoft.WinGet.Client.Engine.PSObjects.PSInstallResult[]`
         WhatIf    = $false
     }
+
     $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateWinGet')
 
-    Write-Verbose -Message 'Retrieving all WinGet packages ...'
     try {
-        $Packages = Get-WinGetPackage
+        Write-Verbose -Message 'Retrieving all WinGet packages ...'
+        $Packages = Get-WinGetPackage -ErrorAction 'Stop'
     } catch {
-        throw 'Failed to enumerate installed WinGet packages: {0}' -f $PSItem.Exception.Message
+        $ErrMsg = "Failed to enumerate installed WinGet packages: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSCommandFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $Result.Available = @($Packages | Where-Object IsUpdateAvailable)
-    Write-Verbose -Message ('Found {0} updates across {1} installed packages.' -f $Result.Available.Count, $Packages.Count)
+    Write-Verbose -Message "Found $($Result.Available.Count) updates across $($Packages.Count) installed packages."
 
-    # `Update-WinGetPackage` doesn't properly support `-WhatIf`; it will
+    # `Update-WinGetPackage` doesn't correctly support `-WhatIf`; it will
     # install package updates even if `-WhatIf` is set.
     if (!$PSCmdlet.ShouldProcess('WinGet apps', 'Update')) {
         $Result.WhatIf = $true
         return $Result
     }
 
-    $InstallResults = [Collections.Generic.List[Object]]::new()
+    $InstallResults = [Collections.Generic.List[PSObject]]::new()
     foreach ($Update in $Result.Available) {
         try {
-            $InstallResult = Update-WinGetPackage -Id $Update.Id -Verbose:$false
+            $InstallResult = Update-WinGetPackage -Id $Update.Id -ErrorAction 'Stop' -Verbose:$false
             $InstallResults.Add($InstallResult)
         } catch {
-            Write-Error -Message ('Failed to update package {0}: {1}' -f $Update.Name, $PSItem.Exception.Message)
             $Result.Success = $false
+
+            $ErrMsg = "Failed to update package $($Update.Name): $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSCommandFailed', $ErrCat, $null)
+            $PSCmdlet.WriteError($ErrRec)
         }
     }
 
     if ($Result.Success) {
         $Failed = @($InstallResults | Where-Object Status -NE 'OK')
-        if ($Failed) { $Result.Success = $false }
+        if ($Failed) {
+            $Result.Success = $false
+        }
     }
 
     $Result.Results = $InstallResults.ToArray()
@@ -1193,60 +1484,70 @@ Function Update-WSL {
             [Switch]$Fatal
         )
 
-        $Result = [PSCustomObject]@{}
+        $StatusArgs = @('--status')
+        $StatusCmd = "wsl $($StatusArgs -join ' ')"
 
-        $StatusArgs = [String[]]@('--status')
-        $VersionArgs = [String[]]@('--version')
+        $VersionArgs = @('--version')
+        $VersionCmd = "wsl $($VersionArgs -join ' ')"
 
         $DefaultOutputEncoding = [Console]::OutputEncoding
 
-        Write-Verbose -Message ('Retrieving WSL status: wsl {0}' -f ($StatusArgs -join ' '))
         # We can't immediately launch `wsl --version` as if WSL is available
         # but not installed it will prompt the user to press any key to start
         # the install with a 60 second time-out. Instead we can first use `wsl
         # --status` which seems to exit with code 50 when WSL is not installed.
         try {
+            Write-Verbose -Message "Retrieving WSL status: ${StatusCmd}"
             [Console]::OutputEncoding = [Text.Encoding]::Unicode
             $null = & wsl @StatusArgs 2>&1
-        } catch {
-            $Msg = 'Failed to check WSL status: {0}' -f $PSItem.Exception.Message
-            if ($Fatal) { throw $Msg } else { Write-Error -Message $Msg; return }
         } finally {
             [Console]::OutputEncoding = $DefaultOutputEncoding
         }
 
         switch ($LASTEXITCODE) {
-            0 { }
+            0 { } # Success
+
             50 {
-                $Msg = 'WSL is not installed.'
-                if ($Fatal) { throw $Msg } else { Write-Error -Message $Msg; return }
+                $ErrMsg = 'WSL is not installed.'
+                $ErrCat = [Management.Automation.ErrorCategory]::NotInstalled
             }
+
             default {
-                $Msg = 'Unknown exit code return by WSL: {0}' -f $LASTEXITCODE
-                if ($Fatal) { throw $Msg } else { Write-Error -Message $Msg; return }
+                $ErrMsg = "Unknown exit code return by WSL: ${LASTEXITCODE}"
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             }
         }
 
-        Write-Verbose -Message ('Retrieving WSL version: wsl {0}' -f ($VersionArgs -join ' '))
+        if ($LASTEXITCODE -ne 0) {
+            $ErrExc = [Exception]::new($ErrMsg)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $null)
+
+            if ($Fatal) {
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            $PSCmdlet.WriteError($ErrRec)
+            return
+        }
+
         try {
+            Write-Verbose -Message "Retrieving WSL version: ${VersionCmd}"
             [Console]::OutputEncoding = [Text.Encoding]::Unicode
-            $WslVersion = & wsl @VersionArgs
-        } catch {
-            $Msg = 'Failed to check WSL version: {0}' -f $PSItem.Exception.Message
-            if ($Fatal) { throw $Msg } else { Write-Error -Message $Msg; return }
+            $WslVersion = & wsl @VersionArgs 2>&1
         } finally {
             [Console]::OutputEncoding = $DefaultOutputEncoding
         }
 
         if ($LASTEXITCODE -ne 0) {
-            Write-Warning -Message 'WSL returned non-zero exit code on requesting version details: {0}' -f $LASTEXITCODE
+            Write-Warning -Message "WSL exited with non-zero exit code on requesting version details: ${LASTEXITCODE}"
         }
 
+        $Result = [PSCustomObject]@{}
         foreach ($Line in $WslVersion) {
             if ([String]::IsNullOrWhiteSpace($Line)) { continue }
 
             if ($Line -notmatch '^([A-Za-z0-9]+) version: (.+)') {
-                Write-Warning -Message ('Unable to parse line in version output: {0}' -f $Line)
+                Write-Warning -Message "Unable to parse line in version output: ${Line}"
                 continue
             }
 
@@ -1254,13 +1555,16 @@ Function Update-WSL {
             $RawVersion = $Matches[2]
 
             $Version = $null
-            if (![Version]::TryParse($RawVersion, [ref]$Version)) { $Version = $RawVersion }
+            if (![Version]::TryParse($RawVersion, [Ref]$Version)) {
+                Write-Warning -Message "Failed to parse WSL version: ${RawVersion}"
+                $Version = $RawVersion
+            }
 
-            $Result | Add-Member -MemberType NoteProperty -Name $Component -Value $Version
+            $Result | Add-Member -MemberType 'NoteProperty' -Name $Component -Value $Version
         }
 
         if ($Result.PSObject.Properties.Name -contains 'WSL') {
-            $Result | Add-Member -MemberType ScriptMethod -Name 'ToString' -Value { $this.WSL } -Force
+            $Result | Add-Member -MemberType 'ScriptMethod' -Name 'ToString' -Value { $this.WSL } -Force
         } else {
             Write-Warning -Message 'No WSL version identified in version output.'
         }
@@ -1268,21 +1572,27 @@ Function Update-WSL {
         return $Result
     }
 
-    if (!(Get-Command -Name 'wsl' -ErrorAction Ignore)) {
-        throw 'Unable to update WSL as wsl command not found.'
+    if (!(Get-Command -Name 'wsl' -ErrorAction 'Ignore')) {
+        $ErrMsg = 'Unable to update WSL as wsl command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'wsl')
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $Result = [PSCustomObject]@{
         Success      = $false
-        BeforeUpdate = [String[]]@()
-        AfterUpdate  = [String[]]@()
+        BeforeUpdate = ''
+        AfterUpdate  = ''
         Output       = [String[]]@()
         ExitCode     = -1
         WhatIf       = $false
     }
+
     $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateWSL')
 
-    $UpdateArgs = [String[]]@('--update')
+    $UpdateArgs = @('--update')
+    $UpdateCmd = "wsl $($UpdateArgs -join ' ')"
 
     $Result.BeforeUpdate = Get-WslVersion -Fatal
 
@@ -1292,32 +1602,28 @@ Function Update-WSL {
         return $Result
     }
 
-    Write-Verbose -Message ('Updating WSL: wsl {0}' -f ($UpdateArgs -join ' '))
     $DefaultOutputEncoding = [Console]::OutputEncoding
 
     try {
+        Write-Verbose -Message "Updating WSL: ${UpdateCmd}"
         [Console]::OutputEncoding = [Text.Encoding]::Unicode
         $Result.Output = [String[]]@(& wsl @UpdateArgs 2>&1)
         $Result.ExitCode = $LASTEXITCODE
-
-        if ($Result.ExitCode -ne 0) {
-            Write-Error -Message ('WSL returned non-zero exit code on performing update: {0}' -f $Result.ExitCode)
-        }
-    } catch {
-        $Msg = 'Failed to start WSL update: {0}' -f $PSItem.Exception.Message
-        $Result.Output = [String[]]@($Msg)
-        Write-Eror -Message $Msg
     } finally {
         [Console]::OutputEncoding = $DefaultOutputEncoding
     }
 
-    $Result.AfterUpdate = Get-WslVersion
-    if ($null -ne $Result.AfterUpdate) {
-        if ($Result.ExitCode -eq 0) { $Result.Success = $true }
+    if ($Result.ExitCode -eq 0) {
+        $Result.Success = $true
     } else {
-        Write-Error -Message 'Unable to detect WSL version after updating.'
+        $ErrMsg = "WSL exited with non-zero exit code on performing update: $($Result.ExitCode)"
+        $ErrExc = [Exception]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $null)
+        $PSCmdlet.WriteError($ErrRec)
     }
 
+    $Result.AfterUpdate = Get-WslVersion
     return $Result
 }
 
