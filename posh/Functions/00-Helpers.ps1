@@ -23,6 +23,7 @@ Function Test-EnvironmentMatch {
     [OutputType([Void])]
     Param(
         [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [Hashtable]$Environment
     )
 
@@ -124,12 +125,13 @@ Function Test-ModuleAvailable {
         [Switch]$PassThru
     )
 
+    $FoundModule = $false
+    $MissingModule = $false
+
     if ($PassThru) {
         $ModuleInfo = [Collections.Generic.List[PSModuleInfo]]::new()
     }
 
-    $FoundModule = $false
-    $MissingModule = $false
     foreach ($Module in $Name) {
         Write-Debug -Message "Checking module is available: ${Module}"
 
@@ -140,6 +142,7 @@ Function Test-ModuleAvailable {
                 # Suppress verbose output on import
                 $VerboseOriginal = $Global:VerbosePreference
                 $Global:VerbosePreference = 'SilentlyContinue'
+
                 Import-Module -Name $Module -ErrorAction 'Ignore' -Verbose:$false
             } finally {
                 $Global:VerbosePreference = $VerboseOriginal
@@ -380,7 +383,7 @@ Function Start-DotFilesSection {
         try {
             Test-CommandAvailable -Name $Command
         } catch {
-            Write-DotFilesMessage -Type 'Verbose' -Message "Command(s) not available: $($Command -join ', ')"
+            Write-DotFilesMessage -Type 'Verbose' -Message "Command(s) not available: $($PSItem.Exception.CommandName)"
             $Error.RemoveAt(0)
             return $false
         }
@@ -396,7 +399,7 @@ Function Start-DotFilesSection {
         }
     }
 
-    $ProcessModules = $ModuleOperation -eq 'Import' -or $ForceTestModule -or !$Global:DotFilesFastLoad
+    $ProcessModules = $ModuleOperation -eq 'Import' -or $ForceTestModule -or !$DotFilesFastLoad
     if ($Module -and $ProcessModules) {
         try {
             Test-ModuleAvailable -Name $Module -Operation $ModuleOperation -Require $ModuleRequire
