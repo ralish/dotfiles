@@ -24,6 +24,7 @@ Function Get-TypeConstructor {
         $Constructors = $Type.GetConstructors()
         foreach ($Constructor in $Constructors) {
             $ConstructorParams = $Constructor.GetParameters()
+
             if ($ConstructorParams.Count -gt 0) {
                 $FormattedConstructorParams = @($ConstructorParams | ForEach-Object { $PSItem.ToString() })
                 $FormattedParams = "$($Type.FullName)($($FormattedConstructorParams -join ', '))"
@@ -51,6 +52,7 @@ Function Get-TypeMethod {
         $Methods = $Type.GetMethods() | Sort-Object -Property 'Name'
         foreach ($Method in $Methods) {
             $MethodParams = $Method.GetParameters()
+
             if ($MethodParams.Count -gt 0) {
                 $FormattedMethodParams = @($MethodParams | ForEach-Object { $PSItem.ToString() })
                 $FormattedParams = "$($Type.FullName)($($FormattedMethodParams -join ', '))"
@@ -79,19 +81,19 @@ Function Get-ArgumentCompleter {
         [Switch]$Native
     )
 
-    $BindingFlags = [Reflection.BindingFlags]'NonPublic, Static'
+    # Retrieve the execution context
     $LocalPipelineType = [PowerShell].Assembly.GetType('System.Management.Automation.Runspaces.LocalPipeline')
-    $GetExecutionContextFromTLS = $LocalPipelineType.GetMethod('GetExecutionContextFromTLS', $BindingFlags)
-    $InternalExecutionContext = $GetExecutionContextFromTLS.Invoke($null, $BindingFlags, $null, $null, $PSCulture)
+    $GetExecutionContextFromTLS = $LocalPipelineType.GetMethod('GetExecutionContextFromTLS', [Reflection.BindingFlags]'NonPublic, Static')
+    $InternalExecutionContext = $GetExecutionContextFromTLS.Invoke($null, [Reflection.BindingFlags]'NonPublic, Static', $null, $null, $PSCulture)
 
-    $BindingFlags = [Reflection.BindingFlags]'Instance, NonPublic'
+    # Retrieve the argument completers property
     if ($Native) {
-        $ArgumentCompletersPropertyName = 'NativeArgumentCompleters'
+        $ArgumentCompletersProperty = $InternalExecutionContext.GetType().GetProperty('NativeArgumentCompleters', [Reflection.BindingFlags]'Instance, NonPublic')
     } else {
-        $ArgumentCompletersPropertyName = 'CustomArgumentCompleters'
+        $ArgumentCompletersProperty = $InternalExecutionContext.GetType().GetProperty('CustomArgumentCompleters', [Reflection.BindingFlags]'Instance, NonPublic')
     }
-    $ArgumentCompletersProperty = $InternalExecutionContext.GetType().GetProperty($ArgumentCompletersPropertyName, $BindingFlags)
 
+    # Retrieve the argument completers
     $BindingFlags = [Reflection.BindingFlags]'GetProperty, Instance, NonPublic'
     $ArgumentCompleters = $ArgumentCompletersProperty.GetGetMethod($true).Invoke($InternalExecutionContext, $BindingFlags, $null, @(), $PSCulture)
 
@@ -294,7 +296,6 @@ Function Uninstall-ObsoleteModule {
 
 # Update PowerShell modules & built-in help
 Function Update-PowerShell {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseCompatibleCmdlets', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(
@@ -302,64 +303,96 @@ Function Update-PowerShell {
         [String[]]$PsGetV3Blacklist = @('ExchangeOnlineManagement', 'PnP.PowerShell'),
 
         [Switch]$IncludeDscModules,
-        [Switch]$SkipUninstallObsolete,
         [Switch]$SkipUpdateHelp,
+        [Switch]$SkipUninstallObsolete,
         [Switch]$Force,
 
-        [ValidateRange(-1, [Int]::MaxValue)]
-        [Int]$ProgressParentId
+        [ValidateRange(-1, [SByte]::MaxValue)]
+        [SByte]$ProgressParentId
     )
 
+    # Attempt to import the PowerShellGet v2 module side-by-side with the v3
+    # module when using the latter but we encounter compatibility issues.
     Function Import-PsGetV2SxS {
         [CmdletBinding()]
         [OutputType([Boolean])]
         Param()
 
-        if ($Script:PsGetV2) { return $true }
-        if ($Script:PsGetV2AttemptedSxS) { return $false }
+        if ($Script:PsGetV2) {
+            return $true
+        }
+
+        if ($Script:PsGetV2AttemptedSxS) {
+            return $false
+        }
 
         Write-Verbose -Message 'Attempting to import PowerShellGet v2 side-by-side ...'
         $Script:PsGetV2AttemptedSxS = $true
+
         $PowerShellGet = Get-Module -Name 'PowerShellGet' -ListAvailable -Verbose:$false |
             Where-Object Version -Match '^2\.' |
             Sort-Object -Property 'Version' -Descending |
             Select-Object -First 1
 
-        if ($PowerShellGet) {
-            try {
-                $PowerShellGet | Import-Module -ErrorAction Stop -Verbose:$false
-                $Script:PsGetV2 = $true
-                return $true
-            } catch {
-                Write-Error -Message 'Failed to import PowerShellGet v2 module side-by-side.'
-            }
-        } else {
-            Write-Error -Message 'No PowerShellGet v2 module was found for importing side-by-side.'
+        if (!$PowerShellGet) {
+            $ErrMsg = 'PowerShellGet v2 module not available for side-by-side import.'
+            $ErrExc = [IO.FileNotFoundException]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'PowerShellGet')
+            $PSCmdlet.WriteError($ErrRec)
+            return $false
         }
 
-        return $false
+        try {
+            $PowerShellGet | Import-Module -ErrorAction 'Stop' -Verbose:$false
+            $Script:PsGetV2 = $true
+        } catch {
+            $ErrMsg = 'Failed to import PowerShellGet v2 module side-by-side.'
+            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'PowerShellGet')
+            $PSCmdlet.WriteError($ErrRec)
+            return $false
+        }
+
+        return $true
     }
 
     $PowerShellGet = Test-ModuleAvailable -Name 'PowerShellGet' -PassThru
 
-    $Script:PsGetV2 = $false
-    $Script:PsGetV3 = $false
-    $Script:PsGetV2AttemptedSxS = $false
-
-    if ($PowerShellGet.Version.Major -eq 2) {
-        $Script:PsGetV2 = $true
-    } elseif ($PowerShellGet.Version.Major -ge 3) {
-        $Script:PsGetV3 = $true
-    } else {
-        throw 'PowerShellGet must be at least v2 but found: {0}' -f $PowerShellGet.Version
+    if ($PowerShellGet.Version.Major -lt 2) {
+        $ErrMsg = 'PowerShellGet v2 or later was not found.'
+        $ErrExc = [IO.FileNotFoundException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'PowerShellGet')
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    Write-Verbose -Message ('Using PowerShellGet v{0}' -f $PowerShellGet.Version)
+    $Script:PsGetV2 = $false
+    $Script:PsGetV2AttemptedSxS = $false
+    $Script:PsGetV3 = $false
 
-    # Not all platforms have DSC support as part of PowerShell itself
-    $DscSupported = Get-Command -Name 'Get-DscResource' -ErrorAction Ignore
-    if ($IncludeDscModules -and !$DscSupported) {
-        throw 'Unable to enumerate DSC modules as Get-DscResource command not available.'
+    if ($PowerShellGet.Version.Major -ge 3) {
+        $Script:PsGetV3 = $true
+    } else {
+        $Script:PsGetV2 = $true
+    }
+
+    Write-Verbose -Message "Using PowerShellGet v$($PowerShellGet.Version)"
+
+    # Newer PowerShell versions no longer ship with DSC support built-in. It's
+    # instead provided as a separate module which may not be installed.
+    try {
+        $DscSupported = $false
+        $DscSupported = Get-Command -Name 'Get-DscResource' -ErrorAction 'Stop'
+    } catch {
+        if ($IncludeDscModules) {
+            $ErrMsg = 'Unable to enumerate DSC modules as Get-DscResource command not available.'
+            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSCommandNotFound', $ErrCat, 'Get-DscResource')
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
     }
 
     $WriteProgressParams = @{
@@ -375,21 +408,23 @@ Function Update-PowerShell {
     if ($Script:PsGetV3) {
         $InstalledModules = Get-PSResource -Verbose:$false
     } else {
-        # Suppress verbose output on loading
-        $VerboseOriginal = $Global:VerbosePreference
-        $VerbosePreference = 'SilentlyContinue'
+        try {
+            # Suppress verbose output on implicit import
+            $VerboseOriginal = $Global:VerbosePreference
+            $Global:VerbosePreference = 'SilentlyContinue'
 
-        $InstalledModules = Get-InstalledModule -Verbose:$false
-
-        # Restore the original `$VerbosePreference` setting
-        $VerbosePreference = $VerboseOriginal
+            $InstalledModules = Get-InstalledModule -Verbose:$false
+        } finally {
+            $Global:VerbosePreference = $VerboseOriginal
+        }
     }
 
     # `Get-PSResource` returns all module versions while `Get-InstalledModule`
-    # only returns the latest version, so it's redundant with PowerShellGet v3.
-    $UniqueModules = $InstalledModules.Name | Sort-Object -Unique
+    # only returns the latest version, so technically the uniqueness check is
+    # only applicable to PowerShellGet v3.
+    $UniqueModules = @($InstalledModules.Name | Sort-Object -Unique)
 
-    # Percentage of the total progress for updating modules
+    # Percentage of the total progress to use for module update progress
     $ProgressPercentUpdatesBase = 10
     if ($UniqueModules -contains 'AWS.Tools.Installer') {
         $ProgressPercentUpdatesSection = 80
@@ -400,19 +435,19 @@ Function Update-PowerShell {
     if (!$IncludeDscModules -and $DscSupported) {
         Write-Progress @WriteProgressParams -Status 'Enumerating DSC modules for exclusion' -PercentComplete 5
 
-        # `Get-DscResource` likes to output multiple progress bars but doesn't
-        # have the good manners to clean them up. The result is a visual mess
-        # when we've got our own progress bars.
-        $OriginalProgressPreference = $ProgressPreference
-        Set-Variable -Name 'ProgressPreference' -Scope Global -Value 'Ignore' -WhatIf:$false
-
         try {
+            # `Get-DscResource` likes to output multiple progress bars but
+            # doesn't have the good manners to clean them up when it's done.
+            # The result is a visual mess when we have our own progress bars.
+            $ProgressOriginal = $Global:ProgressPreference
+            $Global:ProgressPreference = 'Ignore'
+
             # `Get-DscResource` may output various errors, most often due to
             # duplicate resources. That's often the case with, for example, the
             # `PackageManagement` module being available in multiple locations.
-            $DscModules = @(Get-DscResource -Module * -ErrorAction Ignore -Verbose:$false | Select-Object -ExpandProperty 'ModuleName' -Unique)
+            $DscModules = @(Get-DscResource -Module * -ErrorAction 'Ignore' -Verbose:$false | Select-Object -ExpandProperty 'ModuleName' -Unique)
         } finally {
-            Set-Variable -Name 'ProgressPreference' -Scope Global -Value $OriginalProgressPreference -WhatIf:$false
+            $Global:ProgressPreference = $ProgressOriginal
         }
     }
 
@@ -425,23 +460,21 @@ Function Update-PowerShell {
     }
 
     # Update all modules compatible with PowerShellGet
-    for ($ModuleIdx = 0; $ModuleIdx -lt $UniqueModules.Count; $ModuleIdx++) {
-        $ModuleName = $UniqueModules[$ModuleIdx]
+    for ($i = 0; $i -lt $UniqueModules.Count; $i++) {
+        $ModuleName = $UniqueModules[$i]
         $Module = $InstalledModules | Where-Object Name -EQ $ModuleName | Sort-Object -Property 'Version' | Select-Object -Last 1
 
         if ($ModuleName -match $ExcludedModuleRegex) {
-            Write-Verbose -Message ('Skipping excluded module: {0}' -f $ModuleName)
+            Write-Verbose -Message "Skipping excluded module: ${ModuleName}"
             continue
         }
 
         if (!$IncludeDscModules -and $DscSupported -and $ModuleName -in $DscModules) {
-            Write-Verbose -Message ('Skipping DSC module: {0}' -f $ModuleName)
+            Write-Verbose -Message "Skipping DSC module: ${ModuleName}"
             continue
         }
 
-        if ($ModuleName -match '^AWS\.Tools\.' -and $Module.Repository -notmatch 'PSGallery') {
-            continue
-        }
+        if ($ModuleName -match '^AWS\.Tools\.' -and $Module.Repository -notmatch 'PSGallery') { continue }
 
         $UpdateParams = @{
             Name          = $ModuleName
@@ -453,12 +486,12 @@ Function Update-PowerShell {
         } elseif ($Module.InstalledLocation.StartsWith($ScopePathAllUsers)) {
             $UpdateParams['Scope'] = 'AllUsers'
         } else {
-            Write-Warning -Message ('Unable to determine install scope for module: {0}' -f $Module)
+            Write-Warning -Message "Unable to determine install scope for module: ${ModuleName}"
             continue
         }
 
-        $PercentComplete = ($ModuleIdx + 1) / $UniqueModules.Count * $ProgressPercentUpdatesSection + $ProgressPercentUpdatesBase
-        Write-Progress @WriteProgressParams -Status ('Updating {0}' -f $ModuleName) -PercentComplete $PercentComplete
+        $PercentComplete = ($i + 1) / $UniqueModules.Count * $ProgressPercentUpdatesSection + $ProgressPercentUpdatesBase
+        Write-Progress @WriteProgressParams -Status "Updating ${ModuleName}" -PercentComplete $PercentComplete
 
         if ($PSCmdlet.ShouldProcess($ModuleName, 'Update')) {
             if ($Script:PsGetV3 -and $ModuleName -notin $PsGetV3Blacklist) {
@@ -466,13 +499,14 @@ Function Update-PowerShell {
                 continue
             }
 
-            # If PowerShellGet v2 has not been imported then we're using
-            # PowerShellGet v3 but need to fallback to the previous major
-            # version for this module due to a compatibility issue.
+            # If PowerShellGet v2 has not been imported then we must be using
+            # PowerShellGet v3. The module which we're about to update has a
+            # compatibility issue with PowerShellGet v3 so try to fallback to
+            # PowerShellGet v2.
             if (!$Script:PsGetV2) {
                 $ImportSxS = Import-PsGetV2SxS
                 if (!$ImportSxS) {
-                    Write-Warning -Message ('Unable to update module as PowerShellGet v2 is unavailable: {0}' -f $ModuleName)
+                    Write-Warning -Message "Unable to update module as PowerShellGet v2 is unavailable: ${ModuleName}"
                     continue
                 }
             }
@@ -481,7 +515,7 @@ Function Update-PowerShell {
         }
     }
 
-    # The modular AWS Tools for PowerShell has its own mechanism
+    # The modular AWS Tools for PowerShell has its own update mechanism
     if ($UniqueModules -contains 'AWS.Tools.Installer' -and 'AWS.Tools.Installer' -notmatch $ExcludedModuleRegex) {
         # The `Update-AWSToolsModule` function is not yet compatible with
         # PowerShellGet v3. If we're currently using PowerShellGet v3 but
@@ -490,7 +524,6 @@ Function Update-PowerShell {
             $ImportSxS = Import-PsGetV2SxS
             if (!$ImportSxS) {
                 Write-Warning -Message 'Unable to update AWS modules as PowerShellGet v2 is unavailable.'
-                continue
             }
         }
 
@@ -516,7 +549,7 @@ Function Update-PowerShell {
 
     if (!$SkipUpdateHelp -and $PSCmdlet.ShouldProcess('PowerShell help', 'Update')) {
         try {
-            Update-Help -Force:$Force -ErrorAction Stop
+            Update-Help -Force:$Force -ErrorAction 'Stop'
         } catch {
             Write-Warning -Message 'Some errors were reported while updating PowerShell module help.'
         }
@@ -556,17 +589,19 @@ Function Compare-Hashtable {
             $Identical = $false
 
             switch ($CaseMatching) {
-                Insensitive {
+                'Insensitive' {
                     if ($Reference[$Key] -ieq $Difference[$Key]) {
                         $Identical = $true
                     }
                 }
-                Sensitive {
+
+                'Sensitive' {
                     if ($Reference[$Key] -ceq $Difference[$Key]) {
                         $Identical = $true
                     }
                 }
-                Default {
+
+                default {
                     if ($Reference[$Key] -eq $Difference[$Key]) {
                         $Identical = $true
                     }
@@ -604,32 +639,38 @@ Function Compare-ObjectProperties {
         [String[]]$IgnoredProperties
     )
 
-    $ObjProps = @()
-    $ObjProps += $ReferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty 'Name'
-    $ObjProps += $DifferenceObject | Get-Member -MemberType Property, NoteProperty | Select-Object -ExpandProperty 'Name'
-    $ObjProps = $ObjProps | Sort-Object | Select-Object -Unique
+    $RefPropNames = @($ReferenceObject |
+            Get-Member -MemberType 'Property', 'NoteProperty' |
+            Select-Object -ExpandProperty 'Name' |
+            Where-Object { $PSItem -notin $IgnoredProperties } )
 
-    if ($IgnoredProperties) {
-        $ObjProps = $ObjProps | Where-Object { $_ -notin $IgnoredProperties }
-    }
+    $DiffPropNames = @($DifferenceObject |
+            Get-Member -MemberType 'Property', 'NoteProperty' |
+            Select-Object -ExpandProperty 'Name' |
+            Where-Object { $PSItem -notin $IgnoredProperties } )
 
-    $ObjDiffs = [Collections.Generic.List[PSCustomObject]]::new()
-    foreach ($Property in $ObjProps) {
-        $Diff = Compare-Object -ReferenceObject $ReferenceObject -DifferenceObject $DifferenceObject -Property $Property
+    $AllPropNames = ($RefPropNames + $DiffPropNames) |
+        Sort-Object |
+        Select-Object -Unique
 
-        if ($Diff) {
-            $DiffProps = [PSCustomObject]@{
-                PropertyName = $Property
-                RefValue     = $Diff | Where-Object SideIndicator -EQ '<=' | Select-Object -ExpandProperty $Property
-                DiffValue    = $Diff | Where-Object SideIndicator -EQ '=>' | Select-Object -ExpandProperty $Property
+    $DifferentProperties = [Collections.Generic.List[PSCustomObject]]::new()
+
+    foreach ($PropertyName in $AllPropNames) {
+        $CompareObject = Compare-Object -ReferenceObject $ReferenceObject -DifferenceObject $DifferenceObject -Property $PropertyName
+
+        if ($CompareObject) {
+            $DifferentProperty = [PSCustomObject]@{
+                PropertyName   = $PropertyName
+                ReferenceValue = $CompareObject | Where-Object SideIndicator -EQ '<=' | Select-Object -ExpandProperty $PropertyName
+                DifferentValue = $CompareObject | Where-Object SideIndicator -EQ '=>' | Select-Object -ExpandProperty $PropertyName
             }
 
-            $ObjDiffs.Add($DiffProps)
+            $DifferentProperties.Add($DifferentProperty)
         }
     }
 
-    if ($ObjDiffs) {
-        return $ObjDiffs.ToArray()
+    if ($DifferentProperties) {
+        return $DifferentProperties.ToArray()
     }
 }
 
@@ -735,20 +776,22 @@ Function Update-Profile {
         $CurrentUserCurrentHost = $true
     }
 
-    $ProfileTypes = 'AllUsersAllHosts', 'AllUsersCurrentHost', 'CurrentUserAllHosts', 'CurrentUserCurrentHost'
-    foreach ($ProfileType in $ProfileTypes) {
-        if (Get-Variable -Name $ProfileType -ValueOnly) {
-            if (Test-Path -LiteralPath $profile.$ProfileType -PathType 'Leaf') {
-                Write-Verbose -Message "Sourcing ${ProfileType} from: $($profile.$ProfileType)"
-                . $profile.$ProfileType
-            } else {
-                Write-Warning -Message "Skipping ${ProfileType} as it doesn't exist: $($profile.ProfileType)"
+    try {
+        $ProfileTypes = 'AllUsersAllHosts', 'AllUsersCurrentHost', 'CurrentUserAllHosts', 'CurrentUserCurrentHost'
+        foreach ($ProfileType in $ProfileTypes) {
+            if (Get-Variable -Name $ProfileType -ValueOnly) {
+                if (Test-Path -LiteralPath $profile.$ProfileType -PathType 'Leaf') {
+                    Write-Verbose -Message "Sourcing ${ProfileType} from: $($profile.$ProfileType)"
+                    . $profile.$ProfileType
+                } else {
+                    Write-Warning -Message "Skipping ${ProfileType} as it doesn't exist: $($profile.$ProfileType)"
+                }
             }
         }
+    } finally {
+        $Env:DOTFILES_REBUILD_COMPLETIONS = $null
+        Remove-Variable -Name 'ProfileType', 'ProfileTypes'
     }
-
-    $Env:DOTFILES_REBUILD_COMPLETIONS = $null
-    Remove-Variable -Name 'ProfileType', 'ProfileTypes'
 }
 
 #endregion
@@ -762,7 +805,11 @@ Function Disable-TlsCertificateValidation {
     Param()
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        throw 'Unable to disable TLS certificate validation on PowerShell Core.'
+        $ErrMsg = 'Unable to disable TLS certificate validation on PowerShell 6 or later.'
+        $ErrExc = [NotSupportedException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PwshNotSupported', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $TrustAllCerts = @'
@@ -793,7 +840,7 @@ namespace DotFiles {
 # Invoke `Format-List` selecting all properties
 Function fla {
     [CmdletBinding()]
-    [OutputType($null)]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [PSObject]$InputObject,
@@ -811,14 +858,14 @@ Function fla {
 
     End {
         $null = $PSBoundParameters.Remove('InputObject')
-        $Objects | Format-List -Property * @PSBoundParameters
+        $Objects | Format-List @PSBoundParameters -Property *
     }
 }
 
 # Invoke `Format-Table` selecting all properties
 Function fta {
     [CmdletBinding()]
-    [OutputType($null)]
+    [OutputType([Void])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [PSObject]$InputObject,
@@ -836,7 +883,7 @@ Function fta {
 
     End {
         $null = $PSBoundParameters.Remove('InputObject')
-        $Objects | Format-Table -Property * @PSBoundParameters
+        $Objects | Format-Table @PSBoundParameters -Property *
     }
 }
 
@@ -885,7 +932,7 @@ Function gvi {
         [String]$Path
     )
 
-    Get-Item -Path $Path | Select-Object -ExpandProperty VersionInfo
+    Get-Item -Path $Path | Select-Object -ExpandProperty 'VersionInfo'
 }
 
 #endregion
