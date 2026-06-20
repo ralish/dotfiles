@@ -6,10 +6,10 @@ OPENSSH_POSH="$DOTFILES_DIR/posh/Functions/OpenSSH.ps1"
 
 if [[ ${OS-} == 'Windows_NT' ]]; then
     read -r -d '' posh_cmd << EOF
-        Function Start-DotFilesSection {};
-        Function Complete-DotFilesSection {};
-        New-Item -Path Variable:\DotFilesPath -Value "$DOTFILES_DIR" | Out-Null;
-        . "$OPENSSH_POSH";
+        Function Start-DotFilesSection { return \$true };
+        Function Complete-DotFilesSection { return \$true };
+        \$null = New-Item -Path Variable:\DotFilesPath -Value "$DOTFILES_DIR";
+        \$null = . "$OPENSSH_POSH";
         Update-OpenSSHConfig
 EOF
 
