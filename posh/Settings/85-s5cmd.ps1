@@ -15,7 +15,7 @@ Register-ArgumentCompleter -Native -CommandName 's5cmd' -ScriptBlock {
 
     $Completion = "$wordToComplete --generate-bash-completion"
     Invoke-Expression -Command $Completion | ForEach-Object { # DevSkim: ignore DS104456
-        [System.Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
+        [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
     }
 }
 

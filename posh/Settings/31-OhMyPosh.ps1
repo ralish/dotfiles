@@ -10,11 +10,44 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Name of theme to use
-$ThemeName = 'oh-my-posh'
+# Setup Oh My Posh configuration
+Function Initialize-OhMyPosh {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
+
+    # Name of theme to use
+    $ThemeName = 'oh-my-posh'
+
+    # Retrieve Oh My Posh theme path
+    $ThemePath = Get-OhMyPoshThemePath -ThemeName $ThemeName
+    if ($ThemePath) {
+        Write-DotFilesMessage -Type 'Verbose' -Message "Theme path: ${ThemePath}"
+    }
+
+    try {
+        # Suppress verbose output on loading
+        $VerboseOriginal = $Global:VerbosePreference
+        $Global:VerbosePreference = 'SilentlyContinue'
+
+        # Load Oh My Posh
+        if ($ThemePath) {
+            & oh-my-posh init pwsh --config $ThemePath | Invoke-Expression # DevSkim: ignore DS104456
+        } else {
+            & oh-my-posh init pwsh | Invoke-Expression # DevSkim: ignore DS104456
+        }
+    } finally {
+        $Global:VerbosePreference = $VerboseOriginal
+    }
+
+    # Enable `posh-git` support if imported
+    if (Get-Module -Name 'posh-git' -Verbose:$false) {
+        $Env:POSH_GIT_ENABLED = $true
+    }
+}
 
 # Attempt to retrieve the path to a theme given its name
-Function Get-OmpThemePath {
+Function Get-OhMyPoshThemePath {
     [CmdletBinding()]
     [OutputType([Void], [String])]
     Param(
@@ -54,7 +87,6 @@ Function Get-OmpThemePath {
         $ThemeDir = Join-Path -Path $BasePath -ChildPath 'themes'
     }
 
-    # Output the detected installation type and themes directory
     Write-DotFilesMessage -Type 'Verbose' -Message $Msg
     Write-DotFilesMessage -Type 'Verbose' -Message "Themes directory: ${ThemeDir}"
 
@@ -69,32 +101,7 @@ Function Get-OmpThemePath {
     return $ThemePath
 }
 
-# Retrieve Oh My Posh theme path
-$ThemePath = Get-OmpThemePath -ThemeName $ThemeName
-if ($ThemePath) {
-    Write-DotFilesMessage -Type 'Verbose' -Message "Theme path: ${ThemePath}"
-}
+Initialize-OhMyPosh
 
-try {
-    # Suppress verbose output on loading
-    $VerboseOriginal = $VerbosePreference
-    $VerbosePreference = 'SilentlyContinue'
-
-    # Load Oh My Posh
-    if ($ThemePath) {
-        & oh-my-posh init pwsh --config $ThemePath | Invoke-Expression # DevSkim: ignore DS104456
-    } else {
-        & oh-my-posh init pwsh | Invoke-Expression # DevSkim: ignore DS104456
-    }
-} finally {
-    $VerbosePreference = $VerboseOriginal
-}
-
-# Enable `posh-git` support if imported
-if (Get-Module -Name 'posh-git' -Verbose:$false) {
-    $Env:POSH_GIT_ENABLED = $true
-}
-
-Remove-Item -LiteralPath 'Function:\Get-OmpThemePath'
-Remove-Variable -Name 'ThemeName', 'ThemePath', 'VerboseOriginal'
+Remove-Item -LiteralPath 'Function:\Get-OhMyPoshThemePath', 'Function:\Initialize-OhMyPosh'
 Complete-DotFilesSection

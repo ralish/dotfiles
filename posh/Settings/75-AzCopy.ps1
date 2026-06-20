@@ -10,18 +10,27 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Disable logging to the system log
-$Env:AZCOPY_DISABLE_SYSLOG = 'true'
+# Setup AzCopy configuration
+Function Initialize-AzCopy {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
 
-# (Re)build the native completions script
-$CompletionsFile = Join-Path -Path $PoShCompletionsPath -ChildPath 'azcopy.ps1'
-if ($Env:DOTFILES_REBUILD_COMPLETIONS -or !(Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
-    Write-DotFilesMessage -Type 'Verbose' -Message 'Building native completions script ...'
-    & azcopy completion powershell | Out-File -FilePath $CompletionsFile -Encoding 'utf8'
+    # Disable logging to the system log
+    $Env:AZCOPY_DISABLE_SYSLOG = 'true'
+
+    # (Re)build the native completions script
+    $CompletionsFile = Join-Path -Path $PoShCompletionsPath -ChildPath 'azcopy.ps1'
+    if ($Env:DOTFILES_REBUILD_COMPLETIONS -or !(Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
+        Write-DotFilesMessage -Type 'Verbose' -Message 'Building native completions script ...'
+        & azcopy completion powershell | Out-File -FilePath $CompletionsFile -Encoding 'utf8'
+    }
+
+    Write-DotFilesMessage -Type 'Verbose' -Message 'Registering native argument completer ...'
+    Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
 }
 
-Write-DotFilesMessage -Type 'Verbose' -Message 'Registering native argument completer ...'
-Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
+Initialize-AzCopy
 
-Remove-Variable -Name 'CompletionsFile'
+Remove-Item -LiteralPath 'Function:\Initialize-AzCopy'
 Complete-DotFilesSection

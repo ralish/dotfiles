@@ -3,7 +3,7 @@
 
 $DotFilesSection = @{
     Type            = 'Settings'
-    Name            = 'Docker'
+    Name            = 'Docker Completion'
     Command         = 'docker'
     Module          = 'DockerCompletion'
     ModuleOperation = 'Import'

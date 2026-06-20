@@ -13,6 +13,29 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 # Disable telemetry
 $Env:DOTNET_CLI_TELEMETRY_OPTOUT = 'true'
 
+# Setup .NET CLI configuration
+Function Initialize-DotNetCli {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
+
+    # Assume if there's an existing native completions script we can use it. This
+    # avoids a potentially expensive process launch of `dotnet` to retrieve the
+    # version, which tells us whether to use dynamic or native completions.
+    $CompletionsFile = Join-Path -Path $PoShCompletionsPath -ChildPath 'dotnet.ps1'
+    if (!$Env:DOTFILES_REBUILD_COMPLETIONS -and (Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
+        $CompletionsType = 'Native'
+    } else {
+        $CompletionsType = Get-DotNetCliCompletionsType
+    }
+
+    # Import the appropriate type of completions
+    Import-DotNetCliCompletions -Type $CompletionsType
+
+    # Clean-up the completions setup functions
+    Remove-Item -LiteralPath 'Function:\Get-DotNetCliCompletionsType', 'Function:\Import-DotNetCliCompletions'
+}
+
 # Determine the type of argument completions to use
 Function Get-DotNetCliCompletionsType {
     [CmdletBinding()]
@@ -26,10 +49,14 @@ Function Get-DotNetCliCompletionsType {
         # If we're running this version of `dotnet` for the first time the
         # welcome banner will display which may cause issues issues with output
         # parsing.
-        if ($Env:DOTNET_NOLOGO) { $OriginalNoLogo = $Env:DOTNET_NOLOGO } else { $OriginalNoLogo = '' }
+        if ($Env:DOTNET_NOLOGO) {
+            $OriginalNoLogo = $Env:DOTNET_NOLOGO
+        } else {
+            $OriginalNoLogo = $null
+        }
         $Env:DOTNET_NOLOGO = 'true'
 
-        $CliVersionRaw = & dotnet @VersionArgs
+        $CliVersionRaw = (& dotnet @VersionArgs 2>&1) -join ''
         if ($LASTEXITCODE -ne 0) {
             $ErrMsg = "Failed to retrieve .NET version (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ErrMsg)
@@ -47,7 +74,11 @@ Function Get-DotNetCliCompletionsType {
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
     } finally {
-        if ($OriginalNoLogo) { $Env:DOTNET_NOLOGO = $OriginalNoLogo } else { $Env:DOTNET_NOLOGO = '' }
+        if ($OriginalNoLogo) {
+            $Env:DOTNET_NOLOGO = $OriginalNoLogo
+        } else {
+            $Env:DOTNET_NOLOGO = $null
+        }
     }
 
     # From .NET 10 we can use native completions which are much faster
@@ -93,19 +124,7 @@ Function Import-DotNetCliCompletions {
     }
 }
 
-# Assume if there's an existing native completions script we can use it. This
-# avoids a potentially expensive process launch of `dotnet` to retrieve the
-# version, which tells us whether to use dynamic or native completions.
-$CompletionsFile = Join-Path -Path $PoShCompletionsPath -ChildPath 'dotnet.ps1'
-if (!$Env:DOTFILES_REBUILD_COMPLETIONS -and (Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
-    $CompletionsType = 'Native'
-} else {
-    $CompletionsType = Get-DotNetCliCompletionsType
-}
+Initialize-DotNetCli
 
-# Import the appropriate type of completions
-Import-DotNetCliCompletions -Type $CompletionsType
-
-Remove-Item -LiteralPath 'Function:\Get-DotNetCliCompletionsType', 'Function:\Import-DotNetCliCompletions'
-Remove-Variable -Name 'CompletionsFile'
+Remove-Item -LiteralPath 'Function:\Initialize-DotNetCli'
 Complete-DotFilesSection

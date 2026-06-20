@@ -2,9 +2,10 @@
 # https://learn.microsoft.com/en-au/powershell/module/activedirectory/
 
 $DotFilesSection = @{
-    Type   = 'Settings'
-    Name   = 'Active Directory'
-    Module = 'ActiveDirectory'
+    Type     = 'Settings'
+    Name     = 'Active Directory'
+    Module   = 'ActiveDirectory'
+    Platform = 'Windows'
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }

@@ -10,18 +10,27 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Configuration file path
-$Env:RIPGREP_CONFIG_PATH = Join-Path -Path $HOME -ChildPath '.ripgreprc'
+# Setup `ripgrep` configuration
+Function Initialize-Ripgrep {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
 
-# (Re)build the native completions script
-$CompletionsFile = Join-Path -Path $PoShCompletionsPath -ChildPath 'rg.ps1'
-if ($Env:DOTFILES_REBUILD_COMPLETIONS -or !(Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
-    Write-DotFilesMessage -Type 'Verbose' -Message 'Building native completions script ...'
-    & rg --generate=complete-powershell | Out-File -FilePath $CompletionsFile -Encoding 'utf8'
+    # Configuration file path
+    $Env:RIPGREP_CONFIG_PATH = Join-Path -Path $HOME -ChildPath '.ripgreprc'
+
+    # (Re)build the native completions script
+    $CompletionsFile = Join-Path -Path $PoShCompletionsPath -ChildPath 'rg.ps1'
+    if ($Env:DOTFILES_REBUILD_COMPLETIONS -or !(Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
+        Write-DotFilesMessage -Type 'Verbose' -Message 'Building native completions script ...'
+        & rg --generate=complete-powershell | Out-File -FilePath $CompletionsFile -Encoding 'utf8'
+    }
+
+    Write-DotFilesMessage -Type 'Verbose' -Message 'Registering native argument completer ...'
+    Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
 }
 
-Write-DotFilesMessage -Type 'Verbose' -Message 'Registering native argument completer ...'
-Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
+Initialize-Ripgrep
 
-Remove-Variable -Name 'CompletionsFile'
+Remove-Item -LiteralPath 'Function:\Initialize-Ripgrep'
 Complete-DotFilesSection

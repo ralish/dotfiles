@@ -6,6 +6,7 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
+# PowerShell prompt format function
 Function Prompt {
     [OutputType([String])]
     Param()

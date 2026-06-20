@@ -9,31 +9,40 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Tab completion for System.CommandLine
-# https://learn.microsoft.com/en-au/dotnet/standard/commandline/how-to-enable-tab-completion
-$Env:DOTNET_SUGGEST_SCRIPT_VERSION = '1.0.2'
+# Setup `dotnet-suggest` configuration
+Function Initialize-DotNetSuggest {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
 
-# Determine the list of apps registered for suggestions
-$RegisteredAppsRaw = (& dotnet-suggest list) | Out-String
-$RegisteredAppsSplit = $RegisteredAppsRaw.Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries)
-$RegisteredApps = $RegisteredAppsSplit | Where-Object {
-    # `dotnet` has its own argument completion support
-    $PSItem -ne 'dotnet' -and
-    # Almost always `dotnet <x>` aliases which don't work anyway
-    # https://github.com/dotnet/command-line-api/issues/2302
-    $PSItem -notmatch '^dotnet '
-}
+    # Tab completion for System.CommandLine
+    # https://learn.microsoft.com/en-au/dotnet/standard/commandline/how-to-enable-tab-completion
+    $Env:DOTNET_SUGGEST_SCRIPT_VERSION = '1.0.2'
 
-Write-DotFilesMessage -Type 'Verbose' -Message "Registering dynamic argument completer for $($RegisteredApps.Count) command(s)."
-Register-ArgumentCompleter -Native -CommandName $RegisteredApps -ScriptBlock {
-    Param($wordToComplete, $commandAst, $cursorPosition)
+    # Determine the list of apps registered for suggestions
+    $RegisteredAppsRaw = & dotnet-suggest list | Out-String
+    $RegisteredAppsSplit = $RegisteredAppsRaw.Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries)
+    $RegisteredApps = $RegisteredAppsSplit | Where-Object {
+        # `dotnet` has its own argument completion support
+        $PSItem -ne 'dotnet' -and
+        # Almost always `dotnet <x>` aliases which don't work anyway
+        # https://github.com/dotnet/command-line-api/issues/2302
+        $PSItem -notmatch '^dotnet '
+    }
 
-    $CommandPath = (Get-Command -Name $commandAst.CommandElements[0]).Source
-    $CommandArgs = $CommandAst.Extent.ToString().Replace('"', '\"')
-    & dotnet-suggest get -e $CommandPath --position $cursorPosition -- $CommandArgs | ForEach-Object {
-        [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
+    Write-DotFilesMessage -Type 'Verbose' -Message "Registering dynamic argument completer for $($RegisteredApps.Count) command(s)."
+    Register-ArgumentCompleter -Native -CommandName $RegisteredApps -ScriptBlock {
+        Param($wordToComplete, $commandAst, $cursorPosition)
+
+        $CommandPath = (Get-Command -Name $commandAst.CommandElements[0]).Source
+        $CommandArgs = $CommandAst.Extent.ToString().Replace('"', '\"')
+        & dotnet-suggest get -e $CommandPath --position $cursorPosition -- $CommandArgs | ForEach-Object {
+            [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
+        }
     }
 }
 
-Remove-Variable -Name 'RegisteredApps', 'RegisteredAppsRaw', 'RegisteredAppsSplit'
+Initialize-DotNetSuggest
+
+Remove-Item -LiteralPath 'Function:\Initialize-DotNetSuggest'
 Complete-DotFilesSection

@@ -33,19 +33,20 @@ Function Import-AzPredictor {
     }
 
     if ((Get-PSReadLineOption).PredictionSource -ne 'HistoryAndPlugin') {
-        Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as PredictionSource option of PSReadLine is not set to "HistoryAndPlugin".'
+        Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as PredictionSource for PSReadLine is not set to "HistoryAndPlugin".'
         return
     }
 
     try {
         # Suppress verbose output on import
-        $VerboseOriginal = $VerbosePreference
-        $VerbosePreference = 'SilentlyContinue'
+        $VerboseOriginal = $Global:VerbosePreference
+        $Global:VerbosePreference = 'SilentlyContinue'
+
         Import-Module -Name 'Az.Tools.Predictor' -ErrorAction 'Stop' -Verbose:$false
     } catch {
         Write-DotFilesMessage -Type 'Warning' -Message 'Failed to import Az.Tools.Predictor module.'
     } finally {
-        $VerbosePreference = $VerboseOriginal
+        $Global:VerbosePreference = $VerboseOriginal
     }
 }
 

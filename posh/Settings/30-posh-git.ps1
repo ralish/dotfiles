@@ -10,18 +10,27 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Check for at least v1.0.0
-$CurrentVersion = (Get-Module -Name 'posh-git' -Verbose:$false).Version
-$RequiredVersion = [Version]::new('1.0.0')
-if ($CurrentVersion -ge $RequiredVersion) {
+# Setup `posh-git` configuration
+Function Initialize-PoshGit {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
+
+    # Verify module version is at least v1.0.0
+    $CurrentVersion = (Get-Module -Name 'posh-git' -Verbose:$false).Version
+    $RequiredVersion = [Version]::new('1.0.0')
+    if ($CurrentVersion -lt $RequiredVersion) {
+        Write-DotFilesMessage -Type 'Warning' -Message "Expected at least v${RequiredVersion} but found v${CurrentVersion}."
+    }
+
     # Abbreviate home directory path with a tilde
     $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
 
     # Prefix prompt with username and hostname
     $GitPromptSettings.DefaultPromptPrefix.Text = "${Env:USERNAME}@${Env:COMPUTERNAME}"
-} else {
-    Write-DotFilesMessage -Type 'Warning' -Message "Expected at least v${RequiredVersion} but found v${CurrentVersion}."
 }
 
-Remove-Variable -Name 'CurrentVersion', 'RequiredVersion'
+Initialize-PoshGit
+
+Remove-Item -LiteralPath 'Function:\Initialize-PoshGit'
 Complete-DotFilesSection

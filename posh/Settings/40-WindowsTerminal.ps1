@@ -28,7 +28,7 @@ Function Set-WindowsTerminalGlobalVariables {
     $Global:__OriginalPrompt = $Function:Prompt
 }
 
-# Must run before new `Prompt` function to preserve the original prompt
+# Must run before the new `Prompt` function to preserve the original prompt
 Set-WindowsTerminalGlobalVariables
 
 # Returns the last exit code for usage by the shell integration
@@ -48,7 +48,7 @@ Function __Get-LastExitCodeForWinTerm {
         return -1
     }
 
-    return $LastExitCode
+    return $LASTEXITCODE
 }
 
 # Shell Integration

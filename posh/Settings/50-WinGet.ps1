@@ -5,8 +5,8 @@
 $DotFilesSection = @{
     Type     = 'Settings'
     Name     = 'WinGet'
-    Platform = 'Windows'
     Command  = 'winget'
+    Platform = 'Windows'
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
@@ -19,8 +19,8 @@ Register-ArgumentCompleter -Native -CommandName 'winget' -ScriptBlock {
 
     [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [Text.UTF8Encoding]::new()
     $Word = $wordToComplete.Replace('"', '""')
-    $AST = $commandAst.ToString().Replace('"', '""')
-    & winget complete --word=$Word --commandline $AST --position $cursorPosition | ForEach-Object {
+    $Ast = $commandAst.ToString().Replace('"', '""')
+    & winget complete --word=$Word --commandline $Ast --position $cursorPosition | ForEach-Object {
         [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
     }
 }

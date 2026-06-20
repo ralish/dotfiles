@@ -13,7 +13,7 @@ if ($PWD.Path -eq "${Env:SystemRoot}\System32") {
 }
 
 # Windows 10 releases starting with v1511 (TH1) include improved console VT100
-# support. Applications can enable the support by calling `SetConsoleMode(...)`
+# support. Applications can enable the support by calling `SetConsoleMode()`
 # with the `ENABLE_VIRTUAL_TERMINAL_PROCESSING` console mode output flag. The
 # improved VT100 support  can also be enabled by default by setting
 # `VirtualTerminalLevel` (`REG_DWORD`) to `1` under the `HKCU\Console` key.
@@ -25,8 +25,8 @@ if ($PWD.Path -eq "${Env:SystemRoot}\System32") {
 # resulting in the first character of each line being right-justified.
 #
 # The bug is fixed in Windows 10 v2004 (20H1). An effective workaround for
-# impacted releases is to call `SetConsoleMode(...)` to perform the required
-# state transitions for the tab stop width to be correctly set.
+# impacted releases is to call `SetConsoleMode()` to perform the required state
+# transitions for the tab stop width to be correctly set.
 #
 # To avoid unnecessary P/Invoke calls and the associated type compilation,
 # check if we're running on an affected configuration. This means all of:
@@ -61,7 +61,7 @@ Function Repair-ConHostVT100Bug {
     Write-DotFilesMessage -Type 'Verbose' -Message 'Applying fix for ConHost VT100 tab stop width bug ...'
 
     if (!('DotFiles.Console' -as [Type])) {
-        $ConsoleCode = Join-Path -Path $PoshSettingsPath -ChildPath '10-Windows.cs'
+        $ConsoleCode = Join-Path -Path $PSScriptRoot -ChildPath '10-Windows.cs'
         $ConsoleAPI = Get-Content -LiteralPath $ConsoleCode -Raw
         Add-Type -TypeDefinition $ConsoleAPI
     }
@@ -111,7 +111,9 @@ Function Repair-ConHostVT100Bug {
     }
 }
 
-Repair-ConHostVT100Bug
-
-Remove-Item -LiteralPath 'Function:\Repair-ConHostVT100Bug'
-Complete-DotFilesSection
+try {
+    Repair-ConHostVT100Bug
+} finally {
+    Remove-Item -LiteralPath 'Function:\Repair-ConHostVT100Bug'
+    Complete-DotFilesSection
+}

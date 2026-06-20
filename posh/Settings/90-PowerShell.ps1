@@ -33,7 +33,7 @@ switch ($PSVersionTable.PSEdition) {
         $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
     }
 
-    Default {
+    default {
         Write-DotFilesMessage -Type 'Warning' -Message 'Unknown PowerShell edition.'
     }
 }

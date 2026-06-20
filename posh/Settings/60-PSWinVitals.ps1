@@ -4,8 +4,8 @@
 $DotFilesSection = @{
     Type     = 'Settings'
     Name     = 'PSWinVitals'
-    Platform = 'Windows'
     Module   = 'PSWinVitals'
+    Platform = 'Windows'
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }

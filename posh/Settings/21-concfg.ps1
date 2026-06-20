@@ -4,9 +4,10 @@
 $DotFilesSection = @{
     Type         = 'Settings'
     Name         = 'ConCfg'
+    Command      = 'concfg'
     Platform     = 'Windows'
     PwshHostName = 'ConsoleHost'
-    Command      = 'concfg'
+    Module       = 'PSReadLine'
     Environment  = @{ WT_SESSION = $false }
 }
 

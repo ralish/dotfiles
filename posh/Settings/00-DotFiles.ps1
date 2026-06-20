@@ -6,7 +6,7 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Validate `dotfiles` directory path from `DOTFILES` environment variable
+# Validate and set `dotfiles` path from `DOTFILES` environment variable
 Function Set-DotFilesEnvPath {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
@@ -14,7 +14,7 @@ Function Set-DotFilesEnvPath {
     Param()
 
     if (!(Test-IsPathFullyQualified -Path $Env:DOTFILES)) {
-        $ErrMsg = "DOTFILES is not set to a fully qualified path: ${Env:DOTFILES}"
+        $ErrMsg = "DOTFILES environment variable is not set to a fully qualified path: ${Env:DOTFILES}"
         $ErrExc = [FormatException]::new($ErrMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $Env:DOTFILES)
@@ -23,7 +23,7 @@ Function Set-DotFilesEnvPath {
 
     $DotFiles = Get-Item -LiteralPath $Env:DOTFILES -ErrorAction 'Ignore'
     if ($DotFiles -isnot [IO.DirectoryInfo]) {
-        $ErrMsg = "Dotfiles path is inaccessible or not a directory: ${Env:DOTFILES}"
+        $ErrMsg = "DOTFILES environment variable path is inaccessible or not a directory: ${Env:DOTFILES}"
         $ErrExc = [IO.IOException]::new($ErrMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotDirectory', $ErrCat, $Env:DOTFILES)
@@ -34,7 +34,7 @@ Function Set-DotFilesEnvPath {
     Write-DotFilesMessage -Type 'Verbose' -Message "dotfiles directory from environment variable: ${Global:DotFiles}"
 }
 
-# Find `dotfiles` directory path and resolve all symlinks and junctions
+# Find and set `dotfiles` path while resolving all symlinks and junctions
 Function Set-DotFilesFinalPath {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
@@ -42,7 +42,7 @@ Function Set-DotFilesFinalPath {
     Param()
 
     if (!('DotFiles.FinalPath' -as [Type])) {
-        $FinalPathCode = Join-Path -Path $PoshSettingsPath -ChildPath '00-DotFiles.cs'
+        $FinalPathCode = Join-Path -Path $PSScriptRoot -ChildPath '00-DotFiles.cs'
         $FinalPathAPI = Get-Content -LiteralPath $FinalPathCode -Raw
         Add-Type -TypeDefinition $FinalPathAPI
     }
@@ -95,11 +95,13 @@ Function Set-DotFilesFinalPath {
     }
 }
 
-if ($Env:DOTFILES) {
-    Set-DotFilesEnvPath
-} else {
-    Set-DotFilesFinalPath
+try {
+    if ($Env:DOTFILES) {
+        Set-DotFilesEnvPath
+    } else {
+        Set-DotFilesFinalPath
+    }
+} finally {
+    Remove-Item -LiteralPath 'Function:\Set-DotFilesEnvPath', 'Function:\Set-DotFilesFinalPath'
+    Complete-DotFilesSection
 }
-
-Remove-Item -LiteralPath 'Function:\Set-DotFilesEnvPath', 'Function:\Set-DotFilesFinalPath'
-Complete-DotFilesSection
