@@ -26,21 +26,10 @@ Function Initialize-Aliases {
     }
 
     if (Test-IsWindows) {
-        if (Get-Command -Name 'curl.exe' -ErrorAction 'Ignore') {
-            Remove-Item -LiteralPath 'Alias:\curl' -ErrorAction 'Ignore'
-        }
-
-        if (Get-Command -Name 'diff.exe' -ErrorAction 'Ignore') {
-            Remove-Item -LiteralPath 'Alias:\diff' -Force -ErrorAction 'Ignore'
-        }
-
-        if (Get-Command -Name 'sc.exe' -ErrorAction 'Ignore') {
-            Remove-Item -LiteralPath 'Alias:\sc' -Force -ErrorAction 'Ignore'
-        }
-
-        if (Get-Command -Name 'wget.exe' -ErrorAction 'Ignore') {
-            Remove-Item -LiteralPath 'Alias:\wget' -ErrorAction 'Ignore'
-        }
+        Remove-Item -LiteralPath 'Alias:\curl' -ErrorAction 'Ignore'
+        Remove-Item -LiteralPath 'Alias:\diff' -Force -ErrorAction 'Ignore'
+        Remove-Item -LiteralPath 'Alias:\sc' -Force -ErrorAction 'Ignore'
+        Remove-Item -LiteralPath 'Alias:\wget' -ErrorAction 'Ignore'
     }
 }
 
