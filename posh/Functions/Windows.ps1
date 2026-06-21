@@ -14,7 +14,7 @@ Function Disable-PresentationMode {
     [OutputType([Void])]
     Param()
 
-    & PresentationSettings.exe /stop
+    & "${Env:SystemRoot}\System32\PresentationSettings.exe" /stop
 }
 
 # Enable presentation mode
@@ -23,22 +23,22 @@ Function Enable-PresentationMode {
     [OutputType([Void])]
     Param()
 
-    & PresentationSettings.exe /start
+    & "${Env:SystemRoot}\System32\PresentationSettings.exe" /start
 }
 
 #endregion
 
 #region Environment variables
 
-# Retrieve a persisted environment variable
+# Retrieve an environment variable
 Function Get-EnvironmentVariable {
     [CmdletBinding()]
-    [OutputType([String], [Collections.Generic.List[PSCustomObject]])]
+    [OutputType([String], [PSCustomObject[]])]
     Param(
         [ValidateNotNullOrEmpty()]
         [String]$Name,
 
-        [ValidateSet('Machine', 'Process', 'User')]
+        [ValidateSet('Machine', 'User', 'Process')]
         [String]$Scope = 'Process'
     )
 
@@ -61,7 +61,7 @@ Function Get-EnvironmentVariable {
     return $EnvVars.ToArray()
 }
 
-# Set a persisted environment variable
+# Set an environment variable
 Function Set-EnvironmentVariable {
     [CmdletBinding()]
     [OutputType([Void])]
@@ -69,11 +69,10 @@ Function Set-EnvironmentVariable {
         [Parameter(Mandatory)]
         [String]$Name,
 
-        [Parameter(ValueFromPipeline)]
-        [AllowEmptyString()]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [String]$Value,
 
-        [ValidateSet('Machine', 'User')]
+        [ValidateSet('Machine', 'User', 'Process')]
         [String]$Scope = 'User',
 
         [ValidateSet('Overwrite', 'Append', 'Prepend')]
@@ -87,47 +86,72 @@ Function Set-EnvironmentVariable {
 
         switch ($Action) {
             'Overwrite' { $NewValue = $Value }
-            'Append' { $NewValue = '{0}{1}' -f $CurrentValue, $Value }
-            'Prepend' { $NewValue = '{0}{1}' -f $Value, $CurrentValue }
+            'Append' { $NewValue = "${CurrentValue}${Value}" }
+            'Prepend' { $NewValue = "${Value}${CurrentValue}" }
         }
 
         [Environment]::SetEnvironmentVariable($Name, $NewValue, [EnvironmentVariableTarget]::$Scope)
     }
 }
 
+# Remove an environment variable
+Function Remove-EnvironmentVariable {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Name,
+
+        [ValidateSet('Machine', 'User', 'Process')]
+        [String]$Scope = 'User'
+    )
+
+    [Environment]::SetEnvironmentVariable($Name, $null, [EnvironmentVariableTarget]::$Scope)
+}
+
 #endregion
 
 #region Event logs
 
-# dmesg for Windows!
+# `dmesg` for Windows
 Function dmesg {
-    [OutputType([Void], [Diagnostics.Eventing.Reader.EventLogRecord[]], [String[]])]
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
+    [OutputType([Void], [String[]], [Diagnostics.Eventing.Reader.EventLogRecord[]])]
     Param(
+        [Parameter(ParameterSetName = 'MinSeverity', Mandatory)]
+        [ValidateSet('Any', 'Critical', 'Error', 'Warning', 'Info', 'Verbose')]
+        [String]$MinSeverityLevel,
+
+        [ValidateSet('EventLogRecord', 'PlainText', 'PlainTextMinimal')]
+        [String]$OutputFormat = 'EventLogRecord',
+
         [ValidateNotNullOrEmpty()]
-        [String]$ComputerName
+        [String]$ComputerName,
+
+        [Switch]$Force
     )
 
     $Filter = @(
-        '*-Kernel-*'
-        '*-TPM-*'
         '*-FilterManager'
         '*-HAL'
         '*-Hypervisor'
         '*-IsolatedUserMode'
+        '*-Kernel-*'
         '*-Ntfs'
+        '*-TPM-*'
         '*-Wininit'
         '*-Winlogon'
         'TPM'
         'Win32k'
     )
 
-    Find-WinEvent -Filter $Filter @PSBoundParameters @args
+    Find-WinEvent -Filter $Filter @PSBoundParameters
 }
 
 # Find events by filtering against logs and providers
 Function Find-WinEvent {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
-    [OutputType([Void], [Diagnostics.Eventing.Reader.EventLogRecord[]], [String[]])]
+    [OutputType([Void], [String[]], [Diagnostics.Eventing.Reader.EventLogRecord[]])]
     Param(
         [Parameter(Mandatory)]
         [String[]]$Filter,
@@ -144,7 +168,6 @@ Function Find-WinEvent {
         [String]$MinSeverityLevel,
 
         [ValidateSet('EventLogRecord', 'PlainText', 'PlainTextMinimal')]
-        [ValidateNotNullOrEmpty()]
         [String]$OutputFormat = 'EventLogRecord',
 
         [String[]]$ExcludedLogs = @(
@@ -164,19 +187,28 @@ Function Find-WinEvent {
         Write-Warning -Message 'Some event logs may be inaccessible without administrator privileges.'
     }
 
-    $WinEvents = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogRecord]]::new()
-    $EventLogs = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogConfiguration]]::new()
-    $SkippedLogs = [Collections.Generic.List[String]]::new()
-    $ProviderLogs = @{}
-
     $CommonParams = @{}
+
     if ($ComputerName) {
         $CommonParams['ComputerName'] = $ComputerName
     }
 
+    # Default to boot time as start time
+    if (!$StartTime) {
+        try {
+            $StartTime = (Get-CimInstance @CommonParams -ClassName 'Win32_OperatingSystem' -ErrorAction 'Stop').LastBootUpTime
+        } catch {
+            $ErrMsg = "Failed to retrieve system boot time: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'WmiApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+    }
+
     # EventLevel Enum
     # https://learn.microsoft.com/en-au/dotnet/api/system.diagnostics.tracing.eventlevel
-    $EventLevelToInt = @{
+    $EventLevelNameToInt = @{
         Any      = 0
         Critical = 1
         Error    = 2
@@ -185,56 +217,44 @@ Function Find-WinEvent {
         Verbose  = 5
     }
 
-    $EventLevelToName = @(
-        'Any'
-        'Critical'
-        'Error'
-        'Warning'
-        'Info'
-        'Verbose'
-    )
-
-    # Default to boot time as start time
-    if (!$StartTime) {
-        $StartTime = (Get-CimInstance @CommonParams -ClassName 'Win32_OperatingSystem').LastBootUpTime
-    }
-
     # Configure event severity filtering
+    $EventLevels = $null
     if ($PSCmdlet.ParameterSetName -eq 'SeverityLevel' -and $SeverityLevels -notcontains 'Any') {
         $EventLevels = [Collections.Generic.List[Int]]::new()
-        foreach ($Severity in $SeverityLevel) {
-            $EventLevels.Add($EventLevelToInt[$Severity])
+        foreach ($Severity in $SeverityLevels) {
+            $EventLevels.Add($EventLevelNameToInt[$Severity])
         }
-    } elseif ($PSCmdlet.ParameterSetName -eq 'MinSeverity' -and $SeverityLevel -ne 'Any') {
-        $EventLevels = 0..$EventLevelToInt[$MinSeverity]
+    } elseif ($PSCmdlet.ParameterSetName -eq 'MinSeverity' -and $MinSeverityLevel -ne 'Any') {
+        $EventLevels = 0..$EventLevelNameToInt[$MinSeverityLevel]
     }
 
     # Retrieve matching event logs
-    $EventLogsToAdd = Get-WinEvent @CommonParams -ListLog $Filter -Force:$Force -ErrorAction Ignore | Where-Object {
+    $EventLogs = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogConfiguration]]::new()
+    Get-WinEvent @CommonParams -ListLog $Filter -Force:$Force -ErrorAction 'Ignore' | Where-Object {
         # Explicitly excluded logs
-        $_.LogName -notin $ExcludedLogs -and
+        $PSItem.LogName -notin $ExcludedLogs -and
         # No records (must test both!)
-        $_.RecordCount -ne 0 -and
-        $null -ne $_.RecordCount -and
+        $null -ne $PSItem.RecordCount -and
+        $PSItem.RecordCount -ne 0 -and
         # Written to since start time
-        $_.LastWriteTime -ge $StartTime
-    }
+        $PSItem.LastWriteTime -ge $StartTime
+    } | ForEach-Object { $EventLogs.Add($PSItem) }
 
-    # Add matched event logs to array
-    foreach ($Log in $EventLogsToAdd) {
-        $EventLogs.Add($Log)
-    }
-
-    # Retrieve matching event providers. For each event provider, record which
-    # event log(s) it outputs to. We'll later retrieve events from these log(s)
-    # filtered by the event provider. Exclude any logs which match the filter,
-    # as we'll retrieve all events from these logs without any provider filter.
-    foreach ($Provider in (Get-WinEvent @CommonParams -ListProvider $Filter -ErrorAction Ignore)) {
+    # Retrieve matching event providers
+    #
+    # For each event provider record which event logs it outputs to. We'll
+    # later retrieve events from these logs filtered by the event provider.
+    # Exclude any logs which match the filter, as we'll retrieve all events
+    # from these logs without any provider filter.
+    $ProviderLogs = @{}
+    $SkippedLogs = [Collections.Generic.List[String]]::new()
+    foreach ($Provider in (Get-WinEvent @CommonParams -ListProvider $Filter -ErrorAction 'Ignore')) {
         $LogLinks = $Provider.LogLinks | Where-Object LogName -NotIn $ExcludedLogs
 
-        foreach ($Link in $LogLinks) {
-            $LogName = $Link.LogName
+        foreach ($LogLink in $LogLinks) {
+            $LogName = $LogLink.LogName
 
+            # Check if event log matches a filter
             $LogFiltered = $false
             foreach ($Entry in $Filter) {
                 if ($LogName -like $Entry) {
@@ -243,28 +263,30 @@ Function Find-WinEvent {
                 }
             }
 
-            # Log already included by log filter
+            # Event log is already included by filter
             if ($LogFiltered) { continue }
 
-            # Log previously enumerated and inaccessible or irrelevant
+            # Event log previously enumerated and inaccessible or irrelevant
             if ($SkippedLogs -contains $LogName) { continue }
 
+            # Is this the first time we've seen this event log?
             if (!$ProviderLogs.ContainsKey($LogName)) {
+                # Try to retrieve the event log
                 try {
-                    $Log = Get-WinEvent @CommonParams -ListLog $LogName -Force:$Force -ErrorAction Stop
+                    $EventLog = Get-WinEvent @CommonParams -ListLog $LogName -Force:$Force -ErrorAction 'Stop'
                 } catch {
-                    Write-Error -Message $_.Exception.Message
+                    $PSCmdlet.WriteError($PSItem)
                     $SkippedLogs.Add($LogName)
                     continue
                 }
 
                 # No records or not written to since start time
-                if ($Log.RecordCount -eq 0 -or $null -eq $Log.RecordCount -or $Log.LastWriteTime -lt $StartTime) {
+                if ($null -eq $EventLog.RecordCount -or $EventLog.RecordCount -eq 0 -or $EventLog.LastWriteTime -lt $StartTime) {
                     $SkippedLogs.Add($LogName)
                     continue
                 }
 
-                $EventLogs.Add($Log)
+                $EventLogs.Add($EventLog)
                 $ProviderLogs[$LogName] = [Collections.Generic.List[String]]::new()
             }
 
@@ -273,7 +295,11 @@ Function Find-WinEvent {
     }
 
     if ($EventLogs.Count -eq 0) {
-        throw 'No event logs or providers matched the filter.'
+        $ErrMsg = 'No event logs or providers matched the filter.'
+        $ErrExc = [Management.Automation.ItemNotFoundException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'FilterReturnedNoMatches', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     $WriteProgressParams = @{
@@ -281,11 +307,12 @@ Function Find-WinEvent {
     }
 
     # Retrieve all the events matching the filter
-    for ($Idx = 0; $Idx -lt $EventLogs.Count; $Idx++) {
-        $EventLog = $EventLogs[$Idx]
+    $WinEvents = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogRecord]]::new()
+    for ($i = 0; $i -lt $EventLogs.Count; $i++) {
+        $EventLog = $EventLogs[$i]
         $LogName = $EventLog.LogName
 
-        Write-Progress @WriteProgressParams -Status $LogName -PercentComplete ($Idx / $EventLogs.Count * 100)
+        Write-Progress @WriteProgressParams -Status $LogName -PercentComplete ($i / $EventLogs.Count * 100)
 
         $EventFilter = @{
             LogName   = $LogName
@@ -311,63 +338,78 @@ Function Find-WinEvent {
         }
 
         try {
-            $FoundEvents = Get-WinEvent @CommonParams @EventParams -ErrorAction Stop
-            foreach ($WinEvent in $FoundEvents) {
-                $WinEvents.Add($WinEvent)
-            }
+            Get-WinEvent @CommonParams @EventParams -ErrorAction 'Stop' |
+                ForEach-Object { $WinEvents.Add($PSItem) }
         } catch {
-            $Ex = $_
-            switch -Regex ($_.FullyQualifiedErrorId) {
+            $Exc = $PSItem
+            switch -Regex ($PSItem.FullyQualifiedErrorId) {
                 '^NoMatchingEventsFound,' { continue }
                 default {
-                    Write-Warning -Message $Ex.Exception.Message
+                    Write-Warning -Message $Exc.Exception.Message
                     continue
                 }
             }
         }
-
-        $LogsDone++
     }
 
-    Write-Progress @WriteProgressParams -Completed
-
     $SortedEvents = $WinEvents | Sort-Object -Property 'TimeCreated'
+    Write-Progress @WriteProgressParams -Completed
 
     if ($OutputFormat -eq 'EventLogRecord') {
         return $SortedEvents
     }
 
-    $WinEvents = [Collections.Generic.List[String]]::new()
-    $DateFormat = 'yyyy/MM/dd hh:mm:ss tt'
-    $StringSplitOptions = [StringSplitOptions]::RemoveEmptyEntries -bor [StringSplitOptions]::TrimEntries
-    $PrefixWhitespace = ' ' * ('[{0}] {1,-8} -> ' -f (Get-Date).ToString($DateFormat), $EventLevelToName[0]).Length
-    $MultilinePrefix = '{0}{1}' -f [Environment]::NewLine, $PrefixWhitespace
+    # User requested event log records be emitted as plain text
 
+    # EventLevel Enum
+    # https://learn.microsoft.com/en-au/dotnet/api/system.diagnostics.tracing.eventlevel
+    $EventLevelIntToName = @(
+        'Any'
+        'Critical'
+        'Error'
+        'Warning'
+        'Info'
+        'Verbose'
+    )
+
+    # String formatting configuration
+    $DateFormat = 'yyyy/MM/dd hh:mm:ss tt'
+    $PrefixWhitespace = ' ' * ('[{0}] {1,-8} -> ' -f (Get-Date).ToString($DateFormat), $EventLevelIntToName[0]).Length
+    $MultilinePrefix = "$([Environment]::NewLine)${PrefixWhitespace}"
+
+    # Using the `TrimEntries` option would be convenient here but it's only
+    # available from .NET 5 so can't be used in Windows PowerShell.
+    $StringSplitOptions = [StringSplitOptions]::RemoveEmptyEntries
+
+    $WinEvents = [Collections.Generic.List[String]]::new()
     foreach ($WinEvent in $SortedEvents) {
         $Time = $WinEvent.TimeCreated.ToString($DateFormat)
-        $Level = $EventLevelToName[$WinEvent.Level].ToUpper()
         $Provider = $WinEvent.ProviderName
-        $Msg = $WinEvent.Message
+        $EvtMsg = $WinEvent.Message
 
-        $ReplaceChars = [Char[]]@(
-            # Left-to-right mark
-            0x200e
-        )
+        if ($WinEvent.Level -lt $EventLevelIntToName.Count) {
+            $Level = $EventLevelIntToName[$WinEvent.Level].ToUpper()
+        } else {
+            # Custom providers may define their own levels
+            $Level = 'UNKNOWN'
+        }
 
+        # Left-to-right mark
+        $ReplaceChars = [Char[]]@(0x200e)
         foreach ($Char in $ReplaceChars) {
-            $Msg = $Msg.Replace([String]$Char, [String]::Empty)
+            $EvtMsg = $EvtMsg.Replace([String]$Char, '')
         }
 
         if ($WinEvent.Message) {
-            $Msg = $Msg.Split("`r`n", $StringSplitOptions).Split("`n", $StringSplitOptions)
+            $EvtMsg = $EvtMsg.Split("`r`n", $StringSplitOptions).Split("`n", $StringSplitOptions).Trim() | Where-Object { ![String]::IsNullOrEmpty($PSItem) }
         } else {
-            $Msg = [String]::Empty
+            $EvtMsg = ''
         }
 
         if ($OutputFormat -eq 'PlainText') {
-            $Text = '[{0}] {1,-8} -> {2}{3}{4}' -f $Time, $Level, $Provider, $MultilinePrefix, ($Msg -join $MultilinePrefix)
+            $Text = '[{0}] {1,-8} -> {2}{3}{4}' -f $Time, $Level, $Provider, $MultilinePrefix, ($EvtMsg -join $MultilinePrefix)
         } else {
-            $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, ($Msg -join $MultilinePrefix)
+            $Text = '[{0}] {1,-8} -> {2}' -f $Time, $Level, ($EvtMsg -join $MultilinePrefix)
         }
 
         $WinEvents.Add($Text)
@@ -376,7 +418,7 @@ Function Find-WinEvent {
     return $WinEvents.ToArray()
 }
 
-# Watch an Event Log (similar to Unix `tail`)
+# Watch an event log (similar to Unix `tail`)
 # Slightly improved from: https://stackoverflow.com/a/15262376/8787985
 Function Watch-EventLog {
     [CmdletBinding()]
@@ -386,13 +428,15 @@ Function Watch-EventLog {
         [String]$LogName
     )
 
-    $IndexOld = (Get-WinEvent -LogName $LogName -MaxEvents 1).RecordId
+    $PreviousIndex = (Get-WinEvent -LogName $LogName -MaxEvents 1).RecordId
+
     do {
         Start-Sleep -Seconds 1
-        $IndexNew = (Get-WinEvent -LogName $LogName -MaxEvents 1).RecordId
-        if ($IndexNew -ne $IndexOld) {
-            Get-WinEvent -LogName $LogName -MaxEvents ($IndexNew - $IndexOld) | Sort-Object -Property 'RecordId'
-            $IndexOld = $IndexNew
+        $NewIndex = (Get-WinEvent -LogName $LogName -MaxEvents 1).RecordId
+
+        if ($NewIndex -ne $PreviousIndex) {
+            Get-WinEvent -LogName $LogName -MaxEvents ($NewIndex - $PreviousIndex) | Sort-Object -Property 'RecordId'
+            $PreviousIndex = $NewIndex
         }
     } while ($true)
 }
@@ -409,17 +453,16 @@ Function Get-MultipleHardLinks {
         [Parameter(Mandatory)]
         [IO.DirectoryInfo]$Path,
 
-        [ValidateScript( { $_ -gt 1 } )]
-        [Int]$MinimumHardLinks = 2,
+        [ValidateRange(1, [UInt16]::MaxValue)]
+        [UInt16]$MinimumHardLinks = 2,
 
         [Switch]$Recurse,
         [Switch]$Force
     )
 
-    $Files = Get-ChildItem -Path $Path -File -Recurse:$Recurse -Force:$Force |
-        Where-Object {
-            $_.LinkType -eq 'HardLink' -and $_.Target.Count -ge ($MinimumHardLinks - 1)
-        } | Add-Member -MemberType ScriptProperty -Name 'LinkCount' -Value { $this.Target.Count + 1 } -Force -PassThru
+    $Files = Get-ChildItem -LiteralPath $Path -File -Recurse:$Recurse -Force:$Force |
+        Where-Object { $PSItem.LinkType -eq 'HardLink' -and $PSItem.Target.Count -ge ($MinimumHardLinks - 1) } |
+        Add-Member -MemberType 'ScriptProperty' -Name 'LinkCount' -Value { $this.Target.Count + 1 } -Force -PassThru
 
     return $Files
 }
@@ -439,33 +482,29 @@ Function Get-NonInheritedACL {
         [Switch]$Force
     )
 
-    $Directories = Get-ChildItem -Path $Path -Directory -Recurse:$Recurse -Force:$Force
+    $Dirs = Get-ChildItem -LiteralPath $Path -Directory -Recurse:$Recurse -Force:$Force
 
-    $ACLMatches = [Collections.Generic.List[IO.DirectoryInfo]]::new()
-    foreach ($Directory in $Directories) {
-        $ACL = Get-Acl -LiteralPath $Directory.FullName
-        $ACLNonInherited = $ACL.Access | Where-Object { $_.IsInherited -eq $false }
+    $AclMatches = [Collections.Generic.List[IO.DirectoryInfo]]::new()
+    foreach ($Dir in $Dirs) {
+        $Acl = Get-Acl -LiteralPath $Dir.FullName
 
-        if (!$ACLNonInherited) { continue }
+        $AclNonInherited = $Acl.Access | Where-Object IsInherited -EQ $false
+        if (!$AclNonInherited) { continue }
 
-        if ($User) {
-            if ($ACLNonInherited.IdentityReference -notcontains $User) {
-                continue
-            }
-        }
+        if ($User -and $AclNonInherited.IdentityReference -notcontains $User) { continue }
 
-        $ACLMatches.Add($Directory)
+        $AclMatches.Add($Dir)
     }
 
-    return $ACLMatches.ToArray()
+    return $AclMatches.ToArray()
 }
 
-# Helper function to call MKLINK in cmd
+# Helper function to call `cmd` built-in command `mklink`
 Function mklink {
     [OutputType([String])]
     Param()
 
-    & $env:ComSpec /c mklink $args
+    & $Env:ComSpec /c mklink $args
 }
 
 #endregion
@@ -478,16 +517,16 @@ Function Edit-Hosts {
     [OutputType([Void])]
     Param()
 
-    $StartProcessParams = @{
+    $Params = @{
         FilePath     = 'notepad.exe'
-        ArgumentList = '{0}\System32\drivers\etc\hosts' -f $env:SystemRoot
+        ArgumentList = "${Env:SystemRoot}\System32\drivers\etc\hosts"
     }
 
     if (!(Test-IsAdministrator)) {
-        $StartProcessParams.Add('Verb', 'RunAs')
+        $Params.Add('Verb', 'RunAs')
     }
 
-    Start-Process @StartProcessParams
+    Start-Process @Params
 }
 
 # Restore connections to mapped network drives
@@ -498,11 +537,15 @@ Function Restore-MappedNetworkDrives {
 
     $MappedDrives = Get-SmbMapping | Where-Object Status -EQ 'Unavailable'
     foreach ($MappedDrive in $MappedDrives) {
-        Write-Verbose -Message ('Restoring mapped network drive: {0}' -f $MappedDrive.LocalPath)
+        Write-Verbose -Message "Restoring mapped network drive: $($MappedDrive.LocalPath)"
         try {
-            $null = New-SmbMapping -LocalPath $MappedDrive.LocalPath -RemotePath $MappedDrive.RemotePath -Persistent $true
+            $null = New-SmbMapping -LocalPath $MappedDrive.LocalPath -RemotePath $MappedDrive.RemotePath -Persistent $true -ErrorAction 'Stop'
         } catch {
-            throw 'Failed to restore mapped network drive: {0}' -f $MappedDrive.LocalPath
+            $ErrMsg = "Failed to restore mapped network drive: $($MappedDrive.LocalPath)"
+            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RestoreMappedNetworkDriveFailed', $ErrCat, $MappedDrive)
+            $PSCmdlet.WriteError($ErrRec)
         }
     }
 }
@@ -514,10 +557,10 @@ Function Restore-MappedNetworkDrives {
 # Search the registry
 Function Search-Registry {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
-    [OutputType([Void], [PSCustomObject[]], ParameterSetName = 'Default')]
-    [OutputType([Void], ParameterSetName = 'Recursion')]
+    [OutputType(ParameterSetName = 'Default', [Void], [PSCustomObject[]])]
+    [OutputType(ParameterSetName = 'Recursion', [Void])]
     Param(
-        [Parameter(Mandatory, ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Default', Mandatory)]
         [ValidateSet('HKCC', 'HKCR', 'HKCU', 'HKLM', 'HKPD', 'HKU')]
         [String]$Hive,
 
@@ -528,44 +571,81 @@ Function Search-Registry {
         [String]$SimpleMatch,
 
         [ValidateSet('Keys', 'Values', 'Data')]
-        [ValidateNotNullOrEmpty()]
         [String[]]$Types = @('Keys', 'Values', 'Data'),
 
         [Parameter(ParameterSetName = 'Default')]
         [Switch]$NoRecurse,
 
-        [Parameter(Mandatory, ParameterSetName = 'Recursion')]
+        [Parameter(ParameterSetName = 'Recursion', Mandatory)]
         [Microsoft.Win32.RegistryKey]$ParentKey,
 
-        [Parameter(Mandatory, ParameterSetName = 'Recursion')]
+        [Parameter(ParameterSetName = 'Recursion', Mandatory)]
         [String]$SubKeyName,
 
-        [Parameter(Mandatory, ParameterSetName = 'Recursion')]
+        [Parameter(ParameterSetName = 'Recursion', Mandatory)]
         [AllowEmptyCollection()]
         [Collections.Generic.List[PSCustomObject]]$Results
     )
 
-    if ($PSCmdlet.ParameterSetName -eq 'Default') {
-        switch ($Hive) {
-            'HKCC' { $RegHive = [Microsoft.Win32.Registry]::CurrentConfig }
-            'HKCR' { $RegHive = [Microsoft.Win32.Registry]::ClassesRoot }
-            'HKCU' { $RegHive = [Microsoft.Win32.Registry]::CurrentUser }
-            'HKLM' { $RegHive = [Microsoft.Win32.Registry]::LocalMachine }
-            'HKPD' { $RegHive = [Microsoft.Win32.Registry]::PerformanceData }
-            'HKU' { $RegHive = [Microsoft.Win32.Registry]::Users }
+    switch ($PSCmdlet.ParameterSetName) {
+        'Default' {
+            switch ($Hive) {
+                'HKCC' { $RegHive = [Microsoft.Win32.Registry]::CurrentConfig }
+                'HKCR' { $RegHive = [Microsoft.Win32.Registry]::ClassesRoot }
+                'HKCU' { $RegHive = [Microsoft.Win32.Registry]::CurrentUser }
+                'HKLM' { $RegHive = [Microsoft.Win32.Registry]::LocalMachine }
+                'HKPD' { $RegHive = [Microsoft.Win32.Registry]::PerformanceData }
+                'HKU' { $RegHive = [Microsoft.Win32.Registry]::Users }
+            }
+
+            $RegKeys = [Collections.Generic.List[Microsoft.Win32.RegistryKey]]::new()
+            $RegKeys.Add($RegHive)
+
+            $DirSepChar = [IO.Path]::DirectorySeparatorChar
+            $SubKeys = @($Path.Split($DirSepChar))
+            $OpenSubKeyFailed = $false
+
+            # Traverse the path, opening each intermediate key
+            foreach ($SubKey in $SubKeys) {
+                try {
+                    $RegKey = $RegKeys[-1].OpenSubKey($SubKey)
+                    if (!$RegKey) {
+                        $OpenSubKeyFailed = $true
+                    }
+                } catch {
+                    $OpenSubKeyFailed = $true
+                }
+
+                if ($OpenSubKeyFailed) {
+                    $RegPath = "$($SubKeys[-1])${DirSepChar}$($SubKeys[$RegKeys.Count - 1])"
+                    $ErrMsg = "Failed to open registry key: ${RegPath}"
+                    $ErrExc = [Management.Automation.ItemNotFoundException]::new($ErrMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegistryKeyNotFound', $ErrCat, $RegPath)
+                    $PSCmdlet.WriteError($ErrRec)
+                    break
+                }
+
+                $RegKeys.Add($RegKey)
+            }
+
+            # We hit a failure, close all the opened keys
+            if ($OpenSubKeyFailed) {
+                for ($i = $RegKeys.Count - 1; $i -ne 0; $i--) {
+                    $RegKeys[$i].Close()
+                }
+
+                return
+            }
+
+            $RegistryKey = $RegKeys[-1]
+            $Results = [Collections.Generic.List[PSCustomObject]]::new()
         }
 
-        $RegKeys = [Collections.Generic.List[Microsoft.Win32.RegistryKey]]::new()
-        $RegKeys.Add($RegHive)
-
-        $DirSepChar = [IO.Path]::DirectorySeparatorChar
-        $OpenSubKeyFailed = $false
-        $SubKeys = $Path.Split($DirSepChar)
-
-        foreach ($SubKey in $SubKeys) {
+        'Recursion' {
             try {
-                $RegKey = $RegKeys[-1].OpenSubKey($SubKey)
-                if (!$RegKey) {
+                $RegistryKey = $ParentKey.OpenSubKey($SubKeyName)
+                if (!$RegistryKey) {
                     $OpenSubKeyFailed = $true
                 }
             } catch {
@@ -573,48 +653,18 @@ Function Search-Registry {
             }
 
             if ($OpenSubKeyFailed) {
-                $RegPath = '{0}{1}{2}' -f $SubKeys[-1].Name, $DirSepChar, $SubKeys[$RegKeys.Count - 1]
-                Write-Error -Message ('Failed to open registry key: {0}' -f $RegPath)
-                break
+                $RegPath = "$($ParentKey.Name)$([IO.Path]::DirectorySeparatorChar)${SubKeyName}"
+                Write-Verbose -Message "Failed to open registry key: ${RegPath}"
+                return
             }
 
-            $RegKeys.Add($RegKey)
-        }
-
-        if ($OpenSubKeyFailed) {
-            for ($i = $RegKeys.Count - 1; $i -ne 0; $i--) {
-                $RegKeys[$i].Close()
+            $WriteProgressParams = @{
+                Activity = "Searching registry for simple match: ${SimpleMatch}"
+                Status   = $RegistryKey.Name
             }
 
-            return
+            Write-Progress @WriteProgressParams
         }
-
-        $RegistryKey = $RegKeys[-1]
-        $Results = [Collections.Generic.List[PSCustomObject]]::new()
-    } else {
-        $OpenSubKeyFailed = $false
-
-        try {
-            $RegistryKey = $ParentKey.OpenSubKey($SubKeyName)
-            if (!$RegistryKey) {
-                $OpenSubKeyFailed = $true
-            }
-        } catch {
-            $OpenSubKeyFailed = $true
-        }
-
-        if ($OpenSubKeyFailed) {
-            $RegPath = '{0}{1}{2}' -f $ParentKey.Name, [IO.Path]::DirectorySeparatorChar, $SubKeyName
-            Write-Verbose -Message ('Failed to open registry key: {0}' -f $RegPath)
-            return
-        }
-
-        $WriteProgressParams = @{
-            Activity = 'Searching registry for simple match: {0}' -f $SimpleMatch
-            Status   = $RegistryKey.Name
-        }
-
-        Write-Progress @WriteProgressParams
     }
 
     $Recurse = $false
@@ -625,7 +675,7 @@ Function Search-Registry {
             SimpleMatch = $SimpleMatch
             Types       = $Types
             ParentKey   = $RegistryKey
-            SubKeyName  = $null
+            SubKeyName  = ''
             Results     = $Results
         }
     }
@@ -714,47 +764,46 @@ Function Update-RdcDefaultConfig {
     [OutputType([Void])]
     Param()
 
-    $RdcDir = Join-Path -Path $DotFilesPath -ChildPath 'mstsc'
+    $RdcDir = Join-Path -Path $DotFiles -ChildPath 'mstsc'
     $RdcTemplateFile = Join-Path -Path $RdcDir -ChildPath 'Template.ini'
     $RdcDefaultFile = Join-Path -Path $RdcDir -ChildPath 'Default.rdp'
 
-    $RdcDefaultSettings = Get-Content -LiteralPath $RdcTemplateFile |
-        # Exclude comments and blank lines
-        Where-Object { $_ -match '^[a-z]' } |
-        # RDC always lowercases setting names
-        ForEach-Object { $_.ToLower() }
+    try {
+        $RdcDefaultSettings = Get-Content -LiteralPath $RdcTemplateFile -ErrorAction 'Stop' |
+            # Exclude comments and blank lines
+            Where-Object { $PSItem -match '^[a-z]' } |
+            # RDC always lowercases setting names
+            ForEach-Object { $PSItem.ToLower() }
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
-    # Encoding: UTF-16LE
-    # Arguments: bigEndian, byteOrderMark
+    # UTF-16LE file encoding
     $Encoder = [Text.UnicodeEncoding]::new($false, $true)
 
     # We do this slightly convoluted dance to handle the case where the file
-    # already exists and has the Hidden and/or System attributes.
+    # already exists and has the "Hidden" and/or "System" attributes.
     try {
+        $FileStream = $StreamWriter = $null
+
         $FileStream = [IO.File]::Open($RdcDefaultFile, [IO.FileMode]::OpenOrCreate)
+        $StreamWriter = [IO.StreamWriter]::new($FileStream, $Encoder, 1024, $true)
 
-        try {
-            # Arguments: stream, encoding, bufferSize, leaveOpen
-            $StreamWriter = [IO.StreamWriter]::new($FileStream, $Encoder, 1024, $true)
-
-            foreach ($Line in $RdcDefaultSettings) {
-                $StreamWriter.WriteLine($Line)
-            }
-
-            $StreamWriter.Flush()
-        } finally {
-            $StreamWriter.Dispose()
+        foreach ($Line in $RdcDefaultSettings) {
+            $StreamWriter.WriteLine($Line)
         }
+
+        $StreamWriter.Flush()
 
         # Truncate any trailing data if the file already existed
         $FileStream.SetLength($FileStream.Position)
+    } catch {
+        $PSCmdlet.ThrowTerminatingError($PSItem)
     } finally {
-        $FileStream.Dispose()
+        if ($StreamWriter) { $StreamWriter.Close() }
+        if ($FileStream) { $FileStream.Dispose() }
     }
 
-    # Match what RDC sets
-    $RdcDefaultFileAttributes = [IO.FileAttributes]::Archive + [IO.FileAttributes]::Hidden + [IO.FileAttributes]::System
-    [IO.File]::SetAttributes($RdcDefaultFile, $RdcDefaultFileAttributes)
+    # Match what RDC itself sets
+    [IO.File]::SetAttributes($RdcDefaultFile, [IO.FileAttributes]'Archive,Hidden,System')
 }
 
 #endregion
@@ -764,9 +813,9 @@ Function Update-RdcDefaultConfig {
 # Convert security descriptors between different formats
 Function Convert-SecurityDescriptor {
     [CmdletBinding()]
-    [OutputType([Void], [String], [Management.ManagementBaseObject], ParameterSetName = 'Binary')]
-    [OutputType([Void], [Byte[]], [Management.ManagementBaseObject], ParameterSetName = 'SDDL')]
-    [OutputType([Void], [Byte[]], [String], ParameterSetName = 'WMI')]
+    [OutputType(ParameterSetName = 'Binary', [String], [Management.ManagementBaseObject])]
+    [OutputType(ParameterSetName = 'SDDL', [Byte[]], [Management.ManagementBaseObject])]
+    [OutputType(ParameterSetName = 'WMI', [Byte[]], [String])]
     Param(
         [Parameter(ParameterSetName = 'Binary', Mandatory)]
         [Byte[]]$BinarySD,
@@ -802,7 +851,12 @@ Function Convert-SecurityDescriptor {
 
             'WMI' {
                 if ($WmiSD.__CLASS -ne 'Win32_SecurityDescriptor') {
-                    throw 'Expected Win32_SecurityDescriptor instance but received: {0}' -f $WmiSD.__CLASS
+                    $ErrMsg = "Expected Win32_SecurityDescriptor instance but received: $($WmiSD.__CLASS)"
+                    $ErrExc = [ArgumentException]::new($ErrMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $WmiSD)
+                    $PSCmdlet.WriteError($ErrRec)
+                    return
                 }
 
                 if ($TargetType -eq 'Binary') {
@@ -813,7 +867,11 @@ Function Convert-SecurityDescriptor {
             }
         }
 
-        throw 'Unable to convert security descriptor to same type as input.'
+        $ErrMsg = 'Unable to convert security descriptor to same type as input.'
+        $ErrExc = [ArgumentException]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $null)
+        $PSCmdlet.WriteError($ErrRec)
     }
 }
 
@@ -825,15 +883,15 @@ Function Get-WellKnownSID {
     Param(
         [Parameter(ParameterSetName = 'NTAuthority', Mandatory)]
         [ValidateSet('Anonymous', 'Authenticated Users', 'Batch', 'Claims Valid', 'Cloud Account Authentication', 'Compound Identity Present', 'Dialup', 'Digest Authentication', 'Enterprise Domain Controllers', 'IIS User', 'Interactive', 'Local Service', 'Local System', 'Microsoft Account Authentication', 'Network Service', 'Network', 'NTLM Authentication', 'Other Organization', 'Principal Self', 'Proxy', 'Remote Interactive Logon', 'Restricted', 'SChannel Authentication', 'Service', 'Terminal Server Users', 'This Organization Certificate', 'This Organization', 'User-mode Drivers', 'Write Restricted')]
-        [String[]]$NTAuthority,
+        [String]$NTAuthority,
 
         [Parameter(ParameterSetName = 'Builtin', Mandatory)]
         [ValidateSet('Access Control Assistance Operators', 'Account Operators', 'Administrators', 'Backup Operators', 'Builtin', 'Certificate Service DCOM Access', 'Cryptographic Operators', 'Device Owners', 'Distributed COM Users', 'Event Log Readers', 'Guests', 'Hyper-V Administrators', 'IIS Users', 'Incoming Forest Trust Builders', 'Local account and member of Administrators group', 'Local account', 'Network Configuration Operators', 'Performance Log Users', 'Performance Monitor Users', 'Power Users', 'Pre-Windows 2000 Compatible Access', 'Print Operators', 'RDS Endpoint Servers', 'RDS Management Servers', 'RDS Remote Access Servers', 'Remote Desktop Users', 'Remote Management Users', 'Replicators', 'Server Operators', 'Storage Replica Administrators', 'System Managed Group', 'Terminal Server License Servers', 'Users', 'Windows Authorization Access Group')]
-        [String[]]$Builtin,
+        [String]$Builtin,
 
         [Parameter(ParameterSetName = 'Domain', Mandatory)]
         [ValidateSet('Administrator', 'Allowed RODC Password Replication Group', 'Cert Publishers', 'Cloneable Domain Controllers', 'DefaultAccount', 'Denied RODC Password Replication Group', 'Domain Admins', 'Domain Computers', 'Domain Controllers', 'Domain Guests', 'Domain Users', 'Enterprise Admins', 'Enterprise Key Admins', 'Enterprise Read-only Domain Controllers', 'Group Policy Creator Owners', 'Guest', 'Key Admins', 'krbtgt', 'Protected Users', 'RAS and IAS Servers', 'Read-only Domain Controllers', 'Schema Admins', 'WDAGUtilityAccount')]
-        [String[]]$Domain,
+        [String]$Domain,
 
         [Parameter(ParameterSetName = 'Domain')]
         [ValidateNotNullOrEmpty()]
@@ -841,55 +899,55 @@ Function Get-WellKnownSID {
 
         [Parameter(ParameterSetName = 'NullAuthority', Mandatory)]
         [ValidateSet('Nobody')]
-        [String[]]$NullAuthority,
+        [String]$NullAuthority,
 
         [Parameter(ParameterSetName = 'WorldAuthority', Mandatory)]
         [ValidateSet('Everyone')]
-        [String[]]$WorldAuthority,
+        [String]$WorldAuthority,
 
         [Parameter(ParameterSetName = 'LocalAuthority', Mandatory)]
         [ValidateSet('Console Logon', 'Local')]
-        [String[]]$LocalAuthority,
+        [String]$LocalAuthority,
 
         [Parameter(ParameterSetName = 'CreatorAuthority', Mandatory)]
         [ValidateSet('Creator Group Server', 'Creator Group', 'Creator Owner Server', 'Creator Owner', 'Owner Rights')]
-        [String[]]$CreatorAuthority,
+        [String]$CreatorAuthority,
 
         [Parameter(ParameterSetName = 'NTService', Mandatory)]
         [ValidateSet('All Services', 'NT Service')]
-        [String[]]$NTService,
+        [String]$NTService,
 
         [Parameter(ParameterSetName = 'NTVirtualMachine', Mandatory)]
         [ValidateSet('NT Virtual Machine', 'Virtual Machines')]
-        [String[]]$NTVirtualMachine,
+        [String]$NTVirtualMachine,
 
         [Parameter(ParameterSetName = 'NTTask', Mandatory)]
         [ValidateSet('NT Task')]
-        [String[]]$NTTask,
+        [String]$NTTask,
 
         [Parameter(ParameterSetName = 'WindowManager', Mandatory)]
         [ValidateSet('Window Manager', 'Window Manager Group')]
-        [String[]]$WindowManager,
+        [String]$WindowManager,
 
         [Parameter(ParameterSetName = 'FontDriverHost', Mandatory)]
         [ValidateSet('Font Driver Host')]
-        [String[]]$FontDriverHost,
+        [String]$FontDriverHost,
 
         [Parameter(ParameterSetName = 'ApplicationPackageAuthority', Mandatory)]
         [ValidateSet('All Application Packages')]
-        [String[]]$ApplicationPackageAuthority,
+        [String]$ApplicationPackageAuthority,
 
         [Parameter(ParameterSetName = 'MandatoryLabel', Mandatory)]
         [ValidateSet('High Mandatory Level', 'Low Mandatory Level', 'Medium Mandatory Level', 'Medium Plus Mandatory Level', 'Protected Process Mandatory Level', 'Secure Process Mandatory Level', 'System Mandatory Level', 'Untrusted Mandatory Level')]
-        [String[]]$MandatoryLabel,
+        [String]$MandatoryLabel,
 
         [Parameter(ParameterSetName = 'IdentityAuthority', Mandatory)]
         [ValidateSet('Authentication authority asserted identity', 'Fresh public key identity', 'Key property attestation', 'Key property multi-factor authentication', 'Key trust identity', 'Service asserted identity')]
-        [String[]]$IdentityAuthority
+        [String]$IdentityAuthority
     )
 
     switch ($PSCmdlet.ParameterSetName) {
-        NTAuthority {
+        'NTAuthority' {
             switch ($NTAuthority) {
                 'Dialup'                                            { $SID = 'S-1-5-1' }
                 'Network'                                           { $SID = 'S-1-5-2' }
@@ -923,7 +981,7 @@ Function Get-WellKnownSID {
             }
         }
 
-        Builtin {
+        'Builtin' {
             switch ($Builtin) {
                 'Builtin'                                           { $SID = 'S-1-5-32' }
                 'Administrators'                                    { $SID = 'S-1-5-32-544' }
@@ -962,7 +1020,7 @@ Function Get-WellKnownSID {
             }
         }
 
-        Domain {
+        'Domain' {
             switch ($Domain) {
                 'Enterprise Read-only Domain Controllers'           { $RID = '498' }
                 'Administrator'                                     { $RID = '500' }
@@ -993,45 +1051,38 @@ Function Get-WellKnownSID {
                 Test-ModuleAvailable -Name 'ActiveDirectory'
 
                 try {
-                    $Dc = Get-ADDomainController -DomainName $DomainName -Discover -NextClosestSite -ErrorAction Stop
-                } catch {
-                    throw $_
-                }
+                    $Dc = Get-ADDomainController -DomainName $DomainName -Discover -NextClosestSite -ErrorAction 'Stop'
+                    $RootDse = Get-ADRootDSE -Server $Dc.HostName.Value -ErrorAction 'Stop'
+                    $DomainIdentifier = Get-ADObject -Server $Dc.HostName.Value -Identity $RootDse.defaultNamingContext -Properties 'objectSid' -ErrorAction 'Stop'
+                } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
-                try {
-                    $RootDse = Get-ADRootDSE -Server $Dc.HostName.Value -ErrorAction Stop
-                } catch {
-                    throw $_
-                }
-
-                $DomainIdentifier = Get-ADObject -Server $Dc.HostName.Value -Identity $RootDse.defaultNamingContext -Properties 'objectSid'
-                $SID = '{0}-{1}' -f $DomainIdentifier.objectSid.Value, $RID
+                $SID = "$($DomainIdentifier.objectSid.Value)-${RID}"
             } else {
                 $LocalUsers = Get-LocalUser
-                $SID = '{0}-{1}' -f $LocalUsers[0].SID.AccountDomainSid.Value, $RID
+                $SID = "$($LocalUsers[0].SID.AccountDomainSid.Value)-${RID}"
             }
         }
 
-        NullAuthority {
+        'NullAuthority' {
             switch ($NullAuthority) {
                 'Nobody'                                            { $SID = 'S-1-0-0' }
             }
         }
 
-        WorldAuthority {
+        'WorldAuthority' {
             switch ($WorldAuthority) {
                 'Everyone'                                          { $SID = 'S-1-1-0' }
             }
         }
 
-        LocalAuthority {
+        'LocalAuthority' {
             switch ($LocalAuthority) {
                 'Local'                                             { $SID = 'S-1-2-0' }
                 'Console Logon'                                     { $SID = 'S-1-2-1' }
             }
         }
 
-        CreatorAuthority {
+        'CreatorAuthority' {
             switch ($CreatorAuthority) {
                 'Creator Owner'                                     { $SID = 'S-1-3-0' }
                 'Creator Group'                                     { $SID = 'S-1-3-1' }
@@ -1041,46 +1092,46 @@ Function Get-WellKnownSID {
             }
         }
 
-        NTService {
+        'NTService' {
             switch ($NTService) {
                 'NT Service'                                        { $SID = 'S-1-5-80' }
                 'All Services'                                      { $SID = 'S-1-5-80-0' }
             }
         }
 
-        NTVirtualMachine {
+        'NTVirtualMachine' {
             switch ($NTVirtualMachine) {
                 'NT Virtual Machine'                                { $SID = 'S-1-5-83' }
                 'Virtual Machines'                                  { $SID = 'S-1-5-83-0' }
             }
         }
 
-        NTTask {
+        'NTTask' {
             switch ($NTTask) {
                 'NT Task'                                           { $SID = 'S-1-5-87' }
             }
         }
 
-        WindowManager {
+        'WindowManager' {
             switch ($WindowManager) {
                 'Window Manager'                                    { $SID = 'S-1-5-90' }
                 'Window Manager Group'                              { $SID = 'S-1-5-90-0' }
             }
         }
 
-        FontDriverHost {
+        'FontDriverHost' {
             switch ($FontDriverHost) {
                 'Font Driver Host'                                  { $SID = 'S-1-5-96' }
             }
         }
 
-        ApplicationPackageAuthority {
+        'ApplicationPackageAuthority' {
             switch ($ApplicationPackageAuthority) {
                 'All Application Packages'                          { $SID = 'S-1-15-2-1' }
             }
         }
 
-        MandatoryLabel {
+        'MandatoryLabel' {
             switch ($MandatoryLabel) {
                 'Untrusted Mandatory Level'                         { $SID = 'S-1-16-0' }
                 'Low Mandatory Level'                               { $SID = 'S-1-16-4096' }
@@ -1093,7 +1144,7 @@ Function Get-WellKnownSID {
             }
         }
 
-        IdentityAuthority {
+        'IdentityAuthority' {
             switch ($IdentityAuthority) {
                 'Authentication authority asserted identity'        { $SID = 'S-1-18-1' }
                 'Service asserted identity'                         { $SID = 'S-1-18-2' }
@@ -1112,18 +1163,14 @@ Function Get-WellKnownSID {
 
 #region User accounts
 
-# Test if the user has Administrator privileges
+# Test if the user has administrator privileges
 Function Test-IsAdministrator {
     [CmdletBinding()]
     [OutputType([Boolean])]
     Param()
 
     $User = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
-    if ($User.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        return $true
-    }
-
-    return $false
+    return $User.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
 #endregion
