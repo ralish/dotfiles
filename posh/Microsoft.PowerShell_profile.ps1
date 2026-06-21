@@ -147,6 +147,18 @@ if (Test-Path -LiteralPath $PoshScriptsPath -PathType 'Container') {
     $Env:Path = Add-PathStringElement -Path $Env:Path -Element $PoshScriptsPath -Action 'Prepend'
 }
 
+# Output final count of queued async tasks
+if ($DotFilesLoadAsync) {
+    $MsgParams = @{
+        Type        = 'Verbose'
+        Message     = "Number of queued tasks: $($AsyncLoadQueue.Count)"
+        SectionType = 'Profile'
+        SectionName = 'Async tasks'
+    }
+
+    Write-DotFilesMessage @MsgParams
+}
+
 # Output (synchronous) profile load time
 if ($DotFilesTimings) {
     $DotFilesProfileStopwatch.Stop()
