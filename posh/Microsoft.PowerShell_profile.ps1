@@ -27,28 +27,27 @@ foreach ($SkipEnvVar in $DotFilesSkipEnvVars) {
 #region Configuration
 
 # Display verbose messages during profile load
-if (!(Get-Variable -Name 'DotFilesVerbose' -ErrorAction 'Ignore')) {
-    $DotFilesVerbose = $false
-}
+$DotFilesVerbose = $false
 
 # Display timing data during profile load (requires verbose)
-if (!(Get-Variable -Name 'DotFilesTimings' -ErrorAction 'Ignore')) {
-    $DotFilesTimings = $true
-}
+$DotFilesTimings = $false
 
 # Skip certain expensive calls for faster profile loading
 #
 # - `Get-Module -ListAvailable`
 #   Assume the module exists instead of checking.
-if (!(Get-Variable -Name 'DotFilesFastLoad' -ErrorAction 'Ignore')) {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-    $DotFilesFastLoad = $true
-}
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+$DotFilesFastLoad = $true
 
 # Load opted-in components asynchronously via the idle event
-if (!(Get-Variable -Name 'DotFilesLoadAsync' -ErrorAction 'Ignore')) {
-    $DotFilesLoadAsync = $true
-}
+$DotFilesLoadAsync = $true
+
+# Paths to directories used during profile load
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+$PoshCompletionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Completions'
+$PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
+$PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
+$PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
 
 #endregion
 
@@ -116,10 +115,6 @@ if ($DotFilesLoadAsync) {
 # and settings we'll call `Update-FormatData` with all specified paths.
 $FormatDataPaths = [Collections.Generic.List[String]]::new()
 
-# Path to cached completion scripts for native argument completers
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-$PoShCompletionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Completions'
-
 #endregion
 
 #region Processing
@@ -148,7 +143,6 @@ if ($FormatDataPaths) {
 }
 
 # Amend the search path to include scripts directory
-$PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
 if (Test-Path -LiteralPath $PoshScriptsPath -PathType 'Container') {
     $Env:Path = Add-PathStringElement -Path $Env:Path -Element $PoshScriptsPath -Action 'Prepend'
 }
@@ -173,15 +167,20 @@ if ($DotFilesTimings) {
 
 # Clean-up ephemeral variables (not required for async)
 Remove-Variable -Name @(
-    'CmdLineArg'
-    'MsgParams'
-    'PoshPath'
-    'SkipEnvVar'
-
     'DotFilesSkipEnvVars'
     'PoshFunctionsPath'
     'PoshScriptsPath'
     'PoshSettingsPath'
+
+    'CmdLineArg'
+    'MsgParams'
+    'PoshFile'
+    'PoshFiles'
+    'PoshPath'
+    'SkipEnvVar'
+
+    'foreach'
+    'switch'
 ) -ErrorAction 'Ignore'
 
 # Clean-up profile loading data (performed later if using async)

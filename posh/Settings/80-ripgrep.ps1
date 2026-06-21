@@ -20,7 +20,7 @@ Function Initialize-Ripgrep {
     $Env:RIPGREP_CONFIG_PATH = Join-Path -Path $HOME -ChildPath '.ripgreprc'
 
     # (Re)build the native completions script
-    $CompletionsFile = Join-Path -Path $PoShCompletionsPath -ChildPath 'rg.ps1'
+    $CompletionsFile = Join-Path -Path $PoshCompletionsPath -ChildPath 'rg.ps1'
     if ($Env:DOTFILES_REBUILD_COMPLETIONS -or !(Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
         Write-DotFilesMessage -Type 'Verbose' -Message 'Building native completions script ...'
         & rg --generate=complete-powershell | Out-File -FilePath $CompletionsFile -Encoding 'utf8'

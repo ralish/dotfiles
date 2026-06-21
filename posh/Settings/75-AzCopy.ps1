@@ -20,7 +20,7 @@ Function Initialize-AzCopy {
     $Env:AZCOPY_DISABLE_SYSLOG = 'true'
 
     # (Re)build the native completions script
-    $CompletionsFile = Join-Path -Path $PoShCompletionsPath -ChildPath 'azcopy.ps1'
+    $CompletionsFile = Join-Path -Path $PoshCompletionsPath -ChildPath 'azcopy.ps1'
     if ($Env:DOTFILES_REBUILD_COMPLETIONS -or !(Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
         Write-DotFilesMessage -Type 'Verbose' -Message 'Building native completions script ...'
         & azcopy completion powershell | Out-File -FilePath $CompletionsFile -Encoding 'utf8'

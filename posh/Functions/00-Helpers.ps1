@@ -261,10 +261,11 @@ Function Clear-DotFilesLoadData {
         'AsyncLoadQueue'
         'DotFilesIsAsync'
         'DotFilesProfileStopwatch'
+        'DotFilesSection'
         'DotFilesSectionStopwatch'
         'DotFilesVerboseOriginal'
         'FormatDataPaths'
-        'PoShCompletionsPath'
+        'PoshCompletionsPath'
     )
 
     if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
