@@ -254,13 +254,14 @@ Function Clear-DotFilesLoadData {
         # Settings
         'DotFilesFastLoad'
         'DotFilesLoadAsync'
-        'DotFilesShowTimings'
+        'DotFilesTimings'
         'DotFilesVerbose'
 
         # State
         'AsyncLoadQueue'
         'DotFilesIsAsync'
-        'DotFilesLoadStart'
+        'DotFilesProfileStopwatch'
+        'DotFilesSectionStopwatch'
         'DotFilesVerboseOriginal'
         'FormatDataPaths'
         'PoShCompletionsPath'
@@ -281,7 +282,6 @@ Function Clear-DotFilesLoadData {
 
 # Complete a `dotfiles` section and conditionally output timings
 Function Complete-DotFilesSection {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -292,20 +292,21 @@ Function Complete-DotFilesSection {
         Write-DotFilesMessage -Type 'Debug' -Message 'Completing section processing ...'
     }
 
-    if ($DotFilesShowTimings) {
-        if ($Global:DotFilesSectionStart -isnot [DateTime]) {
-            $ErrMsg = 'No start time found for section timing.'
+    if ($DotFilesTimings) {
+        if ($DotFilesSectionStopwatch -isnot [Diagnostics.Stopwatch]) {
+            $ErrMsg = 'No stopwatch found for section timing.'
             $ErrExc = [InvalidOperationException]::new($ErrMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::MetadataError
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesInvalidState', $ErrCat, $null)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $Timing = Get-DotFilesTiming -StartTime $Global:DotFilesSectionStart
+        $DotFilesSectionStopwatch.Stop()
+        $Timing = Get-DotFilesTiming -Stopwatch $DotFilesSectionStopwatch
         Write-DotFilesMessage -Type 'Verbose' -Message $Timing
     }
 
-    Remove-Variable -Name 'DotFilesSection*' -Scope 'Global'
+    Remove-Variable -Name 'DotFilesSectionName', 'DotFilesSectionType' -Scope 'Global'
 }
 
 # Retrieve the elapsed time for a `dotfiles` section
@@ -314,20 +315,17 @@ Function Get-DotFilesTiming {
     [OutputType([Void], [String])]
     Param(
         [Parameter(Mandatory)]
-        [DateTime]$StartTime,
+        [Diagnostics.Stopwatch]$Stopwatch,
 
         [UInt16]$SlowThresholdMs = 100,
         [UInt16]$UltraSlowThresholdMs = 300
     )
 
-    if (!$DotFilesShowTimings) { return }
+    $Timing = "Elapsed time: $($Stopwatch.ElapsedMilliseconds) ms"
 
-    $ElapsedTime = (Get-Date) - $StartTime
-    $Timing = "Elapsed time: $([Int]($ElapsedTime.TotalMilliseconds)) ms"
-
-    if ($ElapsedTime.TotalMilliseconds -ge $UltraSlowThresholdMs) {
+    if ($Stopwatch.ElapsedMilliseconds -ge $UltraSlowThresholdMs) {
         $Timing += ' [ULTRA SLOW]'
-    } elseif ($ElapsedTime.TotalMilliseconds -ge $SlowThresholdMs) {
+    } elseif ($Stopwatch.ElapsedMilliseconds -ge $SlowThresholdMs) {
         $Timing += ' [SLOW]'
     }
 
@@ -380,10 +378,6 @@ Function Start-DotFilesSection {
     $Global:DotFilesSectionType = $Type
     $Global:DotFilesSectionName = $Name
 
-    if ($DotFilesShowTimings) {
-        $Global:DotFilesSectionStart = Get-Date
-    }
-
     if ($DotFilesIsAsync) {
         Write-DotFilesMessage -Type 'Debug' -Message 'Starting async section processing ...'
     } else {
@@ -418,6 +412,15 @@ Function Start-DotFilesSection {
 
             $AsyncLoadScript = {
                 $Global:DotFilesIsAsync = $true
+
+                if ($Global:DotFilesShowTimings) {
+                    if (!$Global:DotFilesSectionStopwatch) {
+                        $Global:DotFilesSectionStopwatch = [Diagnostics.Stopwatch]::new()
+                    }
+
+                    $DotFilesSectionStopwatch.Restart()
+                }
+
                 if ($DotFilesVerbose) { Write-Host }
                 . $CallStack[1].ScriptName
             }.GetNewClosure()

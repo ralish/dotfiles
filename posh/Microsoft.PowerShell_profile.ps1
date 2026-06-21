@@ -32,8 +32,8 @@ if (!(Get-Variable -Name 'DotFilesVerbose' -ErrorAction 'Ignore')) {
 }
 
 # Display timing data during profile load (requires verbose)
-if (!(Get-Variable -Name 'DotFilesShowTimings' -ErrorAction 'Ignore')) {
-    $DotFilesShowTimings = $true
+if (!(Get-Variable -Name 'DotFilesTimings' -ErrorAction 'Ignore')) {
+    $DotFilesTimings = $true
 }
 
 # Skip certain expensive calls for faster profile loading
@@ -54,6 +54,9 @@ if (!(Get-Variable -Name 'DotFilesLoadAsync' -ErrorAction 'Ignore')) {
 
 #region Setup
 
+# Load the helper functions
+. (Join-Path -Path $PoshFunctionsPath -ChildPath '00-Helpers.ps1')
+
 # Enable verbose profile load
 if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
     # `$VerbosePreference` seems to have no value during profile load? Use
@@ -66,10 +69,19 @@ if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
     }
 
     $Global:VerbosePreference = 'Continue'
+}
 
-    # Record start of profile load
-    if ($DotFilesShowTimings) {
-        $DotFilesLoadStart = Get-Date
+# Record load time of profile and each section
+if ($DotFilesTimings) {
+    if ($DotFilesVerbose) {
+        $DotFilesProfileStopwatch = [Diagnostics.Stopwatch]::StartNew()
+        $DotFilesProfileStopwatch.Start()
+
+        # Reset before loading each section
+        $DotFilesSectionStopwatch = [Diagnostics.Stopwatch]::StartNew()
+    } else {
+        Write-Warning -Message 'Ignoring DotFilesTimings as DotFilesVerbose is not enabled.'
+        $DotFilesTimings = $false
     }
 }
 
@@ -112,19 +124,21 @@ $PoShCompletionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Completions'
 
 #region Processing
 
-# Source custom functions
-$PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
-# PowerShell <= 5.1: Using `-LiteralPath` breaks wildcards in `-Include`
-Get-ChildItem -Path $PoshFunctionsPath -File -Recurse -Include '*.ps1' |
-    Sort-Object -Property 'Name' |
-    ForEach-Object { . $PSItem.FullName }
+# Source functions and settings
+foreach ($PoshPath in $PoshFunctionsPath, $PoshSettingsPath) {
+    # PowerShell <= 5.1: Using `-LiteralPath` breaks wildcards in `-Include`
+    $PoshFiles = @(Get-ChildItem -Path $PoshPath -File -Recurse -Include '*.ps1' | Sort-Object -Property 'Name')
 
-# Source custom settings
-$PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
-# PowerShell <= 5.1: Using `-LiteralPath` breaks wildcards in `-Include`
-Get-ChildItem -Path $PoshSettingsPath -File -Recurse -Include '*.ps1' |
-    Sort-Object -Property 'Name' |
-    ForEach-Object { . $PSItem.FullName }
+    foreach ($PoshFile in $PoshFiles) {
+        if ($PoshFile.Name -eq '00-Helpers.ps1') { continue }
+
+        if ($DotFilesTimings) {
+            $DotFilesSectionStopwatch.Restart()
+        }
+
+        . $PoshFile.FullName
+    }
+}
 
 # Update formatting data
 if ($FormatDataPaths) {
@@ -140,13 +154,16 @@ if (Test-Path -LiteralPath $PoshScriptsPath -PathType 'Container') {
 }
 
 # Output (synchronous) profile load time
-if ($DotFilesVerbose -and $DotFilesShowTimings) {
+if ($DotFilesTimings) {
+    $DotFilesProfileStopwatch.Stop()
+
     $MsgParams = @{
         Type        = 'Verbose'
-        Message     = (Get-DotFilesTiming -StartTime $DotFilesLoadStart -SlowThresholdMs 300 -UltraSlowThresholdMs 1000)
+        Message     = (Get-DotFilesTiming -Stopwatch $DotFilesProfileStopwatch -SlowThresholdMs 300 -UltraSlowThresholdMs 1000)
         SectionType = 'Profile'
         SectionName = 'End'
     }
+
     Write-DotFilesMessage @MsgParams
 }
 
@@ -158,6 +175,7 @@ if ($DotFilesVerbose -and $DotFilesShowTimings) {
 Remove-Variable -Name @(
     'CmdLineArg'
     'MsgParams'
+    'PoshPath'
     'SkipEnvVar'
 
     'DotFilesSkipEnvVars'
