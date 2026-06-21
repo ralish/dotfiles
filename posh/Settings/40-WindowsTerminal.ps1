@@ -32,7 +32,7 @@ Function Set-WindowsTerminalGlobalVariables {
 Set-WindowsTerminalGlobalVariables
 
 # Returns the last exit code for usage by the shell integration
-Function __Get-LastExitCodeForWinTerm {
+Function Global:__Get-LastExitCodeForWinTerm {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
     [OutputType([Int32])]
     Param()
@@ -53,7 +53,7 @@ Function __Get-LastExitCodeForWinTerm {
 
 # Shell Integration
 # https://learn.microsoft.com/en-au/windows/terminal/tutorials/shell-integration
-Function Prompt {
+Function Global:Prompt {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [OutputType([String])]
     Param()

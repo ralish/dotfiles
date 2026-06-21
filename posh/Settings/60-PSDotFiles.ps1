@@ -10,16 +10,24 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Path to `dotfiles` directory
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-$DotFilesPath = $DotFiles
+# Setup `PSDotFiles` configuration
+Function Initialize-PSDotFiles {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
 
-# Enable automatic component detection
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-$DotFilesAutodetect = $true
+    # Path to `dotfiles` directory
+    $Global:DotFilesPath = $DotFiles
 
-# Allow evaluation of nested symlinks
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-$DotFilesAllowNestedSymlinks = $true
+    # Enable automatic component detection
+    $Global:DotFilesAutodetect = $true
 
+    # Allow evaluation of nested symlinks
+    $Global:DotFilesAllowNestedSymlinks = $true
+}
+
+Initialize-PSDotFiles
+
+Remove-Item -LiteralPath 'Function:\Initialize-PSDotFiles'
 Complete-DotFilesSection

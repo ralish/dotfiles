@@ -10,6 +10,6 @@ $DotFilesSection = @{
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Add an alias for the unintuitively named `Connect-OrganizationAddInService`
-Set-Alias -Name 'Connect-CentralizedDeployment' -Value 'Connect-OrganizationAddInService'
+Set-Alias -Name 'Connect-CentralizedDeployment' -Value 'Connect-OrganizationAddInService' -Scope 'Global'
 
 Complete-DotFilesSection

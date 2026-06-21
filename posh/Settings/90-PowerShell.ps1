@@ -5,9 +5,8 @@
 $null = Start-DotFilesSection -Type 'Settings' -Name 'PowerShell'
 
 # Save the output of the last command in a global variable
-Function Out-Default {
+Function Global:Out-Default {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidOverwritingBuiltInCmdlets', '')]
     [OutputType([Void])]
     Param()
 
@@ -16,7 +15,7 @@ Function Out-Default {
 }
 
 # Number of elements to enumerate when displaying arrays
-$FormatEnumerationLimit = 5
+$Global:FormatEnumerationLimit = 5
 
 # Set configuration specific to PowerShell edition
 switch ($PSVersionTable.PSEdition) {
@@ -27,7 +26,7 @@ switch ($PSVersionTable.PSEdition) {
 
     'Desktop' {
         # Use UTF-8 as the output encoding
-        $OutputEncoding = [Text.UTF8Encoding]::new()
+        $Global:OutputEncoding = [Text.UTF8Encoding]::new()
 
         # `Out-File`: Default to UTF-8 encoding
         $PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'

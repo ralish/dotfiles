@@ -9,53 +9,63 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Add an alias for the unintuitively named `Connect-IPPSSession`
-Set-Alias -Name 'Connect-SecurityAndCompliance' -Value 'Connect-IPPSSession'
+# Setup `ExchangeOnlineManagement` configuration
+Function Initialize-ExchangeOnlineManagement {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
 
-# Type: Mailbox
-# Properties we may want to ignore.
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-$ExoMailboxIgnoredProperties = @(
-    # User identity
-    'MicrosoftOnlineServicesID'
-    'WindowsEmailAddress'
-    'WindowsLiveID'
+    # Add an alias for the unintuitively named `Connect-IPPSSession`
+    Set-Alias -Name 'Connect-SecurityAndCompliance' -Value 'Connect-IPPSSession' -Scope 'Global'
 
-    # Mailbox identity
-    #'Alias'
-    'DistinguishedName'
-    #'Id'
-    'Identity'
-    'LegacyExchangeDN'
-    'Name'
-    'NetID'
-    'SamAccountName'
-    #'UserPrincipalName'
+    # Type: Mailbox
+    # Properties we may want to ignore.
+    $Global:ExoMailboxIgnoredProperties = @(
+        # User identity
+        'MicrosoftOnlineServicesID'
+        'WindowsEmailAddress'
+        'WindowsLiveID'
 
-    # Mailbox internal
-    'MailboxLocations'
-    'MailboxRelease'
+        # Mailbox identity
+        #'Alias'
+        'DistinguishedName'
+        #'Id'
+        'Identity'
+        'LegacyExchangeDN'
+        'Name'
+        'NetID'
+        'SamAccountName'
+        #'UserPrincipalName'
 
-    # Server internal
-    'Database'
-    'ServerLegacyDN'
-    'ServerName'
+        # Mailbox internal
+        'MailboxLocations'
+        'MailboxRelease'
 
-    # GUIDs
-    'DatabaseGuid'
-    'ExchangeGuid'
-    'ExchangeObjectId'
-    'ExternalDirectoryObjectId'
-    'Guid'
+        # Server internal
+        'Database'
+        'ServerLegacyDN'
+        'ServerName'
 
-    # Timestamps
-    'EnforcedTimestamps'
-    'StsRefreshTokensValidFrom'
-    'WhenChanged'
-    'WhenChangedUTC'
-    'WhenCreated'
-    'WhenCreatedUTC'
-    'WhenMailboxCreated'
-)
+        # GUIDs
+        'DatabaseGuid'
+        'ExchangeGuid'
+        'ExchangeObjectId'
+        'ExternalDirectoryObjectId'
+        'Guid'
 
+        # Timestamps
+        'EnforcedTimestamps'
+        'StsRefreshTokensValidFrom'
+        'WhenChanged'
+        'WhenChangedUTC'
+        'WhenCreated'
+        'WhenCreatedUTC'
+        'WhenMailboxCreated'
+    )
+}
+
+Initialize-ExchangeOnlineManagement
+
+Remove-Item -LiteralPath 'Function:\Initialize-ExchangeOnlineManagement'
 Complete-DotFilesSection

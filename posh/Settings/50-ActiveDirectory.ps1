@@ -10,76 +10,86 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Class: `top`
-# Properties we may want to ignore.
-$ADClassIgnoredPropertiesTop = @(
-    # Only exposed via LDAP attributes
-    'dSCorePropagationData'
-    'mS-DS-ConsistencyGuid'
-    'uSNChanged'
-    'uSNCreated'
-    'whenChanged'
-    'whenCreated'
+# Setup `ActiveDirectory` configuration
+Function Initialize-ActiveDirectory {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
 
-    # PowerShell property followed by equivalent LDAP attribute
-    'Created', 'createTimeStamp'
-    'Modified', 'modifyTimeStamp'
+    # Class: `top`
+    # Properties we may want to ignore.
+    $Global:ADClassIgnoredPropertiesTop = @(
+        # Only exposed via LDAP attributes
+        'dSCorePropagationData'
+        'mS-DS-ConsistencyGuid'
+        'uSNChanged'
+        'uSNCreated'
+        'whenChanged'
+        'whenCreated'
 
-    # LDAP attributes & PowerShell properties differing only in case
-    'CanonicalName'                 # canonicalName
-    'CN'                            # cn
-    'DistinguishedName'             # distinguishedName
-    'ObjectGUID'                    # objectGUID
+        # PowerShell property followed by equivalent LDAP attribute
+        'Created', 'createTimeStamp'
+        'Modified', 'modifyTimeStamp'
 
-    # Interesting but duplicated properties
-    'Deleted'                       # isDeleted
-)
+        # LDAP attributes & PowerShell properties differing only in case
+        'CanonicalName'                 # canonicalName
+        'CN'                            # cn
+        'DistinguishedName'             # distinguishedName
+        'ObjectGUID'                    # objectGUID
 
-# Class: `securityPrincipal`
-# Properties we may want to ignore.
-$ADClassIgnoredPropertiesSecurityPrincipal = $ADClassIgnoredPropertiesTop + @(
-    # PowerShell property followed by equivalent LDAP attribute
-    'SID', 'objectSid'
+        # Interesting but duplicated properties
+        'Deleted'                       # isDeleted
+    )
 
-    # LDAP attributes & PowerShell properties differing only in case
-    'MemberOf'                      # memberOf
-)
+    # Class: `securityPrincipal`
+    # Properties we may want to ignore.
+    $Global:ADClassIgnoredPropertiesSecurityPrincipal = $ADClassIgnoredPropertiesTop + @(
+        # PowerShell property followed by equivalent LDAP attribute
+        'SID', 'objectSid'
 
-# Class: `user`
-# Properties we may want to ignore.
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-$ADClassIgnoredPropertiesUser = $ADClassIgnoredPropertiesSecurityPrincipal + @(
-    # Only exposed via LDAP attributes
-    'lastLogoff'
-    'lastLogon'
-    'logonCount'
-    'msDS-KeyCredentialLink'
+        # LDAP attributes & PowerShell properties differing only in case
+        'MemberOf'                      # memberOf
+    )
 
-    # PowerShell property followed by equivalent LDAP attribute
-    'AccountLockoutTime', 'lockoutTime'
-    'BadLogonCount', 'badPwdCount'
-    'LastBadPasswordAttempt', 'badPasswordTime'
-    'LastLogonDate', 'lastLogonTimestamp'
-    'PasswordLastSet', 'pwdLastSet'
+    # Class: `user`
+    # Properties we may want to ignore.
+    $Global:ADClassIgnoredPropertiesUser = $ADClassIgnoredPropertiesSecurityPrincipal + @(
+        # Only exposed via LDAP attributes
+        'lastLogoff'
+        'lastLogon'
+        'logonCount'
+        'msDS-KeyCredentialLink'
 
-    # Interesting but duplicated properties: `person`
-    'OfficePhone'                   # telephoneNumber
-    'Surname'                       # sn
+        # PowerShell property followed by equivalent LDAP attribute
+        'AccountLockoutTime', 'lockoutTime'
+        'BadLogonCount', 'badPwdCount'
+        'LastBadPasswordAttempt', 'badPasswordTime'
+        'LastLogonDate', 'lastLogonTimestamp'
+        'PasswordLastSet', 'pwdLastSet'
 
-    # Interesting but duplicated properties: `organizationalPerson`
-    'City'                          # l
-    'Country'                       # c
-    'Fax'                           # facsimileTelephoneNumber
-    'Office'                        # physicalDeliveryOfficeName
-    'OtherName'                     # middleName
-    'POBox'                         # postOfficeBox
-    'State'                         # st
+        # Interesting but duplicated properties: `person`
+        'OfficePhone'                   # telephoneNumber
+        'Surname'                       # sn
 
-    # Interesting but duplicated properties: `user`
-    'AccountExpirationDate'         # accountExpires
-    'EmailAddress'                  # mail
-    'MobilePhone'                   # mobile
-    'Organization'                  # o
-)
+        # Interesting but duplicated properties: `organizationalPerson`
+        'City'                          # l
+        'Country'                       # c
+        'Fax'                           # facsimileTelephoneNumber
+        'Office'                        # physicalDeliveryOfficeName
+        'OtherName'                     # middleName
+        'POBox'                         # postOfficeBox
+        'State'                         # st
 
+        # Interesting but duplicated properties: `user`
+        'AccountExpirationDate'         # accountExpires
+        'EmailAddress'                  # mail
+        'MobilePhone'                   # mobile
+        'Organization'                  # o
+    )
+}
+
+Initialize-ActiveDirectory
+
+Remove-Item -LiteralPath 'Function:\Initialize-ActiveDirectory'
 Complete-DotFilesSection

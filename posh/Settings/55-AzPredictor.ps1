@@ -42,7 +42,7 @@ Function Import-AzPredictor {
         $VerboseOriginal = $Global:VerbosePreference
         $Global:VerbosePreference = 'SilentlyContinue'
 
-        Import-Module -Name 'Az.Tools.Predictor' -ErrorAction 'Stop' -Verbose:$false
+        Import-Module -Name 'Az.Tools.Predictor' -Scope 'Global' -ErrorAction 'Stop' -Verbose:$false
     } catch {
         Write-DotFilesMessage -Type 'Warning' -Message 'Failed to import Az.Tools.Predictor module.'
     } finally {

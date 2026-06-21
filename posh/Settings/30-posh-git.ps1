@@ -12,6 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `posh-git` configuration
 Function Initialize-PoshGit {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -24,10 +25,10 @@ Function Initialize-PoshGit {
     }
 
     # Abbreviate home directory path with a tilde
-    $GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
+    $Global:GitPromptSettings.DefaultPromptAbbreviateHomeDirectory = $true
 
     # Prefix prompt with username and hostname
-    $GitPromptSettings.DefaultPromptPrefix.Text = "${Env:USERNAME}@${Env:COMPUTERNAME}"
+    $Global:GitPromptSettings.DefaultPromptPrefix.Text = "${Env:USERNAME}@${Env:COMPUTERNAME}"
 }
 
 Initialize-PoshGit
