@@ -6,6 +6,7 @@ $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'vcpkg'
     Command = 'vcpkg'
+    Async   = $true
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }

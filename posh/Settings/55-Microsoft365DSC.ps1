@@ -8,6 +8,7 @@ $DotFilesSection = @{
     Module          = 'Microsoft365DSC'
     Platform        = 'Windows'
     ForceTestModule = $true
+    Async           = $true
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }

@@ -6,6 +6,7 @@ $DotFilesSection = @{
     Type    = 'Settings'
     Name    = '.NET CLI'
     Command = 'dotnet'
+    Async   = $true
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }

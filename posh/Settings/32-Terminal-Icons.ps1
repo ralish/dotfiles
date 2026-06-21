@@ -6,6 +6,7 @@ $DotFilesSection = @{
     Name            = 'Terminal-Icons'
     Module          = 'Terminal-Icons'
     ModuleOperation = 'Import'
+    Async           = $true
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }

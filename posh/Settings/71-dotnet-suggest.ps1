@@ -5,6 +5,7 @@ $DotFilesSection = @{
     Type    = 'Settings'
     Name    = 'dotnet-suggest'
     Command = 'dotnet-suggest'
+    Async   = $true
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
