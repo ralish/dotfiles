@@ -143,7 +143,9 @@ Function Test-ModuleAvailable {
                 $VerboseOriginal = $Global:VerbosePreference
                 $Global:VerbosePreference = 'SilentlyContinue'
 
-                Import-Module -Name $Module -ErrorAction 'Ignore' -Verbose:$false
+                # Ensure we always load into the global scope. This isn't the
+                # default if running asynchronously (e.g. an event callback).
+                Import-Module -Name $Module -Scope 'Global' -ErrorAction 'Ignore' -Verbose:$false
             } finally {
                 $Global:VerbosePreference = $VerboseOriginal
             }
@@ -234,6 +236,49 @@ Function Test-IsPathFullyQualified {
 
 #region Profile
 
+# Clean-up `dotfiles` profile loading data
+Function Clear-DotFilesLoadData {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
+
+    $Functions = @(
+        'Clear-DotFilesLoadData'
+        'Complete-DotFilesSection'
+        'Get-DotFilesTiming'
+        'Start-DotFilesSection'
+        'Write-DotFilesMessage'
+    )
+
+    $Variables = @(
+        # Settings
+        'DotFilesFastLoad'
+        'DotFilesLoadAsync'
+        'DotFilesShowTimings'
+        'DotFilesVerbose'
+
+        # State
+        'AsyncLoadQueue'
+        'DotFilesIsAsync'
+        'DotFilesLoadStart'
+        'DotFilesVerboseOriginal'
+        'FormatDataPaths'
+        'PoShCompletionsPath'
+    )
+
+    if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
+        $Global:VerbosePreference = $DotFilesVerboseOriginal
+    }
+
+    foreach ($Name in $Functions) {
+        Remove-Item -LiteralPath "Function:\${Name}" -ErrorAction 'Ignore'
+    }
+
+    foreach ($Name in $Variables) {
+        Remove-Variable -Name $Name -Scope 'Global' -ErrorAction 'Ignore'
+    }
+}
+
 # Complete a `dotfiles` section and conditionally output timings
 Function Complete-DotFilesSection {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
@@ -241,7 +286,11 @@ Function Complete-DotFilesSection {
     [OutputType([Void])]
     Param()
 
-    Write-DotFilesMessage -Type 'Debug' -Message 'Completing section processing ...'
+    if ($DotFilesIsAsync) {
+        Write-DotFilesMessage -Type 'Debug' -Message 'Completing async section processing ...'
+    } else {
+        Write-DotFilesMessage -Type 'Debug' -Message 'Completing section processing ...'
+    }
 
     if ($DotFilesShowTimings) {
         if ($Global:DotFilesSectionStart -isnot [DateTime]) {
@@ -285,27 +334,6 @@ Function Get-DotFilesTiming {
     return $Timing
 }
 
-# Remove `dotfiles` helper functions
-Function Remove-DotFilesHelpers {
-    [CmdletBinding()]
-    [OutputType([Void])]
-    Param()
-
-    $Helpers = @(
-        'Complete-DotFilesSection'
-        'Get-DotFilesTiming'
-        'Remove-DotFilesHelpers'
-        'Start-DotFilesSection'
-        'Write-DotFilesMessage'
-    )
-
-    foreach ($Helper in $Helpers) {
-        try {
-            Remove-Item -LiteralPath "Function:\${Helper}" -ErrorAction 'Stop'
-        } catch { $PSCmdlet.WriteError($PSItem) }
-    }
-}
-
 # Start a `dotfiles` section with optional prerequisite checks
 Function Start-DotFilesSection {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
@@ -345,7 +373,8 @@ Function Start-DotFilesSection {
         [ValidateSet('Any', 'All')]
         [String]$ModuleRequire = 'All',
 
-        [Switch]$ForceTestModule
+        [Switch]$ForceTestModule,
+        [Switch]$Async
     )
 
     $Global:DotFilesSectionType = $Type
@@ -355,58 +384,82 @@ Function Start-DotFilesSection {
         $Global:DotFilesSectionStart = Get-Date
     }
 
-    Write-DotFilesMessage -Type 'Debug' -Message 'Starting section processing ...'
+    if ($DotFilesIsAsync) {
+        Write-DotFilesMessage -Type 'Debug' -Message 'Starting async section processing ...'
+    } else {
+        Write-DotFilesMessage -Type 'Debug' -Message 'Starting section processing ...'
+    }
 
-    if ($Platform) {
-        if ($Platform -eq 'Windows' -and !(Test-IsWindows)) {
-            Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as platform is not Windows.'
+    if (!$DotFilesIsAsync) {
+        if ($Platform) {
+            if ($Platform -eq 'Windows' -and !(Test-IsWindows)) {
+                Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as platform is not Windows.'
+                return $false
+            }
+
+            if ($Platform -eq 'Unix' -and !(Test-IsUnix)) {
+                Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as platform is not Unix-like.'
+                return $false
+            }
+        }
+
+        if ($PwshMinVersion -and $PwshMinVersion -gt $PSVersionTable.PSVersion) {
+            Write-DotFilesMessage -Type 'Verbose' -Message "Skipping as PowerShell version is below minimum: ${PwshMinVersion}"
             return $false
         }
 
-        if ($Platform -eq 'Unix' -and !(Test-IsUnix)) {
-            Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as platform is not Unix-like.'
+        if ($PwshHostName -and $Host.Name -notin $PwshHostName) {
+            Write-DotFilesMessage -Type 'Verbose' -Message "Skipping as PowerShell host is not supported: $($Host.Name)"
+            return $false
+        }
+
+        if ($Async -and $DotFilesLoadAsync) {
+            $CallStack = Get-PSCallStack
+
+            $AsyncLoadScript = {
+                $Global:DotFilesIsAsync = $true
+                if ($DotFilesVerbose) { Write-Host }
+                . $CallStack[1].ScriptName
+            }.GetNewClosure()
+
+            $AsyncLoadQueue.Enqueue($AsyncLoadScript)
+
+            # Return `false` to halt further synchronous processing
+            Write-DotFilesMessage -Type 'Verbose' -Message 'All prerequisites met.'
             return $false
         }
     }
 
-    if ($PwshMinVersion -and $PwshMinVersion -gt $PSVersionTable.PSVersion) {
-        Write-DotFilesMessage -Type 'Verbose' -Message "Skipping as PowerShell version is below minimum: ${PwshMinVersion}"
-        return $false
-    }
-
-    if ($PwshHostName -and $Host.Name -notin $PwshHostName) {
-        Write-DotFilesMessage -Type 'Verbose' -Message "Skipping as PowerShell host is not supported: $($Host.Name)"
-        return $false
-    }
-
-    if ($Command) {
-        try {
-            Test-CommandAvailable -Name $Command
-        } catch {
-            Write-DotFilesMessage -Type 'Verbose' -Message "Command(s) not available: $($PSItem.Exception.CommandName)"
-            $Error.RemoveAt(0)
-            return $false
+    if (!$Async -or !$DotFilesLoadAsync -or $DotFilesIsAsync) {
+        if ($Command) {
+            try {
+                Test-CommandAvailable -Name $Command
+            } catch {
+                Write-DotFilesMessage -Type 'Verbose' -Message "Command(s) not available: $($PSItem.Exception.CommandName)"
+                $Error.RemoveAt(0)
+                return $false
+            }
         }
-    }
 
-    if ($Environment) {
-        try {
-            Test-EnvironmentMatch -Environment $Environment
-        } catch {
-            Write-DotFilesMessage -Type 'Verbose' -Message $PSItem.Exception.Message
-            $Error.RemoveAt(0)
-            return $false
+        if ($Environment) {
+            try {
+                Test-EnvironmentMatch -Environment $Environment
+            } catch {
+                Write-DotFilesMessage -Type 'Verbose' -Message $PSItem.Exception.Message
+                $Error.RemoveAt(0)
+                return $false
+            }
         }
-    }
 
-    $ProcessModules = $ModuleOperation -eq 'Import' -or $ForceTestModule -or !$DotFilesFastLoad
-    if ($Module -and $ProcessModules) {
-        try {
-            Test-ModuleAvailable -Name $Module -Operation $ModuleOperation -Require $ModuleRequire
-        } catch {
-            Write-DotFilesMessage -Type 'Verbose' -Message $PSItem.Exception.Message
-            $Error.RemoveAt(0)
-            return $false
+        $ProcessModules = $ModuleOperation -eq 'Import' -or $ForceTestModule -or !$DotFilesFastLoad
+        if ($Module -and $ProcessModules) {
+            try {
+                Test-ModuleAvailable -Name $Module -Operation $ModuleOperation -Require $ModuleRequire
+            } catch {
+                Write-DotFilesMessage -Type 'Verbose' -Message $PSItem.Exception.Message
+                $Error.RemoveAt(0)
+                return $false
+            }
         }
     }
 
@@ -442,7 +495,12 @@ Function Write-DotFilesMessage {
         $SectionName = $Global:DotFilesSectionName
     }
 
-    $Msg = '[dotfiles | {0,-10} | {1,-25}] {2}' -f $SectionType, $SectionName, $Message
+    if ($DotFilesLoadAsync) {
+        if ($DotFilesIsAsync) { $LoadType = 'Async' } else { $LoadType = 'Sync' }
+        $Msg = '[dotfiles | {0,-10} | {1,-25} | {2,-5}] {3}' -f $SectionType, $SectionName, $LoadType, $Message
+    } else {
+        $Msg = '[dotfiles | {0,-10} | {1,-25}] {2}' -f $SectionType, $SectionName, $Message
+    }
 
     switch ($Type) {
         'Debug' { Write-Debug -Message $Msg }
