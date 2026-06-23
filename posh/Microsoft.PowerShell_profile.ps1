@@ -122,6 +122,13 @@ $FormatDataPaths = [Collections.Generic.List[String]]::new()
 # Source functions and settings
 foreach ($PoshPath in $PoshFunctionsPath, $PoshSettingsPath) {
     # PowerShell <= 5.1: Using `-LiteralPath` breaks wildcards in `-Include`
+    #
+    # An aside: the sort order returned by `Sort-Object` is different between
+    # Windows PowerShell (<= 5.1) and Powershell (6+). The cause is .NET uses
+    # the ICU library where possible while the .NET Framework uses Windows NLS.
+    # It doesn't functionally cause any problems in our usage so is just a mild
+    # annoyance. There's also no easy fix that doesn't have global effects.
+    # https://learn.microsoft.com/en-au/dotnet/core/extensions/globalization-icu
     $PoshFiles = @(Get-ChildItem -Path $PoshPath -File -Recurse -Include '*.ps1' | Sort-Object -Property 'Name')
 
     foreach ($PoshFile in $PoshFiles) {
