@@ -17,6 +17,8 @@
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Windows) { return }
+                                    if ($_.Windows -is [Management.Automation.ErrorRecord]) { return $_.Windows.Exception.Message }
+
                                     if ($_.Windows -is [String]) { return $_.Windows }
                                     $_.Windows.Summary
                                 </ScriptBlock>
@@ -28,6 +30,8 @@
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.WSL) { return }
+                                    if ($_.WSL -is [Management.Automation.ErrorRecord]) { return $_.WSL.Exception.Message }
+
                                     if ($_.WSL -is [String]) { return $_.WSL }
                                     if (!$_.WSL.Success) { 'Error during operation (view property for details)' }
                                     if ($_.WSL.WhatIf) { return "$($_.WSL.BeforeUpdate) (current version)" }
@@ -48,6 +52,8 @@
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Office) { return }
+                                    if ($_.Office -is [Management.Automation.ErrorRecord]) { return $_.Office.Exception.Message }
+
                                     if ($_.Office -is [String]) { return $_.Office }
                                     if (!$_.Office.Success) { 'Error during operation (view property for details)' }
                                     if ($_.Office.WhatIf) { return "$($_.Office.BeforeUpdate) (current version)" }
@@ -63,6 +69,8 @@
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.VisualStudio) { return }
+                                    if ($_.VisualStudio -is [Management.Automation.ErrorRecord]) { return $_.VisualStudio.Exception.Message }
+
                                     if ($_.VisualStudio -is [String]) { return $_.VisualStudio }
                                     if (!$_.VisualStudio.Success) { 'Error during operation (view property for details)' }
                                     if ($_.VisualStudio.WhatIf) { return "$([String]::Join(', ', ($_.VisualStudio.BeforeUpdate.InstallationVersion | Sort-Object))) (current versions)" }
@@ -81,10 +89,16 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>PowerShell</Label>
                                 <ItemSelectionCondition>
                                     <PropertyName>PowerShell</PropertyName>
                                 </ItemSelectionCondition>
-                                <PropertyName>PowerShell</PropertyName>
+                                <ScriptBlock>
+                                    if ($null -eq $_.PowerShell) { return }
+                                    if ($_.PowerShell -is [Management.Automation.ErrorRecord]) { return $_.PowerShell.Exception.Message }
+
+                                    $_.PowerShell
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>MicrosoftStore</Label>
@@ -93,6 +107,8 @@
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.MicrosoftStore) { return }
+                                    if ($_.MicrosoftStore -is [Management.Automation.ErrorRecord]) { return $_.MicrosoftStore.Exception.Message }
+
                                     if ($_.MicrosoftStore -is [String]) { return $_.MicrosoftStore }
                                     if (!$_.MicrosoftStore.Success) { return 'Error during operation (view property for details)' }
                                     if ($_.MicrosoftStore.WhatIf) { return 'Did not run (WhatIf mode)' }
@@ -106,6 +122,8 @@
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Edge) { return }
+                                    if ($_.Edge -is [Management.Automation.ErrorRecord]) { return $_.Edge.Exception.Message }
+
                                     if ($_.Edge -is [String]) { return $_.Edge }
                                     if (!$_.Edge.Success) { 'Error during operation (view property for details)' }
                                     if ($_.Edge.WhatIf) { return "$($_.Edge.BeforeUpdate) (current version)" }
@@ -121,6 +139,8 @@
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Chrome) { return }
+                                    if ($_.Chrome -is [Management.Automation.ErrorRecord]) { return $_.Chrome.Exception.Message }
+
                                     if ($_.Chrome -is [String]) { return $_.Chrome }
                                     if (!$_.Chrome.Success) { 'Error during operation (view property for details)' }
                                     if ($_.Chrome.WhatIf) { return "$($_.Chrome.BeforeUpdate) (current version)" }
@@ -136,6 +156,8 @@
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.WinGet) { return }
+                                    if ($_.WinGet -is [Management.Automation.ErrorRecord]) { return $_.WinGet.Exception.Message }
+
                                     if ($_.WinGet -is [String]) { return $_.WinGet }
                                     if (!$_.WinGet.Success) { 'Error during operation (view property for details)' }
                                     if ($_.WinGet.WhatIf) { return "$($_.WinGet.Available.Count) available updates" }
@@ -153,6 +175,8 @@
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Homebrew) { return }
+                                    if ($_.Homebrew -is [Management.Automation.ErrorRecord]) { return $_.Homebrew.Exception.Message }
+
                                     if ($_.Homebrew -is [String]) { return $_.Homebrew }
 
                                     $Actions = [Collections.Generic.List[String]]::new()
@@ -175,6 +199,8 @@
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Scoop) { return }
+                                    if ($_.Scoop -is [Management.Automation.ErrorRecord]) { return $_.Scoop.Exception.Message }
+
                                     if ($_.Scoop -is [String]) { return $_.Scoop }
 
                                     $Actions = [Collections.Generic.List[String]]::new()
@@ -191,22 +217,40 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>DotNetTools</Label>
                                 <ItemSelectionCondition>
                                     <PropertyName>DotNetTools</PropertyName>
                                 </ItemSelectionCondition>
-                                <PropertyName>DotNetTools</PropertyName>
+                                <ScriptBlock>
+                                    if ($null -eq $_.DotNetTools) { return }
+                                    if ($_.DotNetTools -is [Management.Automation.ErrorRecord]) { return $_.DotNetTools.Exception.Message }
+
+                                    $_.DotNetTools
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>GoExecutables</Label>
                                 <ItemSelectionCondition>
                                     <PropertyName>GoExecutables</PropertyName>
                                 </ItemSelectionCondition>
-                                <PropertyName>GoExecutables</PropertyName>
+                                <ScriptBlock>
+                                    if ($null -eq $_.GoExecutables) { return }
+                                    if ($_.GoExecutables -is [Management.Automation.ErrorRecord]) { return $_.GoExecutables.Exception.Message }
+
+                                    $_.GoExecutables
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>NodejsPackages</Label>
                                 <ItemSelectionCondition>
                                     <PropertyName>NodejsPackages</PropertyName>
                                 </ItemSelectionCondition>
-                                <PropertyName>NodejsPackages</PropertyName>
+                                <ScriptBlock>
+                                    if ($null -eq $_.NodejsPackages) { return }
+                                    if ($_.NodejsPackages -is [Management.Automation.ErrorRecord]) { return $_.NodejsPackages.Exception.Message }
+
+                                    $_.NodejsPackages
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>Python</Label>
@@ -215,6 +259,8 @@
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Python) { return }
+                                    if ($_.Python -is [Management.Automation.ErrorRecord]) { return $_.Python.Exception.Message }
+
                                     if ($_.Python -is [String]) { return $_.Python }
                                     if (!$_.Python.Success) { 'Error during operation (view property for details)' }
                                     if ($_.Python.WhatIf) { return "$([String]::Join(', ', $_.Python.BeforeUpdate)) (current versions)" }
@@ -232,28 +278,52 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>PythonPackages</Label>
                                 <ItemSelectionCondition>
                                     <PropertyName>PythonPackages</PropertyName>
                                 </ItemSelectionCondition>
-                                <PropertyName>PythonPackages</PropertyName>
+                                <ScriptBlock>
+                                    if ($null -eq $_.PythonPackages) { return }
+                                    if ($_.PythonPackages -is [Management.Automation.ErrorRecord]) { return $_.PythonPackages.Exception.Message }
+
+                                    $_.PythonPackages
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>QtComponents</Label>
                                 <ItemSelectionCondition>
                                     <PropertyName>QtComponents</PropertyName>
                                 </ItemSelectionCondition>
-                                <PropertyName>QtComponents</PropertyName>
+                                <ScriptBlock>
+                                    if ($null -eq $_.QtComponents) { return }
+                                    if ($_.QtComponents -is [Management.Automation.ErrorRecord]) { return $_.QtComponents.Exception.Message }
+
+                                    $_.QtComponents
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>RubyGems</Label>
                                 <ItemSelectionCondition>
                                     <PropertyName>RubyGems</PropertyName>
                                 </ItemSelectionCondition>
-                                <PropertyName>RubyGems</PropertyName>
+                                <ScriptBlock>
+                                    if ($null -eq $_.RubyGems) { return }
+                                    if ($_.RubyGems -is [Management.Automation.ErrorRecord]) { return $_.RubyGems.Exception.Message }
+
+                                    $_.RubyGems
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>RustToolchains</Label>
                                 <ItemSelectionCondition>
                                     <PropertyName>RustToolchains</PropertyName>
                                 </ItemSelectionCondition>
-                                <PropertyName>RustToolchains</PropertyName>
+                                <ScriptBlock>
+                                    if ($null -eq $_.RustToolchains) { return }
+                                    if ($_.RustToolchains -is [Management.Automation.ErrorRecord]) { return $_.RustToolchains.Exception.Message }
+
+                                    $_.RustToolchains
+                                </ScriptBlock>
                             </ListItem>
                         </ListItems>
                     </ListEntry>

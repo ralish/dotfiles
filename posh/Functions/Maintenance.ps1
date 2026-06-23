@@ -356,8 +356,7 @@ Function Update-AllTheThings {
             try {
                 $Results.Windows = Update-Windows -ExcludeCategories @('Drivers', 'Driver Sets')
             } catch {
-                $Results.Windows = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.Windows = $PSItem
             }
 
             $TasksDone++
@@ -369,8 +368,7 @@ Function Update-AllTheThings {
             try {
                 $Results.WSL = Update-WSL
             } catch {
-                $Results.WSL = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.WSL = $PSItem
             }
 
             $TasksDone++
@@ -382,8 +380,7 @@ Function Update-AllTheThings {
             try {
                 $Results.Office = Update-Office -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                $Results.Office = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.Office = $PSItem
             }
 
             $TasksDone++
@@ -395,8 +392,7 @@ Function Update-AllTheThings {
             try {
                 $Results.VisualStudio = Update-VisualStudio -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                $Results.VisualStudio = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.VisualStudio = $PSItem
             }
 
             $TasksDone++
@@ -408,8 +404,7 @@ Function Update-AllTheThings {
             try {
                 $Results.PowerShell = Update-PowerShell -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                $Results.PowerShell = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.PowerShell = $PSItem
             }
 
             $TasksDone++
@@ -421,8 +416,7 @@ Function Update-AllTheThings {
             try {
                 $Results.MicrosoftStore = Update-MicrosoftStore
             } catch {
-                $Results.MicrosoftStore = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.MicrosoftStore = $PSItem
             }
 
             $TasksDone++
@@ -434,8 +428,7 @@ Function Update-AllTheThings {
             try {
                 $Results.Edge = Update-Edge -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                $Results.Edge = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.Edge = $PSItem
             }
 
             $TasksDone++
@@ -447,8 +440,7 @@ Function Update-AllTheThings {
             try {
                 $Results.Chrome = Update-Chrome -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                $Results.Chrome = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.Chrome = $PSItem
             }
 
             $TasksDone++
@@ -460,8 +452,7 @@ Function Update-AllTheThings {
             try {
                 $Results.WinGet = Update-WinGet
             } catch {
-                $Results.WinGet = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.WinGet = $PSItem
             }
 
             $TasksDone++
@@ -473,8 +464,7 @@ Function Update-AllTheThings {
             try {
                 $Results.Homebrew = Update-Homebrew -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                $Results.Homebrew = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.Homebrew = $PSItem
             }
 
             $TasksDone++
@@ -486,8 +476,7 @@ Function Update-AllTheThings {
             try {
                 $Results.Scoop = Update-Scoop -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                $Results.Scoop = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.Scoop = $PSItem
             }
 
             $TasksDone++
@@ -499,8 +488,7 @@ Function Update-AllTheThings {
             try {
                 $Results.DotNetTools = Update-DotNetTools -ProgressParentId $WriteProgressParams['Id']
             } catch {
-                $Results.DotNetTools = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.DotNetTools = $PSItem
             }
 
             $TasksDone++
@@ -512,8 +500,7 @@ Function Update-AllTheThings {
             try {
                 $Results.GoBinaries = Update-GoBinaries
             } catch {
-                $Results.GoBinaries = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.GoBinaries = $PSItem
             }
 
             $TasksDone++
@@ -525,8 +512,7 @@ Function Update-AllTheThings {
             try {
                 $Results.NodejsPackages = Update-NodejsPackages
             } catch {
-                $Results.NodejsPackages = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.NodejsPackages = $PSItem
             }
 
             $TasksDone++
@@ -538,8 +524,7 @@ Function Update-AllTheThings {
             try {
                 $Results.Python = Update-Python
             } catch {
-                $Results.Python = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.Python = $PSItem
             }
 
             $TasksDone++
@@ -551,8 +536,7 @@ Function Update-AllTheThings {
             try {
                 $Results.PythonPipPackages = Update-PythonPipPackages
             } catch {
-                $Results.PythonPipPackages = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.PythonPipPackages = $PSItem
             }
 
             $TasksDone++
@@ -564,8 +548,7 @@ Function Update-AllTheThings {
             try {
                 $Results.PythonPipxPackages = Update-PythonPipxPackages
             } catch {
-                $Results.PythonPipxPackages = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.PythonPipxPackages = $PSItem
             }
 
             $TasksDone++
@@ -577,8 +560,7 @@ Function Update-AllTheThings {
             try {
                 $Results.QtComponents = Update-QtComponents
             } catch {
-                $Results.QtComponents = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.QtComponents = $PSItem
             }
 
             $TasksDone++
@@ -590,8 +572,7 @@ Function Update-AllTheThings {
             try {
                 $Results.RubyGems = Update-RubyGems
             } catch {
-                $Results.RubyGems = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.RubyGems = $PSItem
             }
 
             $TasksDone++
@@ -603,8 +584,7 @@ Function Update-AllTheThings {
             try {
                 $Results.RustToolchains = Update-RustToolchains
             } catch {
-                $Results.RustToolchains = $PSItem.Exception.Message
-                $PSCmdlet.WriteError($PSItem)
+                $Results.RustToolchains = $PSItem
             }
 
             $TasksDone++
