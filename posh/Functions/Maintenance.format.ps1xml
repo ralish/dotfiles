@@ -12,6 +12,9 @@
                         <ListItems>
                             <ListItem>
                                 <Label>Windows</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>Windows</PropertyName>
+                                </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Windows) { return }
                                     if ($_.Windows -is [String]) { return $_.Windows }
@@ -20,6 +23,9 @@
                             </ListItem>
                             <ListItem>
                                 <Label>WSL</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>WSL</PropertyName>
+                                </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.WSL) { return }
                                     if ($_.WSL -is [String]) { return $_.WSL }
@@ -37,6 +43,9 @@
                             </ListItem>
                             <ListItem>
                                 <Label>Office</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>Office</PropertyName>
+                                </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Office) { return }
                                     if ($_.Office -is [String]) { return $_.Office }
@@ -49,6 +58,9 @@
                             </ListItem>
                             <ListItem>
                                 <Label>VisualStudio</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>VisualStudio</PropertyName>
+                                </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.VisualStudio) { return }
                                     if ($_.VisualStudio -is [String]) { return $_.VisualStudio }
@@ -69,10 +81,16 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <ItemSelectionCondition>
+                                    <PropertyName>PowerShell</PropertyName>
+                                </ItemSelectionCondition>
                                 <PropertyName>PowerShell</PropertyName>
                             </ListItem>
                             <ListItem>
                                 <Label>MicrosoftStore</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>MicrosoftStore</PropertyName>
+                                </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.MicrosoftStore) { return }
                                     if ($_.MicrosoftStore -is [String]) { return $_.MicrosoftStore }
@@ -83,6 +101,9 @@
                             </ListItem>
                             <ListItem>
                                 <Label>Edge</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>Edge</PropertyName>
+                                </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Edge) { return }
                                     if ($_.Edge -is [String]) { return $_.Edge }
@@ -95,6 +116,9 @@
                             </ListItem>
                             <ListItem>
                                 <Label>Chrome</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>Chrome</PropertyName>
+                                </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Chrome) { return }
                                     if ($_.Chrome -is [String]) { return $_.Chrome }
@@ -107,6 +131,9 @@
                             </ListItem>
                             <ListItem>
                                 <Label>WinGet</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>WinGet</PropertyName>
+                                </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.WinGet) { return }
                                     if ($_.WinGet -is [String]) { return $_.WinGet }
@@ -121,6 +148,9 @@
                             </ListItem>
                             <ListItem>
                                 <Label>Homebrew</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>Homebrew</PropertyName>
+                                </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Homebrew) { return }
                                     if ($_.Homebrew -is [String]) { return $_.Homebrew }
@@ -140,6 +170,9 @@
                             </ListItem>
                             <ListItem>
                                 <Label>Scoop</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>Scoop</PropertyName>
+                                </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Scoop) { return }
                                     if ($_.Scoop -is [String]) { return $_.Scoop }
@@ -158,16 +191,28 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <ItemSelectionCondition>
+                                    <PropertyName>DotNetTools</PropertyName>
+                                </ItemSelectionCondition>
                                 <PropertyName>DotNetTools</PropertyName>
                             </ListItem>
                             <ListItem>
+                                <ItemSelectionCondition>
+                                    <PropertyName>GoExecutables</PropertyName>
+                                </ItemSelectionCondition>
                                 <PropertyName>GoExecutables</PropertyName>
                             </ListItem>
                             <ListItem>
+                                <ItemSelectionCondition>
+                                    <PropertyName>NodejsPackages</PropertyName>
+                                </ItemSelectionCondition>
                                 <PropertyName>NodejsPackages</PropertyName>
                             </ListItem>
                             <ListItem>
                                 <Label>Python</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>Python</PropertyName>
+                                </ItemSelectionCondition>
                                 <ScriptBlock>
                                     if ($null -eq $_.Python) { return }
                                     if ($_.Python -is [String]) { return $_.Python }
@@ -187,15 +232,27 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <ItemSelectionCondition>
+                                    <PropertyName>PythonPackages</PropertyName>
+                                </ItemSelectionCondition>
                                 <PropertyName>PythonPackages</PropertyName>
                             </ListItem>
                             <ListItem>
+                                <ItemSelectionCondition>
+                                    <PropertyName>QtComponents</PropertyName>
+                                </ItemSelectionCondition>
                                 <PropertyName>QtComponents</PropertyName>
                             </ListItem>
                             <ListItem>
+                                <ItemSelectionCondition>
+                                    <PropertyName>RubyGems</PropertyName>
+                                </ItemSelectionCondition>
                                 <PropertyName>RubyGems</PropertyName>
                             </ListItem>
                             <ListItem>
+                                <ItemSelectionCondition>
+                                    <PropertyName>RustToolchains</PropertyName>
+                                </ItemSelectionCondition>
                                 <PropertyName>RustToolchains</PropertyName>
                             </ListItem>
                         </ListItems>
