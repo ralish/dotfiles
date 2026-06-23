@@ -1031,11 +1031,17 @@ Function Update-Scoop {
         $VerboseOriginal = $Global:VerbosePreference
         $Global:VerbosePreference = 'SilentlyContinue'
 
+        # Scoop may emit a "What if" output for updating formatting data. This
+        # action is harmless so temporarily disable `WhatIf` mode.
+        $WhatIfOriginal = $WhatIfPreference
+        $WhatIfPreference = $false
+
         $Result.Apps = [String[]]@(& scoop @UpdateAppsArgs 6>&1 | Where-Object { $PSItem -notmatch $ProgressBarRegex })
     } catch {
         $LASTEXITCODE = -1
     } finally {
         $Global:VerbosePreference = $VerboseOriginal
+        $WhatIfPreference = $WhatIfOriginal
     }
 
     if ($LASTEXITCODE -ne 0) {
