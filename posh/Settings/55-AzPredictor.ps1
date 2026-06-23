@@ -38,7 +38,7 @@ Function Import-AzPredictor {
     }
 
     try {
-        # Suppress verbose output on import
+        # Suppress verbose output on import (global scope to catch everything)
         $VerboseOriginal = $Global:VerbosePreference
         $Global:VerbosePreference = 'SilentlyContinue'
 

@@ -993,14 +993,14 @@ Function Update-Scoop {
 
         try {
             # Suppress useless verbose output from Scoop
-            $VerboseOriginal = $Global:VerbosePreference
-            $Global:VerbosePreference = 'SilentlyContinue'
+            $VerboseOriginal = $VerbosePreference
+            $VerbosePreference = 'SilentlyContinue'
 
             $Result.Scoop = [String[]]@(& scoop @UpdateScoopArgs 6>&1)
         } catch {
             $LASTEXITCODE = -1
         } finally {
-            $Global:VerbosePreference = $VerboseOriginal
+            $VerbosePreference = $VerboseOriginal
         }
 
         if ($LASTEXITCODE -ne 0) {
@@ -1028,8 +1028,8 @@ Function Update-Scoop {
 
     try {
         # Suppress useless verbose output from Scoop
-        $VerboseOriginal = $Global:VerbosePreference
-        $Global:VerbosePreference = 'SilentlyContinue'
+        $VerboseOriginal = $VerbosePreference
+        $VerbosePreference = 'SilentlyContinue'
 
         # Scoop may emit a "What if" output for updating formatting data. This
         # action is harmless so temporarily disable `WhatIf` mode.
@@ -1040,7 +1040,7 @@ Function Update-Scoop {
     } catch {
         $LASTEXITCODE = -1
     } finally {
-        $Global:VerbosePreference = $VerboseOriginal
+        $VerbosePreference = $VerboseOriginal
         $WhatIfPreference = $WhatIfOriginal
     }
 
@@ -1061,14 +1061,14 @@ Function Update-Scoop {
 
         try {
             # Suppress useless verbose output from Scoop
-            $VerboseOriginal = $Global:VerbosePreference
-            $Global:VerbosePreference = 'SilentlyContinue'
+            $VerboseOriginal = $VerbosePreference
+            $VerbosePreference = 'SilentlyContinue'
 
             $Result.Cleanup = [String[]]@(& scoop @CleanupArgs 6>&1)
         } catch {
             $LASTEXITCODE = -1
         } finally {
-            $Global:VerbosePreference = $VerboseOriginal
+            $VerbosePreference = $VerboseOriginal
         }
 
         if ($LASTEXITCODE -ne 0) {

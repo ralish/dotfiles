@@ -237,12 +237,12 @@ Function Update-PowerShell {
     } else {
         try {
             # Suppress verbose output on implicit import
-            $VerboseOriginal = $Global:VerbosePreference
-            $Global:VerbosePreference = 'SilentlyContinue'
+            $VerboseOriginal = $VerbosePreference
+            $VerbosePreference = 'SilentlyContinue'
 
             $InstalledModules = Get-InstalledModule -Verbose:$false
         } finally {
-            $Global:VerbosePreference = $VerboseOriginal
+            $VerbosePreference = $VerboseOriginal
         }
     }
 

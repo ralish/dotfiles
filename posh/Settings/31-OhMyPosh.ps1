@@ -26,7 +26,7 @@ Function Initialize-OhMyPosh {
     }
 
     try {
-        # Suppress verbose output on loading
+        # Suppress verbose output on import (global scope to catch everything)
         $VerboseOriginal = $Global:VerbosePreference
         $Global:VerbosePreference = 'SilentlyContinue'
 
