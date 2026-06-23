@@ -4,6 +4,7 @@
 $DotFilesSection = @{
     Type            = 'Settings'
     Name            = 'posh-git'
+    Command         = 'git'
     Module          = 'posh-git'
     ModuleOperation = 'Import'
 }
