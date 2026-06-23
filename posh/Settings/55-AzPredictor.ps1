@@ -2,15 +2,13 @@
 # https://learn.microsoft.com/en-au/powershell/azure/predictor-overview
 # https://github.com/Azure/azure-powershell
 
-# Temporarily disabled because it is so slow! On average it takes almost a full
-# second to load. Need to find a way to load this on-demand or asynchronously.
-return
-
 $DotFilesSection = @{
     Type            = 'Settings'
     Name            = 'Az Predictor'
     Module          = 'Az.Tools.Predictor', 'PSReadLine'
+    PwshMinVersion  = 7.2
     ForceTestModule = $true
+    Async           = $true
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
@@ -21,11 +19,6 @@ Function Import-AzPredictor {
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
-
-    if ($PSVersionTable.PSVersion -lt [Version]::new('7.2')) {
-        Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as PowerShell is not v7.2 or later.'
-        return
-    }
 
     if ((Get-Module -Name 'PSReadLine').Version -lt [Version]::new('2.2.2')) {
         Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as PSReadLine module is not v2.2.2 or later.'
