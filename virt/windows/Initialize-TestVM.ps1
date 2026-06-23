@@ -754,8 +754,8 @@ Function Get-WindowsInfo {
 
     # The implicit import of the `CimCmdlets` module that may occur below
     # triggers several "What if" outputs under Windows PowerShell, even though
-    # `Get-Command` doesn't support `-WhatIf`. We can use `$WhatIfPreference`
-    # to suppress them.
+    # `Get-CimInstance` doesn't support `-WhatIf`. As this cmdlet doesn't
+    # modify any state we temporarily disable `WhatIf` mode.
     try {
         $WhatIfOriginal = $WhatIfPreference
         $WhatIfPreference = $false
