@@ -258,7 +258,7 @@ Function Update-PowerShell {
             # doesn't have the good manners to clean them up when it's done.
             # The result is a visual mess when we have our own progress bars.
             $ProgressOriginal = $Global:ProgressPreference
-            $Global:ProgressPreference = 'Ignore'
+            $Global:ProgressPreference = 'SilentlyContinue'
 
             # `Get-DscResource` may output various errors, most often due to
             # duplicate resources. That's often the case with, for example, the
