@@ -201,6 +201,13 @@ Function Update-PowerShell {
     # Newer PowerShell versions no longer ship with DSC support built-in. It's
     # instead provided as a separate module which may not be installed.
     try {
+        # The implicit import of the `PSDesiredStateConfiguration` module that
+        # may occur below triggers several "What if" outputs, even though
+        # `Get-Command` doesn't support `-WhatIf`. As this cmdlet doesn't
+        # modify any state we temporarily disable `WhatIf` mode.
+        $WhatIfOriginal = $WhatIfPreference
+        $WhatIfPreference = $false
+
         $DscSupported = $false
         $DscSupported = Get-Command -Name 'Get-DscResource' -ErrorAction 'Stop'
     } catch {
@@ -211,6 +218,8 @@ Function Update-PowerShell {
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSCommandNotFound', $ErrCat, 'Get-DscResource')
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
+    } finally {
+        $WhatIfPreference = $WhatIfOriginal
     }
 
     $WriteProgressParams = @{
