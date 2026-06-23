@@ -334,6 +334,17 @@ Function Get-DotFilesTiming {
 }
 
 # Start a `dotfiles` section with optional prerequisite checks
+#
+# Parameter validation via parameter validation attributes is deliberately less
+# strict for optional parameters than typical. Specifically, we permit:
+# - An empty string for `Platform`
+# - `null` for `PwshMinVersion`
+# - `null` or an empty array for `PwshHostName`, `Command`, `Environment`, and
+#   `Module`
+#
+# The reason for this is PowerShell 5.1 will throw an error when creating the
+# closure for the asynchronous loading scriptblock when any function parameters
+# fail validation, even when they're not provided in the function invocation.
 Function Start-DotFilesSection {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
@@ -345,25 +356,19 @@ Function Start-DotFilesSection {
         [Parameter(Mandatory)]
         [String]$Name,
 
-        [ValidateSet('Unix', 'Windows')]
+        [ValidateSet('', 'Unix', 'Windows')]
         [String]$Platform,
 
-        [ValidateNotNull()]
         [Version]$PwshMinVersion,
-
-        [ValidateNotNullOrEmpty()]
         [String[]]$PwshHostName,
 
         # Test-CommandAvailable
-        [ValidateNotNullOrEmpty()]
         [String[]]$Command,
 
         # Test-EnvironmentMatch
-        [ValidateNotNullOrEmpty()]
         [Hashtable]$Environment,
 
         # Test-ModuleAvailable
-        [ValidateNotNullOrEmpty()]
         [String[]]$Module,
 
         [ValidateSet('Get', 'Import')]
