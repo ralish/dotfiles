@@ -1562,7 +1562,9 @@ Function Update-WSL {
 
             $Version = $null
             if (![Version]::TryParse($RawVersion, [Ref]$Version)) {
-                Write-Warning -Message "Failed to parse WSL version: ${RawVersion}"
+                # Don't emit any warning or error as it's expected that some
+                # WSL components will have versions not compatible with a
+                # `Version` object.
                 $Version = $RawVersion
             }
 
