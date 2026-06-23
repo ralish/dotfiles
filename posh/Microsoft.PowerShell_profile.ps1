@@ -68,6 +68,7 @@ if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
     }
 
     $Global:VerbosePreference = 'Continue'
+    Write-DotFilesMessage -Type 'Verbose' -SectionType 'Profile' -SectionName 'Begin' -Message 'Starting profile load ...'
 }
 
 # Record load time of profile and each section
@@ -100,9 +101,10 @@ if ($DotFilesLoadAsync) {
             return
         }
 
-        Clear-DotFilesLoadData
+        Write-Host
+        Write-DotFilesMessage -Type 'Verbose' -SectionType 'Profile' -SectionName 'End' -Message 'Finished asynchronous processing.'
 
-        Write-DotFilesMessage -Type 'Debug' -Message 'Unregistering idle event callback ...'
+        Clear-DotFilesLoadData
         Unregister-Event -SubscriptionId $EventSubscriber.SubscriptionId -Force
     }
 }
@@ -158,9 +160,9 @@ if (Test-Path -LiteralPath $PoshScriptsPath -PathType 'Container') {
 if ($DotFilesLoadAsync) {
     $MsgParams = @{
         Type        = 'Verbose'
-        Message     = "Number of queued tasks: $($AsyncLoadQueue.Count)"
         SectionType = 'Profile'
-        SectionName = 'Async tasks'
+        SectionName = 'End'
+        Message     = "Number of queued tasks: $($AsyncLoadQueue.Count)"
     }
 
     Write-DotFilesMessage @MsgParams
@@ -172,12 +174,27 @@ if ($DotFilesTimings) {
 
     $MsgParams = @{
         Type        = 'Verbose'
+        SectionType = 'Profile'
+        SectionName = 'End'
         Message     = (Get-DotFilesTiming -Stopwatch $DotFilesProfileStopwatch -SlowThresholdMs 300 -UltraSlowThresholdMs 1000)
+    }
+
+    Write-DotFilesMessage @MsgParams
+}
+
+# Signal the end of (synchronous) profile load
+if ($DotFilesVerbose) {
+    $MsgParams = @{
+        Type        = 'Verbose'
         SectionType = 'Profile'
         SectionName = 'End'
     }
 
-    Write-DotFilesMessage @MsgParams
+    if ($DotFilesLoadAsync) {
+        Write-DotFilesMessage @MsgParams -Message 'Finished synchronous processing.'
+    } else {
+        Write-DotFilesMessage @MsgParams -Message 'Finished profile load.'
+    }
 }
 
 #endregion
