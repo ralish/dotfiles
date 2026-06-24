@@ -35,9 +35,9 @@ Set-WindowsTerminalGlobalVariables
 Function Global:__Get-LastExitCodeForWinTerm {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
     [OutputType([Int32])]
-    Param()
+    Param([Boolean]$LastCmdSucceeded, [Int32]$ExitCode)
 
-    if ($? -eq $true) {
+    if ($LastCmdSucceeded) {
         return 0
     }
 
@@ -48,7 +48,7 @@ Function Global:__Get-LastExitCodeForWinTerm {
         return -1
     }
 
-    return $LASTEXITCODE
+    return $ExitCode
 }
 
 # Shell Integration
@@ -58,12 +58,18 @@ Function Global:Prompt {
     [OutputType([String])]
     Param()
 
+    # Capture $? before the Get-History below resets it to $true, then hand it to
+    # __Get-LastExitCodeForWinTerm. That function used to re-read $? *after* the reset and
+    # so always reported success in the OSC 133;D command-finished mark. ($LASTEXITCODE is
+    # unaffected by Get-History, so it is passed directly at the call site below.)
+    $LastCmdSucceeded = $?
+
     # Skip emitting an end of command mark for the first command
     $LastHistoryEntry = Get-History -Count 1
     if ($Global:__LastHistoryId -ne -1) {
         if ($LastHistoryEntry.Id -ne $Global:__LastHistoryId) {
             # Mark end of last command with exit code
-            $LastExitCodeForWinTerm = __Get-LastExitCodeForWinTerm
+            $LastExitCodeForWinTerm = __Get-LastExitCodeForWinTerm -LastCmdSucceeded $LastCmdSucceeded -ExitCode $LASTEXITCODE
             # `OSC FinalTerm ; CmdEnd ; <ExitCode> ST`
             $Prompt = "$([Char]27)]133;D;${LastExitCodeForWinTerm}`a"
         } else {
