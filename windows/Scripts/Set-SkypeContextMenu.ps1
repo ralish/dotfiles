@@ -14,8 +14,8 @@ Param(
 )
 
 if ([Environment]::OSVersion.Version.Major -lt 10) {
-    $ErrMsg = 'Script is only valid for Windows 10 or later.'
-    $ErrExc = [PlatformNotSupportedException]::new($ErrMsg)
+    $ExcMsg = 'Script is only valid for Windows 10 or later.'
+    $ErrExc = [PlatformNotSupportedException]::new($ExcMsg)
     $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'OSNotSupported', $ErrCat, $null)
     $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -26,13 +26,13 @@ $ContextMenuKey = @(Get-ItemProperty -Path $ContextMenuPath -ErrorAction 'Ignore
 
 if ($ContextMenuKey.Count -ne 1) {
     if ($ContextMenuKey.Count -ne 0) {
-        $ErrMsg = 'Found multiple Skype context menu registry keys.'
-        $ErrExc = [InvalidOperationException]::new($ErrMsg)
+        $ExcMsg = 'Found multiple Skype context menu registry keys.'
+        $ErrExc = [InvalidOperationException]::new($ExcMsg)
         $ErrId = 'MultipleRegistryKeys'
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
     } else {
-        $ErrMsg = 'Skype context menu registry key is not present.'
-        $ErrExc = [Management.Automation.ItemNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Skype context menu registry key is not present.'
+        $ErrExc = [Management.Automation.ItemNotFoundException]::new($ExcMsg)
         $ErrId = 'RegistryKeyNotFound'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
     }
@@ -44,15 +44,15 @@ if ($ContextMenuKey.Count -ne 1) {
 $ContextMenuKey = $ContextMenuKey[0]
 if ($ContextMenuKey.PSObject.Properties.Name -contains 'DllPath') {
     if ([String]::IsNullOrWhiteSpace($ContextMenuKey.DllPath)) {
-        $ErrMsg = 'DllPath registry value for Skype context menu is empty.'
-        $ErrExc = [InvalidOperationException]::new($ErrMsg)
+        $ExcMsg = 'DllPath registry value for Skype context menu is empty.'
+        $ErrExc = [InvalidOperationException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'InvalidRegistryValue', $ErrCat, $null)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 } else {
-    $ErrMsg = 'DllPath registry value for Skype context menu is not present.'
-    $ErrExc = [Management.Automation.ItemNotFoundException]::new($ErrMsg)
+    $ExcMsg = 'DllPath registry value for Skype context menu is not present.'
+    $ErrExc = [Management.Automation.ItemNotFoundException]::new($ExcMsg)
     $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegistryValueNotFound', $ErrCat, $null)
     $PSCmdlet.ThrowTerminatingError($ErrRec)

@@ -14,8 +14,8 @@ Function Set-DotFilesEnvPath {
     Param()
 
     if (!(Test-IsPathFullyQualified -Path $Env:DOTFILES)) {
-        $ErrMsg = "DOTFILES environment variable is not set to a fully qualified path: ${Env:DOTFILES}"
-        $ErrExc = [FormatException]::new($ErrMsg)
+        $ExcMsg = "DOTFILES environment variable is not set to a fully qualified path: ${Env:DOTFILES}"
+        $ErrExc = [FormatException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $Env:DOTFILES)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -23,8 +23,8 @@ Function Set-DotFilesEnvPath {
 
     $DotFiles = Get-Item -LiteralPath $Env:DOTFILES -ErrorAction 'Ignore'
     if ($DotFiles -isnot [IO.DirectoryInfo]) {
-        $ErrMsg = "DOTFILES environment variable path is inaccessible or not a directory: ${Env:DOTFILES}"
-        $ErrExc = [IO.IOException]::new($ErrMsg)
+        $ExcMsg = "DOTFILES environment variable path is inaccessible or not a directory: ${Env:DOTFILES}"
+        $ErrExc = [IO.IOException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotDirectory', $ErrCat, $Env:DOTFILES)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -75,8 +75,8 @@ Function Set-DotFilesFinalPath {
         # including the terminating null and represents the required buffer
         # size including the null terminator.
         if ($Result -gt ($ProfileDirFinalPath.Capacity + 1)) {
-            $ErrMsg = "Final path to PowerShell profile directory exceeds string buffer size of $($ProfileDirFinalPath.Capacity): $($Result - 1)"
-            $ErrExc = [ComponentModel.Win32Exception]::new(122, $ErrMsg) # ERROR_INSUFFICIENT_BUFFER
+            $ExcMsg = "Final path to PowerShell profile directory exceeds string buffer size of $($ProfileDirFinalPath.Capacity): $($Result - 1)"
+            $ErrExc = [ComponentModel.Win32Exception]::new(122, $ExcMsg) # ERROR_INSUFFICIENT_BUFFER
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeApiFailed', $ErrCat, $Result)
             $PSCmdlet.ThrowTerminatingError($ErrRec)

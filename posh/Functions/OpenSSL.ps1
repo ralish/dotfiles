@@ -158,8 +158,8 @@ Function Global:New-OpenSSLCertificate {
         foreach ($IPAddress in $IPAddresses) {
             if ($IPAddress.AddressFamily -ne [Net.Sockets.AddressFamily]::InterNetwork -and
                 $IPAddress.AddressFamily -ne [Net.Sockets.AddressFamily]::InterNetworkV6) {
-                $ErrMsg = "Provided IP address is neither IPv4 or IPv6: ${IPAddress}"
-                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ExcMsg = "Provided IP address is neither IPv4 or IPv6: ${IPAddress}"
+                $ErrExc = [ArgumentException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $IPAddress)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -631,16 +631,16 @@ Function Global:Get-OpenSSLVersion {
 
     $Version = & openssl @VersionArgs 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve OpenSSL version (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve OpenSSL version (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $VersionCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if ($Version -notmatch '^OpenSSL ([0-9]+\.[0-9]+(\.[0-9]+)?)') {
-        $ErrMsg = "Failed to extract OpenSSL version: ${Version}"
-        $ErrExc = [FormatException]::new($ErrMsg)
+        $ExcMsg = "Failed to extract OpenSSL version: ${Version}"
+        $ErrExc = [FormatException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ParserError
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $Version)
         $PSCmdlet.ThrowTerminatingError($ErrRec)

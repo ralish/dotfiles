@@ -35,16 +35,16 @@ Function Global:Switch-Cygwin {
 
     $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
     if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $ErrMsg = "Cygwin path is inaccessible or not a directory: ${Path}"
+        $Msg = "Cygwin path is inaccessible or not a directory: ${Path}"
 
         if (!$Force) {
-            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ErrExc = [ArgumentException]::new($Msg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        Write-Warning -Message $ErrMsg
+        Write-Warning -Message $Msg
     }
 
     $Enable = !$Disable
@@ -139,16 +139,16 @@ Function Global:Switch-Perl {
 
     $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
     if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $ErrMsg = "Perl path is inaccessible or not a directory: ${Path}"
+        $Msg = "Perl path is inaccessible or not a directory: ${Path}"
 
         if (!$Force) {
-            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ErrExc = [ArgumentException]::new($Msg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        Write-Warning -Message $ErrMsg
+        Write-Warning -Message $Msg
     }
 
     $Enable = !$Disable
@@ -176,8 +176,8 @@ Function Global:Switch-Perl {
 
     if ($Env:PERL5LIB) {
         if (!(Test-IsPathFullyQualified -Path $Env:PERL5LIB)) {
-            $ErrMsg = "PERL5LIB is not set to a fully qualified path: ${Env:PERL5LIB}"
-            $ErrExc = [FormatException]::new($ErrMsg)
+            $ExcMsg = "PERL5LIB is not set to a fully qualified path: ${Env:PERL5LIB}"
+            $ErrExc = [FormatException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $Env:PERL5LIB)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -185,8 +185,8 @@ Function Global:Switch-Perl {
 
         $UserBasePathElements = $Env:PERL5LIB.Split('\')
         if ($UserBasePathElements.Count -lt 3) {
-            $ErrMsg = "PERL5LIB has less than expected minimum of 3 path components: ${Env:PERL5LIB}"
-            $ErrExc = [FormatException]::new($ErrMsg)
+            $ExcMsg = "PERL5LIB has less than expected minimum of 3 path components: ${Env:PERL5LIB}"
+            $ErrExc = [FormatException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'InvalidPath', $ErrCat, $Env:PERL5LIB)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -283,16 +283,16 @@ Function Global:Switch-Python {
 
     $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
     if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $ErrMsg = "Python path is inaccessible or not a directory: ${Path}"
+        $Msg = "Python path is inaccessible or not a directory: ${Path}"
 
         if (!$Force) {
-            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ErrExc = [ArgumentException]::new($Msg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        Write-Warning -Message $ErrMsg
+        Write-Warning -Message $Msg
     }
 
     $Enable = !$Disable
@@ -316,8 +316,8 @@ Function Global:Switch-Python {
 
     if ($Env:PYTHONUSERBASE) {
         if (!(Test-IsPathFullyQualified -Path $Env:PYTHONUSERBASE)) {
-            $ErrMsg = "PYTHONUSERBASE is not set to a fully qualified path: ${Env:PYTHONUSERBASE}"
-            $ErrExc = [FormatException]::new($ErrMsg)
+            $ExcMsg = "PYTHONUSERBASE is not set to a fully qualified path: ${Env:PYTHONUSERBASE}"
+            $ErrExc = [FormatException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $Env:PYTHONUSERBASE)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -343,14 +343,14 @@ Function Global:Switch-Python {
             $PythonVersionRaw = (& $PythonExe @VersionArgs 2>&1) -join ''
             if ($LASTEXITCODE -ne 0) {
                 $PythonFailed = $true
-                $ErrMsg = "Failed to retrieve Python version (rc: ${LASTEXITCODE})."
+                $ExcMsg = "Failed to retrieve Python version (rc: ${LASTEXITCODE})."
             }
         } catch {
             $PythonFailed = $true
-            $ErrMsg = "Python executable missing or could not be executed: ${PythonExe}"
+            $ExcMsg = "Python executable missing or could not be executed: ${PythonExe}"
         } finally {
             if ($PythonFailed) {
-                $ErrExc = [Exception]::new($ErrMsg)
+                $ErrExc = [Exception]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $VersionCmd)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -358,8 +358,8 @@ Function Global:Switch-Python {
         }
 
         if ($PythonVersionRaw -notmatch '[0-9]+\.[0-9]+') {
-            $ErrMsg = "Failed to extract Python version: ${PythonVersionRaw}"
-            $ErrExc = [FormatException]::new($ErrMsg)
+            $ExcMsg = "Failed to extract Python version: ${PythonVersionRaw}"
+            $ErrExc = [FormatException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ParserError
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $PythonVersionRaw)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -485,16 +485,16 @@ Function Global:Switch-WindowsSDK {
 
     $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
     if ($PathItem -isnot [IO.DirectoryInfo]) {
-        $ErrMsg = "Windows SDK path is inaccessible or not a directory: ${Path}"
+        $Msg = "Windows SDK path is inaccessible or not a directory: ${Path}"
 
         if (!$Force) {
-            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ErrExc = [ArgumentException]::new($Msg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        Write-Warning -Message $ErrMsg
+        Write-Warning -Message $Msg
     }
 
     $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
@@ -528,8 +528,8 @@ Function Global:Switch-WindowsSDK {
             12 { if ($Is64BitOs) { $Architecture = 'arm64' } else { $Architecture = 'arm' } }
 
             default {
-                $ErrMsg = "Unsupported processor architecture: $($Processor.Architecture)"
-                $ErrExc = [NotSupportedException]::new($ErrMsg)
+                $ExcMsg = "Unsupported processor architecture: $($Processor.Architecture)"
+                $ErrExc = [NotSupportedException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ProcessorNotSupported', $ErrCat, $Processor)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -548,16 +548,16 @@ Function Global:Switch-WindowsSDK {
 
     $SdkVerPathItem = Get-Item -LiteralPath $SdkVerPath -ErrorAction 'Ignore'
     if ($SdkVerPathItem -isnot [IO.DirectoryInfo]) {
-        $ErrMsg = "Windows SDK version path is inaccessible or not a directory: ${SdkVerPath}"
+        $Msg = "Windows SDK version path is inaccessible or not a directory: ${SdkVerPath}"
 
         if (!$Force) {
-            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ErrExc = [ArgumentException]::new($Msg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $SdkVerPath)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        Write-Warning -Message $ErrMsg
+        Write-Warning -Message $Msg
     }
 
     $Enable = !$Disable

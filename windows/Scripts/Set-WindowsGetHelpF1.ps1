@@ -15,8 +15,8 @@ Param(
 )
 
 if ([Environment]::OSVersion.Version.Major -lt 10) {
-    $ErrMsg = 'Script is only valid for Windows 10 or later.'
-    $ErrExc = [PlatformNotSupportedException]::new($ErrMsg)
+    $ExcMsg = 'Script is only valid for Windows 10 or later.'
+    $ErrExc = [PlatformNotSupportedException]::new($ExcMsg)
     $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'OSNotSupported', $ErrCat, $null)
     $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -67,8 +67,8 @@ try {
                 foreach ($Privilege in $Privileges.Keys) {
                     $Result = $NtDll::RtlAdjustPrivilege($Privileges[$Privilege], $true, $false, [Ref]$null)
                     if ($Result -ne 0) {
-                        $ErrMsg = "Failed calling RtlAdjustPrivilege to enable ${Privilege} privilege (NTSTATUS: ${Result})."
-                        $ErrExc = [Exception]::new($ErrMsg)
+                        $ExcMsg = "Failed calling RtlAdjustPrivilege to enable ${Privilege} privilege (NTSTATUS: ${Result})."
+                        $ErrExc = [Exception]::new($ExcMsg)
                         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeApiFailed', $ErrCat, $Result)
                         $PSCmdlet.ThrowTerminatingError($ErrRec)

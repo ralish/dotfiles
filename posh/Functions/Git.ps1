@@ -85,8 +85,8 @@ Function Global:Invoke-GitLinter {
 
                     $MdlCliCmd = $MdlCliCmds[1]
                 } catch {
-                    $ErrMsg = 'The markdownlint-cli2 or markdownlint command must be available.'
-                    $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+                    $ExcMsg = 'The markdownlint-cli2 or markdownlint command must be available.'
+                    $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, $MdlCliCmds)
                     $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -111,8 +111,8 @@ Function Global:Invoke-GitLinter {
                         } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
                         if ($SettingsFile -isnot [IO.FileInfo]) {
-                            $ErrMsg = "Provided PSScriptAnalyzer settings path is not a file: ${Settings}"
-                            $ErrExc = [ArgumentException]::new($ErrMsg)
+                            $ExcMsg = "Provided PSScriptAnalyzer settings path is not a file: ${Settings}"
+                            $ErrExc = [ArgumentException]::new($ExcMsg)
                             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $SettingsFile)
                             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -120,8 +120,8 @@ Function Global:Invoke-GitLinter {
                     }
 
                     default {
-                        $ErrMsg = "Settings parameter has unsupported type: ${SettingsType}"
-                        $ErrExc = [ArgumentException]::new($ErrMsg)
+                        $ExcMsg = "Settings parameter has unsupported type: ${SettingsType}"
+                        $ErrExc = [ArgumentException]::new($ExcMsg)
                         $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Settings)
                         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -144,8 +144,8 @@ Function Global:Invoke-GitLinter {
     $GitArgs = @('ls-files')
     $GitOutput = & git @GitArgs
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -169,8 +169,8 @@ Function Global:Invoke-GitLinter {
                 $RgArgs = '--path-separator', '/', '--hidden', '-l', $Shebang
                 & rg @RgArgs | ForEach-Object { $LintFiles.Add($PSItem) }
                 if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) {
-                    $ErrMsg = "ripgrep exited with unexpected exit code: ${LASTEXITCODE}"
-                    $ErrExc = [Exception]::new($ErrMsg)
+                    $ExcMsg = "ripgrep exited with unexpected exit code: ${LASTEXITCODE}"
+                    $ErrExc = [Exception]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "rg $($RgArgs -join ' ')")
                     $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -182,8 +182,8 @@ Function Global:Invoke-GitLinter {
                 $RgArgs = '--path-separator', '/', '--hidden', '-l', $ShellDirective
                 & rg @RgArgs | ForEach-Object { $LintFiles.Add($PSItem) }
                 if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) {
-                    $ErrMsg = "ripgrep exited with unexpected exit code: ${LASTEXITCODE}"
-                    $ErrExc = [Exception]::new($ErrMsg)
+                    $ExcMsg = "ripgrep exited with unexpected exit code: ${LASTEXITCODE}"
+                    $ErrExc = [Exception]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "rg $($RgArgs -join ' ')")
                     $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -269,8 +269,8 @@ Function Global:Invoke-GitMergeAllBranches {
 
     $null = & git symbolic-ref -q HEAD
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = 'Refusing to run while HEAD is detached.'
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = 'Refusing to run while HEAD is detached.'
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $null)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -283,8 +283,8 @@ Function Global:Invoke-GitMergeAllBranches {
         } else {
             $null = & git rev-parse -q --verify master 2>&1
             if ($LASTEXITCODE -ne 0) {
-                $ErrMsg = 'Unable to guess source branch to merge (not main or master).'
-                $ErrExc = [Exception]::new($ErrMsg)
+                $ExcMsg = 'Unable to guess source branch to merge (not main or master).'
+                $ErrExc = [Exception]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $null)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -299,8 +299,8 @@ Function Global:Invoke-GitMergeAllBranches {
     $GitArgs = @('branch')
     $GitOutput = & git @GitArgs
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -310,8 +310,8 @@ Function Global:Invoke-GitMergeAllBranches {
     $Branches = [Collections.Generic.List[String]]::new()
     foreach ($Branch in $GitOutput) {
         if ($Branch -notmatch '^[*+ ] \S') {
-            $ErrMsg = 'Unexpected prefix for branch: "{0}"' -f $Branch
-            $ErrExc = [FormatException]::new($ErrMsg)
+            $ExcMsg = 'Unexpected prefix for branch: "{0}"' -f $Branch
+            $ErrExc = [FormatException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ParserError
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $Branch)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -329,16 +329,16 @@ Function Global:Invoke-GitMergeAllBranches {
     }
 
     if ([String]::IsNullOrWhiteSpace($CurrentBranch)) {
-        $ErrMsg = 'Repository has no current branch.'
-        $ErrExc = [InvalidOperationException]::new($ErrMsg)
+        $ExcMsg = 'Repository has no current branch.'
+        $ErrExc = [InvalidOperationException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NoCurrentBranch', $ErrCat, "git $($GitArgs -join ' ')")
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if ($SourceBranch -notin $Branches) {
-        $ErrMsg = "Source branch for merge not checked out: ${SourceBranch}"
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Source branch for merge not checked out: ${SourceBranch}"
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $SourceBranch)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -348,8 +348,8 @@ Function Global:Invoke-GitMergeAllBranches {
         $GitArgs = 'checkout', $SourceBranch
         & git @GitArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -367,8 +367,8 @@ Function Global:Invoke-GitMergeAllBranches {
             $GitArgs = 'checkout', $Branch
             & git @GitArgs
             if ($LASTEXITCODE -ne 0) {
-                $ErrMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
-                $ErrExc = [Exception]::new($ErrMsg)
+                $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+                $ErrExc = [Exception]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -377,8 +377,8 @@ Function Global:Invoke-GitMergeAllBranches {
             $GitArgs = 'merge', '--ff-only', $SourceBranch
             & git @GitArgs
             if ($LASTEXITCODE -ne 0) {
-                $ErrMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
-                $ErrExc = [Exception]::new($ErrMsg)
+                $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+                $ErrExc = [Exception]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -392,8 +392,8 @@ Function Global:Invoke-GitMergeAllBranches {
         $GitArgs = 'checkout', $CurrentBranch
         & git @GitArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -453,8 +453,8 @@ Function Global:Invoke-GitRepoCommand {
         foreach ($GitPath in $Path) {
             if (!(Test-IsPathFullyQualified -Path $GitPath)) {
                 if ($OriginalLocation.Provider.Name -ne 'FileSystem') {
-                    $ErrMsg = "Skipping relative path as current path is not a file system: ${GitPath}"
-                    $ErrExc = [ArgumentException]::new($ErrMsg)
+                    $ExcMsg = "Skipping relative path as current path is not a file system: ${GitPath}"
+                    $ErrExc = [ArgumentException]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $GitPath)
                     $PSCmdlet.WriteError($ErrRec)
@@ -472,8 +472,8 @@ Function Global:Invoke-GitRepoCommand {
             }
 
             if ($BaseDir -isnot [IO.DirectoryInfo]) {
-                $ErrMsg = "Path is not a directory: ${GitPath}"
-                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ExcMsg = "Path is not a directory: ${GitPath}"
+                $ErrExc = [ArgumentException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $GitPath)
                 $PSCmdlet.WriteError($ErrRec)
@@ -530,8 +530,8 @@ Function Global:Invoke-GitRepoCommand {
                     foreach ($GitCmd in $GitCmds) {
                         & git @GitCmd
                         if ($LASTEXITCODE -ne 0) {
-                            $ErrMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
-                            $ErrExc = [Exception]::new($ErrMsg)
+                            $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+                            $ErrExc = [Exception]::new($ExcMsg)
                             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitCmd -join ' ')")
                             $PSCmdlet.WriteError($ErrRec)
@@ -573,8 +573,8 @@ Function Global:Remove-GitCleanSubset {
             }
 
             if ($Line -notmatch '^Would remove (.+)') {
-                $ErrMsg = "Path not in expected format: ${Line}"
-                $ErrExc = [FormatException]::new($ErrMsg)
+                $ExcMsg = "Path not in expected format: ${Line}"
+                $ErrExc = [FormatException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::ParserError
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $Line)
                 $PSCmdlet.WriteError($ErrRec)

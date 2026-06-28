@@ -63,8 +63,8 @@ Function Invoke-ComponentStoreCleanup {
         $DismArgs = '/Online', '/Cleanup-Image', '/StartComponentCleanup', '/ResetBase'
         & $DismExe @DismArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "${DismExe} exited with non-zero exit code: ${LASTEXITCODE}"
-            $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ErrMsg
+            $ExcMsg = "${DismExe} exited with non-zero exit code: ${LASTEXITCODE}"
+            $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ExcMsg
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = New-Object -TypeName 'Management.Automation.ErrorRecord' -ArgumentList $ErrExc, 'NativeCommandFailed', $ErrCat, "${DismExe} $($DismArgs -join ' ')"
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -87,8 +87,8 @@ Function Invoke-ComponentStoreCleanup {
     }
 
     if ($CleanMgr.ExitCode -ne 0) {
-        $ErrMsg = "${CleanMgrExe} exited with non-zero exit code: $($CleanMgr.ExitCode)"
-        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ErrMsg
+        $ExcMsg = "${CleanMgrExe} exited with non-zero exit code: $($CleanMgr.ExitCode)"
+        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ExcMsg
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = New-Object -TypeName 'Management.Automation.ErrorRecord' -ArgumentList $ErrExc, 'NativeCommandFailed', $ErrCat, "${CleanMgrExe} ${CleanMgrArgs}"
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -128,8 +128,8 @@ Function Invoke-DiskCleanup {
     }
 
     if ($CleanMgr.ExitCode -ne 0) {
-        $ErrMsg = "${CleanMgrExe} exited with non-zero exit code: $($CleanMgr.ExitCode)"
-        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ErrMsg
+        $ExcMsg = "${CleanMgrExe} exited with non-zero exit code: $($CleanMgr.ExitCode)"
+        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ExcMsg
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = New-Object -TypeName 'Management.Automation.ErrorRecord' -ArgumentList $ErrExc, 'NativeCommandFailed', $ErrCat, "${CleanMgrExe} ${CleanMgrArgs}"
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -508,8 +508,8 @@ Function Optimize-WindowsDefender {
     $MpCmdRunArgs = '-RemoveDefinitions', '-All'
     & $MpCmdRunExe @MpCmdRunArgs
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "${MpCmdRunExe} exited with non-zero exit code: ${LASTEXITCODE}"
-        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ErrMsg
+        $ExcMsg = "${MpCmdRunExe} exited with non-zero exit code: ${LASTEXITCODE}"
+        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ExcMsg
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = New-Object -TypeName 'Management.Automation.ErrorRecord' -ArgumentList $ErrExc, 'NativeCommandFailed', $ErrCat, "${MpCmdRunExe} $($MpCmdRunArgs -join ' ')"
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -533,8 +533,8 @@ Function Optimize-WindowsPower {
         } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
         if ($PowerCfg.ExitCode -ne 0) {
-            $ErrMsg = "${PowerCfgExe} exited with non-zero exit code: $($PowerCfg.ExitCode)"
-            $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ErrMsg
+            $ExcMsg = "${PowerCfgExe} exited with non-zero exit code: $($PowerCfg.ExitCode)"
+            $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ExcMsg
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = New-Object -TypeName 'Management.Automation.ErrorRecord' -ArgumentList $ErrExc, 'NativeCommandFailed', $ErrCat, "${PowerCfgExe} $($PowerCfgArgs -join ' ')"
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -558,8 +558,8 @@ Function Optimize-WindowsSecurity {
     $SecEditArgs = '/export', '/cfg', $SecEditCfg, '/quiet'
     & $SecEditExe @SecEditArgs
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "${SecEditExe} exited with non-zero exit code: ${LASTEXITCODE}"
-        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ErrMsg
+        $ExcMsg = "${SecEditExe} exited with non-zero exit code: ${LASTEXITCODE}"
+        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ExcMsg
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = New-Object -TypeName 'Management.Automation.ErrorRecord' -ArgumentList $ErrExc, 'NativeCommandFailed', $ErrCat, "${SecEditExe} $($SecEditArgs -join ' ')"
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -577,8 +577,8 @@ Function Optimize-WindowsSecurity {
     $SecEditArgs = '/configure', '/db', $SecEditDb, '/cfg', $SecEditCfg, '/quiet'
     & $SecEditExe @SecEditArgs
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "${SecEditExe} exited with non-zero exit code: ${LASTEXITCODE}"
-        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ErrMsg
+        $ExcMsg = "${SecEditExe} exited with non-zero exit code: ${LASTEXITCODE}"
+        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ExcMsg
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = New-Object -TypeName 'Management.Automation.ErrorRecord' -ArgumentList $ErrExc, 'NativeCommandFailed', $ErrCat, "${SecEditExe} $($SecEditArgs -join ' ')"
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -817,8 +817,8 @@ Function Invoke-NgenTasks {
     $NgenArgs = 'executeQueuedItems', '/nologo', '/silent'
     & $NgenExe @NgenArgs
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "${NgenExe} exited with non-zero exit code: ${LASTEXITCODE}"
-        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ErrMsg
+        $ExcMsg = "${NgenExe} exited with non-zero exit code: ${LASTEXITCODE}"
+        $ErrExc = New-Object -TypeName 'Exception' -ArgumentList $ExcMsg
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = New-Object -TypeName 'Management.Automation.ErrorRecord' -ArgumentList $ErrExc, 'NativeCommandFailed', $ErrCat, "${NgenExe} $($NgenArgs -join ' ')"
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1009,8 +1009,8 @@ Function Test-DotNetPresent {
 #endregion
 
 if ($PSVersionTable.PSVersion.Major -ge 6) {
-    $ErrMsg = "$(Split-Path -Path $PSCommandPath -Leaf) is not compatible with PowerShell 6 or later."
-    $ErrExc = New-Object -TypeName 'PlatformNotSupportedException' -ArgumentList $ErrMsg
+    $ExcMsg = "$(Split-Path -Path $PSCommandPath -Leaf) is not compatible with PowerShell 6 or later."
+    $ErrExc = New-Object -TypeName 'PlatformNotSupportedException' -ArgumentList $ExcMsg
     $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
     $ErrRec = New-Object -TypeName 'Management.Automation.ErrorRecord' -ArgumentList $ErrExc, 'PwshNotSupported', $ErrCat, $null
     $PSCmdlet.ThrowTerminatingError($ErrRec)

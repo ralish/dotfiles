@@ -26,8 +26,8 @@ Function Global:Get-DotFilesLastUpdated {
         $RgArgs = '--hidden', '-g', $RgGlobExcludeGit, '-g', $RgGlobExcludeThis, 'Last reviewed release: '
         $LastReviewedReleases = & rg @RgArgs
         if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) {
-            $ErrMsg = "ripgrep exited with unexpected exit code: ${LASTEXITCODE}"
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "ripgrep exited with unexpected exit code: ${LASTEXITCODE}"
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "rg $($RgArgs -join ' ')")
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -36,8 +36,8 @@ Function Global:Get-DotFilesLastUpdated {
         $GitArgs = @('ls-files')
         $LastReviewedVersions = & git @GitArgs | Where-Object { $PSItem -match '[\\/]VERSION$' }
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -47,8 +47,8 @@ Function Global:Get-DotFilesLastUpdated {
 
         foreach ($LastReviewedRelease in $LastReviewedReleases) {
             if ($LastReviewedRelease -notmatch '^(.+):.*Last reviewed release: (.+)') {
-                $ErrMsg = "Unexpected match returned by rg: ${LastReviewedRelease}"
-                $ErrExc = [FormatException]::new($ErrMsg)
+                $ExcMsg = "Unexpected match returned by rg: ${LastReviewedRelease}"
+                $ErrExc = [FormatException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::ParserError
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $LastReviewedRelease)
                 $PSCmdlet.WriteError($ErrRec)

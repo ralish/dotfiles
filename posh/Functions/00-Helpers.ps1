@@ -34,8 +34,8 @@ Function Test-EnvironmentMatch {
         $EnvCurrentValue = [Environment]::GetEnvironmentVariable($EnvName)
 
         if (!($EnvExpectedValue -is [Boolean] -or $EnvExpectedValue -is [String])) {
-            $ErrMsg = 'Value for key "{0}" is not a Boolean or String type.' -f $EnvName
-            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ExcMsg = 'Value for key "{0}" is not a Boolean or String type.' -f $EnvName
+            $ErrExc = [ArgumentException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $EnvExpectedValue)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -43,8 +43,8 @@ Function Test-EnvironmentMatch {
 
         # An empty string is an invalid environment variable value on Windows
         if ((Test-IsWindows) -and $EnvExpectedValue -is [String] -and $EnvExpectedValue -eq '') {
-            $ErrMsg = 'Environment variable "{0}" cannot be set to an empty string on Windows.' -f $EnvName
-            $ErrExc = [NotSupportedException]::new($ErrMsg)
+            $ExcMsg = 'Environment variable "{0}" cannot be set to an empty string on Windows.' -f $EnvName
+            $ErrExc = [NotSupportedException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'EnvironmentVariableInvalid', $ErrCat, $EnvExpectedValue)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -55,8 +55,8 @@ Function Test-EnvironmentMatch {
             if ($EnvExpectedValue -eq $false) {
                 if ($null -eq $EnvCurrentValue) { continue }
 
-                $ErrMsg = "Environment variable exists: ${EnvName}"
-                $ErrExc = [InvalidOperationException]::new($ErrMsg)
+                $ExcMsg = "Environment variable exists: ${EnvName}"
+                $ErrExc = [InvalidOperationException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::ResourceExists
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'EnvironmentVariableExists', $ErrCat, $EnvName)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -65,24 +65,24 @@ Function Test-EnvironmentMatch {
             # Environment variable must exist (any value)
             if ($null -ne $EnvCurrentValue) { continue }
 
-            $ErrMsg = "Environment variable not set: ${EnvName}"
-            $ErrExc = [InvalidOperationException]::new($ErrMsg)
+            $ExcMsg = "Environment variable not set: ${EnvName}"
+            $ErrExc = [InvalidOperationException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'EnvironmentVariableNotFound', $ErrCat, $EnvName)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
         if ($null -eq $EnvCurrentValue) {
-            $ErrMsg = "Environment variable not set: ${EnvName}"
-            $ErrExc = [InvalidOperationException]::new($ErrMsg)
+            $ExcMsg = "Environment variable not set: ${EnvName}"
+            $ErrExc = [InvalidOperationException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'EnvironmentVariableNotFound', $ErrCat, $EnvName)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
         if ($EnvExpectedValue -cne $EnvCurrentValue) {
-            $ErrMsg = 'Environment variable "{0}" set to "{1}" but expected "{2}".' -f $EnvName, $EnvCurrentValue, $EnvExpectedValue
-            $ErrExc = [InvalidOperationException]::new($ErrMsg)
+            $ExcMsg = 'Environment variable "{0}" set to "{1}" but expected "{2}".' -f $EnvName, $EnvCurrentValue, $EnvExpectedValue
+            $ErrExc = [InvalidOperationException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'EnvironmentVariableMismatch', $ErrCat, $EnvName)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -174,15 +174,15 @@ Function Test-ModuleAvailable {
     if ($Require -eq 'Any' -and !$FoundModule) {
         $ThrowError = $true
         $ErrObj = $Name -join ', '
-        $ErrMsg = "Suitable module not available: ${ErrObj}"
+        $ExcMsg = "Suitable module not available: ${ErrObj}"
     } elseif ($Require -eq 'All' -and $MissingModule) {
         $ThrowError = $true
         $ErrObj = $MissingModuleName
-        $ErrMsg = "Required module not available: ${ErrObj}"
+        $ExcMsg = "Required module not available: ${ErrObj}"
     }
 
     if ($ThrowError) {
-        $ErrExc = [IO.FileNotFoundException]::new($ErrMsg)
+        $ErrExc = [IO.FileNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, $ErrObj)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -299,8 +299,8 @@ Function Complete-DotFilesSection {
 
     if ($Global:DotFilesTimings) {
         if ($Global:DotFilesSectionStopwatch -isnot [Diagnostics.Stopwatch]) {
-            $ErrMsg = 'No stopwatch found for section timing.'
-            $ErrExc = [InvalidOperationException]::new($ErrMsg)
+            $ExcMsg = 'No stopwatch found for section timing.'
+            $ErrExc = [InvalidOperationException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::MetadataError
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesInvalidState', $ErrCat, $null)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -369,8 +369,8 @@ Function Invoke-DotFilesAsyncTask {
             # processed async task.
             $null = & $Global:AsyncLoadQueue.Dequeue()
         } catch {
-            $ErrMsg = "Exception was thrown processing an async task: $($PSItem.Exception.Message)"
-            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ExcMsg = "Exception was thrown processing an async task: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesAsyncTaskFailure', $ErrCat, $null)
             $PSCmdlet.WriteError($ErrRec)

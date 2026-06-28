@@ -9,8 +9,8 @@
 Param()
 
 if ([Environment]::OSVersion.Version.Major -lt 10) {
-    $ErrMsg = 'Script is only valid for Windows 10 or later.'
-    $ErrExc = [PlatformNotSupportedException]::new($ErrMsg)
+    $ExcMsg = 'Script is only valid for Windows 10 or later.'
+    $ErrExc = [PlatformNotSupportedException]::new($ExcMsg)
     $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'OSNotSupported', $ErrCat, $null)
     $PSCmdlet.ThrowTerminatingError($ErrRec)

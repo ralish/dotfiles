@@ -60,8 +60,8 @@ Function Get-DotNetCliCompletionsType {
 
         $CliVersionRaw = (& dotnet @VersionArgs 2>&1) -join ''
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to retrieve .NET version (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to retrieve .NET version (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $VersionCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -69,8 +69,8 @@ Function Get-DotNetCliCompletionsType {
 
         $CliVersion = $null
         if (![Version]::TryParse($CliVersionRaw, [Ref]$CliVersion)) {
-            $ErrMsg = "Failed to parse .NET version: ${CliVersionRaw}"
-            $ErrExc = [FormatException]::new($ErrMsg)
+            $ExcMsg = "Failed to parse .NET version: ${CliVersionRaw}"
+            $ErrExc = [FormatException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ParserError
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'VersionParseFailed', $ErrCat, $CliVersionRaw)
             $PSCmdlet.ThrowTerminatingError($ErrRec)

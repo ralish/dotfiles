@@ -21,8 +21,8 @@ Function Global:Update-Homebrew {
     )
 
     if (!(Get-Command -Name 'brew' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to update Homebrew as brew command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to update Homebrew as brew command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'brew')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -59,8 +59,8 @@ Function Global:Update-Homebrew {
         if ($LASTEXITCODE -ne 0) {
             Write-Progress @WriteProgressParams -Completed
 
-            $ErrMsg = "Homebrew update exited with non-zero exit code: ${LASTEXITCODE}"
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Homebrew update exited with non-zero exit code: ${LASTEXITCODE}"
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateBrewCmd)
             $PSCmdlet.WriteError($ErrRec)
@@ -82,8 +82,8 @@ Function Global:Update-Homebrew {
     if ($LASTEXITCODE -ne 0) {
         Write-Progress @WriteProgressParams -Completed
 
-        $ErrMsg = "Homebrew upgrade${DryrunMsg} exited with non-zero exit code: ${LASTEXITCODE}"
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Homebrew upgrade${DryrunMsg} exited with non-zero exit code: ${LASTEXITCODE}"
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpgradeAppsCmd)
         $PSCmdlet.WriteError($ErrRec)
@@ -102,8 +102,8 @@ Function Global:Update-Homebrew {
     Write-Verbose -Message "Cleaning-up outdated Homebrew data${DryrunMsg}: ${CleanupCmd}"
     $Result.Cleanup = [String[]]@(& brew @CleanupArgs 2>&1)
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Homebrew clean-up${DryrunMsg} exited with non-zero exit code: ${LASTEXITCODE}"
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Homebrew clean-up${DryrunMsg} exited with non-zero exit code: ${LASTEXITCODE}"
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $CleanupCmd)
         $PSCmdlet.WriteError($ErrRec)

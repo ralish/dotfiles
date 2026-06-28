@@ -21,8 +21,8 @@ Function Global:Clear-DockerCache {
     Write-Verbose -Message "Retrieving Docker disk usage: ${DfCmd}"
     $null = & docker @DfArgs 2>&1
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve Docker disk usage (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve Docker disk usage (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $DfCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -32,8 +32,8 @@ Function Global:Clear-DockerCache {
         Write-Verbose -Message "Clearing Docker caches: ${PruneCmd}"
         & docker @PruneArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to clear Docker cache (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to clear Docker cache (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $PruneCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)

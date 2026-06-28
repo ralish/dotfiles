@@ -153,8 +153,8 @@ Function Global:Update-PowerShell {
             Select-Object -First 1
 
         if (!$PowerShellGet) {
-            $ErrMsg = 'PowerShellGet v2 module not available for side-by-side import.'
-            $ErrExc = [IO.FileNotFoundException]::new($ErrMsg)
+            $ExcMsg = 'PowerShellGet v2 module not available for side-by-side import.'
+            $ErrExc = [IO.FileNotFoundException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'PowerShellGet')
             $PSCmdlet.WriteError($ErrRec)
@@ -165,8 +165,8 @@ Function Global:Update-PowerShell {
             $PowerShellGet | Import-Module -ErrorAction 'Stop' -Verbose:$false
             $Script:PsGetV2 = $true
         } catch {
-            $ErrMsg = 'Failed to import PowerShellGet v2 module side-by-side.'
-            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ExcMsg = 'Failed to import PowerShellGet v2 module side-by-side.'
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'PowerShellGet')
             $PSCmdlet.WriteError($ErrRec)
@@ -179,8 +179,8 @@ Function Global:Update-PowerShell {
     $PowerShellGet = Test-ModuleAvailable -Name 'PowerShellGet' -PassThru
 
     if ($PowerShellGet.Version.Major -lt 2) {
-        $ErrMsg = 'PowerShellGet v2 or later was not found.'
-        $ErrExc = [IO.FileNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'PowerShellGet v2 or later was not found.'
+        $ErrExc = [IO.FileNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'PowerShellGet')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -212,8 +212,8 @@ Function Global:Update-PowerShell {
         $DscSupported = Get-Command -Name 'Get-DscResource' -ErrorAction 'Stop'
     } catch {
         if ($IncludeDscModules) {
-            $ErrMsg = 'Unable to enumerate DSC modules as Get-DscResource command not available.'
-            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ExcMsg = 'Unable to enumerate DSC modules as Get-DscResource command not available.'
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSCommandNotFound', $ErrCat, 'Get-DscResource')
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -558,8 +558,8 @@ Function Global:Disable-TlsCertificateValidation {
     Param()
 
     if ($PSVersionTable.PSEdition -eq 'Core') {
-        $ErrMsg = 'Unable to disable TLS certificate validation on PowerShell 6 or later.'
-        $ErrExc = [NotSupportedException]::new($ErrMsg)
+        $ExcMsg = 'Unable to disable TLS certificate validation on PowerShell 6 or later.'
+        $ErrExc = [NotSupportedException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PwshNotSupported', $ErrCat, $null)
         $PSCmdlet.ThrowTerminatingError($ErrRec)

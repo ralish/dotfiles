@@ -51,8 +51,8 @@ Function Global:Set-AWSCredentialEnvironment {
         }
 
         if ($Credential.GetType().FullName -ne 'Amazon.SecurityToken.Model.Credentials') {
-            $ErrMsg = "Unexpected type for Credential argument: $($Credential.GetType().FullName)"
-            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ExcMsg = "Unexpected type for Credential argument: $($Credential.GetType().FullName)"
+            $ErrExc = [ArgumentException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $Credential)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -90,8 +90,8 @@ Function Global:Set-R53HostedZoneNameTag {
     Process {
         foreach ($Zone in $HostedZone) {
             if ($Zone.GetType().FullName -ne 'Amazon.Route53.Model.HostedZone') {
-                $ErrMsg = 'Skipping zone which is not of expected type: Amazon.Route53.Model.HostedZone'
-                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ExcMsg = 'Skipping zone which is not of expected type: Amazon.Route53.Model.HostedZone'
+                $ErrExc = [ArgumentException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $Zone)
                 $PSCmdlet.WriteError($ErrRec)
@@ -153,8 +153,8 @@ Function Global:Set-R53HostedZoneParkedRecords {
     $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
 
     if ($Records -contains 'Redirect' -and !$RedirectCloudFrontDomainName) {
-        $ErrMsg = 'Must specify RedirectCloudFrontDomainName parameter when setting redirect records.'
-        $ErrExc = [ArgumentException]::new($ErrMsg)
+        $ExcMsg = 'Must specify RedirectCloudFrontDomainName parameter when setting redirect records.'
+        $ErrExc = [ArgumentException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSMissingParameter', $ErrCat, $null)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -245,8 +245,8 @@ Function Global:Set-R53HostedZoneParkedRecords {
         $Zone = $Zones | Where-Object Name -EQ $ZoneFqdn
 
         if (!$Zone) {
-            $ErrMsg = "Unable to set records for non-existent zone: ${ZoneName}"
-            $ErrExc = [InvalidOperationException]::new($ErrMsg)
+            $ExcMsg = "Unable to set records for non-existent zone: ${ZoneName}"
+            $ErrExc = [InvalidOperationException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'AwsRoute53ZoneNotFound', $ErrCat, $ZoneName)
             $PSCmdlet.WriteError($ErrRec)
@@ -254,8 +254,8 @@ Function Global:Set-R53HostedZoneParkedRecords {
         }
 
         if ($Zone -is [Array]) {
-            $ErrMsg = "Skipping FQDN which returned multiple zones: ${ZoneName}"
-            $ErrExc = [InvalidOperationException]::new($ErrMsg)
+            $ExcMsg = "Skipping FQDN which returned multiple zones: ${ZoneName}"
+            $ErrExc = [InvalidOperationException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'AwsRoute53MultipleZones', $ErrCat, $ZoneName)
             $PSCmdlet.WriteError($ErrRec)
@@ -382,8 +382,8 @@ Function Global:Set-R53HostedZoneTag {
     Process {
         foreach ($Zone in $HostedZone) {
             if ($Zone.GetType().FullName -ne 'Amazon.Route53.Model.HostedZone') {
-                $ErrMsg = 'Skipping zone which is not of expected type: Amazon.Route53.Model.HostedZone'
-                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ExcMsg = 'Skipping zone which is not of expected type: Amazon.Route53.Model.HostedZone'
+                $ErrExc = [ArgumentException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $Zone)
                 $PSCmdlet.WriteError($ErrRec)
@@ -420,8 +420,8 @@ Function Global:Get-S3BucketSize {
             $Modules = Test-ModuleAvailable -Name $ModulesMonolithic -Require 'Any' -PassThru
         } catch {
             $ErrObj = "$($ModulesPerService -join ', ') | $($ModulesMonolithic -join ' | ')"
-            $ErrMsg = "Valid set of modules not available: ${ErrObj}"
-            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ExcMsg = "Valid set of modules not available: ${ErrObj}"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, $ErrObj)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -430,8 +430,8 @@ Function Global:Get-S3BucketSize {
 
     $ModuleVersionMajor = @($Modules.Version.Major | Sort-Object -Unique)
     if ($ModuleVersionMajor.Count -ne 1) {
-        $ErrMsg = "AWS modules span multiple major versions: $($ModuleVersionMajor -join ', ')"
-        $ErrExc = [InvalidOperationException]::new($ErrMsg)
+        $ExcMsg = "AWS modules span multiple major versions: $($ModuleVersionMajor -join ', ')"
+        $ErrExc = [InvalidOperationException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleMismatch', $ErrCat, $Modules)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -504,8 +504,8 @@ Function Global:Get-S3BucketSize {
                     default {
                         $UnknownDimension = $true
 
-                        $ErrMsg = "Skipping BucketSizeBytes metric with unknown dimension: $($Dimension.Name)"
-                        $ErrExc = [NotSupportedException]::new($ErrMsg)
+                        $ExcMsg = "Skipping BucketSizeBytes metric with unknown dimension: $($Dimension.Name)"
+                        $ErrExc = [NotSupportedException]::new($ExcMsg)
                         $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
                         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'AwsCloudWatchUnknownMetricDimension', $ErrCat, $Metric)
                         $PSCmdlet.WriteError($ErrRec)
@@ -516,8 +516,8 @@ Function Global:Get-S3BucketSize {
             if ($UnknownDimension) { continue }
 
             if (!$BucketName -or !$StorageType) {
-                $ErrMsg = 'Skipping BucketSizeBytes metric missing BucketName and/or StorageType dimension.'
-                $ErrExc = [InvalidOperationException]::new($ErrMsg)
+                $ExcMsg = 'Skipping BucketSizeBytes metric missing BucketName and/or StorageType dimension.'
+                $ErrExc = [InvalidOperationException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'AwsCloudWatchMissingMetricDimension', $ErrCat, $Metric)
                 $PSCmdlet.WriteError($ErrRec)
@@ -526,8 +526,8 @@ Function Global:Get-S3BucketSize {
 
             $Bucket = $Buckets | Where-Object BucketName -EQ $BucketName
             if (!$Bucket) {
-                $ErrMsg = "Skipping BucketSizeBytes metric for unknown bucket: ${BucketName}"
-                $ErrExc = [InvalidOperationException]::new($ErrMsg)
+                $ExcMsg = "Skipping BucketSizeBytes metric for unknown bucket: ${BucketName}"
+                $ErrExc = [InvalidOperationException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'AwsCloudWatchUnknownBucketInMetric', $ErrCat, $Metric)
                 $PSCmdlet.WriteError($ErrRec)
@@ -542,8 +542,8 @@ Function Global:Get-S3BucketSize {
             }
 
             if ($Statistic.Datapoints.Count -eq 0) {
-                $ErrMsg = "Skipping BucketSizeBytes statistic with $($Statistic.Datapoints.Count) datapoints for S3 bucket: ${BucketName}"
-                $ErrExc = [InvalidOperationException]::new($ErrMsg)
+                $ExcMsg = "Skipping BucketSizeBytes statistic with $($Statistic.Datapoints.Count) datapoints for S3 bucket: ${BucketName}"
+                $ErrExc = [InvalidOperationException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'AwsCloudWatchInvalidDatapointsCount', $ErrCat, $Statistic)
                 $PSCmdlet.WriteError($ErrRec)

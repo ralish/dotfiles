@@ -26,8 +26,8 @@ Param(
 
 if ($GuidRefSearch) {
     if (!(Test-Path -LiteralPath 'Function:\Search-Registry')) {
-        $ErrMsg = 'Missing Search-Registry function required for -GuidRefSearch parameter.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Missing Search-Registry function required for -GuidRefSearch parameter.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSFunctionNotFound', $ErrCat, 'Search-Registry')
         $PSCmdlet.ThrowTerminatingError($ErrRec)

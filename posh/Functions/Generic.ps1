@@ -389,8 +389,8 @@ Function Global:Add-FileToEmptyDirectories {
     foreach ($DirPath in $Path) {
         if (!(Test-IsPathFullyQualified -Path $DirPath)) {
             if ($CurrentLocation.Provider.Name -ne 'FileSystem') {
-                $ErrMsg = "Skipping relative path as current path is not a file system: ${DirPath}"
-                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ExcMsg = "Skipping relative path as current path is not a file system: ${DirPath}"
+                $ErrExc = [ArgumentException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $DirPath)
                 $PSCmdlet.WriteError($ErrRec)
@@ -408,8 +408,8 @@ Function Global:Add-FileToEmptyDirectories {
         }
 
         if ($DirItem -isnot [IO.DirectoryInfo]) {
-            $ErrMsg = "Path is not a directory: ${DirPath}"
-            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ExcMsg = "Path is not a directory: ${DirPath}"
+            $ErrExc = [ArgumentException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $DirPath)
             $PSCmdlet.WriteError($ErrRec)
@@ -468,8 +468,8 @@ Function Global:Get-DirectorySummary {
 
         $Directory = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($Directory -isnot [IO.DirectoryInfo]) {
-            $ErrMsg = "Path is not a directory: ${Path}"
-            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ExcMsg = "Path is not a directory: ${Path}"
+            $ErrExc = [ArgumentException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
             $PSCmdlet.WriteError($ErrRec)
@@ -662,8 +662,8 @@ Function Global:Sort-XmlElement {
 
     Begin {
         if ($MaxDepth -lt $Depth) {
-            $ErrMsg = "Maximum sorting depth (${MaxDepth}) cannot be less than current depth (${Depth})."
-            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ExcMsg = "Maximum sorting depth (${MaxDepth}) cannot be less than current depth (${Depth})."
+            $ErrExc = [ArgumentException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, "${MaxDepth} < ${Depth}")
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -731,8 +731,8 @@ Function Global:Add-GroupObjectComputerProperty {
                 if ($GroupItem.PSObject.Properties.Name -notcontains 'PSComputerName') {
                     $SkipGroup = $true
 
-                    $ErrMsg = 'Group item has no PSComputerName property.'
-                    $ErrExc = [Management.Automation.PropertyNotFoundException]::new($ErrMsg)
+                    $ExcMsg = 'Group item has no PSComputerName property.'
+                    $ErrExc = [Management.Automation.PropertyNotFoundException]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSItemMissingProperty', $ErrCat, $GroupItem)
                     $PSCmdlet.WriteError($ErrRec)

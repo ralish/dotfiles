@@ -38,16 +38,16 @@ Function Global:Update-OpenSSHConfig {
     }
 
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve OpenSSH version (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve OpenSSH version (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $VersionCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if ($VersionRaw -notmatch '^OpenSSH\S+([1-9][0-9]?\.[0-9]{1,2})') {
-        $ErrMsg = "Failed to extract OpenSSH version: ${VersionRaw}"
-        $ErrExc = [FormatException]::new($ErrMsg)
+        $ExcMsg = "Failed to extract OpenSSH version: ${VersionRaw}"
+        $ErrExc = [FormatException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ParserError
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $VersionRaw)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -61,8 +61,8 @@ Function Global:Update-OpenSSHConfig {
     $TemplateFile = Join-Path -Path $TemplatesDir -ChildPath "ssh_config.$($Version -replace '\.')"
 
     if (!(Test-Path -LiteralPath $TemplateFile -PathType 'Leaf')) {
-        $ErrMsg = "No configuration template for OpenSSH version: ${Version}"
-        $ErrExc = [IO.FileNotFoundException]::new($ErrMsg)
+        $ExcMsg = "No configuration template for OpenSSH version: ${Version}"
+        $ErrExc = [IO.FileNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFound', $ErrCat, $TemplateFile)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -73,8 +73,8 @@ Function Global:Update-OpenSSHConfig {
     $KexCmd = "ssh $($KexArgs -join ' ')"
     $SupportedKexAlgorithms = @(& ssh @KexArgs)
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve supported KEX algorithms (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve supported KEX algorithms (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $KexCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -126,8 +126,8 @@ Function Global:Update-OpenSSHConfig {
     } catch {
         Remove-Item -LiteralPath $ConfigFileTmp -ErrorAction 'Ignore'
 
-        $ErrMsg = "Fatal error building OpenSSH configuration file: $($PSItem.Exception.Message)"
-        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ExcMsg = "Fatal error building OpenSSH configuration file: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'OpensshBuildConfigFailed', $ErrCat, $null)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -147,8 +147,8 @@ Function Global:Update-OpenSSHConfig {
                 $KexFiltered = @($KexValues -split ',' | Where-Object { $PSItem -notmatch 'sntrup761x25519-sha512@openssh\.com' })
 
                 if ($KexFiltered.Count -eq 0) {
-                    $ErrMsg = 'No KEX algorithms remaining after removal of unsupported "sntrup761x25519-sha512@openssh.com" algorithm.'
-                    $ErrExc = [Exception]::new($ErrMsg)
+                    $ExcMsg = 'No KEX algorithms remaining after removal of unsupported "sntrup761x25519-sha512@openssh.com" algorithm.'
+                    $ErrExc = [Exception]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'OpensshBuildConfigFailed', $ErrCat, $Config[$i])
                     $PSCmdlet.ThrowTerminatingError($ErrRec)

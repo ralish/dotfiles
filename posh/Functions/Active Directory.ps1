@@ -135,8 +135,8 @@ Function Global:Get-KerberosTokenSize {
 
     $UsernameSplit = @($Username.Split('\'))
     if ($UsernameSplit.Count -gt 2) {
-        $ErrMsg = 'Expected only a single "\" character to be present in username.'
-        $ErrExc = [ArgumentException]::new($ErrMsg)
+        $ExcMsg = 'Expected only a single "\" character to be present in username.'
+        $ErrExc = [ArgumentException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ADInvalidUsername', $ErrCat, $Username)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -242,16 +242,16 @@ Function Global:Add-ADShadowPrincipalMember {
     } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     if (!$ShadowPrincipal) {
-        $ErrMsg = "No shadow principal found for filter on CN: ${Name}"
-        $ErrExc = [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException]::new($ErrMsg)
+        $ExcMsg = "No shadow principal found for filter on CN: ${Name}"
+        $ErrExc = [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ADShadowPrincipalNotFound', $ErrCat, $Name)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if ($ShadowPrincipal -is [Array]) {
-        $ErrMsg = "Expected a single shadow principal but found $($ShadowPrincipal.Count) for filter on CN: ${Name}"
-        $ErrExc = [Microsoft.ActiveDirectory.Management.ADIdentityResolutionException]::new($ErrMsg)
+        $ExcMsg = "Expected a single shadow principal but found $($ShadowPrincipal.Count) for filter on CN: ${Name}"
+        $ErrExc = [Microsoft.ActiveDirectory.Management.ADIdentityResolutionException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ADMultipleShadowPrincipals', $ErrCat, $Name)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -266,8 +266,8 @@ Function Global:Add-ADShadowPrincipalMember {
         }
 
         if (!$User) {
-            $ErrMsg = "No AD user found for filter on CN: ${Member}"
-            $ErrExc = [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException]::new($ErrMsg)
+            $ExcMsg = "No AD user found for filter on CN: ${Member}"
+            $ErrExc = [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ADUserNotFound', $ErrCat, $Member)
             $PSCmdlet.WriteError($ErrRec)
@@ -275,8 +275,8 @@ Function Global:Add-ADShadowPrincipalMember {
         }
 
         if ($User -is [Array]) {
-            $ErrMsg = "Expected a single user but found $($User.Count) for filter on CN: ${Member}"
-            $ErrExc = [Microsoft.ActiveDirectory.Management.ADIdentityResolutionException]::new($ErrMsg)
+            $ExcMsg = "Expected a single user but found $($User.Count) for filter on CN: ${Member}"
+            $ErrExc = [Microsoft.ActiveDirectory.Management.ADIdentityResolutionException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ADMultipleUsers', $ErrCat, $Member)
             $PSCmdlet.WriteError($ErrRec)

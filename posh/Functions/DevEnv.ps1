@@ -12,8 +12,8 @@ Function Global:Clear-NuGetCache {
     Param()
 
     if (!(Get-Command -Name 'nuget' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to clear NuGet cache as nuget command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to clear NuGet cache as nuget command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'nuget')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -32,8 +32,8 @@ Function Global:Clear-NuGetCache {
     Write-Verbose -Message "Retrieving NuGet caches: ${GetCmd}"
     $NuGetLocals = & nuget @GetArgs
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve NuGet caches (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve NuGet caches (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GetCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -52,8 +52,8 @@ Function Global:Clear-NuGetCache {
         }
 
         if (!$CacheFound) {
-            $ErrMsg = "Failed to determine NuGet ${Cache} cache location."
-            $ErrExc = [FormatException]::new($ErrMsg)
+            $ExcMsg = "Failed to determine NuGet ${Cache} cache location."
+            $ErrExc = [FormatException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ParserError
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NugetCacheNotFound', $ErrCat, $NuGetLocals)
             $PSCmdlet.WriteError($ErrRec)
@@ -70,8 +70,8 @@ Function Global:Clear-NuGetCache {
             Write-Verbose -Message "Clearing NuGet ${Cache} cache: ${ClearCmd}"
             & nuget @ClearArgs
             if ($LASTEXITCODE -ne 0) {
-                $ErrMsg = "Failed to clear NuGet ${Cache} cache (rc: ${LASTEXITCODE})."
-                $ErrExc = [Exception]::new($ErrMsg)
+                $ExcMsg = "Failed to clear NuGet ${Cache} cache (rc: ${LASTEXITCODE})."
+                $ErrExc = [Exception]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ClearCmd)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -93,8 +93,8 @@ Function Global:Update-DotNetTools {
     )
 
     if (!(Get-Command -Name 'dotnet' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to update .NET global tools as dotnet command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to update .NET global tools as dotnet command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'dotnet')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -140,8 +140,8 @@ Function Global:Update-DotNetTools {
 
         $CliVersionRaw = (& dotnet @VersionArgs 2>&1) -join ''
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to retrieve .NET version (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to retrieve .NET version (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $VersionCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -149,8 +149,8 @@ Function Global:Update-DotNetTools {
 
         $CliVersion = $null
         if (![Version]::TryParse($CliVersionRaw, [Ref]$CliVersion)) {
-            $ErrMsg = "Failed to parse .NET version: ${CliVersionRaw}"
-            $ErrExc = [FormatException]::new($ErrMsg)
+            $ExcMsg = "Failed to parse .NET version: ${CliVersionRaw}"
+            $ErrExc = [FormatException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ParserError
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'VersionParseFailed', $ErrCat, $CliVersionRaw)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -160,8 +160,8 @@ Function Global:Update-DotNetTools {
         Write-Verbose -Message "Retrieving .NET global tools: ${ListCmd}"
         $Result.BeforeUpdate = [String[]]@(& dotnet @ListArgs 2>&1)
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to retrieve .NET global tools (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to retrieve .NET global tools (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ListCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -226,8 +226,8 @@ Function Global:Update-DotNetTools {
         if ($Result.ExitCode -eq 0) {
             $Result.Success = $true
         } else {
-            $ErrMsg = "Failed to update .NET global tools (rc: $($Result.ExitCode))."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to update .NET global tools (rc: $($Result.ExitCode))."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $FailedCmd)
             $PSCmdlet.WriteError($ErrRec)
@@ -237,8 +237,8 @@ Function Global:Update-DotNetTools {
         Write-Verbose -Message "Retrieving .NET global tools: ${ListCmd}"
         $Result.AfterUpdate = [String[]]@(& dotnet @ListArgs 2>&1)
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to retrieve .NET global tools (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to retrieve .NET global tools (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ListCmd)
             $PSCmdlet.WriteError($ErrRec)
@@ -266,8 +266,8 @@ Function Global:Clear-GoCache {
     Param()
 
     if (!(Get-Command -Name 'go' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to clear Go cache as go command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to clear Go cache as go command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'go')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -288,8 +288,8 @@ Function Global:Clear-GoCache {
     Write-Verbose -Message "Retrieving Go build cache path: ${BuildGetCmd}"
     $GoBuildCache = (& go @BuildGetArgs) -join ''
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve Go build cache path (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve Go build cache path (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $BuildGetCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -298,8 +298,8 @@ Function Global:Clear-GoCache {
     Write-Verbose -Message "Retrieving Go module cache path: ${ModuleGetCmd}"
     $GoModuleCache = (& go @ModuleGetArgs) -join ''
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve Go module cache path (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve Go module cache path (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ModuleGetCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -309,8 +309,8 @@ Function Global:Clear-GoCache {
         Write-Verbose -Message "Clearing Go build cache: ${BuildClearCmd}"
         & go @BuildClearArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to clear Go build cache (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to clear Go build cache (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $BuildClearCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -321,8 +321,8 @@ Function Global:Clear-GoCache {
         Write-Verbose -Message "Clearing Go module cache: ${ModuleClearCmd}"
         & go @ModuleClearArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to clear Go module cache (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to clear Go module cache (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ModuleClearCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -365,16 +365,16 @@ Function Global:Switch-Go {
     End {
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
-            $ErrMsg = "Go path is inaccessible or not a directory: ${Path}"
+            $Msg = "Go path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ErrExc = [ArgumentException]::new($Msg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
-            Write-Warning -Message $ErrMsg
+            Write-Warning -Message $Msg
         }
 
         $Enable = !$Disable
@@ -398,8 +398,8 @@ Function Global:Switch-Go {
         if ($Env:GOPATH) {
             foreach ($GoPath in $Env:GOPATH.Split([IO.Path]::PathSeparator)) {
                 if (!(Test-IsPathFullyQualified -Path $GoPath)) {
-                    $ErrMsg = "Found not fully qualified path while parsing GOPATH: ${GoPath}"
-                    $ErrExc = [FormatException]::new($ErrMsg)
+                    $ExcMsg = "Found not fully qualified path while parsing GOPATH: ${GoPath}"
+                    $ErrExc = [FormatException]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $GoPath)
                     $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -458,8 +458,8 @@ Function Global:Update-GoBinaries {
     Param()
 
     if (!(Get-Command -Name 'gup' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to update Go binaries as gup command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to update Go binaries as gup command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'gup')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -499,8 +499,8 @@ Function Global:Update-GoBinaries {
     Write-Verbose -Message "Updating gup${CheckMsg}: ${GupCmd}"
     $Result.Gup = [String[]]@(& gup @GupArgs 2>&1)
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to update gup${CheckMsg} (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to update gup${CheckMsg} (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GupCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -522,8 +522,8 @@ Function Global:Update-GoBinaries {
     if ($Result.ExitCode -eq 0) {
         $Result.Success = $true
     } else {
-        $ErrMsg = "Failed to update Go binaries ${CheckMsg} (rc: $($Result.ExitCode))."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to update Go binaries ${CheckMsg} (rc: $($Result.ExitCode))."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GupCmd)
         $PSCmdlet.WriteError($ErrRec)
@@ -568,16 +568,16 @@ Function Global:Switch-GoogleDepotTools {
     End {
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
-            $ErrMsg = "depot_tools path is inaccessible or not a directory: ${Path}"
+            $Msg = "depot_tools path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ErrExc = [ArgumentException]::new($Msg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
-            Write-Warning -Message $ErrMsg
+            Write-Warning -Message $Msg
         }
 
         $Enable = !$Disable
@@ -641,8 +641,8 @@ Function Global:Clear-GradleCache {
 
     if ($Env:GRADLE_USER_HOME) {
         if (!(Test-IsPathFullyQualified -Path $Env:GRADLE_USER_HOME)) {
-            $ErrMsg = "GRADLE_USER_HOME is not set to a fully qualified path: ${Env:GRADLE_USER_HOME}"
-            $ErrExc = [FormatException]::new($ErrMsg)
+            $ExcMsg = "GRADLE_USER_HOME is not set to a fully qualified path: ${Env:GRADLE_USER_HOME}"
+            $ErrExc = [FormatException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $Env:GRADLE_USER_HOME)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -661,8 +661,8 @@ Function Global:Clear-GradleCache {
             Remove-Item -Path $GradleCachePath -Recurse -Verbose:$false
         }
     } elseif ($null -ne $PathItem) {
-        $ErrMsg = "Gradle cache path is not a directory: ${GradleCache}"
-        $ErrExc = [IO.IOException]::new($ErrMsg)
+        $ExcMsg = "Gradle cache path is not a directory: ${GradleCache}"
+        $ErrExc = [IO.IOException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotDirectory', $ErrCat, $GradleCache)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -676,8 +676,8 @@ Function Global:Clear-MavenCache {
     Param()
 
     if (!(Get-Command -Name 'mvn' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to clear Maven cache as mvn command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to clear Maven cache as mvn command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'mvn')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -689,8 +689,8 @@ Function Global:Clear-MavenCache {
     Write-Verbose -Message "Retrieving Maven cache path: ${GetCmd}"
     $MvnCache = (& mvn @GetArgs) -join ''
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve Maven cache path (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve Maven cache path (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GetCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -704,8 +704,8 @@ Function Global:Clear-MavenCache {
             Remove-Item -Path $MvnCachePath -Recurse -Verbose:$false
         }
     } elseif ($null -ne $PathItem) {
-        $ErrMsg = "Maven cache path is not a directory: ${MvnCache}"
-        $ErrExc = [IO.IOException]::new($ErrMsg)
+        $ExcMsg = "Maven cache path is not a directory: ${MvnCache}"
+        $ErrExc = [IO.IOException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotDirectory', $ErrCat, $MvnCache)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -744,16 +744,16 @@ Function Global:Switch-Java {
     End {
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
-            $ErrMsg = "Java path is inaccessible or not a directory: ${Path}"
+            $Msg = "Java path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ErrExc = [ArgumentException]::new($Msg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
-            Write-Warning -Message $ErrMsg
+            Write-Warning -Message $Msg
         }
 
         $Enable = !$Disable
@@ -812,8 +812,8 @@ Function Global:Clear-NpmCache {
     Param()
 
     if (!(Get-Command -Name 'npm' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to clear npm cache as npm command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to clear npm cache as npm command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'npm')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -828,8 +828,8 @@ Function Global:Clear-NpmCache {
     Write-Verbose -Message "Retrieving npm cache path: ${GetCmd}"
     $NpmCache = (& npm @GetArgs) -join ''
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve npm cache path (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve npm cache path (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GetCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -839,8 +839,8 @@ Function Global:Clear-NpmCache {
         Write-Verbose -Message "Clearing npm cache: ${ClearCmd}"
         & npm @ClearArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to clear npm cache (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to clear npm cache (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ClearCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -883,16 +883,16 @@ Function Global:Switch-Nodejs {
     End {
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
-            $ErrMsg = "Node.js path is inaccessible or not a directory: ${Path}"
+            $Msg = "Node.js path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ErrExc = [ArgumentException]::new($Msg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
-            Write-Warning -Message $ErrMsg
+            Write-Warning -Message $Msg
         }
 
         try {
@@ -903,14 +903,14 @@ Function Global:Switch-Nodejs {
             $GlobalPrefixPath = (& npm @GlobalPrefixPathArgs) -join ''
             if ($LASTEXITCODE -ne 0) {
                 $NpmFailed = $true
-                $ErrMsg = "Failed to retrieve npm global prefix path (rc: ${LASTEXITCODE})."
+                $ExcMsg = "Failed to retrieve npm global prefix path (rc: ${LASTEXITCODE})."
             }
         } catch {
             $NpmFailed = $true
-            $ErrMsg = 'npm executable missing or could not be executed.'
+            $ExcMsg = 'npm executable missing or could not be executed.'
         } finally {
             if ($NpmFailed) {
-                $ErrExc = [Exception]::new($ErrMsg)
+                $ErrExc = [Exception]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GlobalPrefixPathCmd)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -918,8 +918,8 @@ Function Global:Switch-Nodejs {
         }
 
         if (!(Test-IsPathFullyQualified -Path $GlobalPrefixPath)) {
-            $ErrMsg = "npm global prefix is not set to a fully qualified path: ${GlobalPrefixPath}"
-            $ErrExc = [FormatException]::new($ErrMsg)
+            $ExcMsg = "npm global prefix is not set to a fully qualified path: ${GlobalPrefixPath}"
+            $ErrExc = [FormatException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $GlobalPrefixPath)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -981,8 +981,8 @@ Function Global:Update-NodejsPackages {
     Param()
 
     if (!(Get-Command -Name 'npm' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to update Node.js packages as npm command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to update Node.js packages as npm command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'npm')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -998,8 +998,8 @@ Function Global:Update-NodejsPackages {
         Write-Verbose -Message "Updating npm: ${UpdateNpmCmd}"
         & npm @UpdateNpmArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to update npm (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to update npm (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateNpmCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1010,8 +1010,8 @@ Function Global:Update-NodejsPackages {
         Write-Verbose -Message "Updating Node.js packages: ${UpdateCmd}"
         & npm @UpdateArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to update Node.js packages (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to update Node.js packages (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1052,16 +1052,16 @@ Function Global:Switch-PHP {
     End {
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
-            $ErrMsg = "PHP path is inaccessible or not a directory: ${Path}"
+            $Msg = "PHP path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ErrExc = [ArgumentException]::new($Msg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
-            Write-Warning -Message $ErrMsg
+            Write-Warning -Message $Msg
         }
 
         $Enable = !$Disable
@@ -1104,8 +1104,8 @@ Function Global:Clear-PipCache {
     Param()
 
     if (!(Get-Command -Name 'python' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to clear pip cache as python command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to clear pip cache as python command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'python')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1125,8 +1125,8 @@ Function Global:Clear-PipCache {
 
     $null = & python @PipModuleArgs 2>&1
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = 'Unable to clear pip cache as pip module not found.'
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = 'Unable to clear pip cache as pip module not found.'
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $PipModuleCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1134,16 +1134,16 @@ Function Global:Clear-PipCache {
 
     $PipVersionRaw = (& python @VersionArgs 2>&1) -join ''
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve pip version (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve pip version (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $VersionCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if ($PipVersionRaw -notmatch '^pip ([0-9]+\.[0-9]+(\.[0-9]+)?)') {
-        $ErrMsg = "Failed to extract pip version: ${PipVersionRaw}"
-        $ErrExc = [FormatException]::new($ErrMsg)
+        $ExcMsg = "Failed to extract pip version: ${PipVersionRaw}"
+        $ErrExc = [FormatException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ParserError
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $PipVersionRaw)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1155,8 +1155,8 @@ Function Global:Clear-PipCache {
     Write-Verbose -Message "Retrieving pip cache path: ${GetCmd}"
     $PipCacheInfo = & python @GetArgs
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve pip cache path (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve pip cache path (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GetCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1181,24 +1181,24 @@ Function Global:Clear-PipCache {
     }
 
     if (!$PipCacheIndexV2) {
-        $ErrMsg = 'Failed to determine pip package index page cache v2 location.'
-        $ErrExc = [FormatException]::new($ErrMsg)
+        $ExcMsg = 'Failed to determine pip package index page cache v2 location.'
+        $ErrExc = [FormatException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ParserError
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PipCacheNotFound', $ErrCat, $PipCacheInfo)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if (!$PipCacheIndex) {
-        $ErrMsg = 'Failed to determine pip package index page cache location.'
-        $ErrExc = [FormatException]::new($ErrMsg)
+        $ExcMsg = 'Failed to determine pip package index page cache location.'
+        $ErrExc = [FormatException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ParserError
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PipCacheNotFound', $ErrCat, $PipCacheInfo)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if (!$PipCacheWheels) {
-        $ErrMsg = 'Failed to determine pip wheels cache location.'
-        $ErrExc = [FormatException]::new($ErrMsg)
+        $ExcMsg = 'Failed to determine pip wheels cache location.'
+        $ErrExc = [FormatException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ParserError
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PipCacheNotFound', $ErrCat, $PipCacheInfo)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1208,8 +1208,8 @@ Function Global:Clear-PipCache {
         Write-Verbose -Message "Clearing pip cache: ${ClearCmd}"
         & python @ClearArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to clear pip cache (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to clear pip cache (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ClearCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1227,16 +1227,16 @@ Function Global:Update-PythonPipPackages {
     Param()
 
     if ([String]::IsNullOrWhiteSpace($Env:VIRTUAL_ENV) -and (Test-IsUnix)) {
-        $ErrMsg = 'Updating pip packages outside of a virtualenv is only supported on Windows.'
-        $ErrExc = [NotSupportedException]::new($ErrMsg)
+        $ExcMsg = 'Updating pip packages outside of a virtualenv is only supported on Windows.'
+        $ErrExc = [NotSupportedException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'OSNotSupported', $ErrCat, $null)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if (!(Get-Command -Name 'python' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to update pip packages as python command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to update pip packages as python command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'python')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1255,8 +1255,8 @@ Function Global:Update-PythonPipPackages {
 
     $null = & python @PipModuleArgs 2>&1
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = 'Unable to update pip packages as pip module not found.'
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = 'Unable to update pip packages as pip module not found.'
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $PipModuleCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1264,8 +1264,8 @@ Function Global:Update-PythonPipPackages {
 
     $PipdeptreeOutput = & python @PipdeptreeModuleArgs 2>&1
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = 'Unable to update pip packages as pipdeptree module not found.'
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = 'Unable to update pip packages as pipdeptree module not found.'
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $PipdeptreeModuleCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1273,16 +1273,16 @@ Function Global:Update-PythonPipPackages {
 
     $PipVersionRaw = (& python @PipVersionArgs 2>&1) -join ''
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve pip version (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve pip version (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $PipVersionCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if ($PipVersionRaw -notmatch '^pip ([0-9]+\.[0-9]+(\.[0-9]+)?)') {
-        $ErrMsg = "Failed to extract pip version: ${PipVersionRaw}"
-        $ErrExc = [FormatException]::new($ErrMsg)
+        $ExcMsg = "Failed to extract pip version: ${PipVersionRaw}"
+        $ErrExc = [FormatException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ParserError
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $PipVersionRaw)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1305,8 +1305,8 @@ Function Global:Update-PythonPipPackages {
         Write-Verbose -Message "Updating pip package: ${PipUpdatePipCmd}"
         & python @PipUpdatePipArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to update pip (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to update pip (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $PipUpdatePipCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1330,8 +1330,8 @@ Function Global:Update-PythonPipPackages {
         Write-Verbose -Message "Updating pip packages: ${PipUpdateCmd} $($Packages -join ' ')"
         & python @PipUpdateArgs @Packages
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to update pip packages (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to update pip packages (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $PipUpdateCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1348,8 +1348,8 @@ Function Global:Update-PythonPipxPackages {
     Param()
 
     if (!(Get-Command -Name 'python' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to update pipx packages as python command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to update pipx packages as python command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'python')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1366,8 +1366,8 @@ Function Global:Update-PythonPipxPackages {
     # Use `list` as invoking without a command will return a non-zero exit code
     $null = & python @ListArgs 2>&1
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = 'Unable to update pipx packages as pipx module not found.'
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = 'Unable to update pipx packages as pipx module not found.'
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ListCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1394,8 +1394,8 @@ Function Global:Update-PythonPipxPackages {
             Write-Verbose -Message "Updating pipx packages: ${UpdateCmd}"
             & python @UpdateArgs
             if ($LASTEXITCODE -ne 0) {
-                $ErrMsg = "Failed to update pipx packages (rc: ${LASTEXITCODE})."
-                $ErrExc = [Exception]::new($ErrMsg)
+                $ExcMsg = "Failed to update pipx packages (rc: ${LASTEXITCODE})."
+                $ErrExc = [Exception]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1461,8 +1461,8 @@ Function Global:Update-QtComponents {
         }
 
         if ($QtMtPath -isnot [IO.FileInfo] -or $QtMtPath.Name -ne $QtMtName) {
-            $ErrMsg = 'Unable to update Qt components as MaintenanceTool command was not found.'
-            $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+            $ExcMsg = 'Unable to update Qt components as MaintenanceTool command was not found.'
+            $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'MaintenanceTool')
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1481,8 +1481,8 @@ Function Global:Update-QtComponents {
         Write-Verbose -Message "Updating Qt components: ${QtMtCmd}"
         & $QtMtPath @QtMtArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to update Qt components (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to update Qt components (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $QtMtCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1501,8 +1501,8 @@ Function Global:Clear-GemCache {
     Param()
 
     if (!(Get-Command -Name 'gem' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to clear gem cache as gem command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to clear gem cache as gem command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'gem')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1517,8 +1517,8 @@ Function Global:Clear-GemCache {
     Write-Verbose -Message "Retrieving gem environment: ${GetCmd}"
     $GemEnv = & gem @GetArgs
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve Gem environment (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve Gem environment (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GetCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1533,8 +1533,8 @@ Function Global:Clear-GemCache {
     }
 
     if (!$GemSpecCache) {
-        $ErrMsg = 'Failed to determine gem cache path.'
-        $ErrExc = [FormatException]::new($ErrMsg)
+        $ExcMsg = 'Failed to determine gem cache path.'
+        $ErrExc = [FormatException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ParserError
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $GemEnv)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1544,8 +1544,8 @@ Function Global:Clear-GemCache {
         Write-Verbose -Message "Clearing gem cache: ${ClearCmd}"
         & gem @ClearArgs
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to clear gem cache (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to clear gem cache (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ClearCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1591,16 +1591,16 @@ Function Global:Switch-Ruby {
     End {
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
-            $ErrMsg = "Ruby path is inaccessible or not a directory: ${Path}"
+            $Msg = "Ruby path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ErrExc = [ArgumentException]::new($Msg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
-            Write-Warning -Message $ErrMsg
+            Write-Warning -Message $Msg
         }
 
         $Enable = !$Disable
@@ -1672,16 +1672,16 @@ Function Global:Update-RubyGems {
     Param()
 
     if (!(Test-IsWindows)) {
-        $ErrMsg = 'Updating Ruby gems is only supported on Windows.'
-        $ErrExc = [NotSupportedException]::new($ErrMsg)
+        $ExcMsg = 'Updating Ruby gems is only supported on Windows.'
+        $ErrExc = [NotSupportedException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'OSNotSupported', $ErrCat, $null)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
     if (!(Get-Command -Name 'gem' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to update Ruby gems as gem command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to update Ruby gems as gem command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'gem')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1709,8 +1709,8 @@ Function Global:Update-RubyGems {
     Write-Verbose -Message "Updating RubyGems system${ExplainMsg}: ${UpdateSystemCmd}"
     & gem @UpdateSystemArgs
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to update RubyGems system${ExplainMsg} (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to update RubyGems system${ExplainMsg} (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateSystemCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1726,8 +1726,8 @@ Function Global:Update-RubyGems {
     }
 
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to retrieve Ruby gems (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to retrieve Ruby gems (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ListCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1743,8 +1743,8 @@ Function Global:Update-RubyGems {
     Write-Verbose -Message "Updating Ruby gems${ExplainMsg}: ${UpdateCmd} $($Packages -join ' ')"
     & gem @UpdateArgs @Packages
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to update Ruby gems${ExplainMsg} (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to update Ruby gems${ExplainMsg} (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "${UpdateCmd} $($Packages -join ' ')")
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1760,8 +1760,8 @@ Function Global:Update-RubyGems {
     Write-Verbose -Message "Uninstalling obsolete Ruby gems${DryrunMsg}: ${CleanupCmd}"
     & gem @CleanupArgs
     if ($LASTEXITCODE -ne 0) {
-        $ErrMsg = "Failed to uninstall obsolete Ruby gems${DryrunMsg} (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ErrMsg)
+        $ExcMsg = "Failed to uninstall obsolete Ruby gems${DryrunMsg} (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $CleanupCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1814,15 +1814,15 @@ Function Global:Switch-Rust {
 
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
-            $ErrMsg = "Cargo path is inaccessible or not a directory: ${Path}"
+            $Msg = "Cargo path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
                 if ($PSBoundParameters.ContainsKey('Path')) {
-                    $ErrExc = [ArgumentException]::new($ErrMsg)
+                    $ErrExc = [ArgumentException]::new($Msg)
                     $ErrId = 'PSInvalidArgument'
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 } else {
-                    $ErrExc = [IO.IOException]::new($ErrMsg)
+                    $ErrExc = [IO.IOException]::new($Msg)
                     $ErrId = 'PathNotDirectory'
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 }
@@ -1831,7 +1831,7 @@ Function Global:Switch-Rust {
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
-            Write-Warning -Message $ErrMsg
+            Write-Warning -Message $Msg
         }
 
         $Enable = !$Disable
@@ -1882,8 +1882,8 @@ Function Global:Update-RustToolchains {
     Param()
 
     if (!(Get-Command -Name 'rustup' -ErrorAction 'Ignore')) {
-        $ErrMsg = 'Unable to update Rust toolchains as rustup command not found.'
-        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'Unable to update Rust toolchains as rustup command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'rustup')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1893,8 +1893,8 @@ Function Global:Update-RustToolchains {
         Write-Verbose -Message 'Updating Rust toolchains: rustup update'
         & rustup update
         if ($LASTEXITCODE -ne 0) {
-            $ErrMsg = "Failed to update Rust toolchains (rc: ${LASTEXITCODE})."
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "Failed to update Rust toolchains (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, 'rustup update')
             $PSCmdlet.ThrowTerminatingError($ErrRec)

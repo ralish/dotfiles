@@ -76,8 +76,8 @@ Function Get-OhMyPoshThemePath {
         } elseif ($PathElements -contains '.linuxbrew') {
             $BinFileItem = Get-Item -LiteralPath $BinFilePath -ErrorAction 'Ignore'
             if ($BinFileItem -isnot [IO.FileInfo]) {
-                $ErrMsg = "Detected Homebrew installation but path to oh-my-posh binary is not a file: ${BinFilePath}"
-                $ErrExc = [IO.FileNotFoundException]::new($ErrMsg)
+                $ExcMsg = "Detected Homebrew installation but path to oh-my-posh binary is not a file: ${BinFilePath}"
+                $ErrExc = [IO.FileNotFoundException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFound', $ErrCat, $BinFilePath)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)

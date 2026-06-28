@@ -38,8 +38,8 @@ Function Global:Get-AzureAuthHeader {
         }
 
         default {
-            $ErrMsg = "Unexpected type for AccessToken argument: $($AccessToken.GetType().FullName)"
-            $ErrExc = [ArgumentException]::new($ErrMsg)
+            $ExcMsg = "Unexpected type for AccessToken argument: $($AccessToken.GetType().FullName)"
+            $ErrExc = [ArgumentException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $AccessToken)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -97,8 +97,8 @@ Function Global:Get-EntraUserLicenseReport {
         } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
         if ($LicensingInfo.Count -eq 0) {
-            $ErrMsg = 'Imported licensing information CSV has no entries.'
-            $ErrExc = [IO.InvalidDataException]::new($ErrMsg)
+            $ExcMsg = 'Imported licensing information CSV has no entries.'
+            $ErrExc = [IO.InvalidDataException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvImportEmpty', $ErrCat, $LicensingInfoCsv)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -107,8 +107,8 @@ Function Global:Get-EntraUserLicenseReport {
         $ColumnNames = 'Product_Display_Name', 'String_Id', 'Guid', 'Service_Plan_Name', 'Service_Plan_Id', 'Service_Plans_Included_Friendly_Names'
         foreach ($ColumnName in $ColumnNames) {
             if (!($LicensingInfo[0].PSObject.Properties.Name -contains $ColumnName)) {
-                $ErrMsg = "Imported CSV is missing expected column: ${ColumnName}"
-                $ErrExc = [IO.InvalidDataException]::new($ErrMsg)
+                $ExcMsg = "Imported CSV is missing expected column: ${ColumnName}"
+                $ErrExc = [IO.InvalidDataException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvMissingColumn', $ErrCat, $LicensingInfoCsv)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -134,8 +134,8 @@ Function Global:Get-EntraUserLicenseReport {
                 # Validate format and normalise
                 $LicenseSkuId = [Guid]::new($Entry.Guid).ToString()
             } catch {
-                $ErrMsg = "Invalid GUID encountered for license entry: $($Entry.Guid)"
-                $ErrExc = [FormatException]::new($ErrMsg)
+                $ExcMsg = "Invalid GUID encountered for license entry: $($Entry.Guid)"
+                $ErrExc = [FormatException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvInvalidData', $ErrCat, $Entry.Guid)
                 $PSCmdlet.WriteError($ErrRec)
@@ -198,8 +198,8 @@ Function Global:Get-EntraUserLicenseReport {
                 # Validate format and normalise
                 $ServicePlanId = [Guid]::new($Entry.Service_Plan_Id).ToString()
             } catch {
-                $ErrMsg = "Invalid GUID encountered for service plan entry: $($Entry.Service_Plan_Id)"
-                $ErrExc = [FormatException]::new($ErrMsg)
+                $ExcMsg = "Invalid GUID encountered for service plan entry: $($Entry.Service_Plan_Id)"
+                $ErrExc = [FormatException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvInvalidData', $ErrCat, $Entry.Service_Plan_Id)
                 $PSCmdlet.WriteError($ErrRec)

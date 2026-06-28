@@ -52,8 +52,8 @@ if ($PSCmdlet.ShouldProcess($DismCmd, 'Start')) {
         3010 { Write-Warning -Message 'DISM completed successfully but the changes require a reboot.' }
 
         default {
-            $ErrMsg = "DISM exited with non-zero exit code: $($Dism.ExitCode)"
-            $ErrExc = [Exception]::new($ErrMsg)
+            $ExcMsg = "DISM exited with non-zero exit code: $($Dism.ExitCode)"
+            $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $DismCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)

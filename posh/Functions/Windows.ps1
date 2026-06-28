@@ -198,8 +198,8 @@ Function Global:Find-WinEvent {
         try {
             $StartTime = (Get-CimInstance @CommonParams -ClassName 'Win32_OperatingSystem' -ErrorAction 'Stop').LastBootUpTime
         } catch {
-            $ErrMsg = "Failed to retrieve system boot time: $($PSItem.Exception.Message)"
-            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ExcMsg = "Failed to retrieve system boot time: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'WmiApiFailed', $ErrCat, $null)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -295,8 +295,8 @@ Function Global:Find-WinEvent {
     }
 
     if ($EventLogs.Count -eq 0) {
-        $ErrMsg = 'No event logs or providers matched the filter.'
-        $ErrExc = [Management.Automation.ItemNotFoundException]::new($ErrMsg)
+        $ExcMsg = 'No event logs or providers matched the filter.'
+        $ErrExc = [Management.Automation.ItemNotFoundException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'FilterReturnedNoMatches', $ErrCat, $null)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -539,8 +539,8 @@ Function Global:Restore-MappedNetworkDrives {
         try {
             $null = New-SmbMapping -LocalPath $MappedDrive.LocalPath -RemotePath $MappedDrive.RemotePath -Persistent $true -ErrorAction 'Stop'
         } catch {
-            $ErrMsg = "Failed to restore mapped network drive: $($MappedDrive.LocalPath)"
-            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ExcMsg = "Failed to restore mapped network drive: $($MappedDrive.LocalPath)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RestoreMappedNetworkDriveFailed', $ErrCat, $MappedDrive)
             $PSCmdlet.WriteError($ErrRec)
@@ -616,8 +616,8 @@ Function Global:Search-Registry {
 
                 if ($OpenSubKeyFailed) {
                     $RegPath = Join-Path -Path $RegKeys[-1].Name -ChildPath $SubKey
-                    $ErrMsg = "Failed to open registry key: ${RegPath}"
-                    $ErrExc = [Management.Automation.ItemNotFoundException]::new($ErrMsg)
+                    $ExcMsg = "Failed to open registry key: ${RegPath}"
+                    $ErrExc = [Management.Automation.ItemNotFoundException]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegistryKeyNotFound', $ErrCat, $RegPath)
                     $PSCmdlet.WriteError($ErrRec)
@@ -851,8 +851,8 @@ Function Global:Convert-SecurityDescriptor {
 
             'WMI' {
                 if ($WmiSD.__CLASS -ne 'Win32_SecurityDescriptor') {
-                    $ErrMsg = "Expected Win32_SecurityDescriptor instance but received: $($WmiSD.__CLASS)"
-                    $ErrExc = [ArgumentException]::new($ErrMsg)
+                    $ExcMsg = "Expected Win32_SecurityDescriptor instance but received: $($WmiSD.__CLASS)"
+                    $ErrExc = [ArgumentException]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $WmiSD)
                     $PSCmdlet.WriteError($ErrRec)
@@ -867,8 +867,8 @@ Function Global:Convert-SecurityDescriptor {
             }
         }
 
-        $ErrMsg = 'Unable to convert security descriptor to same type as input.'
-        $ErrExc = [ArgumentException]::new($ErrMsg)
+        $ExcMsg = 'Unable to convert security descriptor to same type as input.'
+        $ErrExc = [ArgumentException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $null)
         $PSCmdlet.WriteError($ErrRec)
