@@ -13,7 +13,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'AWS.format.ps1xm
 #region IAM
 
 # Set AWS credential environment variables
-Function Set-AWSCredentialEnvironment {
+Function Global:Set-AWSCredentialEnvironment {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUsePSCredentialType', '')]
     [CmdletBinding()]
@@ -69,7 +69,7 @@ Function Set-AWSCredentialEnvironment {
 #region Route 53
 
 # Set the `Name` tag for a Route 53 hosted zone to the zone name
-Function Set-R53HostedZoneNameTag {
+Function Global:Set-R53HostedZoneNameTag {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(
@@ -110,7 +110,7 @@ Function Set-R53HostedZoneNameTag {
 }
 
 # Set records on a Route 53 hosted zone suitable for a parked domain
-Function Set-R53HostedZoneParkedRecords {
+Function Global:Set-R53HostedZoneParkedRecords {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType('Amazon.Route53.Model.ChangeInfo[]')]
     Param(
@@ -353,7 +353,7 @@ Function Set-R53HostedZoneParkedRecords {
 }
 
 # Set a tag on a Route 53 hosted zone
-Function Set-R53HostedZoneTag {
+Function Global:Set-R53HostedZoneTag {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(
@@ -405,7 +405,7 @@ Function Set-R53HostedZoneTag {
 #region S3
 
 # Retrieve the size of every AWS S3 bucket
-Function Get-S3BucketSize {
+Function Global:Get-S3BucketSize {
     [CmdletBinding()]
     [OutputType('Void', 'Amazon.S3.Model.S3Bucket[]')]
     Param()

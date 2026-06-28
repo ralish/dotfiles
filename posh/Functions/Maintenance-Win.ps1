@@ -13,7 +13,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Maintenance-Win.
 #
 # Chromium Updater Functional Specification
 # https://chromium.googlesource.com/chromium/src/+/HEAD/docs/updater/functional_spec.md#Updates
-Function Update-Chrome {
+Function Global:Update-Chrome {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
@@ -321,7 +321,7 @@ Function Update-Chrome {
 }
 
 # Update Microsoft Edge
-Function Update-Edge {
+Function Global:Update-Edge {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
@@ -624,7 +624,7 @@ Function Update-Edge {
 }
 
 # Update Microsoft Store apps
-Function Update-MicrosoftStore {
+Function Global:Update-MicrosoftStore {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param()
@@ -711,7 +711,7 @@ Function Update-MicrosoftStore {
 }
 
 # Update Microsoft Office (Click-to-Run only)
-Function Update-Office {
+Function Global:Update-Office {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
@@ -855,7 +855,7 @@ Function Update-Office {
 }
 
 # Update Python runtimes
-Function Update-Python {
+Function Global:Update-Python {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param()
@@ -946,7 +946,7 @@ Function Update-Python {
 # Update Scoop, installed apps, and perform clean-up
 #
 # TODO: Add dependency cooldown support when available
-Function Update-Scoop {
+Function Global:Update-Scoop {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
@@ -1096,7 +1096,7 @@ Function Update-Scoop {
 #
 # Use command-line parameters to install, update, and manage Visual Studio
 # https://learn.microsoft.com/en-au/visualstudio/install/use-command-line-parameters-to-install-visual-studio
-Function Update-VisualStudio {
+Function Global:Update-VisualStudio {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
@@ -1293,7 +1293,7 @@ Function Update-VisualStudio {
 }
 
 # Update Microsoft Windows
-Function Update-Windows {
+Function Global:Update-Windows {
     [CmdletBinding(DefaultParameterSetName = 'Exclude', SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
@@ -1399,7 +1399,7 @@ Function Update-Windows {
 # Update Microsoft WinGet
 #
 # TODO: Add dependency cooldown support when available
-Function Update-WinGet {
+Function Global:Update-WinGet {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param()
@@ -1481,7 +1481,7 @@ Function Update-WinGet {
 }
 
 # Update Windows Subsystem for Linux
-Function Update-WSL {
+Function Global:Update-WSL {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param()

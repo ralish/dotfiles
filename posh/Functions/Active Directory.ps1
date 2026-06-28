@@ -12,7 +12,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory
 #region Directory schema
 
 # Resolve AD GUIDs corresponding to extended rights or schema objects
-Function Resolve-ADGuid {
+Function Global:Resolve-ADGuid {
     [CmdletBinding(DefaultParameterSetName = 'Guid')]
     [OutputType('Void', 'Microsoft.ActiveDirectory.Management.ADObject[]')]
     Param(
@@ -114,7 +114,7 @@ Function Resolve-ADGuid {
 #
 # Problems with Kerberos authentication when a user belongs to many groups
 # https://learn.microsoft.com/en-au/troubleshoot/windows-server/windows-security/kerberos-authentication-problems-if-user-belongs-to-groups
-Function Get-KerberosTokenSize {
+Function Global:Get-KerberosTokenSize {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     Param(
@@ -210,7 +210,7 @@ Function Get-KerberosTokenSize {
 #region Shadow security principals
 
 # Add members to a shadow principal
-Function Add-ADShadowPrincipalMember {
+Function Global:Add-ADShadowPrincipalMember {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType('Void', 'Microsoft.ActiveDirectory.Management.ADObject[]')]
     Param(
@@ -298,7 +298,7 @@ Function Add-ADShadowPrincipalMember {
 }
 
 # Retrieve the `DN` for the "Shadow Principal Configuration" container
-Function Get-ADShadowPrincipalContainer {
+Function Global:Get-ADShadowPrincipalContainer {
     [CmdletBinding()]
     [OutputType([String])]
     Param(
@@ -319,7 +319,7 @@ Function Get-ADShadowPrincipalContainer {
 }
 
 # Create a shadow principal
-Function New-ADShadowPrincipal {
+Function Global:New-ADShadowPrincipal {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType('Void', 'Microsoft.ActiveDirectory.Management.ADObject')]
     Param(

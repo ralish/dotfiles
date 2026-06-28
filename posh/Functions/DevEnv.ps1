@@ -6,7 +6,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'DevEnv.format.ps
 #region .NET
 
 # Clear NuGet cache
-Function Clear-NuGetCache {
+Function Global:Clear-NuGetCache {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()
@@ -84,7 +84,7 @@ Function Clear-NuGetCache {
 #
 # TODO: Add support for local tools
 # TODO: Add dependency cooldown support when available
-Function Update-DotNetTools {
+Function Global:Update-DotNetTools {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
@@ -260,7 +260,7 @@ Function Update-DotNetTools {
 #region Go
 
 # Clear Go cache
-Function Clear-GoCache {
+Function Global:Clear-GoCache {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()
@@ -334,7 +334,7 @@ Function Clear-GoCache {
 #
 # Environment variables
 # https://golang.org/cmd/go/#hdr-Environment_variables
-Function Switch-Go {
+Function Global:Switch-Go {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -452,7 +452,7 @@ Function Switch-Go {
 #
 # TODO: Add dependency cooldown support when available
 # TODO: Handle the case where `gup` wasn't installed by Go
-Function Update-GoBinaries {
+Function Global:Update-GoBinaries {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param()
@@ -537,7 +537,7 @@ Function Update-GoBinaries {
 #region Google
 
 # Configure environment for Google `depot_tools` usage
-Function Switch-GoogleDepotTools {
+Function Global:Switch-GoogleDepotTools {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -634,7 +634,7 @@ Function Switch-GoogleDepotTools {
 #region Java
 
 # Clear Gradle cache
-Function Clear-GradleCache {
+Function Global:Clear-GradleCache {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param()
@@ -670,7 +670,7 @@ Function Clear-GradleCache {
 }
 
 # Clear Maven cache
-Function Clear-MavenCache {
+Function Global:Clear-MavenCache {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param()
@@ -713,7 +713,7 @@ Function Clear-MavenCache {
 }
 
 # Configure environment for Java development
-Function Switch-Java {
+Function Global:Switch-Java {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -806,7 +806,7 @@ Function Switch-Java {
 #region Node.js
 
 # Clear npm cache
-Function Clear-NpmCache {
+Function Global:Clear-NpmCache {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()
@@ -852,7 +852,7 @@ Function Clear-NpmCache {
 #
 # Environment variables
 # https://nodejs.org/api/cli.html#cli_environment_variables
-Function Switch-Nodejs {
+Function Global:Switch-Nodejs {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -975,7 +975,7 @@ Function Switch-Nodejs {
 #
 # TODO: Add dependency cooldown support
 # https://docs.npmjs.com/cli/v11/using-npm/config#min-release-age
-Function Update-NodejsPackages {
+Function Global:Update-NodejsPackages {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()
@@ -1024,7 +1024,7 @@ Function Update-NodejsPackages {
 #region PHP
 
 # Configure environment for PHP development
-Function Switch-PHP {
+Function Global:Switch-PHP {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -1098,7 +1098,7 @@ Function Switch-PHP {
 #region Python
 
 # Clear pip cache
-Function Clear-PipCache {
+Function Global:Clear-PipCache {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()
@@ -1221,7 +1221,7 @@ Function Clear-PipCache {
 #
 # TODO: Add dependency cooldown support
 # https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-uploaded-prior-to
-Function Update-PythonPipPackages {
+Function Global:Update-PythonPipPackages {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()
@@ -1342,7 +1342,7 @@ Function Update-PythonPipPackages {
 # Update Python pipx packages
 #
 # TODO: Add dependency cooldown support when available
-Function Update-PythonPipxPackages {
+Function Global:Update-PythonPipxPackages {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()
@@ -1415,7 +1415,7 @@ Function Update-PythonPipxPackages {
 #region Qt
 
 # Update Qt components
-Function Update-QtComponents {
+Function Global:Update-QtComponents {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param(
@@ -1495,7 +1495,7 @@ Function Update-QtComponents {
 #region Ruby
 
 # Clear gem cache
-Function Clear-GemCache {
+Function Global:Clear-GemCache {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()
@@ -1557,7 +1557,7 @@ Function Clear-GemCache {
 #
 # Environment variables
 # https://docs.ruby-lang.org/en/master/language/options_md.html
-Function Switch-Ruby {
+Function Global:Switch-Ruby {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -1666,7 +1666,7 @@ Function Switch-Ruby {
 #
 # TODO: Add dependency cooldown support when available
 # https://github.com/ruby/rubygems/discussions/9113
-Function Update-RubyGems {
+Function Global:Update-RubyGems {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([String[]])]
     Param()
@@ -1773,7 +1773,7 @@ Function Update-RubyGems {
 #region Rust
 
 # Configure environment for Rust development
-Function Switch-Rust {
+Function Global:Switch-Rust {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -1876,7 +1876,7 @@ Function Switch-Rust {
 }
 
 # Update Rust toolchains
-Function Update-RustToolchains {
+Function Global:Update-RustToolchains {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([String[]])]
     Param()

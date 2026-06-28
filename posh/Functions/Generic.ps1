@@ -7,7 +7,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Generic.format.p
 
 # Convert a byte array to a hex string
 # Via: https://www.reddit.com/r/PowerShell/comments/5rhjsy/hex_to_byte_array_and_back/
-Function Convert-BytesToHex {
+Function Global:Convert-BytesToHex {
     [CmdletBinding()]
     [OutputType([String])]
     Param(
@@ -32,7 +32,7 @@ Function Convert-BytesToHex {
 
 # Convert a hex string to a byte array
 # Via: https://www.reddit.com/r/PowerShell/comments/5rhjsy/hex_to_byte_array_and_back/
-Function Convert-HexToBytes {
+Function Global:Convert-HexToBytes {
     [CmdletBinding()]
     [OutputType([Byte[]])]
     Param(
@@ -53,7 +53,7 @@ Function Convert-HexToBytes {
 }
 
 # Convert a string from Base64 format
-Function ConvertFrom-Base64 {
+Function Global:ConvertFrom-Base64 {
     [CmdletBinding()]
     [OutputType([String])]
     Param(
@@ -67,7 +67,7 @@ Function ConvertFrom-Base64 {
 }
 
 # Convert a string from URL encoded format
-Function ConvertFrom-URLEncoded {
+Function Global:ConvertFrom-URLEncoded {
     [CmdletBinding()]
     [OutputType([String])]
     Param(
@@ -81,7 +81,7 @@ Function ConvertFrom-URLEncoded {
 }
 
 # Convert a string to Base64 format
-Function ConvertTo-Base64 {
+Function Global:ConvertTo-Base64 {
     [CmdletBinding()]
     [OutputType([String])]
     Param(
@@ -95,7 +95,7 @@ Function ConvertTo-Base64 {
 }
 
 # Convert a text file to the given encoding
-Function ConvertTo-TextEncoding {
+Function Global:ConvertTo-TextEncoding {
     [CmdletBinding()]
     [OutputType([Void])]
     Param(
@@ -236,7 +236,7 @@ Function ConvertTo-TextEncoding {
 }
 
 # Convert a string to URL encoded format
-Function ConvertTo-URLEncoded {
+Function Global:ConvertTo-URLEncoded {
     [CmdletBinding()]
     [OutputType([String])]
     Param(
@@ -250,7 +250,7 @@ Function ConvertTo-URLEncoded {
 }
 
 # Determine the encoding of a text file
-Function Get-TextEncoding {
+Function Global:Get-TextEncoding {
     [CmdletBinding()]
     [OutputType([Void], [PSCustomObject[]])]
     Param(
@@ -364,7 +364,7 @@ Function Get-TextEncoding {
 #region Filesystem
 
 # Create a file in each empty directory under a path
-Function Add-FileToEmptyDirectories {
+Function Global:Add-FileToEmptyDirectories {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(
@@ -452,7 +452,7 @@ Function Add-FileToEmptyDirectories {
 }
 
 # Retrieve a directory summary containing item counts and total size
-Function Get-DirectorySummary {
+Function Global:Get-DirectorySummary {
     [CmdletBinding()]
     [OutputType([Void], [PSCustomObject])]
     Param(
@@ -508,7 +508,7 @@ Function Get-DirectorySummary {
 #region Formatting
 
 # Add quotes to strings with spaces
-Function Add-QuotesToStringWithSpace {
+Function Global:Add-QuotesToStringWithSpace {
     [CmdletBinding()]
     [OutputType([String])]
     Param(
@@ -536,7 +536,7 @@ Function Add-QuotesToStringWithSpace {
 }
 
 # Format a number representing the size of some digital information
-Function Format-SizeDigital {
+Function Global:Format-SizeDigital {
     [CmdletBinding()]
     [OutputType([String])]
     Param(
@@ -584,7 +584,7 @@ Function Format-SizeDigital {
 
 # Beautify XML strings
 # Via: https://learn.microsoft.com/en-au/archive/blogs/sergey_babkins_blog/how-to-pretty-print-xml-in-powershell-and-text-pipelines
-Function Format-Xml {
+Function Global:Format-Xml {
     [CmdletBinding()]
     [OutputType([String])]
     Param(
@@ -643,7 +643,7 @@ Function Format-Xml {
 
 # Sort XML elements
 # Via: https://danielsmon.com/2017/03/10/diff-xml-via-sorting-xml-elements-and-attributes/
-Function Sort-XmlElement {
+Function Global:Sort-XmlElement {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
     [CmdletBinding()]
     [OutputType([Void])]
@@ -712,7 +712,7 @@ Function Sort-XmlElement {
 #region Object properties
 
 # Add a `Computer` property to group objects
-Function Add-GroupObjectComputerProperty {
+Function Global:Add-GroupObjectComputerProperty {
     [CmdletBinding()]
     [OutputType([Void], [Microsoft.PowerShell.Commands.GroupInfo[]])]
     Param(
@@ -753,7 +753,7 @@ Function Add-GroupObjectComputerProperty {
 #region Path management
 
 # Add an element to a `Path` type string
-Function Add-PathStringElement {
+Function Global:Add-PathStringElement {
     [CmdletBinding()]
     [OutputType([String])]
     Param(
@@ -827,7 +827,7 @@ Function Add-PathStringElement {
 }
 
 # Remove an element from a `Path` type string
-Function Remove-PathStringElement {
+Function Global:Remove-PathStringElement {
     [CmdletBinding()]
     [OutputType([String])]
     Param(
@@ -881,7 +881,7 @@ Function Remove-PathStringElement {
 }
 
 # Remove excess separators from a `Path` type string
-Function Repair-PathString {
+Function Global:Repair-PathString {
     [CmdletBinding()]
     [OutputType([String])]
     Param(

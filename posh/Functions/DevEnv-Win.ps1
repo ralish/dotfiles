@@ -12,7 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 #
 # Environment variables
 # https://cygwin.com/cygwin-ug-net/setup-env.html
-Function Switch-Cygwin {
+Function Global:Switch-Cygwin {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -120,7 +120,7 @@ Function Switch-Cygwin {
 #
 # Environment variables
 # https://perldoc.perl.org/perlrun.html#ENVIRONMENT
-Function Switch-Perl {
+Function Global:Switch-Perl {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -257,7 +257,7 @@ Function Switch-Perl {
 #
 # Environment variables
 # https://docs.python.org/3/using/cmdline.html#environment-variables
-Function Switch-Python {
+Function Global:Switch-Python {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -453,7 +453,7 @@ Function Switch-Python {
 #region Windows
 
 # Configure environment for Windows SDK tools
-Function Switch-WindowsSDK {
+Function Global:Switch-WindowsSDK {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(

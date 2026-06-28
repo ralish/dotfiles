@@ -10,7 +10,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Create a certificate signing request or self-signed certificate
 # https://docs.openssl.org/master/man1/openssl-req/
-Function New-OpenSSLCertificate {
+Function Global:New-OpenSSLCertificate {
     [CmdletBinding()]
     [OutputType([String[]])]
     Param(
@@ -203,7 +203,7 @@ Function New-OpenSSLCertificate {
 
 # Retrieve the details of a certificate
 # https://docs.openssl.org/master/man1/openssl-x509/
-Function Get-OpenSSLCertificate {
+Function Global:Get-OpenSSLCertificate {
     [CmdletBinding()]
     [OutputType([String[]])]
     Param(
@@ -237,7 +237,7 @@ Function Get-OpenSSLCertificate {
 
 # Retrieve the details of a certificate signing request
 # https://docs.openssl.org/master/man1/openssl-req/
-Function Get-OpenSSLCsr {
+Function Global:Get-OpenSSLCsr {
     [CmdletBinding()]
     [OutputType([String[]])]
     Param(
@@ -273,7 +273,7 @@ Function Get-OpenSSLCsr {
 
 # Retrieve the details of a PKCS #12 certificate
 # https://docs.openssl.org/master/man1/openssl-pkcs12/
-Function Get-OpenSSLPkcs12 {
+Function Global:Get-OpenSSLPkcs12 {
     [CmdletBinding()]
     [OutputType([String[]])]
     Param(
@@ -330,7 +330,7 @@ Function Get-OpenSSLPkcs12 {
 
 # Retrieve a certificate from a SSL/TLS server
 # https://docs.openssl.org/master/man1/openssl-s_client/
-Function Get-OpenSSLServerCertificate {
+Function Global:Get-OpenSSLServerCertificate {
     [CmdletBinding()]
     [OutputType([String[]])]
     Param(
@@ -398,7 +398,7 @@ Function Get-OpenSSLServerCertificate {
 
 # Convert a certificate in DER format to PEM format
 # https://docs.openssl.org/master/man1/openssl-x509/
-Function Convert-OpenSSLDerToPem {
+Function Global:Convert-OpenSSLDerToPem {
     [CmdletBinding()]
     [OutputType([String[]])]
     Param(
@@ -426,7 +426,7 @@ Function Convert-OpenSSLDerToPem {
 
 # Convert a certificate in PEM format to DER format
 # https://docs.openssl.org/master/man1/openssl-x509/
-Function Convert-OpenSSLPemToDer {
+Function Global:Convert-OpenSSLPemToDer {
     [CmdletBinding()]
     [OutputType([String[]])]
     Param(
@@ -454,7 +454,7 @@ Function Convert-OpenSSLPemToDer {
 
 # Convert a certificate in PEM format to PKCS #12 format
 # https://docs.openssl.org/master/man1/openssl-pkcs12/
-Function Convert-OpenSSLPemToPkcs12 {
+Function Global:Convert-OpenSSLPemToPkcs12 {
     [CmdletBinding()]
     [OutputType([String[]])]
     Param(
@@ -531,7 +531,7 @@ Function Convert-OpenSSLPemToPkcs12 {
 
 # Convert a certificate in PKCS #12 format to PEM format
 # https://docs.openssl.org/master/man1/openssl-pkcs12/
-Function Convert-OpenSSLPkcs12ToPem {
+Function Global:Convert-OpenSSLPkcs12ToPem {
     [CmdletBinding(DefaultParameterSetName = 'Both')]
     [OutputType([String[]])]
     Param(
@@ -598,7 +598,7 @@ Function Convert-OpenSSLPkcs12ToPem {
 
 # Retrieve the list of supported ECC curves
 # https://docs.openssl.org/master/man1/openssl-ecparam/
-Function Get-OpenSSLEccCurves {
+Function Global:Get-OpenSSLEccCurves {
     [CmdletBinding()]
     [OutputType([String[]])]
     Param()
@@ -621,7 +621,7 @@ Function Get-OpenSSLEccCurves {
 
 # Retrieve the installed version of OpenSSL
 # https://docs.openssl.org/master/man1/openssl-version/
-Function Get-OpenSSLVersion {
+Function Global:Get-OpenSSLVersion {
     [CmdletBinding()]
     [OutputType([Version])]
     Param()

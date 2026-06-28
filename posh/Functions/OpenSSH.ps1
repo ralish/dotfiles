@@ -7,7 +7,7 @@ $DotFilesSection = @{
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Update OpenSSH configuration
-Function Update-OpenSSHConfig {
+Function Global:Update-OpenSSHConfig {
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

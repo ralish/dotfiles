@@ -7,7 +7,7 @@ $DotFilesSection = @{
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Clear Docker cache
-Function Clear-DockerCache {
+Function Global:Clear-DockerCache {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()

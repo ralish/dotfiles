@@ -12,7 +12,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Azure.format.ps1
 #region Authentication
 
 # Construct a HTTP authorization header for Azure
-Function Get-AzureAuthHeader {
+Function Global:Get-AzureAuthHeader {
     [CmdletBinding()]
     [OutputType([Hashtable])]
     Param(
@@ -59,7 +59,7 @@ Function Get-AzureAuthHeader {
 #region Reporting
 
 # Retrieve licensing information for Entra users
-Function Get-EntraUserLicenseReport {
+Function Global:Get-EntraUserLicenseReport {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     [OutputType(ParameterSetName = ('Default', 'LicensingInfo'), [PSCustomObject[]])]
     [OutputType(ParameterSetName = ('ParsedLicenses', 'ParsedServices'), [Hashtable])]

@@ -7,7 +7,7 @@ $DotFilesSection = @{
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Print summary information about a Git repository
-Function Get-GitRepoSummary {
+Function Global:Get-GitRepoSummary {
     [CmdletBinding()]
     [OutputType([Void], [String[]])]
     Param(
@@ -36,7 +36,7 @@ Function Get-GitRepoSummary {
 }
 
 # Invoke a linter on matching repository files
-Function Invoke-GitLinter {
+Function Global:Invoke-GitLinter {
     [CmdletBinding()]
     [OutputType(ParameterSetName = ('DevSkim', 'Markdownlint', 'ShellCheck'), [Void], [String[]])]
     [OutputType(ParameterSetName = 'PSScriptAnalyzer', 'Void', 'Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.DiagnosticRecord[]')]
@@ -259,7 +259,7 @@ Function Invoke-GitLinter {
 }
 
 # Fast-forward all branches to match a branch
-Function Invoke-GitMergeAllBranches {
+Function Global:Invoke-GitMergeAllBranches {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param(
@@ -402,7 +402,7 @@ Function Invoke-GitMergeAllBranches {
 }
 
 # Run a Git command in all repositories under a path
-Function Invoke-GitRepoCommand {
+Function Global:Invoke-GitRepoCommand {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param(
@@ -554,7 +554,7 @@ Function Invoke-GitRepoCommand {
 }
 
 # Remove a subset of paths returned by `git-clean`
-Function Remove-GitCleanSubset {
+Function Global:Remove-GitCleanSubset {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(

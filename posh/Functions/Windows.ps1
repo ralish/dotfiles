@@ -9,7 +9,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 #region Desktop
 
 # Disable presentation mode
-Function Disable-PresentationMode {
+Function Global:Disable-PresentationMode {
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -18,7 +18,7 @@ Function Disable-PresentationMode {
 }
 
 # Enable presentation mode
-Function Enable-PresentationMode {
+Function Global:Enable-PresentationMode {
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -31,7 +31,7 @@ Function Enable-PresentationMode {
 #region Environment variables
 
 # Retrieve an environment variable
-Function Get-EnvironmentVariable {
+Function Global:Get-EnvironmentVariable {
     [CmdletBinding()]
     [OutputType([String], [PSCustomObject[]])]
     Param(
@@ -62,7 +62,7 @@ Function Get-EnvironmentVariable {
 }
 
 # Set an environment variable
-Function Set-EnvironmentVariable {
+Function Global:Set-EnvironmentVariable {
     [CmdletBinding()]
     [OutputType([Void])]
     Param(
@@ -95,7 +95,7 @@ Function Set-EnvironmentVariable {
 }
 
 # Remove an environment variable
-Function Remove-EnvironmentVariable {
+Function Global:Remove-EnvironmentVariable {
     [CmdletBinding()]
     [OutputType([Void])]
     Param(
@@ -114,7 +114,7 @@ Function Remove-EnvironmentVariable {
 #region Event logs
 
 # `dmesg` for Windows
-Function dmesg {
+Function Global:dmesg {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     [OutputType([Void], [String[]], [Diagnostics.Eventing.Reader.EventLogRecord[]])]
     Param(
@@ -149,7 +149,7 @@ Function dmesg {
 }
 
 # Find events by filtering against logs and providers
-Function Find-WinEvent {
+Function Global:Find-WinEvent {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     [OutputType([Void], [String[]], [Diagnostics.Eventing.Reader.EventLogRecord[]])]
     Param(
@@ -418,7 +418,7 @@ Function Find-WinEvent {
 
 # Watch an event log (similar to Unix `tail`)
 # Slightly improved from: https://stackoverflow.com/a/15262376/8787985
-Function Watch-EventLog {
+Function Global:Watch-EventLog {
     [CmdletBinding()]
     [OutputType([Void], [Diagnostics.Eventing.Reader.EventLogRecord[]])]
     Param(
@@ -444,7 +444,7 @@ Function Watch-EventLog {
 #region Filesystem
 
 # Retrieve files with a minimum number of hard links
-Function Get-MultipleHardLinks {
+Function Global:Get-MultipleHardLinks {
     [CmdletBinding()]
     [OutputType([Void], [IO.FileInfo[]])]
     Param(
@@ -466,7 +466,7 @@ Function Get-MultipleHardLinks {
 }
 
 # Retrieve directories with non-inherited ACLs
-Function Get-NonInheritedACL {
+Function Global:Get-NonInheritedACL {
     [CmdletBinding()]
     [OutputType([Void], [IO.DirectoryInfo[]])]
     Param(
@@ -498,7 +498,7 @@ Function Get-NonInheritedACL {
 }
 
 # Helper function to call `cmd` built-in command `mklink`
-Function mklink {
+Function Global:mklink {
     [OutputType([String])]
     Param()
 
@@ -510,7 +510,7 @@ Function mklink {
 #region Networking
 
 # Open the hosts file for editing
-Function Edit-Hosts {
+Function Global:Edit-Hosts {
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -528,7 +528,7 @@ Function Edit-Hosts {
 }
 
 # Restore connections to mapped network drives
-Function Restore-MappedNetworkDrives {
+Function Global:Restore-MappedNetworkDrives {
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -553,7 +553,7 @@ Function Restore-MappedNetworkDrives {
 #region Registry
 
 # Search the registry
-Function Search-Registry {
+Function Global:Search-Registry {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     [OutputType(ParameterSetName = 'Default', [Void], [PSCustomObject[]])]
     [OutputType(ParameterSetName = 'Recursion', [Void])]
@@ -759,7 +759,7 @@ Function Search-Registry {
 #region Remote Desktop Connection
 
 # Update RDC default configuration
-Function Update-RdcDefaultConfig {
+Function Global:Update-RdcDefaultConfig {
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -811,7 +811,7 @@ Function Update-RdcDefaultConfig {
 #region Security
 
 # Convert security descriptors between different formats
-Function Convert-SecurityDescriptor {
+Function Global:Convert-SecurityDescriptor {
     [CmdletBinding()]
     [OutputType(ParameterSetName = 'Binary', [String], [Management.ManagementBaseObject])]
     [OutputType(ParameterSetName = 'SDDL', [Byte[]], [Management.ManagementBaseObject])]
@@ -876,7 +876,7 @@ Function Convert-SecurityDescriptor {
 }
 
 # Retrieve well-known security identifiers
-Function Get-WellKnownSID {
+Function Global:Get-WellKnownSID {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
     [CmdletBinding()]
     [OutputType([Security.Principal.SecurityIdentifier])]
@@ -1164,7 +1164,7 @@ Function Get-WellKnownSID {
 #region User accounts
 
 # Test if the user has administrator privileges
-Function Test-IsAdministrator {
+Function Global:Test-IsAdministrator {
     [CmdletBinding()]
     [OutputType([Boolean])]
     Param()

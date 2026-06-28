@@ -12,7 +12,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Maintenance-Nix.
 # Update Homebrew, casks and formulae, and perform clean-up
 #
 # TODO: Add dependency cooldown support when available
-Function Update-Homebrew {
+Function Global:Update-Homebrew {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(

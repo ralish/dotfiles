@@ -3,7 +3,7 @@ $null = Start-DotFilesSection -Type 'Functions' -Name 'PowerShell'
 #region .NET
 
 # Retrieve all type accelerators
-Function Get-TypeAccelerator {
+Function Global:Get-TypeAccelerator {
     [CmdletBinding()]
     [OutputType([Collections.Generic.Dictionary[String, Type]])]
     Param()
@@ -12,7 +12,7 @@ Function Get-TypeAccelerator {
 }
 
 # Retrieve the constructors for a type
-Function Get-TypeConstructor {
+Function Global:Get-TypeConstructor {
     [CmdletBinding()]
     [OutputType([Void], [PSCustomObject[]])]
     Param(
@@ -40,7 +40,7 @@ Function Get-TypeConstructor {
 }
 
 # Retrieve the methods for a type
-Function Get-TypeMethod {
+Function Global:Get-TypeMethod {
     [CmdletBinding()]
     [OutputType([Void], [PSCustomObject[]])]
     Param(
@@ -74,7 +74,7 @@ Function Get-TypeMethod {
 
 # Retrieve custom argument completers
 # Via: https://gist.github.com/indented-automation/26c637fb530c4b168e62c72582534f5b
-Function Get-ArgumentCompleter {
+Function Global:Get-ArgumentCompleter {
     [CmdletBinding()]
     [OutputType([Void], [PSCustomObject[]])]
     Param(
@@ -113,7 +113,7 @@ Function Get-ArgumentCompleter {
 #region Maintenance
 
 # Update PowerShell modules & built-in help
-Function Update-PowerShell {
+Function Global:Update-PowerShell {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(
@@ -387,7 +387,7 @@ Function Update-PowerShell {
 #region Object handling
 
 # Compare two hashtables
-Function Compare-Hashtable {
+Function Global:Compare-Hashtable {
     [CmdletBinding()]
     [OutputType([Void], [PSCustomObject[]])]
     Param(
@@ -454,7 +454,7 @@ Function Compare-Hashtable {
 
 # Compare the properties of two objects
 # Via: https://learn.microsoft.com/en-au/archive/blogs/janesays/compare-all-properties-of-two-objects-in-windows-powershell
-Function Compare-ObjectProperties {
+Function Global:Compare-ObjectProperties {
     [CmdletBinding()]
     [OutputType([Void], [PSCustomObject[]])]
     Param(
@@ -507,7 +507,7 @@ Function Compare-ObjectProperties {
 #region Profile management
 
 # Reload selected PowerShell profiles
-Function Update-Profile {
+Function Global:Update-Profile {
     [CmdletBinding()]
     [OutputType([Void])]
     Param(
@@ -552,7 +552,7 @@ Function Update-Profile {
 #region Security
 
 # Disable TLS certificate validation
-Function Disable-TlsCertificateValidation {
+Function Global:Disable-TlsCertificateValidation {
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -591,7 +591,7 @@ namespace DotFiles {
 #region Shortcut functions
 
 # Invoke `Format-List` selecting all properties
-Function fla {
+Function Global:fla {
     [CmdletBinding()]
     [OutputType([Void])]
     Param(
@@ -616,7 +616,7 @@ Function fla {
 }
 
 # Invoke `Format-Table` selecting all properties
-Function fta {
+Function Global:fta {
     [CmdletBinding()]
     [OutputType([Void])]
     Param(
@@ -641,7 +641,7 @@ Function fta {
 }
 
 # Invoke `Get-Help` with `-Detailed`
-Function ghd {
+Function Global:ghd {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     Param(
@@ -653,7 +653,7 @@ Function ghd {
 }
 
 # Invoke `Get-Help` with `-Examples`
-Function ghe {
+Function Global:ghe {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     Param(
@@ -665,7 +665,7 @@ Function ghe {
 }
 
 # Invoke `Get-Help` with `-Full`
-Function ghf {
+Function Global:ghf {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     Param(
@@ -677,7 +677,7 @@ Function ghf {
 }
 
 # Retrieve `FileVersionInfo` from a file
-Function gvi {
+Function Global:gvi {
     [CmdletBinding()]
     [OutputType([Diagnostics.FileVersionInfo])]
     Param(
