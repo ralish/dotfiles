@@ -487,7 +487,7 @@ Function Start-DotFilesSection {
             try {
                 Test-CommandAvailable -Name $Command
             } catch {
-                Write-DotFilesMessage -Type 'Verbose' -Message "Command(s) not available: $($PSItem.Exception.CommandName)"
+                Write-DotFilesMessage -Type 'Verbose' -Message "Skipping as command not available: $($PSItem.Exception.CommandName)"
                 $Error.RemoveAt(0)
                 return $false
             }
@@ -497,7 +497,8 @@ Function Start-DotFilesSection {
             try {
                 Test-EnvironmentMatch -Environment $Environment
             } catch {
-                Write-DotFilesMessage -Type 'Verbose' -Message $PSItem.Exception.Message
+                $ExcMsg = $PSItem.Exception.Message
+                Write-DotFilesMessage -Type 'Verbose' -Message ('Skipping as {0}{1}' -f [Char]::ToLowerInvariant($ExcMsg[0]), $ExcMsg.Substring(1))
                 $Error.RemoveAt(0)
                 return $false
             }
@@ -508,7 +509,8 @@ Function Start-DotFilesSection {
             try {
                 Test-ModuleAvailable -Name $Module -Operation $ModuleOperation -Require $ModuleRequire
             } catch {
-                Write-DotFilesMessage -Type 'Verbose' -Message $PSItem.Exception.Message
+                $ExcMsg = $PSItem.Exception.Message
+                Write-DotFilesMessage -Type 'Verbose' -Message ('Skipping as {0}{1}' -f [Char]::ToLowerInvariant($ExcMsg[0]), $ExcMsg.Substring(1))
                 $Error.RemoveAt(0)
                 return $false
             }
