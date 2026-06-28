@@ -60,18 +60,31 @@ $PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesIsAsync = $false
 
-# Enable verbose profile load
-if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
-    # `$VerbosePreference` seems to have no value during profile load? Use
-    # the default of `SilentlyContinue` when this appears to be the case.
-    if ($Global:VerbosePreference) {
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-        $DotFilesVerboseOriginal = $Global:VerbosePreference
-    } else {
-        $DotFilesVerboseOriginal = 'SilentlyContinue'
-    }
+# Enable verbose profile loading
+#
+# During profile loading, how `$VerbosePreference` and related variables like
+# `$DotFilesVerbose` and `$VerboseOriginal` work with scoping is not intuitive:
+#
+# - When initially loading the profile (i.e. PowerShell is starting), values
+#   are defined and aligned across all scopes (global, script, local). This is
+#   a little surprising with `$VerbosePreference` existing in the local scope.
+#
+# - In an asynchronous context, the variables are defined and aligned only in
+#   the global and script scopes (i.e. no local scope definition). Makes sense.
+#
+# - When reloading the profile with verbose mode enabled (e.g. via `. up
+#   -Verbose`), the behaviour is exactly the same as previously described!
+#
+# That last dot point sort of makes sense when you think about it, but it does
+# mean it's impossible to know what the original value of `$VerbosePreference`
+# was prior to reloading the profile. As it's unusual to set it to something
+# other than `SilentlyContinue` in a global context, we'll just reset it to
+# that after we finish (re)loading.
+if ($DotFilesVerbose -or $VerbosePreference -eq 'Continue') {
+    # Make sure our internal setting and `$VerbosePreference` are aligned
+    $DotFilesVerbose = $true
+    $VerbosePreference = 'Continue'
 
-    $Global:VerbosePreference = 'Continue'
     Write-DotFilesMessage -Type 'Verbose' -SectionType 'Profile' -SectionName 'Begin' -Message 'Starting profile load ...'
 }
 
@@ -96,14 +109,7 @@ if ($DotFilesLoadAsync) {
 
     # Register the idle callback for async processing of components
     Register-EngineEvent -SourceIdentifier 'PowerShell.OnIdle' -SupportEvent -Action {
-        if ($AsyncLoadQueue.Count -gt 0) {
-            & $AsyncLoadQueue.Dequeue()
-            return
-        }
-
-        Write-Host
-        Write-DotFilesMessage -Type 'Verbose' -SectionType 'Profile' -SectionName 'End' -Message 'Finished asynchronous processing.'
-
+        if (Invoke-DotFilesAsyncTask) { return }
         Clear-DotFilesLoadData
         Unregister-Event -SubscriptionId $EventSubscriber.SubscriptionId -Force
     }

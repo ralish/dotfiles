@@ -248,6 +248,7 @@ Function Clear-DotFilesLoadData {
         'Clear-DotFilesLoadData'
         'Complete-DotFilesSection'
         'Get-DotFilesTiming'
+        'Invoke-DotFilesAsyncTask'
         'Start-DotFilesSection'
         'Write-DotFilesMessage'
     )
@@ -265,13 +266,13 @@ Function Clear-DotFilesLoadData {
         'DotFilesProfileStopwatch'
         'DotFilesSection'
         'DotFilesSectionStopwatch'
-        'DotFilesVerboseOriginal'
         'FormatDataPaths'
         'PoshCompletionsPath'
     )
 
-    if ($Global:DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
-        $Global:VerbosePreference = $Global:DotFilesVerboseOriginal
+    if ($Global:DotFilesVerbose) {
+        # Refer to the comment in `Microsoft.PowerShell_profile.ps1`
+        $Global:VerbosePreference = 'SilentlyContinue'
     }
 
     foreach ($Name in $Functions) {
@@ -334,6 +335,55 @@ Function Get-DotFilesTiming {
     }
 
     return $Timing
+}
+
+# Dequeue a `dotfiles` task from the asynchronous loading queue and process it
+Function Invoke-DotFilesAsyncTask {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    Param()
+
+    # If the profile was (re)loaded with verbose mode enabled ensure that's
+    # also the case for asynchronous processing.
+    if ($Global:DotFilesVerbose) {
+        $VerbosePreference = 'Continue'
+
+        # To avoid misalignment if the prompt has already been output
+        Write-Host
+    }
+
+    if ($Global:DotFilesTimings) {
+        if (!$Global:DotFilesSectionStopwatch) {
+            $Global:DotFilesSectionStopwatch = [Diagnostics.Stopwatch]::new()
+        }
+
+        $Global:DotFilesSectionStopwatch.Restart()
+    }
+
+    if ($Global:AsyncLoadQueue.Count -gt 0) {
+        try {
+            # `$null` assignment should be unnecessary but is performed as a
+            # precaution against the accidental pollution of the function's
+            # expected boolean output type through uncaptured output from a
+            # processed async task.
+            $null = & $Global:AsyncLoadQueue.Dequeue()
+        } catch {
+            $ErrMsg = "Exception was thrown processing an async task: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesAsyncTaskFailure', $ErrCat, $null)
+            $PSCmdlet.WriteError($ErrRec)
+        }
+    }
+
+    $MoreAsyncTasks = $true
+    if ($Global:AsyncLoadQueue.Count -eq 0) {
+        $MoreAsyncTasks = $false
+        Write-DotFilesMessage -Type 'Verbose' -SectionType 'Profile' -SectionName 'End' -Message 'Finished asynchronous processing.'
+    }
+
+    return $MoreAsyncTasks
 }
 
 # Start a `dotfiles` section with optional prerequisite checks
@@ -421,16 +471,6 @@ Function Start-DotFilesSection {
 
             $AsyncLoadScript = {
                 $Global:DotFilesIsAsync = $true
-
-                if ($Global:DotFilesTimings) {
-                    if (!$Global:DotFilesSectionStopwatch) {
-                        $Global:DotFilesSectionStopwatch = [Diagnostics.Stopwatch]::new()
-                    }
-
-                    $Global:DotFilesSectionStopwatch.Restart()
-                }
-
-                if ($Global:DotFilesVerbose) { Write-Host }
                 . $CallStack[1].ScriptName
             }.GetNewClosure()
 
