@@ -23,13 +23,19 @@ Function Initialize-DotNetSuggest {
     # Determine the list of apps registered for suggestions
     $RegisteredAppsRaw = & dotnet-suggest list | Out-String
     $RegisteredAppsSplit = $RegisteredAppsRaw.Split([Environment]::NewLine, [StringSplitOptions]::RemoveEmptyEntries)
-    $RegisteredApps = $RegisteredAppsSplit | Where-Object {
-        # `dotnet` has its own argument completion support
-        $PSItem -ne 'dotnet' -and
-        # Almost always `dotnet <x>` aliases which don't work anyway
-        # https://github.com/dotnet/command-line-api/issues/2302
-        $PSItem -notmatch '^dotnet '
-    }
+
+    # Unique sort is to remove duplicates command names. This can happen with
+    # outdated entries in `.dotnet-suggest-registration.txt` that haven't been
+    # cleaned-up. Usually this is due to binaries under old versioned paths.
+    $RegisteredApps = $RegisteredAppsSplit |
+        Sort-Object -Unique |
+        Where-Object {
+            # `dotnet` has its own argument completion support
+            $PSItem -ne 'dotnet' -and
+            # Almost always `dotnet <x>` aliases which don't work anyway
+            # https://github.com/dotnet/command-line-api/issues/2302
+            $PSItem -notmatch '^dotnet '
+        }
 
     Write-DotFilesMessage -Type 'Verbose' -Message "Registering dynamic argument completer for $($RegisteredApps.Count) command(s)."
     Register-ArgumentCompleter -Native -CommandName $RegisteredApps -ScriptBlock {
