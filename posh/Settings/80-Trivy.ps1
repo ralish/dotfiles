@@ -12,12 +12,13 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup Trivy configuration
 Function Initialize-Trivy {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
 
     # (Re)build the native completions script
-    $CompletionsFile = Join-Path -Path $PoshCompletionsPath -ChildPath 'trivy.ps1'
+    $CompletionsFile = Join-Path -Path $Global:PoshCompletionsPath -ChildPath 'trivy.ps1'
     if ($Env:DOTFILES_REBUILD_COMPLETIONS -or !(Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
         Write-DotFilesMessage -Type 'Verbose' -Message 'Building native completions script ...'
         & trivy completion powershell | Out-File -FilePath $CompletionsFile -Encoding 'utf8'

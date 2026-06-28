@@ -16,6 +16,7 @@ $Env:DOTNET_CLI_TELEMETRY_OPTOUT = 'true'
 
 # Setup .NET CLI configuration
 Function Initialize-DotNetCli {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -23,7 +24,7 @@ Function Initialize-DotNetCli {
     # Assume if there's an existing native completions script we can use it. This
     # avoids a potentially expensive process launch of `dotnet` to retrieve the
     # version, which tells us whether to use dynamic or native completions.
-    $CompletionsFile = Join-Path -Path $PoshCompletionsPath -ChildPath 'dotnet.ps1'
+    $CompletionsFile = Join-Path -Path $Global:PoshCompletionsPath -ChildPath 'dotnet.ps1'
     if (!$Env:DOTFILES_REBUILD_COMPLETIONS -and (Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
         $CompletionsType = 'Native'
     } else {

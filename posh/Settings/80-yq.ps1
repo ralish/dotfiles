@@ -11,12 +11,13 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `yq` configuration
 Function Initialize-Yq {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
 
     # (Re)build the native completions script
-    $CompletionsFile = Join-Path -Path $PoshCompletionsPath -ChildPath 'yq.ps1'
+    $CompletionsFile = Join-Path -Path $Global:PoshCompletionsPath -ChildPath 'yq.ps1'
     if ($Env:DOTFILES_REBUILD_COMPLETIONS -or !(Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
         Write-DotFilesMessage -Type 'Verbose' -Message 'Building native completions script ...'
         & yq shell-completion powershell | Out-File -FilePath $CompletionsFile -Encoding 'utf8'

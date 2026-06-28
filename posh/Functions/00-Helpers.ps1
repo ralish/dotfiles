@@ -238,6 +238,7 @@ Function Test-IsPathFullyQualified {
 
 # Clean-up `dotfiles` profile loading data
 Function Clear-DotFilesLoadData {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -268,8 +269,8 @@ Function Clear-DotFilesLoadData {
         'PoshCompletionsPath'
     )
 
-    if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
-        $Global:VerbosePreference = $DotFilesVerboseOriginal
+    if ($Global:DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
+        $Global:VerbosePreference = $Global:DotFilesVerboseOriginal
     }
 
     foreach ($Name in $Functions) {
@@ -283,18 +284,19 @@ Function Clear-DotFilesLoadData {
 
 # Complete a `dotfiles` section and conditionally output timings
 Function Complete-DotFilesSection {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
 
-    if ($DotFilesIsAsync) {
+    if ($Global:DotFilesIsAsync) {
         Write-DotFilesMessage -Type 'Debug' -Message 'Completing async section processing ...'
     } else {
         Write-DotFilesMessage -Type 'Debug' -Message 'Completing section processing ...'
     }
 
-    if ($DotFilesTimings) {
-        if ($DotFilesSectionStopwatch -isnot [Diagnostics.Stopwatch]) {
+    if ($Global:DotFilesTimings) {
+        if ($Global:DotFilesSectionStopwatch -isnot [Diagnostics.Stopwatch]) {
             $ErrMsg = 'No stopwatch found for section timing.'
             $ErrExc = [InvalidOperationException]::new($ErrMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::MetadataError
@@ -302,8 +304,8 @@ Function Complete-DotFilesSection {
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $DotFilesSectionStopwatch.Stop()
-        $Timing = Get-DotFilesTiming -Stopwatch $DotFilesSectionStopwatch
+        $Global:DotFilesSectionStopwatch.Stop()
+        $Timing = Get-DotFilesTiming -Stopwatch $Global:DotFilesSectionStopwatch
         Write-DotFilesMessage -Type 'Verbose' -Message $Timing
     }
 
@@ -384,13 +386,13 @@ Function Start-DotFilesSection {
     $Global:DotFilesSectionType = $Type
     $Global:DotFilesSectionName = $Name
 
-    if ($DotFilesIsAsync) {
+    if ($Global:DotFilesIsAsync) {
         Write-DotFilesMessage -Type 'Debug' -Message 'Starting async section processing ...'
     } else {
         Write-DotFilesMessage -Type 'Debug' -Message 'Starting section processing ...'
     }
 
-    if (!$DotFilesIsAsync) {
+    if (!$Global:DotFilesIsAsync) {
         if ($Platform) {
             if ($Platform -eq 'Windows' -and !(Test-IsWindows)) {
                 Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as platform is not Windows.'
@@ -413,25 +415,25 @@ Function Start-DotFilesSection {
             return $false
         }
 
-        if ($Async -and $DotFilesLoadAsync) {
+        if ($Async -and $Global:DotFilesLoadAsync) {
             $CallStack = Get-PSCallStack
 
             $AsyncLoadScript = {
                 $Global:DotFilesIsAsync = $true
 
-                if ($Global:DotFilesShowTimings) {
+                if ($Global:DotFilesTimings) {
                     if (!$Global:DotFilesSectionStopwatch) {
                         $Global:DotFilesSectionStopwatch = [Diagnostics.Stopwatch]::new()
                     }
 
-                    $DotFilesSectionStopwatch.Restart()
+                    $Global:DotFilesSectionStopwatch.Restart()
                 }
 
-                if ($DotFilesVerbose) { Write-Host }
+                if ($Global:DotFilesVerbose) { Write-Host }
                 . $CallStack[1].ScriptName
             }.GetNewClosure()
 
-            $AsyncLoadQueue.Enqueue($AsyncLoadScript)
+            $Global:AsyncLoadQueue.Enqueue($AsyncLoadScript)
 
             # Return `false` to halt further synchronous processing
             Write-DotFilesMessage -Type 'Verbose' -Message 'All prerequisites met.'
@@ -439,7 +441,7 @@ Function Start-DotFilesSection {
         }
     }
 
-    if (!$Async -or !$DotFilesLoadAsync -or $DotFilesIsAsync) {
+    if (!$Async -or !$Global:DotFilesLoadAsync -or $Global:DotFilesIsAsync) {
         if ($Command) {
             try {
                 Test-CommandAvailable -Name $Command
@@ -460,7 +462,7 @@ Function Start-DotFilesSection {
             }
         }
 
-        $ProcessModules = $ModuleOperation -eq 'Import' -or $ForceTestModule -or !$DotFilesFastLoad
+        $ProcessModules = $ModuleOperation -eq 'Import' -or $ForceTestModule -or !$Global:DotFilesFastLoad
         if ($Module -and $ProcessModules) {
             try {
                 Test-ModuleAvailable -Name $Module -Operation $ModuleOperation -Require $ModuleRequire
@@ -504,8 +506,8 @@ Function Write-DotFilesMessage {
         $SectionName = $Global:DotFilesSectionName
     }
 
-    if ($DotFilesLoadAsync) {
-        if ($DotFilesIsAsync) { $LoadType = 'Async' } else { $LoadType = 'Sync' }
+    if ($Global:DotFilesLoadAsync) {
+        if ($Global:DotFilesIsAsync) { $LoadType = 'Async' } else { $LoadType = 'Sync' }
         $Msg = '[dotfiles | {0,-10} | {1,-25} | {2,-5}] {3}' -f $SectionType, $SectionName, $LoadType, $Message
     } else {
         $Msg = '[dotfiles | {0,-10} | {1,-25}] {2}' -f $SectionType, $SectionName, $Message

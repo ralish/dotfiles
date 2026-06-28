@@ -56,6 +56,10 @@ $PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
 # Load the helper functions
 . (Join-Path -Path $PoshFunctionsPath -ChildPath '00-Helpers.ps1')
 
+# Indicates if we're currently executing in an async context
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+$DotFilesIsAsync = $false
+
 # Enable verbose profile load
 if ($DotFilesVerbose -or $Global:VerbosePreference -eq 'Continue') {
     # `$VerbosePreference` seems to have no value during profile load? Use
@@ -84,10 +88,6 @@ if ($DotFilesTimings) {
         $DotFilesTimings = $false
     }
 }
-
-# Indicates if we're currently executing in an async context
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-$DotFilesIsAsync = $false
 
 # Enable async component loading
 if ($DotFilesLoadAsync) {
