@@ -72,7 +72,7 @@ Function Get-DotFilesLastUpdated {
             $ComponentName = [IO.Path]::GetFileName($ComponentDir)
             $Version = Get-Content -LiteralPath $LastReviewedVersion -TotalCount 1
 
-            if ([String]::IsNullOrEmpty($Version)) {
+            if ([String]::IsNullOrWhiteSpace($Version)) {
                 $Version = '(empty)'
             } elseif ($Version -match '^v[0-9]') {
                 $Version = $Version.Substring(1)

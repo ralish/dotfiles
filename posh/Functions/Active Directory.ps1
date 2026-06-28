@@ -172,8 +172,8 @@ Function Get-KerberosTokenSize {
     $SIDHistory = @($ADUser.SIDHistory).Count
     $GroupsDomainLocal = @($ADGroups | Where-Object GroupScope -EQ 'DomainLocal').Count
     $GroupsGlobal = @($ADGroups | Where-Object GroupScope -EQ 'Global').Count
-    $GroupsUniversalInside = @($ADGroups | Where-Object { $PSItem.GroupScope -eq 'Universal' -and $PSItem.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
-    $GroupsUniversalOutside = @($ADGroups | Where-Object { $PSItem.GroupScope -eq 'Universal' -and !$PSItem.distinguishedName.EndsWith($ADDomain.DistinguishedName) }).Count
+    $GroupsUniversalInside = @($ADGroups | Where-Object { $PSItem.GroupScope -eq 'Universal' -and $PSItem.distinguishedName.EndsWith($ADDomain.DistinguishedName, [StringComparison]::OrdinalIgnoreCase) }).Count
+    $GroupsUniversalOutside = @($ADGroups | Where-Object { $PSItem.GroupScope -eq 'Universal' -and !$PSItem.distinguishedName.EndsWith($ADDomain.DistinguishedName, [StringComparison]::OrdinalIgnoreCase) }).Count
 
     $TokenSizeBytes = $TicketOverheadBytes
 

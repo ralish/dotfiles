@@ -32,7 +32,7 @@ if (!(Get-PSDrive -Name 'HKCR' -ErrorAction 'Ignore')) {
 
 try {
     foreach ($Extension in $Extensions) {
-        $Extension = $Extension.ToLowerInvariant()
+        $Extension = $Extension.ToLower()
         $ContextMenuPath = "HKCR:\SystemFileAssociations\.${Extension}\Shell\3D Edit"
 
         try {

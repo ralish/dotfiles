@@ -462,7 +462,7 @@ Function Invoke-GitMergeAllBranches {
         $Branches.Add($Branch)
     }
 
-    if ([String]::IsNullOrEmpty($CurrentBranch)) {
+    if ([String]::IsNullOrWhiteSpace($CurrentBranch)) {
         $ErrMsg = 'Repository has no current branch.'
         $ErrExc = [InvalidOperationException]::new($ErrMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult

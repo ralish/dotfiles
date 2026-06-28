@@ -281,9 +281,11 @@ Function Update-PowerShell {
     if (Test-IsWindows) {
         $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::MyDocuments)
         $ScopePathAllUsers = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
+        $StringComparisonType = [StringComparison]::OrdinalIgnoreCase
     } else {
         $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
         $ScopePathAllUsers = '/usr/local/share'
+        $StringComparisonType = [StringComparison]::Ordinal
     }
 
     # Update all modules compatible with PowerShellGet
@@ -308,9 +310,9 @@ Function Update-PowerShell {
             AcceptLicense = $true
         }
 
-        if ($Module.InstalledLocation.StartsWith($ScopePathCurrentUser)) {
+        if ($Module.InstalledLocation.StartsWith($ScopePathCurrentUser, $StringComparisonType)) {
             $UpdateParams['Scope'] = 'CurrentUser'
-        } elseif ($Module.InstalledLocation.StartsWith($ScopePathAllUsers)) {
+        } elseif ($Module.InstalledLocation.StartsWith($ScopePathAllUsers, $StringComparisonType)) {
             $UpdateParams['Scope'] = 'AllUsers'
         } else {
             Write-Warning -Message "Unable to determine install scope for module: ${ModuleName}"

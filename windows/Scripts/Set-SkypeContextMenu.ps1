@@ -43,7 +43,7 @@ if ($ContextMenuKey.Count -ne 1) {
 
 $ContextMenuKey = $ContextMenuKey[0]
 if ($ContextMenuKey.PSObject.Properties.Name -contains 'DllPath') {
-    if ([String]::IsNullOrEmpty($ContextMenuKey.DllPath)) {
+    if ([String]::IsNullOrWhiteSpace($ContextMenuKey.DllPath)) {
         $ErrMsg = 'DllPath registry value for Skype context menu is empty.'
         $ErrExc = [InvalidOperationException]::new($ErrMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidData

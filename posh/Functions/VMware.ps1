@@ -27,13 +27,19 @@ Function Optimize-VMwareVirtualMachine {
     $NoRecurseDirs = [Collections.Generic.List[String]]::new()
     $DirsProcessed = 0
 
+    if (Test-IsWindows) {
+        $StringComparisonType = [StringComparison]::OrdinalIgnoreCase
+    } else {
+        $StringComparisonType = [StringComparison]::Ordinal
+    }
+
     foreach ($SubDir in $SubDirs) {
         $DirsProcessed++
         $DirPathTerminated = $SubDir.FullName + [IO.Path]::DirectorySeparatorChar
 
         $NoRecurse = $false
         foreach ($NoRecurseDir in $NoRecurseDirs) {
-            if ($DirPathTerminated, [StringComparison]::CurrentCultureIgnoreCase) {
+            if ($DirPathTerminated.StartsWith($NoRecurseDir, $StringComparisonType)) {
                 Write-Debug -Message "Ignoring directory: ${DirPathTerminated}"
                 $NoRecurse = $true
                 break

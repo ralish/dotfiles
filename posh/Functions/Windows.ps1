@@ -401,7 +401,7 @@ Function Find-WinEvent {
         }
 
         if ($WinEvent.Message) {
-            $EvtMsg = $EvtMsg.Split("`r`n", $StringSplitOptions).Split("`n", $StringSplitOptions).Trim() | Where-Object { ![String]::IsNullOrEmpty($PSItem) }
+            $EvtMsg = $EvtMsg.Split("`r`n", $StringSplitOptions).Split("`n", $StringSplitOptions).Trim() | Where-Object { ![String]::IsNullOrWhiteSpace($PSItem) }
         } else {
             $EvtMsg = ''
         }

@@ -240,7 +240,7 @@ Function Set-R53HostedZoneParkedRecords {
 
     # Process record changes for each zone
     foreach ($ZoneName in $Domain) {
-        $ZoneName = $ZoneName.TrimEnd('.').ToLowerInvariant()
+        $ZoneName = $ZoneName.TrimEnd('.').ToLower()
         $ZoneFqdn = "${ZoneName}."
         $Zone = $Zones | Where-Object Name -EQ $ZoneFqdn
 

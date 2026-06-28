@@ -78,9 +78,7 @@ Function Switch-Cygwin {
         $CygwinCfg = [Collections.Generic.List[String]]::new()
 
         if ($Env:CYGWIN) {
-            foreach ($Setting in $Env:CYGWIN.Split(' ')) {
-                if ([String]::IsNullOrEmpty($Setting)) { continue }
-
+            foreach ($Setting in $Env:CYGWIN.Split(' ', [StringSplitOptions]::RemoveEmptyEntries)) {
                 if ($Setting -notmatch 'winsymlinks') {
                     $CygwinCfg.Add($Setting)
                 }
@@ -107,7 +105,7 @@ Function Switch-Cygwin {
             & $PathFunc @PathParams -Element $BinPath |
             Set-EnvironmentVariable -Name 'Path' -Scope 'User'
 
-        if ($Enable -and ![String]::IsNullOrEmpty($Env:CYGWIN)) {
+        if ($Enable -and ![String]::IsNullOrWhiteSpace($Env:CYGWIN)) {
             Set-EnvironmentVariable -Name 'CYGWIN' -Value $Env:CYGWIN -Scope 'User'
         } elseif ($Disable -and $IncludeNonPathVars) {
             Remove-EnvironmentVariable -Name 'CYGWIN' -Scope 'User'
@@ -243,7 +241,7 @@ Function Switch-Perl {
             & $PathFunc @PathParams -Element $PerlBinPath |
             Set-EnvironmentVariable -Name 'Path' -Scope 'User'
 
-        if ($Enable -and ![String]::IsNullOrEmpty($Env:PERL5LIB)) {
+        if ($Enable -and ![String]::IsNullOrWhiteSpace($Env:PERL5LIB)) {
             Set-EnvironmentVariable -Name 'PERL_MB_OPT' -Value $Env:PERL_MB_OPT -Scope 'User'
             Set-EnvironmentVariable -Name 'PERL_MM_OPT' -Value $Env:PERL_MM_OPT -Scope 'User'
         } elseif ($Disable -and $IncludeNonPathVars) {

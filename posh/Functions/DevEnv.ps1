@@ -61,7 +61,7 @@ Function Clear-NuGetCache {
     }
 
     foreach ($Cache in $Caches.Keys) {
-        if ([String]::IsNullOrEmpty($Caches[$Cache])) { continue }
+        if ([String]::IsNullOrWhiteSpace($Caches[$Cache])) { continue }
 
         if ($PSCmdlet.ShouldProcess($Caches[$Cache], 'Clear')) {
             $ClearArgs = 'locals', $Cache, '-clear', '-verbosity', 'quiet'
@@ -436,7 +436,7 @@ Function Switch-Go {
                 }
             }
 
-            if ($Enable -and ![String]::IsNullOrEmpty($Env:GOPATH)) {
+            if ($Enable -and ![String]::IsNullOrWhiteSpace($Env:GOPATH)) {
                 Set-EnvironmentVariable -Name 'GOPATH' -Value $Env:GOPATH -Scope 'User'
             } elseif ($Disable -and $IncludeNonPathVars) {
                 Remove-EnvironmentVariable -Name 'GOPATH' -Scope 'User'
@@ -949,7 +949,7 @@ Function Switch-Nodejs {
                 & $PathFunc @PathParams -Element $Path |
                 Set-EnvironmentVariable -Name 'Path' -Scope 'User'
 
-            if ($Enable -and ![String]::IsNullOrEmpty($Env:NPM_CONFIG_PREFIX)) {
+            if ($Enable -and ![String]::IsNullOrWhiteSpace($Env:NPM_CONFIG_PREFIX)) {
                 Set-EnvironmentVariable -Name 'NPM_CONFIG_PREFIX' -Value $Env:NPM_CONFIG_PREFIX -Scope 'User'
             } elseif ($Disable -and $IncludeNonPathVars) {
                 Remove-EnvironmentVariable -Name 'NPM_CONFIG_PREFIX' -Scope 'User'
@@ -1640,7 +1640,7 @@ Function Switch-Ruby {
                 & $PathFunc @PathParams -Element $BinPath |
                 Set-EnvironmentVariable -Name 'Path' -Scope 'User'
 
-            if ($Enable -and ![String]::IsNullOrEmpty($Env:RUBYOPT)) {
+            if ($Enable -and ![String]::IsNullOrWhiteSpace($Env:RUBYOPT)) {
                 Set-EnvironmentVariable -Name 'RUBYOPT' -Value $Env:RUBYOPT -Scope 'User'
             } elseif ($Disable -and $IncludeNonPathVars) {
                 Remove-EnvironmentVariable -Name 'RUBYOPT' -Scope 'User'
@@ -1708,7 +1708,7 @@ Function Update-RubyGems {
     $PackageRegex = [Regex]::new('\(default: \S+\)')
     & gem @ListArgs | ForEach-Object {
         if (!$PackageRegex.Match($PSItem).Success) {
-            $Packages.Add($PSItem.Split(' ')[0])
+            $Packages.Add($PSItem.Split(' ', [StringSplitOptions]::RemoveEmptyEntries)[0])
         }
     }
 
@@ -1853,7 +1853,7 @@ Function Switch-Rust {
                 & $PathFunc @PathParams -Element $BinPath |
                 Set-EnvironmentVariable -Name 'Path' -Scope 'User'
 
-            if ($Enable -and ![String]::IsNullOrEmpty($Env:CARGO_HOME)) {
+            if ($Enable -and ![String]::IsNullOrWhiteSpace($Env:CARGO_HOME)) {
                 Set-EnvironmentVariable -Name 'CARGO_HOME' -Value $Path -Scope 'User'
             } elseif ($Disable -and $IncludeNonPathVars) {
                 Remove-EnvironmentVariable -Name 'CARGO_HOME' -Scope 'User'
