@@ -342,9 +342,9 @@ Function Get-DotFilesTiming {
 # - `null` or an empty array for `PwshHostName`, `Command`, `Environment`, and
 #   `Module`
 #
-# The reason for this is PowerShell 5.1 will throw an error when creating the
-# closure for the asynchronous loading scriptblock when any function parameters
-# fail validation, even when they're not provided in the function invocation.
+# The reason for doing this is Windows PowerShell 5.1 will throw an error when
+# creating the closure for the asynchronous loading scriptblock if any function
+# parameters fail validation, even if not present in the function invocation.
 Function Start-DotFilesSection {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]

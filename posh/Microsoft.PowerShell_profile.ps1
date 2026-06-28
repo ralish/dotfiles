@@ -123,7 +123,7 @@ $FormatDataPaths = [Collections.Generic.List[String]]::new()
 
 # Source functions and settings
 foreach ($PoshPath in $PoshFunctionsPath, $PoshSettingsPath) {
-    # PowerShell <= 5.1: Using `-LiteralPath` breaks wildcards in `-Include`
+    # Windows PowerShell 5.1: `-LiteralPath` causes `-Include` to be ignored
     #
     # An aside: the sort order returned by `Sort-Object` is different between
     # Windows PowerShell (<= 5.1) and Powershell (6+). The cause is .NET uses

@@ -669,7 +669,7 @@ Function Update-MicrosoftStore {
 
     # Modern PowerShell releases throw an exception on trying to instantiate a
     # non-existing class but older releases just return `null`. This includes
-    # PowerShell 5.1, which is still the latest inbox version.
+    # Windows PowerShell 5.1, which is still the latest inbox version.
     if (!$Instance) {
         $ErrMsg = "Unable to update Microsoft Store apps as ${ClassName} WMI class is not available."
         $ErrExc = [Exception]::new($ErrMsg)
@@ -1232,10 +1232,8 @@ Function Update-VisualStudio {
         # code we have from the original installer is not meaningful for the
         # update of Visual Studio itself. We'll output a warning later on.
         $VsInstallerUpdated = $false
+        $VsInstallerMutexCreated = $false
 
-        # Set to true initially to avoid the subsequent `Write-Progress` call
-        # on the first (and possibly only) iteration of the loop.
-        $VsInstallerMutexCreated = $true
         do {
             # Wait a few seconds in the event the original installer process
             # has exited but the updated installer process hasn't started.
