@@ -93,14 +93,16 @@ Function Update-OpenSSHConfig {
     try {
         $Banner = @(Get-Content -LiteralPath $BannerFile -ErrorAction 'Stop')
         if ($Banner.Count -ge 3) {
-            [IO.File]::WriteAllLines($ConfigFileTmp, $Banner[0..($Banner.Count - 2)], $UTF8EncodingNoBom)
+            $BannerLines = [String[]]$Banner[0..($Banner.Count - 2)]
+            [IO.File]::AppendAllLines($ConfigFileTmp, $BannerLines, $UTF8EncodingNoBom)
         } elseif ($Banner.Count -gt 0) {
             Write-Warning -Message 'Banner file has fewer than the minimum of 3 lines and will be ignored.'
         }
     } catch {
-        switch -Regex ($PSItem.FullyQualifiedErrorId) {
+        $Exc = $PSItem
+        switch -Regex ($Exc.FullyQualifiedErrorId) {
             '^PathNotFound,' { Write-Warning -Message "Banner file does not exist and will be skipped: ${BannerFile}" }
-            default { $PSCmdlet.WriteError($PSItem) }
+            default { $PSCmdlet.WriteError($Exc) }
         }
     }
 
@@ -111,15 +113,15 @@ Function Update-OpenSSHConfig {
         foreach ($Include in $Includes) {
             $Data = @(Get-Content -LiteralPath $Include.FullName -ErrorAction 'Stop')
             if ($Data.Count -ge 3) {
-                Add-Content -LiteralPath $ConfigFileTmp -Value $Data[0..($Data.Count - 2)] -Encoding 'UTF8' -ErrorAction 'Stop'
-                Add-Content -LiteralPath $ConfigFileTmp -Value '' -Encoding 'UTF8' -ErrorAction 'Stop'
+                $IncludeLines = [String[]]($Data[0..($Data.Count - 2)] + '')
+                [IO.File]::AppendAllLines($ConfigFileTmp, $IncludeLines, $UTF8EncodingNoBom)
             } elseif ($Data.Count -gt 0) {
                 Write-Warning -Message "Included configuration file has fewer than the minimum of 3 lines and will be ignored: $($Include.Name)"
             }
         }
 
-        $Template = Get-Content -LiteralPath $TemplateFile -ErrorAction 'Stop'
-        Add-Content -LiteralPath $ConfigFileTmp -Value $Template -Encoding 'UTF8' -ErrorAction 'Stop'
+        $Template = [String[]](Get-Content -LiteralPath $TemplateFile -ErrorAction 'Stop')
+        [IO.File]::AppendAllLines($ConfigFileTmp, $Template, $UTF8EncodingNoBom)
         $Config = @(Get-Content -LiteralPath $ConfigFileTmp -ErrorAction 'Stop')
     } catch {
         Remove-Item -LiteralPath $ConfigFileTmp -ErrorAction 'Ignore'
@@ -187,7 +189,7 @@ Function Update-OpenSSHConfig {
 
     # Write the final configuration file
     try {
-        [IO.File]::WriteAllLines($ConfigFileTmp, $Config, $UTF8EncodingNoBom)
+        [IO.File]::WriteAllLines($ConfigFileTmp, [String[]]$Config, $UTF8EncodingNoBom)
     } catch {
         Remove-Item -LiteralPath $ConfigFileTmp -ErrorAction 'Ignore'
         $PSCmdlet.ThrowTerminatingError($PSItem)

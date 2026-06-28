@@ -302,9 +302,7 @@ Function Find-WinEvent {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $WriteProgressParams = @{
-        Activity = 'Retrieving Windows event logs'
-    }
+    $WriteProgressParams = @{ Activity = 'Retrieving Windows event logs' }
 
     # Retrieve all the events matching the filter
     $WinEvents = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogRecord]]::new()
@@ -617,7 +615,7 @@ Function Search-Registry {
                 }
 
                 if ($OpenSubKeyFailed) {
-                    $RegPath = "$($SubKeys[-1])${DirSepChar}$($SubKeys[$RegKeys.Count - 1])"
+                    $RegPath = Join-Path -Path $RegKeys[-1].Name -ChildPath $SubKey
                     $ErrMsg = "Failed to open registry key: ${RegPath}"
                     $ErrExc = [Management.Automation.ItemNotFoundException]::new($ErrMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
@@ -643,6 +641,8 @@ Function Search-Registry {
         }
 
         'Recursion' {
+            $OpenSubKeyFailed = $false
+
             try {
                 $RegistryKey = $ParentKey.OpenSubKey($SubKeyName)
                 if (!$RegistryKey) {

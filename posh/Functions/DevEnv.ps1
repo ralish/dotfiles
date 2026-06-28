@@ -112,7 +112,7 @@ Function Update-DotNetTools {
         BeforeUpdate = [String[]]@()
         AfterUpdate  = [String[]]@()
         Output       = [String[]]@()
-        ExitCode     = -1
+        ExitCode     = $null
     }
 
     $Result.PSObject.TypeNames.Insert(0, 'DotFiles.DevEnv.UpdateDotNetTools')
@@ -205,9 +205,12 @@ Function Update-DotNetTools {
                     $DotnetOutput.AddRange([String[]]@(& dotnet @UpdateArgs $Tool 2>&1))
 
                     # Only the first non-zero exit code is retained
-                    if ($Result.ExitCode -ne 0) {
+                    if ($null -eq $Result.ExitCode -or $Result.ExitCode -eq 0) {
                         $Result.ExitCode = $LASTEXITCODE
-                        $FailedCmd = "${UpdateCmd} ${Tool}"
+
+                        if ($LASTEXITCODE -ne 0) {
+                            $FailedCmd = "${UpdateCmd} ${Tool}"
+                        }
                     }
 
                     $ToolsUpdated++
@@ -422,10 +425,6 @@ Function Switch-Go {
             Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
             if ($Enable) { $PathParams['Action'] = 'Append' }
 
-            Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
-                & $PathFunc @PathParams -Element $BinPath |
-                Set-EnvironmentVariable -Name 'Path' -Scope 'User'
-
             # More than one path means we added paths from `GOPATH`
             if ($PathChanges.Count -gt 1) {
                 # Add in reverse order excluding the last path (`$BinPath`)
@@ -435,6 +434,10 @@ Function Switch-Go {
                         Set-EnvironmentVariable -Name 'Path' -Scope 'User'
                 }
             }
+
+            Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
+                & $PathFunc @PathParams -Element $BinPath |
+                Set-EnvironmentVariable -Name 'Path' -Scope 'User'
 
             if ($Enable -and ![String]::IsNullOrWhiteSpace($Env:GOPATH)) {
                 Set-EnvironmentVariable -Name 'GOPATH' -Value $Env:GOPATH -Scope 'User'
@@ -495,9 +498,8 @@ Function Update-GoBinaries {
 
     Write-Verbose -Message "Updating gup${CheckMsg}: ${GupCmd}"
     $Result.Gup = [String[]]@(& gup @GupArgs 2>&1)
-    $Result.ExitCode = $LASTEXITCODE
-    if ($Result.ExitCode -ne 0) {
-        $ErrMsg = "Failed to update gup${CheckMsg} (rc: $($Result.ExitCode))."
+    if ($LASTEXITCODE -ne 0) {
+        $ErrMsg = "Failed to update gup${CheckMsg} (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ErrMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GupCmd)
@@ -516,23 +518,15 @@ Function Update-GoBinaries {
 
     Write-Verbose -Message "Updating Go binaries${CheckMsg}: ${GupCmd}"
     $Result.Binaries = [String[]]@(& gup @GupArgs 2>&1)
-
-    # Only the first non-zero exit code is retained
-    if ($Result.ExitCode -ne 0) {
-        $Result.ExitCode = $LASTEXITCODE
-    }
-
-    if ($Result.ExitCode -ne 0) {
+    $Result.ExitCode = $LASTEXITCODE
+    if ($Result.ExitCode -eq 0) {
+        $Result.Success = $true
+    } else {
         $ErrMsg = "Failed to update Go binaries ${CheckMsg} (rc: $($Result.ExitCode))."
         $ErrExc = [Exception]::new($ErrMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GupCmd)
         $PSCmdlet.WriteError($ErrRec)
-    }
-
-    # Only true if both `gup` runs completed successfully
-    if ($Result.ExitCode -eq 0) {
-        $Result.Success = $true
     }
 
     return $Result
@@ -661,8 +655,10 @@ Function Clear-GradleCache {
 
     $PathItem = Get-Item -LiteralPath $GradleCache -ErrorAction 'Ignore'
     if ($PathItem -is [IO.DirectoryInfo]) {
+        $GradleCachePath = '{0}{1}*' -f $GradleCache, [IO.Path]::DirectorySeparatorChar
+
         if ($PSCmdlet.ShouldProcess($GradleCache, 'Clear')) {
-            Remove-Item -Path "${GradleCache}\*" -Recurse -Verbose:$false
+            Remove-Item -Path $GradleCachePath -Recurse -Verbose:$false
         }
     } elseif ($null -ne $PathItem) {
         $ErrMsg = "Gradle cache path is not a directory: ${GradleCache}"
@@ -702,8 +698,10 @@ Function Clear-MavenCache {
 
     $PathItem = Get-Item -LiteralPath $MvnCache -ErrorAction 'Ignore'
     if ($PathItem -is [IO.DirectoryInfo]) {
+        $MvnCachePath = '{0}{1}*' -f $MvnCache, [IO.Path]::DirectorySeparatorChar
+
         if ($PSCmdlet.ShouldProcess($MvnCache, 'Clear')) {
-            Remove-Item -Path "$MvnCache\*" -Recurse -Verbose:$false
+            Remove-Item -Path $MvnCachePath -Recurse -Verbose:$false
         }
     } elseif ($null -ne $PathItem) {
         $ErrMsg = "Maven cache path is not a directory: ${MvnCache}"
@@ -897,7 +895,38 @@ Function Switch-Nodejs {
             Write-Warning -Message $ErrMsg
         }
 
+        try {
+            $GlobalPrefixPathArgs = 'config', 'get', 'prefix'
+            $GlobalPrefixPathCmd = "npm $($GlobalPrefixPathArgs -join ' ')"
+
+            $NpmFailed = $false
+            $GlobalPrefixPath = (& npm @GlobalPrefixPathArgs) -join ''
+            if ($LASTEXITCODE -ne 0) {
+                $NpmFailed = $true
+                $ErrMsg = "Failed to retrieve npm global prefix path (rc: ${LASTEXITCODE})."
+            }
+        } catch {
+            $NpmFailed = $true
+            $ErrMsg = 'npm executable missing or could not be executed.'
+        } finally {
+            if ($NpmFailed) {
+                $ErrExc = [Exception]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GlobalPrefixPathCmd)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+        }
+
+        if (!(Test-IsPathFullyQualified -Path $GlobalPrefixPath)) {
+            $ErrMsg = "npm global prefix is not set to a fully qualified path: ${GlobalPrefixPath}"
+            $ErrExc = [FormatException]::new($ErrMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $GlobalPrefixPath)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
         $Enable = !$Disable
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
         $PathParams = @{}
         $PathChanges = [Collections.Generic.List[String]]::new()
 
@@ -910,24 +939,8 @@ Function Switch-Nodejs {
             $PathChangesDesc = 'Removed from PATH: '
         }
 
-        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
         $PathChanges.Add($Path)
-
-        if ($Env:NPM_CONFIG_PREFIX) {
-            if (!(Test-IsPathFullyQualified -Path $Env:NPM_CONFIG_PREFIX)) {
-                $ErrMsg = "NPM_CONFIG_PREFIX is not set to a fully qualified path: ${Env:NPM_CONFIG_PREFIX}"
-                $ErrExc = [FormatException]::new($ErrMsg)
-                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $Env:NPM_CONFIG_PREFIX)
-                $PSCmdlet.ThrowTerminatingError($ErrRec)
-            }
-
-            $GlobalNpmPath = $Env:NPM_CONFIG_PREFIX
-        } else {
-            $GlobalNpmPath = Join-Path -Path $Env:APPDATA -ChildPath 'npm'
-        }
-
-        $PathChanges.Add($GlobalNpmPath)
+        $PathChanges.Add($GlobalPrefixPath)
 
         foreach ($PathChange in $PathChanges) {
             $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
@@ -945,7 +958,7 @@ Function Switch-Nodejs {
             if ($Enable) { $PathParams['Action'] = 'Append' }
 
             Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
-                & $PathFunc @PathParams -Element $GlobalNpmPath |
+                & $PathFunc @PathParams -Element $GlobalPrefixPath |
                 & $PathFunc @PathParams -Element $Path |
                 Set-EnvironmentVariable -Name 'Path' -Scope 'User'
 
@@ -1520,7 +1533,7 @@ Function Clear-GemCache {
     }
 
     if (!$GemSpecCache) {
-        $ErrMsg = "Failed to determine gem cache path (rc: ${LASTEXITCODE})."
+        $ErrMsg = 'Failed to determine gem cache path.'
         $ErrExc = [FormatException]::new($ErrMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ParserError
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $GemEnv)

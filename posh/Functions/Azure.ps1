@@ -88,6 +88,9 @@ Function Get-EntraUserLicenseReport {
 
     Test-ModuleAvailable -Name $RequiredModules
 
+    $LicenseSkuIdLookup = @{}
+    $ServicePlanIdLookup = @{}
+
     if ($LicensingInfoCsv) {
         try {
             $LicensingInfo = @(Import-Csv -LiteralPath $LicensingInfoCsv -ErrorAction 'Stop')
@@ -111,57 +114,7 @@ Function Get-EntraUserLicenseReport {
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
         }
-    }
 
-    # Scopes to request if there's no existing context or missing scopes
-    $DefaultScopes = 'User.Read.All', 'LicenseAssignment.Read.All'
-    # Acceptable user scopes
-    $UserScopes = 'User.Read.All', 'Directory.Read.All'
-    # Acceptable licensing scopes
-    $LicensingScopes = 'LicenseAssignment.Read.All', 'Organization.Read.All', 'Directory.Read.All'
-
-    # Check any existing context has acceptable scopes
-    $MgContext = Get-MgContext
-    $HasRequiredScopes = $false
-    if ($MgContext) {
-        $HasUserScope = $false
-        foreach ($Scope in $UserScopes) {
-            if ($Scope -in $MgContext.Scopes) {
-                $HasUserScope = $true
-                break
-            }
-        }
-
-        $HasLicensingScope = $false
-        foreach ($Scope in $LicensingScopes) {
-            if ($Scope -in $MgContext.Scopes) {
-                $HasLicensingScope = $true
-                break
-            }
-        }
-
-        $HasRequiredScopes = $HasUserScope -and $HasLicensingScope
-    }
-
-    if (!$HasRequiredScopes) {
-        try {
-            Write-Verbose -Message 'Connecting to Microsoft Graph ...'
-            Connect-MgGraph -Scopes $DefaultScopes -NoWelcome -ErrorAction 'Stop'
-        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
-    }
-
-    try {
-        Write-Verbose -Message 'Retrieving subscribed licensing SKUs ...'
-        $SubscribedSKUs = Get-MgSubscribedSku -All -ErrorAction 'Stop' | Where-Object AppliesTo -EQ 'User'
-
-        Write-Verbose -Message 'Retrieving user license assignments ...'
-        $Users = Get-MgUser -All -Property 'Id', 'UserPrincipalName', 'DisplayName', 'AssignedLicenses' -ErrorAction 'Stop'
-    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
-
-    $LicenseSkuIdLookup = @{}
-    $ServicePlanIdLookup = @{}
-
-    if ($LicensingInfoCsv) {
         # Find/replace pairs to clean-up license names
         $LicenseCleanupNameFragments = [Ordered]@{
             '_'                             = ' '
@@ -184,7 +137,7 @@ Function Get-EntraUserLicenseReport {
                 $ErrMsg = "Invalid GUID encountered for license entry: $($Entry.Guid)"
                 $ErrExc = [FormatException]::new($ErrMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvInvalidData', $ErrCat, $Entry.GUID)
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvInvalidData', $ErrCat, $Entry.Guid)
                 $PSCmdlet.WriteError($ErrRec)
                 continue
             }
@@ -292,8 +245,9 @@ Function Get-EntraUserLicenseReport {
                 $UpdatedCurrentName = $true
             }
 
-            # Replace current name with candidate name if the candidate name
-            # does not match the regex but the current name does.
+            # Regular expressions which if the candidate name does not match
+            # but the current name does triggers replacement of the current
+            # name with the candidate name.
             $CandidateNoMatchRegexes = @(
                 # Grammar/spelling mistakes
                 '\b(Microsoft Microsoft|PowerApps)\b'
@@ -306,40 +260,57 @@ Function Get-EntraUserLicenseReport {
                 '\b(Azure|Flow|O(ffice )?365)\b'
             )
 
+            # Check if the candidate name matches any of the regexes and bail
+            # out early if so as it's clearly not suitable.
             foreach ($TestRegex in $CandidateNoMatchRegexes) {
                 if ($ServicePlanCandidateName -match $TestRegex) {
                     $IgnoredCandidateName = $true
                     break
                 }
-
-                if ($ServicePlanCurrentName -match $TestRegex) {
-                    $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
-                    $UpdatedCurrentName = $true
-                }
             }
 
             if ($IgnoredCandidateName) { continue }
 
-            # Replace current name with candidate name if the current name
-            # does not match the regex but the candidate name does not.
+            # The candidate name may be preferred. Check if the current name
+            # matches any of the regexes, and if so, perform the replacement.
+            foreach ($TestRegex in $CandidateNoMatchRegexes) {
+                if ($ServicePlanCurrentName -match $TestRegex) {
+                    $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
+                    $UpdatedCurrentName = $true
+                    break
+                }
+            }
+
+            # Regular expressions which if the current name does not match but
+            # the candidate name does triggers replacement of the current name
+            # with the candidate name.
             $CandidateMatchRegexes = @(
                 # References a plan (e.g. `Plan 2`)
                 '\bPlan\b'
             )
 
+            # Check if the current name matches any of the regexes and bail out
+            # early if so as it's clearly already suitable.
             foreach ($TestRegex in $CandidateMatchRegexes) {
                 if ($ServicePlanCurrentName -match $TestRegex) {
                     $IgnoredCandidateName = $true
                     break
                 }
+            }
 
+            if ($IgnoredCandidateName) { continue }
+
+            # The candidate name may be preferred. Check if candidate name
+            # matches any of the regexes, and if so, perform the replacement.
+            foreach ($TestRegex in $CandidateNoMatchRegexes) {
                 if ($ServicePlanCandidateName -match $TestRegex) {
                     $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
                     $UpdatedCurrentName = $true
+                    break
                 }
             }
 
-            if ($IgnoredCandidateName -or $UpdatedCurrentName) { continue }
+            if ($UpdatedCurrentName) { continue }
 
             $ConflictingNames++
             Write-Debug -Message ('Display name for service "{0}" differs from existing entry: {1} != {2}' -f $ServicePlanId, $ServicePlanCurrentName, $ServicePlanCandidateName)
@@ -369,7 +340,54 @@ Function Get-EntraUserLicenseReport {
         if ($ReturnParsedServices) {
             return $ServicePlanIdLookup
         }
-    } else {
+    }
+
+    # Scopes to request if there's no existing context or missing scopes
+    $DefaultScopes = 'User.Read.All', 'LicenseAssignment.Read.All'
+    # Acceptable user scopes
+    $UserScopes = 'User.Read.All', 'Directory.Read.All'
+    # Acceptable licensing scopes
+    $LicensingScopes = 'LicenseAssignment.Read.All', 'Organization.Read.All', 'Directory.Read.All'
+
+    # Check any existing context has acceptable scopes
+    $MgContext = Get-MgContext
+    $HasRequiredScopes = $false
+    if ($MgContext) {
+        $HasUserScope = $false
+        foreach ($Scope in $UserScopes) {
+            if ($Scope -in $MgContext.Scopes) {
+                $HasUserScope = $true
+                break
+            }
+        }
+
+        $HasLicensingScope = $false
+        foreach ($Scope in $LicensingScopes) {
+            if ($Scope -in $MgContext.Scopes) {
+                $HasLicensingScope = $true
+                break
+            }
+        }
+
+        $HasRequiredScopes = $HasUserScope -and $HasLicensingScope
+    }
+
+    if (!$HasRequiredScopes) {
+        try {
+            Write-Verbose -Message 'Connecting to Microsoft Graph ...'
+            Connect-MgGraph -Scopes $DefaultScopes -NoWelcome -ErrorAction 'Stop'
+        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+    }
+
+    try {
+        Write-Verbose -Message 'Retrieving subscribed licensing SKUs ...'
+        $SubscribedSKUs = Get-MgSubscribedSku -All -ErrorAction 'Stop' | Where-Object AppliesTo -EQ 'User'
+
+        Write-Verbose -Message 'Retrieving user license assignments ...'
+        $Users = Get-MgUser -All -Property 'Id', 'UserPrincipalName', 'DisplayName', 'AssignedLicenses' -ErrorAction 'Stop'
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+
+    if (!$LicensingInfoCsv) {
         # Populate the mapping of license SKU IDs to names
         foreach ($SubscribedSKU in $SubscribedSKUs) {
             $LicenseSkuIdLookup[$SubscribedSKU.SkuId] = $SubscribedSKU.SkuPartNumber

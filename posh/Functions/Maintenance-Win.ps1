@@ -648,16 +648,6 @@ Function Update-MicrosoftStore {
     $MethodName = 'UpdateScanMethod'
 
     try {
-        $Session = New-CimSession -ErrorAction 'Stop' -Verbose:$false
-    } catch {
-        $ErrMsg = "Error creating new WMI session: $($PSItem.Exception.Message)"
-        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'WmiApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    try {
         $Instance = Get-CimInstance -Namespace $Namespace -ClassName $ClassName -ErrorAction 'Stop'
     } catch {
         $ErrMsg = "Unable to update Microsoft Store apps as ${ClassName} WMI class is not available: $($PSItem.Exception.Message)"
@@ -685,16 +675,28 @@ Function Update-MicrosoftStore {
     }
 
     try {
-        $UpdateScan = $Session.InvokeMethod($Namespace, $Instance, $MethodName, $null)
+        $Session = New-CimSession -ErrorAction 'Stop' -Verbose:$false
     } catch {
-        $ErrMsg = "Error invoking ${MethodName} method of ${ClassName} WMI class: $($PSItem.Exception.Message)"
+        $ErrMsg = "Error creating new WMI session: $($PSItem.Exception.Message)"
         $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'WmiApiFailed', $ErrCat, $null)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $Result.ReturnValue = $UpdateScan.ReturnValue.Value
+    try {
+        $UpdateScan = $Session.InvokeMethod($Namespace, $Instance, $MethodName, $null)
+        $Result.ReturnValue = $UpdateScan.ReturnValue.Value
+    } catch {
+        $ErrMsg = "Error invoking ${MethodName} method of ${ClassName} WMI class: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'WmiApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    } finally {
+        Remove-CimSession -CimSession $Session
+    }
+
     if ($Result.ReturnValue -eq 0) {
         $Result.Success = $true
     } else {
@@ -806,8 +808,14 @@ Function Update-Office {
         $StatusMsg = "Executing Scenario: ${ExecutingScenario} (Waited ${ElapsedSeconds} secs / time-out: ${MaxWaitTime} secs) ..."
         Write-Progress @WriteProgressParams -Status $StatusMsg
 
-        $TasksRegPath = Join-Path -Path $C2RRegPath -ChildPath "Scenario\${ExecutingScenario}\TasksState"
-        $TasksRegKey = Get-Item -LiteralPath $TasksRegPath
+        try {
+            $TasksRegPath = Join-Path -Path $C2RRegPath -ChildPath "Scenario\${ExecutingScenario}\TasksState"
+            $TasksRegKey = Get-Item -LiteralPath $TasksRegPath -ErrorAction 'Stop'
+        } catch {
+            Write-Warning -Message "Failed to retrieve tasks state for executing scenario: $($PSItem.Exception.Message)"
+            continue
+        }
+
         foreach ($Task in $TasksRegKey.GetValueNames()) {
             $TaskName = $Task.Split(':')[0]
             $TaskStatus = $TasksRegKey.GetValue($Task)
@@ -961,11 +969,11 @@ Function Update-Scoop {
     }
 
     $Result = [PSCustomObject]@{
-        Scoop        = [String[]]@()
-        Apps         = [String[]]@()
-        Cleanup      = [String[]]@()
-        LastExitCode = -1
-        WhatIf       = $false
+        Scoop    = [String[]]@()
+        Apps     = [String[]]@()
+        Cleanup  = [String[]]@()
+        ExitCode = -1
+        WhatIf   = $false
     }
 
     $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateScoop')
@@ -997,16 +1005,15 @@ Function Update-Scoop {
             $VerbosePreference = 'SilentlyContinue'
 
             $Result.Scoop = [String[]]@(& scoop @UpdateScoopArgs 6>&1)
-        } catch {
-            $LASTEXITCODE = -1
         } finally {
             $VerbosePreference = $VerboseOriginal
         }
 
-        if ($LASTEXITCODE -ne 0) {
+        $Result.ExitCode = $LASTEXITCODE
+        if ($Result.ExitCode -ne 0) {
             Write-Progress @WriteProgressParams -Completed
 
-            $ErrMsg = "Scoop update exited with non-zero exit code: ${LASTEXITCODE}"
+            $ErrMsg = "Scoop update exited with non-zero exit code: $($Result.ExitCode)"
             $ErrExc = [Exception]::new($ErrMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $UpdateScoopCmd)
@@ -1037,17 +1044,16 @@ Function Update-Scoop {
         $WhatIfPreference = $false
 
         $Result.Apps = [String[]]@(& scoop @UpdateAppsArgs 6>&1 | Where-Object { $PSItem -notmatch $ProgressBarRegex })
-    } catch {
-        $LASTEXITCODE = -1
     } finally {
         $VerbosePreference = $VerboseOriginal
         $WhatIfPreference = $WhatIfOriginal
     }
 
-    if ($LASTEXITCODE -ne 0) {
+    $Result.ExitCode = $LASTEXITCODE
+    if ($Result.ExitCode -ne 0) {
         Write-Progress @WriteProgressParams -Completed
 
-        $ErrMsg = "Scoop apps update exited with non-zero exit code: ${LASTEXITCODE}"
+        $ErrMsg = "Scoop apps update exited with non-zero exit code: $($Result.ExitCode)"
         $ErrExc = [Exception]::new($ErrMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $UpdateAppsCmd)
@@ -1065,16 +1071,15 @@ Function Update-Scoop {
             $VerbosePreference = 'SilentlyContinue'
 
             $Result.Cleanup = [String[]]@(& scoop @CleanupArgs 6>&1)
-        } catch {
-            $LASTEXITCODE = -1
         } finally {
             $VerbosePreference = $VerboseOriginal
         }
 
-        if ($LASTEXITCODE -ne 0) {
+        $Result.ExitCode = $LASTEXITCODE
+        if ($Result.ExitCode -ne 0) {
             Write-Progress @WriteProgressParams -Completed
 
-            $ErrMsg = "Scoop clean-up exited with non-zero exit code: ${LASTEXITCODE}"
+            $ErrMsg = "Scoop clean-up exited with non-zero exit code: $($Result.ExitCode)"
             $ErrExc = [Exception]::new($ErrMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $CleanupCmd)
@@ -1347,7 +1352,7 @@ Function Update-Windows {
     # HACK: `PSWindowsUpdate` returns three instances of each update result.
     # Keep only unique KBs on the grounds the installation of a given update
     # will only be attempted once for a given invocation.
-    $Result.Updates = Get-WindowsUpdate @UpdateParams | Sort-Object -Property 'KB' -Unique
+    $Result.Updates = @(Get-WindowsUpdate @UpdateParams | Sort-Object -Property 'KB' -Unique)
 
     if ($Result.Updates.Count -eq 0) {
         $Result.Summary = 'No updates found'
@@ -1429,7 +1434,7 @@ Function Update-WinGet {
 
     try {
         Write-Verbose -Message 'Retrieving all WinGet packages ...'
-        $Packages = Get-WinGetPackage -ErrorAction 'Stop'
+        $Packages = @(Get-WinGetPackage -ErrorAction 'Stop')
     } catch {
         $ErrMsg = "Failed to enumerate installed WinGet packages: $($PSItem.Exception.Message)"
         $ErrExc = [Exception]::new($ErrMsg, $PSItem.Exception)
@@ -1489,10 +1494,7 @@ Function Update-WSL {
         )
 
         $StatusArgs = @('--status')
-        $StatusCmd = "wsl $($StatusArgs -join ' ')"
-
         $VersionArgs = @('--version')
-        $VersionCmd = "wsl $($VersionArgs -join ' ')"
 
         $DefaultOutputEncoding = [Console]::OutputEncoding
 
@@ -1501,7 +1503,6 @@ Function Update-WSL {
         # the install with a 60 second time-out. Instead we can first use `wsl
         # --status` which seems to exit with code 50 when WSL is not installed.
         try {
-            Write-Verbose -Message "Retrieving WSL status: ${StatusCmd}"
             [Console]::OutputEncoding = [Text.Encoding]::Unicode
             $null = & wsl @StatusArgs 2>&1
         } finally {
@@ -1535,7 +1536,6 @@ Function Update-WSL {
         }
 
         try {
-            Write-Verbose -Message "Retrieving WSL version: ${VersionCmd}"
             [Console]::OutputEncoding = [Text.Encoding]::Unicode
             $WslVersion = & wsl @VersionArgs 2>&1
         } finally {

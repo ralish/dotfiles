@@ -112,7 +112,7 @@ Function Set-R53HostedZoneNameTag {
 # Set records on a Route 53 hosted zone suitable for a parked domain
 Function Set-R53HostedZoneParkedRecords {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType('Void', 'Amazon.Route53.Model.ChangeInfo[]')]
+    [OutputType('Amazon.Route53.Model.ChangeInfo[]')]
     Param(
         [Parameter(Mandatory)]
         [String[]]$Domain,
@@ -541,7 +541,7 @@ Function Get-S3BucketSize {
                 continue
             }
 
-            if ($Statistic.Datapoints.Count -ne 1) {
+            if ($Statistic.Datapoints.Count -eq 0) {
                 $ErrMsg = "Skipping BucketSizeBytes statistic with $($Statistic.Datapoints.Count) datapoints for S3 bucket: ${BucketName}"
                 $ErrExc = [InvalidOperationException]::new($ErrMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
@@ -550,7 +550,7 @@ Function Get-S3BucketSize {
                 continue
             }
 
-            $Bucket.BucketSizeBytes += $Statistic.Datapoints[0].Average
+            $Bucket.BucketSizeBytes += ($Statistic.Datapoints | Sort-Object -Property 'Timestamp' -Descending)[0].Average
         }
     }
 

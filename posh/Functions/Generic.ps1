@@ -154,7 +154,8 @@ Function ConvertTo-TextEncoding {
                 }
             }
 
-            if ($SourceEncoding -match '^UTF-') {
+            # UTF-7 has no concept of a BOM
+            if ($SourceEncoding -match '^UTF-' -and $SourceEncoding -ne 'UTF-7') {
                 $SourceEncoderParams += $SourceByteOrderMark
             }
 
@@ -417,7 +418,13 @@ Function Add-FileToEmptyDirectories {
 
         $FilesToCreate = [Collections.Generic.List[String]]::new()
         # Retrieve top-level directories in the path minus any exclusions
-        Get-ChildItem -LiteralPath $DirItem.FullName -Directory -Exclude $Exclude -Force:$Force | ForEach-Object {
+        Get-ChildItem -LiteralPath $DirItem.FullName -Directory -Force:$Force | ForEach-Object {
+            # Ideally we'd use `-Exclude` in `Get-ChildItem` but it's ignored
+            # on Windows PowerShell 5.1 when used alongside `-LiteralPath`.
+            foreach ($Filter in $Exclude) {
+                if ($PSItem.Name -like $Filter) { return }
+            }
+
             # For each top-level subdirectory check if it has any children
             $TopSubDirItems = Get-ChildItem -LiteralPath $PSItem.FullName -Force:$Force | Measure-Object
             if ($TopSubDirItems.Count -ne 0) {

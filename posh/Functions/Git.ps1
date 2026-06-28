@@ -35,158 +35,6 @@ Function Get-GitRepoSummary {
     }
 }
 
-# Run a Git command in all repositories under a path
-Function Invoke-GitRepoCommand {
-    [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([Void], [String[]])]
-    Param(
-        [Parameter(Mandatory)]
-        [String[]]$Command,
-
-        [ValidateNotNullOrEmpty()]
-        [Regex]$RepoInclude,
-
-        [ValidateNotNullOrEmpty()]
-        [Regex]$RepoExclude,
-
-        [Parameter(ValueFromPipeline)]
-        [ValidateNotNullOrEmpty()]
-        [String[]]$Path,
-
-        [Switch]$Recurse
-    )
-
-    Begin {
-        $OriginalLocation = Get-Location
-
-        if (!$Path) {
-            $Path += $PWD.Path
-        }
-
-        $GitCmds = [Collections.Generic.List[String[]]]::new()
-        foreach ($GitCmd in $Command) {
-            $GitArgs = $GitCmd.Split()
-            $GitCmds.Add($GitArgs)
-        }
-
-        $RecurseParams = @{
-            Command = $Command
-            Recurse = $Recurse
-        }
-
-        if ($PSBoundParameters.ContainsKey('RepoInclude')) {
-            $RecurseParams['RepoInclude'] = $RepoInclude
-        }
-
-        if ($PSBoundParameters.ContainsKey('RepoExclude')) {
-            $RecurseParams['RepoExclude'] = $RepoExclude
-        }
-    }
-
-    Process {
-        foreach ($GitPath in $Path) {
-            if (!(Test-IsPathFullyQualified -Path $GitPath)) {
-                if ($OriginalLocation.Provider.Name -ne 'FileSystem') {
-                    $ErrMsg = "Skipping relative path as current path is not a file system: ${GitPath}"
-                    $ErrExc = [ArgumentException]::new($ErrMsg)
-                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $GitPath)
-                    $PSCmdlet.WriteError($ErrRec)
-                    continue
-                }
-
-                $GitPath = Join-Path -Path $OriginalLocation -ChildPath $GitPath
-            }
-
-            try {
-                $BaseDir = Get-Item -LiteralPath $GitPath -ErrorAction 'Stop'
-            } catch {
-                $PSCmdlet.WriteError($PSItem)
-                continue
-            }
-
-            if ($BaseDir -isnot [IO.DirectoryInfo]) {
-                $ErrMsg = "Path is not a directory: ${GitPath}"
-                $ErrExc = [ArgumentException]::new($ErrMsg)
-                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $GitPath)
-                $PSCmdlet.WriteError($ErrRec)
-                continue
-            }
-
-            $GitDirs = [Collections.Generic.List[IO.DirectoryInfo]]::new()
-            $GitDir = Join-Path -Path $BaseDir.FullName -ChildPath '.git'
-            if (Test-Path -LiteralPath $GitDir -PathType 'Container') {
-                $GitDirs.Add($BaseDir)
-            } else {
-                $SubDirs = Get-ChildItem -LiteralPath $BaseDir.FullName -Directory
-
-                foreach ($SubDir in $SubDirs) {
-                    $GitDir = Join-Path -Path $SubDir.FullName -ChildPath '.git'
-
-                    if (!(Test-Path -LiteralPath $GitDir -PathType 'Container')) {
-                        if ($Recurse) {
-                            Invoke-GitRepoCommand -Path $SubDir.FullName @RecurseParams
-                        } else {
-                            Write-Verbose -Message "Skipping directory: $($SubDir.Name)"
-                        }
-
-                        continue
-                    }
-
-                    if ($RepoInclude -and $SubDir.Name -notmatch $RepoInclude) {
-                        Write-Verbose -Message "Skipping repository not matching inclusion filter: $($SubDir.Name)"
-                        continue
-                    }
-
-                    if ($RepoExclude -and $SubDir.Name -match $RepoExclude) {
-                        Write-Verbose -Message "Skipping repository matching exclusion filter: $($SubDir.Name)"
-                        continue
-                    }
-
-                    $GitDirs.Add($SubDir)
-                }
-            }
-
-            $GitDirsProcessed = 0
-            foreach ($GitDir in $GitDirs) {
-                $GitDirsProcessed++
-
-                if ($PSCmdlet.ShouldProcess($GitDir.Name, 'Invoke Git command')) {
-                    try {
-                        Write-Host -ForegroundColor 'Green' "Running in: $($GitDir.Name)"
-                        Set-Location -LiteralPath $GitDir.FullName -ErrorAction 'Stop'
-                    } catch {
-                        $PSCmdlet.WriteError($PSItem)
-                        continue
-                    }
-
-                    foreach ($GitCmd in $GitCmds) {
-                        & git @GitCmd
-                        if ($LASTEXITCODE -ne 0) {
-                            $ErrMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
-                            $ErrExc = [Exception]::new($ErrMsg)
-                            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-                            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitCmd -join ' ')")
-                            $PSCmdlet.WriteError($ErrRec)
-                        }
-                    }
-
-                    if ($GitDirsProcessed -lt $GitDirs.Count) {
-                        Write-Host
-                    }
-                }
-            }
-        }
-    }
-
-    End {
-        try {
-            Set-Location -LiteralPath $OriginalLocation -ErrorAction 'Stop'
-        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
-    }
-}
-
 # Invoke a linter on matching repository files
 Function Invoke-GitLinter {
     [CmdletBinding()]
@@ -350,15 +198,24 @@ Function Invoke-GitLinter {
         default { $LintFiles = $GitOutput }
     }
 
-    if ($ExcludePattern) {
-        $LintFiles = $LintFiles | Where-Object { $PSItem -notmatch $ExcludePattern }
-    }
-
-    if ($ExcludeSymlinks) {
-        $LintFiles = $LintFiles | Where-Object { (Get-Item -LiteralPath $PSItem -Force).LinkType -ne 'SymbolicLink' }
-    }
-
     foreach ($LintFile in $LintFiles) {
+        if ($ExcludePattern -and $LintFile -match $ExcludePattern) { continue }
+
+        if (!(Test-Path -LiteralPath $LintFile -PathType 'Leaf')) {
+            Write-Warning -Message "Skipping file missing from working tree: ${LintFile}"
+            continue
+        }
+
+        if ($ExcludeSymlinks) {
+            try {
+                $File = Get-Item -LiteralPath $LintFile -Force -ErrorAction 'Stop'
+                if ($File.LinkType -eq 'SymbolicLink') { continue }
+            } catch {
+                $PSCmdlet.WriteError($PSItem)
+                continue
+            }
+        }
+
         switch ($PSCmdlet.ParameterSetName) {
             'DevSkim' {
                 Write-Verbose -Message "Invoking DevSkim on: ${LintFile}"
@@ -409,6 +266,15 @@ Function Invoke-GitMergeAllBranches {
         [ValidateNotNullOrEmpty()]
         [String]$SourceBranch
     )
+
+    $null = & git symbolic-ref -q HEAD
+    if ($LASTEXITCODE -ne 0) {
+        $ErrMsg = 'Refusing to run while HEAD is detached.'
+        $ErrExc = [Exception]::new($ErrMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
 
     if (!$SourceBranch) {
         $null = & git rev-parse -q --verify main 2>&1
@@ -532,6 +398,158 @@ Function Invoke-GitMergeAllBranches {
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
+    }
+}
+
+# Run a Git command in all repositories under a path
+Function Invoke-GitRepoCommand {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
+    Param(
+        [Parameter(Mandatory)]
+        [String[]]$Command,
+
+        [ValidateNotNullOrEmpty()]
+        [Regex]$RepoInclude,
+
+        [ValidateNotNullOrEmpty()]
+        [Regex]$RepoExclude,
+
+        [Parameter(ValueFromPipeline)]
+        [ValidateNotNullOrEmpty()]
+        [String[]]$Path,
+
+        [Switch]$Recurse
+    )
+
+    Begin {
+        $OriginalLocation = Get-Location
+
+        if (!$Path) {
+            $Path += $PWD.Path
+        }
+
+        $GitCmds = [Collections.Generic.List[String[]]]::new()
+        foreach ($GitCmd in $Command) {
+            $GitArgs = $GitCmd.Split(' ', [StringSplitOptions]::RemoveEmptyEntries)
+            $GitCmds.Add($GitArgs)
+        }
+
+        $RecurseParams = @{
+            Command = $Command
+            Recurse = $Recurse
+        }
+
+        if ($PSBoundParameters.ContainsKey('RepoInclude')) {
+            $RecurseParams['RepoInclude'] = $RepoInclude
+        }
+
+        if ($PSBoundParameters.ContainsKey('RepoExclude')) {
+            $RecurseParams['RepoExclude'] = $RepoExclude
+        }
+    }
+
+    Process {
+        foreach ($GitPath in $Path) {
+            if (!(Test-IsPathFullyQualified -Path $GitPath)) {
+                if ($OriginalLocation.Provider.Name -ne 'FileSystem') {
+                    $ErrMsg = "Skipping relative path as current path is not a file system: ${GitPath}"
+                    $ErrExc = [ArgumentException]::new($ErrMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $GitPath)
+                    $PSCmdlet.WriteError($ErrRec)
+                    continue
+                }
+
+                $GitPath = Join-Path -Path $OriginalLocation -ChildPath $GitPath
+            }
+
+            try {
+                $BaseDir = Get-Item -LiteralPath $GitPath -ErrorAction 'Stop'
+            } catch {
+                $PSCmdlet.WriteError($PSItem)
+                continue
+            }
+
+            if ($BaseDir -isnot [IO.DirectoryInfo]) {
+                $ErrMsg = "Path is not a directory: ${GitPath}"
+                $ErrExc = [ArgumentException]::new($ErrMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $GitPath)
+                $PSCmdlet.WriteError($ErrRec)
+                continue
+            }
+
+            $GitDirs = [Collections.Generic.List[IO.DirectoryInfo]]::new()
+            $GitDir = Join-Path -Path $BaseDir.FullName -ChildPath '.git'
+            if (Test-Path -LiteralPath $GitDir -PathType 'Container') {
+                $GitDirs.Add($BaseDir)
+            } else {
+                $SubDirs = Get-ChildItem -LiteralPath $BaseDir.FullName -Directory
+
+                foreach ($SubDir in $SubDirs) {
+                    $GitDir = Join-Path -Path $SubDir.FullName -ChildPath '.git'
+
+                    if (!(Test-Path -LiteralPath $GitDir -PathType 'Container')) {
+                        if ($Recurse) {
+                            Invoke-GitRepoCommand -Path $SubDir.FullName @RecurseParams
+                        } else {
+                            Write-Verbose -Message "Skipping directory: $($SubDir.Name)"
+                        }
+
+                        continue
+                    }
+
+                    if ($RepoInclude -and $SubDir.Name -notmatch $RepoInclude) {
+                        Write-Verbose -Message "Skipping repository not matching inclusion filter: $($SubDir.Name)"
+                        continue
+                    }
+
+                    if ($RepoExclude -and $SubDir.Name -match $RepoExclude) {
+                        Write-Verbose -Message "Skipping repository matching exclusion filter: $($SubDir.Name)"
+                        continue
+                    }
+
+                    $GitDirs.Add($SubDir)
+                }
+            }
+
+            $GitDirsProcessed = 0
+            foreach ($GitDir in $GitDirs) {
+                $GitDirsProcessed++
+
+                if ($PSCmdlet.ShouldProcess($GitDir.Name, 'Invoke Git command')) {
+                    try {
+                        Write-Host -ForegroundColor 'Green' "Running in: $($GitDir.Name)"
+                        Set-Location -LiteralPath $GitDir.FullName -ErrorAction 'Stop'
+                    } catch {
+                        $PSCmdlet.WriteError($PSItem)
+                        continue
+                    }
+
+                    foreach ($GitCmd in $GitCmds) {
+                        & git @GitCmd
+                        if ($LASTEXITCODE -ne 0) {
+                            $ErrMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+                            $ErrExc = [Exception]::new($ErrMsg)
+                            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitCmd -join ' ')")
+                            $PSCmdlet.WriteError($ErrRec)
+                        }
+                    }
+
+                    if ($GitDirsProcessed -lt $GitDirs.Count) {
+                        Write-Host
+                    }
+                }
+            }
+        }
+    }
+
+    End {
+        try {
+            Set-Location -LiteralPath $OriginalLocation -ErrorAction 'Stop'
+        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
     }
 }
 

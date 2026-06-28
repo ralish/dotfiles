@@ -84,6 +84,9 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <PropertyName>ExitCode</PropertyName>
+                            </ListItem>
+                            <ListItem>
                                 <PropertyName>WhatIf</PropertyName>
                             </ListItem>
                         </ListItems>
@@ -182,7 +185,7 @@
                                 <ScriptBlock>
                                     if ($_.WhatIf) { return 'Did not run (WhatIf mode)' }
 
-                                    $Updated = ($_.Results | Where-Object Status -eq 'OK' | Measure-Object).Count
+                                    $Updated = ($_.Results | Where-Object Status -EQ 'OK' | Measure-Object).Count
                                     $Failed = $_.Results.Count - $Updated
                                     $Unknown = $_.Available.Count - $_.Results.Count
                                     "${Updated} packages updated (${Failed} failed, ${Unknown} missing)"

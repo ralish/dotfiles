@@ -18,8 +18,6 @@
                                 <ScriptBlock>
                                     if ($null -eq $_.Windows) { return }
                                     if ($_.Windows -is [Management.Automation.ErrorRecord]) { return $_.Windows.Exception.Message }
-
-                                    if ($_.Windows -is [String]) { return $_.Windows }
                                     $_.Windows.Summary
                                 </ScriptBlock>
                             </ListItem>
@@ -32,8 +30,7 @@
                                     if ($null -eq $_.WSL) { return }
                                     if ($_.WSL -is [Management.Automation.ErrorRecord]) { return $_.WSL.Exception.Message }
 
-                                    if ($_.WSL -is [String]) { return $_.WSL }
-                                    if (!$_.WSL.Success) { 'Error during operation (view property for details)' }
+                                    if (!$_.WSL.Success) { return 'Error during operation (view property for details)' }
                                     if ($_.WSL.WhatIf) { return "$($_.WSL.BeforeUpdate) (current version)" }
 
                                     if ($null -ne $_.WSL.AfterUpdate) {
@@ -54,8 +51,7 @@
                                     if ($null -eq $_.Office) { return }
                                     if ($_.Office -is [Management.Automation.ErrorRecord]) { return $_.Office.Exception.Message }
 
-                                    if ($_.Office -is [String]) { return $_.Office }
-                                    if (!$_.Office.Success) { 'Error during operation (view property for details)' }
+                                    if (!$_.Office.Success) { return 'Error during operation (view property for details)' }
                                     if ($_.Office.WhatIf) { return "$($_.Office.BeforeUpdate) (current version)" }
 
                                     if ($_.Office.BeforeUpdate -eq $_.Office.AfterUpdate) { return "$($_.Office.BeforeUpdate) (no update)" }
@@ -71,8 +67,7 @@
                                     if ($null -eq $_.VisualStudio) { return }
                                     if ($_.VisualStudio -is [Management.Automation.ErrorRecord]) { return $_.VisualStudio.Exception.Message }
 
-                                    if ($_.VisualStudio -is [String]) { return $_.VisualStudio }
-                                    if (!$_.VisualStudio.Success) { 'Error during operation (view property for details)' }
+                                    if (!$_.VisualStudio.Success) { return 'Error during operation (view property for details)' }
                                     if ($_.VisualStudio.WhatIf) { return "$([String]::Join(', ', ($_.VisualStudio.BeforeUpdate.InstallationVersion | Sort-Object))) (current versions)" }
 
                                     $Updated = $false
@@ -96,7 +91,6 @@
                                 <ScriptBlock>
                                     if ($null -eq $_.PowerShell) { return }
                                     if ($_.PowerShell -is [Management.Automation.ErrorRecord]) { return $_.PowerShell.Exception.Message }
-
                                     $_.PowerShell
                                 </ScriptBlock>
                             </ListItem>
@@ -109,7 +103,6 @@
                                     if ($null -eq $_.MicrosoftStore) { return }
                                     if ($_.MicrosoftStore -is [Management.Automation.ErrorRecord]) { return $_.MicrosoftStore.Exception.Message }
 
-                                    if ($_.MicrosoftStore -is [String]) { return $_.MicrosoftStore }
                                     if (!$_.MicrosoftStore.Success) { return 'Error during operation (view property for details)' }
                                     if ($_.MicrosoftStore.WhatIf) { return 'Did not run (WhatIf mode)' }
                                     'Updated all apps'
@@ -124,8 +117,7 @@
                                     if ($null -eq $_.Edge) { return }
                                     if ($_.Edge -is [Management.Automation.ErrorRecord]) { return $_.Edge.Exception.Message }
 
-                                    if ($_.Edge -is [String]) { return $_.Edge }
-                                    if (!$_.Edge.Success) { 'Error during operation (view property for details)' }
+                                    if (!$_.Edge.Success) { return 'Error during operation (view property for details)' }
                                     if ($_.Edge.WhatIf) { return "$($_.Edge.BeforeUpdate) (current version)" }
 
                                     if ($_.Edge.BeforeUpdate -eq $_.Edge.AfterUpdate) { return "$($_.Edge.BeforeUpdate) (no update)" }
@@ -141,8 +133,7 @@
                                     if ($null -eq $_.Chrome) { return }
                                     if ($_.Chrome -is [Management.Automation.ErrorRecord]) { return $_.Chrome.Exception.Message }
 
-                                    if ($_.Chrome -is [String]) { return $_.Chrome }
-                                    if (!$_.Chrome.Success) { 'Error during operation (view property for details)' }
+                                    if (!$_.Chrome.Success) { return 'Error during operation (view property for details)' }
                                     if ($_.Chrome.WhatIf) { return "$($_.Chrome.BeforeUpdate) (current version)" }
 
                                     if ($_.Chrome.BeforeUpdate -eq $_.Chrome.AfterUpdate) { return "$($_.Chrome.BeforeUpdate) (no update)" }
@@ -158,11 +149,10 @@
                                     if ($null -eq $_.WinGet) { return }
                                     if ($_.WinGet -is [Management.Automation.ErrorRecord]) { return $_.WinGet.Exception.Message }
 
-                                    if ($_.WinGet -is [String]) { return $_.WinGet }
-                                    if (!$_.WinGet.Success) { 'Error during operation (view property for details)' }
+                                    if (!$_.WinGet.Success) { return 'Error during operation (view property for details)' }
                                     if ($_.WinGet.WhatIf) { return "$($_.WinGet.Available.Count) available updates" }
 
-                                    $Updated = ($_.WinGet.Results | Where-Object Status -eq 'OK' | Measure-Object).Count
+                                    $Updated = ($_.WinGet.Results | Where-Object Status -EQ 'OK' | Measure-Object).Count
                                     $Failed = $_.WinGet.Results.Count - $Updated
                                     $Unknown = $_.WinGet.Available.Count - $_.WinGet.Results.Count
                                     "${Updated} packages updated (${Failed} failed, ${Unknown} missing)"
@@ -177,11 +167,9 @@
                                     if ($null -eq $_.Homebrew) { return }
                                     if ($_.Homebrew -is [Management.Automation.ErrorRecord]) { return $_.Homebrew.Exception.Message }
 
-                                    if ($_.Homebrew -is [String]) { return $_.Homebrew }
-
                                     $Actions = [Collections.Generic.List[String]]::new()
-                                    if ($_.Homebrew.Update.Count -gt 0) { $Actions.Add('Updated Homebrew') }
-                                    if ($_.Homebrew.Upgrade.Count -gt 0) {
+                                    if ($_.Homebrew.Brew.Count -gt 0) { $Actions.Add('Updated Homebrew') }
+                                    if ($_.Homebrew.Apps.Count -gt 0) {
                                         $Action = 'Upgraded apps'
                                         if ($_.Homebrew.WhatIf) { $Action += ' (dry-run)' }
                                         $Actions.Add($Action)
@@ -200,8 +188,6 @@
                                 <ScriptBlock>
                                     if ($null -eq $_.Scoop) { return }
                                     if ($_.Scoop -is [Management.Automation.ErrorRecord]) { return $_.Scoop.Exception.Message }
-
-                                    if ($_.Scoop -is [String]) { return $_.Scoop }
 
                                     $Actions = [Collections.Generic.List[String]]::new()
                                     if ($_.Scoop.Scoop.Count -gt 0) { $Actions.Add('Updated Scoop') }
@@ -224,20 +210,18 @@
                                 <ScriptBlock>
                                     if ($null -eq $_.DotNetTools) { return }
                                     if ($_.DotNetTools -is [Management.Automation.ErrorRecord]) { return $_.DotNetTools.Exception.Message }
-
                                     $_.DotNetTools
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
-                                <Label>GoExecutables</Label>
+                                <Label>GoBinaries</Label>
                                 <ItemSelectionCondition>
-                                    <PropertyName>GoExecutables</PropertyName>
+                                    <PropertyName>GoBinaries</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.GoExecutables) { return }
-                                    if ($_.GoExecutables -is [Management.Automation.ErrorRecord]) { return $_.GoExecutables.Exception.Message }
-
-                                    $_.GoExecutables
+                                    if ($null -eq $_.GoBinaries) { return }
+                                    if ($_.GoBinaries -is [Management.Automation.ErrorRecord]) { return $_.GoBinaries.Exception.Message }
+                                    $_.GoBinaries
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -248,7 +232,6 @@
                                 <ScriptBlock>
                                     if ($null -eq $_.NodejsPackages) { return }
                                     if ($_.NodejsPackages -is [Management.Automation.ErrorRecord]) { return $_.NodejsPackages.Exception.Message }
-
                                     $_.NodejsPackages
                                 </ScriptBlock>
                             </ListItem>
@@ -261,8 +244,7 @@
                                     if ($null -eq $_.Python) { return }
                                     if ($_.Python -is [Management.Automation.ErrorRecord]) { return $_.Python.Exception.Message }
 
-                                    if ($_.Python -is [String]) { return $_.Python }
-                                    if (!$_.Python.Success) { 'Error during operation (view property for details)' }
+                                    if (!$_.Python.Success) { return 'Error during operation (view property for details)' }
                                     if ($_.Python.WhatIf) { return "$([String]::Join(', ', $_.Python.BeforeUpdate)) (current versions)" }
 
                                     $Updated = $false
@@ -278,15 +260,25 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
-                                <Label>PythonPackages</Label>
+                                <Label>PythonPipPackages</Label>
                                 <ItemSelectionCondition>
-                                    <PropertyName>PythonPackages</PropertyName>
+                                    <PropertyName>PythonPipPackages</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.PythonPackages) { return }
-                                    if ($_.PythonPackages -is [Management.Automation.ErrorRecord]) { return $_.PythonPackages.Exception.Message }
-
-                                    $_.PythonPackages
+                                    if ($null -eq $_.PythonPipPackages) { return }
+                                    if ($_.PythonPipPackages -is [Management.Automation.ErrorRecord]) { return $_.PythonPipPackages.Exception.Message }
+                                    $_.PythonPipPackages
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>PythonPipxPackages</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>PythonPipxPackages</PropertyName>
+                                </ItemSelectionCondition>
+                                <ScriptBlock>
+                                    if ($null -eq $_.PythonPipxPackages) { return }
+                                    if ($_.PythonPipxPackages -is [Management.Automation.ErrorRecord]) { return $_.PythonPipxPackages.Exception.Message }
+                                    $_.PythonPipxPackages
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -297,7 +289,6 @@
                                 <ScriptBlock>
                                     if ($null -eq $_.QtComponents) { return }
                                     if ($_.QtComponents -is [Management.Automation.ErrorRecord]) { return $_.QtComponents.Exception.Message }
-
                                     $_.QtComponents
                                 </ScriptBlock>
                             </ListItem>
@@ -309,7 +300,6 @@
                                 <ScriptBlock>
                                     if ($null -eq $_.RubyGems) { return }
                                     if ($_.RubyGems -is [Management.Automation.ErrorRecord]) { return $_.RubyGems.Exception.Message }
-
                                     $_.RubyGems
                                 </ScriptBlock>
                             </ListItem>
@@ -321,7 +311,6 @@
                                 <ScriptBlock>
                                     if ($null -eq $_.RustToolchains) { return }
                                     if ($_.RustToolchains -is [Management.Automation.ErrorRecord]) { return $_.RustToolchains.Exception.Message }
-
                                     $_.RustToolchains
                                 </ScriptBlock>
                             </ListItem>

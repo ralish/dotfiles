@@ -173,18 +173,18 @@ Function New-OpenSSLCertificate {
         $Subject = "/$($Subjects -join '/')"
         $Params.Add('-subj')
         $Params.Add($Subject)
+    }
 
-        if ($SANs.Count -gt 0) {
-            $SAN = "subjectAltName = $($SANs -join ', ')"
-            $Params.Add('-addext')
-            $Params.Add($SAN)
-        }
+    if ($SANs.Count -gt 0) {
+        $SAN = "subjectAltName = $($SANs -join ', ')"
+        $Params.Add('-addext')
+        $Params.Add($SAN)
     }
 
     if ($PSCmdlet.ParameterSetName -match '^SelfSigned') {
         $Params.Add('-sha256')
         $Params.Add('-days')
-        $Params.Add($ValidDays)
+        $Params.Add([String]$ValidDays)
     }
 
     if ($Config) {
@@ -409,12 +409,14 @@ Function Convert-OpenSSLDerToPem {
         [String]$PemFile
     )
 
-    $Params = @(
-        'x509',
-        '-in', $DerFile,
-        '-inform', 'DER',
-        '-out', $PemFile,
-        '-outform', 'PEM'
+    $Params = [Collections.Generic.List[String]]::new(
+        [String[]]@(
+            'x509',
+            '-in', $DerFile,
+            '-inform', 'DER',
+            '-out', $PemFile,
+            '-outform', 'PEM'
+        )
     )
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
@@ -435,12 +437,14 @@ Function Convert-OpenSSLPemToDer {
         [String]$DerFile
     )
 
-    $Params = @(
-        'x509',
-        '-in', $PemFile,
-        '-inform', 'PEM',
-        '-out', $DerFile,
-        '-outform', 'DER'
+    $Params = [Collections.Generic.List[String]]::new(
+        [String[]]@(
+            'x509',
+            '-in', $PemFile,
+            '-inform', 'PEM',
+            '-out', $DerFile,
+            '-outform', 'DER'
+        )
     )
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
@@ -599,9 +603,11 @@ Function Get-OpenSSLEccCurves {
     [OutputType([String[]])]
     Param()
 
-    $Params = @(
-        'ecparam',
-        '-list_curves'
+    $Params = [Collections.Generic.List[String]]::new(
+        [String[]]@(
+            'ecparam',
+            '-list_curves'
+        )
     )
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '

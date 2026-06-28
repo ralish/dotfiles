@@ -45,7 +45,7 @@ Function Test-EnvironmentMatch {
         if ((Test-IsWindows) -and $EnvExpectedValue -is [String] -and $EnvExpectedValue -eq '') {
             $ErrMsg = 'Environment variable "{0}" cannot be set to an empty string on Windows.' -f $EnvName
             $ErrExc = [NotSupportedException]::new($ErrMsg)
-            $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'EnvironmentVariableInvalid', $ErrCat, $EnvExpectedValue)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
@@ -127,6 +127,7 @@ Function Test-ModuleAvailable {
 
     $FoundModule = $false
     $MissingModule = $false
+    $MissingModuleName = $null
 
     if ($PassThru) {
         $ModuleInfo = [Collections.Generic.List[PSModuleInfo]]::new()
@@ -309,13 +310,13 @@ Function Complete-DotFilesSection {
         Write-DotFilesMessage -Type 'Verbose' -Message $Timing
     }
 
-    Remove-Variable -Name 'DotFilesSectionName', 'DotFilesSectionType' -Scope 'Global'
+    Remove-Variable -Name 'DotFilesSectionName', 'DotFilesSectionType' -Scope 'Global' -ErrorAction 'Ignore'
 }
 
 # Retrieve the elapsed time for a `dotfiles` section
 Function Get-DotFilesTiming {
     [CmdletBinding()]
-    [OutputType([Void], [String])]
+    [OutputType([String])]
     Param(
         [Parameter(Mandatory)]
         [Diagnostics.Stopwatch]$Stopwatch,

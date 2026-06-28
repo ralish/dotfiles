@@ -222,10 +222,7 @@ Function Update-PowerShell {
         $WhatIfPreference = $WhatIfOriginal
     }
 
-    $WriteProgressParams = @{
-        Activity = 'Updating PowerShell modules'
-    }
-
+    $WriteProgressParams = @{ Activity = 'Updating PowerShell modules' }
     if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
         $WriteProgressParams['ParentId'] = $ProgressParentId
         $WriteProgressParams['Id'] = $ProgressParentId + 1
@@ -395,9 +392,11 @@ Function Compare-Hashtable {
     [OutputType([Void], [PSCustomObject[]])]
     Param(
         [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [Hashtable]$Reference,
 
         [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [Hashtable]$Difference,
 
         [ValidateSet('Default', 'Insensitive', 'Sensitive')]

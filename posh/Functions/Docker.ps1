@@ -12,25 +12,30 @@ Function Clear-DockerCache {
     [OutputType([Void], [String[]])]
     Param()
 
-    $DockerArgs = 'system', 'df'
-    $null = & docker @DockerArgs 2>&1
+    $DfArgs = 'system', 'df'
+    $DfCmd = "docker $($DfArgs -join ' ')"
+
+    $PruneArgs = 'system', 'prune', '--force'
+    $PruneCmd = "docker $($PruneArgs -join ' ')"
+
+    Write-Verbose -Message "Retrieving Docker disk usage: ${DfCmd}"
+    $null = & docker @DfArgs 2>&1
     if ($LASTEXITCODE -ne 0) {
         $ErrMsg = "Failed to retrieve Docker disk usage (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ErrMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "docker $($DockerArgs -join ' ')")
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $DfCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $DockerArgs = 'system', 'prune', '--force'
-    $DockerCmd = "docker $($DockerArgs -join ' ')"
-    if ($PSCmdlet.ShouldProcess($DockerCmd, 'Clear')) {
-        & docker @DockerArgs
+    if ($PSCmdlet.ShouldProcess($PruneCmd, 'Clear')) {
+        Write-Verbose -Message "Clearing Docker caches: ${PruneCmd}"
+        & docker @PruneArgs
         if ($LASTEXITCODE -ne 0) {
             $ErrMsg = "Failed to clear Docker cache (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ErrMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $DockerCmd)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $PruneCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
     }

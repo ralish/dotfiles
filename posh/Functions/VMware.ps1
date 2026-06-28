@@ -18,9 +18,7 @@ Function Optimize-VMwareVirtualMachine {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $WriteProgressParams = @{
-        Activity = 'Optimizing VMware VMs'
-    }
+    $WriteProgressParams = @{ Activity = 'Optimizing VMware VMs' }
 
     Write-Progress @WriteProgressParams -Status 'Enumerating directories' -PercentComplete 1
     $SubDirs = Get-ChildItem -LiteralPath $BaseDir.FullName -Directory -Recurse

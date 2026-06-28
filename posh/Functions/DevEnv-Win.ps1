@@ -48,8 +48,9 @@ Function Switch-Cygwin {
     }
 
     $Enable = !$Disable
-    $PathParams = @{}
+    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
     $PathChanges = [Collections.Generic.List[String]]::new()
+    $PathParams = @{}
 
     if ($Enable) {
         $PathFunc = 'Add-PathStringElement'
@@ -59,8 +60,6 @@ Function Switch-Cygwin {
         $PathFunc = 'Remove-PathStringElement'
         $PathChangesDesc = 'Removed from PATH: '
     }
-
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
 
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
     $PathChanges.Add($BinPath)
@@ -153,8 +152,9 @@ Function Switch-Perl {
     }
 
     $Enable = !$Disable
-    $PathParams = @{}
+    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
     $PathChanges = [Collections.Generic.List[String]]::new()
+    $PathParams = @{}
 
     if ($Enable) {
         $PathFunc = 'Add-PathStringElement'
@@ -164,8 +164,6 @@ Function Switch-Perl {
         $PathFunc = 'Remove-PathStringElement'
         $PathChangesDesc = 'Removed from PATH: '
     }
-
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
 
     $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
     $PathChanges.Add($PerlBinPath)
@@ -283,16 +281,6 @@ Function Switch-Python {
         [Switch]$Force
     )
 
-    if (!$Version) {
-        if (!(Get-Command -Name "${Path}\python.exe" -ErrorAction 'Ignore')) {
-            $ErrMsg = 'Unable to detect Python version as python command not found.'
-            $ErrExc = [Management.Automation.CommandNotFoundException]::new($ErrMsg)
-            $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'python')
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
-        }
-    }
-
     $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
     if ($PathItem -isnot [IO.DirectoryInfo]) {
         $ErrMsg = "Python path is inaccessible or not a directory: ${Path}"
@@ -308,8 +296,9 @@ Function Switch-Python {
     }
 
     $Enable = !$Disable
-    $PathParams = @{}
+    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
     $PathChanges = [Collections.Generic.List[String]]::new()
+    $PathParams = @{}
 
     if ($Enable) {
         $PathFunc = 'Add-PathStringElement'
@@ -320,7 +309,6 @@ Function Switch-Python {
         $PathChangesDesc = 'Removed from PATH: '
     }
 
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
     $PathChanges.Add($Path)
 
     $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
@@ -346,11 +334,11 @@ Function Switch-Python {
     $PathChanges.Add($LocalScriptsSharedPath)
 
     if (!$Version) {
-        $PythonExe = Join-Path -Path $Path -ChildPath 'python.exe'
-        $VersionArgs = @('-V')
-        $VersionCmd = "${PythonExe} $($VersionArgs -join ' ')"
-
         try {
+            $PythonExe = Join-Path -Path $Path -ChildPath 'python.exe'
+            $VersionArgs = @('-V')
+            $VersionCmd = "${PythonExe} $($VersionArgs -join ' ')"
+
             $PythonFailed = $false
             $PythonVersionRaw = (& $PythonExe @VersionArgs 2>&1) -join ''
             if ($LASTEXITCODE -ne 0) {
