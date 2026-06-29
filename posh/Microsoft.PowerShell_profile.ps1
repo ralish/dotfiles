@@ -26,11 +26,19 @@ foreach ($SkipEnvVar in $DotFilesSkipEnvVars) {
 
 #region Configuration
 
-# Display verbose messages during profile load
-$DotFilesVerbose = $false
+# Paths to directories used during profile load
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+$PoshCompletionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Completions'
+$PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
+$PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
+$PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
 
-# Display timing data during profile load (requires verbose)
-$DotFilesTimings = $false
+# Preferred text editors ordered by priority (space-separated)
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+$DotFilesPreferredEditors = 'code', 'vim', 'vi', 'nano', 'pico'
+
+# Load opted-in components asynchronously via the idle event
+$DotFilesLoadAsync = $true
 
 # Skip certain expensive calls for faster profile loading
 #
@@ -39,15 +47,11 @@ $DotFilesTimings = $false
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesFastLoad = $true
 
-# Load opted-in components asynchronously via the idle event
-$DotFilesLoadAsync = $true
+# Display verbose messages during profile load
+$DotFilesVerbose = $false
 
-# Paths to directories used during profile load
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-$PoshCompletionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Completions'
-$PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
-$PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
-$PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
+# Display timing data during profile load (requires verbose)
+$DotFilesTimings = $false
 
 #endregion
 
