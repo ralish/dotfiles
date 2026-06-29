@@ -117,8 +117,7 @@ Function Global:Update-PowerShell {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(
-        [Regex]$ExcludedModuleRegex = '^(Az|Microsoft\.Graph|VMware)(|\..+)',
-        [String[]]$PsGetV3Blacklist = @('ExchangeOnlineManagement', 'PnP.PowerShell'),
+        [Regex]$ExcludedModuleRegex = '^(Az|Microsoft\.(Entra|Graph)|VMware)(|\..+)',
 
         [Switch]$IncludeDscModules,
         [Switch]$SkipUpdateHelp,
@@ -129,77 +128,30 @@ Function Global:Update-PowerShell {
         [SByte]$ProgressParentId
     )
 
-    # Attempt to import the PowerShellGet v2 module side-by-side with the v3
-    # module when using the latter but we encounter compatibility issues.
-    Function Import-PsGetV2SxS {
-        [CmdletBinding()]
-        [OutputType([Boolean])]
-        Param()
+    $PSGetNames = 'Microsoft.PowerShell.PSResourceGet', 'PowerShellGet'
+    $PSGetModule = Test-ModuleAvailable -Name $PSGetNames -Require 'Any' -PassThru
 
-        if ($Script:PsGetV2) {
-            return $true
+    if ($PSGetModule.Name -eq $PSGetNames[0]) {
+        $PSResourceGet = $true
+    } elseif ($PSGetModule.Version.Major -eq 2) {
+        $PSResourceGet = $false
+    } else {
+        if ($PSGetModule.Version.Major -gt 2) {
+            $ExcMsg = 'PowerShellGet v3 beta release is unsupported.'
+        } else {
+            $ExcMsg = "PowerShellGet must be at least v2 but found v$($PSGetModule.Version)."
         }
 
-        if ($Script:PsGetV2AttemptedSxS) {
-            return $false
-        }
-
-        Write-Verbose -Message 'Attempting to import PowerShellGet v2 side-by-side ...'
-        $Script:PsGetV2AttemptedSxS = $true
-
-        $PowerShellGet = Get-Module -Name 'PowerShellGet' -ListAvailable -Verbose:$false |
-            Where-Object Version -Match '^2\.' |
-            Sort-Object -Property 'Version' -Descending |
-            Select-Object -First 1
-
-        if (!$PowerShellGet) {
-            $ExcMsg = 'PowerShellGet v2 module not available for side-by-side import.'
-            $ErrExc = [IO.FileNotFoundException]::new($ExcMsg)
-            $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'PowerShellGet')
-            $PSCmdlet.WriteError($ErrRec)
-            return $false
-        }
-
-        try {
-            $PowerShellGet | Import-Module -ErrorAction 'Stop' -Verbose:$false
-            $Script:PsGetV2 = $true
-        } catch {
-            $ExcMsg = 'Failed to import PowerShellGet v2 module side-by-side.'
-            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-            $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'PowerShellGet')
-            $PSCmdlet.WriteError($ErrRec)
-            return $false
-        }
-
-        return $true
-    }
-
-    $PowerShellGet = Test-ModuleAvailable -Name 'PowerShellGet' -PassThru
-
-    if ($PowerShellGet.Version.Major -lt 2) {
-        $ExcMsg = 'PowerShellGet v2 or later was not found.'
-        $ErrExc = [IO.FileNotFoundException]::new($ExcMsg)
-        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'PowerShellGet')
+        $ErrExc = [NotSupportedException]::new($ExcMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotSupported', $ErrCat, $PSGetModule)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $Script:PsGetV2 = $false
-    $Script:PsGetV2AttemptedSxS = $false
-    $Script:PsGetV3 = $false
-
-    if ($PowerShellGet.Version.Major -ge 3) {
-        $Script:PsGetV3 = $true
-    } else {
-        $Script:PsGetV2 = $true
-    }
-
-    Write-Verbose -Message "Using PowerShellGet v$($PowerShellGet.Version)"
+    Write-Verbose -Message "Using $($PSGetModule.Name) v$($PSGetModule.Version)"
 
     # Newer PowerShell versions no longer ship with DSC support built-in. It's
-    # instead provided as a separate module which may not be installed.
+    # instead provided as a separate module which may not have been installed.
     try {
         # The implicit import of the `PSDesiredStateConfiguration` module that
         # may occur below triggers several "What if" outputs, even though
@@ -208,16 +160,21 @@ Function Global:Update-PowerShell {
         $WhatIfOriginal = $WhatIfPreference
         $WhatIfPreference = $false
 
-        $DscSupported = $false
-        $DscSupported = Get-Command -Name 'Get-DscResource' -ErrorAction 'Stop'
+        $DscSupport = Get-Command -Name 'Get-DscResource' -ErrorAction 'Stop'
+        Write-Verbose -Message "DSC support is available through the $($DscSupport.Source) module."
     } catch {
+        $Msg = 'Unable to enumerate DSC modules as Get-DscResource command not available.'
+
         if ($IncludeDscModules) {
-            $ExcMsg = 'Unable to enumerate DSC modules as Get-DscResource command not available.'
-            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+            $ErrExc = [Exception]::new($Msg, $PSItem.Exception)
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSCommandNotFound', $ErrCat, 'Get-DscResource')
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
+
+        $DscSupport = $false
+        Write-Warning -Message $Msg
+        Write-Warning -Message 'DSC resources will be updated as they cannot be separately enumerated.'
     } finally {
         $WhatIfPreference = $WhatIfOriginal
     }
@@ -229,8 +186,8 @@ Function Global:Update-PowerShell {
     }
 
     Write-Progress @WriteProgressParams -Status 'Enumerating installed modules' -PercentComplete 1
-    if ($Script:PsGetV3) {
-        $InstalledModules = Get-PSResource -Verbose:$false
+    if ($PSResourceGet) {
+        $InstalledModules = Get-InstalledPSResource -Verbose:$false
     } else {
         try {
             # Suppress verbose output on implicit import
@@ -256,7 +213,7 @@ Function Global:Update-PowerShell {
         $ProgressPercentUpdatesSection = 90
     }
 
-    if (!$IncludeDscModules -and $DscSupported) {
+    if (!$IncludeDscModules -and $DscSupport) {
         Write-Progress @WriteProgressParams -Status 'Enumerating DSC modules for exclusion' -PercentComplete 5
 
         try {
@@ -285,7 +242,7 @@ Function Global:Update-PowerShell {
         $StringComparisonType = [StringComparison]::Ordinal
     }
 
-    # Update all modules compatible with PowerShellGet
+    # Update all modules
     for ($i = 0; $i -lt $UniqueModules.Count; $i++) {
         $ModuleName = $UniqueModules[$i]
         $Module = $InstalledModules | Where-Object Name -EQ $ModuleName | Sort-Object -Property 'Version' | Select-Object -Last 1
@@ -295,7 +252,7 @@ Function Global:Update-PowerShell {
             continue
         }
 
-        if (!$IncludeDscModules -and $DscSupported -and $ModuleName -in $DscModules) {
+        if (!$IncludeDscModules -and $DscSupport -and $ModuleName -in $DscModules) {
             Write-Verbose -Message "Skipping DSC module: ${ModuleName}"
             continue
         }
@@ -305,6 +262,8 @@ Function Global:Update-PowerShell {
         $UpdateParams = @{
             Name          = $ModuleName
             AcceptLicense = $true
+            ErrorAction   = 'Stop'
+            Verbose       = $false
         }
 
         if ($Module.InstalledLocation.StartsWith($ScopePathCurrentUser, $StringComparisonType)) {
@@ -320,57 +279,40 @@ Function Global:Update-PowerShell {
         Write-Progress @WriteProgressParams -Status "Updating ${ModuleName}" -PercentComplete $PercentComplete
 
         if ($PSCmdlet.ShouldProcess($ModuleName, 'Update')) {
-            if ($Script:PsGetV3 -and $ModuleName -notin $PsGetV3Blacklist) {
-                Update-PSResource @UpdateParams -Verbose:$false
-                continue
-            }
-
-            # If PowerShellGet v2 has not been imported then we must be using
-            # PowerShellGet v3. The module which we're about to update has a
-            # compatibility issue with PowerShellGet v3 so try to fallback to
-            # PowerShellGet v2.
-            if (!$Script:PsGetV2) {
-                $ImportSxS = Import-PsGetV2SxS
-                if (!$ImportSxS) {
-                    Write-Warning -Message "Unable to update module as PowerShellGet v2 is unavailable: ${ModuleName}"
-                    continue
+            try {
+                if ($PSResourceGet) {
+                    Update-PSResource @UpdateParams
+                } else {
+                    Update-Module @UpdateParams
                 }
-            }
-
-            Update-Module @UpdateParams -Verbose:$false
+            } catch { $PSCmdlet.WriteError($PSItem) }
         }
     }
 
     # The modular AWS Tools for PowerShell has its own update mechanism
     if ($UniqueModules -contains 'AWS.Tools.Installer' -and 'AWS.Tools.Installer' -notmatch $ExcludedModuleRegex) {
-        # The `Update-AWSToolsModule` function is not yet compatible with
-        # PowerShellGet v3. If we're currently using PowerShellGet v3 but
-        # PowerShellGet v2 is available attempt to import it side-by-side.
-        if (!$Script:PsGetV2) {
-            $ImportSxS = Import-PsGetV2SxS
-            if (!$ImportSxS) {
-                Write-Warning -Message 'Unable to update AWS modules as PowerShellGet v2 is unavailable.'
-            }
-        }
-
-        if ($Script:PsGetV2) {
+        if ($PSCmdlet.ShouldProcess('AWS.Tools', 'Update')) {
             $PercentComplete = $ProgressPercentUpdatesBase + $ProgressPercentUpdatesSection
             Write-Progress @WriteProgressParams -Status 'Updating AWS modules' -PercentComplete $PercentComplete
 
-            if ($PSCmdlet.ShouldProcess('AWS.Tools', 'Update')) {
-                Update-AWSToolsModule -CleanUp -Force
-            }
+            try {
+                Update-AWSToolsModule -CleanUp -Force -ErrorAction 'Stop'
+            } catch { $PSCmdlet.WriteError($PSItem) }
         }
     }
 
     Write-Progress @WriteProgressParams -Completed
 
     if (!$SkipUninstallObsolete -and $PSCmdlet.ShouldProcess('Obsolete modules', 'Uninstall')) {
+        $UninstallParams = @{ ErrorAction = 'Stop' }
+
         if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
-            Uninstall-ObsoleteModule -ProgressParentId $WriteProgressParams['Id']
-        } else {
-            Uninstall-ObsoleteModule
+            $UninstallParams['ProgressParentId'] = $WriteProgressParams['Id']
         }
+
+        try {
+            Uninstall-ObsoleteModule @UninstallParams
+        } catch { $PSCmdlet.WriteError($PSItem) }
     }
 
     if (!$SkipUpdateHelp -and $PSCmdlet.ShouldProcess('PowerShell help', 'Update')) {
