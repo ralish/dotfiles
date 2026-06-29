@@ -1,7 +1,7 @@
 # Clink configuration
 # https://chrisant996.github.io/clink/clink.html#configuring-clink
 #
-# Last reviewed release: v1.9.25
+# Last reviewed release: v1.9.27
 # Default file path: %LOCALAPPDATA%\clink\clink_settings
 
 # ---------------------------------- Clink ------------------------------------
@@ -422,6 +422,14 @@ suggestionlist.autooff = False
 
 # Suppress input hints controlled by `comment_row.show_hints`
 suggestionlist.hide_hints = True
+
+# Maximum width in columns for the suggestion list
+#
+# Valid values:
+# - <=0     Limited only by the terminal width
+# - 1..71   Smaller of 72 and the terminal width
+# - >=72    Smaller of value and the terminal width
+suggestionlist.max_width = 100
 
 # Maximum history suggestions when the suggestion list shows suggestions from
 # multiple sources. The valid number of suggestions is an integer from 1 to 8.
