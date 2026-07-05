@@ -125,10 +125,7 @@ Function Global:Get-KerberosTokenSize {
         [ValidateSet('Windows Server 2008 R2 (or earlier)', 'Windows Server 2012 (or later)')]
         [String]$OperatingSystem = 'Windows Server 2012 (or later)',
 
-        [UInt16]$TicketOverheadBytes = 1200,
-
-        [ValidateNotNullOrEmpty()]
-        [String]$Server
+        [UInt16]$TicketOverheadBytes = 1200
     )
 
     $CommonParams = @{ ErrorAction = 'Stop' }
@@ -151,29 +148,58 @@ Function Global:Get-KerberosTokenSize {
     }
 
     try {
-        if ($Server) {
-            $ADDomain = Get-ADDomain @CommonParams -Server $Server -Identity $Domain
-        } else {
-            $ADDomain = Get-ADDomain @CommonParams -Identity $Domain
-            $Server = $ADDomain.PDCEmulator
-        }
+        $DomainController = Get-ADDomainController @CommonParams -DomainName $Domain -Discover -Service 'GlobalCatalog' -NextClosestSite
+        $CommonParams['Server'] = "$($DomainController.HostName.Value):3268"
 
-        $CommonParams['Server'] = $Server
+        $ADUser = Get-ADUser @CommonParams -Identity $User -Properties 'PrimaryGroup', 'SIDHistory', 'TrustedForDelegation'
+        $ADUserPrimaryGroup = Get-ADGroup @CommonParams -Identity $ADUser.PrimaryGroup
 
-        $ADUser = Get-ADUser @CommonParams -Identity $User -Properties 'SIDHistory', 'TrustedForDelegation'
+        # Replacements are to ensure the filter string complies with RFC 4515
+        $ADUserDn = $ADUser.DistinguishedName -replace '\\', '\5c' -replace '\*', '\2a' -replace '\(', '\28' -replace '\)', '\29'
+        $ADUserPrimaryGroupDn = $ADUserPrimaryGroup.DistinguishedName -replace '\\', '\5c' -replace '\*', '\2a' -replace '\(', '\28' -replace '\)', '\29'
 
-        # There's a bug in the `Get-ADPrincipalGroupMembership` cmdlet where it
-        # returns a generic "An unspecified error has occurred" exception when
-        # the request is for a user account with delegation disabled. The
-        # workaround is to provide the `ResourceContextServer` parameter.
-        $ADGroups = Get-ADPrincipalGroupMembership @CommonParams -ResourceContextServer $ADDomain.DNSRoot -Identity $User
+        # LDAP matching rules
+        #
+        # OID                       Capability name
+        # 1.2.840.113556.1.4.803    LDAP_MATCHING_RULE_BIT_AND
+        # 1.2.840.113556.1.4.1941   LDAP_MATCHING_RULE_TRANSITIVE_EVAL
+        #
+        # `groupType` attribute
+        #
+        # Value                     Description
+        # 0x80000000 (2147483648)   Security group
+        $LdapGroupsFilter = '(&(groupType:1.2.840.113556.1.4.803:=2147483648)(|(member:1.2.840.113556.1.4.1941:={0})(member:1.2.840.113556.1.4.1941:={1})))' -f $ADUserDn, $ADUserPrimaryGroupDn
+
+        # The groups present in the Kerberos PAC are built from the transitive
+        # closure of security group memberships (all of domain local, global,
+        # and universal). This is more difficult to retrieve than you'd expect.
+        #
+        # Using `Get-ADPrincipalGroupMembership` is insufficient as it doesn't
+        # handle transitive group memberships. Naively consulting the user's
+        # `memberOf` attribute isn't enough either as:
+        # - It does not include the user's primary group
+        # - It only contains direct group memberships (not transitive)
+        # - It includes distribution groups (not relevant)
+        #
+        # Instead, construct an LDAP filter that requests transitive evaluation
+        # of group memberships and explicitly add the user's primary group. The
+        # empty value for `SearchBase` ensures we search from the root of the
+        # LDAP tree so membership in foreign universal groups is included. If
+        # unspecified, the default naming context of the target domain is used
+        # which negates the purpose of querying the Global Catalog server.
+        #
+        # There are still some instances which are not handled which can result
+        # in the calculated Kerberos token size being underestimated:
+        # - It doesn't factor in any group membership via SID history
+        # - It doesn't factor in any shadow principal memberships
+        $ADGroups = @(Get-ADGroup @CommonParams -SearchBase '' -LDAPFilter $LdapGroupsFilter) + $ADUserPrimaryGroup
     } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     $SIDHistory = @($ADUser.SIDHistory).Count
     $GroupsDomainLocal = @($ADGroups | Where-Object GroupScope -EQ 'DomainLocal').Count
     $GroupsGlobal = @($ADGroups | Where-Object GroupScope -EQ 'Global').Count
-    $GroupsUniversalInside = @($ADGroups | Where-Object { $PSItem.GroupScope -eq 'Universal' -and $PSItem.distinguishedName.EndsWith($ADDomain.DistinguishedName, [StringComparison]::OrdinalIgnoreCase) }).Count
-    $GroupsUniversalOutside = @($ADGroups | Where-Object { $PSItem.GroupScope -eq 'Universal' -and !$PSItem.distinguishedName.EndsWith($ADDomain.DistinguishedName, [StringComparison]::OrdinalIgnoreCase) }).Count
+    $GroupsUniversalInside = @($ADGroups | Where-Object { $PSItem.GroupScope -eq 'Universal' -and $PSItem.SID.AccountDomainSid -eq $ADUser.SID.AccountDomainSid }).Count
+    $GroupsUniversalOutside = @($ADGroups | Where-Object { $PSItem.GroupScope -eq 'Universal' -and $PSItem.SID.AccountDomainSid -ne $ADUser.SID.AccountDomainSid }).Count
 
     $TokenSizeBytes = $TicketOverheadBytes
 
