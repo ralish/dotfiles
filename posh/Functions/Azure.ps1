@@ -39,7 +39,7 @@ Function Global:Get-AzureAuthHeader {
 
         default {
             $ExcMsg = "Unexpected type for AccessToken argument: $($AccessToken.GetType().FullName)"
-            $ErrExc = [ArgumentException]::new($ExcMsg)
+            $ErrExc = [ArgumentException]::new($ExcMsg, 'AccessToken')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $AccessToken)
             $PSCmdlet.ThrowTerminatingError($ErrRec)

@@ -52,7 +52,7 @@ Function Global:Set-AWSCredentialEnvironment {
 
         if ($Credential.GetType().FullName -ne 'Amazon.SecurityToken.Model.Credentials') {
             $ExcMsg = "Unexpected type for Credential argument: $($Credential.GetType().FullName)"
-            $ErrExc = [ArgumentException]::new($ExcMsg)
+            $ErrExc = [ArgumentException]::new($ExcMsg, 'Credential')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $Credential)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -91,7 +91,7 @@ Function Global:Set-R53HostedZoneNameTag {
         foreach ($Zone in $HostedZone) {
             if ($Zone.GetType().FullName -ne 'Amazon.Route53.Model.HostedZone') {
                 $ExcMsg = 'Skipping zone which is not of expected type: Amazon.Route53.Model.HostedZone'
-                $ErrExc = [ArgumentException]::new($ExcMsg)
+                $ErrExc = [ArgumentException]::new($ExcMsg, 'HostedZone')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $Zone)
                 $PSCmdlet.WriteError($ErrRec)
@@ -154,7 +154,7 @@ Function Global:Set-R53HostedZoneParkedRecords {
 
     if ($Records -contains 'Redirect' -and !$RedirectCloudFrontDomainName) {
         $ExcMsg = 'Must specify RedirectCloudFrontDomainName parameter when setting redirect records.'
-        $ErrExc = [ArgumentException]::new($ExcMsg)
+        $ErrExc = [ArgumentException]::new($ExcMsg, 'RedirectCloudFrontDomainName')
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSMissingParameter', $ErrCat, $null)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -383,7 +383,7 @@ Function Global:Set-R53HostedZoneTag {
         foreach ($Zone in $HostedZone) {
             if ($Zone.GetType().FullName -ne 'Amazon.Route53.Model.HostedZone') {
                 $ExcMsg = 'Skipping zone which is not of expected type: Amazon.Route53.Model.HostedZone'
-                $ErrExc = [ArgumentException]::new($ExcMsg)
+                $ErrExc = [ArgumentException]::new($ExcMsg, 'HostedZone')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $Zone)
                 $PSCmdlet.WriteError($ErrRec)

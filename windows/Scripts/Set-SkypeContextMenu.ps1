@@ -33,6 +33,8 @@ if ($ContextMenuKey.Count -ne 1) {
     } else {
         $ExcMsg = 'Skype context menu registry key is not present.'
         $ErrExc = [Management.Automation.ItemNotFoundException]::new($ExcMsg)
+        $ErrExc.ItemName = $ContextMenuPath
+        $ErrExc.SessionStateCategory = [Management.Automation.SessionStateCategory]::CmdletProvider
         $ErrId = 'RegistryKeyNotFound'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
     }
@@ -53,6 +55,8 @@ if ($ContextMenuKey.PSObject.Properties.Name -contains 'DllPath') {
 } else {
     $ExcMsg = 'DllPath registry value for Skype context menu is not present.'
     $ErrExc = [Management.Automation.ItemNotFoundException]::new($ExcMsg)
+    $ErrExc.ItemName = Join-Path -Path $ContextMenuPath -ChildPath 'DllPath'
+    $ErrExc.SessionStateCategory = [Management.Automation.SessionStateCategory]::CmdletProvider
     $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegistryValueNotFound', $ErrCat, $null)
     $PSCmdlet.ThrowTerminatingError($ErrRec)

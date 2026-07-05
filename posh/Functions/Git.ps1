@@ -87,6 +87,7 @@ Function Global:Invoke-GitLinter {
                 } catch {
                     $ExcMsg = 'The markdownlint-cli2 or markdownlint command must be available.'
                     $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+                    $ErrExc.CommandName = $MdCliCmds -join ', '
                     $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, $MdlCliCmds)
                     $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -112,7 +113,7 @@ Function Global:Invoke-GitLinter {
 
                         if ($SettingsFile -isnot [IO.FileInfo]) {
                             $ExcMsg = "Provided PSScriptAnalyzer settings path is not a file: ${Settings}"
-                            $ErrExc = [ArgumentException]::new($ExcMsg)
+                            $ErrExc = [ArgumentException]::new($ExcMsg, 'Settings')
                             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $SettingsFile)
                             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -121,7 +122,7 @@ Function Global:Invoke-GitLinter {
 
                     default {
                         $ExcMsg = "Settings parameter has unsupported type: ${SettingsType}"
-                        $ErrExc = [ArgumentException]::new($ExcMsg)
+                        $ErrExc = [ArgumentException]::new($ExcMsg, 'Settings')
                         $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Settings)
                         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -454,7 +455,7 @@ Function Global:Invoke-GitRepoCommand {
             if (!(Test-IsPathFullyQualified -Path $GitPath)) {
                 if ($OriginalLocation.Provider.Name -ne 'FileSystem') {
                     $ExcMsg = "Skipping relative path as current path is not a file system: ${GitPath}"
-                    $ErrExc = [ArgumentException]::new($ExcMsg)
+                    $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $GitPath)
                     $PSCmdlet.WriteError($ErrRec)
@@ -473,7 +474,7 @@ Function Global:Invoke-GitRepoCommand {
 
             if ($BaseDir -isnot [IO.DirectoryInfo]) {
                 $ExcMsg = "Path is not a directory: ${GitPath}"
-                $ErrExc = [ArgumentException]::new($ExcMsg)
+                $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $GitPath)
                 $PSCmdlet.WriteError($ErrRec)

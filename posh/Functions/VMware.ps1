@@ -12,7 +12,7 @@ Function Global:Optimize-VMwareVirtualMachine {
     $BaseDir = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
     if ($BaseDir -isnot [IO.DirectoryInfo]) {
         $ExcMsg = "Path is not a directory: ${Path}"
-        $ErrExc = [ArgumentException]::new($ExcMsg)
+        $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
         $PSCmdlet.ThrowTerminatingError($ErrRec)

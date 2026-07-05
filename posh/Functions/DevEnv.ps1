@@ -14,6 +14,7 @@ Function Global:Clear-NuGetCache {
     if (!(Get-Command -Name 'nuget' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to clear NuGet cache as nuget command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'nuget'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'nuget')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -95,6 +96,7 @@ Function Global:Update-DotNetTools {
     if (!(Get-Command -Name 'dotnet' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update .NET global tools as dotnet command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'dotnet'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'dotnet')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -268,6 +270,7 @@ Function Global:Clear-GoCache {
     if (!(Get-Command -Name 'go' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to clear Go cache as go command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'go'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'go')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -368,7 +371,7 @@ Function Global:Switch-Go {
             $Msg = "Go path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($Msg)
+                $ErrExc = [ArgumentException]::new($Msg, 'Path')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -460,6 +463,7 @@ Function Global:Update-GoBinaries {
     if (!(Get-Command -Name 'gup' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update Go binaries as gup command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'gup'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'gup')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -571,7 +575,7 @@ Function Global:Switch-GoogleDepotTools {
             $Msg = "depot_tools path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($Msg)
+                $ErrExc = [ArgumentException]::new($Msg, 'Path')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -678,6 +682,7 @@ Function Global:Clear-MavenCache {
     if (!(Get-Command -Name 'mvn' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to clear Maven cache as mvn command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'mvn'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'mvn')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -747,7 +752,7 @@ Function Global:Switch-Java {
             $Msg = "Java path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($Msg)
+                $ErrExc = [ArgumentException]::new($Msg, 'Path')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -814,6 +819,7 @@ Function Global:Clear-NpmCache {
     if (!(Get-Command -Name 'npm' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to clear npm cache as npm command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'npm'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'npm')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -886,7 +892,7 @@ Function Global:Switch-Nodejs {
             $Msg = "Node.js path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($Msg)
+                $ErrExc = [ArgumentException]::new($Msg, 'Path')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -983,6 +989,7 @@ Function Global:Update-NodejsPackages {
     if (!(Get-Command -Name 'npm' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update Node.js packages as npm command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'npm'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'npm')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1055,7 +1062,7 @@ Function Global:Switch-PHP {
             $Msg = "PHP path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($Msg)
+                $ErrExc = [ArgumentException]::new($Msg, 'Path')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1106,6 +1113,7 @@ Function Global:Clear-PipCache {
     if (!(Get-Command -Name 'python' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to clear pip cache as python command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'python'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'python')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1237,6 +1245,7 @@ Function Global:Update-PythonPipPackages {
     if (!(Get-Command -Name 'python' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update pip packages as python command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'python'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'python')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1350,6 +1359,7 @@ Function Global:Update-PythonPipxPackages {
     if (!(Get-Command -Name 'python' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update pipx packages as python command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'python'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'python')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1463,8 +1473,9 @@ Function Global:Update-QtComponents {
         if ($QtMtPath -isnot [IO.FileInfo] -or $QtMtPath.Name -ne $QtMtName) {
             $ExcMsg = 'Unable to update Qt components as MaintenanceTool command was not found.'
             $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+            $ErrExc.CommandName = $QtMtPath
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'MaintenanceTool')
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, $QtMtPath)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
@@ -1503,6 +1514,7 @@ Function Global:Clear-GemCache {
     if (!(Get-Command -Name 'gem' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to clear gem cache as gem command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'gem'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'gem')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1594,7 +1606,7 @@ Function Global:Switch-Ruby {
             $Msg = "Ruby path is inaccessible or not a directory: ${Path}"
 
             if (!$Force) {
-                $ErrExc = [ArgumentException]::new($Msg)
+                $ErrExc = [ArgumentException]::new($Msg, 'Path')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1682,6 +1694,7 @@ Function Global:Update-RubyGems {
     if (!(Get-Command -Name 'gem' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update Ruby gems as gem command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'gem'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'gem')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1818,7 +1831,7 @@ Function Global:Switch-Rust {
 
             if (!$Force) {
                 if ($PSBoundParameters.ContainsKey('Path')) {
-                    $ErrExc = [ArgumentException]::new($Msg)
+                    $ErrExc = [ArgumentException]::new($Msg, 'Path')
                     $ErrId = 'PSInvalidArgument'
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 } else {
@@ -1884,6 +1897,7 @@ Function Global:Update-RustToolchains {
     if (!(Get-Command -Name 'rustup' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update Rust toolchains as rustup command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'rustup'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'rustup')
         $PSCmdlet.ThrowTerminatingError($ErrRec)

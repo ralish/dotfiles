@@ -159,7 +159,7 @@ Function Global:New-OpenSSLCertificate {
             if ($IPAddress.AddressFamily -ne [Net.Sockets.AddressFamily]::InterNetwork -and
                 $IPAddress.AddressFamily -ne [Net.Sockets.AddressFamily]::InterNetworkV6) {
                 $ExcMsg = "Provided IP address is neither IPv4 or IPv6: ${IPAddress}"
-                $ErrExc = [ArgumentException]::new($ExcMsg)
+                $ErrExc = [ArgumentException]::new($ExcMsg, 'IPAddresses')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $IPAddress)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)

@@ -38,7 +38,7 @@ Function Global:Switch-Cygwin {
         $Msg = "Cygwin path is inaccessible or not a directory: ${Path}"
 
         if (!$Force) {
-            $ErrExc = [ArgumentException]::new($Msg)
+            $ErrExc = [ArgumentException]::new($Msg, 'Path')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -142,7 +142,7 @@ Function Global:Switch-Perl {
         $Msg = "Perl path is inaccessible or not a directory: ${Path}"
 
         if (!$Force) {
-            $ErrExc = [ArgumentException]::new($Msg)
+            $ErrExc = [ArgumentException]::new($Msg, 'Path')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -286,7 +286,7 @@ Function Global:Switch-Python {
         $Msg = "Python path is inaccessible or not a directory: ${Path}"
 
         if (!$Force) {
-            $ErrExc = [ArgumentException]::new($Msg)
+            $ErrExc = [ArgumentException]::new($Msg, 'Path')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -488,7 +488,7 @@ Function Global:Switch-WindowsSDK {
         $Msg = "Windows SDK path is inaccessible or not a directory: ${Path}"
 
         if (!$Force) {
-            $ErrExc = [ArgumentException]::new($Msg)
+            $ErrExc = [ArgumentException]::new($Msg, 'Path')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -551,7 +551,7 @@ Function Global:Switch-WindowsSDK {
         $Msg = "Windows SDK version path is inaccessible or not a directory: ${SdkVerPath}"
 
         if (!$Force) {
-            $ErrExc = [ArgumentException]::new($Msg)
+            $ErrExc = [ArgumentException]::new($Msg, 'Path')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $SdkVerPath)
             $PSCmdlet.ThrowTerminatingError($ErrRec)

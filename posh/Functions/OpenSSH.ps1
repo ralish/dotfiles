@@ -58,13 +58,14 @@ Function Global:Update-OpenSSHConfig {
 
     $BaseDir = Join-Path -Path $DotFiles -ChildPath 'openssh/.ssh'
     $TemplatesDir = Join-Path -Path $BaseDir -ChildPath 'templates'
-    $TemplateFile = Join-Path -Path $TemplatesDir -ChildPath "ssh_config.$($Version -replace '\.')"
+    $TemplateFileName = "ssh_config.$($Version -replace '\.')"
+    $TemplateFilePath = Join-Path -Path $TemplatesDir -ChildPath $TemplateFileName
 
-    if (!(Test-Path -LiteralPath $TemplateFile -PathType 'Leaf')) {
+    if (!(Test-Path -LiteralPath $TemplateFilePath -PathType 'Leaf')) {
         $ExcMsg = "No configuration template for OpenSSH version: ${Version}"
-        $ErrExc = [IO.FileNotFoundException]::new($ExcMsg)
+        $ErrExc = [IO.FileNotFoundException]::new($ExcMsg, $TemplateFileName)
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFound', $ErrCat, $TemplateFile)
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFound', $ErrCat, $TemplateFilePath)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
@@ -120,7 +121,7 @@ Function Global:Update-OpenSSHConfig {
             }
         }
 
-        $Template = [String[]](Get-Content -LiteralPath $TemplateFile -ErrorAction 'Stop')
+        $Template = [String[]](Get-Content -LiteralPath $TemplateFilePath -ErrorAction 'Stop')
         [IO.File]::AppendAllLines($ConfigFileTmp, $Template, $UTF8EncodingNoBom)
         $Config = @(Get-Content -LiteralPath $ConfigFileTmp -ErrorAction 'Stop')
     } catch {

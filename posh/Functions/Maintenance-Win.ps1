@@ -737,6 +737,7 @@ Function Global:Update-Office {
     if (!(Test-Path -LiteralPath $OfficeC2RClient -PathType 'Leaf')) {
         $ExcMsg = "Unable to update Office as Click-to-Run client not found: ${OfficeC2RClient}"
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = $OfficeC2RClient
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, $OfficeC2RClient)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -896,6 +897,7 @@ Function Global:Update-Python {
     if (!(Get-Command -Name 'pymanager' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update Python runtimes as pymanager command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'pymanager'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'pymanager')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -957,6 +959,7 @@ Function Global:Update-Scoop {
     if (!(Get-Command -Name 'scoop' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update Scoop as scoop command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'scoop'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptNotFound', $ErrCat, 'scoop')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1149,6 +1152,7 @@ Function Global:Update-VisualStudio {
     if (!(Test-Path -LiteralPath $VsInstallerPath -PathType 'Leaf')) {
         $ExcMsg = "Unable to update Visual Studio as VS Installer not found: ${VsInstallerPath}"
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = $VsInstallerPath
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, $VsInstallerPath)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1407,6 +1411,7 @@ Function Global:Update-WinGet {
     if (!(Get-Command -Name 'winget' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update WinGet packages as winget command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'winget'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'winget')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -1581,6 +1586,7 @@ Function Global:Update-WSL {
     if (!(Get-Command -Name 'wsl' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update WSL as wsl command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'wsl'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'wsl')
         $PSCmdlet.ThrowTerminatingError($ErrRec)

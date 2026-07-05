@@ -23,6 +23,7 @@ Function Global:Update-Homebrew {
     if (!(Get-Command -Name 'brew' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update Homebrew as brew command not found.'
         $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'brew'
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'brew')
         $PSCmdlet.ThrowTerminatingError($ErrRec)

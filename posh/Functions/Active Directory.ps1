@@ -136,7 +136,7 @@ Function Global:Get-KerberosTokenSize {
     $UsernameSplit = @($Username.Split('\'))
     if ($UsernameSplit.Count -gt 2) {
         $ExcMsg = 'Expected only a single "\" character to be present in username.'
-        $ErrExc = [ArgumentException]::new($ExcMsg)
+        $ErrExc = [ArgumentException]::new($ExcMsg, 'Username')
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ADInvalidUsername', $ErrCat, $Username)
         $PSCmdlet.ThrowTerminatingError($ErrRec)

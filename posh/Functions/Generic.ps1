@@ -390,7 +390,7 @@ Function Global:Add-FileToEmptyDirectories {
         if (!(Test-IsPathFullyQualified -Path $DirPath)) {
             if ($CurrentLocation.Provider.Name -ne 'FileSystem') {
                 $ExcMsg = "Skipping relative path as current path is not a file system: ${DirPath}"
-                $ErrExc = [ArgumentException]::new($ExcMsg)
+                $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $DirPath)
                 $PSCmdlet.WriteError($ErrRec)
@@ -409,7 +409,7 @@ Function Global:Add-FileToEmptyDirectories {
 
         if ($DirItem -isnot [IO.DirectoryInfo]) {
             $ExcMsg = "Path is not a directory: ${DirPath}"
-            $ErrExc = [ArgumentException]::new($ExcMsg)
+            $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $DirPath)
             $PSCmdlet.WriteError($ErrRec)
@@ -469,7 +469,7 @@ Function Global:Get-DirectorySummary {
         $Directory = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($Directory -isnot [IO.DirectoryInfo]) {
             $ExcMsg = "Path is not a directory: ${Path}"
-            $ErrExc = [ArgumentException]::new($ExcMsg)
+            $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
             $PSCmdlet.WriteError($ErrRec)
@@ -663,7 +663,7 @@ Function Global:Sort-XmlElement {
     Begin {
         if ($MaxDepth -lt $Depth) {
             $ExcMsg = "Maximum sorting depth (${MaxDepth}) cannot be less than current depth (${Depth})."
-            $ErrExc = [ArgumentException]::new($ExcMsg)
+            $ErrExc = [ArgumentException]::new($ExcMsg, 'MaxDepth')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, "${MaxDepth} < ${Depth}")
             $PSCmdlet.ThrowTerminatingError($ErrRec)

@@ -297,6 +297,7 @@ Function Global:Find-WinEvent {
     if ($EventLogs.Count -eq 0) {
         $ExcMsg = 'No event logs or providers matched the filter.'
         $ErrExc = [Management.Automation.ItemNotFoundException]::new($ExcMsg)
+        $ErrExc.SessionStateCategory = [Management.Automation.SessionStateCategory]::Resource
         $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'FilterReturnedNoMatches', $ErrCat, $null)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -619,6 +620,8 @@ Function Global:Search-Registry {
                     $RegPath = Join-Path -Path $RegKeys[-1].Name -ChildPath $SubKey
                     $ExcMsg = "Failed to open registry key: ${RegPath}"
                     $ErrExc = [Management.Automation.ItemNotFoundException]::new($ExcMsg)
+                    $ErrExc.ItemName = $RegPath
+                    $ErrExc.SessionStateCategory = [Management.Automation.SessionStateCategory]::Resource
                     $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegistryKeyNotFound', $ErrCat, $RegPath)
                     $PSCmdlet.WriteError($ErrRec)
@@ -853,7 +856,7 @@ Function Global:Convert-SecurityDescriptor {
             'WMI' {
                 if ($WmiSD.__CLASS -ne 'Win32_SecurityDescriptor') {
                     $ExcMsg = "Expected Win32_SecurityDescriptor instance but received: $($WmiSD.__CLASS)"
-                    $ErrExc = [ArgumentException]::new($ExcMsg)
+                    $ErrExc = [ArgumentException]::new($ExcMsg, 'WmiSD')
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $WmiSD)
                     $PSCmdlet.WriteError($ErrRec)
@@ -869,7 +872,7 @@ Function Global:Convert-SecurityDescriptor {
         }
 
         $ExcMsg = 'Unable to convert security descriptor to same type as input.'
-        $ErrExc = [ArgumentException]::new($ExcMsg)
+        $ErrExc = [ArgumentException]::new($ExcMsg, 'TargetType')
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $null)
         $PSCmdlet.WriteError($ErrRec)
