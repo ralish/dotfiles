@@ -162,9 +162,10 @@ Function Invoke-ShutdownCleanup {
         try {
             Remove-Item -Path $RegKey -Recurse -ErrorAction 'Stop'
         } catch {
-            switch -Regex ($PSItem.FullyQualifiedErrorId) {
+            $ErrRec = $PSItem
+            switch -Regex ($ErrRec.FullyQualifiedErrorId) {
                 '^PathNotFound,' { }
-                default { $PSCmdlet.WriteError($PSItem) }
+                default { $PSCmdlet.WriteError($ErrRec) }
             }
         }
     }
@@ -177,9 +178,10 @@ Function Invoke-ShutdownCleanup {
             try {
                 Remove-Item -LiteralPath $PSReadLineOptions.HistorySavePath -ErrorAction 'Stop'
             } catch {
-                switch -Regex ($PSItem.FullyQualifiedErrorId) {
+                $ErrRec = $PSItem
+                switch -Regex ($ErrRec.FullyQualifiedErrorId) {
                     '^PathNotFound,' { }
-                    default { $PSCmdlet.WriteError($PSItem) }
+                    default { $PSCmdlet.WriteError($ErrRec) }
                 }
             }
         }
@@ -441,10 +443,11 @@ Function Optimize-WindowsDefender {
                 return
             }
         } catch [Microsoft.Management.Infrastructure.CimException] {
-            switch -Regex ($PSItem.FullyQualifiedErrorId) {
+            $ErrRec = $PSItem
+            switch -Regex ($ErrRec.FullyQualifiedErrorId) {
                 '^MI RESULT 16,' { $MpError = 'MI_RESULT_METHOD_NOT_AVAILABLE' }
                 '^HRESULT 0x800106ba,' { $MpError = 'RPC_S_SERVER_UNAVAILABLE' }
-                default { $PSCmdlet.ThrowTerminatingError($PSItem) }
+                default { $PSCmdlet.ThrowTerminatingError($ErrRec) }
             }
 
             Write-Host -ForegroundColor 'Yellow' "[Windows Defender] Unable to query status as Get-MpComputerStatus returned: ${MpError}"

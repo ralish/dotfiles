@@ -99,10 +99,10 @@ Function Global:Update-OpenSSHConfig {
             Write-Warning -Message 'Banner file has fewer than the minimum of 3 lines and will be ignored.'
         }
     } catch {
-        $Exc = $PSItem
-        switch -Regex ($Exc.FullyQualifiedErrorId) {
+        $ErrRec = $PSItem
+        switch -Regex ($ErrRec.FullyQualifiedErrorId) {
             '^PathNotFound,' { Write-Warning -Message "Banner file does not exist and will be skipped: ${BannerFile}" }
-            default { $PSCmdlet.WriteError($Exc) }
+            default { $PSCmdlet.WriteError($ErrRec) }
         }
     }
 

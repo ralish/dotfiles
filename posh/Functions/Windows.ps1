@@ -339,11 +339,12 @@ Function Global:Find-WinEvent {
             Get-WinEvent @CommonParams @EventParams -ErrorAction 'Stop' |
                 ForEach-Object { $WinEvents.Add($PSItem) }
         } catch {
-            $Exc = $PSItem
-            switch -Regex ($PSItem.FullyQualifiedErrorId) {
+            $ErrRec = $PSItem
+            switch -Regex ($ErrRec.FullyQualifiedErrorId) {
                 '^NoMatchingEventsFound,' { continue }
+
                 default {
-                    Write-Warning -Message $Exc.Exception.Message
+                    Write-Warning -Message $ErrRec.Exception.Message
                     continue
                 }
             }

@@ -27,9 +27,10 @@ foreach ($BasePath in $BasePaths) {
             try {
                 Remove-Item -LiteralPath $BagPath -Recurse -ErrorAction 'Stop'
             } catch {
-                switch -Regex ($PSItem.FullyQualifiedErrorId) {
+                $ErrRec = $PSItem
+                switch -Regex ($ErrRec.FullyQualifiedErrorId) {
                     '^PathNotFound,' { }
-                    default { $PSCmdlet.WriteError($PSItem) }
+                    default { $PSCmdlet.WriteError($ErrRec) }
                 }
             }
         }
