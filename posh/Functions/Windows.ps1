@@ -1052,9 +1052,9 @@ Function Global:Get-WellKnownSID {
             }
 
             if ($DomainName) {
-                Test-ModuleAvailable -Name 'ActiveDirectory'
-
                 try {
+                    Test-ModuleAvailable -Name 'ActiveDirectory'
+
                     $Dc = Get-ADDomainController -DomainName $DomainName -Discover -NextClosestSite -ErrorAction 'Stop'
                     $RootDse = Get-ADRootDSE -Server $Dc.HostName.Value -ErrorAction 'Stop'
                     $DomainIdentifier = Get-ADObject -Server $Dc.HostName.Value -Identity $RootDse.defaultNamingContext -Properties 'objectSid' -ErrorAction 'Stop'

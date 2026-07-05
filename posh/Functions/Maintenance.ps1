@@ -11,7 +11,9 @@ Function Global:Get-DotFilesLastUpdated {
     [OutputType([PSCustomObject[]])]
     Param()
 
-    Test-CommandAvailable -Name 'git', 'rg'
+    try {
+        Test-CommandAvailable -Name 'git', 'rg'
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     try {
         Push-Location

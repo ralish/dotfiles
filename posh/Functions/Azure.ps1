@@ -86,7 +86,9 @@ Function Global:Get-EntraUserLicenseReport {
         'Microsoft.Graph.Users'
     )
 
-    Test-ModuleAvailable -Name $RequiredModules
+    try {
+        Test-ModuleAvailable -Name $RequiredModules
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     $LicenseSkuIdLookup = @{}
     $ServicePlanIdLookup = @{}

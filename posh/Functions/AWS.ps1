@@ -37,8 +37,10 @@ Function Global:Set-AWSCredentialEnvironment {
 
     Begin {
         if ($PSCmdlet.ParameterSetName -eq 'AWSCredentials') {
-            $Module = Test-ModuleAvailable -Name 'AWS.Tools.SecurityToken', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
-            $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
+            try {
+                $Module = Test-ModuleAvailable -Name 'AWS.Tools.SecurityToken', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
+                $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
+            } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
         }
     }
 
@@ -80,8 +82,10 @@ Function Global:Set-R53HostedZoneNameTag {
     )
 
     Begin {
-        $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
-        $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
+        try {
+            $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
+            $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
+        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = 'Name'
@@ -149,8 +153,10 @@ Function Global:Set-R53HostedZoneParkedRecords {
         [String[]]$RedirectCloudFrontRecordTypes = 'A'
     )
 
-    $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
-    $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
+    try {
+        $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
+        $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     if ($Records -contains 'Redirect' -and !$RedirectCloudFrontDomainName) {
         $ExcMsg = 'Must specify RedirectCloudFrontDomainName parameter when setting redirect records.'
@@ -371,8 +377,10 @@ Function Global:Set-R53HostedZoneTag {
     )
 
     Begin {
-        $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
-        $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
+        try {
+            $Module = Test-ModuleAvailable -Name 'AWS.Tools.Route53', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
+            $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
+        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
         $Tag = [Amazon.Route53.Model.Tag]::new()
         $Tag.Key = $Key
@@ -438,14 +446,13 @@ Function Global:Get-S3BucketSize {
     }
 
     $ModuleVersionMajor = $ModuleVersionMajor[0]
-    $Modules | Import-Module -ErrorAction 'Stop' -Verbose:$false
 
     try {
+        $Modules | Import-Module -ErrorAction 'Stop' -Verbose:$false
+
         Write-Verbose -Message 'Retrieving enabled regions ...'
         $Regions = Get-EC2Region -ErrorAction 'Stop' -Verbose:$false
-    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
-    try {
         Write-Verbose -Message 'Retrieving S3 buckets ...'
         $Buckets = Get-S3Bucket -ErrorAction 'Stop' -Verbose:$false
     } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }

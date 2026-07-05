@@ -128,8 +128,10 @@ Function Global:Update-PowerShell {
         [SByte]$ProgressParentId
     )
 
-    $PSGetNames = 'Microsoft.PowerShell.PSResourceGet', 'PowerShellGet'
-    $PSGetModule = Test-ModuleAvailable -Name $PSGetNames -Require 'Any' -PassThru
+    try {
+        $PSGetNames = 'Microsoft.PowerShell.PSResourceGet', 'PowerShellGet'
+        $PSGetModule = Test-ModuleAvailable -Name $PSGetNames -Require 'Any' -PassThru
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     if ($PSGetModule.Name -eq $PSGetNames[0]) {
         $PSResourceGet = $true

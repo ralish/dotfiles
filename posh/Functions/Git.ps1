@@ -69,7 +69,9 @@ Function Global:Invoke-GitLinter {
 
     switch ($PSCmdlet.ParameterSetName) {
         'DevSkim' {
-            Test-CommandAvailable -Name 'devskim'
+            try {
+                Test-CommandAvailable -Name 'devskim'
+            } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
         }
 
         'Markdownlint' {
@@ -96,7 +98,9 @@ Function Global:Invoke-GitLinter {
         }
 
         'PSScriptAnalyzer' {
-            Test-CommandAvailable -Name 'Invoke-ScriptAnalyzer'
+            try {
+                Test-CommandAvailable -Name 'Invoke-ScriptAnalyzer'
+            } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
             $ScriptAnalyzerParams = @{ Verbose = $false }
 
@@ -134,11 +138,13 @@ Function Global:Invoke-GitLinter {
         }
 
         'ShellCheck' {
-            Test-CommandAvailable -Name 'shellcheck'
+            try {
+                Test-CommandAvailable -Name 'shellcheck'
 
-            if ($ShebangSearch -or $ShellDirectiveSearch) {
-                Test-CommandAvailable -Name 'rg'
-            }
+                if ($ShebangSearch -or $ShellDirectiveSearch) {
+                    Test-CommandAvailable -Name 'rg'
+                }
+            } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
         }
     }
 
