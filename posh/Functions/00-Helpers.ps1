@@ -12,8 +12,18 @@ Function Test-CommandAvailable {
     foreach ($Command in $Name) {
         try {
             Write-Debug -Message "Checking command is available: ${Command}"
-            $null = Get-Command -Name $Command -ErrorAction 'Stop'
+            $Result = Get-Command -Name $Command -ErrorAction 'Stop'
         } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
+
+        # If a wildcard is present an exception is not thrown on no matches
+        if ($null -eq $Result) {
+            $ExcMsg = "Command matching wildcard not found: ${Command}"
+            $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+            $ErrExc.CommandName = $Command
+            $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CommandNotFoundException', $ErrCat, $Command)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
     }
 }
 
@@ -35,7 +45,7 @@ Function Test-EnvironmentMatch {
 
         if (!($EnvExpectedValue -is [Boolean] -or $EnvExpectedValue -is [String])) {
             $ExcMsg = 'Value for key "{0}" is not a Boolean or String type.' -f $EnvName
-            $ErrExc = [ArgumentException]::new($ExcMsg)
+            $ErrExc = [ArgumentException]::new($ExcMsg, 'Environment')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $EnvExpectedValue)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -146,12 +156,18 @@ Function Test-ModuleAvailable {
 
                 # Ensure we always load into the global scope. This isn't the
                 # default if running asynchronously (e.g. an event callback).
-                Import-Module -Name $Module -Scope 'Global' -ErrorAction 'Ignore' -Verbose:$false
+                $ModuleAvailable = Import-Module -Name $Module -Scope 'Global' -PassThru -ErrorAction 'Stop' -Verbose:$false
+            } catch {
+                $ModuleAvailable = $null
+
+                $ErrRec = $PSItem
+                switch -Regex ($ErrRec.FullyQualifiedErrorId) {
+                    '^Modules_ModuleNotFound,' { $Error.RemoveAt(0) }
+                    default { $PSCmdlet.ThrowTerminatingError($ErrRec) }
+                }
             } finally {
                 $Global:VerbosePreference = $VerboseOriginal
             }
-
-            $ModuleAvailable = @(Get-Module -Name $Module -Verbose:$false)
         }
 
         if ($ModuleAvailable) {
@@ -183,8 +199,8 @@ Function Test-ModuleAvailable {
 
     if ($ThrowError) {
         $ErrExc = [IO.FileNotFoundException]::new($ExcMsg)
-        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, $ErrObj)
+        $ErrCat = [Management.Automation.ErrorCategory]::ResourceUnavailable
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'Modules_ModuleNotFound', $ErrCat, $ErrObj)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
@@ -265,7 +281,9 @@ Function Clear-DotFilesLoadData {
         'DotFilesIsAsync'
         'DotFilesProfileStopwatch'
         'DotFilesSection'
+        'DotFilesSectionName'
         'DotFilesSectionStopwatch'
+        'DotFilesSectionType'
         'FormatDataPaths'
         'PoshCompletionsPath'
     )
@@ -301,7 +319,7 @@ Function Complete-DotFilesSection {
         if ($Global:DotFilesSectionStopwatch -isnot [Diagnostics.Stopwatch]) {
             $ExcMsg = 'No stopwatch found for section timing.'
             $ErrExc = [InvalidOperationException]::new($ExcMsg)
-            $ErrCat = [Management.Automation.ErrorCategory]::MetadataError
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesInvalidState', $ErrCat, $null)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
@@ -363,6 +381,9 @@ Function Invoke-DotFilesAsyncTask {
 
     if ($Global:AsyncLoadQueue.Count -ne 0) {
         try {
+            # Ensure the task is aware it's running in an async context
+            $Global:DotFilesIsAsync = $true
+
             # `$null` assignment should be unnecessary but is performed as a
             # precaution against the accidental pollution of the function's
             # expected boolean output type through uncaptured output from a
@@ -374,6 +395,8 @@ Function Invoke-DotFilesAsyncTask {
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesAsyncTaskFailure', $ErrCat, $null)
             $PSCmdlet.WriteError($ErrRec)
+        } finally {
+            $Global:DotFilesIsAsync = $false
         }
     }
 
@@ -469,50 +492,71 @@ Function Start-DotFilesSection {
         if ($Async -and $Global:DotFilesLoadAsync) {
             $CallStack = Get-PSCallStack
 
+            # Ensure any state that should persist in the session is set in the
+            # global scope. Changes made in all other scopes will be discarded
+            # on completion as they're loaded into the transient module scope.
             $AsyncLoadScript = {
-                $Global:DotFilesIsAsync = $true
                 . $CallStack[1].ScriptName
             }.GetNewClosure()
 
             $Global:AsyncLoadQueue.Enqueue($AsyncLoadScript)
 
             # Return `false` to halt further synchronous processing
-            Write-DotFilesMessage -Type 'Verbose' -Message 'All prerequisites met.'
+            Write-DotFilesMessage -Type 'Verbose' -Message 'Initial prerequisite checks passed.'
             return $false
         }
     }
 
-    if (!$Async -or !$Global:DotFilesLoadAsync -or $Global:DotFilesIsAsync) {
-        if ($Command) {
-            try {
-                Test-CommandAvailable -Name $Command
-            } catch {
-                Write-DotFilesMessage -Type 'Verbose' -Message "Skipping as command not available: $($PSItem.Exception.CommandName)"
-                $Error.RemoveAt(0)
-                return $false
+    if ($Command) {
+        try {
+            Test-CommandAvailable -Name $Command
+        } catch {
+            $ErrRec = $PSItem
+            switch -Regex ($ErrRec.FullyQualifiedErrorId) {
+                '^CommandNotFoundException,' {
+                    Write-DotFilesMessage -Type 'Verbose' -Message "Skipping as command not available: $($ErrRec.Exception.CommandName)"
+                    $Error.RemoveAt(0)
+                    return $false
+                }
+
+                default { $PSCmdlet.ThrowTerminatingError($ErrRec) }
             }
         }
+    }
 
-        if ($Environment) {
-            try {
-                Test-EnvironmentMatch -Environment $Environment
-            } catch {
-                $ExcMsg = $PSItem.Exception.Message
-                Write-DotFilesMessage -Type 'Verbose' -Message ('Skipping as {0}{1}' -f [Char]::ToLowerInvariant($ExcMsg[0]), $ExcMsg.Substring(1))
-                $Error.RemoveAt(0)
-                return $false
+    if ($Environment -and $Environment.Count -ne 0) {
+        try {
+            Test-EnvironmentMatch -Environment $Environment
+        } catch {
+            $ErrRec = $PSItem
+            switch -Regex ($ErrRec.FullyQualifiedErrorId) {
+                '^EnvironmentVariable(Exists|NotFound|Mismatch),' {
+                    $ExcMsg = $ErrRec.Exception.Message
+                    Write-DotFilesMessage -Type 'Verbose' -Message ('Skipping as {0}{1}' -f [Char]::ToLowerInvariant($ExcMsg[0]), $ExcMsg.Substring(1))
+                    $Error.RemoveAt(0)
+                    return $false
+                }
+
+                default { $PSCmdlet.ThrowTerminatingError($ErrRec) }
             }
         }
+    }
 
-        $ProcessModules = $ModuleOperation -eq 'Import' -or $ForceTestModule -or !$Global:DotFilesFastLoad
-        if ($Module -and $ProcessModules) {
-            try {
-                Test-ModuleAvailable -Name $Module -Operation $ModuleOperation -Require $ModuleRequire
-            } catch {
-                $ExcMsg = $PSItem.Exception.Message
-                Write-DotFilesMessage -Type 'Verbose' -Message ('Skipping as {0}{1}' -f [Char]::ToLowerInvariant($ExcMsg[0]), $ExcMsg.Substring(1))
-                $Error.RemoveAt(0)
-                return $false
+    $ProcessModules = $ModuleOperation -eq 'Import' -or $ForceTestModule -or !$Global:DotFilesFastLoad
+    if ($Module -and $ProcessModules) {
+        try {
+            Test-ModuleAvailable -Name $Module -Operation $ModuleOperation -Require $ModuleRequire
+        } catch {
+            $ErrRec = $PSItem
+            switch -Regex ($ErrRec.FullyQualifiedErrorId) {
+                '^Modules_ModuleNotFound,' {
+                    $ExcMsg = $ErrRec.Exception.Message
+                    Write-DotFilesMessage -Type 'Verbose' -Message ('Skipping as {0}{1}' -f [Char]::ToLowerInvariant($ExcMsg[0]), $ExcMsg.Substring(1))
+                    $Error.RemoveAt(0)
+                    return $false
+                }
+
+                default { $PSCmdlet.ThrowTerminatingError($ErrRec) }
             }
         }
     }
@@ -550,7 +594,12 @@ Function Write-DotFilesMessage {
     }
 
     if ($Global:DotFilesLoadAsync) {
-        if ($Global:DotFilesIsAsync) { $LoadType = 'Async' } else { $LoadType = 'Sync' }
+        if ($Global:DotFilesIsAsync) {
+            $LoadType = 'Async'
+        } else {
+            $LoadType = 'Sync'
+        }
+
         $Msg = '[dotfiles | {0,-10} | {1,-25} | {2,-5}] {3}' -f $SectionType, $SectionName, $LoadType, $Message
     } else {
         $Msg = '[dotfiles | {0,-10} | {1,-25}] {2}' -f $SectionType, $SectionName, $Message
