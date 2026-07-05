@@ -22,7 +22,7 @@
                             <ListItem>
                                 <Label>Output</Label>
                                 <ScriptBlock>
-                                    $Python = $_
+                                    $Python = $PSItem
                                     switch ($Python.Output.Count) {
                                         0 { '(no output)' }
                                         1 { $Python.Output }
@@ -53,7 +53,7 @@
                             <ListItem>
                                 <Label>Scoop</Label>
                                 <ScriptBlock>
-                                    $Scoop = $_
+                                    $Scoop = $PSItem
                                     switch ($Scoop.Scoop.Count) {
                                         0 { '(no output)' }
                                         1 { $Scoop.Scoop }
@@ -64,7 +64,7 @@
                             <ListItem>
                                 <Label>Apps</Label>
                                 <ScriptBlock>
-                                    $Scoop = $_
+                                    $Scoop = $PSItem
                                     switch ($Scoop.Apps.Count) {
                                         0 { '(no output)' }
                                         1 { $Scoop.Apps }
@@ -75,7 +75,7 @@
                             <ListItem>
                                 <Label>Cleanup</Label>
                                 <ScriptBlock>
-                                    $Scoop = $_
+                                    $Scoop = $PSItem
                                     switch ($Scoop.Cleanup.Count) {
                                         0 { '(no output)' }
                                         1 { $Scoop.Cleanup }
@@ -115,7 +115,7 @@
                             <ListItem>
                                 <Label>Errors</Label>
                                 <ScriptBlock>
-                                    $Vs = $_
+                                    $Vs = $PSItem
                                     switch ($Vs.Errors.Count) {
                                         0 { [String]::Empty }
                                         1 { $Vs.Errors }
@@ -149,8 +149,8 @@
                             <ListItem>
                                 <Label>Updates</Label>
                                 <ScriptBlock>
-                                    if ($_.Updates.Count -eq 0) { return 'None' }
-                                    @([String]::Join(', ', ($_.Updates.Title | Sort-Object)))
+                                    if ($PSItem.Updates.Count -eq 0) { return 'None' }
+                                    @([String]::Join(', ', ($PSItem.Updates.Title | Sort-Object)))
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -176,18 +176,18 @@
                             <ListItem>
                                 <Label>Available</Label>
                                 <ScriptBlock>
-                                    if ($_.Available.Count -eq 0) { return 'No available updates' }
-                                    "$($_.Available.Count) available updates"
+                                    if ($PSItem.Available.Count -eq 0) { return 'No available updates' }
+                                    "$($PSItem.Available.Count) available updates"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>Results</Label>
                                 <ScriptBlock>
-                                    if ($_.WhatIf) { return 'Did not run (WhatIf mode)' }
+                                    if ($PSItem.WhatIf) { return 'Did not run (WhatIf mode)' }
 
-                                    $Updated = ($_.Results | Where-Object Status -EQ 'OK' | Measure-Object).Count
-                                    $Failed = $_.Results.Count - $Updated
-                                    $Unknown = $_.Available.Count - $_.Results.Count
+                                    $Updated = ($PSItem.Results | Where-Object Status -EQ 'OK' | Measure-Object).Count
+                                    $Failed = $PSItem.Results.Count - $Updated
+                                    $Unknown = $PSItem.Available.Count - $PSItem.Results.Count
                                     "${Updated} packages updated (${Failed} failed, ${Unknown} missing)"
                                 </ScriptBlock>
                             </ListItem>
@@ -220,7 +220,7 @@
                             <ListItem>
                                 <Label>Output</Label>
                                 <ScriptBlock>
-                                    $Wsl = $_
+                                    $Wsl = $PSItem
                                     switch ($Wsl.Output.Count) {
                                         0 { '(no output)' }
                                         1 { $Wsl.Output }

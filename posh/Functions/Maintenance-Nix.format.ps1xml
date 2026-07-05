@@ -13,7 +13,7 @@
                             <ListItem>
                                 <Label>Brew</Label>
                                 <ScriptBlock>
-                                    $Homebrew = $_
+                                    $Homebrew = $PSItem
                                     switch ($Homebrew.Brew.Count) {
                                         0 { '(no output)' }
                                         1 { $Homebrew.Brew }
@@ -24,7 +24,7 @@
                             <ListItem>
                                 <Label>Apps</Label>
                                 <ScriptBlock>
-                                    $Homebrew = $_
+                                    $Homebrew = $PSItem
                                     switch ($Homebrew.Apps.Count) {
                                         0 { '(no output)' }
                                         1 { $Homebrew.Apps }
@@ -35,7 +35,7 @@
                             <ListItem>
                                 <Label>Cleanup</Label>
                                 <ScriptBlock>
-                                    $Homebrew = $_
+                                    $Homebrew = $PSItem
                                     switch ($Homebrew.Cleanup.Count) {
                                         0 { '(no output)' }
                                         1 { $Homebrew.Cleanup }

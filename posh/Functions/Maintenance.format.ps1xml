@@ -16,9 +16,9 @@
                                     <PropertyName>Windows</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.Windows) { return }
-                                    if ($_.Windows -is [Management.Automation.ErrorRecord]) { return $_.Windows.Exception.Message }
-                                    $_.Windows.Summary
+                                    if ($null -eq $PSItem.Windows) { return }
+                                    if ($PSItem.Windows -is [Management.Automation.ErrorRecord]) { return $PSItem.Windows.Exception.Message }
+                                    $PSItem.Windows.Summary
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -27,19 +27,19 @@
                                     <PropertyName>WSL</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.WSL) { return }
-                                    if ($_.WSL -is [Management.Automation.ErrorRecord]) { return $_.WSL.Exception.Message }
+                                    if ($null -eq $PSItem.WSL) { return }
+                                    if ($PSItem.WSL -is [Management.Automation.ErrorRecord]) { return $PSItem.WSL.Exception.Message }
 
-                                    if (!$_.WSL.Success) { return 'Error during operation (view property for details)' }
-                                    if ($_.WSL.WhatIf) { return "$($_.WSL.BeforeUpdate) (current version)" }
+                                    if (!$PSItem.WSL.Success) { return 'Error during operation (view property for details)' }
+                                    if ($PSItem.WSL.WhatIf) { return "$($PSItem.WSL.BeforeUpdate) (current version)" }
 
-                                    if ($null -ne $_.WSL.AfterUpdate) {
-                                        if ($_.WSL.BeforeUpdate -eq $_.WSL.AfterUpdate) {
-                                            return "$($_.WSL.BeforeUpdate) (no update)"
+                                    if ($null -ne $PSItem.WSL.AfterUpdate) {
+                                        if ($PSItem.WSL.BeforeUpdate -eq $PSItem.WSL.AfterUpdate) {
+                                            return "$($PSItem.WSL.BeforeUpdate) (no update)"
                                         }
                                     }
 
-                                    "$($_.WSL.AfterUpdate) (previous: $($_.WSL.BeforeUpdate))"
+                                    "$($PSItem.WSL.AfterUpdate) (previous: $($PSItem.WSL.BeforeUpdate))"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -48,14 +48,14 @@
                                     <PropertyName>Office</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.Office) { return }
-                                    if ($_.Office -is [Management.Automation.ErrorRecord]) { return $_.Office.Exception.Message }
+                                    if ($null -eq $PSItem.Office) { return }
+                                    if ($PSItem.Office -is [Management.Automation.ErrorRecord]) { return $PSItem.Office.Exception.Message }
 
-                                    if (!$_.Office.Success) { return 'Error during operation (view property for details)' }
-                                    if ($_.Office.WhatIf) { return "$($_.Office.BeforeUpdate) (current version)" }
+                                    if (!$PSItem.Office.Success) { return 'Error during operation (view property for details)' }
+                                    if ($PSItem.Office.WhatIf) { return "$($PSItem.Office.BeforeUpdate) (current version)" }
 
-                                    if ($_.Office.BeforeUpdate -eq $_.Office.AfterUpdate) { return "$($_.Office.BeforeUpdate) (no update)" }
-                                    "$($_.Office.AfterUpdate) (previous: $($_.Office.BeforeUpdate))"
+                                    if ($PSItem.Office.BeforeUpdate -eq $PSItem.Office.AfterUpdate) { return "$($PSItem.Office.BeforeUpdate) (no update)" }
+                                    "$($PSItem.Office.AfterUpdate) (previous: $($PSItem.Office.BeforeUpdate))"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -64,22 +64,22 @@
                                     <PropertyName>VisualStudio</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.VisualStudio) { return }
-                                    if ($_.VisualStudio -is [Management.Automation.ErrorRecord]) { return $_.VisualStudio.Exception.Message }
+                                    if ($null -eq $PSItem.VisualStudio) { return }
+                                    if ($PSItem.VisualStudio -is [Management.Automation.ErrorRecord]) { return $PSItem.VisualStudio.Exception.Message }
 
-                                    if (!$_.VisualStudio.Success) { return 'Error during operation (view property for details)' }
-                                    if ($_.VisualStudio.WhatIf) { return "$([String]::Join(', ', ($_.VisualStudio.BeforeUpdate.InstallationVersion | Sort-Object))) (current versions)" }
+                                    if (!$PSItem.VisualStudio.Success) { return 'Error during operation (view property for details)' }
+                                    if ($PSItem.VisualStudio.WhatIf) { return "$([String]::Join(', ', ($PSItem.VisualStudio.BeforeUpdate.InstallationVersion | Sort-Object))) (current versions)" }
 
                                     $Updated = $false
-                                    foreach ($VsBefore in $_.VisualStudio.BeforeUpdate) {
-                                        $VsAfter = $_.VisualStudio.AfterUpdate | Where-Object InstanceId -EQ $VsBefore.InstanceId
+                                    foreach ($VsBefore in $PSItem.VisualStudio.BeforeUpdate) {
+                                        $VsAfter = $PSItem.VisualStudio.AfterUpdate | Where-Object InstanceId -EQ $VsBefore.InstanceId
                                         if ($VsBefore.InstallationVersion -ne $VsAfter.InstallationVersion) { $Updated = $true; break }
                                     }
 
-                                    $BeforeUpdate = [String]::Join(', ', ($_.VisualStudio.BeforeUpdate.InstallationVersion | Sort-Object))
+                                    $BeforeUpdate = [String]::Join(', ', ($PSItem.VisualStudio.BeforeUpdate.InstallationVersion | Sort-Object))
                                     if (!$Updated) { return "${BeforeUpdate} (no updates)" }
 
-                                    $AfterUpdate = [String]::Join(', ', ($_.VisualStudio.AfterUpdate.InstallationVersion | Sort-Object))
+                                    $AfterUpdate = [String]::Join(', ', ($PSItem.VisualStudio.AfterUpdate.InstallationVersion | Sort-Object))
                                     "${AfterUpdate} (previous: ${BeforeUpdate})"
                                 </ScriptBlock>
                             </ListItem>
@@ -89,9 +89,9 @@
                                     <PropertyName>PowerShell</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.PowerShell) { return }
-                                    if ($_.PowerShell -is [Management.Automation.ErrorRecord]) { return $_.PowerShell.Exception.Message }
-                                    $_.PowerShell
+                                    if ($null -eq $PSItem.PowerShell) { return }
+                                    if ($PSItem.PowerShell -is [Management.Automation.ErrorRecord]) { return $PSItem.PowerShell.Exception.Message }
+                                    $PSItem.PowerShell
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -100,11 +100,11 @@
                                     <PropertyName>MicrosoftStore</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.MicrosoftStore) { return }
-                                    if ($_.MicrosoftStore -is [Management.Automation.ErrorRecord]) { return $_.MicrosoftStore.Exception.Message }
+                                    if ($null -eq $PSItem.MicrosoftStore) { return }
+                                    if ($PSItem.MicrosoftStore -is [Management.Automation.ErrorRecord]) { return $PSItem.MicrosoftStore.Exception.Message }
 
-                                    if (!$_.MicrosoftStore.Success) { return 'Error during operation (view property for details)' }
-                                    if ($_.MicrosoftStore.WhatIf) { return 'Did not run (WhatIf mode)' }
+                                    if (!$PSItem.MicrosoftStore.Success) { return 'Error during operation (view property for details)' }
+                                    if ($PSItem.MicrosoftStore.WhatIf) { return 'Did not run (WhatIf mode)' }
                                     'Updated all apps'
                                 </ScriptBlock>
                             </ListItem>
@@ -114,14 +114,14 @@
                                     <PropertyName>Edge</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.Edge) { return }
-                                    if ($_.Edge -is [Management.Automation.ErrorRecord]) { return $_.Edge.Exception.Message }
+                                    if ($null -eq $PSItem.Edge) { return }
+                                    if ($PSItem.Edge -is [Management.Automation.ErrorRecord]) { return $PSItem.Edge.Exception.Message }
 
-                                    if (!$_.Edge.Success) { return 'Error during operation (view property for details)' }
-                                    if ($_.Edge.WhatIf) { return "$($_.Edge.BeforeUpdate) (current version)" }
+                                    if (!$PSItem.Edge.Success) { return 'Error during operation (view property for details)' }
+                                    if ($PSItem.Edge.WhatIf) { return "$($PSItem.Edge.BeforeUpdate) (current version)" }
 
-                                    if ($_.Edge.BeforeUpdate -eq $_.Edge.AfterUpdate) { return "$($_.Edge.BeforeUpdate) (no update)" }
-                                    "Updated to $($_.Edge.AfterUpdate) (previous: $($_.Edge.BeforeUpdate))"
+                                    if ($PSItem.Edge.BeforeUpdate -eq $PSItem.Edge.AfterUpdate) { return "$($PSItem.Edge.BeforeUpdate) (no update)" }
+                                    "Updated to $($PSItem.Edge.AfterUpdate) (previous: $($PSItem.Edge.BeforeUpdate))"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -130,14 +130,14 @@
                                     <PropertyName>Chrome</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.Chrome) { return }
-                                    if ($_.Chrome -is [Management.Automation.ErrorRecord]) { return $_.Chrome.Exception.Message }
+                                    if ($null -eq $PSItem.Chrome) { return }
+                                    if ($PSItem.Chrome -is [Management.Automation.ErrorRecord]) { return $PSItem.Chrome.Exception.Message }
 
-                                    if (!$_.Chrome.Success) { return 'Error during operation (view property for details)' }
-                                    if ($_.Chrome.WhatIf) { return "$($_.Chrome.BeforeUpdate) (current version)" }
+                                    if (!$PSItem.Chrome.Success) { return 'Error during operation (view property for details)' }
+                                    if ($PSItem.Chrome.WhatIf) { return "$($PSItem.Chrome.BeforeUpdate) (current version)" }
 
-                                    if ($_.Chrome.BeforeUpdate -eq $_.Chrome.AfterUpdate) { return "$($_.Chrome.BeforeUpdate) (no update)" }
-                                    "Updated to $($_.Chrome.AfterUpdate) (previous: $($_.Chrome.BeforeUpdate))"
+                                    if ($PSItem.Chrome.BeforeUpdate -eq $PSItem.Chrome.AfterUpdate) { return "$($PSItem.Chrome.BeforeUpdate) (no update)" }
+                                    "Updated to $($PSItem.Chrome.AfterUpdate) (previous: $($PSItem.Chrome.BeforeUpdate))"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -146,15 +146,15 @@
                                     <PropertyName>WinGet</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.WinGet) { return }
-                                    if ($_.WinGet -is [Management.Automation.ErrorRecord]) { return $_.WinGet.Exception.Message }
+                                    if ($null -eq $PSItem.WinGet) { return }
+                                    if ($PSItem.WinGet -is [Management.Automation.ErrorRecord]) { return $PSItem.WinGet.Exception.Message }
 
-                                    if (!$_.WinGet.Success) { return 'Error during operation (view property for details)' }
-                                    if ($_.WinGet.WhatIf) { return "$($_.WinGet.Available.Count) available updates" }
+                                    if (!$PSItem.WinGet.Success) { return 'Error during operation (view property for details)' }
+                                    if ($PSItem.WinGet.WhatIf) { return "$($PSItem.WinGet.Available.Count) available updates" }
 
-                                    $Updated = ($_.WinGet.Results | Where-Object Status -EQ 'OK' | Measure-Object).Count
-                                    $Failed = $_.WinGet.Results.Count - $Updated
-                                    $Unknown = $_.WinGet.Available.Count - $_.WinGet.Results.Count
+                                    $Updated = ($PSItem.WinGet.Results | Where-Object Status -EQ 'OK' | Measure-Object).Count
+                                    $Failed = $PSItem.WinGet.Results.Count - $Updated
+                                    $Unknown = $PSItem.WinGet.Available.Count - $PSItem.WinGet.Results.Count
                                     "${Updated} packages updated (${Failed} failed, ${Unknown} missing)"
                                 </ScriptBlock>
                             </ListItem>
@@ -164,17 +164,17 @@
                                     <PropertyName>Homebrew</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.Homebrew) { return }
-                                    if ($_.Homebrew -is [Management.Automation.ErrorRecord]) { return $_.Homebrew.Exception.Message }
+                                    if ($null -eq $PSItem.Homebrew) { return }
+                                    if ($PSItem.Homebrew -is [Management.Automation.ErrorRecord]) { return $PSItem.Homebrew.Exception.Message }
 
                                     $Actions = [Collections.Generic.List[String]]::new()
-                                    if ($_.Homebrew.Brew.Count -gt 0) { $Actions.Add('Updated Homebrew') }
-                                    if ($_.Homebrew.Apps.Count -gt 0) {
+                                    if ($PSItem.Homebrew.Brew.Count -gt 0) { $Actions.Add('Updated Homebrew') }
+                                    if ($PSItem.Homebrew.Apps.Count -gt 0) {
                                         $Action = 'Upgraded apps'
-                                        if ($_.Homebrew.WhatIf) { $Action += ' (dry-run)' }
+                                        if ($PSItem.Homebrew.WhatIf) { $Action += ' (dry-run)' }
                                         $Actions.Add($Action)
                                     }
-                                    if ($_.Homebrew.Cleanup.Count -gt 0) { $Actions.Add('Cleaned-up outdated data') }
+                                    if ($PSItem.Homebrew.Cleanup.Count -gt 0) { $Actions.Add('Cleaned-up outdated data') }
 
                                     if ($Actions.Count -eq 0) { return 'Performed no actions' }
                                     [String]::Join(', ', $Actions)
@@ -186,17 +186,17 @@
                                     <PropertyName>Scoop</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.Scoop) { return }
-                                    if ($_.Scoop -is [Management.Automation.ErrorRecord]) { return $_.Scoop.Exception.Message }
+                                    if ($null -eq $PSItem.Scoop) { return }
+                                    if ($PSItem.Scoop -is [Management.Automation.ErrorRecord]) { return $PSItem.Scoop.Exception.Message }
 
                                     $Actions = [Collections.Generic.List[String]]::new()
-                                    if ($_.Scoop.Scoop.Count -gt 0) { $Actions.Add('Updated Scoop') }
-                                    if ($_.Scoop.Apps.Count -gt 0) {
+                                    if ($PSItem.Scoop.Scoop.Count -gt 0) { $Actions.Add('Updated Scoop') }
+                                    if ($PSItem.Scoop.Apps.Count -gt 0) {
                                         $Action = 'Updated apps'
-                                        if ($_.Scoop.WhatIf) { $Action += ' (dry-run)' }
+                                        if ($PSItem.Scoop.WhatIf) { $Action += ' (dry-run)' }
                                         $Actions.Add($Action)
                                     }
-                                    if ($_.Scoop.Cleanup.Count -gt 0) { $Actions.Add('Cleaned-up outdated data') }
+                                    if ($PSItem.Scoop.Cleanup.Count -gt 0) { $Actions.Add('Cleaned-up outdated data') }
 
                                     if ($Actions.Count -eq 0) { return 'Performed no actions' }
                                     [String]::Join(', ', $Actions)
@@ -208,9 +208,9 @@
                                     <PropertyName>DotNetTools</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.DotNetTools) { return }
-                                    if ($_.DotNetTools -is [Management.Automation.ErrorRecord]) { return $_.DotNetTools.Exception.Message }
-                                    $_.DotNetTools
+                                    if ($null -eq $PSItem.DotNetTools) { return }
+                                    if ($PSItem.DotNetTools -is [Management.Automation.ErrorRecord]) { return $PSItem.DotNetTools.Exception.Message }
+                                    $PSItem.DotNetTools
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -219,9 +219,9 @@
                                     <PropertyName>GoBinaries</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.GoBinaries) { return }
-                                    if ($_.GoBinaries -is [Management.Automation.ErrorRecord]) { return $_.GoBinaries.Exception.Message }
-                                    $_.GoBinaries
+                                    if ($null -eq $PSItem.GoBinaries) { return }
+                                    if ($PSItem.GoBinaries -is [Management.Automation.ErrorRecord]) { return $PSItem.GoBinaries.Exception.Message }
+                                    $PSItem.GoBinaries
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -230,9 +230,9 @@
                                     <PropertyName>NodejsPackages</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.NodejsPackages) { return }
-                                    if ($_.NodejsPackages -is [Management.Automation.ErrorRecord]) { return $_.NodejsPackages.Exception.Message }
-                                    $_.NodejsPackages
+                                    if ($null -eq $PSItem.NodejsPackages) { return }
+                                    if ($PSItem.NodejsPackages -is [Management.Automation.ErrorRecord]) { return $PSItem.NodejsPackages.Exception.Message }
+                                    $PSItem.NodejsPackages
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -241,21 +241,21 @@
                                     <PropertyName>Python</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.Python) { return }
-                                    if ($_.Python -is [Management.Automation.ErrorRecord]) { return $_.Python.Exception.Message }
+                                    if ($null -eq $PSItem.Python) { return }
+                                    if ($PSItem.Python -is [Management.Automation.ErrorRecord]) { return $PSItem.Python.Exception.Message }
 
-                                    if (!$_.Python.Success) { return 'Error during operation (view property for details)' }
-                                    if ($_.Python.WhatIf) { return "$([String]::Join(', ', $_.Python.BeforeUpdate)) (current versions)" }
+                                    if (!$PSItem.Python.Success) { return 'Error during operation (view property for details)' }
+                                    if ($PSItem.Python.WhatIf) { return "$([String]::Join(', ', $PSItem.Python.BeforeUpdate)) (current versions)" }
 
                                     $Updated = $false
-                                    foreach ($PyBefore in $_.Python.BeforeUpdate) {
-                                        if ($PyBefore -notin $_.Python.AfterUpdate) { $Updated = $true; break }
+                                    foreach ($PyBefore in $PSItem.Python.BeforeUpdate) {
+                                        if ($PyBefore -notin $PSItem.Python.AfterUpdate) { $Updated = $true; break }
                                     }
 
-                                    $BeforeUpdate = [String]::Join(', ', ($_.Python.BeforeUpdate | Sort-Object))
+                                    $BeforeUpdate = [String]::Join(', ', ($PSItem.Python.BeforeUpdate | Sort-Object))
                                     if (!$Updated) { return "${BeforeUpdate} (no updates)" }
 
-                                    $AfterUpdate = [String]::Join(', ', ($_.Python.AfterUpdate | Sort-Object))
+                                    $AfterUpdate = [String]::Join(', ', ($PSItem.Python.AfterUpdate | Sort-Object))
                                     "${AfterUpdate} (previous: ${BeforeUpdate})"
                                 </ScriptBlock>
                             </ListItem>
@@ -265,9 +265,9 @@
                                     <PropertyName>PythonPipPackages</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.PythonPipPackages) { return }
-                                    if ($_.PythonPipPackages -is [Management.Automation.ErrorRecord]) { return $_.PythonPipPackages.Exception.Message }
-                                    $_.PythonPipPackages
+                                    if ($null -eq $PSItem.PythonPipPackages) { return }
+                                    if ($PSItem.PythonPipPackages -is [Management.Automation.ErrorRecord]) { return $PSItem.PythonPipPackages.Exception.Message }
+                                    $PSItem.PythonPipPackages
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -276,9 +276,9 @@
                                     <PropertyName>PythonPipxPackages</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.PythonPipxPackages) { return }
-                                    if ($_.PythonPipxPackages -is [Management.Automation.ErrorRecord]) { return $_.PythonPipxPackages.Exception.Message }
-                                    $_.PythonPipxPackages
+                                    if ($null -eq $PSItem.PythonPipxPackages) { return }
+                                    if ($PSItem.PythonPipxPackages -is [Management.Automation.ErrorRecord]) { return $PSItem.PythonPipxPackages.Exception.Message }
+                                    $PSItem.PythonPipxPackages
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -287,9 +287,9 @@
                                     <PropertyName>QtComponents</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.QtComponents) { return }
-                                    if ($_.QtComponents -is [Management.Automation.ErrorRecord]) { return $_.QtComponents.Exception.Message }
-                                    $_.QtComponents
+                                    if ($null -eq $PSItem.QtComponents) { return }
+                                    if ($PSItem.QtComponents -is [Management.Automation.ErrorRecord]) { return $PSItem.QtComponents.Exception.Message }
+                                    $PSItem.QtComponents
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -298,9 +298,9 @@
                                     <PropertyName>RubyGems</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.RubyGems) { return }
-                                    if ($_.RubyGems -is [Management.Automation.ErrorRecord]) { return $_.RubyGems.Exception.Message }
-                                    $_.RubyGems
+                                    if ($null -eq $PSItem.RubyGems) { return }
+                                    if ($PSItem.RubyGems -is [Management.Automation.ErrorRecord]) { return $PSItem.RubyGems.Exception.Message }
+                                    $PSItem.RubyGems
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -309,9 +309,9 @@
                                     <PropertyName>RustToolchains</PropertyName>
                                 </ItemSelectionCondition>
                                 <ScriptBlock>
-                                    if ($null -eq $_.RustToolchains) { return }
-                                    if ($_.RustToolchains -is [Management.Automation.ErrorRecord]) { return $_.RustToolchains.Exception.Message }
-                                    $_.RustToolchains
+                                    if ($null -eq $PSItem.RustToolchains) { return }
+                                    if ($PSItem.RustToolchains -is [Management.Automation.ErrorRecord]) { return $PSItem.RustToolchains.Exception.Message }
+                                    $PSItem.RustToolchains
                                 </ScriptBlock>
                             </ListItem>
                         </ListItems>

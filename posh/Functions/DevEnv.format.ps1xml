@@ -19,26 +19,26 @@
                             <ListItem>
                                 <Label>BeforeUpdate</Label>
                                 <ScriptBlock>
-                                    if ($_.BeforeUpdate.Count -eq 0) { return '(no output)' }
-                                    if ($_.BeforeUpdate.Count -eq 1) { return 'Parse error (view property for output)' }
-                                    "$($_.BeforeUpdate.Count - 2) tools installed"
+                                    if ($PSItem.BeforeUpdate.Count -eq 0) { return '(no output)' }
+                                    if ($PSItem.BeforeUpdate.Count -eq 1) { return 'Parse error (view property for output)' }
+                                    "$($PSItem.BeforeUpdate.Count - 2) tools installed"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>AfterUpdate</Label>
                                 <ScriptBlock>
-                                    if ($_.AfterUpdate.Count -eq 0) { return '(no output)' }
-                                    if ($_.AfterUpdate.Count -eq 1) { return 'Parse error (view property for output)' }
-                                    "$($_.AfterUpdate.Count - 2) tools installed"
+                                    if ($PSItem.AfterUpdate.Count -eq 0) { return '(no output)' }
+                                    if ($PSItem.AfterUpdate.Count -eq 1) { return 'Parse error (view property for output)' }
+                                    "$($PSItem.AfterUpdate.Count - 2) tools installed"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>Output</Label>
                                 <ScriptBlock>
-                                    if ($_.Output.Count -eq 0) { return '(no output)' }
+                                    if ($PSItem.Output.Count -eq 0) { return '(no output)' }
 
                                     $Updated = 0
-                                    foreach ($Line in $_.Output) {
+                                    foreach ($Line in $PSItem.Output) {
                                         switch -Regex ($Line) {
                                             'is already installed' { }
                                             'was successfully updated' { $Updated++ }
@@ -75,9 +75,9 @@
                             <ListItem>
                                 <Label>Gup</Label>
                                 <ScriptBlock>
-                                    if ($_.Gup.Count -eq 0) { return '(no output)' }
+                                    if ($PSItem.Gup.Count -eq 0) { return '(no output)' }
 
-                                    foreach ($Line in $_.Gup) {
+                                    foreach ($Line in $PSItem.Gup) {
                                         if ($Line -match '^\[1/1\] .+') {
                                             switch -Regex ($Line) {
                                                 'Already up-to-date: v(\S+)' { return "$($Matches[1]) (up-to-date)" }
@@ -93,11 +93,11 @@
                             <ListItem>
                                 <Label>Binaries</Label>
                                 <ScriptBlock>
-                                    if ($_.Binaries.Count -eq 0) { return '(no output)' }
+                                    if ($PSItem.Binaries.Count -eq 0) { return '(no output)' }
                                     $ParseError = 'Parse error (view property for output)'
 
                                     $Current = $Available = $Updated = $Total = 0
-                                    foreach ($Line in $_.Binaries) {
+                                    foreach ($Line in $PSItem.Binaries) {
                                         if ($Line -match '^\[[1-9][0-9]*/([1-9][0-9]*)\] .+') {
                                             if ($Total -eq 0) { $Total = $Matches[1] }
                                             elseif ($Total -ne $Matches[1]) { return $ParseError }
@@ -112,7 +112,7 @@
 
                                     if ($Updated -gt 0 -and $Available -gt 0) { return $ParseError }
 
-                                    if ($_.WhatIf) {
+                                    if ($PSItem.WhatIf) {
                                         if ($Current + $Available -ne $Total) { return $ParseError }
                                         return "${Available} updates available (view property for output)"
                                     }

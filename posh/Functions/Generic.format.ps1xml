@@ -32,7 +32,7 @@
                                 <PropertyName>Items</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>Format-SizeDigital -Size $_.Size</ScriptBlock>
+                                <ScriptBlock>Format-SizeDigital -Size $PSItem.Size</ScriptBlock>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>

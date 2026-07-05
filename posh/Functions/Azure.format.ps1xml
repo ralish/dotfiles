@@ -30,13 +30,13 @@
                                 <PropertyName>DisplayName</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.AssignedLicenses.Count</ScriptBlock>
+                                <ScriptBlock>$PSItem.AssignedLicenses.Count</ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.EnabledServices.Count</ScriptBlock>
+                                <ScriptBlock>$PSItem.EnabledServices.Count</ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <ScriptBlock>$_.DisabledServices.Count</ScriptBlock>
+                                <ScriptBlock>$PSItem.DisabledServices.Count</ScriptBlock>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>

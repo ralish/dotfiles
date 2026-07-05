@@ -50,7 +50,7 @@
                     <TableRowEntry>
                         <TableColumnItems>
                             <TableColumnItem>
-                                <ScriptBlock>[Guid]::new($_.schemaIDGUID)</ScriptBlock>
+                                <ScriptBlock>[Guid]::new($PSItem.schemaIDGUID)</ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Name</PropertyName>
