@@ -1381,7 +1381,7 @@ Function Global:Update-Windows {
             if ($Update.Status -match '^..R....$') { $Installed++; $NeedReboot = $true }
         }
 
-        if ($Failed -gt 0) {
+        if ($Failed -ne 0) {
             $Result.Success = $false
         }
 

@@ -931,7 +931,7 @@ Function Set-DiskCleanupProfile {
     }
 
     $UnknownCategories.Sort()
-    if ($UnknownCategories.Count -gt 0) {
+    if ($UnknownCategories.Count -ne 0) {
         Write-Warning -Message "Some Disk Clean-up categories will be ignored: $($UnknownCategories.ToArray() -join ', ')"
     }
 

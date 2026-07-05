@@ -168,7 +168,7 @@ Function Global:Invoke-GitLinter {
                 $Shebang = '^#!/usr/bin/env (ba)?sh$'
                 $RgArgs = '--path-separator', '/', '--hidden', '-l', $Shebang
                 & rg @RgArgs | ForEach-Object { $LintFiles.Add($PSItem) }
-                if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) {
+                if ($LASTEXITCODE -ge 2) {
                     $ExcMsg = "ripgrep exited with unexpected exit code: ${LASTEXITCODE}"
                     $ErrExc = [Exception]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
@@ -181,7 +181,7 @@ Function Global:Invoke-GitLinter {
                 $ShellDirective = '#.*\bshellcheck\b.*\bshell=(ba)?sh\b'
                 $RgArgs = '--path-separator', '/', '--hidden', '-l', $ShellDirective
                 & rg @RgArgs | ForEach-Object { $LintFiles.Add($PSItem) }
-                if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) {
+                if ($LASTEXITCODE -ge 2) {
                     $ExcMsg = "ripgrep exited with unexpected exit code: ${LASTEXITCODE}"
                     $ErrExc = [Exception]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult

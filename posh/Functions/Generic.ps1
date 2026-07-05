@@ -565,7 +565,7 @@ Function Global:Format-SizeDigital {
         }
 
         $Log = [Math]::Truncate([Math]::Log($Size, $LogBase))
-        if ($Log -gt 0) {
+        if ($Log -ne 0) {
             if ($Log -ge $LogMagnitudes.Count) {
                 $Log = $LogMagnitudes.Count - 1
             }
@@ -617,7 +617,7 @@ Function Global:Format-Xml {
             $XmlWriterSettings = [Xml.XmlWriterSettings]::new()
             $XmlWriterSettings.OmitXmlDeclaration = $OmitXmlDeclaration.ToBool()
 
-            if ($IndentSize -gt 0) {
+            if ($IndentSize -ne 0) {
                 $XmlWriterSettings.Indent = $true
                 $XmlWriterSettings.IndentChars = [String]::new(' ', $IndentSize)
             }

@@ -195,7 +195,7 @@ Function Global:Update-DotNetTools {
                 }
             }
 
-            if ($Tools.Count -gt 0) {
+            if ($Tools.Count -ne 0) {
                 $ToolsUpdated = 0
                 $DotnetOutput = [Collections.Generic.List[String]]::new()
 
@@ -428,7 +428,7 @@ Function Global:Switch-Go {
             # More than one path means we added paths from `GOPATH`
             if ($PathChanges.Count -gt 1) {
                 # Add in reverse order excluding the last path (`$BinPath`)
-                for ($i = $PathChanges.Count - 1; $i -gt 0; $i--) {
+                for ($i = $PathChanges.Count - 1; $i -ne 0; $i--) {
                     Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
                         & $PathFunc @PathParams -Element $PathChanges[$i] |
                         Set-EnvironmentVariable -Name 'Path' -Scope 'User'

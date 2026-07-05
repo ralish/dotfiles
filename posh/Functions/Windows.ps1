@@ -749,7 +749,7 @@ Function Global:Search-Registry {
         $RegKeys[$i].Close()
     }
 
-    if ($Results.Count -gt 0) {
+    if ($Results.Count -ne 0) {
         return $Results.ToArray()
     }
 }

@@ -25,7 +25,7 @@ Function Global:Get-DotFilesLastUpdated {
 
         $RgArgs = '--hidden', '-g', $RgGlobExcludeGit, '-g', $RgGlobExcludeThis, 'Last reviewed release: '
         $LastReviewedReleases = & rg @RgArgs
-        if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) {
+        if ($LASTEXITCODE -ge 2) {
             $ExcMsg = "ripgrep exited with unexpected exit code: ${LASTEXITCODE}"
             $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult

@@ -148,13 +148,13 @@ Function Global:New-OpenSSLCertificate {
         $Subjects.Add("countryName=${Country}")
     }
 
-    if ($AdditionalDomains.Count -gt 0) {
+    if ($AdditionalDomains.Count -ne 0) {
         foreach ($Domain in $AdditionalDomains) {
             $SANs.Add("DNS:${Domain}")
         }
     }
 
-    if ($IPAddresses.Count -gt 0) {
+    if ($IPAddresses.Count -ne 0) {
         foreach ($IPAddress in $IPAddresses) {
             if ($IPAddress.AddressFamily -ne [Net.Sockets.AddressFamily]::InterNetwork -and
                 $IPAddress.AddressFamily -ne [Net.Sockets.AddressFamily]::InterNetworkV6) {
@@ -169,13 +169,13 @@ Function Global:New-OpenSSLCertificate {
         }
     }
 
-    if ($Subjects.Count -gt 0) {
+    if ($Subjects.Count -ne 0) {
         $Subject = "/$($Subjects -join '/')"
         $Params.Add('-subj')
         $Params.Add($Subject)
     }
 
-    if ($SANs.Count -gt 0) {
+    if ($SANs.Count -ne 0) {
         $SAN = "subjectAltName = $($SANs -join ', ')"
         $Params.Add('-addext')
         $Params.Add($SAN)

@@ -95,7 +95,7 @@ Function Global:Update-OpenSSHConfig {
         if ($Banner.Count -ge 3) {
             $BannerLines = [String[]]$Banner[0..($Banner.Count - 2)]
             [IO.File]::AppendAllLines($ConfigFileTmp, $BannerLines, $UTF8EncodingNoBom)
-        } elseif ($Banner.Count -gt 0) {
+        } elseif ($Banner.Count -ne 0) {
             Write-Warning -Message 'Banner file has fewer than the minimum of 3 lines and will be ignored.'
         }
     } catch {
@@ -115,7 +115,7 @@ Function Global:Update-OpenSSHConfig {
             if ($Data.Count -ge 3) {
                 $IncludeLines = [String[]]($Data[0..($Data.Count - 2)] + '')
                 [IO.File]::AppendAllLines($ConfigFileTmp, $IncludeLines, $UTF8EncodingNoBom)
-            } elseif ($Data.Count -gt 0) {
+            } elseif ($Data.Count -ne 0) {
                 Write-Warning -Message "Included configuration file has fewer than the minimum of 3 lines and will be ignored: $($Include.Name)"
             }
         }

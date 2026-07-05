@@ -25,7 +25,7 @@ Function Global:Get-TypeConstructor {
         foreach ($Constructor in $Constructors) {
             $ConstructorParams = $Constructor.GetParameters()
 
-            if ($ConstructorParams.Count -gt 0) {
+            if ($ConstructorParams.Count -ne 0) {
                 $FormattedConstructorParams = @($ConstructorParams | ForEach-Object { $PSItem.ToString() })
                 $FormattedParams = "$($Type.FullName)($($FormattedConstructorParams -join ', '))"
             } else {
@@ -53,7 +53,7 @@ Function Global:Get-TypeMethod {
         foreach ($Method in $Methods) {
             $MethodParams = $Method.GetParameters()
 
-            if ($MethodParams.Count -gt 0) {
+            if ($MethodParams.Count -ne 0) {
                 $FormattedMethodParams = @($MethodParams | ForEach-Object { $PSItem.ToString() })
                 $FormattedParams = "$($Type.FullName)($($FormattedMethodParams -join ', '))"
             } else {

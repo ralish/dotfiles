@@ -361,7 +361,7 @@ Function Invoke-DotFilesAsyncTask {
         $Global:DotFilesSectionStopwatch.Restart()
     }
 
-    if ($Global:AsyncLoadQueue.Count -gt 0) {
+    if ($Global:AsyncLoadQueue.Count -ne 0) {
         try {
             # `$null` assignment should be unnecessary but is performed as a
             # precaution against the accidental pollution of the function's
