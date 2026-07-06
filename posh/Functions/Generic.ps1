@@ -58,11 +58,46 @@ Function Global:ConvertFrom-Base64 {
     [OutputType([String])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
-        [String]$String
+        [String]$String,
+
+        [ValidateSet('ASCII', 'UTF-7', 'UTF-8', 'UTF-16', 'UTF-16BE', 'UTF-32', 'UTF-32BE')]
+        [String]$Encoding = 'UTF-8'
     )
 
+    Begin {
+        switch ($Encoding) {
+            'ASCII' { $Encoder = [Text.ASCIIEncoding]::new() }
+            'UTF-7' { $Encoder = [Text.UTF7Encoding]::new() }
+
+            'UTF-8' {
+                # No BOM, throw on invalid encoding
+                $Encoder = [Text.UTF8Encoding]::new($false, $true)
+            }
+
+            'UTF-16' {
+                # Little endian, no BOM, throw on invalid encoding
+                $Encoder = [Text.UnicodeEncoding]::new($false, $false, $true)
+            }
+
+            'UTF-16BE' {
+                # Big endian, no BOM, throw on invalid encoding
+                $Encoder = [Text.UnicodeEncoding]::new($true, $false, $true)
+            }
+
+            'UTF-32' {
+                # Little endian, no BOM, throw on invalid encoding
+                $Encoder = [Text.UTF32Encoding]::new($false, $false, $true)
+            }
+
+            'UTF-32BE' {
+                # Big endian, no BOM, throw on invalid encoding
+                $Encoder = [Text.UTF32Encoding]::new($true, $false, $true)
+            }
+        }
+    }
+
     Process {
-        [Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($String))
+        $Encoder.GetString([Convert]::FromBase64String($String))
     }
 }
 
