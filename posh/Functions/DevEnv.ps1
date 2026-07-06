@@ -366,6 +366,10 @@ Function Global:Switch-Go {
     }
 
     End {
+        if (!(Test-IsPathFullyQualified -Path $Path)) {
+            $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+        }
+
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
             $Msg = "Go path is inaccessible or not a directory: ${Path}"
@@ -383,6 +387,7 @@ Function Global:Switch-Go {
         $Enable = !$Disable
         $PathParams = @{}
         $PathChanges = [Collections.Generic.List[String]]::new()
+        $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
 
         if ($Enable) {
             $PathFunc = 'Add-PathStringElement'
@@ -393,7 +398,7 @@ Function Global:Switch-Go {
             $PathChangesDesc = 'Removed from PATH: '
         }
 
-        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
 
         $BinPath = Join-Path -Path $Path -ChildPath 'bin'
         $PathChanges.Add($BinPath)
@@ -408,7 +413,7 @@ Function Global:Switch-Go {
                     $PSCmdlet.ThrowTerminatingError($ErrRec)
                 }
 
-                $GoPath = Join-Path -Path $GoPath -ChildPath 'bin'
+                $GoPath = Join-Path -Path ([IO.Path]::GetFullPath($GoPath)) -ChildPath 'bin'
                 $PathChanges.Insert(1, $GoPath)
             }
         }
@@ -570,6 +575,10 @@ Function Global:Switch-GoogleDepotTools {
     }
 
     End {
+        if (!(Test-IsPathFullyQualified -Path $Path)) {
+            $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+        }
+
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
             $Msg = "depot_tools path is inaccessible or not a directory: ${Path}"
@@ -586,6 +595,7 @@ Function Global:Switch-GoogleDepotTools {
 
         $Enable = !$Disable
         $PathParams = @{}
+        $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
 
         if ($Enable) {
             $PathFunc = 'Add-PathStringElement'
@@ -597,7 +607,7 @@ Function Global:Switch-GoogleDepotTools {
             $PathChangesDesc = 'Removed from PATH: '
         }
 
-        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
 
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $Path
         Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
@@ -747,6 +757,10 @@ Function Global:Switch-Java {
     }
 
     End {
+        if (!(Test-IsPathFullyQualified -Path $Path)) {
+            $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+        }
+
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
             $Msg = "Java path is inaccessible or not a directory: ${Path}"
@@ -763,6 +777,7 @@ Function Global:Switch-Java {
 
         $Enable = !$Disable
         $PathParams = @{}
+        $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
 
         if ($Enable) {
             $PathFunc = 'Add-PathStringElement'
@@ -773,7 +788,7 @@ Function Global:Switch-Java {
             $PathChangesDesc = 'Removed from PATH: '
         }
 
-        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
         $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
@@ -887,6 +902,10 @@ Function Global:Switch-Nodejs {
     }
 
     End {
+        if (!(Test-IsPathFullyQualified -Path $Path)) {
+            $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+        }
+
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
             $Msg = "Node.js path is inaccessible or not a directory: ${Path}"
@@ -932,9 +951,9 @@ Function Global:Switch-Nodejs {
         }
 
         $Enable = !$Disable
-        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
         $PathParams = @{}
         $PathChanges = [Collections.Generic.List[String]]::new()
+        $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
 
         if ($Enable) {
             $PathFunc = 'Add-PathStringElement'
@@ -945,7 +964,10 @@ Function Global:Switch-Nodejs {
             $PathChangesDesc = 'Removed from PATH: '
         }
 
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
         $PathChanges.Add($Path)
+
+        $GlobalPrefixPath = [IO.Path]::GetFullPath($GlobalPrefixPath).TrimEnd($DirSepChars)
         $PathChanges.Add($GlobalPrefixPath)
 
         foreach ($PathChange in $PathChanges) {
@@ -1057,6 +1079,10 @@ Function Global:Switch-PHP {
     }
 
     End {
+        if (!(Test-IsPathFullyQualified -Path $Path)) {
+            $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+        }
+
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
             $Msg = "PHP path is inaccessible or not a directory: ${Path}"
@@ -1073,6 +1099,7 @@ Function Global:Switch-PHP {
 
         $Enable = !$Disable
         $PathParams = @{}
+        $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
 
         if ($Enable) {
             $PathFunc = 'Add-PathStringElement'
@@ -1083,7 +1110,7 @@ Function Global:Switch-PHP {
             $PathChangesDesc = 'Removed from PATH: '
         }
 
-        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
 
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $Path
         Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
@@ -1601,6 +1628,10 @@ Function Global:Switch-Ruby {
     }
 
     End {
+        if (!(Test-IsPathFullyQualified -Path $Path)) {
+            $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+        }
+
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
             $Msg = "Ruby path is inaccessible or not a directory: ${Path}"
@@ -1617,6 +1648,7 @@ Function Global:Switch-Ruby {
 
         $Enable = !$Disable
         $PathParams = @{}
+        $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
 
         if ($Enable) {
             $PathFunc = 'Add-PathStringElement'
@@ -1628,7 +1660,7 @@ Function Global:Switch-Ruby {
             $PathChangesDesc = 'Removed from PATH: '
         }
 
-        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
         $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
@@ -1825,6 +1857,10 @@ Function Global:Switch-Rust {
             }
         }
 
+        if (!(Test-IsPathFullyQualified -Path $Path)) {
+            $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+        }
+
         $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($PathItem -isnot [IO.DirectoryInfo]) {
             $Msg = "Cargo path is inaccessible or not a directory: ${Path}"
@@ -1849,6 +1885,7 @@ Function Global:Switch-Rust {
 
         $Enable = !$Disable
         $PathParams = @{}
+        $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
 
         if ($Enable) {
             $PathFunc = 'Add-PathStringElement'
@@ -1859,7 +1896,7 @@ Function Global:Switch-Rust {
             $PathChangesDesc = 'Removed from PATH: '
         }
 
-        $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
         $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath

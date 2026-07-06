@@ -33,6 +33,10 @@ Function Global:Switch-Cygwin {
         [Switch]$Force
     )
 
+    if (!(Test-IsPathFullyQualified -Path $Path)) {
+        $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+    }
+
     $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
     if ($PathItem -isnot [IO.DirectoryInfo]) {
         $Msg = "Cygwin path is inaccessible or not a directory: ${Path}"
@@ -48,9 +52,9 @@ Function Global:Switch-Cygwin {
     }
 
     $Enable = !$Disable
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
     $PathChanges = [Collections.Generic.List[String]]::new()
     $PathParams = @{}
+    $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
 
     if ($Enable) {
         $PathFunc = 'Add-PathStringElement'
@@ -60,6 +64,8 @@ Function Global:Switch-Cygwin {
         $PathFunc = 'Remove-PathStringElement'
         $PathChangesDesc = 'Removed from PATH: '
     }
+
+    $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
 
     $BinPath = Join-Path -Path $Path -ChildPath 'bin'
     $PathChanges.Add($BinPath)
@@ -137,6 +143,10 @@ Function Global:Switch-Perl {
         [Switch]$Force
     )
 
+    if (!(Test-IsPathFullyQualified -Path $Path)) {
+        $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+    }
+
     $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
     if ($PathItem -isnot [IO.DirectoryInfo]) {
         $Msg = "Perl path is inaccessible or not a directory: ${Path}"
@@ -152,9 +162,9 @@ Function Global:Switch-Perl {
     }
 
     $Enable = !$Disable
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
     $PathChanges = [Collections.Generic.List[String]]::new()
     $PathParams = @{}
+    $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
 
     if ($Enable) {
         $PathFunc = 'Add-PathStringElement'
@@ -164,6 +174,8 @@ Function Global:Switch-Perl {
         $PathFunc = 'Remove-PathStringElement'
         $PathChangesDesc = 'Removed from PATH: '
     }
+
+    $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
 
     $PerlBinPath = Join-Path -Path $Path -ChildPath 'perl\bin'
     $PathChanges.Add($PerlBinPath)
@@ -281,6 +293,10 @@ Function Global:Switch-Python {
         [Switch]$Force
     )
 
+    if (!(Test-IsPathFullyQualified -Path $Path)) {
+        $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+    }
+
     $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
     if ($PathItem -isnot [IO.DirectoryInfo]) {
         $Msg = "Python path is inaccessible or not a directory: ${Path}"
@@ -296,9 +312,9 @@ Function Global:Switch-Python {
     }
 
     $Enable = !$Disable
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
     $PathChanges = [Collections.Generic.List[String]]::new()
     $PathParams = @{}
+    $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
 
     if ($Enable) {
         $PathFunc = 'Add-PathStringElement'
@@ -309,6 +325,7 @@ Function Global:Switch-Python {
         $PathChangesDesc = 'Removed from PATH: '
     }
 
+    $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
     $PathChanges.Add($Path)
 
     $ScriptsPath = Join-Path -Path $Path -ChildPath 'Scripts'
@@ -483,6 +500,10 @@ Function Global:Switch-WindowsSDK {
         }
     }
 
+    if (!(Test-IsPathFullyQualified -Path $Path)) {
+        $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+    }
+
     $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
     if ($PathItem -isnot [IO.DirectoryInfo]) {
         $Msg = "Windows SDK path is inaccessible or not a directory: ${Path}"
@@ -497,7 +518,20 @@ Function Global:Switch-WindowsSDK {
         Write-Warning -Message $Msg
     }
 
-    $Path = [IO.Path]::GetFullPath($Path).TrimEnd('\')
+    $Enable = !$Disable
+    $PathParams = @{}
+    $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
+
+    if ($Enable) {
+        $PathFunc = 'Add-PathStringElement'
+        $PathParams['Action'] = 'Prepend'
+        $PathChangesDesc = 'Prepended to PATH: '
+    } else {
+        $PathFunc = 'Remove-PathStringElement'
+        $PathChangesDesc = 'Removed from PATH: '
+    }
+
+    $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
 
     if (!$Version) {
         $Version = [Environment]::OSVersion.Version
@@ -558,18 +592,6 @@ Function Global:Switch-WindowsSDK {
         }
 
         Write-Warning -Message $Msg
-    }
-
-    $Enable = !$Disable
-    $PathParams = @{}
-
-    if ($Enable) {
-        $PathFunc = 'Add-PathStringElement'
-        $PathParams['Action'] = 'Prepend'
-        $PathChangesDesc = 'Prepended to PATH: '
-    } else {
-        $PathFunc = 'Remove-PathStringElement'
-        $PathChangesDesc = 'Removed from PATH: '
     }
 
     $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $SdkVerPath
