@@ -342,12 +342,8 @@ Function Global:Find-WinEvent {
         } catch {
             $ErrRec = $PSItem
             switch -Regex ($ErrRec.FullyQualifiedErrorId) {
-                '^NoMatchingEventsFound,' { continue }
-
-                default {
-                    Write-Warning -Message $ErrRec.Exception.Message
-                    continue
-                }
+                '^NoMatchingEventsFound,' { $Error.RemoveAt(0) }
+                default { Write-Warning -Message $ErrRec.Exception.Message }
             }
         }
     }

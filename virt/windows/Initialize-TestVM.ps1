@@ -164,7 +164,7 @@ Function Invoke-ShutdownCleanup {
         } catch {
             $ErrRec = $PSItem
             switch -Regex ($ErrRec.FullyQualifiedErrorId) {
-                '^PathNotFound,' { }
+                '^PathNotFound,' { $Error.RemoveAt(0) }
                 default { $PSCmdlet.WriteError($ErrRec) }
             }
         }
@@ -180,7 +180,7 @@ Function Invoke-ShutdownCleanup {
             } catch {
                 $ErrRec = $PSItem
                 switch -Regex ($ErrRec.FullyQualifiedErrorId) {
-                    '^PathNotFound,' { }
+                    '^PathNotFound,' { $Error.RemoveAt(0) }
                     default { $PSCmdlet.WriteError($ErrRec) }
                 }
             }
