@@ -186,50 +186,66 @@ Function Global:ConvertTo-TextEncoding {
     )
 
     Begin {
-        $EncodingClasses = @{
-            'ASCII'    = 'Text.ASCIIEncoding'
-            'UTF-7'    = 'Text.UTF7Encoding'
-            'UTF-8'    = 'Text.UTF8Encoding'
-            'UTF-16'   = 'Text.UnicodeEncoding'
-            'UTF-16BE' = 'Text.UnicodeEncoding'
-            'UTF-32'   = 'Text.UTF32Encoding'
-            'UTF-32BE' = 'Text.UTF32Encoding'
-        }
+        switch ($Encoding) {
+            'ASCII' { $Encoder = [Text.ASCIIEncoding]::new() }
+            'UTF-7' { $Encoder = [Text.UTF7Encoding]::new() }
 
-        $EncoderParams = @()
+            'UTF-8' {
+                # Throw on invalid encoding
+                $Encoder = [Text.UTF8Encoding]::new($ByteOrderMark, $true)
+            }
 
-        if ($Encoding -match '^UTF-[13]') {
-            if ($Encoding -match 'BE$') {
-                $EncoderParams += $true
-            } else {
-                $EncoderParams += $false
+            'UTF-16' {
+                # Little endian, throw on invalid encoding
+                $Encoder = [Text.UnicodeEncoding]::new($false, $ByteOrderMark, $true)
+            }
+
+            'UTF-16BE' {
+                # Big endian, throw on invalid encoding
+                $Encoder = [Text.UnicodeEncoding]::new($true, $ByteOrderMark, $true)
+            }
+
+            'UTF-32' {
+                # Little endian, throw on invalid encoding
+                $Encoder = [Text.UTF32Encoding]::new($false, $ByteOrderMark, $true)
+            }
+
+            'UTF-32BE' {
+                # Big endian, throw on invalid encoding
+                $Encoder = [Text.UTF32Encoding]::new($true, $ByteOrderMark, $true)
             }
         }
-
-        # UTF-7 has no concept of a BOM
-        if ($Encoding -match '^UTF-' -and $Encoding -ne 'UTF-7') {
-            $EncoderParams += $ByteOrderMark
-        }
-
-        $Encoder = New-Object -TypeName $EncodingClasses[$Encoding] -ArgumentList $EncoderParams
 
         if ($SourceEncoding) {
-            $SourceEncoderParams = @()
+            switch ($SourceEncoding) {
+                'ASCII' { $SourceEncoder = [Text.ASCIIEncoding]::new() }
+                'UTF-7' { $SourceEncoder = [Text.UTF7Encoding]::new() }
 
-            if ($SourceEncoding -match '^UTF-[13]') {
-                if ($SourceEncoding -match 'BE$') {
-                    $SourceEncoderParams += $true
-                } else {
-                    $SourceEncoderParams += $false
+                'UTF-8' {
+                    # Throw on invalid encoding
+                    $SourceEncoder = [Text.UTF8Encoding]::new($SourceByteOrderMark, $true)
+                }
+
+                'UTF-16' {
+                    # Little endian, throw on invalid encoding
+                    $SourceEncoder = [Text.UnicodeEncoding]::new($false, $SourceByteOrderMark, $true)
+                }
+
+                'UTF-16BE' {
+                    # Big endian, throw on invalid encoding
+                    $SourceEncoder = [Text.UnicodeEncoding]::new($true, $SourceByteOrderMark, $true)
+                }
+
+                'UTF-32' {
+                    # Little endian, throw on invalid encoding
+                    $SourceEncoder = [Text.UTF32Encoding]::new($false, $SourceByteOrderMark, $true)
+                }
+
+                'UTF-32BE' {
+                    # Big endian, throw on invalid encoding
+                    $SourceEncoder = [Text.UTF32Encoding]::new($true, $SourceByteOrderMark, $true)
                 }
             }
-
-            # UTF-7 has no concept of a BOM
-            if ($SourceEncoding -match '^UTF-' -and $SourceEncoding -ne 'UTF-7') {
-                $SourceEncoderParams += $SourceByteOrderMark
-            }
-
-            $SourceEncoder = New-Object -TypeName $EncodingClasses[$SourceEncoding] -ArgumentList $SourceEncoderParams
         }
     }
 
