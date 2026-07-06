@@ -187,28 +187,45 @@ Function Global:Switch-Perl {
     $PathChanges.Add($RootBinPath)
 
     if ($Env:PERL5LIB) {
-        if (!(Test-IsPathFullyQualified -Path $Env:PERL5LIB)) {
-            $ExcMsg = "PERL5LIB is not set to a fully qualified path: ${Env:PERL5LIB}"
-            $ErrExc = [FormatException]::new($ExcMsg)
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $Env:PERL5LIB)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        $LibBinPaths = [Collections.Generic.List[String]]::new()
+
+        if ($Enable) {
+            $LibPaths = [Collections.Generic.List[String]]::new()
         }
 
-        $UserBasePathElements = $Env:PERL5LIB.Split('\')
-        if ($UserBasePathElements.Count -lt 3) {
-            $ExcMsg = "PERL5LIB has less than expected minimum of 3 path components: ${Env:PERL5LIB}"
-            $ErrExc = [FormatException]::new($ExcMsg)
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'InvalidPath', $ErrCat, $Env:PERL5LIB)
-            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        foreach ($LibPath in $Env:PERL5LIB.Split([IO.Path]::PathSeparator)) {
+            if ([String]::IsNullOrWhiteSpace($LibPath)) { continue }
+
+            if (!(Test-IsPathFullyQualified -Path $LibPath)) {
+                $ExcMsg = "Found not fully qualified path while parsing PERL5LIB: ${LibPath}"
+                $ErrExc = [FormatException]::new($ExcMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFullyQualified', $ErrCat, $LibPath)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            $LibBasePathElements = $LibPath.Split('\')
+            if ($LibBasePathElements.Count -lt 3) {
+                $ExcMsg = "Found path with less than expected minimum of 3 path components while parsing PERL5LIB: ${LibPath}"
+                $ErrExc = [FormatException]::new($ExcMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'InvalidPath', $ErrCat, $LibPath)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            $LibBasePath = $LibBasePathElements[0..($LibBasePathElements.Count - 3)] -join '\'
+            $LibBasePath = [IO.Path]::GetFullPath($LibBasePath)
+
+            $LibBinPath = Join-Path -Path $LibBasePath -ChildPath 'bin'
+            $LibBinPaths.Add($LibBinPath)
+
+            if ($Enable) {
+                $LibBasePathEsc = $LibBasePath.Replace('\', '\\')
+                $LibPaths.Add($LibBasePathEsc)
+            }
         }
 
-        $UserBasePath = $UserBasePathElements[0..($UserBasePathElements.Count - 3)] -join '\'
-        $UserBasePathEsc = $UserBasePath.Replace('\', '\\')
-
-        $UserBinPath = Join-Path -Path $UserBasePath -ChildPath 'bin'
-        $PathChanges.Add($UserBinPath)
+        $PathChanges.AddRange($LibBinPaths)
     }
 
     foreach ($PathChange in $PathChanges) {
@@ -217,14 +234,14 @@ Function Global:Switch-Perl {
         Write-Host $PathChange
     }
 
-    if ($Enable -and $Env:PERL5LIB) {
+    if ($Enable -and $Env:PERL5LIB -and $LibPaths.Count -ne 0) {
         # Extra options for `Module::Build`
-        $Env:PERL_MB_OPT = "--install_base '${UserBasePathEsc}'"
+        $Env:PERL_MB_OPT = "--install_base '$($LibPaths[0])'"
         Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MB_OPT to: '
         Write-Host $Env:PERL_MB_OPT
 
         # Extra options for `ExtUtils::MakeMaker`
-        $Env:PERL_MM_OPT = "INSTALL_BASE=`"${UserBasePathEsc}`""
+        $Env:PERL_MM_OPT = "INSTALL_BASE=`"$($LibPaths[0])`""
         Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MM_OPT to: '
         Write-Host $Env:PERL_MM_OPT
     } elseif ($Disable -and $IncludeNonPathVars) {
@@ -240,9 +257,11 @@ Function Global:Switch-Perl {
         if ($Enable) { $PathParams['Action'] = 'Append' }
 
         if ($Env:PERL5LIB) {
-            Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
-                & $PathFunc @PathParams -Element $UserBinPath |
-                Set-EnvironmentVariable -Name 'Path' -Scope 'User'
+            for ($i = $LibBinPaths.Count - 1; $i -ge 0; $i--) {
+                Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
+                    & $PathFunc @PathParams -Element $LibBinPaths[$i] |
+                    Set-EnvironmentVariable -Name 'Path' -Scope 'User'
+            }
         }
 
         Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
