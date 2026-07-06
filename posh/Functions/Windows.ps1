@@ -572,13 +572,13 @@ Function Global:Search-Registry {
         [Parameter(ParameterSetName = 'Default')]
         [Switch]$NoRecurse,
 
-        [Parameter(ParameterSetName = 'Recursion', Mandatory)]
+        [Parameter(ParameterSetName = 'Recursion', Mandatory, DontShow)]
         [Microsoft.Win32.RegistryKey]$ParentKey,
 
-        [Parameter(ParameterSetName = 'Recursion', Mandatory)]
+        [Parameter(ParameterSetName = 'Recursion', Mandatory, DontShow)]
         [String]$SubKeyName,
 
-        [Parameter(ParameterSetName = 'Recursion', Mandatory)]
+        [Parameter(ParameterSetName = 'Recursion', Mandatory, DontShow)]
         [AllowEmptyCollection()]
         [Collections.Generic.List[PSCustomObject]]$Results
     )

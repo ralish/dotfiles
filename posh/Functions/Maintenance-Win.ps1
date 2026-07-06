@@ -20,6 +20,7 @@ Function Global:Update-Chrome {
         [ValidateSet('Stable', 'Beta', 'Dev', 'Canary')]
         [String]$UpdateChannel = 'Stable',
 
+        [Parameter(DontShow)]
         [ValidateRange(-1, [SByte]::MaxValue)]
         [SByte]$ProgressParentId
     )
@@ -328,6 +329,7 @@ Function Global:Update-Edge {
         [ValidateSet('Stable', 'Beta', 'Dev', 'Canary')]
         [String]$UpdateChannel = 'Stable',
 
+        [Parameter(DontShow)]
         [ValidateRange(-1, [SByte]::MaxValue)]
         [SByte]$ProgressParentId
     )
@@ -715,6 +717,7 @@ Function Global:Update-Office {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
+        [Parameter(DontShow)]
         [ValidateRange(-1, [SByte]::MaxValue)]
         [SByte]$ProgressParentId
     )
@@ -952,6 +955,7 @@ Function Global:Update-Scoop {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
+        [Parameter(DontShow)]
         [ValidateRange(-1, [SByte]::MaxValue)]
         [SByte]$ProgressParentId
     )
@@ -1103,6 +1107,7 @@ Function Global:Update-VisualStudio {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
+        [Parameter(DontShow)]
         [ValidateRange(-1, [SByte]::MaxValue)]
         [SByte]$ProgressParentId
     )

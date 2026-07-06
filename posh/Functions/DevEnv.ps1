@@ -89,6 +89,7 @@ Function Global:Update-DotNetTools {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
+        [Parameter(DontShow)]
         [ValidateRange(-1, [SByte]::MaxValue)]
         [SByte]$ProgressParentId
     )

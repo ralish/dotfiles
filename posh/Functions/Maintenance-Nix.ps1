@@ -16,6 +16,7 @@ Function Global:Update-Homebrew {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
+        [Parameter(DontShow)]
         [ValidateRange(-1, [SByte]::MaxValue)]
         [SByte]$ProgressParentId
     )

@@ -124,6 +124,7 @@ Function Global:Update-PowerShell {
         [Switch]$SkipUninstallObsolete,
         [Switch]$Force,
 
+        [Parameter(DontShow)]
         [ValidateRange(-1, [SByte]::MaxValue)]
         [SByte]$ProgressParentId
     )
