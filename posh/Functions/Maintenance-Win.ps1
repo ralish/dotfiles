@@ -870,7 +870,7 @@ Function Global:Update-Python {
         $ListCmd = "pymanager $($ListArgs -join ' ')"
 
         Write-Verbose -Message "Listing Python runtimes: ${ListCmd}"
-        $VersionsJsonRaw = & pymanager @ListArgs 2>&1 | Out-String
+        $VersionsJsonRaw = @(& pymanager @ListArgs 2>&1) -join ''
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Pymanager exited with non-zero exit code listing Python runtimes: ${LASTEXITCODE}"
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1542,7 +1542,7 @@ Function Global:Update-WSL {
 
         try {
             [Console]::OutputEncoding = [Text.Encoding]::Unicode
-            $WslVersion = & wsl @VersionArgs 2>&1
+            $WslVersion = @(& wsl @VersionArgs 2>&1) -join ''
         } finally {
             [Console]::OutputEncoding = $DefaultOutputEncoding
         }

@@ -30,7 +30,7 @@ Function Global:Update-OpenSSHConfig {
         $ErrorCount = $Error.Count
         $VersionArgs = @('-V')
         $VersionCmd = "ssh $($VersionArgs -join ' ')"
-        $VersionRaw = & ssh @VersionArgs 2>&1 | Out-String
+        $VersionRaw = @(& ssh @VersionArgs 2>&1) -join ''
     } finally {
         if ($Error.Count -eq ($ErrorCount + 1)) {
             $Error.RemoveAt(0)

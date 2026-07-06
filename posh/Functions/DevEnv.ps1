@@ -1271,7 +1271,7 @@ Function Global:Update-PythonPipPackages {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $PipdeptreeOutput = & python @PipdeptreeModuleArgs 2>&1
+    $PipdeptreeOutput = @(& python @PipdeptreeModuleArgs 2>&1) -join ''
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = 'Unable to update pip packages as pipdeptree module not found.'
         $ErrExc = [Exception]::new($ExcMsg)

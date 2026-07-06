@@ -629,7 +629,7 @@ Function Global:Get-OpenSSLVersion {
     $VersionArgs = 'version', '-v'
     $VersionCmd = "openssl $($VersionArgs -join ' ')"
 
-    $Version = & openssl @VersionArgs 2>&1 | Out-String
+    $Version = @(& openssl @VersionArgs 2>&1) -join ''
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to retrieve OpenSSL version (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
