@@ -71,6 +71,8 @@ Function Global:Get-EntraUserLicenseReport {
         [Parameter(ParameterSetName = 'ParsedServices', Mandatory)]
         [String]$LicensingInfoCsv,
 
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'LicensingInfo')]
         [Switch]$PrefixServicesWithLicense,
 
         [Parameter(ParameterSetName = 'ParsedLicenses', Mandatory)]
@@ -79,16 +81,6 @@ Function Global:Get-EntraUserLicenseReport {
         [Parameter(ParameterSetName = 'ParsedServices', Mandatory)]
         [Switch]$ReturnParsedServices
     )
-
-    $RequiredModules = @(
-        'Microsoft.Graph.Authentication'
-        'Microsoft.Graph.Identity.DirectoryManagement'
-        'Microsoft.Graph.Users'
-    )
-
-    try {
-        Test-ModuleAvailable -Name $RequiredModules
-    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     $LicenseSkuIdLookup = @{}
     $ServicePlanIdLookup = @{}
@@ -122,9 +114,9 @@ Function Global:Get-EntraUserLicenseReport {
             '_'                             = ' '
             '\bTEST\b'                      = 'Test'
             '\bTELSTRA\b'                   = 'Telstra'
-            '\bGCCHIGH\b'                   = 'GCC High'
-            '\bGCCHigh Tenant\b'            = $null
             '\bDOD\b'                       = 'DoD'
+            '\bGCCHIGH\b'                   = 'GCC High'
+            ' GCCHigh Tenant\b'             = $null
             '( GCC High)? USGOV GCC High\b' = ' GCC High'
             '( \(DoD\))? USGOV DoD\b'       = ' DoD'
         }
@@ -304,7 +296,7 @@ Function Global:Get-EntraUserLicenseReport {
 
             # The candidate name may be preferred. Check if candidate name
             # matches any of the regexes, and if so, perform the replacement.
-            foreach ($TestRegex in $CandidateNoMatchRegexes) {
+            foreach ($TestRegex in $CandidateMatchRegexes) {
                 if ($ServicePlanCandidateName -match $TestRegex) {
                     $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
                     $UpdatedCurrentName = $true
@@ -343,6 +335,16 @@ Function Global:Get-EntraUserLicenseReport {
             return $ServicePlanIdLookup
         }
     }
+
+    $RequiredModules = @(
+        'Microsoft.Graph.Authentication'
+        'Microsoft.Graph.Identity.DirectoryManagement'
+        'Microsoft.Graph.Users'
+    )
+
+    try {
+        Test-ModuleAvailable -Name $RequiredModules
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     # Scopes to request if there's no existing context or missing scopes
     $DefaultScopes = 'User.Read.All', 'LicenseAssignment.Read.All'

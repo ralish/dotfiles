@@ -48,11 +48,17 @@ Function Global:Set-AWSCredentialEnvironment {
         if ($PSCmdlet.ParameterSetName -eq 'PlainText') {
             $Env:AWS_ACCESS_KEY_ID = $AccessKey
             $Env:AWS_SECRET_ACCESS_KEY = $SecretKey
-            $Env:AWS_SESSION_TOKEN = $SessionToken
+
+            if ($PSBoundParameters.ContainsKey('SessionToken')) {
+                $Env:AWS_SESSION_TOKEN = $SessionToken
+            } else {
+                $Env:AWS_SESSION_TOKEN = $null
+            }
+
             return
         }
 
-        if ($Credential.GetType().FullName -ne 'Amazon.SecurityToken.Model.Credentials') {
+        if ($Credential -isnot [Amazon.SecurityToken.Model.Credentials]) {
             $ExcMsg = "Unexpected type for Credential argument: $($Credential.GetType().FullName)"
             $ErrExc = [ArgumentException]::new($ExcMsg, 'Credential')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
@@ -93,8 +99,8 @@ Function Global:Set-R53HostedZoneNameTag {
 
     Process {
         foreach ($Zone in $HostedZone) {
-            if ($Zone.GetType().FullName -ne 'Amazon.Route53.Model.HostedZone') {
-                $ExcMsg = 'Skipping zone which is not of expected type: Amazon.Route53.Model.HostedZone'
+            if ($Zone -isnot [Amazon.Route53.Model.HostedZone]) {
+                $ExcMsg = "Skipping zone which is not of expected type: $($Zone.GetType().FullName)"
                 $ErrExc = [ArgumentException]::new($ExcMsg, 'HostedZone')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $Zone)
@@ -192,8 +198,13 @@ Function Global:Set-R53HostedZoneParkedRecords {
     } elseif ($DmarcRua -or $DmarcRuf) {
         $IgnoredParams = @()
 
-        if ($DmarcRua) { $IgnoredParams += 'DmarcRua' }
-        if ($DmarcRuf) { $IgnoredParams += 'DmarcRuf' }
+        if ($DmarcRua) {
+            $IgnoredParams += 'DmarcRua'
+        }
+
+        if ($DmarcRuf) {
+            $IgnoredParams += 'DmarcRuf'
+        }
 
         Write-Warning -Message "Parameter(s) will be ignored as not setting DMARC record: $($IgnoredParams -join ', ')"
     }
@@ -224,9 +235,17 @@ Function Global:Set-R53HostedZoneParkedRecords {
     } elseif ($CaaIssue -or $CaaIssueWild -or $CaaIoDef) {
         $IgnoredParams = @()
 
-        if ($CaaIssue) { $IgnoredParams += 'CaaIssue' }
-        if ($CaaIssueWild) { $IgnoredParams += 'CaaIssueWild' }
-        if ($CaaIoDef) { $IgnoredParams += 'CaaIoDef' }
+        if ($CaaIssue) {
+            $IgnoredParams += 'CaaIssue'
+        }
+
+        if ($CaaIssueWild) {
+            $IgnoredParams += 'CaaIssueWild'
+        }
+
+        if ($CaaIoDef) {
+            $IgnoredParams += 'CaaIoDef'
+        }
 
         Write-Warning -Message "Parameter(s) will be ignored as not setting CAA record: $($IgnoredParams -join ', ')"
     }
@@ -235,7 +254,9 @@ Function Global:Set-R53HostedZoneParkedRecords {
     if ($Records -notcontains 'Redirect' -and ($RedirectCloudFrontDomainName -or $PSBoundParameters.ContainsKey('RedirectCloudFrontRecordTypes'))) {
         $IgnoredParams = @()
 
-        if ($RedirectCloudFrontDomainName) { $IgnoredParams += 'RedirectCloudFrontDomainName' }
+        if ($RedirectCloudFrontDomainName) {
+            $IgnoredParams += 'RedirectCloudFrontDomainName'
+        }
 
         if ($PSBoundParameters.ContainsKey('RedirectCloudFrontRecordTypes')) {
             $IgnoredParams += 'RedirectCloudFrontRecordTypes'
@@ -277,6 +298,7 @@ Function Global:Set-R53HostedZoneParkedRecords {
             $Record.ResourceRecordSet.Name = $ZoneName
             $Record.ResourceRecordSet.Type = 'MX'
             $Record.ResourceRecordSet.TTL = 3600
+            $Record.ResourceRecordSet.ResourceRecords = [Collections.Generic.List[Amazon.Route53.Model.ResourceRecord]]::new()
             $Record.ResourceRecordSet.ResourceRecords.Add(@{ Value = '0 .' })
             $ZoneRecords.Add($Record)
         }
@@ -288,6 +310,7 @@ Function Global:Set-R53HostedZoneParkedRecords {
             $Record.ResourceRecordSet.Name = $ZoneName
             $Record.ResourceRecordSet.Type = 'TXT'
             $Record.ResourceRecordSet.TTL = 3600
+            $Record.ResourceRecordSet.ResourceRecords = [Collections.Generic.List[Amazon.Route53.Model.ResourceRecord]]::new()
             $Record.ResourceRecordSet.ResourceRecords.Add(@{ Value = '"v=spf1 -all"' })
             $ZoneRecords.Add($Record)
         }
@@ -299,6 +322,7 @@ Function Global:Set-R53HostedZoneParkedRecords {
             $Record.ResourceRecordSet.Name = "*._domainkey.${ZoneName}"
             $Record.ResourceRecordSet.Type = 'TXT'
             $Record.ResourceRecordSet.TTL = 3600
+            $Record.ResourceRecordSet.ResourceRecords = [Collections.Generic.List[Amazon.Route53.Model.ResourceRecord]]::new()
             $Record.ResourceRecordSet.ResourceRecords.Add(@{ Value = '"v=DKIM1; p="' })
             $ZoneRecords.Add($Record)
         }
@@ -310,7 +334,8 @@ Function Global:Set-R53HostedZoneParkedRecords {
             $Record.ResourceRecordSet.Name = "_dmarc.${ZoneName}"
             $Record.ResourceRecordSet.Type = 'TXT'
             $Record.ResourceRecordSet.TTL = 3600
-            $Record.ResourceRecordSet.ResourceRecords.Add(@{ Value = ('"{0}"' -f $Dmarc) })
+            $Record.ResourceRecordSet.ResourceRecords = [Collections.Generic.List[Amazon.Route53.Model.ResourceRecord]]::new()
+            $Record.ResourceRecordSet.ResourceRecords.Add(@{ Value = '"{0}"' -f $Dmarc })
             $ZoneRecords.Add($Record)
         }
 
@@ -321,6 +346,7 @@ Function Global:Set-R53HostedZoneParkedRecords {
             $Record.ResourceRecordSet.Name = $ZoneName
             $Record.ResourceRecordSet.Type = 'CAA'
             $Record.ResourceRecordSet.TTL = 900
+            $Record.ResourceRecordSet.ResourceRecords = [Collections.Generic.List[Amazon.Route53.Model.ResourceRecord]]::new()
 
             foreach ($Entry in $Caa) {
                 $Record.ResourceRecordSet.ResourceRecords.Add(@{ Value = $Entry })
@@ -389,8 +415,8 @@ Function Global:Set-R53HostedZoneTag {
 
     Process {
         foreach ($Zone in $HostedZone) {
-            if ($Zone.GetType().FullName -ne 'Amazon.Route53.Model.HostedZone') {
-                $ExcMsg = 'Skipping zone which is not of expected type: Amazon.Route53.Model.HostedZone'
+            if ($Zone -isnot [Amazon.Route53.Model.HostedZone]) {
+                $ExcMsg = "Skipping zone which is not of expected type: $($Zone.GetType().FullName)"
                 $ErrExc = [ArgumentException]::new($ExcMsg, 'HostedZone')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $Zone)
@@ -430,8 +456,8 @@ Function Global:Get-S3BucketSize {
             $ErrObj = "$($ModulesPerService -join ', ') | $($ModulesMonolithic -join ' | ')"
             $ExcMsg = "Valid set of modules not available: ${ErrObj}"
             $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-            $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, $ErrObj)
+            $ErrCat = [Management.Automation.ErrorCategory]::ResourceUnavailable
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleUnavailable', $ErrCat, $ErrObj)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
     }
@@ -454,7 +480,7 @@ Function Global:Get-S3BucketSize {
         $Regions = Get-EC2Region -ErrorAction 'Stop' -Verbose:$false
 
         Write-Verbose -Message 'Retrieving S3 buckets ...'
-        $Buckets = Get-S3Bucket -ErrorAction 'Stop' -Verbose:$false
+        $Buckets = @(Get-S3Bucket -ErrorAction 'Stop' -Verbose:$false)
     } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     if (!$Buckets) {

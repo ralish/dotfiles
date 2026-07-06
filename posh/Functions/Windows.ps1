@@ -61,6 +61,21 @@ Function Global:Get-EnvironmentVariable {
     return $EnvVars.ToArray()
 }
 
+# Remove an environment variable
+Function Global:Remove-EnvironmentVariable {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Name,
+
+        [ValidateSet('Machine', 'User', 'Process')]
+        [String]$Scope = 'User'
+    )
+
+    [Environment]::SetEnvironmentVariable($Name, [NullString]::Value, [EnvironmentVariableTarget]::$Scope)
+}
+
 # Set an environment variable
 Function Global:Set-EnvironmentVariable {
     [CmdletBinding()]
@@ -92,21 +107,6 @@ Function Global:Set-EnvironmentVariable {
 
         [Environment]::SetEnvironmentVariable($Name, $NewValue, [EnvironmentVariableTarget]::$Scope)
     }
-}
-
-# Remove an environment variable
-Function Global:Remove-EnvironmentVariable {
-    [CmdletBinding()]
-    [OutputType([Void])]
-    Param(
-        [Parameter(Mandatory)]
-        [String]$Name,
-
-        [ValidateSet('Machine', 'User', 'Process')]
-        [String]$Scope = 'User'
-    )
-
-    [Environment]::SetEnvironmentVariable($Name, $null, [EnvironmentVariableTarget]::$Scope)
 }
 
 #endregion
@@ -456,6 +456,14 @@ Function Global:Get-MultipleHardLinks {
         [Switch]$Force
     )
 
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        $ExcMsg = 'Unable to enumerate hard links on PowerShell 6 or later.'
+        $ErrExc = [NotSupportedException]::new($ExcMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::NotImplemented
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PwshNotSupported', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
     $Files = Get-ChildItem -LiteralPath $Path -File -Recurse:$Recurse -Force:$Force |
         Where-Object { $PSItem.LinkType -eq 'HardLink' -and $PSItem.Target.Count -ge ($MinimumHardLinks - 1) } |
         Add-Member -MemberType 'ScriptProperty' -Name 'LinkCount' -Value { $this.Target.Count + 1 } -Force -PassThru
@@ -482,7 +490,12 @@ Function Global:Get-NonInheritedACL {
 
     $AclMatches = [Collections.Generic.List[IO.DirectoryInfo]]::new()
     foreach ($Dir in $Dirs) {
-        $Acl = Get-Acl -LiteralPath $Dir.FullName
+        try {
+            $Acl = Get-Acl -LiteralPath $Dir.FullName -ErrorAction 'Stop'
+        } catch {
+            $PSCmdlet.WriteError($PSItem)
+            continue
+        }
 
         $AclNonInherited = $Acl.Access | Where-Object IsInherited -EQ $false
         if (!$AclNonInherited) { continue }
@@ -629,7 +642,7 @@ Function Global:Search-Registry {
 
             # We hit a failure, close all the opened keys
             if ($OpenSubKeyFailed) {
-                for ($i = $RegKeys.Count - 1; $i -ne 0; $i--) {
+                for ($i = $RegKeys.Count - 1; $i -ge 0; $i--) {
                     $RegKeys[$i].Close()
                 }
 
@@ -745,7 +758,7 @@ Function Global:Search-Registry {
         return
     }
 
-    for ($i = $RegKeys.Count - 1; $i -ne 0; $i--) {
+    for ($i = $RegKeys.Count - 1; $i -ge 0; $i--) {
         $RegKeys[$i].Close()
     }
 

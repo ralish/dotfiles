@@ -13,7 +13,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory
 
 # Resolve AD GUIDs corresponding to extended rights or schema objects
 Function Global:Resolve-ADGuid {
-    [CmdletBinding(DefaultParameterSetName = 'Guid')]
+    [CmdletBinding()]
     [OutputType('Void', 'Microsoft.ActiveDirectory.Management.ADObject[]')]
     Param(
         [Parameter(Mandatory)]
@@ -261,9 +261,8 @@ Function Global:Add-ADShadowPrincipalMember {
         $CommonParams['Server'] = $Server
     }
 
-    $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer @CommonParams
-
     try {
+        $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer @CommonParams
         $ShadowPrincipal = Get-ADObject @CommonParams -Filter { CN -eq $Name } -SearchBase $ShadowPrincipalContainer -SearchScope 'Subtree'
     } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
@@ -334,8 +333,8 @@ Function Global:Get-ADShadowPrincipalContainer {
 
     try {
         if (!$Server) {
-            $DC = Get-ADDomainController -Discover -NextClosestSite -ErrorAction 'Stop'
-            $Server = $DC.HostName.Value
+            $DomainController = Get-ADDomainController -Discover -NextClosestSite -ErrorAction 'Stop'
+            $Server = $DomainController.HostName.Value
         }
 
         $RootDse = Get-ADRootDSE -Server $Server -ErrorAction 'Stop'
@@ -367,7 +366,9 @@ Function Global:New-ADShadowPrincipal {
         $CommonParams['Server'] = $Server
     }
 
-    $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer @CommonParams
+    try {
+        $ShadowPrincipalContainer = Get-ADShadowPrincipalContainer @CommonParams
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     $SidByteArray = [Byte[]]::new($SID.BinaryLength)
     $SID.GetBinaryForm($SidByteArray, 0)

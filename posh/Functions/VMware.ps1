@@ -1,6 +1,6 @@
 $null = Start-DotFilesSection -Type 'Functions' -Name 'VMware'
 
-# Optimises VMware virtual machines
+# Optimizes VMware virtual machines
 Function Global:Optimize-VMwareVirtualMachine {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
@@ -21,7 +21,7 @@ Function Global:Optimize-VMwareVirtualMachine {
     $WriteProgressParams = @{ Activity = 'Optimizing VMware VMs' }
 
     Write-Progress @WriteProgressParams -Status 'Enumerating directories' -PercentComplete 1
-    $SubDirs = Get-ChildItem -LiteralPath $BaseDir.FullName -Directory -Recurse
+    $SubDirs = @(Get-ChildItem -LiteralPath $BaseDir.FullName -Directory -Recurse)
     $NoRecurseDirs = [Collections.Generic.List[String]]::new()
     $DirsProcessed = 0
 

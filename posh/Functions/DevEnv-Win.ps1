@@ -103,7 +103,9 @@ Function Global:Switch-Cygwin {
 
     if ($Persist) {
         Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+        if ($Enable) {
+            $PathParams['Action'] = 'Append'
+        }
 
         Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
             & $PathFunc @PathParams -Element $UsrLocalBinPath |
@@ -254,7 +256,9 @@ Function Global:Switch-Perl {
 
     if ($Persist) {
         Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+        if ($Enable) {
+            $PathParams['Action'] = 'Append'
+        }
 
         if ($Env:PERL5LIB) {
             for ($i = $LibBinPaths.Count - 1; $i -ge 0; $i--) {
@@ -460,7 +464,9 @@ Function Global:Switch-Python {
 
     if ($Persist) {
         Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+        if ($Enable) {
+            $PathParams['Action'] = 'Append'
+        }
 
         Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
             & $PathFunc @PathParams -Element $LocalScriptsVersionedPath |
@@ -619,7 +625,9 @@ Function Global:Switch-WindowsSDK {
 
     if ($Persist) {
         Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-        if ($Enable) { $PathParams['Action'] = 'Append' }
+        if ($Enable) {
+            $PathParams['Action'] = 'Append'
+        }
 
         Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
             & $PathFunc @PathParams -Element $SdkVerPath |

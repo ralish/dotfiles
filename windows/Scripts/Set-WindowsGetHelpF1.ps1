@@ -63,7 +63,12 @@ try {
                 $NtDll = Add-Type -MemberDefinition $NtDllImport -Name 'NtDll' -PassThru
 
                 # Enable required privileges
-                $Privileges = @{ SeTakeOwnership = 9; SeBackup = 17; SeRestore = 18 }
+                $Privileges = @{
+                    SeTakeOwnership = 9
+                    SeBackup        = 17
+                    SeRestore       = 18
+                }
+
                 foreach ($Privilege in $Privileges.Keys) {
                     $Result = $NtDll::RtlAdjustPrivilege($Privileges[$Privilege], $true, $false, [Ref]$null)
                     if ($Result -ne 0) {

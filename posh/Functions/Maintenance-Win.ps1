@@ -101,7 +101,7 @@ Function Global:Update-Chrome {
         Clear-ComObjects
 
         $Exc = $PSItem
-        switch -RegEx ($Exc.Exception.Message) {
+        switch -Regex ($Exc.Exception.Message) {
             # REGDB_E_CLASSNOTREG
             '\b0x80040154\b' { $ExcMsg = 'Unable to update Chrome as Google Update is not available.' }
             default { $ExcMsg = "Google Update COM object failed to activate: $($Exc.Exception.Message)" }
@@ -143,7 +143,7 @@ Function Global:Update-Chrome {
         Clear-ComObjects
 
         $Exc = $PSItem
-        switch -RegEx ($Exc.Exception.Message) {
+        switch -Regex ($Exc.Exception.Message) {
             # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY
             '\b0x80040813\b' { $ExcMsg = 'Google Update reported updates are disabled by policy.' }
             # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY_MANUAL
@@ -214,6 +214,7 @@ Function Global:Update-Chrome {
                     $AppBundle.checkForUpdate()
                 } catch {
                     Clear-ComObjects
+                    Write-Progress -Completed
 
                     $ExcMsg = "Failed to trigger Chrome update check: $($PSItem.Exception.Message)"
                     $ErrExc = [Exception]::new($ExcMsg)
@@ -229,6 +230,7 @@ Function Global:Update-Chrome {
                     $AppBundle.download()
                 } catch {
                     Clear-ComObjects
+                    Write-Progress -Completed
 
                     $ExcMsg = "Failed to trigger Chrome update download: $($PSItem.Exception.Message)"
                     $ErrExc = [Exception]::new($ExcMsg)
@@ -244,6 +246,7 @@ Function Global:Update-Chrome {
                     $AppBundle.install()
                 } catch {
                     Clear-ComObjects
+                    Write-Progress -Completed
 
                     $ExcMsg = "Failed to trigger Chrome update install: $($PSItem.Exception.Message)"
                     $ErrExc = [Exception]::new($ExcMsg)
@@ -408,7 +411,7 @@ Function Global:Update-Edge {
         Clear-ComObjects
 
         $Exc = $PSItem
-        switch -RegEx ($Exc.Exception.Message) {
+        switch -Regex ($Exc.Exception.Message) {
             # REGDB_E_CLASSNOTREG
             '\b0x80040154\b' { $ExcMsg = 'Unable to update Edge as Edge Update is not available.' }
             default { $ExcMsg = "Edge Update COM object failed to activate: $($Exc.Exception.Message)" }
@@ -450,7 +453,7 @@ Function Global:Update-Edge {
         Clear-ComObjects
 
         $Exc = $PSItem
-        switch -RegEx ($Exc.Exception.Message) {
+        switch -Regex ($Exc.Exception.Message) {
             '\b0x80040813\b' { $ExcMsg = 'Edge Update reported updates are disabled by policy.' }
             '\b0x8004081f\b' { $ExcMsg = 'Edge Update reported updates are disabled by policy (manual).' }
             '\b0xA043081D\b' { $ExcMsg = 'Edge Update reported an update is already in-progress.' }
@@ -518,6 +521,7 @@ Function Global:Update-Edge {
                     $AppBundle.checkForUpdate()
                 } catch {
                     Clear-ComObjects
+                    Write-Progress -Completed
 
                     $ExcMsg = "Failed to trigger Edge update check: $($PSItem.Exception.Message)"
                     $ErrExc = [Exception]::new($ExcMsg)
@@ -533,6 +537,7 @@ Function Global:Update-Edge {
                     $AppBundle.download()
                 } catch {
                     Clear-ComObjects
+                    Write-Progress -Completed
 
                     $ExcMsg = "Failed to trigger Edge update download: $($PSItem.Exception.Message)"
                     $ErrExc = [Exception]::new($ExcMsg)
@@ -548,6 +553,7 @@ Function Global:Update-Edge {
                     $AppBundle.install()
                 } catch {
                     Clear-ComObjects
+                    Write-Progress -Completed
 
                     $ExcMsg = "Failed to trigger Edge update install: $($PSItem.Exception.Message)"
                     $ErrExc = [Exception]::new($ExcMsg)
@@ -940,7 +946,7 @@ Function Global:Update-Python {
         $ExcMsg = "Pymanager exited with non-zero exit code updating Python runtimes: $($Result.ExitCode)"
         $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $null)
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
         $PSCmdlet.WriteError($ErrRec)
     }
 
@@ -1125,8 +1131,8 @@ Function Global:Update-VisualStudio {
     } catch {
         $ExcMsg = 'Unable to update Visual Studio as VSSetup module not available.'
         $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'VSSetup')
+        $ErrCat = [Management.Automation.ErrorCategory]::ResourceUnavailable
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleUnavailable', $ErrCat, 'VSSetup')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
@@ -1328,8 +1334,8 @@ Function Global:Update-Windows {
     } catch {
         $ExcMsg = 'Unable to update Windows as PSWindowsUpdate module not available.'
         $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'PSWindowsUpdate')
+        $ErrCat = [Management.Automation.ErrorCategory]::ResourceUnavailable
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleUnavailable', $ErrCat, 'PSWindowsUpdate')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
@@ -1427,8 +1433,8 @@ Function Global:Update-WinGet {
     } catch {
         $ExcMsg = 'Unable to update WinGet as Microsoft.WinGet.Client module not available.'
         $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleNotFound', $ErrCat, 'Microsoft.WinGet.Client')
+        $ErrCat = [Management.Automation.ErrorCategory]::ResourceUnavailable
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleUnavailable', $ErrCat, 'Microsoft.WinGet.Client')
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
@@ -1636,7 +1642,7 @@ Function Global:Update-WSL {
         $ExcMsg = "WSL exited with non-zero exit code on performing update: $($Result.ExitCode)"
         $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $null)
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
         $PSCmdlet.WriteError($ErrRec)
     }
 

@@ -40,13 +40,15 @@ Function Global:Clear-NuGetCache {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
+    $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
+
     foreach ($Cache in $($Caches.Keys)) {
         $CacheRegex = "^${Cache}: (.*)"
         $CacheFound = $false
 
         foreach ($Line in $NuGetLocals) {
             if ($Line -match $CacheRegex) {
-                $Caches[$Cache] = $Matches[1].TrimEnd('\')
+                $Caches[$Cache] = $Matches[1].TrimEnd($DirSepChars)
                 $CacheFound = $true
                 break
             }
@@ -131,8 +133,7 @@ Function Global:Update-DotNetTools {
 
     try {
         # If we're running this version of `dotnet` for the first time the
-        # welcome banner will display which may cause issues issues with output
-        # parsing.
+        # welcome banner will display which may cause output parsing issues.
         if ($Env:DOTNET_NOLOGO) {
             $OriginalNoLogo = $Env:DOTNET_NOLOGO
         } else {
@@ -247,6 +248,8 @@ Function Global:Update-DotNetTools {
             $PSCmdlet.WriteError($ErrRec)
         }
     } finally {
+        Write-Progress @WriteProgressParams -Completed
+
         if ($OriginalNoLogo) {
             $Env:DOTNET_NOLOGO = $OriginalNoLogo
         } else {
@@ -254,7 +257,6 @@ Function Global:Update-DotNetTools {
         }
     }
 
-    Write-Progress @WriteProgressParams -Completed
     return $Result
 }
 
@@ -406,6 +408,8 @@ Function Global:Switch-Go {
 
         if ($Env:GOPATH) {
             foreach ($GoPath in $Env:GOPATH.Split([IO.Path]::PathSeparator)) {
+                if ([String]::IsNullOrWhiteSpace($GoPath)) { continue }
+
                 if (!(Test-IsPathFullyQualified -Path $GoPath)) {
                     $ExcMsg = "Found not fully qualified path while parsing GOPATH: ${GoPath}"
                     $ErrExc = [FormatException]::new($ExcMsg)
@@ -432,12 +436,14 @@ Function Global:Switch-Go {
 
         if ($PSBoundParameters['Persist']) {
             Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-            if ($Enable) { $PathParams['Action'] = 'Append' }
+            if ($Enable) {
+                $PathParams['Action'] = 'Append'
+            }
 
             # More than one path means we added paths from `GOPATH`
             if ($PathChanges.Count -gt 1) {
                 # Add in reverse order excluding the last path (`$BinPath`)
-                for ($i = $PathChanges.Count - 1; $i -ne 0; $i--) {
+                for ($i = $PathChanges.Count - 1; $i -gt 0; $i--) {
                     Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
                         & $PathFunc @PathParams -Element $PathChanges[$i] |
                         Set-EnvironmentVariable -Name 'Path' -Scope 'User'
@@ -627,7 +633,9 @@ Function Global:Switch-GoogleDepotTools {
 
         if ($PSBoundParameters['Persist']) {
             Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-            if ($Enable) { $PathParams['Action'] = 'Append' }
+            if ($Enable) {
+                $PathParams['Action'] = 'Append'
+            }
 
             Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
                 & $PathFunc @PathParams -Element $Path |
@@ -673,7 +681,7 @@ Function Global:Clear-GradleCache {
         $GradleCachePath = '{0}{1}*' -f $GradleCache, [IO.Path]::DirectorySeparatorChar
 
         if ($PSCmdlet.ShouldProcess($GradleCache, 'Clear')) {
-            Remove-Item -Path $GradleCachePath -Recurse -Verbose:$false
+            Remove-Item -Path $GradleCachePath -Recurse -Force -Verbose:$false
         }
     } elseif ($null -ne $PathItem) {
         $ExcMsg = "Gradle cache path is not a directory: ${GradleCache}"
@@ -717,7 +725,7 @@ Function Global:Clear-MavenCache {
         $MvnCachePath = '{0}{1}*' -f $MvnCache, [IO.Path]::DirectorySeparatorChar
 
         if ($PSCmdlet.ShouldProcess($MvnCache, 'Clear')) {
-            Remove-Item -Path $MvnCachePath -Recurse -Verbose:$false
+            Remove-Item -Path $MvnCachePath -Recurse -Force -Verbose:$false
         }
     } elseif ($null -ne $PathItem) {
         $ExcMsg = "Maven cache path is not a directory: ${MvnCache}"
@@ -807,7 +815,9 @@ Function Global:Switch-Java {
 
         if ($PSBoundParameters['Persist']) {
             Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-            if ($Enable) { $PathParams['Action'] = 'Append' }
+            if ($Enable) {
+                $PathParams['Action'] = 'Append'
+            }
 
             Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
                 & $PathFunc @PathParams -Element $BinPath |
@@ -984,7 +994,9 @@ Function Global:Switch-Nodejs {
 
         if ($PSBoundParameters['Persist']) {
             Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-            if ($Enable) { $PathParams['Action'] = 'Append' }
+            if ($Enable) {
+                $PathParams['Action'] = 'Append'
+            }
 
             Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
                 & $PathFunc @PathParams -Element $GlobalPrefixPath |
@@ -1119,7 +1131,9 @@ Function Global:Switch-PHP {
 
         if ($PSBoundParameters['Persist']) {
             Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-            if ($Enable) { $PathParams['Action'] = 'Append' }
+            if ($Enable) {
+                $PathParams['Action'] = 'Append'
+            }
 
             Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
                 & $PathFunc @PathParams -Element $Path |
@@ -1332,7 +1346,7 @@ Function Global:Update-PythonPipPackages {
     }
 
     if ($PipVersion -lt '25.0') {
-        $PipUpdateBaseArgs = @('--no-python-version-warning') + $PipUpdateBaseArgs
+        $PipUpdateBaseArgs += '--no-python-version-warning'
     }
 
     if ($PSCmdlet.ShouldProcess('pip package', 'Update')) {
@@ -1692,7 +1706,9 @@ Function Global:Switch-Ruby {
 
         if ($PSBoundParameters['Persist']) {
             Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-            if ($Enable) { $PathParams['Action'] = 'Append' }
+            if ($Enable) {
+                $PathParams['Action'] = 'Append'
+            }
 
             Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
                 & $PathFunc @PathParams -Element $BinPath |
@@ -1911,14 +1927,16 @@ Function Global:Switch-Rust {
 
         if ($PSBoundParameters['Persist']) {
             Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
-            if ($Enable) { $PathParams['Action'] = 'Append' }
+            if ($Enable) {
+                $PathParams['Action'] = 'Append'
+            }
 
             Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
                 & $PathFunc @PathParams -Element $BinPath |
                 Set-EnvironmentVariable -Name 'Path' -Scope 'User'
 
             if ($Enable -and ![String]::IsNullOrWhiteSpace($Env:CARGO_HOME)) {
-                Set-EnvironmentVariable -Name 'CARGO_HOME' -Value $Path -Scope 'User'
+                Set-EnvironmentVariable -Name 'CARGO_HOME' -Value $Env:CARGO_HOME -Scope 'User'
             } elseif ($Disable -and $IncludeNonPathVars) {
                 Remove-EnvironmentVariable -Name 'CARGO_HOME' -Scope 'User'
             }
@@ -1929,7 +1947,7 @@ Function Global:Switch-Rust {
 # Update Rust toolchains
 Function Global:Update-RustToolchains {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param()
 
     if (!(Get-Command -Name 'rustup' -ErrorAction 'Ignore')) {

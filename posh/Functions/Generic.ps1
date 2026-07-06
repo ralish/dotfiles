@@ -333,8 +333,9 @@ Function Global:Get-TextEncoding {
                 [Byte[]]$Bytes = Get-Content -LiteralPath $Item.FullName -ReadCount $Encoding.Preamble.Count @GetContentBytesParam | Select-Object -First 1
                 if ($Bytes.Count -ne $Encoding.Preamble.Count) { continue }
 
+                # Identical sequences return `$null`
                 $ComparePreamble = Compare-Object -ReferenceObject $Encoding.Preamble -DifferenceObject $Bytes -SyncWindow 0
-                if ($ComparePreamble.Count -eq 0) {
+                if ($null -eq $ComparePreamble) {
                     $Result.Encoding = $Encoding.Name
                     $Result.ByteOrderMark = $Encoding.ByteOrderMark
                     $FoundEncoding = $true
@@ -378,15 +379,13 @@ Function Global:Add-FileToEmptyDirectories {
         [Switch]$Force
     )
 
-    $CurrentLocation = Get-Location
-
     if (!$Path) {
         $Path += $PWD.Path
     }
 
     foreach ($DirPath in $Path) {
         if (!(Test-IsPathFullyQualified -Path $DirPath)) {
-            if ($CurrentLocation.Provider.Name -ne 'FileSystem') {
+            if ($PWD.Provider.Name -ne 'FileSystem') {
                 $ExcMsg = "Skipping relative path as current path is not a file system: ${DirPath}"
                 $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
@@ -395,7 +394,7 @@ Function Global:Add-FileToEmptyDirectories {
                 continue
             }
 
-            $DirPath = Join-Path -Path $CurrentLocation -ChildPath $DirPath
+            $DirPath = Join-Path -Path $PWD.Path -ChildPath $DirPath
         }
 
         try {
@@ -479,7 +478,7 @@ Function Global:Get-DirectorySummary {
         $TotalItems = 0
         $TotalSize = 0
 
-        $Items = Get-ChildItem -LiteralPath $Directory.FullName -Recurse
+        $Items = Get-ChildItem -LiteralPath $Directory.FullName -Recurse -Force
         foreach ($Item in $Items) {
             $TotalItems++
             switch ($Item.PSTypeNames[0]) {
@@ -773,11 +772,7 @@ Function Global:Add-PathStringElement {
 
     Begin {
         if (!$SimpleAlgorithm) {
-            if ($Element.EndsWith($DirectorySeparator)) {
-                $Element = $Element.TrimEnd($DirectorySeparator)
-            }
-
-            $Element += $DirectorySeparator
+            $Element = $Element.TrimEnd($DirectorySeparator) + $DirectorySeparator
         }
 
         $RegExElement = [Regex]::Escape($Element)
@@ -844,11 +839,7 @@ Function Global:Remove-PathStringElement {
 
     Begin {
         if (!$SimpleAlgorithm) {
-            if ($Element.EndsWith($DirectorySeparator)) {
-                $Element = $Element.TrimEnd($DirectorySeparator)
-            }
-
-            $Element += $DirectorySeparator
+            $Element = $Element.TrimEnd($DirectorySeparator) + $DirectorySeparator
         }
 
         $RegExElement = [Regex]::Escape($Element)

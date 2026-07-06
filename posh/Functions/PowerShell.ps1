@@ -55,9 +55,9 @@ Function Global:Get-TypeMethod {
 
             if ($MethodParams.Count -ne 0) {
                 $FormattedMethodParams = @($MethodParams | ForEach-Object { $PSItem.ToString() })
-                $FormattedParams = "$($Type.FullName)($($FormattedMethodParams -join ', '))"
+                $FormattedParams = '({0})' -f $FormattedMethodParams -join ', '
             } else {
-                $FormattedParams = "$($Type.FullName)()"
+                $FormattedParams = '()'
             }
 
             [PSCustomObject]@{
@@ -97,6 +97,9 @@ Function Global:Get-ArgumentCompleter {
     $BindingFlags = [Reflection.BindingFlags]'GetProperty, Instance, NonPublic'
     $ArgumentCompleters = $ArgumentCompletersProperty.GetGetMethod($true).Invoke($InternalExecutionContext, $BindingFlags, $null, @(), $PSCulture)
 
+    # Returns `$null` when there's no argument completers
+    if (!$ArgumentCompleters) { return }
+
     foreach ($Completer in $ArgumentCompleters.Keys) {
         $Name, $Parameter = $Completer.Split(':')
 
@@ -120,8 +123,8 @@ Function Global:Update-PowerShell {
         [Regex]$ExcludedModuleRegex = '^(Az|Microsoft\.(Entra|Graph)|VMware)(|\..+)',
 
         [Switch]$IncludeDscModules,
-        [Switch]$SkipUpdateHelp,
         [Switch]$SkipUninstallObsolete,
+        [Switch]$SkipUpdateHelp,
         [Switch]$Force,
 
         [Parameter(DontShow)]
@@ -169,9 +172,10 @@ Function Global:Update-PowerShell {
         $Msg = 'Unable to enumerate DSC modules as Get-DscResource command not available.'
 
         if ($IncludeDscModules) {
-            $ErrExc = [Exception]::new($Msg, $PSItem.Exception)
+            $ErrExc = [Management.Automation.CommandNotFoundException]::new($Msg)
+            $ErrExc.CommandName = 'Get-DscResource'
             $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSCommandNotFound', $ErrCat, 'Get-DscResource')
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CommandNotFoundException', $ErrCat, 'Get-DscResource')
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
@@ -203,9 +207,9 @@ Function Global:Update-PowerShell {
         }
     }
 
-    # `Get-PSResource` returns all module versions while `Get-InstalledModule`
-    # only returns the latest version, so technically the uniqueness check is
-    # only applicable to PowerShellGet v3.
+    # `Get-InstalledPSResource` returns all module versions while
+    # `Get-InstalledModule` only returns the latest version, so technically the
+    # uniqueness check is only applicable to `PSResourceGet`.
     $UniqueModules = @($InstalledModules.Name | Sort-Object -Unique)
 
     # Percentage of the total progress to use for module update progress

@@ -25,7 +25,14 @@ Function Global:Get-DotFilesLastUpdated {
         # Exclude the file containing this function from being matched by `rg`
         $RgGlobExcludeThis = "!$([IO.Path]::GetFileName($PSCommandPath))"
 
-        $RgArgs = '--hidden', '-g', $RgGlobExcludeGit, '-g', $RgGlobExcludeThis, 'Last reviewed release: '
+        $RgArgs = @(
+            '--hidden'
+            '--no-ignore-dot'
+            '-g', $RgGlobExcludeGit
+            '-g', $RgGlobExcludeThis
+            'Last reviewed release: '
+        )
+
         $LastReviewedReleases = & rg @RgArgs
         if ($LASTEXITCODE -ge 2) {
             $ExcMsg = "ripgrep exited with unexpected exit code: ${LASTEXITCODE}"
@@ -48,7 +55,7 @@ Function Global:Get-DotFilesLastUpdated {
         $ComponentVersions = [Collections.Generic.List[PSCustomObject]]::new()
 
         foreach ($LastReviewedRelease in $LastReviewedReleases) {
-            if ($LastReviewedRelease -notmatch '^(.+):.*Last reviewed release: (.+)') {
+            if ($LastReviewedRelease -notmatch '^(.+?):.*Last reviewed release: (.+)') {
                 $ExcMsg = "Unexpected match returned by rg: ${LastReviewedRelease}"
                 $ErrExc = [FormatException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::ParserError

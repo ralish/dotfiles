@@ -117,7 +117,7 @@
                                 <ScriptBlock>
                                     $Vs = $PSItem
                                     switch ($Vs.Errors.Count) {
-                                        0 { [String]::Empty }
+                                        0 { '' }
                                         1 { $Vs.Errors }
                                         default { "$($Vs.Errors.Count) errors (view property for output)" }
                                     }

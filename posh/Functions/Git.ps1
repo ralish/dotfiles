@@ -89,7 +89,7 @@ Function Global:Invoke-GitLinter {
                 } catch {
                     $ExcMsg = 'The markdownlint-cli2 or markdownlint command must be available.'
                     $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
-                    $ErrExc.CommandName = $MdCliCmds -join ', '
+                    $ErrExc.CommandName = $MdlCliCmds -join ', '
                     $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, $MdlCliCmds)
                     $PSCmdlet.ThrowTerminatingError($ErrRec)
@@ -172,7 +172,7 @@ Function Global:Invoke-GitLinter {
             $GitOutput | Where-Object { $PSItem -match '\.(ba)?sh$' } | ForEach-Object { $LintFiles.Add($PSItem) }
 
             if ($ShebangSearch) {
-                $Shebang = '^#!/usr/bin/env (ba)?sh$'
+                $Shebang = '^#!((/usr)?/bin/(ba)?sh|/usr/bin/env (ba)?sh)$'
                 $RgArgs = '--path-separator', '/', '--hidden', '-l', $Shebang
                 & rg @RgArgs | ForEach-Object { $LintFiles.Add($PSItem) }
                 if ($LASTEXITCODE -ge 2) {
@@ -487,6 +487,9 @@ Function Global:Invoke-GitRepoCommand {
                 continue
             }
 
+            # TODO
+            # Detection based on a `.git` directory is incorrect for linked
+            # worktrees and submodule checkouts (they have a `.git` file).
             $GitDirs = [Collections.Generic.List[IO.DirectoryInfo]]::new()
             $GitDir = Join-Path -Path $BaseDir.FullName -ChildPath '.git'
             if (Test-Path -LiteralPath $GitDir -PathType 'Container') {
