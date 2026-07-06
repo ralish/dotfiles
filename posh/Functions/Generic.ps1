@@ -65,35 +65,7 @@ Function Global:ConvertFrom-Base64 {
     )
 
     Begin {
-        switch ($Encoding) {
-            'ASCII' { $Encoder = [Text.ASCIIEncoding]::new() }
-            'UTF-7' { $Encoder = [Text.UTF7Encoding]::new() }
-
-            'UTF-8' {
-                # No BOM, throw on invalid encoding
-                $Encoder = [Text.UTF8Encoding]::new($false, $true)
-            }
-
-            'UTF-16' {
-                # Little endian, no BOM, throw on invalid encoding
-                $Encoder = [Text.UnicodeEncoding]::new($false, $false, $true)
-            }
-
-            'UTF-16BE' {
-                # Big endian, no BOM, throw on invalid encoding
-                $Encoder = [Text.UnicodeEncoding]::new($true, $false, $true)
-            }
-
-            'UTF-32' {
-                # Little endian, no BOM, throw on invalid encoding
-                $Encoder = [Text.UTF32Encoding]::new($false, $false, $true)
-            }
-
-            'UTF-32BE' {
-                # Big endian, no BOM, throw on invalid encoding
-                $Encoder = [Text.UTF32Encoding]::new($true, $false, $true)
-            }
-        }
+        $Encoder = Get-TextEncoder -Encoding $Encoding -ThrowOnInvalid
     }
 
     Process {
@@ -128,35 +100,7 @@ Function Global:ConvertTo-Base64 {
     )
 
     Begin {
-        switch ($Encoding) {
-            'ASCII' { $Encoder = [Text.ASCIIEncoding]::new() }
-            'UTF-7' { $Encoder = [Text.UTF7Encoding]::new() }
-
-            'UTF-8' {
-                # No BOM, throw on invalid encoding
-                $Encoder = [Text.UTF8Encoding]::new($false, $true)
-            }
-
-            'UTF-16' {
-                # Little endian, no BOM, throw on invalid encoding
-                $Encoder = [Text.UnicodeEncoding]::new($false, $false, $true)
-            }
-
-            'UTF-16BE' {
-                # Big endian, no BOM, throw on invalid encoding
-                $Encoder = [Text.UnicodeEncoding]::new($true, $false, $true)
-            }
-
-            'UTF-32' {
-                # Little endian, no BOM, throw on invalid encoding
-                $Encoder = [Text.UTF32Encoding]::new($false, $false, $true)
-            }
-
-            'UTF-32BE' {
-                # Big endian, no BOM, throw on invalid encoding
-                $Encoder = [Text.UTF32Encoding]::new($true, $false, $true)
-            }
-        }
+        $Encoder = Get-TextEncoder -Encoding $Encoding -ThrowOnInvalid
     }
 
     Process {
@@ -186,66 +130,10 @@ Function Global:ConvertTo-TextEncoding {
     )
 
     Begin {
-        switch ($Encoding) {
-            'ASCII' { $Encoder = [Text.ASCIIEncoding]::new() }
-            'UTF-7' { $Encoder = [Text.UTF7Encoding]::new() }
-
-            'UTF-8' {
-                # Throw on invalid encoding
-                $Encoder = [Text.UTF8Encoding]::new($ByteOrderMark, $true)
-            }
-
-            'UTF-16' {
-                # Little endian, throw on invalid encoding
-                $Encoder = [Text.UnicodeEncoding]::new($false, $ByteOrderMark, $true)
-            }
-
-            'UTF-16BE' {
-                # Big endian, throw on invalid encoding
-                $Encoder = [Text.UnicodeEncoding]::new($true, $ByteOrderMark, $true)
-            }
-
-            'UTF-32' {
-                # Little endian, throw on invalid encoding
-                $Encoder = [Text.UTF32Encoding]::new($false, $ByteOrderMark, $true)
-            }
-
-            'UTF-32BE' {
-                # Big endian, throw on invalid encoding
-                $Encoder = [Text.UTF32Encoding]::new($true, $ByteOrderMark, $true)
-            }
-        }
+        $Encoder = Get-TextEncoder -Encoding $Encoding -ByteOrderMark:$ByteOrderMark -ThrowOnInvalid
 
         if ($SourceEncoding) {
-            switch ($SourceEncoding) {
-                'ASCII' { $SourceEncoder = [Text.ASCIIEncoding]::new() }
-                'UTF-7' { $SourceEncoder = [Text.UTF7Encoding]::new() }
-
-                'UTF-8' {
-                    # Throw on invalid encoding
-                    $SourceEncoder = [Text.UTF8Encoding]::new($SourceByteOrderMark, $true)
-                }
-
-                'UTF-16' {
-                    # Little endian, throw on invalid encoding
-                    $SourceEncoder = [Text.UnicodeEncoding]::new($false, $SourceByteOrderMark, $true)
-                }
-
-                'UTF-16BE' {
-                    # Big endian, throw on invalid encoding
-                    $SourceEncoder = [Text.UnicodeEncoding]::new($true, $SourceByteOrderMark, $true)
-                }
-
-                'UTF-32' {
-                    # Little endian, throw on invalid encoding
-                    $SourceEncoder = [Text.UTF32Encoding]::new($false, $SourceByteOrderMark, $true)
-                }
-
-                'UTF-32BE' {
-                    # Big endian, throw on invalid encoding
-                    $SourceEncoder = [Text.UTF32Encoding]::new($true, $SourceByteOrderMark, $true)
-                }
-            }
+            $SourceEncoder = Get-TextEncoder -Encoding $SourceEncoding -ByteOrderMark:$SourceByteOrderMark -ThrowOnInvalid
         }
     }
 
@@ -332,6 +220,30 @@ Function Global:ConvertTo-URLEncoded {
 
     Process {
         [Uri]::EscapeDataString($String)
+    }
+}
+
+# Retrieve a text encoding class
+Function Global:Get-TextEncoder {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '')]
+    [CmdletBinding()]
+    [OutputType([Text.Encoding])]
+    Param(
+        [ValidateSet('ASCII', 'UTF-7', 'UTF-8', 'UTF-16', 'UTF-16BE', 'UTF-32', 'UTF-32BE')]
+        [String]$Encoding = 'UTF-8',
+
+        [Switch]$ByteOrderMark,
+        [Switch]$ThrowOnInvalid
+    )
+
+    switch ($Encoding) {
+        'ASCII' { [Text.ASCIIEncoding]::new() }
+        'UTF-7' { [Text.UTF7Encoding]::new() }
+        'UTF-8' { [Text.UTF8Encoding]::new($ByteOrderMark, $ThrowOnInvalid) }
+        'UTF-16' { [Text.UnicodeEncoding]::new($false, $ByteOrderMark, $ThrowOnInvalid) }
+        'UTF-16BE' { [Text.UnicodeEncoding]::new($true, $ByteOrderMark, $ThrowOnInvalid) }
+        'UTF-32' { [Text.UTF32Encoding]::new($false, $ByteOrderMark, $ThrowOnInvalid) }
+        'UTF-32BE' { [Text.UTF32Encoding]::new($true, $ByteOrderMark, $ThrowOnInvalid) }
     }
 }
 
