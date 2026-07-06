@@ -42,7 +42,7 @@ Function Set-DotFilesFinalPath {
     Param()
 
     if (!('DotFiles.FinalPath' -as [Type])) {
-        $FinalPathCode = Join-Path -Path $PSScriptRoot -ChildPath '00-DotFiles.cs'
+        $FinalPathCode = Join-Path -Path $PSScriptRoot -ChildPath '00-DotFiles-Win.cs'
         $FinalPathAPI = Get-Content -LiteralPath $FinalPathCode -Raw
         Add-Type -TypeDefinition $FinalPathAPI
     }
