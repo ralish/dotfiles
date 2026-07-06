@@ -158,10 +158,10 @@ Function Global:Clear-AllDevCaches {
     Write-Verbose -Message "Clearing caches for: $($Tasks -join ', ')"
 
     if ($Tasks -contains 'Docker') {
-        Write-Progress @WriteProgressParams -Status 'Clearing Docker cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
+        Write-Progress @WriteProgressParams -Status 'Clearing Docker data' -PercentComplete ($TasksDone / $TasksTotal * 100)
 
         try {
-            Clear-DockerCache
+            Clear-DockerData
         } catch { $PSCmdlet.WriteError($PSItem) }
 
         $TasksDone++
