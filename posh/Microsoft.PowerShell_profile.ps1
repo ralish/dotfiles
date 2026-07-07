@@ -99,7 +99,8 @@ if ($DotFilesTimings) {
         $DotFilesProfileStopwatch.Start()
 
         # Reset before loading each section
-        $DotFilesSectionStopwatch = [Diagnostics.Stopwatch]::StartNew()
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+        $DotFilesSectionStopwatch = [Diagnostics.Stopwatch]::new()
     } else {
         Write-Warning -Message 'Ignoring DotFilesTimings as DotFilesVerbose is not enabled.'
         $DotFilesTimings = $false
@@ -145,11 +146,6 @@ foreach ($PoshPath in $PoshFunctionsPath, $PoshSettingsPath) {
 
     foreach ($PoshFile in $PoshFiles) {
         if ($PoshFile.Name -eq '00-Helpers.ps1') { continue }
-
-        if ($DotFilesTimings) {
-            $DotFilesSectionStopwatch.Restart()
-        }
-
         . $PoshFile.FullName
     }
 }

@@ -371,14 +371,6 @@ Function Invoke-DotFilesAsyncTask {
         Write-Host
     }
 
-    if ($Global:DotFilesTimings) {
-        if (!$Global:DotFilesSectionStopwatch) {
-            $Global:DotFilesSectionStopwatch = [Diagnostics.Stopwatch]::new()
-        }
-
-        $Global:DotFilesSectionStopwatch.Restart()
-    }
-
     if ($Global:AsyncLoadQueue.Count -ne 0) {
         try {
             # Ensure the task is aware it's running in an async context
@@ -459,6 +451,14 @@ Function Start-DotFilesSection {
 
     $Global:DotFilesSectionType = $Type
     $Global:DotFilesSectionName = $Name
+
+    if ($Global:DotFilesTimings) {
+        if (!$Global:DotFilesSectionStopwatch) {
+            $Global:DotFilesSectionStopwatch = [Diagnostics.Stopwatch]::new()
+        }
+
+        $Global:DotFilesSectionStopwatch.Restart()
+    }
 
     if ($Global:DotFilesIsAsync) {
         Write-DotFilesMessage -Type 'Debug' -Message 'Starting async section processing ...'
