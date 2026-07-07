@@ -586,10 +586,26 @@ Function Write-DotFilesMessage {
     )
 
     if (!$SectionType) {
+        if (!$Global:DotFilesSectionType) {
+            $ExcMsg = 'SectionType parameter was not provided and no global value is defined.'
+            $ErrExc = [InvalidOperationException]::new($ExcMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesInvalidState', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
         $SectionType = $Global:DotFilesSectionType
     }
 
     if (!$SectionName) {
+        if (!$Global:DotFilesSectionName) {
+            $ExcMsg = 'SectionName parameter was not provided and no global value is defined.'
+            $ErrExc = [InvalidOperationException]::new($ExcMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesInvalidState', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
         $SectionName = $Global:DotFilesSectionName
     }
 
