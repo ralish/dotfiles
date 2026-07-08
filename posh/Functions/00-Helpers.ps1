@@ -100,22 +100,22 @@ Function Test-EnvironmentMatch {
     }
 }
 
-# Naive check for running on a Unix-like system
+# Check if we're running on a Unix-like platform (Linux or macOS)
 Function Test-IsUnix {
     [CmdletBinding()]
     [OutputType([Boolean])]
     Param()
 
-    return !(Test-IsWindows)
+    return $PSVersionTable.PSVersion.Major -ge 6 -and ($IsLinux -or $IsMacOS)
 }
 
-# Naive check for running on a Windows system
+# Check if we're running on Windows
 Function Test-IsWindows {
     [CmdletBinding()]
     [OutputType([Boolean])]
     Param()
 
-    return $PSVersionTable.PSEdition -eq 'Desktop' -or $PSVersionTable.Platform -eq 'Win32NT'
+    return $PSVersionTable.PSVersion.Major -lt 6 -or $IsWindows
 }
 
 # Confirm a PowerShell module is available
