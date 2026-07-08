@@ -32,6 +32,7 @@ $PoshCompletionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Completions'
 $PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
 $PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
 $PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
+$PoshThemesPath = Join-Path -Path $PSScriptRoot -ChildPath 'Themes'
 
 # Preferred text editors ordered by priority (space-separated)
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]

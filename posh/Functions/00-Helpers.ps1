@@ -286,6 +286,7 @@ Function Clear-DotFilesLoadData {
         'DotFilesSectionType'
         'FormatDataPaths'
         'PoshCompletionsPath'
+        'PoshThemesPath'
     )
 
     if ($Global:DotFilesVerbose) {

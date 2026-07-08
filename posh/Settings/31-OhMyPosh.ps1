@@ -16,8 +16,20 @@ Function Initialize-OhMyPosh {
     [OutputType([Void])]
     Param()
 
-    # Name of theme to use
-    $ThemeName = 'oh-my-posh'
+    # Default theme
+    $ThemeName = 'personal'
+    # `posh-git` integration
+    #
+    # Uses `posh-git` to retrieve Git status information when the working
+    # directory is inside a repository. This shaves off ~50ms per prompt
+    # invocation. Otherwise identical to our default theme.
+    $ThemePoshGitName = 'personal-pg'
+
+    # Enable `posh-git` support if imported
+    if (Get-Module -Name 'posh-git' -Verbose:$false) {
+        $Env:POSH_GIT_ENABLED = $true
+        $ThemeName = $ThemePoshGitName
+    }
 
     # Retrieve Oh My Posh theme path
     $ThemePath = Get-OhMyPoshThemePath -ThemeName $ThemeName
@@ -39,15 +51,11 @@ Function Initialize-OhMyPosh {
     } finally {
         $Global:VerbosePreference = $VerboseOriginal
     }
-
-    # Enable `posh-git` support if imported
-    if (Get-Module -Name 'posh-git' -Verbose:$false) {
-        $Env:POSH_GIT_ENABLED = $true
-    }
 }
 
 # Attempt to retrieve the path to a theme given its name
 Function Get-OhMyPoshThemePath {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void], [String])]
     Param(
@@ -55,9 +63,11 @@ Function Get-OhMyPoshThemePath {
         [String]$ThemeName
     )
 
+    $ThemeFileName = "${ThemeName}.omp.json"
+
     # Check if the theme exists in our profile directory. If it does, we can
     # immediately return and skip figuring out where the bundled themes are.
-    $ThemePath = Join-Path -Path (Split-Path -Path $PROFILE -Parent) -ChildPath "${ThemeName}.omp.json"
+    $ThemePath = Join-Path -Path $Global:PoshThemesPath -ChildPath $ThemeFileName
     $ThemeFile = Get-Item -LiteralPath $ThemePath -ErrorAction 'Ignore'
     if ($ThemeFile -is [IO.FileInfo]) {
         return $ThemePath
@@ -98,7 +108,7 @@ Function Get-OhMyPoshThemePath {
     Write-DotFilesMessage -Type 'Verbose' -Message $Msg
     Write-DotFilesMessage -Type 'Verbose' -Message "Themes directory: ${ThemeDir}"
 
-    $ThemePath = Join-Path -Path $ThemeDir -ChildPath "${ThemeName}.omp.json"
+    $ThemePath = Join-Path -Path $ThemeDir -ChildPath $ThemeFileName
     $ThemeFile = Get-Item -LiteralPath $ThemePath -ErrorAction 'Ignore'
     if ($ThemeFile -isnot [IO.FileInfo]) {
         $Msg = "Expected theme path is not a file: ${ThemePath}"
