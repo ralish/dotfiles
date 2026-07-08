@@ -100,6 +100,24 @@ Function Test-EnvironmentMatch {
     }
 }
 
+# Check if we're running on Linux
+Function Test-IsLinux {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    Param()
+
+    return $PSVersionTable.PSVersion.Major -ge 6 -and $IsLinux
+}
+
+# Check if we're running on macOS
+Function Test-IsMacOS {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    Param()
+
+    return $PSVersionTable.PSVersion.Major -ge 6 -and $IsMacOS
+}
+
 # Check if we're running on a Unix-like platform (Linux or macOS)
 Function Test-IsUnix {
     [CmdletBinding()]
