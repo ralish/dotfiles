@@ -151,8 +151,11 @@ Function Global:Update-DotNetTools {
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
+        # Remove everything after the first dash to handle preview versions
+        $CliVersionNoDash = ($CliVersionRaw -split '-')[0]
+
         $CliVersion = $null
-        if (![Version]::TryParse($CliVersionRaw, [Ref]$CliVersion)) {
+        if (![Version]::TryParse($CliVersionNoDash, [Ref]$CliVersion)) {
             $ExcMsg = "Failed to parse .NET version: ${CliVersionRaw}"
             $ErrExc = [FormatException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::ParserError
@@ -538,7 +541,7 @@ Function Global:Update-GoBinaries {
     if ($Result.ExitCode -eq 0) {
         $Result.Success = $true
     } else {
-        $ExcMsg = "Failed to update Go binaries ${CheckMsg} (rc: $($Result.ExitCode))."
+        $ExcMsg = "Failed to update Go binaries${CheckMsg} (rc: $($Result.ExitCode))."
         $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GupCmd)
@@ -678,7 +681,7 @@ Function Global:Clear-GradleCache {
 
     $PathItem = Get-Item -LiteralPath $GradleCache -ErrorAction 'Ignore'
     if ($PathItem -is [IO.DirectoryInfo]) {
-        $GradleCachePath = '{0}{1}*' -f $GradleCache, [IO.Path]::DirectorySeparatorChar
+        $GradleCachePath = '{0}{1}*' -f [WildcardPattern]::Escape($GradleCache), [IO.Path]::DirectorySeparatorChar
 
         if ($PSCmdlet.ShouldProcess($GradleCache, 'Clear')) {
             Remove-Item -Path $GradleCachePath -Recurse -Force -Verbose:$false
@@ -722,7 +725,7 @@ Function Global:Clear-MavenCache {
 
     $PathItem = Get-Item -LiteralPath $MvnCache -ErrorAction 'Ignore'
     if ($PathItem -is [IO.DirectoryInfo]) {
-        $MvnCachePath = '{0}{1}*' -f $MvnCache, [IO.Path]::DirectorySeparatorChar
+        $MvnCachePath = '{0}{1}*' -f [WildcardPattern]::Escape($MvnCache), [IO.Path]::DirectorySeparatorChar
 
         if ($PSCmdlet.ShouldProcess($MvnCache, 'Clear')) {
             Remove-Item -Path $MvnCachePath -Recurse -Force -Verbose:$false
@@ -1313,7 +1316,7 @@ Function Global:Update-PythonPipPackages {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $PipdeptreeOutput = @(& python @PipdeptreeModuleArgs 2>&1) -join ''
+    $PipdeptreeOutput = [String[]]@(& python @PipdeptreeModuleArgs 2>&1)
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = 'Unable to update pip packages as pipdeptree module not found.'
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1373,6 +1376,8 @@ Function Global:Update-PythonPipPackages {
             $Packages.Add($Package.Groups[1].Value)
         }
     }
+
+    if ($Packages.Count -eq 0) { return }
 
     if ($PSCmdlet.ShouldProcess('pip packages', 'Update')) {
         $PipUpdateArgs = $PipUpdateBaseArgs + @('--upgrade-strategy', 'eager')
@@ -1729,7 +1734,7 @@ Function Global:Switch-Ruby {
 # https://github.com/ruby/rubygems/discussions/9113
 Function Global:Update-RubyGems {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param()
 
     if (!(Test-IsWindows)) {

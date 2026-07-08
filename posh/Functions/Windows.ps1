@@ -116,7 +116,7 @@ Function Global:Set-EnvironmentVariable {
 # `dmesg` for Windows
 Function Global:dmesg {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
-    [OutputType([Void], [String[]], [Diagnostics.Eventing.Reader.EventLogRecord[]])]
+    [OutputType([String[]], [Diagnostics.Eventing.Reader.EventLogRecord[]])]
     Param(
         [Parameter(ParameterSetName = 'MinSeverity', Mandatory)]
         [ValidateSet('Any', 'Critical', 'Error', 'Warning', 'Info', 'Verbose')]
@@ -151,7 +151,7 @@ Function Global:dmesg {
 # Find events by filtering against logs and providers
 Function Global:Find-WinEvent {
     [CmdletBinding(DefaultParameterSetName = 'Default')]
-    [OutputType([Void], [String[]], [Diagnostics.Eventing.Reader.EventLogRecord[]])]
+    [OutputType([String[]], [Diagnostics.Eventing.Reader.EventLogRecord[]])]
     Param(
         [Parameter(Mandatory)]
         [String[]]$Filter,
@@ -305,54 +305,58 @@ Function Global:Find-WinEvent {
 
     $WriteProgressParams = @{ Activity = 'Retrieving Windows event logs' }
 
-    # Retrieve all the events matching the filter
-    $WinEvents = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogRecord]]::new()
-    for ($i = 0; $i -lt $EventLogs.Count; $i++) {
-        $EventLog = $EventLogs[$i]
-        $LogName = $EventLog.LogName
+    try {
+        # Retrieve all the events matching the filter
+        $WinEvents = [Collections.Generic.List[Diagnostics.Eventing.Reader.EventLogRecord]]::new()
+        for ($i = 0; $i -lt $EventLogs.Count; $i++) {
+            $EventLog = $EventLogs[$i]
+            $LogName = $EventLog.LogName
 
-        Write-Progress @WriteProgressParams -Status $LogName -PercentComplete ($i / $EventLogs.Count * 100)
+            Write-Progress @WriteProgressParams -Status $LogName -PercentComplete ($i / $EventLogs.Count * 100)
 
-        $EventFilter = @{
-            LogName   = $LogName
-            StartTime = $StartTime
-        }
+            $EventFilter = @{
+                LogName   = $LogName
+                StartTime = $StartTime
+            }
 
-        if ($ProviderLogs.ContainsKey($LogName)) {
-            $EventFilter['ProviderName'] = $ProviderLogs[$LogName].ToArray()
-        }
+            if ($ProviderLogs.ContainsKey($LogName)) {
+                $EventFilter['ProviderName'] = $ProviderLogs[$LogName].ToArray()
+            }
 
-        if ($EventLevels) {
-            $EventFilter['Level'] = $EventLevels
-        }
+            if ($EventLevels) {
+                $EventFilter['Level'] = $EventLevels
+            }
 
-        $EventParams = @{
-            FilterHashtable = $EventFilter
-            Oldest          = $false
-        }
+            $EventParams = @{
+                FilterHashtable = $EventFilter
+                Oldest          = $false
+            }
 
-        # Analytical & Debug logs must be read in forward chronological order
-        if ($EventLog.LogType -in 'Analytical', 'Debug') {
-            $EventParams['Oldest'] = $true
-        }
+            # Analytical & Debug logs must be read in forward chronological order
+            if ($EventLog.LogType -in 'Analytical', 'Debug') {
+                $EventParams['Oldest'] = $true
+            }
 
-        try {
-            Get-WinEvent @CommonParams @EventParams -ErrorAction 'Stop' |
-                ForEach-Object { $WinEvents.Add($PSItem) }
-        } catch {
-            $ErrRec = $PSItem
-            switch -Regex ($ErrRec.FullyQualifiedErrorId) {
-                '^NoMatchingEventsFound,' { $Error.RemoveAt(0) }
-                default { Write-Warning -Message $ErrRec.Exception.Message }
+            try {
+                Get-WinEvent @CommonParams @EventParams -ErrorAction 'Stop' |
+                    ForEach-Object { $WinEvents.Add($PSItem) }
+            } catch {
+                $ErrRec = $PSItem
+                switch -Regex ($ErrRec.FullyQualifiedErrorId) {
+                    '^NoMatchingEventsFound,' { $Error.RemoveAt(0) }
+                    default { Write-Warning -Message $ErrRec.Exception.Message }
+                }
             }
         }
+
+        $SortedEvents = $WinEvents | Sort-Object -Property 'TimeCreated'
+    } finally {
+        Write-Progress @WriteProgressParams -Completed
     }
 
-    $SortedEvents = $WinEvents | Sort-Object -Property 'TimeCreated'
-    Write-Progress @WriteProgressParams -Completed
 
     if ($OutputFormat -eq 'EventLogRecord') {
-        return $SortedEvents
+        return [Diagnostics.Eventing.Reader.EventLogRecord[]]@($SortedEvents)
     }
 
     # User requested event log records be emitted as plain text
@@ -381,7 +385,6 @@ Function Global:Find-WinEvent {
     foreach ($WinEvent in $SortedEvents) {
         $Time = $WinEvent.TimeCreated.ToString($DateFormat)
         $Provider = $WinEvent.ProviderName
-        $EvtMsg = $WinEvent.Message
 
         if ($WinEvent.Level -lt $EventLevelIntToName.Count) {
             $Level = $EventLevelIntToName[$WinEvent.Level].ToUpper()
@@ -390,13 +393,16 @@ Function Global:Find-WinEvent {
             $Level = 'UNKNOWN'
         }
 
-        # Left-to-right mark
-        $ReplaceChars = [Char[]]@(0x200e)
-        foreach ($Char in $ReplaceChars) {
-            $EvtMsg = $EvtMsg.Replace([String]$Char, '')
-        }
-
         if ($WinEvent.Message) {
+            $EvtMsg = $WinEvent.Message
+
+            # Left-to-right mark
+            $ReplaceChars = [Char[]]@(0x200e)
+            foreach ($Char in $ReplaceChars) {
+                $EvtMsg = $EvtMsg.Replace([String]$Char, '')
+            }
+
+            # Normalise line endings, trim whitespace, and remove blank lines
             $EvtMsg = $EvtMsg.Split("`r`n", $StringSplitOptions).Split("`n", $StringSplitOptions).Trim() | Where-Object { ![String]::IsNullOrWhiteSpace($PSItem) }
         } else {
             $EvtMsg = ''
@@ -444,7 +450,7 @@ Function Global:Watch-EventLog {
 # Retrieve files with a minimum number of hard links
 Function Global:Get-MultipleHardLinks {
     [CmdletBinding()]
-    [OutputType([Void], [IO.FileInfo[]])]
+    [OutputType([IO.FileInfo[]])]
     Param(
         [Parameter(Mandatory)]
         [IO.DirectoryInfo]$Path,
@@ -468,13 +474,13 @@ Function Global:Get-MultipleHardLinks {
         Where-Object { $PSItem.LinkType -eq 'HardLink' -and $PSItem.Target.Count -ge ($MinimumHardLinks - 1) } |
         Add-Member -MemberType 'ScriptProperty' -Name 'LinkCount' -Value { $this.Target.Count + 1 } -Force -PassThru
 
-    return $Files
+    return [IO.FileInfo[]]@($Files)
 }
 
 # Retrieve directories with non-inherited ACLs
 Function Global:Get-NonInheritedACL {
     [CmdletBinding()]
-    [OutputType([Void], [IO.DirectoryInfo[]])]
+    [OutputType([IO.DirectoryInfo[]])]
     Param(
         [Parameter(Mandatory)]
         [IO.DirectoryInfo]$Path,
@@ -598,6 +604,8 @@ Function Global:Search-Registry {
 
     switch ($PSCmdlet.ParameterSetName) {
         'Default' {
+            $WriteProgressParams = @{ Activity = "Searching registry for simple match: ${SimpleMatch}" }
+
             switch ($Hive) {
                 'HKCC' { $RegHive = [Microsoft.Win32.Registry]::CurrentConfig }
                 'HKCR' { $RegHive = [Microsoft.Win32.Registry]::ClassesRoot }
@@ -627,6 +635,7 @@ Function Global:Search-Registry {
 
                 if ($OpenSubKeyFailed) {
                     $RegPath = Join-Path -Path $RegKeys[-1].Name -ChildPath $SubKey
+
                     $ExcMsg = "Failed to open registry key: ${RegPath}"
                     $ErrExc = [Management.Automation.ItemNotFoundException]::new($ExcMsg)
                     $ErrExc.ItemName = $RegPath
@@ -671,11 +680,7 @@ Function Global:Search-Registry {
                 return
             }
 
-            $WriteProgressParams = @{
-                Activity = "Searching registry for simple match: ${SimpleMatch}"
-                Status   = $RegistryKey.Name
-            }
-
+            $WriteProgressParams.Status = $RegistryKey.Name
             Write-Progress @WriteProgressParams
         }
     }
@@ -762,9 +767,11 @@ Function Global:Search-Registry {
         $RegKeys[$i].Close()
     }
 
-    if ($Results.Count -ne 0) {
-        return $Results.ToArray()
+    if ($PSCmdlet.ParameterSetName -eq 'Default' -and $Recurse) {
+        Write-Progress @WriteProgressParams -Completed
     }
+
+    return $Results.ToArray()
 }
 
 #endregion

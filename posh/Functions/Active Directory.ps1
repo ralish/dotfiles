@@ -1,7 +1,8 @@
 $DotFilesSection = @{
-    Type   = 'Functions'
-    Name   = 'Active Directory'
-    Module = 'ActiveDirectory'
+    Type     = 'Functions'
+    Name     = 'Active Directory'
+    Platform = 'Windows'
+    Module   = 'ActiveDirectory'
 }
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
@@ -87,7 +88,7 @@ Function Global:Resolve-ADGuid {
 
     End {
         if ($PSCmdlet.ParameterSetName -eq 'Guid') {
-            # Can occur on an empty pipeline
+            # Empty pipeline
             if ($LDAPFilters.Count -eq 0) { return }
 
             $LDAPFilter = "(|$($LDAPFilters -join ''))"
@@ -118,8 +119,10 @@ Function Global:Get-KerberosTokenSize {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     Param(
-        # Only the `DOMAIN\Username` format is supported (domain is optional)
+        # Only the `DOMAIN\Username` format is supported (domain optional)
         [Parameter(Mandatory)]
+        # Either no backslash or a single one with content before and after
+        [ValidatePattern('^([^\\]+\\)?[^\\]+$')]
         [String]$Username,
 
         [ValidateSet('Windows Server 2008 R2 (or earlier)', 'Windows Server 2012 (or later)')]
@@ -131,14 +134,6 @@ Function Global:Get-KerberosTokenSize {
     $CommonParams = @{ ErrorAction = 'Stop' }
 
     $UsernameSplit = @($Username.Split('\'))
-    if ($UsernameSplit.Count -gt 2) {
-        $ExcMsg = 'Expected only a single "\" character to be present in username.'
-        $ErrExc = [ArgumentException]::new($ExcMsg, 'Username')
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ADInvalidUsername', $ErrCat, $Username)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
     if ($UsernameSplit.Count -eq 2) {
         $User = $UsernameSplit[1]
         $Domain = $UsernameSplit[0]
@@ -154,21 +149,9 @@ Function Global:Get-KerberosTokenSize {
         $ADUser = Get-ADUser @CommonParams -Identity $User -Properties 'PrimaryGroup', 'SIDHistory', 'TrustedForDelegation'
         $ADUserPrimaryGroup = Get-ADGroup @CommonParams -Identity $ADUser.PrimaryGroup
 
-        # Replacements are to ensure the filter string complies with RFC 4515
+        # Replacements ensure the filter string complies with RFC 4515
         $ADUserDn = $ADUser.DistinguishedName -replace '\\', '\5c' -replace '\*', '\2a' -replace '\(', '\28' -replace '\)', '\29'
         $ADUserPrimaryGroupDn = $ADUserPrimaryGroup.DistinguishedName -replace '\\', '\5c' -replace '\*', '\2a' -replace '\(', '\28' -replace '\)', '\29'
-
-        # LDAP matching rules
-        #
-        # OID                       Capability name
-        # 1.2.840.113556.1.4.803    LDAP_MATCHING_RULE_BIT_AND
-        # 1.2.840.113556.1.4.1941   LDAP_MATCHING_RULE_TRANSITIVE_EVAL
-        #
-        # `groupType` attribute
-        #
-        # Value                     Description
-        # 0x80000000 (2147483648)   Security group
-        $LdapGroupsFilter = '(&(groupType:1.2.840.113556.1.4.803:=2147483648)(|(member:1.2.840.113556.1.4.1941:={0})(member:1.2.840.113556.1.4.1941:={1})))' -f $ADUserDn, $ADUserPrimaryGroupDn
 
         # The groups present in the Kerberos PAC are built from the transitive
         # closure of security group memberships (all of domain local, global,
@@ -177,22 +160,39 @@ Function Global:Get-KerberosTokenSize {
         # Using `Get-ADPrincipalGroupMembership` is insufficient as it doesn't
         # handle transitive group memberships. Naively consulting the user's
         # `memberOf` attribute isn't enough either as:
-        # - It does not include the user's primary group
-        # - It only contains direct group memberships (not transitive)
         # - It includes distribution groups (not relevant)
+        # - It only contains direct group memberships (not transitive)
+        # - It doesn't include the user's primary group (unless directly added)
         #
-        # Instead, construct an LDAP filter that requests transitive evaluation
-        # of group memberships and explicitly add the user's primary group. The
-        # empty value for `SearchBase` ensures we search from the root of the
-        # LDAP tree so membership in foreign universal groups is included. If
-        # unspecified, the default naming context of the target domain is used
-        # which negates the purpose of querying the Global Catalog server.
+        # Instead, use an LDAP filter that requests transitive evaluation of
+        # security group membership. The empty `SearchBase` ensures we search
+        # from the root of the LDAP tree so membership in foreign universal
+        # groups is included. If unspecified, the default naming context of the
+        # target domain is used which negates the purpose of querying the GC.
         #
-        # There are still some instances which are not handled which can result
-        # in the calculated Kerberos token size being underestimated:
-        # - It doesn't factor in any group membership via SID history
-        # - It doesn't factor in any shadow principal memberships
-        $ADGroups = @(Get-ADGroup @CommonParams -SearchBase '' -LDAPFilter $LdapGroupsFilter) + $ADUserPrimaryGroup
+        # Some features are not handled which can result in the token size
+        # being underestimated when in use:
+        # - Group membership via SID history
+        # - Shadow principal memberships
+        #
+        # LDAP matching rules
+        #
+        # OID                       Capability
+        # 1.2.840.113556.1.4.803    LDAP_MATCHING_RULE_BIT_AND
+        # 1.2.840.113556.1.4.1941   LDAP_MATCHING_RULE_TRANSITIVE_EVAL
+        #
+        # `groupType` attribute
+        #
+        # Value                     Description
+        # 0x80000000 (2147483648)   Security group
+        $LdapGroupsFilter = '(&(groupType:1.2.840.113556.1.4.803:=2147483648)(|(member:1.2.840.113556.1.4.1941:={0})(member:1.2.840.113556.1.4.1941:={1})))' -f $ADUserDn, $ADUserPrimaryGroupDn
+        $ADGroups = @(Get-ADGroup @CommonParams -SearchBase '' -LDAPFilter $LdapGroupsFilter)
+
+        # The user's primary group will only be included if they were added as
+        # a member (directly or transitively). If not, add it separately.
+        if ($ADUserPrimaryGroup.SID -notin $ADGroups.SID) {
+            $ADGroups += $ADUserPrimaryGroup
+        }
     } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     $SIDHistory = @($ADUser.SIDHistory).Count
@@ -213,6 +213,8 @@ Function Global:Get-KerberosTokenSize {
         }
     }
 
+    # Setting T4D apparently doubles the token size, inclusive of the overhead.
+    # This intuitively sounds wrong, but it is what the documentation state.
     if ($ADUser.TrustedForDelegation) {
         $TokenSizeBytes = $TokenSizeBytes * 2
     }
@@ -346,7 +348,7 @@ Function Global:Get-ADShadowPrincipalContainer {
 # Create a shadow principal
 Function Global:New-ADShadowPrincipal {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType('Void', 'Microsoft.ActiveDirectory.Management.ADObject')]
+    [OutputType('Microsoft.ActiveDirectory.Management.ADObject')]
     Param(
         [Parameter(Mandatory)]
         [String]$Name,
@@ -377,9 +379,7 @@ Function Global:New-ADShadowPrincipal {
         Type            = 'msDS-ShadowPrincipal'
         Path            = $ShadowPrincipalContainer
         Name            = $Name
-        OtherAttributes = @{
-            'msDS-ShadowPrincipalSid' = $SidByteArray
-        }
+        OtherAttributes = @{ 'msDS-ShadowPrincipalSid' = $SidByteArray }
         PassThru        = $PassThru
     }
 

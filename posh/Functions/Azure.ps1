@@ -17,8 +17,8 @@ Function Global:Get-AzureAuthHeader {
     [OutputType([Hashtable])]
     Param(
         # Either:
-        # - Microsoft.Azure.Commands.Profile.Models.PSSecureAccessToken (>= 14.0.0)
-        # - Microsoft.Azure.Commands.Profile.Models.PSAccessToken (< 14.0.0)
+        # - `Microsoft.Azure.Commands.Profile.Models.PSSecureAccessToken` (>= 14.0.0)
+        # - `Microsoft.Azure.Commands.Profile.Models.PSAccessToken` (< 14.0.0)
         [Parameter(Mandatory)]
         [PSObject]$AccessToken
     )
@@ -109,73 +109,76 @@ Function Global:Get-EntraUserLicenseReport {
             }
         }
 
-        # Find/replace pairs to clean-up license names
-        $LicenseCleanupNameFragments = [Ordered]@{
-            '_'                             = ' '
-            '\bTEST\b'                      = 'Test'
-            '\bTELSTRA\b'                   = 'Telstra'
-            '\bDOD\b'                       = 'DoD'
-            '\bGCCHIGH\b'                   = 'GCC High'
-            ' GCCHigh Tenant\b'             = $null
-            '( GCC High)? USGOV GCC High\b' = ' GCC High'
-            '( \(DoD\))? USGOV DoD\b'       = ' DoD'
-        }
-
-        # Populate the mapping of license SKU IDs to display names
-        $ConflictingNames = 0
-        foreach ($Entry in $LicensingInfo) {
-            try {
-                # Validate format and normalise
-                $LicenseSkuId = [Guid]::new($Entry.Guid).ToString()
-            } catch {
-                $ExcMsg = "Invalid GUID encountered for license entry: $($Entry.Guid)"
-                $ErrExc = [FormatException]::new($ExcMsg)
-                $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
-                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvInvalidData', $ErrCat, $Entry.Guid)
-                $PSCmdlet.WriteError($ErrRec)
-                continue
+        # Avoid running unnecessary parsing for `-ReturnParsedServices` switch
+        if ($PSCmdlet.ParameterSetName -eq 'LicensingInfo' -or $ReturnParsedLicenses) {
+            # Find/replace pairs to clean-up license names
+            $LicenseCleanupNameFragments = [Ordered]@{
+                '_'                             = ' '
+                '\bTEST\b'                      = 'Test'
+                '\bTELSTRA\b'                   = 'Telstra'
+                '\bDOD\b'                       = 'DoD'
+                '\bGCCHIGH\b'                   = 'GCC High'
+                ' GCCHigh Tenant\b'             = $null
+                '( GCC High)? USGOV GCC High\b' = ' GCC High'
+                '( \(DoD\))? USGOV DoD\b'       = ' DoD'
             }
 
-            # E.g. `Microsoft 365 E3 (no Teams)`
-            $LicenseCandidateName = $Entry.Product_Display_Name
-
-            # Perform initial clean-up of the name
-            foreach ($Fragment in $LicenseCleanupNameFragments.Keys) {
-                if ($LicenseCandidateName -cmatch $Fragment) {
-                    $LicenseCandidateName = $LicenseCandidateName -creplace $Fragment, $LicenseCleanupNameFragments[$Fragment]
-                    Write-Debug -Message ('Updating "{0}" to: {1}' -f $Entry.Product_Display_Name, $LicenseCandidateName)
+            # Populate the mapping of license SKU IDs to display names
+            $ConflictingNames = 0
+            foreach ($Entry in $LicensingInfo) {
+                try {
+                    # Validate format and normalise
+                    $LicenseSkuId = [Guid]::new($Entry.Guid).ToString()
+                } catch {
+                    $ExcMsg = "Invalid GUID encountered for license entry: $($Entry.Guid)"
+                    $ErrExc = [FormatException]::new($ExcMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'CsvInvalidData', $ErrCat, $Entry.Guid)
+                    $PSCmdlet.WriteError($ErrRec)
+                    continue
                 }
+
+                # E.g. `Microsoft 365 E3 (no Teams)`
+                $LicenseCandidateName = $Entry.Product_Display_Name
+
+                # Perform initial clean-up of the name
+                foreach ($Fragment in $LicenseCleanupNameFragments.Keys) {
+                    if ($LicenseCandidateName -cmatch $Fragment) {
+                        $LicenseCandidateName = $LicenseCandidateName -creplace $Fragment, $LicenseCleanupNameFragments[$Fragment]
+                        Write-Debug -Message ('Updating "{0}" to: {1}' -f $Entry.Product_Display_Name, $LicenseCandidateName)
+                    }
+                }
+
+                # If the license SKU isn't present add it
+                if (!$LicenseSkuIdLookup.ContainsKey($LicenseSkuId)) {
+                    $LicenseSkuIdLookup[$LicenseSkuId] = $LicenseCandidateName
+                    continue
+                }
+
+                # Skip identical names
+                $LicenseCurrentName = $LicenseSkuIdLookup[$LicenseSkuId]
+                if ($LicenseCurrentName -ceq $LicenseCandidateName) { continue }
+
+                # Prefer name which doesn't reference an outdated license name:
+                # - Power Virtual Agent(s) -> Copilot Studio
+                $TestRegex = '\b(Power Virtual Agents?)\b'
+                if ($LicenseCandidateName -match $TestRegex) { continue }
+                if ($LicenseCurrentName -match $TestRegex) {
+                    $LicenseSkuIdLookup[$LicenseSkuId] = $LicenseCandidateName
+                    continue
+                }
+
+                $ConflictingNames++
+                Write-Debug -Message ('Display name for license "{0}" differs from existing entry: {1} != {2}' -f $LicenseSkuId, $LicenseCurrentName, $LicenseCandidateName)
             }
 
-            # If the license SKU isn't present add it
-            if (!$LicenseSkuIdLookup.ContainsKey($LicenseSkuId)) {
-                $LicenseSkuIdLookup[$LicenseSkuId] = $LicenseCandidateName
-                continue
+            if ($ConflictingNames) {
+                Write-Warning -Message "${ConflictingNames} licenses had conflicting names which were not reconciled."
             }
 
-            # Skip identical names
-            $LicenseCurrentName = $LicenseSkuIdLookup[$LicenseSkuId]
-            if ($LicenseCurrentName -ceq $LicenseCandidateName) { continue }
-
-            # Prefer name which does not reference an outdated license name:
-            # - Power Virtual Agent(s) -> Copilot Studio
-            $TestRegex = '\b(Power Virtual Agents?)\b'
-            if ($LicenseCandidateName -match $TestRegex) { continue }
-            if ($LicenseCurrentName -match $TestRegex) {
-                $LicenseSkuIdLookup[$LicenseSkuId] = $LicenseCandidateName
-                continue
+            if ($ReturnParsedLicenses) {
+                return $LicenseSkuIdLookup
             }
-
-            $ConflictingNames++
-            Write-Debug -Message ('Display name for license "{0}" differs from existing entry: {1} != {2}' -f $LicenseSkuId, $LicenseCurrentName, $LicenseCandidateName)
-        }
-
-        if ($ConflictingNames) {
-            Write-Warning -Message "${ConflictingNames} licenses had conflicting names which were not reconciled."
-        }
-
-        if ($ReturnParsedLicenses) {
-            return $LicenseSkuIdLookup
         }
 
         # Find/replace pairs to clean-up service plan names

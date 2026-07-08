@@ -15,7 +15,7 @@ Function Test-CommandAvailable {
             $Result = Get-Command -Name $Command -ErrorAction 'Stop'
         } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
-        # If a wildcard is present an exception is not thrown on no matches
+        # If a command name has a wildcard an exception will not be thrown
         if ($null -eq $Result) {
             $ExcMsg = "Command matching wildcard not found: ${Command}"
             $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
@@ -51,7 +51,7 @@ Function Test-EnvironmentMatch {
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        # An empty string is an invalid environment variable value on Windows
+        # An empty string is an invalid value on Windows
         if ((Test-IsWindows) -and $EnvExpectedValue -is [String] -and $EnvExpectedValue -eq '') {
             $ExcMsg = 'Environment variable "{0}" cannot be set to an empty string on Windows.' -f $EnvName
             $ErrExc = [NotSupportedException]::new($ExcMsg)
@@ -172,8 +172,8 @@ Function Test-ModuleAvailable {
                 $VerboseOriginal = $Global:VerbosePreference
                 $Global:VerbosePreference = 'SilentlyContinue'
 
-                # Ensure we always load into the global scope. This isn't the
-                # default if running asynchronously (e.g. an event callback).
+                # Ensure we always load into the global scope. When running
+                # asynchronously the default is the transient module scope.
                 $ModuleAvailable = Import-Module -Name $Module -Scope 'Global' -PassThru -ErrorAction 'Stop' -Verbose:$false
             } catch {
                 $ModuleAvailable = $null
@@ -234,7 +234,7 @@ Function Test-ModuleAvailable {
 # Test if a path is fully qualified
 #
 # We can't simply use `[IO.Path]::IsPathFullyQualified()` in all cases as it's
-# not available in .NET Framework (i.e. not available in Windows PowerShell).
+# not available in .NET Framework (i.e. Windows PowerShell releases).
 Function Test-IsPathFullyQualified {
     [CmdletBinding()]
     [OutputType([Boolean])]
@@ -244,14 +244,15 @@ Function Test-IsPathFullyQualified {
     )
 
     # PowerShell 6 or later is guaranteed to have `IsPathFullyQualified()` as
-    # it won't be running under .NET Framework.
+    # it will be running under .NET (formerly .NET Core).
     if ($PSVersionTable.PSVersion.Major -ge 6) {
         return [IO.Path]::IsPathFullyQualified($Path)
     }
 
-    # PowerShell 5 or earlier is .NET Framework so we have to do it ourselves.
-    # The below logic is taken from the .NET Core source code. It's very well
-    # commented so check the original method for understanding these checks.
+    # Windows PowerShell uses .NET Framework so we have to do this ourselves.
+    # The below logic is taken from the .NET source code. It's well commented
+    # so check the original method to understand these checks.
+
     if ($Path.Length -lt 2) {
         return $false
     }
@@ -373,7 +374,7 @@ Function Get-DotFilesTiming {
     return $Timing
 }
 
-# Dequeue a `dotfiles` task from the asynchronous loading queue and process it
+# Dequeue a `dotfiles` task from the asynchronous loading queue
 Function Invoke-DotFilesAsyncTask {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
@@ -395,13 +396,10 @@ Function Invoke-DotFilesAsyncTask {
 
     if ($Global:AsyncLoadQueue.Count -ne 0) {
         try {
-            # Ensure the task is aware it's running in an async context
             $Global:DotFilesIsAsync = $true
 
-            # `$null` assignment should be unnecessary but is performed as a
-            # precaution against the accidental pollution of the function's
-            # expected boolean output type through uncaptured output from a
-            # processed async task.
+            # `$null` assignment should be unnecessary but is a precaution
+            # against accidental pipeline pollution from uncaptured output.
             $null = & $Global:AsyncLoadQueue.Dequeue()
         } catch {
             $ExcMsg = "Exception was thrown processing an async task: $($PSItem.Exception.Message)"
@@ -425,16 +423,18 @@ Function Invoke-DotFilesAsyncTask {
 
 # Start a `dotfiles` section with optional prerequisite checks
 #
-# Parameter validation via parameter validation attributes is deliberately less
-# strict for optional parameters than typical. Specifically, we permit:
-# - An empty string for `Platform`
-# - `null` for `PwshMinVersion`
-# - `null` or an empty array for `PwshHostName`, `Command`, `Environment`, and
-#   `Module`
+# Parameter validation via attributes is deliberately less strict for optional
+# parameters than typical. Specifically, we permit:
+# - `Platform`
+#   Empty string.
+# - `PwshMinVersion`
+#   `$null` value.
+# - `PwshHostName`, `Command`, `Environment`, `Module`
+#   `$null` value or empty array.
 #
-# The reason for doing this is Windows PowerShell 5.1 will throw an error when
-# creating the closure for the asynchronous loading scriptblock if any function
-# parameters fail validation, even if not present in the function invocation.
+# The reason is Windows PowerShell throws an exception when creating the
+# closure for the asynchronous scriptblock if any function parameters fail
+# validation, even if they weren't provided for the function invocation.
 Function Start-DotFilesSection {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
@@ -452,13 +452,13 @@ Function Start-DotFilesSection {
         [Version]$PwshMinVersion,
         [String[]]$PwshHostName,
 
-        # Test-CommandAvailable
+        # `Test-CommandAvailable`
         [String[]]$Command,
 
-        # Test-EnvironmentMatch
+        # `Test-EnvironmentMatch`
         [Hashtable]$Environment,
 
-        # Test-ModuleAvailable
+        # `Test-ModuleAvailable`
         [String[]]$Module,
 
         [ValidateSet('Get', 'Import')]
@@ -481,6 +481,9 @@ Function Start-DotFilesSection {
     }
 
     if (!$Global:DotFilesIsAsync) {
+        # Run the platform, PowerShell version, and PowerShell host checks
+        # up-front as they're both cheap and static for a given session.
+
         if ($Platform) {
             if ($Platform -eq 'Windows' -and !(Test-IsWindows)) {
                 Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as platform is not Windows.'
@@ -515,7 +518,7 @@ Function Start-DotFilesSection {
 
             $Global:AsyncLoadQueue.Enqueue($AsyncLoadScript)
 
-            # Return `false` to halt further synchronous processing
+            # Return `$false` to halt further synchronous processing
             Write-DotFilesMessage -Type 'Verbose' -Message 'Initial prerequisite checks passed.'
             return $false
         }

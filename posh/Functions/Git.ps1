@@ -151,7 +151,7 @@ Function Global:Invoke-GitLinter {
     $GitArgs = @('ls-files')
     $GitOutput = & git @GitArgs
     if ($LASTEXITCODE -ne 0) {
-        $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+        $ExcMsg = "Failed to list repository files (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
@@ -291,9 +291,9 @@ Function Global:Invoke-GitMergeAllBranches {
             $null = & git rev-parse -q --verify master 2>&1
             if ($LASTEXITCODE -ne 0) {
                 $ExcMsg = 'Unable to guess source branch to merge (not main or master).'
-                $ErrExc = [Exception]::new($ExcMsg)
+                $ErrExc = [InvalidOperationException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $null)
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'UnknownSourceBranch', $ErrCat, $null)
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
@@ -306,14 +306,14 @@ Function Global:Invoke-GitMergeAllBranches {
     $GitArgs = @('branch')
     $GitOutput = & git @GitArgs
     if ($LASTEXITCODE -ne 0) {
-        $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+        $ExcMsg = "Failed to obtain repository branches (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $CurrentBranch = $null
+    $OriginalBranch = $null
     $Branches = [Collections.Generic.List[String]]::new()
     foreach ($Branch in $GitOutput) {
         if ($Branch -notmatch '^[*+ ] \S') {
@@ -327,15 +327,17 @@ Function Global:Invoke-GitMergeAllBranches {
         $Branch = $Branch.Trim()
         if ($Branch.StartsWith('* ')) {
             $Branch = $Branch -replace '^\* '
-            $CurrentBranch = $Branch
+            $OriginalBranch = $Branch
         } elseif ($Branch.StartsWith('+ ')) {
             $Branch = $Branch -replace '^\+ '
+            Write-Warning -Message "Skipping worktree branch: ${Branch}"
+            continue
         }
 
         $Branches.Add($Branch)
     }
 
-    if ([String]::IsNullOrWhiteSpace($CurrentBranch)) {
+    if ([String]::IsNullOrWhiteSpace($OriginalBranch)) {
         $ExcMsg = 'Repository has no current branch.'
         $ErrExc = [InvalidOperationException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
@@ -345,17 +347,17 @@ Function Global:Invoke-GitMergeAllBranches {
 
     if ($SourceBranch -notin $Branches) {
         $ExcMsg = "Source branch for merge not checked out: ${SourceBranch}"
-        $ErrExc = [Exception]::new($ExcMsg)
+        $ErrExc = [InvalidOperationException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $SourceBranch)
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'BranchNotCheckedOut', $ErrCat, $SourceBranch)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    if (($SourceBranch -ne $CurrentBranch) -and !$WhatIfPreference) {
+    if (($SourceBranch -ne $OriginalBranch) -and !$WhatIfPreference) {
         $GitArgs = 'checkout', $SourceBranch
         & git @GitArgs
         if ($LASTEXITCODE -ne 0) {
-            $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+            $ExcMsg = "Failed to checkout source branch for merge (rc: ${LASTEXITCODE}): ${SourceBranch}"
             $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
@@ -373,22 +375,22 @@ Function Global:Invoke-GitMergeAllBranches {
 
             $GitArgs = 'checkout', $Branch
             & git @GitArgs
-            if ($LASTEXITCODE -ne 0) {
-                $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+            if ($LASTEXITCODE -eq 0) {
+                $GitArgs = 'merge', '--ff-only', $SourceBranch
+                & git @GitArgs
+                if ($LASTEXITCODE -ne 0) {
+                    $ExcMsg = "Failed to fast-forward branch (rc: ${LASTEXITCODE}): ${Branch}"
+                    $ErrExc = [Exception]::new($ExcMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
+                    $PSCmdlet.WriteError($ErrRec)
+                }
+            } else {
+                $ExcMsg = "Failed to checkout branch to fast-forward (rc: ${LASTEXITCODE}): ${Branch}"
                 $ErrExc = [Exception]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
-                $PSCmdlet.ThrowTerminatingError($ErrRec)
-            }
-
-            $GitArgs = 'merge', '--ff-only', $SourceBranch
-            & git @GitArgs
-            if ($LASTEXITCODE -ne 0) {
-                $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
-                $ErrExc = [Exception]::new($ExcMsg)
-                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
-                $PSCmdlet.ThrowTerminatingError($ErrRec)
+                $PSCmdlet.WriteError($ErrRec)
             }
 
             Write-Host
@@ -396,10 +398,10 @@ Function Global:Invoke-GitMergeAllBranches {
     }
 
     if (!$WhatIfPreference) {
-        $GitArgs = 'checkout', $CurrentBranch
+        $GitArgs = 'checkout', $OriginalBranch
         & git @GitArgs
         if ($LASTEXITCODE -ne 0) {
-            $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
+            $ExcMsg = "Failed to checkout original branch (rc: ${LASTEXITCODE}): ${OriginalBranch}"
             $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, "git $($GitArgs -join ' ')")
@@ -438,6 +440,7 @@ Function Global:Invoke-GitRepoCommand {
 
         $GitCmds = [Collections.Generic.List[String[]]]::new()
         foreach ($GitCmd in $Command) {
+            # TODO: Doesn't work with quoted arguments containing spaces
             $GitArgs = $GitCmd.Split(' ', [StringSplitOptions]::RemoveEmptyEntries)
             $GitCmds.Add($GitArgs)
         }
@@ -487,9 +490,7 @@ Function Global:Invoke-GitRepoCommand {
                 continue
             }
 
-            # TODO
-            # Detection based on a `.git` directory is incorrect for linked
-            # worktrees and submodule checkouts (they have a `.git` file).
+            # TODO: Linked worktrees and submodule checkouts have a `.git` file
             $GitDirs = [Collections.Generic.List[IO.DirectoryInfo]]::new()
             $GitDir = Join-Path -Path $BaseDir.FullName -ChildPath '.git'
             if (Test-Path -LiteralPath $GitDir -PathType 'Container') {
@@ -529,16 +530,10 @@ Function Global:Invoke-GitRepoCommand {
                 $GitDirsProcessed++
 
                 if ($PSCmdlet.ShouldProcess($GitDir.Name, 'Invoke Git command')) {
-                    try {
-                        Write-Host -ForegroundColor 'Green' "Running in: $($GitDir.Name)"
-                        Set-Location -LiteralPath $GitDir.FullName -ErrorAction 'Stop'
-                    } catch {
-                        $PSCmdlet.WriteError($PSItem)
-                        continue
-                    }
+                    Write-Host -ForegroundColor 'Green' "Running in: $($GitDir.Name)"
 
                     foreach ($GitCmd in $GitCmds) {
-                        & git @GitCmd
+                        & git -C $GitDir.FullName @GitCmd
                         if ($LASTEXITCODE -ne 0) {
                             $ExcMsg = "Git exited with non-zero exit code: ${LASTEXITCODE}"
                             $ErrExc = [Exception]::new($ExcMsg)
@@ -554,12 +549,6 @@ Function Global:Invoke-GitRepoCommand {
                 }
             }
         }
-    }
-
-    End {
-        try {
-            Set-Location -LiteralPath $OriginalLocation -ErrorAction 'Stop'
-        } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
     }
 }
 

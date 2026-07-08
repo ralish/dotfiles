@@ -195,6 +195,9 @@ Function Global:Switch-Perl {
             $LibPaths = [Collections.Generic.List[String]]::new()
         }
 
+        # Forward or backward slashes (or a mix) are valid for `PERL5LIB`
+        $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
+
         foreach ($LibPath in $Env:PERL5LIB.Split([IO.Path]::PathSeparator)) {
             if ([String]::IsNullOrWhiteSpace($LibPath)) { continue }
 
@@ -206,7 +209,7 @@ Function Global:Switch-Perl {
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
-            $LibBasePathElements = $LibPath.Split('\')
+            $LibBasePathElements = $LibPath.Split($DirSepChars)
             if ($LibBasePathElements.Count -lt 3) {
                 $ExcMsg = "Found path with less than expected minimum of 3 path components while parsing PERL5LIB: ${LibPath}"
                 $ErrExc = [FormatException]::new($ExcMsg)
@@ -237,12 +240,12 @@ Function Global:Switch-Perl {
     }
 
     if ($Enable -and $Env:PERL5LIB -and $LibPaths.Count -ne 0) {
-        # Extra options for `Module::Build`
-        $Env:PERL_MB_OPT = "--install_base '$($LibPaths[0])'"
+        # `Module::Build` options
+        $Env:PERL_MB_OPT = "--install_base `"$($LibPaths[0])`""
         Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MB_OPT to: '
         Write-Host $Env:PERL_MB_OPT
 
-        # Extra options for `ExtUtils::MakeMaker`
+        # `ExtUtils::MakeMaker` options
         $Env:PERL_MM_OPT = "INSTALL_BASE=`"$($LibPaths[0])`""
         Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MM_OPT to: '
         Write-Host $Env:PERL_MM_OPT
@@ -274,7 +277,7 @@ Function Global:Switch-Perl {
             & $PathFunc @PathParams -Element $PerlBinPath |
             Set-EnvironmentVariable -Name 'Path' -Scope 'User'
 
-        if ($Enable -and ![String]::IsNullOrWhiteSpace($Env:PERL5LIB)) {
+        if ($Enable -and $Env:PERL5LIB -and $LibPaths.Count -ne 0) {
             Set-EnvironmentVariable -Name 'PERL_MB_OPT' -Value $Env:PERL_MB_OPT -Scope 'User'
             Set-EnvironmentVariable -Name 'PERL_MM_OPT' -Value $Env:PERL_MM_OPT -Scope 'User'
         } elseif ($Disable -and $IncludeNonPathVars) {
@@ -441,7 +444,9 @@ Function Global:Switch-Python {
         }
     }
 
-    # UTF-8 Mode (see PEP 540)
+    # UTF-8 mode (PEP 540)
+    #
+    # Default from Python 3.15 (PEP 686).
     $Utf8Mode = $false
     if ($Features -contains 'UTF-8' -or $Disable) {
         if ($Enable) {

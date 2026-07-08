@@ -19,11 +19,11 @@ Function Global:Get-DotFilesLastUpdated {
         Push-Location
         Set-Location -LiteralPath $DotFiles -ErrorAction 'Stop'
 
-        # Exclude the `.git` directory
-        $RgGlobExcludeGit = '!.git/'
-
-        # Exclude the file containing this function from being matched by `rg`
+        # Exclude this file
         $RgGlobExcludeThis = "!$([IO.Path]::GetFileName($PSCommandPath))"
+
+        # Exclude `.git` directory
+        $RgGlobExcludeGit = '!.git/'
 
         $RgArgs = @(
             '--hidden'
@@ -168,7 +168,7 @@ Function Global:Clear-AllDevCaches {
         Write-Progress @WriteProgressParams -Status 'Clearing Docker data' -PercentComplete ($TasksDone / $TasksTotal * 100)
 
         try {
-            Clear-DockerData
+            Clear-DockerData -Force
         } catch { $PSCmdlet.WriteError($PSItem) }
 
         $TasksDone++

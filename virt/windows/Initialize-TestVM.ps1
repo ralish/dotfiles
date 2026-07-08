@@ -734,8 +734,7 @@ Function Optimize-WindowsUpdate {
     Set-RegistryValue -LiteralPath 'HKCU:\Software\Policies\Microsoft\MRT' -Name 'DontOfferThroughWUAU' -Type 'DWord' -Value 1
 
     try {
-        $ServiceManager = $null
-        $ServiceRegistration = $null
+        $ServiceManager = $ServiceRegistration = $null
 
         Write-Host -ForegroundColor 'Green' '[Windows Update] Registering Microsoft Update ...'
         $ServiceFlags = 7 # asfAllowPendingRegistration + asfAllowOnlineRegistration + asfRegisterServiceWithAU

@@ -32,6 +32,7 @@ $PoshCompletionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Completions'
 $PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
 $PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
 $PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $PoshThemesPath = Join-Path -Path $PSScriptRoot -ChildPath 'Themes'
 
 # Preferred text editors ordered by priority (space-separated)
@@ -100,7 +101,6 @@ if ($DotFilesTimings) {
         $DotFilesProfileStopwatch.Start()
 
         # Reset before loading each section
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
         $DotFilesSectionStopwatch = [Diagnostics.Stopwatch]::new()
     } else {
         Write-Warning -Message 'Ignoring DotFilesTimings as DotFilesVerbose is not enabled.'

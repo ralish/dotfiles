@@ -20,9 +20,9 @@ Function Global:Set-AWSCredentialEnvironment {
     [OutputType([Void])]
     Param(
         # The AWS type may not be available at the time the function is sourced
-        # due to lazy import of the appropriate AWS module.
+        # due to the AWS module being lazily imported.
         [Parameter(ParameterSetName = 'AWSCredentials', Mandatory, ValueFromPipeline)]
-        [PSObject]$Credential, # Amazon.SecurityToken.Model.Credentials
+        [PSObject]$Credential, # `Amazon.SecurityToken.Model.Credentials`
 
         [Parameter(ParameterSetName = 'PlainText', Mandatory)]
         [String]$AccessKey,
@@ -38,7 +38,7 @@ Function Global:Set-AWSCredentialEnvironment {
     Begin {
         if ($PSCmdlet.ParameterSetName -eq 'AWSCredentials') {
             try {
-                $Module = Test-ModuleAvailable -Name 'AWS.Tools.SecurityToken', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
+                $Module = Test-ModuleAvailable -Name 'AWS.Tools.Common', 'AWSPowerShell.NetCore', 'AWSPowerShell' -Require 'Any' -PassThru
                 $Module | Import-Module -ErrorAction 'Stop' -Verbose:$false
             } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
         }
@@ -82,7 +82,7 @@ Function Global:Set-R53HostedZoneNameTag {
     [OutputType([Void])]
     Param(
         # The AWS type may not be available at the time the function is sourced
-        # due to lazy import of the appropriate AWS module.
+        # due to the AWS module being lazily imported.
         [Parameter(Mandatory, ValueFromPipeline)]
         [Array]$HostedZone # `Amazon.Route53.Model.HostedZone[]`
     )
@@ -176,10 +176,6 @@ Function Global:Set-R53HostedZoneParkedRecords {
         $Zones = Get-R53HostedZoneList -ErrorAction 'Stop'
     } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
-    # Always the hosted zone ID for creating alias records that route traffic
-    # to a CloudFront distribution.
-    $CloudFrontHostedZoneId = 'Z2FDTNDATAQYW2'
-
     $Changes = [Collections.Generic.List[Amazon.Route53.Model.ChangeInfo]]::new()
 
     # Construct the DMARC record
@@ -267,7 +263,7 @@ Function Global:Set-R53HostedZoneParkedRecords {
 
     # Process record changes for each zone
     foreach ($ZoneName in $Domain) {
-        $ZoneName = $ZoneName.TrimEnd('.').ToLower()
+        $ZoneName = $ZoneName.TrimEnd('.').ToLowerInvariant()
         $ZoneFqdn = "${ZoneName}."
         $Zone = $Zones | Where-Object Name -EQ $ZoneFqdn
 
@@ -356,6 +352,9 @@ Function Global:Set-R53HostedZoneParkedRecords {
         }
 
         if ($Records -contains 'Redirect') {
+            # Hosted zone ID for CloudFront distribution alias records
+            $CloudFrontHostedZoneId = 'Z2FDTNDATAQYW2'
+
             foreach ($RecordName in @($ZoneName, "*.${ZoneName}")) {
                 foreach ($RecordType in $RedirectCloudFrontRecordTypes) {
                     $Record = [Amazon.Route53.Model.Change]::new()
@@ -390,7 +389,7 @@ Function Global:Set-R53HostedZoneTag {
     [OutputType([Void])]
     Param(
         # The AWS type may not be available at the time the function is sourced
-        # due to lazy import of the appropriate AWS module.
+        # due to the AWS module being lazily imported.
         [Parameter(Mandatory, ValueFromPipeline)]
         [Array]$HostedZone, # `Amazon.Route53.Model.HostedZone[]`
 
@@ -498,7 +497,7 @@ Function Global:Get-S3BucketSize {
     $MetricsPerRegion = @{}
     foreach ($Region in $Regions.RegionName) {
         try {
-            $Metrics = Get-CWMetricList -Region $Region -MetricName 'BucketSizeBytes' -ErrorAction 'Stop' -Verbose:$false
+            $Metrics = Get-CWMetricList -Region $Region -Namespace 'AWS/S3' -MetricName 'BucketSizeBytes' -ErrorAction 'Stop' -Verbose:$false
             $MetricsPerRegion[$Region] = $Metrics
         } catch {
             Write-Warning -Message "Failed to retrieve BucketSizeBytes metrics for region: ${Region}"
@@ -515,6 +514,7 @@ Function Global:Get-S3BucketSize {
 
     $EndTime = (Get-Date).ToUniversalTime()
     $StartTime = $EndTime.AddDays(-2)
+
     if ($ModuleVersionMajor -ge 5) {
         $CwMetricStatisticParams['EndTime'] = $EndTime
         $CwMetricStatisticParams['StartTime'] = $StartTime

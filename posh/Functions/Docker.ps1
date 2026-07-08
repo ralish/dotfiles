@@ -8,24 +8,33 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Clear Docker data
 Function Global:Clear-DockerData {
-    [CmdletBinding(SupportsShouldProcess)]
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
     [OutputType([Void], [String[]])]
     Param(
         [Switch]$All,
-        [Switch]$Volumes
+        [Switch]$Volumes,
+        [Switch]$Force
     )
 
+    # Confirmation is handled natively in PowerShell (so `--force` is safe)
     $PruneArgs = 'system', 'prune', '--force'
 
+    # Remove all unused images (not just dangling ones)
     if ($All) {
         $PruneArgs += '--all'
     }
 
+    # Remove anonymous volumes
     if ($Volumes) {
         $PruneArgs += '--volumes'
     }
 
     $PruneCmd = "docker $($PruneArgs -join ' ')"
+
+    # Skip confirmation with `-Force` unless `-Confirm` was provided
+    if ($Force -and !$PSBoundParameters.ContainsKey('Confirm')) {
+        $ConfirmPreference = 'None'
+    }
 
     if ($PSCmdlet.ShouldProcess('Docker data', 'Clear')) {
         Write-Verbose -Message "Clearing Docker data: ${PruneCmd}"

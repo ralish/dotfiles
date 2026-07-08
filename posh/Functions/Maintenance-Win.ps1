@@ -85,242 +85,206 @@ Function Global:Update-Chrome {
 
     # So we don't free existing COM objects in the (extremely unlikely) case
     # that they're using the same variable names in a parent scope.
-    $GoogleUpdate = $null
-    $AppBundle = $null
-    $AppUpdate = $null
-    $CurrentVersionWeb = $null
-    $NextVersionWeb = $null
+    $GoogleUpdate = $AppBundle = $AppUpdate = $CurrentVersionWeb = $NextVersionWeb = $null
 
     # Errors returned from COM objects are surfaced by the .NET runtime as
     # a generic `RuntimeException` (`0x80131501` / `COR_E_SYSTEM`), which
     # requires inspection of the exception message to determine the failure.
 
     try {
-        $GoogleUpdate = New-Object -ComObject $ComObjectName
-    } catch {
-        Clear-ComObjects
+        try {
+            $GoogleUpdate = New-Object -ComObject $ComObjectName
+        } catch {
+            $Exc = $PSItem
+            switch -Regex ($Exc.Exception.Message) {
+                # REGDB_E_CLASSNOTREG
+                '\b0x80040154\b' { $ExcMsg = 'Unable to update Chrome as Google Update is not available.' }
+                default { $ExcMsg = "Google Update COM object failed to activate: $($Exc.Exception.Message)" }
+            }
 
-        $Exc = $PSItem
-        switch -Regex ($Exc.Exception.Message) {
-            # REGDB_E_CLASSNOTREG
-            '\b0x80040154\b' { $ExcMsg = 'Unable to update Chrome as Google Update is not available.' }
-            default { $ExcMsg = "Google Update COM object failed to activate: $($Exc.Exception.Message)" }
+            $ErrExc = [Exception]::new($ExcMsg, $Exc.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $ErrExc = [Exception]::new($ExcMsg, $Exc.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    try {
-        $AppBundle = $GoogleUpdate.createAppBundleWeb()
-    } catch {
-        Clear-ComObjects
-
-        $ExcMsg = "Google Update failed to create Chrome app bundle: $($PSItem.Exception.Message)"
-        $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    try {
-        $AppBundle.initialize()
-    } catch {
-        Clear-ComObjects
-
-        $ExcMsg = "Chrome app bundle failed to initialise: $($PSItem.Exception.Message)"
-        $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    try {
-        $AppBundle.createInstalledApp($AppId)
-    } catch {
-        Clear-ComObjects
-
-        $Exc = $PSItem
-        switch -Regex ($Exc.Exception.Message) {
-            # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY
-            '\b0x80040813\b' { $ExcMsg = 'Google Update reported updates are disabled by policy.' }
-            # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY_MANUAL
-            '\b0x8004081f\b' { $ExcMsg = 'Google Update reported updates are disabled by policy (manual).' }
-            # GOOPDATE_E_APP_USING_EXTERNAL_UPDATER
-            '\b0xA043081D\b' { $ExcMsg = 'Google Update reported an update is already in-progress.' }
-            default { $ExcMsg = "Chrome app bundle failed to create installed app: $($Exc.Exception.Message)" }
+        try {
+            $AppBundle = $GoogleUpdate.createAppBundleWeb()
+        } catch {
+            $ExcMsg = "Google Update failed to create Chrome app bundle: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $ErrExc = [Exception]::new($ExcMsg, $Exc.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    try {
-        # Parameter is index of created app
-        $AppUpdate = $AppBundle.appWeb(0)
-    } catch {
-        Clear-ComObjects
-
-        $ExcMsg = "Failed to retrieve app instance from Chrome app bundle: $($PSItem.Exception.Message)"
-        $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    try {
-        $CurrentVersionWeb = $AppUpdate.currentVersionWeb
-        $Result.BeforeUpdate = $CurrentVersionWeb.version
-    } catch {
-        Clear-ComObjects
-
-        $ExcMsg = "Failed to retrieve current version from Chrome app bundle: $($PSItem.Exception.Message)"
-        $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    if (!$PSCmdlet.ShouldProcess('Chrome', 'Update')) {
-        Clear-ComObjects
-        $Result.Success = $true
-        $Result.WhatIf = $true
-        return $Result
-    }
-
-    $MaxWaitTime = 300 # 5 mins
-    $WaitTime = [Diagnostics.Stopwatch]::StartNew()
-
-    do {
-        $LastUpdateStateId = $AppUpdate.currentState.stateValue
-        if ($UpdateStates.ContainsKey($LastUpdateStateId)) {
-            $LastUpdateState = $UpdateStates[$LastUpdateStateId]
-        } else {
-            $LastUpdateState = 'Unknown'
+        try {
+            $AppBundle.initialize()
+        } catch {
+            $ExcMsg = "Chrome app bundle failed to initialise: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $ElapsedSeconds = [Int]($WaitTime.ElapsedMilliseconds / 1000)
-        $StatusMsg = "Update state: ${LastUpdateState} (Waited ${ElapsedSeconds} secs / time-out: ${MaxWaitTime} secs) ..."
-        Write-Progress @WriteProgressParams -Status $StatusMsg
+        try {
+            $AppBundle.createInstalledApp($AppId)
+        } catch {
+            $Exc = $PSItem
+            switch -Regex ($Exc.Exception.Message) {
+                # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY
+                '\b0x80040813\b' { $ExcMsg = 'Google Update reported updates are disabled by policy.' }
+                # GOOPDATE_E_APP_UPDATE_DISABLED_BY_POLICY_MANUAL
+                '\b0x8004081f\b' { $ExcMsg = 'Google Update reported updates are disabled by policy (manual).' }
+                # GOOPDATE_E_APP_USING_EXTERNAL_UPDATER
+                '\b0xA043081D\b' { $ExcMsg = 'Google Update reported an update is already in-progress.' }
+                default { $ExcMsg = "Chrome app bundle failed to create installed app: $($Exc.Exception.Message)" }
+            }
 
-        switch ($LastUpdateStateId) {
-            # Initialising
-            1 {
+            $ErrExc = [Exception]::new($ExcMsg, $Exc.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
+        try {
+            # Parameter is index of created app
+            $AppUpdate = $AppBundle.appWeb(0)
+        } catch {
+            $ExcMsg = "Failed to retrieve app instance from Chrome app bundle: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
+        try {
+            $CurrentVersionWeb = $AppUpdate.currentVersionWeb
+            $Result.BeforeUpdate = $CurrentVersionWeb.version
+        } catch {
+            $ExcMsg = "Failed to retrieve current version from Chrome app bundle: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
+        if (!$PSCmdlet.ShouldProcess('Chrome', 'Update')) {
+            $Result.Success = $true
+            $Result.WhatIf = $true
+            return $Result
+        }
+
+        $MaxWaitTime = 300 # 5 mins
+        $WaitTime = [Diagnostics.Stopwatch]::StartNew()
+
+        try {
+            do {
+                $LastUpdateStateId = $AppUpdate.currentState.stateValue
+                if ($UpdateStates.ContainsKey($LastUpdateStateId)) {
+                    $LastUpdateState = $UpdateStates[$LastUpdateStateId]
+                } else {
+                    $LastUpdateState = 'Unknown'
+                }
+
+                $ElapsedSeconds = [Int]($WaitTime.ElapsedMilliseconds / 1000)
+                $StatusMsg = "${LastUpdateState} (Waited ${ElapsedSeconds} secs / time-out: ${MaxWaitTime} secs) ..."
+                Write-Progress @WriteProgressParams -Status $StatusMsg
+
                 try {
-                    $AppBundle.checkForUpdate()
-                } catch {
-                    Clear-ComObjects
-                    Write-Progress -Completed
+                    switch ($LastUpdateStateId) {
+                        # Initialising
+                        1 { $AppBundle.checkForUpdate() }
 
-                    $ExcMsg = "Failed to trigger Chrome update check: $($PSItem.Exception.Message)"
+                        # Update available
+                        4 { $AppBundle.download() }
+
+                        # Ready to install
+                        11 { $AppBundle.install() }
+                    }
+                } catch {
+                    switch ($LastUpdateStateId) {
+                        1 { $ExcMsg = "Failed to trigger Chrome update check: $($PSItem.Exception.Message)" }
+                        4 { $ExcMsg = "Failed to trigger Chrome update download: $($PSItem.Exception.Message)" }
+                        11 { $ExcMsg = "Failed to trigger Chrome update install: $($PSItem.Exception.Message)" }
+                    }
+
                     $ErrExc = [Exception]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
                     $PSCmdlet.ThrowTerminatingError($ErrRec)
                 }
-            }
 
-            # Update available
-            4 {
+                # IDs >= 14 are final states
+                if ($LastUpdateStateId -ge 14) {
+                    $Result.UpdateState = $LastUpdateState
+                    $Result.UpdateStateId = $LastUpdateStateId
+                    break
+                }
+
+                Start-Sleep -Seconds 1
+            } while ($ElapsedSeconds -lt $MaxWaitTime)
+        } finally {
+            $WaitTime.Stop()
+            Write-Progress @WriteProgressParams -Completed
+        }
+
+        switch ($Result.UpdateStateId) {
+            # Install complete
+            14 {
                 try {
-                    $AppBundle.download()
+                    $NextVersionWeb = $AppUpdate.nextVersionWeb
+                    $Result.AfterUpdate = $NextVersionWeb.version
+                    $Result.Success = $true
                 } catch {
-                    Clear-ComObjects
-                    Write-Progress -Completed
-
-                    $ExcMsg = "Failed to trigger Chrome update download: $($PSItem.Exception.Message)"
+                    $ExcMsg = "Failed to retrieve new version from Chrome app bundle: $($PSItem.Exception.Message)"
                     $ErrExc = [Exception]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-                    $PSCmdlet.ThrowTerminatingError($ErrRec)
+                    $PSCmdlet.WriteError($ErrRec)
                 }
             }
 
-            # Ready to install
-            11 {
-                try {
-                    $AppBundle.install()
-                } catch {
-                    Clear-ComObjects
-                    Write-Progress -Completed
-
-                    $ExcMsg = "Failed to trigger Chrome update install: $($PSItem.Exception.Message)"
-                    $ErrExc = [Exception]::new($ExcMsg)
-                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-                    $PSCmdlet.ThrowTerminatingError($ErrRec)
-                }
+            # Paused
+            15 {
+                Write-Warning -Message 'Google Update reported the update is paused.'
             }
-        }
 
-        # IDs >= 14 are final states
-        if ($LastUpdateStateId -ge 14) {
-            $Result.UpdateState = $LastUpdateState
-            $Result.UpdateStateId = $LastUpdateStateId
-            break
-        }
-
-        Start-Sleep -Seconds 1
-    } while ($ElapsedSeconds -lt $MaxWaitTime)
-
-    $WaitTime.Stop()
-    Write-Progress @WriteProgressParams -Completed
-
-    switch ($Result.UpdateStateId) {
-        # Install complete
-        14 {
-            try {
-                $NextVersionWeb = $AppUpdate.nextVersionWeb
-                $Result.AfterUpdate = $NextVersionWeb.version
+            # No update
+            16 {
+                $Result.AfterUpdate = $Result.BeforeUpdate
                 $Result.Success = $true
-            } catch {
-                $ExcMsg = "Failed to retrieve new version from Chrome app bundle: $($PSItem.Exception.Message)"
+            }
+
+            # Error
+            17 {
+                $ExcMsg = 'Google Update reported an error occurred.'
+                $ErrExc = [Exception]::new($ExcMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+                $PSCmdlet.WriteError($ErrRec)
+            }
+
+            # Timeout
+            -1 {
+                $LastUpdateStateMsg = "Last update state: ${LastUpdateState} [ID: ${LastUpdateStateId}]"
+                Write-Warning -Message "Gave-up waiting on Chrome update after ${MaxWaitTime} secs (${LastUpdateStateMsg})"
+            }
+
+            # Unknown state ID
+            default {
+                $ExcMsg = "Google Update reported an unknown state ID: $($Result.UpdateStateId)"
                 $ErrExc = [Exception]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
                 $PSCmdlet.WriteError($ErrRec)
             }
         }
-
-        # Paused
-        15 { Write-Warning -Message 'Google Update reported the update is paused.' }
-
-        # No update
-        16 {
-            $Result.AfterUpdate = $Result.BeforeUpdate
-            $Result.Success = $true
-        }
-
-        # Error
-        17 {
-            $ExcMsg = 'Google Update reported an error occurred.'
-            $ErrExc = [Exception]::new($ExcMsg)
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-            $PSCmdlet.WriteError($ErrRec)
-        }
-
-        # Timeout
-        -1 {
-            $LastUpdateStateMsg = "Last update state: ${LastUpdateState} [ID: ${LastUpdateStateId}]"
-            Write-Warning -Message "Gave-up waiting on Chrome update after ${MaxWaitTime} secs (${LastUpdateStateMsg})"
-        }
-
-        # Unknown state ID
-        default {
-            $ExcMsg = "Google Update reported an unknown state ID: $($Result.UpdateStateId)"
-            $ErrExc = [Exception]::new($ExcMsg)
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-            $PSCmdlet.WriteError($ErrRec)
-        }
+    } finally {
+        Clear-ComObjects
     }
 
-    Clear-ComObjects
     return $Result
 }
 
@@ -395,239 +359,203 @@ Function Global:Update-Edge {
 
     # So we don't free existing COM objects in the (extremely unlikely) case
     # that they're using the same variable names in a parent scope.
-    $EdgeUpdate = $null
-    $AppBundle = $null
-    $AppUpdate = $null
-    $CurrentVersionWeb = $null
-    $NextVersionWeb = $null
+    $EdgeUpdate = $AppBundle = $AppUpdate = $CurrentVersionWeb = $NextVersionWeb = $null
 
     # Errors returned from COM objects are surfaced by the .NET runtime as
     # a generic `RuntimeException` (`0x80131501` / `COR_E_SYSTEM`), which
     # requires inspection of the exception message to determine the failure.
 
     try {
-        $EdgeUpdate = New-Object -ComObject $ComObjectName
-    } catch {
-        Clear-ComObjects
+        try {
+            $EdgeUpdate = New-Object -ComObject $ComObjectName
+        } catch {
+            $Exc = $PSItem
+            switch -Regex ($Exc.Exception.Message) {
+                # REGDB_E_CLASSNOTREG
+                '\b0x80040154\b' { $ExcMsg = 'Unable to update Edge as Edge Update is not available.' }
+                default { $ExcMsg = "Edge Update COM object failed to activate: $($Exc.Exception.Message)" }
+            }
 
-        $Exc = $PSItem
-        switch -Regex ($Exc.Exception.Message) {
-            # REGDB_E_CLASSNOTREG
-            '\b0x80040154\b' { $ExcMsg = 'Unable to update Edge as Edge Update is not available.' }
-            default { $ExcMsg = "Edge Update COM object failed to activate: $($Exc.Exception.Message)" }
+            $ErrExc = [Exception]::new($ExcMsg, $Exc.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $ErrExc = [Exception]::new($ExcMsg, $Exc.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    try {
-        $AppBundle = $EdgeUpdate.createAppBundleWeb()
-    } catch {
-        Clear-ComObjects
-
-        $ExcMsg = "Edge Update failed to create Edge app bundle: $($PSItem.Exception.Message)"
-        $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    try {
-        $AppBundle.initialize()
-    } catch {
-        Clear-ComObjects
-
-        $ExcMsg = "Edge app bundle failed to initialise: $($PSItem.Exception.Message)"
-        $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    try {
-        $AppBundle.createInstalledApp($AppId)
-    } catch {
-        Clear-ComObjects
-
-        $Exc = $PSItem
-        switch -Regex ($Exc.Exception.Message) {
-            '\b0x80040813\b' { $ExcMsg = 'Edge Update reported updates are disabled by policy.' }
-            '\b0x8004081f\b' { $ExcMsg = 'Edge Update reported updates are disabled by policy (manual).' }
-            '\b0xA043081D\b' { $ExcMsg = 'Edge Update reported an update is already in-progress.' }
-            default { $ExcMsg = "Edge app bundle failed to create installed app: $($Exc.Exception.Message)" }
+        try {
+            $AppBundle = $EdgeUpdate.createAppBundleWeb()
+        } catch {
+            $ExcMsg = "Edge Update failed to create Edge app bundle: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $ErrExc = [Exception]::new($ExcMsg, $Exc.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    try {
-        # Parameter is index of created app
-        $AppUpdate = $AppBundle.appWeb(0)
-    } catch {
-        Clear-ComObjects
-
-        $ExcMsg = "Failed to retrieve app instance from Edge app bundle: $($PSItem.Exception.Message)"
-        $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    try {
-        $CurrentVersionWeb = $AppUpdate.currentVersionWeb
-        $Result.BeforeUpdate = $CurrentVersionWeb.version
-    } catch {
-        Clear-ComObjects
-
-        $ExcMsg = "Failed to retrieve current version from Edge app bundle: $($PSItem.Exception.Message)"
-        $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    if (!$PSCmdlet.ShouldProcess('Edge', 'Update')) {
-        Clear-ComObjects
-        $Result.Success = $true
-        $Result.WhatIf = $true
-        return $Result
-    }
-
-    $MaxWaitTime = 300 # 5 mins
-    $WaitTime = [Diagnostics.Stopwatch]::StartNew()
-
-    do {
-        $LastUpdateStateId = $AppUpdate.currentState.stateValue
-        if ($UpdateStates.ContainsKey($LastUpdateStateId)) {
-            $LastUpdateState = $UpdateStates[$LastUpdateStateId]
-        } else {
-            $LastUpdateState = 'Unknown'
+        try {
+            $AppBundle.initialize()
+        } catch {
+            $ExcMsg = "Edge app bundle failed to initialise: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $ElapsedSeconds = [Int]($WaitTime.ElapsedMilliseconds / 1000)
-        $StatusMsg = "Update state: ${LastUpdateState} (Waited ${ElapsedSeconds} secs / time-out: ${MaxWaitTime} secs) ..."
-        Write-Progress @WriteProgressParams -Status $StatusMsg
+        try {
+            $AppBundle.createInstalledApp($AppId)
+        } catch {
+            $Exc = $PSItem
+            switch -Regex ($Exc.Exception.Message) {
+                '\b0x80040813\b' { $ExcMsg = 'Edge Update reported updates are disabled by policy.' }
+                '\b0x8004081f\b' { $ExcMsg = 'Edge Update reported updates are disabled by policy (manual).' }
+                '\b0xA043081D\b' { $ExcMsg = 'Edge Update reported an update is already in-progress.' }
+                default { $ExcMsg = "Edge app bundle failed to create installed app: $($Exc.Exception.Message)" }
+            }
 
-        switch ($LastUpdateStateId) {
-            # Initialising
-            1 {
+            $ErrExc = [Exception]::new($ExcMsg, $Exc.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
+        try {
+            # Parameter is index of created app
+            $AppUpdate = $AppBundle.appWeb(0)
+        } catch {
+            $ExcMsg = "Failed to retrieve app instance from Edge app bundle: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
+        try {
+            $CurrentVersionWeb = $AppUpdate.currentVersionWeb
+            $Result.BeforeUpdate = $CurrentVersionWeb.version
+        } catch {
+            $ExcMsg = "Failed to retrieve current version from Edge app bundle: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
+        if (!$PSCmdlet.ShouldProcess('Edge', 'Update')) {
+            $Result.Success = $true
+            $Result.WhatIf = $true
+            return $Result
+        }
+
+        $MaxWaitTime = 300 # 5 mins
+        $WaitTime = [Diagnostics.Stopwatch]::StartNew()
+
+        try {
+            do {
+                $LastUpdateStateId = $AppUpdate.currentState.stateValue
+                if ($UpdateStates.ContainsKey($LastUpdateStateId)) {
+                    $LastUpdateState = $UpdateStates[$LastUpdateStateId]
+                } else {
+                    $LastUpdateState = 'Unknown'
+                }
+
+                $ElapsedSeconds = [Int]($WaitTime.ElapsedMilliseconds / 1000)
+                $StatusMsg = "${LastUpdateState} (Waited ${ElapsedSeconds} secs / time-out: ${MaxWaitTime} secs) ..."
+                Write-Progress @WriteProgressParams -Status $StatusMsg
+
                 try {
-                    $AppBundle.checkForUpdate()
-                } catch {
-                    Clear-ComObjects
-                    Write-Progress -Completed
+                    switch ($LastUpdateStateId) {
+                        # Initialising
+                        1 { $AppBundle.checkForUpdate() }
 
-                    $ExcMsg = "Failed to trigger Edge update check: $($PSItem.Exception.Message)"
+                        # Update available
+                        4 { $AppBundle.download() }
+
+                        # Ready to install
+                        11 { $AppBundle.install() }
+                    }
+                } catch {
+                    switch ($LastUpdateStateId) {
+                        1 { $ExcMsg = "Failed to trigger Edge update check: $($PSItem.Exception.Message)" }
+                        4 { $ExcMsg = "Failed to trigger Edge update download: $($PSItem.Exception.Message)" }
+                        11 { $ExcMsg = "Failed to trigger Edge update install: $($PSItem.Exception.Message)" }
+                    }
+
                     $ErrExc = [Exception]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
                     $PSCmdlet.ThrowTerminatingError($ErrRec)
                 }
-            }
 
-            # Update available
-            4 {
+                # IDs >= 14 are final states
+                if ($LastUpdateStateId -ge 14) {
+                    $Result.UpdateState = $LastUpdateState
+                    $Result.UpdateStateId = $LastUpdateStateId
+                    break
+                }
+
+                Start-Sleep -Seconds 1
+            } while ($ElapsedSeconds -lt $MaxWaitTime)
+        } finally {
+            $WaitTime.Stop()
+            Write-Progress @WriteProgressParams -Completed
+        }
+
+        switch ($Result.UpdateStateId) {
+            # Install complete
+            14 {
                 try {
-                    $AppBundle.download()
+                    $NextVersionWeb = $AppUpdate.nextVersionWeb
+                    $Result.AfterUpdate = $NextVersionWeb.version
+                    $Result.Success = $true
                 } catch {
-                    Clear-ComObjects
-                    Write-Progress -Completed
-
-                    $ExcMsg = "Failed to trigger Edge update download: $($PSItem.Exception.Message)"
+                    $ExcMsg = "Failed to retrieve new version from Edge app bundle: $($PSItem.Exception.Message)"
                     $ErrExc = [Exception]::new($ExcMsg)
                     $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                     $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-                    $PSCmdlet.ThrowTerminatingError($ErrRec)
+                    $PSCmdlet.WriteError($ErrRec)
                 }
             }
 
-            # Ready to install
-            11 {
-                try {
-                    $AppBundle.install()
-                } catch {
-                    Clear-ComObjects
-                    Write-Progress -Completed
-
-                    $ExcMsg = "Failed to trigger Edge update install: $($PSItem.Exception.Message)"
-                    $ErrExc = [Exception]::new($ExcMsg)
-                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-                    $PSCmdlet.ThrowTerminatingError($ErrRec)
-                }
+            # Paused
+            15 {
+                Write-Warning -Message 'Edge Update reported the update is paused.'
             }
-        }
 
-        # IDs >= 14 are final states
-        if ($LastUpdateStateId -ge 14) {
-            $Result.UpdateState = $LastUpdateState
-            $Result.UpdateStateId = $LastUpdateStateId
-            break
-        }
-
-        Start-Sleep -Seconds 1
-    } while ($ElapsedSeconds -lt $MaxWaitTime)
-
-    $WaitTime.Stop()
-    Write-Progress @WriteProgressParams -Completed
-
-    switch ($Result.UpdateStateId) {
-        # Install complete
-        14 {
-            try {
-                $NextVersionWeb = $AppUpdate.nextVersionWeb
-                $Result.AfterUpdate = $NextVersionWeb.version
+            # No update
+            16 {
+                $Result.AfterUpdate = $Result.BeforeUpdate
                 $Result.Success = $true
-            } catch {
-                $ExcMsg = "Failed to retrieve new version from Edge app bundle: $($PSItem.Exception.Message)"
+            }
+
+            # Error
+            17 {
+                $ExcMsg = 'Edge Update reported an error occurred.'
+                $ErrExc = [Exception]::new($ExcMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+                $PSCmdlet.WriteError($ErrRec)
+            }
+
+            # Timeout
+            -1 {
+                $LastUpdateStateMsg = "Last update state: ${LastUpdateState} [ID: ${LastUpdateStateId}]"
+                Write-Warning -Message "Gave-up waiting on Edge update after ${MaxWaitTime} secs (${LastUpdateStateMsg})"
+            }
+
+            # Unknown state ID
+            default {
+                $ExcMsg = "Edge Update reported an unknown state ID: $($Result.UpdateStateId)"
                 $ErrExc = [Exception]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
                 $PSCmdlet.WriteError($ErrRec)
             }
         }
-
-        # Paused
-        15 { Write-Warning -Message 'Edge Update reported the update is paused.' }
-
-        # No update
-        16 {
-            $Result.AfterUpdate = $Result.BeforeUpdate
-            $Result.Success = $true
-        }
-
-        # Error
-        17 {
-            $ExcMsg = 'Edge Update reported an error occurred.'
-            $ErrExc = [Exception]::new($ExcMsg)
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-            $PSCmdlet.WriteError($ErrRec)
-        }
-
-        # Timeout
-        -1 {
-            $LastUpdateStateMsg = "Last update state: ${LastUpdateState} [ID: ${LastUpdateStateId}]"
-            Write-Warning -Message "Gave-up waiting on Edge update after ${MaxWaitTime} secs (${LastUpdateStateMsg})"
-        }
-
-        # Unknown state ID
-        default {
-            $ExcMsg = "Edge Update reported an unknown state ID: $($Result.UpdateStateId)"
-            $ErrExc = [Exception]::new($ExcMsg)
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
-            $PSCmdlet.WriteError($ErrRec)
-        }
+    } finally {
+        Clear-ComObjects
     }
 
-    Clear-ComObjects
     return $Result
 }
 
@@ -666,7 +594,7 @@ Function Global:Update-MicrosoftStore {
     }
 
     # Modern PowerShell releases throw an exception on trying to instantiate a
-    # non-existing class but older releases just return `null`. This includes
+    # non-existing class but older releases just return `$null`. This includes
     # Windows PowerShell 5.1, which is still the latest inbox version.
     if (!$Instance) {
         $ExcMsg = "Unable to update Microsoft Store apps as ${ClassName} WMI class is not available."
@@ -789,56 +717,58 @@ Function Global:Update-Office {
     }
 
     try {
-        Write-Progress @WriteProgressParams
-        $UpdateArgs = '/update', 'user', 'updatepromptuser=True'
-        $UpdateCmd = "${OfficeC2RClient} $($UpdateArgs -join ' ')"
-        Start-Process -FilePath $OfficeC2RClient -ArgumentList $UpdateArgs -ErrorAction 'Stop'
-    } catch {
-        $ExcMsg = "Failed to start Office Click-To-Run Client: $($PSItem.Exception.Message)"
-        $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
-    }
-
-    $MaxWaitTime = 900 # 15 mins
-    $WaitTime = [Diagnostics.Stopwatch]::StartNew()
-
-    do {
-        Start-Sleep -Seconds 5
-        $ElapsedSeconds = [Int]($WaitTime.ElapsedMilliseconds / 1000)
-
-        $ExecutingScenario = $C2RRegKey.GetValue('ExecutingScenario')
-        if (!$ExecutingScenario) {
-            $LastScenario = $C2RRegKey.GetValue('LastScenario')
-            $LastScenarioResult = $C2RRegKey.GetValue('LastScenarioResult')
-            break
-        }
-
-        $StatusMsg = "Executing Scenario: ${ExecutingScenario} (Waited ${ElapsedSeconds} secs / time-out: ${MaxWaitTime} secs) ..."
-        Write-Progress @WriteProgressParams -Status $StatusMsg
-
         try {
-            $TasksRegPath = Join-Path -Path $C2RRegPath -ChildPath "Scenario\${ExecutingScenario}\TasksState"
-            $TasksRegKey = Get-Item -LiteralPath $TasksRegPath -ErrorAction 'Stop'
+            Write-Progress @WriteProgressParams
+            $UpdateArgs = '/update', 'user', 'updatepromptuser=True'
+            $UpdateCmd = "${OfficeC2RClient} $($UpdateArgs -join ' ')"
+            Start-Process -FilePath $OfficeC2RClient -ArgumentList $UpdateArgs -ErrorAction 'Stop'
         } catch {
-            Write-Warning -Message "Failed to retrieve tasks state for executing scenario: $($PSItem.Exception.Message)"
-            continue
+            $ExcMsg = "Failed to start Office Click-To-Run Client: $($PSItem.Exception.Message)"
+            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        foreach ($Task in $TasksRegKey.GetValueNames()) {
-            $TaskName = $Task.Split(':')[0]
-            $TaskStatus = $TasksRegKey.GetValue($Task)
+        $MaxWaitTime = 900 # 15 mins
+        $WaitTime = [Diagnostics.Stopwatch]::StartNew()
 
-            switch ($TaskStatus) {
-                'TASKSTATE_CANCELLED' { Write-Warning -Message "Office update task cancelled in ${ExecutingScenario} scenario: ${TaskName}" }
-                'TASKSTATE_FAILED' { Write-Warning -Message "Office update task failed in ${ExecutingScenario} scenario: ${TaskName}" }
+        do {
+            Start-Sleep -Seconds 5
+            $ElapsedSeconds = [Int]($WaitTime.ElapsedMilliseconds / 1000)
+
+            $ExecutingScenario = $C2RRegKey.GetValue('ExecutingScenario')
+            if (!$ExecutingScenario) {
+                $LastScenario = $C2RRegKey.GetValue('LastScenario')
+                $LastScenarioResult = $C2RRegKey.GetValue('LastScenarioResult')
+                break
             }
-        }
-    } while ($ElapsedSeconds -lt $MaxWaitTime)
 
-    $WaitTime.Stop()
-    Write-Progress @WriteProgressParams -Completed
+            $StatusMsg = "Executing Scenario: ${ExecutingScenario} (Waited ${ElapsedSeconds} secs / time-out: ${MaxWaitTime} secs) ..."
+            Write-Progress @WriteProgressParams -Status $StatusMsg
+
+            try {
+                $TasksRegPath = Join-Path -Path $C2RRegPath -ChildPath "Scenario\${ExecutingScenario}\TasksState"
+                $TasksRegKey = Get-Item -LiteralPath $TasksRegPath -ErrorAction 'Stop'
+            } catch {
+                Write-Warning -Message "Failed to retrieve tasks state for executing scenario: $($PSItem.Exception.Message)"
+                continue
+            }
+
+            foreach ($Task in $TasksRegKey.GetValueNames()) {
+                $TaskName = $Task.Split(':')[0]
+                $TaskStatus = $TasksRegKey.GetValue($Task)
+
+                switch ($TaskStatus) {
+                    'TASKSTATE_CANCELLED' { Write-Warning -Message "Office update task cancelled in ${ExecutingScenario} scenario: ${TaskName}" }
+                    'TASKSTATE_FAILED' { Write-Warning -Message "Office update task failed in ${ExecutingScenario} scenario: ${TaskName}" }
+                }
+            }
+        } while ($ElapsedSeconds -lt $MaxWaitTime)
+    } finally {
+        $WaitTime.Stop()
+        Write-Progress @WriteProgressParams -Completed
+    }
 
     if ($ElapsedSeconds -ge $MaxWaitTime) {
         $ExcMsg = "Office update exceeded maximum wait time of ${MaxWaitTime} seconds."
@@ -1008,100 +938,97 @@ Function Global:Update-Scoop {
     # we filter out relevant lines using a regular expression.
     $ProgressBarRegex = '\[=*(> *)?\] +[0-9]{1,3}%'
 
-    if ($PSCmdlet.ShouldProcess('Scoop', 'Update')) {
-        Write-Progress @WriteProgressParams -Status 'Updating Scoop to latest version' -PercentComplete 1
-        Write-Verbose -Message "Updating Scoop: ${UpdateScoopCmd}"
-
-        try {
-            # Suppress useless verbose output from Scoop
-            $VerboseOriginal = $VerbosePreference
-            $VerbosePreference = 'SilentlyContinue'
-
-            $Result.Scoop = [String[]]@(& scoop @UpdateScoopArgs 6>&1)
-        } finally {
-            $VerbosePreference = $VerboseOriginal
-        }
-
-        $Result.ExitCode = $LASTEXITCODE
-        if ($Result.ExitCode -ne 0) {
-            Write-Progress @WriteProgressParams -Completed
-
-            $ExcMsg = "Scoop update exited with non-zero exit code: $($Result.ExitCode)"
-            $ErrExc = [Exception]::new($ExcMsg)
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $UpdateScoopCmd)
-            $PSCmdlet.WriteError($ErrRec)
-            return $Result
-        }
-    }
-
-    $ReportOnlyMsg = ''
-    if (!$PSCmdlet.ShouldProcess('Scoop apps', 'Update')) {
-        $ReportOnlyMsg = ' (report only)'
-        $UpdateAppsArgs = $UpdateAppsReportOnlyArgs
-        $UpdateAppsCmd = $UpdateAppsReportOnlyCmd
-        $Result.WhatIf = $true
-    }
-
-    Write-Progress @WriteProgressParams -Status 'Updating apps' -PercentComplete 20
-    Write-Verbose -Message "Updating Scoop apps${ReportOnlyMsg}: ${UpdateAppsCmd}"
-
     try {
-        # Suppress useless verbose output from Scoop
-        $VerboseOriginal = $VerbosePreference
-        $VerbosePreference = 'SilentlyContinue'
+        if ($PSCmdlet.ShouldProcess('Scoop', 'Update')) {
+            Write-Progress @WriteProgressParams -Status 'Updating Scoop to latest version' -PercentComplete 1
+            Write-Verbose -Message "Updating Scoop: ${UpdateScoopCmd}"
 
-        # Scoop may emit a "What if" output for updating formatting data. This
-        # action is harmless so temporarily disable `WhatIf` mode.
-        $WhatIfOriginal = $WhatIfPreference
-        $WhatIfPreference = $false
+            try {
+                # Suppress useless verbose output from Scoop
+                $VerboseOriginal = $VerbosePreference
+                $VerbosePreference = 'SilentlyContinue'
 
-        $Result.Apps = [String[]]@(& scoop @UpdateAppsArgs 6>&1 | Where-Object { $PSItem -notmatch $ProgressBarRegex })
-    } finally {
-        $VerbosePreference = $VerboseOriginal
-        $WhatIfPreference = $WhatIfOriginal
-    }
+                $Result.Scoop = [String[]]@(& scoop @UpdateScoopArgs 6>&1)
+            } finally {
+                $VerbosePreference = $VerboseOriginal
+            }
 
-    $Result.ExitCode = $LASTEXITCODE
-    if ($Result.ExitCode -ne 0) {
-        Write-Progress @WriteProgressParams -Completed
+            $Result.ExitCode = $LASTEXITCODE
+            if ($Result.ExitCode -ne 0) {
+                $ExcMsg = "Scoop update exited with non-zero exit code: $($Result.ExitCode)"
+                $ErrExc = [Exception]::new($ExcMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $UpdateScoopCmd)
+                $PSCmdlet.WriteError($ErrRec)
+                return $Result
+            }
+        }
 
-        $ExcMsg = "Scoop apps update exited with non-zero exit code: $($Result.ExitCode)"
-        $ErrExc = [Exception]::new($ExcMsg)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $UpdateAppsCmd)
-        $PSCmdlet.WriteError($ErrRec)
-        return $Result
-    }
+        $ReportOnlyMsg = ''
+        if (!$PSCmdlet.ShouldProcess('Scoop apps', 'Update')) {
+            $ReportOnlyMsg = ' (report only)'
+            $UpdateAppsArgs = $UpdateAppsReportOnlyArgs
+            $UpdateAppsCmd = $UpdateAppsReportOnlyCmd
+            $Result.WhatIf = $true
+        }
 
-    if ($PSCmdlet.ShouldProcess('Scoop outdated data', 'Remove')) {
-        Write-Progress @WriteProgressParams -Status 'Cleaning-up outdated data' -PercentComplete 80
-        Write-Verbose -Message "Cleaning-up outdated Scoop data: ${CleanupCmd}"
+        Write-Progress @WriteProgressParams -Status 'Updating apps' -PercentComplete 20
+        Write-Verbose -Message "Updating Scoop apps${ReportOnlyMsg}: ${UpdateAppsCmd}"
 
         try {
             # Suppress useless verbose output from Scoop
             $VerboseOriginal = $VerbosePreference
             $VerbosePreference = 'SilentlyContinue'
 
-            $Result.Cleanup = [String[]]@(& scoop @CleanupArgs 6>&1)
+            # Scoop may emit a "What if" output for updating formatting data.
+            # This action is harmless so temporarily disable `WhatIf` mode.
+            $WhatIfOriginal = $WhatIfPreference
+            $WhatIfPreference = $false
+
+            $Result.Apps = [String[]]@(& scoop @UpdateAppsArgs 6>&1 | Where-Object { $PSItem -notmatch $ProgressBarRegex })
         } finally {
             $VerbosePreference = $VerboseOriginal
+            $WhatIfPreference = $WhatIfOriginal
         }
 
         $Result.ExitCode = $LASTEXITCODE
         if ($Result.ExitCode -ne 0) {
-            Write-Progress @WriteProgressParams -Completed
-
-            $ExcMsg = "Scoop clean-up exited with non-zero exit code: $($Result.ExitCode)"
+            $ExcMsg = "Scoop apps update exited with non-zero exit code: $($Result.ExitCode)"
             $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $CleanupCmd)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $UpdateAppsCmd)
             $PSCmdlet.WriteError($ErrRec)
             return $Result
         }
+
+        if ($PSCmdlet.ShouldProcess('Scoop outdated data', 'Remove')) {
+            Write-Progress @WriteProgressParams -Status 'Cleaning-up outdated data' -PercentComplete 80
+            Write-Verbose -Message "Cleaning-up outdated Scoop data: ${CleanupCmd}"
+
+            try {
+                # Suppress useless verbose output from Scoop
+                $VerboseOriginal = $VerbosePreference
+                $VerbosePreference = 'SilentlyContinue'
+
+                $Result.Cleanup = [String[]]@(& scoop @CleanupArgs 6>&1)
+            } finally {
+                $VerbosePreference = $VerboseOriginal
+            }
+
+            $Result.ExitCode = $LASTEXITCODE
+            if ($Result.ExitCode -ne 0) {
+                $ExcMsg = "Scoop clean-up exited with non-zero exit code: $($Result.ExitCode)"
+                $ErrExc = [Exception]::new($ExcMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSScriptFailed', $ErrCat, $CleanupCmd)
+                $PSCmdlet.WriteError($ErrRec)
+                return $Result
+            }
+        }
+    } finally {
+        Write-Progress @WriteProgressParams -Completed
     }
 
-    Write-Progress @WriteProgressParams -Completed
     return $Result
 }
 
@@ -1193,108 +1120,120 @@ Function Global:Update-VisualStudio {
         return $Result
     }
 
-    $VsUpdateErrors = [Collections.Generic.List[String]]::new()
-    for ($i = 0; $i -lt $VsSetupInstances.Count; $i++) {
-        $VsSetupInstance = $VsSetupInstances[$i]
-        $VsDisplayName = $VsSetupInstance.DisplayName
+    try {
+        $VsUpdateErrors = [Collections.Generic.List[String]]::new()
+        for ($i = 0; $i -lt $VsSetupInstances.Count; $i++) {
+            $VsSetupInstance = $VsSetupInstances[$i]
+            $VsDisplayName = $VsSetupInstance.DisplayName
 
-        # Waiting on the Visual Studio Installer to complete is more difficult
-        # than at all reasonable. Providing the below parameters and waiting on
-        # the process to exit is sufficient *if* the installer itself does not
-        # need to be updated. In the latter case, the original setup process
-        # will exit while the update continues using the updated installer.
-        #
-        # Contrary to the official documentation the `--wait` parameter doesn't
-        # work, and in fact, doesn't appear to even be a valid option. The best
-        # approach I've found is to try to acquire the named mutex used by the
-        # installer: `DevdivInstallerUI`. While undocumented and a hack, all of
-        # the other approaches I've found have more serious downsides. We use
-        # this approach later after the original setup process has exited.
-        #
-        # In addition, when launched via a console application the installer
-        # will spam the terminal with various debug output, even if running in
-        # quiet mode. I can't find any command-line parameter to suppress it,
-        # and redirecting the output streams doesn't work either. I'm guessing
-        # it's doing something nefarious if it detects it was launched from a
-        # console environment. This also occurs for any child processes which
-        # it launches, presumably due to the inheritance of process handles.
-        # Whatever it does seriously confuses PowerShell and/or `PSReadLine`,
-        # which seemingly loses track of the console state; subsequent output
-        # will often overlap earlier debug output from the installer.
-        #
-        # A workaround is to launch the installer from a separate console. We
-        # do that by launching `cmd` and then the installer within it. `cmd`
-        # will return the exit code of the installer when it itself exits.
-        #
-        # Also, the argument quoting for `cmd` looks weird and wrong. It's not;
-        # `cmd` itself is weird and wrong. See its documentation for specifics.
-        Write-Progress @WriteProgressParams -Status "Updating ${VsDisplayName}" -PercentComplete ($i / $VsSetupInstances.Count * 100)
-        $VsInstallerArgs = 'update --installPath "{0}" --passive --norestart' -f $VsSetupInstance.InstallationPath
-        $CmdArgs = '/D /C ""{0}" {1}"' -f $VsInstallerPath, $VsInstallerArgs
-        $UpdateCmd = "cmd $($CmdArgs -join ' ')"
+            # Waiting on the Visual Studio Installer to complete is more
+            # difficult than at all reasonable. Providing the below parameters
+            # and waiting on the process to exit is sufficient *if* the
+            # installer itself does not need to be updated. In the latter case,
+            # the original setup process will exit while the update continues
+            # using the updated installer.
+            #
+            # Contrary to the official documentation the `--wait` parameter
+            # doesn't work, and in fact, doesn't appear to even be a valid
+            # option. The best approach I've found is to try to acquire the
+            # named mutex used by the installer: `DevdivInstallerUI`. While
+            # undocumented and a hack, all of the other approaches I've found
+            # have more serious downsides. We use this approach later after the
+            # original setup process has exited.
+            #
+            # In addition, when launched via a console application the
+            # installer will spam the terminal with various debug output, even
+            # if running in quiet mode. I can't find any command-line parameter
+            # to suppress it, and redirecting the output streams doesn't work
+            # either. I'm guessing it's doing something nefarious if it detects
+            # it was launched from a console environment. This also occurs for
+            # any child processes which it launches, presumably due to the
+            # inheritance of process handles. Whatever it does seriously
+            # confuses PowerShell and/or `PSReadLine`, which seemingly loses
+            # track of the console state; subsequent output will often overlap
+            # earlier debug output from the installer.
+            #
+            # A workaround is to launch the installer from a separate console.
+            # We do that by launching `cmd` and then the installer within it.
+            # `cmd` will return the exit code of the installer when it itself
+            # exits.
+            #
+            # Also, the argument quoting for `cmd` looks weird and wrong. It's
+            # not; `cmd` itself is weird and wrong. See its documentation for
+            # specifics.
+            Write-Progress @WriteProgressParams -Status "Updating ${VsDisplayName}" -PercentComplete ($i / $VsSetupInstances.Count * 100)
+            $VsInstallerArgs = 'update --installPath "{0}" --passive --norestart' -f $VsSetupInstance.InstallationPath
+            $CmdArgs = '/D /C ""{0}" {1}"' -f $VsInstallerPath, $VsInstallerArgs
+            $UpdateCmd = "cmd $($CmdArgs -join ' ')"
 
-        try {
-            $VsInstaller = Start-Process -FilePath ${Env:ComSpec} -ArgumentList $CmdArgs -PassThru -Wait -ErrorAction 'Stop'
-        } catch {
-            $Result.Success = $false
-
-            $ExcMsg = "Failed to start Visual Studio Installer: $($PSItem.Exception.Message)"
-            $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
-            $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
-            $PSCmdlet.WriteError($ErrRec)
-
-            $VsUpdateErrors.Add($ExcMsg)
-            break
-        }
-
-        # If the mutex existed at any point while running this loop the exit
-        # code we have from the original installer is not meaningful for the
-        # update of Visual Studio itself. We'll output a warning later on.
-        $VsInstallerUpdated = $false
-        $VsInstallerMutexCreated = $false
-
-        do {
-            # Wait a few seconds in the event the original installer process
-            # has exited but the updated installer process hasn't started.
-            # While a hack, more durable approaches aren't worth the effort.
-            # For further iterations the delay is simply for efficiency.
-            Start-Sleep -Seconds 3
-
-            # Try to acquire the Visual Studio Installer mutex. If the named
-            # mutex is created then an updated installer is not running. We
-            # avoid waiting on the mutex as it's unclear if the mutex already
-            # existing may cause problems for the installer (even if unheld).
-            [Threading.Mutex]::new($false, 'DevdivInstallerUI', [Ref]$VsInstallerMutexCreated).Close()
-
-            if (!$VsInstallerMutexCreated) {
-                $VsInstallerUpdated = $true
-            }
-        } while (!$VsInstallerMutexCreated)
-
-        if ($VsInstallerUpdated) {
-            Write-Warning -Message "${VsDisplayName} update exit code may be unreliable."
-        }
-
-        switch ($VsInstaller.ExitCode) {
-            0 { } # Success
-
-            3010 {
-                Write-Warning -Message "${VsDisplayName} successfully updated but requires a reboot."
-            }
-
-            default {
+            try {
+                $VsInstaller = Start-Process -FilePath ${Env:ComSpec} -ArgumentList $CmdArgs -PassThru -Wait -ErrorAction 'Stop'
+            } catch {
                 $Result.Success = $false
 
-                $ExcMsg = "Update of ${VsDisplayName} exited with non-zero exit code: $($VsInstaller.ExitCode)"
-                $ErrExc = [Exception]::new($ExcMsg)
-                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                $ExcMsg = "Failed to start Visual Studio Installer: $($PSItem.Exception.Message)"
+                $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
                 $PSCmdlet.WriteError($ErrRec)
 
                 $VsUpdateErrors.Add($ExcMsg)
+                break
+            }
+
+            # If the mutex existed at any point while running this loop the
+            # exit code we have from the original installer is not meaningful
+            # for the update of Visual Studio itself. We'll output a warning
+            # later on.
+            $VsInstallerUpdated = $false
+            $VsInstallerMutexCreated = $false
+
+            do {
+                # Wait a few seconds in the event the original installer
+                # process has exited but the updated installer process hasn't
+                # started. While a hack, more durable approaches aren't worth
+                # the effort. For further iterations the delay is simply for
+                # efficiency.
+                Start-Sleep -Seconds 3
+
+                # Try to acquire the Visual Studio Installer mutex. If the
+                # named mutex is created then an updated installer is not
+                # running. We avoid waiting on the mutex as it's unclear if the
+                # mutex already existing may cause problems for the installer
+                # (even if unheld).
+                [Threading.Mutex]::new($false, 'DevdivInstallerUI', [Ref]$VsInstallerMutexCreated).Close()
+
+                if (!$VsInstallerMutexCreated) {
+                    $VsInstallerUpdated = $true
+                }
+            } while (!$VsInstallerMutexCreated)
+
+            if ($VsInstallerUpdated) {
+                Write-Warning -Message "${VsDisplayName} update exit code may be unreliable."
+            }
+
+            switch ($VsInstaller.ExitCode) {
+                0 { } # Success
+
+                3010 {
+                    Write-Warning -Message "${VsDisplayName} successfully updated but requires a reboot."
+                }
+
+                default {
+                    $Result.Success = $false
+
+                    $ExcMsg = "Update of ${VsDisplayName} exited with non-zero exit code: $($VsInstaller.ExitCode)"
+                    $ErrExc = [Exception]::new($ExcMsg)
+                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
+                    $PSCmdlet.WriteError($ErrRec)
+
+                    $VsUpdateErrors.Add($ExcMsg)
+                }
             }
         }
+    } finally {
+        Write-Progress @WriteProgressParams -Completed
     }
 
     $Result.Errors = [String[]]@($VsUpdateErrors.ToArray())
@@ -1303,7 +1242,6 @@ Function Global:Update-VisualStudio {
     $Result.AfterUpdate = $VsSetupInstances
     $Result.AfterUpdate | Add-Member @VersionToStringMemberParams
 
-    Write-Progress @WriteProgressParams -Completed
     return $Result
 }
 
@@ -1349,9 +1287,11 @@ Function Global:Update-Windows {
 
     $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateWindows')
 
+    $UpdateParams = @{ ErrorAction = 'Stop' }
+
     switch ($PSCmdlet.ParameterSetName) {
-        'Exclude' { $UpdateParams = @{ 'NotCategory' = $ExcludeCategories } }
-        'Include' { $UpdateParams = @{ 'Category' = $IncludeCategories } }
+        'Exclude' { $UpdateParams.Add('NotCategory', $ExcludeCategories) }
+        'Include' { $UpdateParams.Add('Category', $IncludeCategories) }
     }
 
     # `Get-WindowsUpdate` doesn't correctly support `-WhatIf`; it will install
@@ -1367,7 +1307,9 @@ Function Global:Update-Windows {
     # HACK: `PSWindowsUpdate` returns three instances of each update result.
     # Keep only unique KBs on the grounds the installation of a given update
     # will only be attempted once for a given invocation.
-    $Result.Updates = @(Get-WindowsUpdate @UpdateParams | Sort-Object -Property 'KB' -Unique)
+    try {
+        $Result.Updates = @(Get-WindowsUpdate @UpdateParams | Sort-Object -Property 'KB' -Unique)
+    } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     if ($Result.Updates.Count -eq 0) {
         $Result.Summary = 'No updates found'
@@ -1553,7 +1495,7 @@ Function Global:Update-WSL {
 
         try {
             [Console]::OutputEncoding = [Text.Encoding]::Unicode
-            $WslVersion = @(& wsl @VersionArgs 2>&1) -join ''
+            $WslVersion = [String[]]@(& wsl @VersionArgs 2>&1)
         } finally {
             [Console]::OutputEncoding = $DefaultOutputEncoding
         }

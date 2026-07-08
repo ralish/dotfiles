@@ -14,7 +14,7 @@ Function Global:Get-TypeAccelerator {
 # Retrieve the constructors for a type
 Function Global:Get-TypeConstructor {
     [CmdletBinding()]
-    [OutputType([Void], [PSCustomObject[]])]
+    [OutputType([Void], [PSCustomObject])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [Type]$Type
@@ -42,7 +42,7 @@ Function Global:Get-TypeConstructor {
 # Retrieve the methods for a type
 Function Global:Get-TypeMethod {
     [CmdletBinding()]
-    [OutputType([Void], [PSCustomObject[]])]
+    [OutputType([Void], [PSCustomObject])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [Type]$Type
@@ -55,7 +55,7 @@ Function Global:Get-TypeMethod {
 
             if ($MethodParams.Count -ne 0) {
                 $FormattedMethodParams = @($MethodParams | ForEach-Object { $PSItem.ToString() })
-                $FormattedParams = '({0})' -f $FormattedMethodParams -join ', '
+                $FormattedParams = '({0})' -f ($FormattedMethodParams -join ', ')
             } else {
                 $FormattedParams = '()'
             }
@@ -76,7 +76,7 @@ Function Global:Get-TypeMethod {
 # Via: https://gist.github.com/indented-automation/26c637fb530c4b168e62c72582534f5b
 Function Global:Get-ArgumentCompleter {
     [CmdletBinding()]
-    [OutputType([Void], [PSCustomObject[]])]
+    [OutputType([Void], [PSCustomObject])]
     Param(
         [Switch]$Native
     )
@@ -93,11 +93,9 @@ Function Global:Get-ArgumentCompleter {
         $ArgumentCompletersProperty = $InternalExecutionContext.GetType().GetProperty('CustomArgumentCompleters', [Reflection.BindingFlags]'Instance, NonPublic')
     }
 
-    # Retrieve the argument completers
+    # Retrieve the argument completers (`$null` if none)
     $BindingFlags = [Reflection.BindingFlags]'GetProperty, Instance, NonPublic'
     $ArgumentCompleters = $ArgumentCompletersProperty.GetGetMethod($true).Invoke($InternalExecutionContext, $BindingFlags, $null, @(), $PSCulture)
-
-    # Returns `$null` when there's no argument completers
     if (!$ArgumentCompleters) { return }
 
     foreach ($Completer in $ArgumentCompleters.Keys) {
@@ -192,123 +190,128 @@ Function Global:Update-PowerShell {
         $WriteProgressParams['Id'] = $ProgressParentId + 1
     }
 
-    Write-Progress @WriteProgressParams -Status 'Enumerating installed modules' -PercentComplete 1
-    if ($PSResourceGet) {
-        $InstalledModules = Get-InstalledPSResource -Verbose:$false
-    } else {
-        try {
-            # Suppress verbose output on implicit import
-            $VerboseOriginal = $VerbosePreference
-            $VerbosePreference = 'SilentlyContinue'
-
-            $InstalledModules = Get-InstalledModule -Verbose:$false
-        } finally {
-            $VerbosePreference = $VerboseOriginal
-        }
-    }
-
-    # `Get-InstalledPSResource` returns all module versions while
-    # `Get-InstalledModule` only returns the latest version, so technically the
-    # uniqueness check is only applicable to `PSResourceGet`.
-    $UniqueModules = @($InstalledModules.Name | Sort-Object -Unique)
-
-    # Percentage of the total progress to use for module update progress
-    $ProgressPercentUpdatesBase = 10
-    if ($UniqueModules -contains 'AWS.Tools.Installer') {
-        $ProgressPercentUpdatesSection = 80
-    } else {
-        $ProgressPercentUpdatesSection = 90
-    }
-
-    if (!$IncludeDscModules -and $DscSupport) {
-        Write-Progress @WriteProgressParams -Status 'Enumerating DSC modules for exclusion' -PercentComplete 5
-
-        try {
-            # `Get-DscResource` likes to output multiple progress bars but
-            # doesn't have the good manners to clean them up when it's done.
-            # The result is a visual mess when we have our own progress bars.
-            $ProgressOriginal = $Global:ProgressPreference
-            $Global:ProgressPreference = 'SilentlyContinue'
-
-            # `Get-DscResource` may output various errors, most often due to
-            # duplicate resources. That's often the case with, for example, the
-            # `PackageManagement` module being available in multiple locations.
-            $DscModules = @(Get-DscResource -Module * -ErrorAction 'Ignore' -Verbose:$false | Select-Object -ExpandProperty 'ModuleName' -Unique)
-        } finally {
-            $Global:ProgressPreference = $ProgressOriginal
-        }
-    }
-
-    if (Test-IsWindows) {
-        $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::MyDocuments)
-        $ScopePathAllUsers = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
-        $StringComparisonType = [StringComparison]::OrdinalIgnoreCase
-    } else {
-        $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
-        $ScopePathAllUsers = '/usr/local/share'
-        $StringComparisonType = [StringComparison]::Ordinal
-    }
-
-    # Update all modules
-    for ($i = 0; $i -lt $UniqueModules.Count; $i++) {
-        $ModuleName = $UniqueModules[$i]
-        $Module = $InstalledModules | Where-Object Name -EQ $ModuleName | Sort-Object -Property 'Version' | Select-Object -Last 1
-
-        if ($ModuleName -match $ExcludedModuleRegex) {
-            Write-Verbose -Message "Skipping excluded module: ${ModuleName}"
-            continue
-        }
-
-        if (!$IncludeDscModules -and $DscSupport -and $ModuleName -in $DscModules) {
-            Write-Verbose -Message "Skipping DSC module: ${ModuleName}"
-            continue
-        }
-
-        if ($ModuleName -match '^AWS\.Tools\.' -and $Module.Repository -notmatch 'PSGallery') { continue }
-
-        $UpdateParams = @{
-            Name          = $ModuleName
-            AcceptLicense = $true
-            ErrorAction   = 'Stop'
-            Verbose       = $false
-        }
-
-        if ($Module.InstalledLocation.StartsWith($ScopePathCurrentUser, $StringComparisonType)) {
-            $UpdateParams['Scope'] = 'CurrentUser'
-        } elseif ($Module.InstalledLocation.StartsWith($ScopePathAllUsers, $StringComparisonType)) {
-            $UpdateParams['Scope'] = 'AllUsers'
+    try {
+        Write-Progress @WriteProgressParams -Status 'Enumerating installed modules' -PercentComplete 1
+        if ($PSResourceGet) {
+            $InstalledModules = Get-InstalledPSResource -Verbose:$false
         } else {
-            Write-Warning -Message "Unable to determine install scope for module: ${ModuleName}"
-            continue
-        }
-
-        $PercentComplete = ($i + 1) / $UniqueModules.Count * $ProgressPercentUpdatesSection + $ProgressPercentUpdatesBase
-        Write-Progress @WriteProgressParams -Status "Updating ${ModuleName}" -PercentComplete $PercentComplete
-
-        if ($PSCmdlet.ShouldProcess($ModuleName, 'Update')) {
             try {
-                if ($PSResourceGet) {
-                    Update-PSResource @UpdateParams
-                } else {
-                    Update-Module @UpdateParams
-                }
-            } catch { $PSCmdlet.WriteError($PSItem) }
-        }
-    }
+                # Suppress verbose output on implicit import
+                $VerboseOriginal = $VerbosePreference
+                $VerbosePreference = 'SilentlyContinue'
 
-    # The modular AWS Tools for PowerShell has its own update mechanism
-    if ($UniqueModules -contains 'AWS.Tools.Installer' -and 'AWS.Tools.Installer' -notmatch $ExcludedModuleRegex) {
-        if ($PSCmdlet.ShouldProcess('AWS.Tools', 'Update')) {
-            $PercentComplete = $ProgressPercentUpdatesBase + $ProgressPercentUpdatesSection
-            Write-Progress @WriteProgressParams -Status 'Updating AWS modules' -PercentComplete $PercentComplete
+                $InstalledModules = Get-InstalledModule -Verbose:$false
+            } finally {
+                $VerbosePreference = $VerboseOriginal
+            }
+        }
+
+        # `Get-InstalledPSResource` returns all module versions while
+        # `Get-InstalledModule` only returns the latest version, so technically
+        # the uniqueness check is only applicable to `PSResourceGet`.
+        $UniqueModules = @($InstalledModules.Name | Sort-Object -Unique)
+
+        # Percentage of the total progress to use for module update progress
+        $ProgressPercentUpdatesBase = 10
+        if ($UniqueModules -contains 'AWS.Tools.Installer') {
+            $ProgressPercentUpdatesSection = 80
+        } else {
+            $ProgressPercentUpdatesSection = 90
+        }
+
+        if (!$IncludeDscModules -and $DscSupport) {
+            Write-Progress @WriteProgressParams -Status 'Enumerating DSC modules for exclusion' -PercentComplete 5
 
             try {
-                Update-AWSToolsModule -CleanUp -Force -ErrorAction 'Stop'
-            } catch { $PSCmdlet.WriteError($PSItem) }
-        }
-    }
+                # `Get-DscResource` likes to output multiple progress bars but
+                # doesn't have the good manners to clean them up when it's
+                # done. The result is a visual mess when we have our own
+                # progress bars.
+                $ProgressOriginal = $Global:ProgressPreference
+                $Global:ProgressPreference = 'SilentlyContinue'
 
-    Write-Progress @WriteProgressParams -Completed
+                # `Get-DscResource` may output various errors, most often due
+                # to duplicate resources. That's often the case with, for
+                # example, the `PackageManagement` module being available in
+                # multiple locations.
+                $DscModules = @(Get-DscResource -Module * -ErrorAction 'Ignore' -Verbose:$false | Select-Object -ExpandProperty 'ModuleName' -Unique)
+            } finally {
+                $Global:ProgressPreference = $ProgressOriginal
+            }
+        }
+
+        if (Test-IsWindows) {
+            $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::MyDocuments)
+            $ScopePathAllUsers = [Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)
+            $StringComparisonType = [StringComparison]::OrdinalIgnoreCase
+        } else {
+            $ScopePathCurrentUser = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
+            $ScopePathAllUsers = '/usr/local/share'
+            $StringComparisonType = [StringComparison]::Ordinal
+        }
+
+        # Update all modules
+        for ($i = 0; $i -lt $UniqueModules.Count; $i++) {
+            $ModuleName = $UniqueModules[$i]
+            $Module = $InstalledModules | Where-Object Name -EQ $ModuleName | Sort-Object -Property 'Version' | Select-Object -Last 1
+
+            if ($ModuleName -match $ExcludedModuleRegex) {
+                Write-Verbose -Message "Skipping excluded module: ${ModuleName}"
+                continue
+            }
+
+            if (!$IncludeDscModules -and $DscSupport -and $ModuleName -in $DscModules) {
+                Write-Verbose -Message "Skipping DSC module: ${ModuleName}"
+                continue
+            }
+
+            # The modular AWS Tools for PowerShell is handled separately
+            if ($ModuleName -match '^AWS\.Tools\.' -and $Module.Repository -notmatch 'PSGallery') { continue }
+
+            $UpdateParams = @{
+                Name          = $ModuleName
+                AcceptLicense = $true
+                ErrorAction   = 'Stop'
+                Verbose       = $false
+            }
+
+            if ($Module.InstalledLocation.StartsWith($ScopePathCurrentUser, $StringComparisonType)) {
+                $UpdateParams['Scope'] = 'CurrentUser'
+            } elseif ($Module.InstalledLocation.StartsWith($ScopePathAllUsers, $StringComparisonType)) {
+                $UpdateParams['Scope'] = 'AllUsers'
+            } else {
+                Write-Warning -Message "Unable to determine install scope for module: ${ModuleName}"
+                continue
+            }
+
+            $PercentComplete = ($i + 1) / $UniqueModules.Count * $ProgressPercentUpdatesSection + $ProgressPercentUpdatesBase
+            Write-Progress @WriteProgressParams -Status "Updating ${ModuleName}" -PercentComplete $PercentComplete
+
+            if ($PSCmdlet.ShouldProcess($ModuleName, 'Update')) {
+                try {
+                    if ($PSResourceGet) {
+                        Update-PSResource @UpdateParams
+                    } else {
+                        Update-Module @UpdateParams
+                    }
+                } catch { $PSCmdlet.WriteError($PSItem) }
+            }
+        }
+
+        # The modular AWS Tools for PowerShell has its own update mechanism
+        if ($UniqueModules -contains 'AWS.Tools.Installer' -and 'AWS.Tools.Installer' -notmatch $ExcludedModuleRegex) {
+            if ($PSCmdlet.ShouldProcess('AWS.Tools', 'Update')) {
+                $PercentComplete = $ProgressPercentUpdatesBase + $ProgressPercentUpdatesSection
+                Write-Progress @WriteProgressParams -Status 'Updating AWS modules' -PercentComplete $PercentComplete
+
+                try {
+                    Update-AWSToolsModule -CleanUp -Force -ErrorAction 'Stop'
+                } catch { $PSCmdlet.WriteError($PSItem) }
+            }
+        }
+    } finally {
+        Write-Progress @WriteProgressParams -Completed
+    }
 
     if (!$SkipUninstallObsolete -and $PSCmdlet.ShouldProcess('Obsolete modules', 'Uninstall')) {
         $UninstallParams = @{ ErrorAction = 'Stop' }
@@ -338,7 +341,7 @@ Function Global:Update-PowerShell {
 # Compare two hashtables
 Function Global:Compare-Hashtable {
     [CmdletBinding()]
-    [OutputType([Void], [PSCustomObject[]])]
+    [OutputType([PSCustomObject[]])]
     Param(
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
@@ -405,7 +408,7 @@ Function Global:Compare-Hashtable {
 # Via: https://learn.microsoft.com/en-au/archive/blogs/janesays/compare-all-properties-of-two-objects-in-windows-powershell
 Function Global:Compare-ObjectProperties {
     [CmdletBinding()]
-    [OutputType([Void], [PSCustomObject[]])]
+    [OutputType([PSCustomObject[]])]
     Param(
         [Parameter(Mandatory)]
         [PSObject]$ReferenceObject,
@@ -446,9 +449,7 @@ Function Global:Compare-ObjectProperties {
         }
     }
 
-    if ($DifferentProperties) {
-        return $DifferentProperties.ToArray()
-    }
+    return $DifferentProperties.ToArray()
 }
 
 #endregion
@@ -539,10 +540,16 @@ namespace DotFiles {
 
 #region Shortcut functions
 
-# Invoke `Format-List` selecting all properties
+# Invoke `Format-List` with all properties
 Function Global:fla {
     [CmdletBinding()]
-    [OutputType([Void])]
+    [OutputType(
+        'Microsoft.PowerShell.Commands.Internal.Format.FormatStartData',
+        'Microsoft.PowerShell.Commands.Internal.Format.FormatEntryData',
+        'Microsoft.PowerShell.Commands.Internal.Format.FormatEndData',
+        'Microsoft.PowerShell.Commands.Internal.Format.GroupStartData',
+        'Microsoft.PowerShell.Commands.Internal.Format.GroupEndData'
+    )]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [PSObject]$InputObject,
@@ -564,10 +571,16 @@ Function Global:fla {
     }
 }
 
-# Invoke `Format-Table` selecting all properties
+# Invoke `Format-Table` with all properties
 Function Global:fta {
     [CmdletBinding()]
-    [OutputType([Void])]
+    [OutputType(
+        'Microsoft.PowerShell.Commands.Internal.Format.FormatStartData',
+        'Microsoft.PowerShell.Commands.Internal.Format.FormatEntryData',
+        'Microsoft.PowerShell.Commands.Internal.Format.FormatEndData',
+        'Microsoft.PowerShell.Commands.Internal.Format.GroupStartData',
+        'Microsoft.PowerShell.Commands.Internal.Format.GroupEndData'
+    )]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [PSObject]$InputObject,
@@ -592,7 +605,7 @@ Function Global:fta {
 # Invoke `Get-Help` with `-Detailed`
 Function Global:ghd {
     [CmdletBinding()]
-    [OutputType([PSCustomObject])]
+    [OutputType([PSCustomObject], [String])]
     Param(
         [Parameter(Mandatory)]
         [String]$Name
@@ -604,7 +617,7 @@ Function Global:ghd {
 # Invoke `Get-Help` with `-Examples`
 Function Global:ghe {
     [CmdletBinding()]
-    [OutputType([PSCustomObject])]
+    [OutputType([PSCustomObject], [String])]
     Param(
         [Parameter(Mandatory)]
         [String]$Name
@@ -616,7 +629,7 @@ Function Global:ghe {
 # Invoke `Get-Help` with `-Full`
 Function Global:ghf {
     [CmdletBinding()]
-    [OutputType([PSCustomObject])]
+    [OutputType([PSCustomObject], [String])]
     Param(
         [Parameter(Mandatory)]
         [String]$Name
@@ -625,16 +638,16 @@ Function Global:ghf {
     Get-Help -Full @PSBoundParameters
 }
 
-# Retrieve `FileVersionInfo` from a file
+# Retrieve `FileVersionInfo` from file(s)
 Function Global:gvi {
     [CmdletBinding()]
-    [OutputType([Diagnostics.FileVersionInfo])]
+    [OutputType([Diagnostics.FileVersionInfo[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Path
     )
 
-    Get-Item -Path $Path | Select-Object -ExpandProperty 'VersionInfo'
+    return [Diagnostics.FileVersionInfo[]]@(Get-Item -Path $Path | Select-Object -ExpandProperty 'VersionInfo')
 }
 
 #endregion

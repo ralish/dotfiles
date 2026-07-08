@@ -54,64 +54,63 @@ Function Global:Update-Homebrew {
     $CleanupArgs = 'cleanup', '-s'
     $CleanupCmd = "brew $($CleanupArgs -join ' ')"
 
-    if ($PSCmdlet.ShouldProcess('Homebrew', 'Update')) {
-        Write-Progress @WriteProgressParams -Status 'Updating Homebrew to latest version' -PercentComplete 1
-        Write-Verbose -Message "Updating Homebrew: ${UpdateBrewCmd}"
-        $Result.Brew = [String[]]@(& brew @UpdateBrewArgs 2>&1)
-        if ($LASTEXITCODE -ne 0) {
-            Write-Progress @WriteProgressParams -Completed
+    try {
+        if ($PSCmdlet.ShouldProcess('Homebrew', 'Update')) {
+            Write-Progress @WriteProgressParams -Status 'Updating Homebrew to latest version' -PercentComplete 1
+            Write-Verbose -Message "Updating Homebrew: ${UpdateBrewCmd}"
+            $Result.Brew = [String[]]@(& brew @UpdateBrewArgs 2>&1)
+            if ($LASTEXITCODE -ne 0) {
+                $ExcMsg = "Homebrew update exited with non-zero exit code: ${LASTEXITCODE}"
+                $ErrExc = [Exception]::new($ExcMsg)
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateBrewCmd)
+                $PSCmdlet.WriteError($ErrRec)
+                return $Result
+            }
+        }
 
-            $ExcMsg = "Homebrew update exited with non-zero exit code: ${LASTEXITCODE}"
+        $DryrunMsg = ''
+        if (!$PSCmdlet.ShouldProcess('Homebrew casks & formulae', 'Update')) {
+            $DryrunMsg = ' (dry-run)'
+            $UpgradeAppsArgs += '--dry-run'
+            $UpgradeAppsCmd += ' --dry-run'
+            $Result.WhatIf = $true
+        }
+
+        Write-Progress @WriteProgressParams -Status 'Updating casks & formulae' -PercentComplete 10
+        Write-Verbose -Message "Updating Homebrew casks & formulae${DryrunMsg}: ${UpgradeAppsCmd}"
+        $Result.Apps = [String[]]@(& brew @UpgradeAppsArgs 2>&1)
+        if ($LASTEXITCODE -ne 0) {
+            $ExcMsg = "Homebrew upgrade${DryrunMsg} exited with non-zero exit code: ${LASTEXITCODE}"
             $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateBrewCmd)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpgradeAppsCmd)
             $PSCmdlet.WriteError($ErrRec)
             return $Result
         }
-    }
 
-    $DryrunMsg = ''
-    if (!$PSCmdlet.ShouldProcess('Homebrew casks & formulae', 'Update')) {
-        $DryrunMsg = ' (dry-run)'
-        $UpgradeAppsArgs += '--dry-run'
-        $UpgradeAppsCmd += ' --dry-run'
-        $Result.WhatIf = $true
-    }
+        $DryrunMsg = ''
+        if (!$PSCmdlet.ShouldProcess('Homebrew outdated data', 'Remove')) {
+            $DryrunMsg = ' (dry-run)'
+            $CleanupArgs += '--dry-run'
+            $CleanupCmd += ' --dry-run'
+            $Result.WhatIf = $true
+        }
 
-    Write-Progress @WriteProgressParams -Status 'Updating casks & formulae' -PercentComplete 10
-    Write-Verbose -Message "Updating Homebrew casks & formulae${DryrunMsg}: ${UpgradeAppsCmd}"
-    $Result.Apps = [String[]]@(& brew @UpgradeAppsArgs 2>&1)
-    if ($LASTEXITCODE -ne 0) {
+        Write-Progress @WriteProgressParams -Status 'Cleaning-up outdated data' -PercentComplete 90
+        Write-Verbose -Message "Cleaning-up outdated Homebrew data${DryrunMsg}: ${CleanupCmd}"
+        $Result.Cleanup = [String[]]@(& brew @CleanupArgs 2>&1)
+        if ($LASTEXITCODE -ne 0) {
+            $ExcMsg = "Homebrew clean-up${DryrunMsg} exited with non-zero exit code: ${LASTEXITCODE}"
+            $ErrExc = [Exception]::new($ExcMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $CleanupCmd)
+            $PSCmdlet.WriteError($ErrRec)
+        }
+    } finally {
         Write-Progress @WriteProgressParams -Completed
-
-        $ExcMsg = "Homebrew upgrade${DryrunMsg} exited with non-zero exit code: ${LASTEXITCODE}"
-        $ErrExc = [Exception]::new($ExcMsg)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpgradeAppsCmd)
-        $PSCmdlet.WriteError($ErrRec)
-        return $Result
     }
 
-    $DryrunMsg = ''
-    if (!$PSCmdlet.ShouldProcess('Homebrew outdated data', 'Remove')) {
-        $DryrunMsg = ' (dry-run)'
-        $CleanupArgs += '--dry-run'
-        $CleanupCmd += ' --dry-run'
-        $Result.WhatIf = $true
-    }
-
-    Write-Progress @WriteProgressParams -Status 'Cleaning-up outdated data' -PercentComplete 90
-    Write-Verbose -Message "Cleaning-up outdated Homebrew data${DryrunMsg}: ${CleanupCmd}"
-    $Result.Cleanup = [String[]]@(& brew @CleanupArgs 2>&1)
-    if ($LASTEXITCODE -ne 0) {
-        $ExcMsg = "Homebrew clean-up${DryrunMsg} exited with non-zero exit code: ${LASTEXITCODE}"
-        $ErrExc = [Exception]::new($ExcMsg)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $CleanupCmd)
-        $PSCmdlet.WriteError($ErrRec)
-    }
-
-    Write-Progress @WriteProgressParams -Completed
     return $Result
 }
 

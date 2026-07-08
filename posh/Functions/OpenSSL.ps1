@@ -12,7 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 # https://docs.openssl.org/master/man1/openssl-req/
 Function Global:New-OpenSSLCertificate {
     [CmdletBinding()]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(ParameterSetName = 'CsrGenerateKey', Mandatory)]
         [Parameter(ParameterSetName = 'CsrExistingKey', Mandatory)]
@@ -170,7 +170,8 @@ Function Global:New-OpenSSLCertificate {
     }
 
     if ($Subjects.Count -ne 0) {
-        $Subject = "/$($Subjects -join '/')"
+        # Escape "=" and "/" as they are treated as RDN separators
+        $Subject = "/$($Subjects -replace '=', '\=' -replace '/', '\/' -join '/')"
         $Params.Add('-subj')
         $Params.Add($Subject)
     }
@@ -205,7 +206,7 @@ Function Global:New-OpenSSLCertificate {
 # https://docs.openssl.org/master/man1/openssl-x509/
 Function Global:Get-OpenSSLCertificate {
     [CmdletBinding()]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Certificate,
@@ -239,7 +240,7 @@ Function Global:Get-OpenSSLCertificate {
 # https://docs.openssl.org/master/man1/openssl-req/
 Function Global:Get-OpenSSLCsr {
     [CmdletBinding()]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Csr,
@@ -275,7 +276,7 @@ Function Global:Get-OpenSSLCsr {
 # https://docs.openssl.org/master/man1/openssl-pkcs12/
 Function Global:Get-OpenSSLPkcs12 {
     [CmdletBinding()]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Pkcs12File,
@@ -332,7 +333,7 @@ Function Global:Get-OpenSSLPkcs12 {
 # https://docs.openssl.org/master/man1/openssl-s_client/
 Function Global:Get-OpenSSLServerCertificate {
     [CmdletBinding()]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Hostname,
@@ -400,7 +401,7 @@ Function Global:Get-OpenSSLServerCertificate {
 # https://docs.openssl.org/master/man1/openssl-x509/
 Function Global:Convert-OpenSSLDerToPem {
     [CmdletBinding()]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$DerFile,
@@ -428,7 +429,7 @@ Function Global:Convert-OpenSSLDerToPem {
 # https://docs.openssl.org/master/man1/openssl-x509/
 Function Global:Convert-OpenSSLPemToDer {
     [CmdletBinding()]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$PemFile,
@@ -456,7 +457,7 @@ Function Global:Convert-OpenSSLPemToDer {
 # https://docs.openssl.org/master/man1/openssl-pkcs12/
 Function Global:Convert-OpenSSLPemToPkcs12 {
     [CmdletBinding()]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$PemFile,
@@ -533,7 +534,7 @@ Function Global:Convert-OpenSSLPemToPkcs12 {
 # https://docs.openssl.org/master/man1/openssl-pkcs12/
 Function Global:Convert-OpenSSLPkcs12ToPem {
     [CmdletBinding(DefaultParameterSetName = 'Both')]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param(
         [Parameter(Mandatory)]
         [String]$Pkcs12File,
@@ -600,7 +601,7 @@ Function Global:Convert-OpenSSLPkcs12ToPem {
 # https://docs.openssl.org/master/man1/openssl-ecparam/
 Function Global:Get-OpenSSLEccCurves {
     [CmdletBinding()]
-    [OutputType([String[]])]
+    [OutputType([Void], [String[]])]
     Param()
 
     $Params = [Collections.Generic.List[String]]::new(

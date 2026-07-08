@@ -42,13 +42,15 @@ Function Global:Convert-HexToBytes {
     )
 
     Process {
-        $Bytes = [Byte[]]::new($Hex.Length / 2)
+        try {
+            $Bytes = [Byte[]]::new($Hex.Length / 2)
 
-        for ($i = 0; $i -lt $Hex.Length; $i += 2) {
-            $Bytes[$i / 2] = [Convert]::ToByte($Hex.Substring($i, 2), 16)
-        }
+            for ($i = 0; $i -lt $Hex.Length; $i += 2) {
+                $Bytes[$i / 2] = [Convert]::ToByte($Hex.Substring($i, 2), 16)
+            }
 
-        return $Bytes
+            return $Bytes
+        } catch { $PSCmdlet.WriteError($PSItem) }
     }
 }
 
@@ -69,7 +71,9 @@ Function Global:ConvertFrom-Base64 {
     }
 
     Process {
-        $Encoder.GetString([Convert]::FromBase64String($String))
+        try {
+            return $Encoder.GetString([Convert]::FromBase64String($String))
+        } catch { $PSCmdlet.WriteError($PSItem) }
     }
 }
 
@@ -83,6 +87,7 @@ Function Global:ConvertFrom-URLEncoded {
     )
 
     Process {
+        # Never throws
         [Net.WebUtility]::UrlDecode($String)
     }
 }
@@ -104,7 +109,9 @@ Function Global:ConvertTo-Base64 {
     }
 
     Process {
-        [Convert]::ToBase64String($Encoder.GetBytes($String))
+        try {
+            [Convert]::ToBase64String($Encoder.GetBytes($String))
+        } catch { $PSCmdlet.WriteError($PSItem) }
     }
 }
 
@@ -219,7 +226,9 @@ Function Global:ConvertTo-URLEncoded {
     )
 
     Process {
-        [Uri]::EscapeDataString($String)
+        try {
+            [Uri]::EscapeDataString($String)
+        } catch { $PSCmdlet.WriteError($PSItem) }
     }
 }
 
@@ -236,6 +245,14 @@ Function Global:Get-TextEncoder {
         [Switch]$ThrowOnInvalid
     )
 
+    if ($ByteOrderMark -and $Encoding -in ('ASCII', 'UTF-7')) {
+        Write-Warning -Message "Ignoring ByteOrderMark parameter as not applicable for ${Encoding} encoding."
+    }
+
+    if ($ThrowOnInvalid -and $Encoding -in ('ASCII', 'UTF-7')) {
+        Write-Warning -Message "Ignoring ThrowOnInvalid parameter as not supported for ${Encoding} encoding."
+    }
+
     switch ($Encoding) {
         'ASCII' { [Text.ASCIIEncoding]::new() }
         'UTF-7' { [Text.UTF7Encoding]::new() }
@@ -250,7 +267,7 @@ Function Global:Get-TextEncoder {
 # Determine the encoding of a text file
 Function Global:Get-TextEncoding {
     [CmdletBinding()]
-    [OutputType([Void], [PSCustomObject[]])]
+    [OutputType([PSCustomObject[]])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [String[]]$Path
@@ -711,7 +728,7 @@ Function Global:Sort-XmlElement {
 # Add a `Computer` property to group objects
 Function Global:Add-GroupObjectComputerProperty {
     [CmdletBinding()]
-    [OutputType([Void], [Microsoft.PowerShell.Commands.GroupInfo[]])]
+    [OutputType([Void], [Microsoft.PowerShell.Commands.GroupInfo])]
     Param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [AllowEmptyCollection()]
@@ -771,6 +788,14 @@ Function Global:Add-PathStringElement {
     )
 
     Begin {
+        # This isn't quite right as case-sensitivity is a property of the
+        # filesystem, but this is nonetheless correct in almost all cases.
+        if (Test-IsLinux) {
+            $CaseSensitive = $true
+        } else {
+            $CaseSensitive = $false
+        }
+
         if (!$SimpleAlgorithm) {
             $Element = $Element.TrimEnd($DirectorySeparator) + $DirectorySeparator
         }
@@ -789,12 +814,23 @@ Function Global:Add-PathStringElement {
             $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
         }
 
-        if ($Path -notmatch $SingleElement) {
+        if ($CaseSensitive) {
+            $NotMatch = $Path -cnotmatch $SingleElement
+        } else {
+            $NotMatch = $Path -inotmatch $SingleElement
+        }
+
+        if ($NotMatch) {
             $RegExPathSeparator = [Regex]::Escape($PathSeparator)
             $FirstElement = "^${RegExElement}${RegExPathSeparator}"
             $LastElement = "${RegExPathSeparator}${RegExElement}$"
             $MiddleElement = "${RegExPathSeparator}${RegExElement}${RegExPathSeparator}"
-            $Path = $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
+
+            if ($CaseSensitive) {
+                $Path = $Path -creplace $FirstElement -creplace $LastElement -creplace $MiddleElement, $PathSeparator
+            } else {
+                $Path = $Path -ireplace $FirstElement -ireplace $LastElement -ireplace $MiddleElement, $PathSeparator
+            }
 
             switch ($Action) {
                 'Append' {
@@ -838,6 +874,14 @@ Function Global:Remove-PathStringElement {
     )
 
     Begin {
+        # This isn't quite right as case-sensitivity is a property of the
+        # filesystem, but this is nonetheless correct in almost all cases.
+        if (Test-IsLinux) {
+            $CaseSensitive = $true
+        } else {
+            $CaseSensitive = $false
+        }
+
         if (!$SimpleAlgorithm) {
             $Element = $Element.TrimEnd($DirectorySeparator) + $DirectorySeparator
         }
@@ -856,7 +900,13 @@ Function Global:Remove-PathStringElement {
             $Path = Repair-PathString -String $Path -PathSeparator $PathSeparator
         }
 
-        if ($Path -match $SingleElement) {
+        if ($CaseSensitive) {
+            $Match = $Path -cmatch $SingleElement
+        } else {
+            $Match = $Path -imatch $SingleElement
+        }
+
+        if ($Match) {
             return ''
         }
 
@@ -865,7 +915,13 @@ Function Global:Remove-PathStringElement {
         $LastElement = "${RegExPathSeparator}${RegExElement}$"
         $MiddleElement = "${RegExPathSeparator}${RegExElement}${RegExPathSeparator}"
 
-        return $Path -replace $FirstElement -replace $LastElement -replace $MiddleElement, $PathSeparator
+        if ($CaseSensitive) {
+            $Result = $Path -creplace $FirstElement -creplace $LastElement -creplace $MiddleElement, $PathSeparator
+        } else {
+            $Result = $Path -ireplace $FirstElement -ireplace $LastElement -ireplace $MiddleElement, $PathSeparator
+        }
+
+        return $Result
     }
 }
 
