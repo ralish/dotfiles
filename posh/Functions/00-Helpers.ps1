@@ -326,8 +326,7 @@ Function Complete-DotFilesSection {
         }
 
         $Global:DotFilesSectionStopwatch.Stop()
-        $Timing = Get-DotFilesTiming -Stopwatch $Global:DotFilesSectionStopwatch
-        Write-DotFilesMessage -Type 'Verbose' -Message $Timing
+        Write-DotFilesMessage -Type 'Verbose' -Message (Get-DotFilesTiming -Stopwatch $Global:DotFilesSectionStopwatch)
     }
 
     Remove-Variable -Name 'DotFilesSectionName', 'DotFilesSectionType' -Scope 'Global' -ErrorAction 'Ignore'
@@ -370,6 +369,10 @@ Function Invoke-DotFilesAsyncTask {
 
         # To avoid misalignment if the prompt has already been output
         Write-Host
+    }
+
+    if ($Global:DotFilesTimings) {
+        $Global:DotFilesSectionStopwatch.Restart()
     }
 
     if ($Global:AsyncLoadQueue.Count -ne 0) {
@@ -452,14 +455,6 @@ Function Start-DotFilesSection {
 
     $Global:DotFilesSectionType = $Type
     $Global:DotFilesSectionName = $Name
-
-    if ($Global:DotFilesTimings) {
-        if (!$Global:DotFilesSectionStopwatch) {
-            $Global:DotFilesSectionStopwatch = [Diagnostics.Stopwatch]::new()
-        }
-
-        $Global:DotFilesSectionStopwatch.Restart()
-    }
 
     if ($Global:DotFilesIsAsync) {
         Write-DotFilesMessage -Type 'Debug' -Message 'Starting async section processing ...'

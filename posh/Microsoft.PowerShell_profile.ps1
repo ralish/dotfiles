@@ -147,6 +147,14 @@ foreach ($PoshPath in $PoshFunctionsPath, $PoshSettingsPath) {
 
     foreach ($PoshFile in $PoshFiles) {
         if ($PoshFile.Name -eq '00-Helpers.ps1') { continue }
+
+        # Originally was handled in `Start-DotFilesSection` but then the
+        # filesystem level operations (opening and reading the file) and
+        # PowerShell script parsing aren't included in the load timing.
+        if ($DotFilesTimings) {
+            $DotFilesSectionStopwatch.Restart()
+        }
+
         . $PoshFile.FullName
     }
 }
