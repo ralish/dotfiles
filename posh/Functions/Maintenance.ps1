@@ -261,8 +261,8 @@ Function Global:Update-AllTheThings {
             $TasksApps += 'Homebrew'
         }
 
-        $AllTasks = $TasksApps + $TasksDevel + $TasksSystem
-        $TasksVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]$AllTasks)
+        $ValidTasks = $TasksApps + $TasksDevel + $TasksSystem
+        $TasksVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]$ValidTasks)
 
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
@@ -291,9 +291,35 @@ Function Global:Update-AllTheThings {
     }
 
     End {
+        Function Invoke-Task {
+            [CmdletBinding()]
+            [OutputType([PSObject])]
+            Param(
+                [Parameter(Mandatory)]
+                [ValidateNotNullOrEmpty()]
+                [Hashtable]$Progress,
+
+                [Parameter(Mandatory)]
+                [String]$Command,
+
+                [ValidateNotNull()]
+                [Hashtable]$Parameters = @{}
+            )
+
+            Write-Progress @Progress
+
+            try {
+                return & $Command @Parameters
+            } catch {
+                return $PSItem
+            }
+        }
+
         $WriteProgressParams = @{
-            Id       = 0
-            Activity = 'Updating all the things'
+            Id              = 0
+            Activity        = 'Updating all the things'
+            Status          = ''
+            PercentComplete = 0
         }
 
         $Results = [PSCustomObject]@{
@@ -337,7 +363,7 @@ Function Global:Update-AllTheThings {
             }
 
             default {
-                foreach ($Task in $AllTasks) {
+                foreach ($Task in $ValidTasks) {
                     if (($PSCmdlet.ParameterSetName -eq 'OptOut' -and $PSBoundParameters['ExcludeTasks'] -notcontains $Task) -or
                         ($PSCmdlet.ParameterSetName -eq 'OptIn' -and $PSBoundParameters['IncludeTasks'] -contains $Task)) {
                         $Tasks.Add($Task)
@@ -351,246 +377,129 @@ Function Global:Update-AllTheThings {
         Write-Verbose -Message "Running updates for: $($Tasks -join ', ')"
 
         if ($Tasks -contains 'Windows') {
-            Write-Progress @WriteProgressParams -Status 'Windows' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.Windows = Update-Windows -ExcludeCategories @('Drivers', 'Driver Sets')
-            } catch {
-                $Results.Windows = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Windows'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.Windows = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Windows' -Parameters @{ ExcludeCategories = ('Drivers', 'Driver Sets') }
         }
 
         if ($Tasks -contains 'WSL') {
-            Write-Progress @WriteProgressParams -Status 'Windows Subsystem for Linux' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.WSL = Update-WSL
-            } catch {
-                $Results.WSL = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Windows Subsystem for Linux'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.WSL = Invoke-Task -Progress $WriteProgressParams -Command 'Update-WSL'
         }
 
         if ($Tasks -contains 'Office') {
-            Write-Progress @WriteProgressParams -Status 'Office' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.Office = Update-Office -ProgressParentId $WriteProgressParams['Id']
-            } catch {
-                $Results.Office = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Office'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.Office = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Office' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
         }
 
         if ($Tasks -contains 'VisualStudio') {
-            Write-Progress @WriteProgressParams -Status 'Visual Studio' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.VisualStudio = Update-VisualStudio -ProgressParentId $WriteProgressParams['Id']
-            } catch {
-                $Results.VisualStudio = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Visual Studio'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.VisualStudio = Invoke-Task -Progress $WriteProgressParams -Command 'Update-VisualStudio' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
         }
 
         if ($Tasks -contains 'PowerShell') {
-            Write-Progress @WriteProgressParams -Status 'PowerShell' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.PowerShell = Update-PowerShell -ProgressParentId $WriteProgressParams['Id']
-            } catch {
-                $Results.PowerShell = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'PowerShell'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.PowerShell = Invoke-Task -Progress $WriteProgressParams -Command 'Update-PowerShell' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
         }
 
         if ($Tasks -contains 'MicrosoftStore') {
-            Write-Progress @WriteProgressParams -Status 'Microsoft Store apps' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.MicrosoftStore = Update-MicrosoftStore
-            } catch {
-                $Results.MicrosoftStore = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Microsoft Store apps'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.MicrosoftStore = Invoke-Task -Progress $WriteProgressParams -Command 'Update-MicrosoftStore'
         }
 
         if ($Tasks -contains 'Edge') {
-            Write-Progress @WriteProgressParams -Status 'Edge' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.Edge = Update-Edge -ProgressParentId $WriteProgressParams['Id']
-            } catch {
-                $Results.Edge = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Edge'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.Edge = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Edge' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
         }
 
         if ($Tasks -contains 'Chrome') {
-            Write-Progress @WriteProgressParams -Status 'Chrome' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.Chrome = Update-Chrome -ProgressParentId $WriteProgressParams['Id']
-            } catch {
-                $Results.Chrome = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Chrome'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.Chrome = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Chrome' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
         }
 
         if ($Tasks -contains 'WinGet') {
-            Write-Progress @WriteProgressParams -Status 'WinGet' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.WinGet = Update-WinGet
-            } catch {
-                $Results.WinGet = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'WinGet'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.WinGet = Invoke-Task -Progress $WriteProgressParams -Command 'Update-WinGet'
         }
 
         if ($Tasks -contains 'Homebrew') {
-            Write-Progress @WriteProgressParams -Status 'Homebrew' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.Homebrew = Update-Homebrew -ProgressParentId $WriteProgressParams['Id']
-            } catch {
-                $Results.Homebrew = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Homebrew'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.Homebrew = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Homebrew' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
         }
 
         if ($Tasks -contains 'Scoop') {
-            Write-Progress @WriteProgressParams -Status 'Scoop' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.Scoop = Update-Scoop -ProgressParentId $WriteProgressParams['Id']
-            } catch {
-                $Results.Scoop = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Scoop'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.Scoop = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Scoop' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
         }
 
         if ($Tasks -contains 'DotNetTools') {
-            Write-Progress @WriteProgressParams -Status '.NET tools' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.DotNetTools = Update-DotNetTools -ProgressParentId $WriteProgressParams['Id']
-            } catch {
-                $Results.DotNetTools = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = '.NET tools'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.DotNetTools = Invoke-Task -Progress $WriteProgressParams -Command 'Update-DotNetTools' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
         }
 
         if ($Tasks -contains 'GoBinaries') {
-            Write-Progress @WriteProgressParams -Status 'Go binaries' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.GoBinaries = Update-GoBinaries
-            } catch {
-                $Results.GoBinaries = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Go binaries'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.GoBinaries = Invoke-Task -Progress $WriteProgressParams -Command 'Update-GoBinaries'
         }
 
         if ($Tasks -contains 'NodejsPackages') {
-            Write-Progress @WriteProgressParams -Status 'Node.js packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.NodejsPackages = Update-NodejsPackages
-            } catch {
-                $Results.NodejsPackages = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Node.js packages'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.NodejsPackages = Invoke-Task -Progress $WriteProgressParams -Command 'Update-NodejsPackages'
         }
 
         if ($Tasks -contains 'Python') {
-            Write-Progress @WriteProgressParams -Status 'Python runtimes' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.Python = Update-Python
-            } catch {
-                $Results.Python = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Python runtimes'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.Python = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Python'
         }
 
         if ($Tasks -contains 'PythonPipPackages') {
-            Write-Progress @WriteProgressParams -Status 'Python pip packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.PythonPipPackages = Update-PythonPipPackages
-            } catch {
-                $Results.PythonPipPackages = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Python pip packages'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.PythonPipPackages = Invoke-Task -Progress $WriteProgressParams -Command 'Update-PythonPipPackages'
         }
 
         if ($Tasks -contains 'PythonPipxPackages') {
-            Write-Progress @WriteProgressParams -Status 'Python pipx packages' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.PythonPipxPackages = Update-PythonPipxPackages
-            } catch {
-                $Results.PythonPipxPackages = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Python pipx packages'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.PythonPipxPackages = Invoke-Task -Progress $WriteProgressParams -Command 'Update-PythonPipxPackages'
         }
 
         if ($Tasks -contains 'QtComponents') {
-            Write-Progress @WriteProgressParams -Status 'Qt components' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.QtComponents = Update-QtComponents
-            } catch {
-                $Results.QtComponents = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Qt components'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.QtComponents = Invoke-Task -Progress $WriteProgressParams -Command 'Update-QtComponents'
         }
 
         if ($Tasks -contains 'RubyGems') {
-            Write-Progress @WriteProgressParams -Status 'Ruby gems' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.RubyGems = Update-RubyGems
-            } catch {
-                $Results.RubyGems = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Ruby gems'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.RubyGems = Invoke-Task -Progress $WriteProgressParams -Command 'Update-RubyGems'
         }
 
         if ($Tasks -contains 'RustToolchains') {
-            Write-Progress @WriteProgressParams -Status 'Rust toolchains' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-            try {
-                $Results.RustToolchains = Update-RustToolchains
-            } catch {
-                $Results.RustToolchains = $PSItem
-            }
-
-            $TasksDone++
+            $WriteProgressParams['Status'] = 'Rust toolchains'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.RustToolchains = Invoke-Task -Progress $WriteProgressParams -Command 'Update-RustToolchains'
         }
 
-        Write-Progress @WriteProgressParams -Completed
+        if ($Tasks.Count -ne 0) {
+            Write-Progress @WriteProgressParams -Completed
+        }
+
         return $Results
     }
 }
