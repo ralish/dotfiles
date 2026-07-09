@@ -106,145 +106,136 @@ Function Global:Clear-AllDevCaches {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
     [CmdletBinding(DefaultParameterSetName = 'OptOut', SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
-    Param(
-        [Parameter(ParameterSetName = 'OptOut')]
-        [ValidateSet(
-            'Docker',
-            'gem',
-            'Go',
-            'Gradle',
-            'Maven',
-            'npm',
-            'NuGet',
-            'pip'
-        )]
-        [String[]]$ExcludeTasks,
+    Param()
 
-        [Parameter(ParameterSetName = 'OptIn', Mandatory)]
-        [ValidateSet(
-            'Docker',
-            'gem',
-            'Go',
-            'Gradle',
-            'Maven',
-            'npm',
-            'NuGet',
-            'pip'
-        )]
-        [String[]]$IncludeTasks
-    )
+    DynamicParam {
+        $ValidTasks = [String[]]@('Docker', 'gem', 'Go', 'Gradle', 'Maven', 'npm', 'NuGet', 'pip')
+        $TasksVsa = [Management.Automation.ValidateSetAttribute]::new($ValidTasks)
 
-    $ValidTasks = @(
-        'Docker'
-        'gem'
-        'Go'
-        'Gradle'
-        'Maven'
-        'npm'
-        'NuGet'
-        'pip'
-    )
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
-    $WriteProgressParams = @{
-        Id       = 0
-        Activity = 'Clearing caches for development environments & tooling'
+        $OptInAttrs = [Collections.ObjectModel.Collection[Attribute]]::new()
+        $OptInParamAttr = [Management.Automation.ParameterAttribute]@{ ParameterSetName = 'OptIn'; Mandatory = $true }
+        $OptInAttrs.Add($OptInParamAttr)
+        $OptInAttrs.Add($TasksVsa)
+        $OptInParam = [Management.Automation.RuntimeDefinedParameter]::new('IncludeTasks', [String[]], $OptInAttrs)
+        $RuntimeParams.Add('IncludeTasks', $OptInParam)
+
+        $OptOutAttrs = [Collections.ObjectModel.Collection[Attribute]]::new()
+        $OptOutParamAttr = [Management.Automation.ParameterAttribute]@{ ParameterSetName = 'OptOut' }
+        $OptOutAttrs.Add($OptOutParamAttr)
+        $OptOutAttrs.Add($TasksVsa)
+        $OptOutParam = [Management.Automation.RuntimeDefinedParameter]::new('ExcludeTasks', [String[]], $OptOutAttrs)
+        $RuntimeParams.Add('ExcludeTasks', $OptOutParam)
+
+        return $RuntimeParams
     }
 
-    $Tasks = [Collections.Generic.List[String]]::new()
-    $TasksDone = 0
-    $TasksTotal = 0
+    End {
+        $WriteProgressParams = @{
+            Id              = 0
+            Activity        = 'Clearing caches for development environments & tooling'
+            Status          = ''
+            PercentComplete = 0
+        }
 
-    foreach ($Task in $ValidTasks) {
-        if (($PSCmdlet.ParameterSetName -eq 'OptOut' -and $ExcludeTasks -notcontains $Task) -or
-            ($PSCmdlet.ParameterSetName -eq 'OptIn' -and $IncludeTasks -contains $Task)) {
-            $Tasks.Add($Task)
-            $TasksTotal++
+        $Tasks = [Collections.Generic.List[String]]::new()
+
+        foreach ($Task in $ValidTasks) {
+            if (($PSCmdlet.ParameterSetName -eq 'OptOut' -and $PSBoundParameters['ExcludeTasks'] -notcontains $Task) -or
+                ($PSCmdlet.ParameterSetName -eq 'OptIn' -and $PSBoundParameters['IncludeTasks'] -contains $Task)) {
+                $Tasks.Add($Task)
+            }
+        }
+
+        $TasksDone = 0
+        $TasksTotal = $Tasks.Count
+        Write-Verbose -Message "Clearing caches for: $($Tasks -join ', ')"
+
+        if ($Tasks -contains 'Docker') {
+            $WriteProgressParams['Status'] = 'Clearing Docker data'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            Write-Progress @WriteProgressParams
+
+            try {
+                Clear-DockerData -Force
+            } catch { $PSCmdlet.WriteError($PSItem) }
+        }
+
+        if ($Tasks -contains 'gem') {
+            $WriteProgressParams['Status'] = 'Clearing gem cache'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            Write-Progress @WriteProgressParams
+
+            try {
+                Clear-GemCache
+            } catch { $PSCmdlet.WriteError($PSItem) }
+        }
+
+        if ($Tasks -contains 'Go') {
+            $WriteProgressParams['Status'] = 'Clearing Go cache'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            Write-Progress @WriteProgressParams
+
+            try {
+                Clear-GoCache
+            } catch { $PSCmdlet.WriteError($PSItem) }
+        }
+
+        if ($Tasks -contains 'Gradle') {
+            $WriteProgressParams['Status'] = 'Clearing Gradle cache'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            Write-Progress @WriteProgressParams
+
+            try {
+                Clear-GradleCache
+            } catch { $PSCmdlet.WriteError($PSItem) }
+        }
+
+        if ($Tasks -contains 'Maven') {
+            $WriteProgressParams['Status'] = 'Clearing Maven cache'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            Write-Progress @WriteProgressParams
+
+            try {
+                Clear-MavenCache
+            } catch { $PSCmdlet.WriteError($PSItem) }
+        }
+
+        if ($Tasks -contains 'npm') {
+            $WriteProgressParams['Status'] = 'Clearing npm cache'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            Write-Progress @WriteProgressParams
+
+            try {
+                Clear-NpmCache
+            } catch { $PSCmdlet.WriteError($PSItem) }
+        }
+
+        if ($Tasks -contains 'NuGet') {
+            $WriteProgressParams['Status'] = 'Clearing NuGet cache'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            Write-Progress @WriteProgressParams
+
+            try {
+                Clear-NuGetCache
+            } catch { $PSCmdlet.WriteError($PSItem) }
+        }
+
+        if ($Tasks -contains 'pip') {
+            $WriteProgressParams['Status'] = 'Clearing pip cache'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            Write-Progress @WriteProgressParams
+
+            try {
+                Clear-PipCache
+            } catch { $PSCmdlet.WriteError($PSItem) }
+        }
+
+        if ($Tasks.Count -ne 0) {
+            Write-Progress @WriteProgressParams -Completed
         }
     }
-
-    Write-Verbose -Message "Clearing caches for: $($Tasks -join ', ')"
-
-    if ($Tasks -contains 'Docker') {
-        Write-Progress @WriteProgressParams -Status 'Clearing Docker data' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-        try {
-            Clear-DockerData -Force
-        } catch { $PSCmdlet.WriteError($PSItem) }
-
-        $TasksDone++
-    }
-
-    if ($Tasks -contains 'gem') {
-        Write-Progress @WriteProgressParams -Status 'Clearing gem cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-        try {
-            Clear-GemCache
-        } catch { $PSCmdlet.WriteError($PSItem) }
-
-        $TasksDone++
-    }
-
-    if ($Tasks -contains 'Go') {
-        Write-Progress @WriteProgressParams -Status 'Clearing Go cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-        try {
-            Clear-GoCache
-        } catch { $PSCmdlet.WriteError($PSItem) }
-
-        $TasksDone++
-    }
-
-    if ($Tasks -contains 'Gradle') {
-        Write-Progress @WriteProgressParams -Status 'Clearing Gradle cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-        try {
-            Clear-GradleCache
-        } catch { $PSCmdlet.WriteError($PSItem) }
-
-        $TasksDone++
-    }
-
-    if ($Tasks -contains 'Maven') {
-        Write-Progress @WriteProgressParams -Status 'Clearing Maven cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-        try {
-            Clear-MavenCache
-        } catch { $PSCmdlet.WriteError($PSItem) }
-
-        $TasksDone++
-    }
-
-    if ($Tasks -contains 'npm') {
-        Write-Progress @WriteProgressParams -Status 'Clearing npm cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-        try {
-            Clear-NpmCache
-        } catch { $PSCmdlet.WriteError($PSItem) }
-
-        $TasksDone++
-    }
-
-    if ($Tasks -contains 'NuGet') {
-        Write-Progress @WriteProgressParams -Status 'Clearing NuGet cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-        try {
-            Clear-NuGetCache
-        } catch { $PSCmdlet.WriteError($PSItem) }
-
-        $TasksDone++
-    }
-
-    if ($Tasks -contains 'pip') {
-        Write-Progress @WriteProgressParams -Status 'Clearing pip cache' -PercentComplete ($TasksDone / $TasksTotal * 100)
-
-        try {
-            Clear-PipCache
-        } catch { $PSCmdlet.WriteError($PSItem) }
-
-        $TasksDone++
-    }
-
-    Write-Progress @WriteProgressParams -Completed
 }
 
 # Update everything!
