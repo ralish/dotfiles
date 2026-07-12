@@ -1,6 +1,6 @@
 Windows Event Viewer
 ====================
 
-Copy everything in the `Views` directory to `%ProgramData%\Microsoft\Event Viewer\Views`.
+Last reviewed release: Windows Server 2022 & 2025
 
-Server roles have been verified against Windows Server 2022 and Windows Server 2025.
+Copy everything in the `Views` directory to `%ProgramData%\Microsoft\Event Viewer\Views`.
