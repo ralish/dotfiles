@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code settings
      *
-     * Last reviewed release: v1.112.0
+     * Last reviewed release: v1.128.0
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
@@ -12,6 +12,7 @@
     "$schema": "vscode://schemas/settings/user",
 
     // Text Editor
+    "editor.accessibilitySupport": "off",
     "editor.dragAndDrop": false,
     "editor.emptySelectionClipboard": false,
     "editor.mouseWheelZoom": true,
@@ -82,6 +83,7 @@
     "workbench.editor.pinnedTabsOnSeparateRow": true,
     "workbench.editor.preventPinnedEditorClose": "never",
     "workbench.editor.revealIfOpen": true,
+    "workbench.editor.useModal": "off",
 
     // Workbench: Settings Editor
     "workbench.settings.alwaysShowAdvancedSettings": true,
@@ -95,18 +97,24 @@
     "zenMode.hideStatusBar": false,
     "zenMode.restore": false,
 
+    // Workbench: Browser
+    "workbench.browser.searchEngine": "none",
+
     // Window
     "window.confirmSaveUntitledWorkspace": false,
 
     // Window: New Window
     "window.newWindowDimensions": "inherit",
 
-    // Chat
-    //"chat.upvoteAnimation": "pulseWave",
+    // Chat: Agent
+    "chat.agent.sandbox.enabled": "on",
+    "chat.agent.sandbox.enabledWindows": "on",
 
     // Chat: Tools
     "chat.tools.terminal.enableAutoApprove": false,
-    "chat.tools.terminal.sandbox.enabled": true,
+
+    // Chat: Miscellaneous
+    //"chat.disableAIFeatures": true,
 
     // Features: Explorer
     "explorer.autoReveal": "focusNoScroll",
@@ -199,6 +207,7 @@
     "git.blame.statusBarItem.enabled": false, // Handled by GitLens
     "git.confirmCommittedDelete": false,
     "git.confirmSync": false,
+    "git.detectWorktrees": true,
     "git.enableSmartCommit": true,
     "git.fetchOnPull": true,
     "git.openRepositoryInParentFolders": "never",
@@ -209,6 +218,14 @@
     "git.suggestSmartCommit": false,
     "git.timeline.date": "authored",
     "git.untrackedChanges": "separate",
+
+    // GitHub Copilot Chat
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false
+    },
 
     // JavaScript and TypeScript: Formatting
     "js/ts.format.semicolons": "remove",
@@ -221,9 +238,12 @@
         "https://raw.githubusercontent.com/": true
     },
 
-    // Markdown
+    // Markdown: Language Features
     "markdown.updateLinksOnFileMove.enabled": "prompt",
+    // Markdown: Validation
     "markdown.validate.enabled": true,
+    // Markdown: Preview
+    "markdown.preview.markEditorSelection": true,
 
     // PHP
     "php.validate.executablePath": "C:\\DevEnvs\\PHP\\php.exe",
@@ -315,6 +335,7 @@
     //"csharp.debug.symbolOptions.cachePath": "D:/Symbols/Cache",
     "csharp.debug.symbolOptions.searchMicrosoftSymbolServer": true,
     "csharp.debug.symbolOptions.searchNuGetOrgSymbolServer": true,
+    "csharp.debug.terminateChildProcesses": true,
     // C#: OmniSharp
     "csharp.suppressHiddenDiagnostics": false,
     // EditorConfig support may conflict with Visual Studio if running
@@ -323,7 +344,6 @@
     "omnisharp.sdkIncludePrereleases": false,
 
     // C# Dev Kit
-    "dotnet.automaticallyCreateSolutionInWorkspace": false,
     "dotnet.testWindow.enableTestExplorerDiff": true,
 
     // CloudFormation Linter
@@ -333,6 +353,8 @@
     // CMake Tools
     "cmake.configureOnOpen": false,
     "cmake.options.statusBarVisibility": "visible",
+    "cmake.outlineViewType": "tree",
+    "cmake.removeStaleKitsOnScan": true,
 
     // Container Tools
     "containers.containers.sortBy": "Label",
@@ -380,14 +402,6 @@
     // Flake8
     "flake8.importStrategy": "fromEnvironment",
 
-    // GitHub Copilot Chat
-    "github.copilot.enable": {
-        "*": false,
-        "plaintext": false,
-        "markdown": false,
-        "scminput": false
-    },
-
     // GitHub Pull Requests
     "githubIssues.issueBranchTitle": "issue${issueNumber}",
     "githubIssues.useBranchForIssues": "prompt",
@@ -400,6 +414,7 @@
 
     // GitLens: General
     "gitlens.showWhatsNewAfterUpgrades": false,
+    "gitlens.defaultCurrentUserNameStyle": "nameAndYou",
     "gitlens.plusFeatures.enabled": false,
     // GitLens: Commit Graph
     "gitlens.graph.layout": "editor",
@@ -409,11 +424,17 @@
     "gitlens.launchpad.indicator.enabled": false,
     "gitlens.launchpad.indicator.label": "counts",
     // GitLens: Interactive Rebase Editor
+    "gitlens.rebaseEditor.density": "compact",
     "gitlens.rebaseEditor.openOnPausedRebase": false,
     // GitLens: Terminal
     "gitlens.gitkraken.mcp.autoEnabled": false,
     // GitLens: AI
     "gitlens.ai.enabled": false,
+    // Next two settings are present only because GitLens keeps adding them,
+    // resulting in our settings being marked as modified in our `dotfiles`
+    // repository. This is despite disabling AI features for the extension.
+    "gitlens.ai.model": "vscode",
+    "gitlens.ai.vscode.model": "copilot:claude-sonnet-4.6",
     // GitLens: Date & Times
     "gitlens.defaultDateStyle": "absolute",
     // GitLens: Advanced
@@ -552,6 +573,9 @@
     // Python
     "python.experiments.enabled": false,
     "python.useEnvironmentsExtension": true,
+
+    // Python Debugger
+    "debugpy.showPythonInlineValues": true,
 
     // Python Environments
     "python-envs.alwaysUseUv": false,
