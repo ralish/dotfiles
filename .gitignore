@@ -81,6 +81,9 @@ temp/
 /cpanp/.cpanplus/authors/
 /cpanp/.cpanplus/install-logs/
 
+# Directory Opus
+/dopus/
+
 # Fiddler
 /fiddler/Scripts/BrowserPAC.js
 
