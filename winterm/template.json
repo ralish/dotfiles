@@ -259,7 +259,6 @@
                 "name": "Ubuntu",
                 "source": "Microsoft.WSL", // Fragment
                 "guid": "{00000000-0000-0000-0000-000000000000}",
-                "icon": "C:\\Users\\SDL\\AppData\\Local\\wsl\\{00000000-0000-0000-0000-000000000000}\\shortcut.ico",
 
                 "colorScheme": "Solarized Dark",
                 "closeOnExit": "always",
@@ -269,7 +268,6 @@
                 "name": "Kali",
                 "source": "Microsoft.WSL", // Fragment
                 "guid": "{00000000-0000-0000-0000-000000000000}",
-                "icon": "C:\\Users\\SDL\\AppData\\Local\\wsl\\{00000000-0000-0000-0000-000000000000}\\shortcut.ico",
 
                 "colorScheme": "Solarized Dark",
                 "closeOnExit": "always",
