@@ -31,15 +31,15 @@
                                     if ($PSItem.WSL -is [Management.Automation.ErrorRecord]) { return $PSItem.WSL.Exception.Message }
 
                                     if (!$PSItem.WSL.Success) { return 'Error during operation (view property for details)' }
-                                    if ($PSItem.WSL.WhatIf) { return "$($PSItem.WSL.BeforeUpdate) (current version)" }
+                                    if ($PSItem.WSL.WhatIf) { return "$($PSItem.WSL.BeforeUpdate.WSL) (current version)" }
 
                                     if ($null -ne $PSItem.WSL.AfterUpdate) {
-                                        if ($PSItem.WSL.BeforeUpdate -eq $PSItem.WSL.AfterUpdate) {
-                                            return "$($PSItem.WSL.BeforeUpdate) (no update)"
+                                        if ($PSItem.WSL.BeforeUpdate.WSL -eq $PSItem.WSL.AfterUpdate.WSL) {
+                                            return "$($PSItem.WSL.BeforeUpdate.WSL) (no update)"
                                         }
                                     }
 
-                                    "$($PSItem.WSL.AfterUpdate) (previous: $($PSItem.WSL.BeforeUpdate))"
+                                    "$($PSItem.WSL.AfterUpdate.WSL) (previous: $($PSItem.WSL.BeforeUpdate.WSL))"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>

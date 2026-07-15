@@ -212,10 +212,34 @@
                                 <PropertyName>Success</PropertyName>
                             </ListItem>
                             <ListItem>
-                                <PropertyName>BeforeUpdate</PropertyName>
+                                <Label>BeforeUpdate</Label>
+                                <ScriptBlock>
+                                    $Wsl = $PSItem
+
+                                    $Versions = [Collections.Generic.List[String]]::new()
+                                    foreach ($Component in $Wsl.BeforeUpdate.PSObject.Properties.Name) {
+                                        if ($Component -eq 'Windows') { continue }
+                                        $Versions.Add("${Component}: $($Wsl.BeforeUpdate.$Component)")
+                                    }
+
+                                    $Versions -join ', '
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
-                                <PropertyName>AfterUpdate</PropertyName>
+                                <Label>AfterUpdate</Label>
+                                <ScriptBlock>
+                                    $Wsl = $PSItem
+
+                                    if ($null -eq $Wsl.AfterUpdate) { return }
+
+                                    $Versions = [Collections.Generic.List[String]]::new()
+                                    foreach ($Component in $Wsl.AfterUpdate.PSObject.Properties.Name) {
+                                        if ($Component -eq 'Windows') { continue }
+                                        $Versions.Add("${Component}: $($Wsl.AfterUpdate.$Component)")
+                                    }
+
+                                    $Versions -join ', '
+                                </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>Output</Label>

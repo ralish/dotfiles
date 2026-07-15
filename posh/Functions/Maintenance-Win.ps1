@@ -1547,8 +1547,8 @@ Function Global:Update-WSL {
 
     $Result = [PSCustomObject]@{
         Success      = $false
-        BeforeUpdate = ''
-        AfterUpdate  = ''
+        BeforeUpdate = $null
+        AfterUpdate  = $null
         Output       = [String[]]@()
         ExitCode     = -1
         WhatIf       = $false
