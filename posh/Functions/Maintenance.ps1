@@ -403,7 +403,8 @@ Function Global:Update-AllTheThings {
         if ($Tasks -contains 'PowerShell') {
             $WriteProgressParams['Status'] = 'PowerShell'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
-            $Results.PowerShell = Invoke-Task -Progress $WriteProgressParams -Command 'Update-PowerShell' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+            $null = Invoke-Task -Progress $WriteProgressParams -Command 'Update-PowerShell' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+            $Results.PowerShell = $true
         }
 
         if ($Tasks -contains 'MicrosoftStore') {

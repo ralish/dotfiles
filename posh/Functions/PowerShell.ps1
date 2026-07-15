@@ -114,6 +114,8 @@ Function Global:Get-ArgumentCompleter {
 #region Maintenance
 
 # Update PowerShell modules & built-in help
+#
+# TODO: Return the update results
 Function Global:Update-PowerShell {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
