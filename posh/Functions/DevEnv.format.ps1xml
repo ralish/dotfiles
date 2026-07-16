@@ -98,7 +98,7 @@
 
                                     $Current = $Available = $Updated = $Total = 0
                                     foreach ($Line in $PSItem.Binaries) {
-                                        if ($Line -match '^\[[1-9][0-9]*/([1-9][0-9]*)\] .+') {
+                                        if ($Line -match '^\[ *[1-9][0-9]*/([1-9][0-9]*)\] .+') {
                                             if ($Total -eq 0) { $Total = $Matches[1] }
                                             elseif ($Total -ne $Matches[1]) { return $ParseError }
 
