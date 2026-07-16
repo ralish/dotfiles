@@ -19,34 +19,52 @@
                             <ListItem>
                                 <Label>BeforeUpdate</Label>
                                 <ScriptBlock>
-                                    if ($PSItem.BeforeUpdate.Count -eq 0) { return '(no output)' }
-                                    if ($PSItem.BeforeUpdate.Count -eq 1) { return 'Parse error (view property for output)' }
-                                    "$($PSItem.BeforeUpdate.Count - 2) tools installed"
+                                    $DotNetTools = $PSItem
+
+                                    if ($DotNetTools.BeforeUpdate.Count -eq 0) { return '(no output)' }
+                                    if ($DotNetTools.BeforeUpdate.Count -eq 1) { return 'Parse error (view property for output)' }
+                                    return "$($DotNetTools.BeforeUpdate.Count - 2) tools installed"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>AfterUpdate</Label>
                                 <ScriptBlock>
-                                    if ($PSItem.AfterUpdate.Count -eq 0) { return '(no output)' }
-                                    if ($PSItem.AfterUpdate.Count -eq 1) { return 'Parse error (view property for output)' }
-                                    "$($PSItem.AfterUpdate.Count - 2) tools installed"
+                                    $DotNetTools = $PSItem
+
+                                    if ($DotNetTools.AfterUpdate.Count -eq 0) { return '(no output)' }
+                                    if ($DotNetTools.AfterUpdate.Count -eq 1) { return 'Parse error (view property for output)' }
+                                    if ($DotNetTools.BeforeUpdate.Count -ne $DotNetTools.AfterUpdate.Count) { return 'Package count after update differs from before update' }
+
+                                    $Updated = $Total = 0
+                                    for ($LineNum = 2; $LineNum -lt $DotNetTools.AfterUpdate.Count; $LineNum++) {
+                                        $Elements = $DotNetTools.BeforeUpdate[$LineNum].Split(' ', [StringSplitOptions]::RemoveEmptyEntries)
+                                        $BeforePkgId = $Elements[0]
+                                        $BeforePkgVersion = $Elements[1]
+
+                                        $Elements = $DotNetTools.AfterUpdate[$LineNum].Split(' ', [StringSplitOptions]::RemoveEmptyEntries)
+                                        $AfterPkgId = $Elements[0]
+                                        $AfterPkgVersion = $Elements[1]
+
+                                        if ($BeforePkgId -ne $AfterPkgId) {
+                                            return "Package name before update differs from after update: ${BeforePkgId} != ${AfterPkgId}"
+                                        }
+
+                                        if ($BeforePkgVersion -ne $AfterPkgVersion) { $Updated++ }
+                                    }
+
+                                    return "${Updated} tools updated ($($DotNetTools.AfterUpdate.Count - 2) tools installed)"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>Output</Label>
                                 <ScriptBlock>
-                                    if ($PSItem.Output.Count -eq 0) { return '(no output)' }
+                                    $DotNetTools = $PSItem
 
-                                    $Updated = 0
-                                    foreach ($Line in $PSItem.Output) {
-                                        switch -Regex ($Line) {
-                                            'is already installed' { }
-                                            'was successfully updated' { $Updated++ }
-                                            Default { return 'Parse error (view property for output)' }
-                                        }
+                                    switch ($DotNetTools.Output.Count) {
+                                        0 { '(no output)' }
+                                        1 { $DotNetTools.Output }
+                                        default { "$($DotNetTools.Output.Count) lines (view property for output)" }
                                     }
-
-                                    "${Updated} tools updated (view property for output)"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
@@ -75,9 +93,11 @@
                             <ListItem>
                                 <Label>Gup</Label>
                                 <ScriptBlock>
-                                    if ($PSItem.Gup.Count -eq 0) { return '(no output)' }
+                                    $GoBinaries = $PSItem
 
-                                    foreach ($Line in $PSItem.Gup) {
+                                    if ($GoBinaries.Gup.Count -eq 0) { return '(no output)' }
+
+                                    foreach ($Line in $GoBinaries.Gup) {
                                         if ($Line -match '^\[1/1\] .+') {
                                             switch -Regex ($Line) {
                                                 'Already up-to-date: v(\S+)' { return "$($Matches[1]) (up-to-date)" }
@@ -87,20 +107,26 @@
                                         }
                                     }
 
-                                    'Parse error (view property for output)'
+                                    return 'Parse error (view property for output)'
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
                                 <Label>Binaries</Label>
                                 <ScriptBlock>
-                                    if ($PSItem.Binaries.Count -eq 0) { return '(no output)' }
+                                    $GoBinaries = $PSItem
+
+                                    if ($GoBinaries.Binaries.Count -eq 0) { return '(no output)' }
+
                                     $ParseError = 'Parse error (view property for output)'
 
                                     $Current = $Available = $Updated = $Total = 0
-                                    foreach ($Line in $PSItem.Binaries) {
+                                    foreach ($Line in $GoBinaries.Binaries) {
                                         if ($Line -match '^\[ *[1-9][0-9]*/([1-9][0-9]*)\] .+') {
-                                            if ($Total -eq 0) { $Total = $Matches[1] }
-                                            elseif ($Total -ne $Matches[1]) { return $ParseError }
+                                            if ($Total -eq 0) {
+                                                $Total = $Matches[1]
+                                            } elseif ($Total -ne $Matches[1]) {
+                                                return $ParseError
+                                            }
 
                                             switch -Regex ($Line) {
                                                 'Already up-to-date: v\S+' { $Current++ }
@@ -112,13 +138,14 @@
 
                                     if ($Updated -gt 0 -and $Available -gt 0) { return $ParseError }
 
-                                    if ($PSItem.WhatIf) {
+                                    if ($GoBinaries.WhatIf) {
                                         if ($Current + $Available -ne $Total) { return $ParseError }
                                         return "${Available} updates available (view property for output)"
                                     }
 
                                     if ($Current + $Updated -ne $Total) { return $ParseError }
-                                    "${Updated} binaries updated (view property for output)"
+
+                                    return "${Updated} binaries updated (view property for output)"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
