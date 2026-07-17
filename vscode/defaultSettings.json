@@ -1,4 +1,12 @@
 {
+    /*
+     * Visual Studio Code defaults
+     *
+     * Exported from release: v1.129.0
+     *
+     * Obtained from "Preferences: Open Default Settings (JSON)" command.
+     */
+
     // AHK++ (AutoHotkey Plus Plus)
     // Learn more about [MPRESS](https://www.autohotkey.com/mpress/mpress_web.htm)
     "AHK++.compiler": {
@@ -1947,6 +1955,29 @@
     // Controls whether the `window.title` should be optimized for screen readers when in screen reader mode. When enabled, the window title will have `activeEditorState` appended to the end.
     "accessibility.windowTitleOptimized": true,
 
+    // Voice Mode
+    // When enabled, voice mode automatically re-enters listening after the assistant finishes speaking, so you can hold a hands-free back-and-forth conversation. When disabled, you start each turn manually. This controls only the auto-listen loop; how a turn ends is controlled by `agents.voice.turn.silenceMs` and `agents.voice.turn.stopPhrases`.
+    "agents.voice.handsFree": true,
+
+    // Show the voice transcript overlay in the chat input area while voice mode is active. Enable this to read responses as text when `agents.voice.speakResponses` is disabled.
+    "agents.voice.showTranscript": false,
+
+    // When enabled, the assistant reads responses aloud. When disabled, responses are not spoken; enable `agents.voice.showTranscript` to read them as a text transcript instead.
+    "agents.voice.speakResponses": true,
+
+    // Trailing silence in milliseconds before the backend ends the turn automatically. Set to `-1` to disable ending the turn on silence, in which case the turn ends only via a stop phrase (`agents.voice.turn.stopPhrases`) or manually. When enabled, the backend clamps this to its supported range (currently 200-5000 ms) and is the source of truth.
+    "agents.voice.turn.silenceMs": 800,
+
+    // Phrases that end the turn when spoken at the end of an utterance. Leave empty to disable ending the turn on a stop phrase, in which case the turn ends only on trailing silence (`agents.voice.turn.silenceMs`) or manually. The backend strips the matched phrase from the transcript before it reaches the agent.
+    "agents.voice.turn.stopPhrases": ["send it"],
+
+    // The voice used when the assistant reads responses aloud. Changing this while voice mode is connected takes effect immediately.
+    //  - victoria_neutral: Victoria.
+    //  - kevin_neutral: Kevin.
+    //  - maya_neutral: Maya.
+    //  - daniel_neutral: Daniel.
+    "agents.voice.voice": "maya_neutral",
+
     // Application
     // When enabled, slow renderers are automatically profiled.
     "application.experimental.rendererProfiling": false,
@@ -2285,6 +2316,9 @@
     // When enabled breadcrumbs show `constructor`-symbols.
     "breadcrumbs.showConstructors": true,
 
+    // Controls whether the breadcrumbs bar shows a dropdown to switch between the editors that can open the current file (for example the text editor and a custom editor). The dropdown only appears when a more specialized editor is available.
+    "breadcrumbs.showEditorType": false,
+
     // When enabled breadcrumbs show `enumMember`-symbols.
     "breadcrumbs.showEnumMembers": true,
 
@@ -2364,7 +2398,7 @@
     "breadcrumbs.symbolSortOrder": "position",
 
     // CloudFormation Linter configuration
-    // Append Rules Directories
+    // Append Rules Directories. For security this can only be set in user or remote (machine) settings, not in workspace/folder settings, because cfn-lint loads and executes code from these directories.
     "cfnLint.appendRules": [],
 
     // Enable/disable completion feature
@@ -2388,13 +2422,13 @@
     // Enable/disable hover feature
     "cfnLint.hover": true,
 
-    // Ignore Rules
+    // Ignore Rules. Set in user or remote (machine) settings; not honored from workspace/folder settings because it is passed to the cfn-lint process.
     "cfnLint.ignoreRules": [],
 
-    // (Optional) Path to an override specfile json file
+    // (Optional) Path to an override specfile json file. Set in user or remote (machine) settings; not honored from workspace/folder settings because it is passed to the cfn-lint process.
     "cfnLint.overrideSpecPath": "",
 
-    // Path to cfn-lint
+    // Path to cfn-lint. For security this can only be set in user or remote (machine) settings, not in workspace/folder settings, because it controls which executable is launched.
     "cfnLint.path": "cfn-lint",
 
     // Enable/disable validation feature
@@ -2542,12 +2576,18 @@
         "~/.copilot/agents": true
     },
 
+    // Enable agent debug logging for agent host sessions: surface their debug events in the agent debug panel. Takes effect immediately; only sessions that run while this is enabled are captured.
+    "chat.agentHost.agentDebugLog.enabled": false,
+
+    // Maximum number of debug events kept in memory per agent host session for the agent debug panel. Older events beyond this limit are dropped from the in-memory buffer, which also lowers the totals (such as token usage) shown in the panel overview.
+    "chat.agentHost.agentDebugLog.maxEventsInMemory": 10000,
+
     // When enabled, logs all AHP transport messages for agent host connections to JSONL files under the window's log directory.
     "chat.agentHost.ahpJsonlLoggingEnabled": false,
 
     // Chat Agent Host Starter
     // When enabled, the agent host wires up the BYOK ('bring your own key') language-model bridge so extension-provided BYOK models can run in agent-host sessions. Requires `chat.agentHost.enabled`. The agent host process must be restarted for changes to take effect.
-    "chat.agentHost.byokModels.enabled": false,
+    "chat.agentHost.byokModels.enabled": true,
 
     // When enabled, the agent host registers the Claude provider (subject to the Claude SDK being reachable). Independent of `chat.agents.claude.preferAgentHost` and `chat.editor.claude.preferAgentHost`, which choose which integration surfaces Claude. Requires `chat.agentHost.enabled`. The agent host process must be restarted for changes to take effect.
     "chat.agentHost.claudeAgent.enabled": true,
@@ -2560,6 +2600,11 @@
 
     // When enabled, some agents run in a separate agent host process.
     "chat.agentHost.enabled": false,
+
+    // Per-model capability overrides for Copilot SDK agent sessions, keyed by model id, intended for evaluating preview models against an existing model's profile. For each model id, declare an aliased `family` (for example `claude-opus-4-8`) to route the model to that family's tuned system prompt without a code change; the model id sent to the runtime is unaffected. Only affects Copilot CLI agent sessions.
+    //
+    // **Note**: This is an advanced setting for experimentation.
+    "chat.agentHost.modelCapabilityOverrides": {},
 
     // When enabled, Copilot SDK sessions running a Claude Opus 4.8 model apply Opus 4.8-tuned system-prompt section overrides on top of the default system message.
     "chat.agentHost.opus48Prompt.enabled": false,
@@ -2581,6 +2626,11 @@
 
     // Output path for span JSON lines when exporter type is `file`. Configurable in user settings only. Sets `COPILOT_OTEL_FILE_EXPORTER_PATH`.
     "chat.agentHost.otel.outfile": "",
+
+    // Overrides the reasoning effort for Copilot SDK agent sessions regardless of the per-model picker value. Set it to a level the selected model supports (for example `low`, `medium`, `high`, or `xhigh`) — choosing a level the model does not support may be rejected by the model. A value that isn't a recognized effort level is ignored and the session falls back to the picker value. Applied when a session is created and when its model changes. Only affects Copilot CLI agent sessions.
+    //
+    // **Note**: This is an advanced setting for experimentation.
+    "chat.agentHost.reasoningEffortOverride": "",
 
     // Sandbox mode for the Copilot SDK's built-in shell tool. Only takes effect when `chat.agentHost.customTerminalTool.enabled` is `false`; when the Agent Host's own terminal tool is enabled, the engine sandbox is controlled by `chat.agent.sandbox.enabled`. The sandbox applies only to requests that run with default approvals — not when approvals are bypassed — and is not supported on Windows yet.
     //  - off: No sandbox policy is forwarded for the SDK's built-in shell tool — commands run unsandboxed.
@@ -2667,6 +2717,9 @@
 
     // Show the context window usage indicator in the chat input.
     "chat.contextUsage.enabled": true,
+
+    // Controls whether the Chat Customizations editor shows the prompt file migration affordances for agent-host harnesses. When disabled, the migration card and sidebar shortcut are hidden.
+    "chat.customizations.promptMigration.enabled": false,
 
     // Controls whether the Chat Customizations editor shows a structured preview for markdown customization files (agents, skills, instructions, prompts). When disabled, the editor always opens the raw markdown in the embedded code editor.
     "chat.customizations.structuredPreview.enabled": false,
@@ -2785,8 +2838,8 @@
     //  - Claude Sonnet 4.5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 4.6 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 2.5 Pro (copilot): Gemini 2.5 Pro has a planned deprecation date of 2026-07-31.
-    //  - Gemini 3 Flash (Preview) (copilot): Gemini 3 Flash (Preview) has a planned deprecation date of 2026-07-31.
+    //  - Gemini 2.5 Pro (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
+    //  - Gemini 3 Flash (Preview) (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
@@ -2811,9 +2864,6 @@
 
     // Controls the font size in pixels in chat messages.
     "chat.fontSize": 13,
-
-    // Controls whether the built-in General Purpose agent is available as a subagent.
-    "chat.generalPurposeAgent.enabled": false,
 
     // Controls whether to show a growth notification in the agent sessions view to encourage new users to try Copilot.
     "chat.growthNotification.enabled": false,
@@ -2942,8 +2992,8 @@
     //  - Claude Sonnet 4.5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 4.6 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 2.5 Pro (copilot): Gemini 2.5 Pro has a planned deprecation date of 2026-07-31.
-    //  - Gemini 3 Flash (Preview) (copilot): Gemini 3 Flash (Preview) has a planned deprecation date of 2026-07-31.
+    //  - Gemini 2.5 Pro (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
+    //  - Gemini 3 Flash (Preview) (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
@@ -2966,7 +3016,7 @@
     // Enable agent plugin integration in chat.
     "chat.plugins.enabled": true,
 
-    // Controls which [agent plugins](https://aka.ms/vscode-agent-plugins) are enabled or disabled. Keys are plugin IDs in `<plugin>@<marketplace>` form (where marketplace is defined in `chat.plugins.marketplaces`); values enable (`true`) or disable (`false`) the plugin. Discovered alongside the path-keyed entries in `chat.pluginLocations`. When set by policy, only plugins mapped to `true` here are allowed to load.
+    // Controls which [agent plugins](https://aka.ms/vscode-agent-plugins) are enabled or disabled. Keys are plugin IDs in `<plugin>@<marketplace>` form (where marketplace is defined in `chat.plugins.marketplaces`); values enable (`true`) or disable (`false`) the plugin. Discovered alongside the path-keyed entries in `chat.pluginLocations`. When set by policy, entries are additive: plugins mapped to `true` are enabled in addition to the user's own plugins, and only plugins mapped to `false` are blocked from loading.
     "chat.plugins.enabledPlugins": {},
 
     // Plugin marketplaces to query. Entries may be GitHub shorthand (`owner/repo` or `owner/repo#ref`), direct Git repository URIs (`https://...git`, `ssh://...git`, or `git@host:path.git`, each optionally suffixed with `#ref`), or local repository URIs (`file:///...`). Equivalent GitHub shorthand and URI entries are deduplicated.
@@ -3282,6 +3332,7 @@
 
     // Controls which agent turn status pills are shown above the chat input while a turn is in progress and inside the completed response. Only applies to agent sessions.
     "chat.turnStatusPills": {
+        "browser": false,
         "changes": false,
         "preview": false
     },
@@ -5248,8 +5299,6 @@
 
     // Defines a default formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
-    //  - ms-vscode.cpptools: C/C++ IntelliSense, debugging, and code browsing.
-    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
     //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
@@ -5261,6 +5310,7 @@
     //  - ms-python.black-formatter: Formatting support for Python files using the Black formatter.
     //  - ms-vscode.cmake-tools: Extended CMake support in Visual Studio Code
     //  - GitHub.copilot-chat: AI chat features powered by Copilot
+    //  - ms-vscode.cpptools: C/C++ IntelliSense, debugging, and code browsing.
     //  - ms-vscode.cpptools-extension-pack: Popular extensions for C++ development in Visual Studio Code.
     //  - ms-dotnettools.csdevkit: Official C# extension from Microsoft
     //  - ms-dotnettools.csharp: Base language support for C#
@@ -5273,6 +5323,7 @@
     //  - ms-python.isort: Import organization support for Python files using isort.
     //  - redhat.java: Java Linting, Intellisense, formatting, refactoring, Maven/Gradle support and more...
     //  - samuelcolvin.jinjahtml: Syntax highlighting for jinja(2) including HTML, Markdown, YAML, Ruby and LaTeX templates
+    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - sumneko.lua: Lua Language Server coded by Lua
     //  - ms-vscode.makefile-tools: Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.
     //  - vscode.markdown-language-features: Provides rich language support for Markdown.
@@ -5646,6 +5697,9 @@
 
     // Controls whether showing a suggestion will shift the code to make space for the suggestion inline.
     "editor.inlineSuggest.edits.allowCodeShifting": "always",
+
+    // Controls how many lines of surrounding context are shown above and below the target line in the long distance inline suggestion preview. Set to 0 to only show the target line.
+    "editor.inlineSuggest.edits.longDistanceHintContextLineCount": 0,
 
     // Controls whether larger suggestions can be shown side by side.
     //  - auto: Larger suggestions will show side by side if there is enough space, otherwise they will be shown below.
@@ -7562,8 +7616,8 @@
     // Enable the Copilot CLI. When disabled, the Copilot CLI will not be available in 'Continue In' context menus.
     "github.copilot.chat.backgroundAgent.enabled": true,
 
-    // Enables the updated system prompt tuned for the Claude Opus 4.7 model.
-    "github.copilot.chat.claude47OpusPrompt.enabled": false,
+    // Enables the updated system prompt tuned for the Claude Opus 4.8 model.
+    "github.copilot.chat.claude48OpusPrompt.enabled": false,
 
     // Allow auto permission mode, which uses a model classifier to approve or deny tool operations automatically. [Learn more](https://aka.ms/vscode-claude-auto-mode).
     "github.copilot.chat.claudeAgent.allowAutoPermissions": false,
@@ -7579,6 +7633,9 @@
 
     // Load the Claude Agent SDK from the `ms-vscode.vscode-claude-sdk` extension (installed on demand) instead of the version bundled with Copilot Chat.
     "github.copilot.chat.claudeAgent.useSdkExtension": false,
+
+    // Enables the updated system prompt tuned for the Claude Sonnet 5 model.
+    "github.copilot.chat.claudeSonnet5Prompt.enabled": false,
 
     // Enable AI-generated branch names in Copilot CLI.
     "github.copilot.chat.cli.aiGenerateBranchNames.enabled": true,
@@ -7838,7 +7895,7 @@
     "github.copilot.chat.languageContext.typescript.items": "double",
 
     // Enable local session tracking. When enabled, session data is tracked locally for /chronicle commands.
-    "github.copilot.chat.localIndex.enabled": false,
+    "github.copilot.chat.localIndex.enabled": true,
 
     // Enable local workspace recording for analysis.
     "github.copilot.chat.localWorkspaceRecording.enabled": false,
@@ -7937,6 +7994,9 @@
 
     // Additional tools to enable for the Plan agent, on top of built-in tools. Use fully-qualified tool names (e.g., `github/issue_read`, `mcp_server/tool_name`).
     "github.copilot.chat.planAgent.additionalTools": [],
+
+    // When enabled, models that offer their full (long) context window at no additional cost will only show the long context option in the model picker and use it by default. When disabled, both the smaller default and larger long context options are shown so you can select a smaller context window.
+    "github.copilot.chat.preferLongContext.enabled": false,
 
     // Add project labels in chat requests.
     "github.copilot.chat.projectLabels.chat": false,
@@ -8705,7 +8765,7 @@
     // Specifies the threshold (in tokens) for when to show a warning about the prompt being too large
     "gitlens.ai.largePromptWarningThreshold": 120000,
 
-    // Specifies the AI provider and model to use for GitLens' AI features. Should be formatted as `provider:model` (e.g. `openai:gpt-4o` or `anthropic:claude-3-5-sonnet-latest`), `gitkraken` for GitKraken AI provided models, or `vscode` for models provided by the VS Code extension API (e.g. Copilot)
+    // Specifies the AI provider and model to use for GitLens' AI features. Should be formatted as `provider:model` (e.g. `openai:gpt-5.5` or `anthropic:claude-sonnet-5`), `gitkraken` for GitKraken AI provided models, or `vscode` for models provided by the VS Code extension API (e.g. Copilot)
     "gitlens.ai.model": null,
 
     // Specifies the temperature, a measure of output randomness, to use for the AI model. Higher values result in more randomness, e.g. creativity, while lower values are more deterministic
@@ -8800,9 +8860,6 @@
     //  - file: Toggles each file individually
     //  - window: Toggles the window, i.e. all files at once
     "gitlens.changes.toggleMode": "file",
-
-    // Specifies whether to use cloud-based integrations when authenticating with GitHub
-    "gitlens.cloudIntegrations.enabled": true,
 
     // Cloud Patches (ᴘʀᴇᴠɪᴇᴡ)
     // Specifies whether to enable the preview of _Cloud Patches_, which allow you to privately and securely share code with specific teammates and other developers
@@ -9079,9 +9136,10 @@
     "gitlens.graph.defaultItemLimit": 500,
 
     // Specifies the location of the details panel in the _Commit Graph_
+    //  - auto: Automatically show the details panel to the right or below the Commit Graph based on the available width
     //  - right: Show the details panel to the right of the Commit Graph
     //  - bottom: Show the details panel below the Commit Graph
-    "gitlens.graph.details.location": "right",
+    "gitlens.graph.details.location": "auto",
 
     // Specifies whether to dim (deemphasize) merge commit rows in the _Commit Graph_
     "gitlens.graph.dimMergeCommits": false,
@@ -9090,6 +9148,9 @@
     //  - auto: Opens editors beside the Commit Graph when it is the active editor; otherwise opens in the active editor group
     //  - active: Always opens editors in the active editor group
     "gitlens.graph.editorOpeningBehavior": "auto",
+
+    // (Experimental) Specifies whether to show the home header (account and integrations status) at the top of the _Commit Graph_
+    "gitlens.graph.experimental.homeHeader.enabled": false,
 
     // (Experimental) Specifies whether to enable the Agent Kanban mode on the _Commit Graph_
     "gitlens.graph.experimental.kanban.enabled": true,
@@ -9194,6 +9255,9 @@
 
     // Specifies whether to show a local branch's upstream status in the _Commit Graph_
     "gitlens.graph.showUpstreamStatus": true,
+
+    // Specifies whether to show a badge with the working tree change count on the _Commit Graph_ view
+    "gitlens.graph.showWorkingTreeBadge": true,
 
     // Specifies whether to show inline working tree change stats on every worktree's _WIP_ row in the _Commit Graph_. When disabled, only the primary worktree's _WIP_ row and the currently-selected worktree's _WIP_ row show stats — which avoids an initial `git status` per worktree as rows scroll into view in large graphs
     "gitlens.graph.showWorktreeWipStats": true,
@@ -9555,6 +9619,11 @@
     //  - name:asc: Sorts tags by name in ascending order
     //  - name:desc: Sorts tags by name in descending order
     "gitlens.sortTagsBy": "date:desc",
+
+    // Specifies how working (uncommitted) changes are sorted in the _Commit Graph_'s working changes (WIP) details
+    //  - stage: Sorts working changes by stage — staged, then mixed, then unstaged — ordering within each stage by the `scm.defaultViewSortKey` setting
+    //  - flat: Sorts working changes by the `scm.defaultViewSortKey` setting
+    "gitlens.sortWorkingChangesBy": "stage",
 
     // Specifies how worktrees are sorted in quick pick menus and views
     //  - date:desc: Sorts worktrees by the most recent commit date in descending order
@@ -10580,14 +10649,16 @@
 
     // `"assignVariableTypes"` controls inlay hints for variable types in assign statements:
     // ```go
-    // 	i/* int*/, j/* int*/ := 0, len(r)-1
+    // 	i« int», j« int» := 0, len(r)-1
     // ```
     //
     "go.inlayHints.assignVariableTypes": false,
 
     // `"compositeLiteralFields"` inlay hints for composite literal field names:
     // ```go
-    // 	{/*in: */"Hello, world", /*want: */"dlrow ,olleH"}
+    // 	Point2D{«X: »1, «Y: »2}
+    //
+    // 	Outer{«Embedded.»Field: 0}
     // ```
     //
     "go.inlayHints.compositeLiteralFields": false,
@@ -10597,7 +10668,7 @@
     // 	for _, c := range []struct {
     // 		in, want string
     // 	}{
-    // 		/*struct{ in string; want string }*/{"Hello, world", "dlrow ,olleH"},
+    // 		«struct{ in string; want string }»{"Hello, world", "dlrow ,olleH"},
     // 	}
     // ```
     //
@@ -10606,10 +10677,10 @@
     // `"constantValues"` controls inlay hints for constant values:
     // ```go
     // 	const (
-    // 		KindNone   Kind = iota/* = 0*/
-    // 		KindPrint/*  = 1*/
-    // 		KindPrintf/* = 2*/
-    // 		KindErrorf/* = 3*/
+    // 		KindNone   Kind = iota« = 0»
+    // 		KindPrint«  = 1»
+    // 		KindPrintf« = 2»
+    // 		KindErrorf« = 3»
     // 	)
     // ```
     //
@@ -10617,14 +10688,14 @@
 
     // `"functionTypeParameters"` inlay hints for implicit type parameters on generic functions:
     // ```go
-    // 	myFoo/*[int, string]*/(1, "hello")
+    // 	myFoo«[int, string]»(1, "hello")
     // ```
     //
     "go.inlayHints.functionTypeParameters": false,
 
     // `"ignoredError"` inlay hints for implicitly discarded errors:
     // ```go
-    // 	f.Close() // ignore error
+    // 	f.Close()« // ignore error»
     // ```
     // This check inserts an `// ignore error` hint following any
     // statement that is a function call whose error result is
@@ -10640,14 +10711,14 @@
 
     // `"parameterNames"` controls inlay hints for parameter names:
     // ```go
-    // 	parseInt(/* str: */ "123", /* radix: */ 8)
+    // 	parseInt(« str: » "123", « radix: » 8)
     // ```
     //
     "go.inlayHints.parameterNames": false,
 
     // `"rangeVariableTypes"` controls inlay hints for variable types in range statements:
     // ```go
-    // 	for k/* int*/, v/* string*/ := range []string{} {
+    // 	for k« int», v« string» := range []string{} {
     // 		fmt.Println(k, v)
     // 	}
     // ```
@@ -11034,8 +11105,8 @@
     //  - Claude Sonnet 4.5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 4.6 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 2.5 Pro (copilot): Gemini 2.5 Pro has a planned deprecation date of 2026-07-31.
-    //  - Gemini 3 Flash (Preview) (copilot): Gemini 3 Flash (Preview) has a planned deprecation date of 2026-07-31.
+    //  - Gemini 2.5 Pro (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
+    //  - Gemini 3 Flash (Preview) (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
@@ -13686,8 +13757,6 @@
 
     // Defines a default notebook formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
-    //  - ms-vscode.cpptools: C/C++ IntelliSense, debugging, and code browsing.
-    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
     //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
@@ -13699,6 +13768,7 @@
     //  - ms-python.black-formatter: Formatting support for Python files using the Black formatter.
     //  - ms-vscode.cmake-tools: Extended CMake support in Visual Studio Code
     //  - GitHub.copilot-chat: AI chat features powered by Copilot
+    //  - ms-vscode.cpptools: C/C++ IntelliSense, debugging, and code browsing.
     //  - ms-vscode.cpptools-extension-pack: Popular extensions for C++ development in Visual Studio Code.
     //  - ms-dotnettools.csdevkit: Official C# extension from Microsoft
     //  - ms-dotnettools.csharp: Base language support for C#
@@ -13711,6 +13781,7 @@
     //  - ms-python.isort: Import organization support for Python files using isort.
     //  - redhat.java: Java Linting, Intellisense, formatting, refactoring, Maven/Gradle support and more...
     //  - samuelcolvin.jinjahtml: Syntax highlighting for jinja(2) including HTML, Markdown, YAML, Ruby and LaTeX templates
+    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - sumneko.lua: Lua Language Server coded by Lua
     //  - ms-vscode.makefile-tools: Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.
     //  - vscode.markdown-language-features: Provides rich language support for Markdown.
