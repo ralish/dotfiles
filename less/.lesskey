@@ -28,6 +28,6 @@ LESS = --follow-name -i -j3 --mouse --no-histdups -X -Q -F -R --use-color
 LESSHISTFILE = -
 
 # Disable the visual bell ("flash") terminal capability
-LESS_TERMCAP_vb =
+LESS_TERMCAP_vb = \x7f
 
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
