@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Windows Performance Recorder configuration schema
+  https://learn.microsoft.com/en-au/windows-hardware/test/wpt/windows-performance-recorder
+
+  Exported from release: Windows 11 25H2
+
+  The XML schema is included in `wpr.exe` as an `RCData` resource.
+-->
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:simpleType name="SimpleValueType">
     <xs:restriction base="xs:unsignedShort">
