@@ -674,6 +674,16 @@
     "xml.symbols.maxItemsComputed": 10000,
 
     // YAML
+    "yaml.disableSchemaDetection": [
+        "**/.forgejo/workflows/*.yml",
+        "**/.forgejo/workflows/*.yaml",
+        "**/.gitea/workflows/*.yml",
+        "**/.gitea/workflows/*.yaml",
+        "**/.github/workflows/*.yml",
+        "**/.github/workflows/*.yaml",
+        "azure-pipelines.yml",
+        "azure-pipelines.yaml"
+    ],
     "yaml.format.singleQuote": true,
     "yaml.maxItemsComputed": 10000,
 
