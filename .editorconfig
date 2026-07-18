@@ -25,28 +25,28 @@ trim_trailing_whitespace = false
 charset = utf-16le
 indent_size = 2
 
-# XML documents & schemas
+# XML
 [*.{xml,xsd}]
 insert_final_newline = false
 
-# ConEmu configuration
+# ConEmu
 [conemu/*.xml]
 indent_style = tab
 
-# Fiddler scripts
+# Fiddler
 [fiddler/Scripts/*.{cs,js}]
 charset = utf-8-bom
 insert_final_newline = false
 
-# Git configuration
+# Git
 [.gitconfig*]
 indent_style = tab
 
-# Onetastic file
+# Onetastic
 [*.onetastic]
 insert_final_newline = false
 
-# PowerShell XML file
+# PowerShell
 [*.ps1xml]
 insert_final_newline = false
 
@@ -61,39 +61,36 @@ keep_padding = true             # shfmt: -kp
 space_redirects = true          # shfmt: -sr
 switch_case_indent = true       # shfmt: -ci
 
-# Shell scripts: POSIX
 [{.mk-sbuild.rc,.quiltrc,.startxwinrc,user-dirs.dirs}]
 shell_variant = posix           # shfmt: -p
 
-# Shell scripts: bin/
-#
-# Matching on a pattern with a path separator alongside other patterns
-# via curly braces doesn't appear to be possible. So sadly, we have to
-# duplicate the above section for matching files under "bin/" dirs.
+# Matching on a pattern with a path separator alongside other patterns with the
+# curly brace syntax doesn't appear to be possible, so we duplicate the earlier
+# configuration to handle scripts under `bin` directories.
 [**/bin/*]
 max_line_length = 79
 keep_padding = true             # shfmt: -kp
 space_redirects = true          # shfmt: -sr
 switch_case_indent = true       # shfmt: -ci
 
-# Windows Event Viewer filter
+# Windows Event Viewer
 [windows/Event Viewer/**.{xml,xsd}]
 indent_size = 2
 
-# Windows Performance Recorder configuration
+# Windows Performance Recorder
 [windows/Windows Performance Recorder/*.{xml,xsd}]
 indent_size = 2
 
-# Windows Sandbox configuration
+# Windows Sandbox
 [*.wsb]
 indent_size = 2
 insert_final_newline = false
 
-# XDG user directories locale
+# XDG user directories
 [xdg-user-dir/.config/user-dirs.locale]
 insert_final_newline = false
 
-# XLaunch configuration
+# XLaunch
 [*.xlaunch]
 insert_final_newline = false
 
