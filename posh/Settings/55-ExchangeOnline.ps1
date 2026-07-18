@@ -19,6 +19,12 @@ Function Initialize-ExchangeOnlineManagement {
     # Add an alias for the unintuitively named `Connect-IPPSSession`
     Set-Alias -Name 'Connect-SecurityAndCompliance' -Value 'Connect-IPPSSession' -Scope 'Global'
 
+    # `Connect-ExchangeOnline`: Hide notice banner
+    $PSDefaultParameterValues['Connect-ExchangeOnline:ShowBanner'] = $false
+
+    # `Connect-IPPSSession`: Hide notice banner
+    $PSDefaultParameterValues['Connect-IPPSSession:ShowBanner'] = $false
+
     # Type: Mailbox
     # Properties we may want to ignore.
     $Global:ExoMailboxIgnoredProperties = @(
