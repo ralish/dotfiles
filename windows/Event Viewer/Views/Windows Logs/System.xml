@@ -130,6 +130,19 @@
           </Suppress>
 
           <!--
+            Source:     mtkwecx
+            Level:      Information
+            Message:    7501 - Country Info
+
+            Emitted by the Mediatek PCI LE Extensible Wireless LAN Card Driver.
+            Presumably refers to IEEE 802.11d-2001 support for additional
+            regulatory domains.
+          -->
+          <Suppress Path="System">
+            *[System[Provider[@Name='mtkwecx'] and EventID=7501]]
+          </Suppress>
+
+          <!--
             Source:     Netwtw10
             Level:      Warning
             Message:    6062 - Lso was triggered
