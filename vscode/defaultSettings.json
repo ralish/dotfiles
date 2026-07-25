@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code defaults
      *
-     * Exported from release: v1.129.0
+     * Exported from release: v1.130.0
      *
      * Obtained from "Preferences: Open Default Settings (JSON)" command.
      */
@@ -1867,6 +1867,18 @@
         "sound": "auto"
     },
 
+    // Plays a signal - sound (audio cue) and/or announcement (alert) - when voice mode has started.
+    "accessibility.signals.voiceModeStarted": {
+        "announcement": "auto",
+        "sound": "on"
+    },
+
+    // Plays a signal - sound (audio cue) and/or announcement (alert) - when voice mode has stopped.
+    "accessibility.signals.voiceModeStopped": {
+        "announcement": "auto",
+        "sound": "on"
+    },
+
     // Plays a sound / audio cue when the voice recording has started.
     "accessibility.signals.voiceRecordingStarted": {
         "sound": "on"
@@ -1874,7 +1886,7 @@
 
     // Plays a sound / audio cue when the voice recording has stopped.
     "accessibility.signals.voiceRecordingStopped": {
-        "sound": "auto"
+        "sound": "on"
     },
 
     // Controls whether links should be underlined in the workbench.
@@ -1956,8 +1968,17 @@
     "accessibility.windowTitleOptimized": true,
 
     // Voice Mode
+    // Enable the Voice Mode panel in the chat view for voice-driven coding conversations.
+    "agents.voice.enabled": false,
+
     // When enabled, voice mode automatically re-enters listening after the assistant finishes speaking, so you can hold a hands-free back-and-forth conversation. When disabled, you start each turn manually. This controls only the auto-listen loop; how a turn ends is controlled by `agents.voice.turn.silenceMs` and `agents.voice.turn.stopPhrases`.
-    "agents.voice.handsFree": true,
+    "agents.voice.handsFree": false,
+
+    // The language used for speech recognition and spoken responses. The selectable languages support native voice output. Automatic follows the system or browser locale for speech recognition and uses English voice output when the detected language does not support native voice output. Changing this while voice mode is connected takes effect immediately.
+    "agents.voice.language": "auto",
+
+    // Show your speech as a live, word-by-word transcript while you are speaking. When disabled, your transcript appears only once you finish speaking. Requires `agents.voice.showTranscript` to be enabled to be visible.
+    "agents.voice.liveTranscript": false,
 
     // Show the voice transcript overlay in the chat input area while voice mode is active. Enable this to read responses as text when `agents.voice.speakResponses` is disabled.
     "agents.voice.showTranscript": false,
@@ -2595,6 +2616,11 @@
     // When enabled, the agent host registers the Codex provider (subject to the Codex SDK being reachable). Requires `chat.agentHost.enabled`. The agent host process must be restarted for changes to take effect.
     "chat.agentHost.codexAgent.enabled": false,
 
+    // Controls the log level for the Copilot SDK runtime used by the local agent host. Changing this setting restarts the Copilot SDK client; active sessions are reloaded when next used.
+    //  - info: Log informational messages. Running VS Code with trace logging still enables all Copilot SDK runtime diagnostics.
+    //  - trace: Log all Copilot SDK runtime diagnostics.
+    "chat.agentHost.copilotSdk.logLevel": "info",
+
     // When enabled, Copilot SDK sessions use the Agent Host terminal tool override instead of the SDK's default terminal behavior.
     "chat.agentHost.customTerminalTool.enabled": false,
 
@@ -2637,6 +2663,9 @@
     //  - on: The SDK's built-in shell tool runs inside a sandbox using the configured filesystem policy and host-list-restricted network.
     //  - allowNetwork: The SDK's built-in shell tool runs inside a sandbox with unrestricted outbound network access.
     "chat.agentHost.sdkSandbox.enabled": "off",
+
+    // When enabled, Copilot sessions automatically discover and use the operating system's proxy configuration when no proxy environment variable is set.
+    "chat.agentHost.systemProxy.enabled": true,
 
     // Controls whether Agent Session Projection mode is enabled for reviewing agent sessions in a focused workspace.
     "chat.agentSessionProjection.enabled": false,
@@ -2697,6 +2726,9 @@
         }
     },
 
+    // Controls whether Assisted permissions is shown in Agent Host approval pickers.
+    "chat.assistedPermissions.enabled": false,
+
     // Automatically skip question carousels by telling the agent that the user is not available and to use its best judgment. This is an advanced setting and can lead to unintended choices or actions based on incomplete context.
     "chat.autoReply": false,
 
@@ -2707,7 +2739,7 @@
     //  - none: Do not use a default utility model.
     //  - mainAgent: Use the selected BYOK main agent model.
     //  - copilot: Use the default GitHub Copilot utility models.
-    "chat.byokUtilityModelDefault": "none",
+    "chat.byokUtilityModelDefault": "copilot",
 
     // Enables checkpoints in chat. Checkpoints allow you to restore the chat to a previous state.
     "chat.checkpoints.enabled": true,
@@ -2732,6 +2764,9 @@
 
     // The default model for new chat conversations. Use "auto" to let Copilot pick a model, a model family name (such as "opus" or "gemini") to use the latest available model in that family, or a full model id. You can still switch the model within a conversation; each new conversation starts at this model.
     "chat.defaultModel": "",
+
+    // When enabled, new editor and panel chat sessions default to the Agent Host Copilot CLI instead of the local harness. Requires `chat.agentHost.enabled`.
+    "chat.defaultToCopilotHarness": false,
 
     // Enables chat participant autodetection for panel chat.
     "chat.detectParticipant.enabled": true,
@@ -2763,14 +2798,11 @@
     // When enabled, Claude sessions opened from the regular workbench (sidebar chat) run inside the agent host process instead of the GitHub Copilot Chat extension. Only one Claude implementation surfaces per window.
     "chat.editor.claude.preferAgentHost": false,
 
+    // When enabled, Codex sessions opened from the regular workbench (sidebar chat) run inside the agent host process using the Codex App Server instead of the OpenAI extension. Only one Codex implementation surfaces per window. Requires `chat.agentHost.enabled` and `chat.agentHost.codexAgent.enabled`.
+    "chat.editor.codex.preferAgentHost": false,
+
     // When enabled, hides the Extension Host Copilot CLI entry from the editor window chat picker.
     "chat.editor.copilotCli.hideExtensionHost": false,
-
-    // Controls which provider is used as the default for new editor chat sessions.
-    //  - local: Use the built-in VS Code local chat harness
-    //  - copilotEh: Use the Extension Host Copilot CLI
-    //  - copilotAh: Use the Agent Host Copilot CLI
-    "chat.editor.defaultProvider": "local",
 
     // Controls the font family in chat codeblocks.
     "chat.editor.fontFamily": "default",
@@ -2784,8 +2816,11 @@
     // Controls the line height in pixels in chat codeblocks. Use 0 to compute the line height from the font size.
     "chat.editor.lineHeight": 0,
 
-    // When enabled, shows the VS Code local chat harness in the chat picker.
+    // When enabled, shows the VS Code local chat harness in the chat picker. This setting is ignored in virtual workspaces, where the local chat harness is always available.
     "chat.editor.localAgent.enabled": true,
+
+    // When enabled, prefers the Agent Host Copilot CLI for new editor chat sessions. If the local harness is selected, it is replaced with Copilot once.
+    "chat.editor.preferCopilotHarness": false,
 
     // Controls whether lines should wrap in chat codeblocks.
     "chat.editor.wordWrap": "off",
@@ -2842,6 +2877,7 @@
     //  - Gemini 3 Flash (Preview) (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.3-Codex (copilot): OpenAI Codex model specialized for code generation, debugging, and software development tasks.
     //  - GPT-5.4 (copilot): OpenAI GPT model for coding and general assistance.
@@ -2996,6 +3032,7 @@
     //  - Gemini 3 Flash (Preview) (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.3-Codex (copilot): OpenAI Codex model specialized for code generation, debugging, and software development tasks.
     //  - GPT-5.4 (copilot): OpenAI GPT model for coding and general assistance.
@@ -3054,6 +3091,22 @@
 
     // Repository patterns to exclude from session sync. Use exact `owner/repo` names or glob patterns like `my-org/*`. Sessions from matching repositories will only be stored locally.
     "chat.sessionSync.excludeRepositories": [],
+
+    // Enables dictating into the chat input using on-device speech-to-text. When enabled on a supported platform, a microphone button appears in the chat input; the transcription model is downloaded on first use and runs locally.
+    "chat.speechToText.enabled": false,
+
+    // Controls how the chat dictation shortcut (`Cmd/Ctrl+I`) behaves.
+    //  - auto: Tap the dictation shortcut to start and stop, or press and hold it to dictate only while held (push-to-talk).
+    //  - toggle: Tap the dictation shortcut to start dictating and tap again to stop.
+    //  - pushToTalk: Press and hold the dictation shortcut to dictate; dictation stops as soon as the shortcut is released.
+    "chat.speechToText.mode": "auto",
+
+    // The on-device model used for chat dictation. The model is downloaded on first use and cached on disk. Larger models are more accurate but slower and take longer to download.
+    //  - onnx-community/whisper-tiny: Smallest and fastest; lowest accuracy (~75MB download).
+    //  - onnx-community/whisper-base: Balanced speed and accuracy (~145MB download).
+    //  - onnx-community/whisper-small: Most accurate; slower and larger (~465MB download).
+    //  - onnx-community/nemotron-3.5-asr-streaming-0.6b-onnx-int4: NVIDIA Nemotron RNN-T: multilingual (35+ languages, auto-detected), high accuracy, matches the GitHub Copilot app (~800MB download).
+    "chat.speechToText.model": "onnx-community/nemotron-3.5-asr-streaming-0.6b-onnx-int4",
 
     // Controls whether subagents can invoke other subagents. When enabled, nesting is limited to a maximum depth of 5.
     "chat.subagents.allowInvocationsFromSubagents": false,
@@ -3285,6 +3338,9 @@
     // Whether to ignore the built-in default auto-approve rules used by the run in terminal tool as defined in `chat.tools.terminal.autoApprove`. When this setting is enabled, the run in terminal tool will ignore any rule that comes from the default set but still follow rules defined in the user, remote and workspace settings. Use this setting at your own risk; the default auto-approve rules are designed to protect you against running dangerous commands.
     "chat.tools.terminal.ignoreDefaultAutoApproveRules": false,
 
+    // When enabled, the output of commands run by the run in terminal tool is compacted before being returned to the model, reducing the number of tokens spent on noisy output (for example progress bars or repeated log lines) while preserving the important information.
+    "chat.tools.terminal.outputCompaction": false,
+
     // When enabled, repeated get terminal output tool calls return only output added since the previous poll for the same terminal execution, or a short unchanged-output message when there is no new output.
     "chat.tools.terminal.outputDeltas": false,
 
@@ -3330,12 +3386,8 @@
         "https://github.com/microsoft/vscode/wiki/*": true
     },
 
-    // Controls which agent turn status pills are shown above the chat input while a turn is in progress and inside the completed response. Only applies to agent sessions.
-    "chat.turnStatusPills": {
-        "browser": false,
-        "changes": false,
-        "preview": false
-    },
+    // Controls whether agent status pills are shown above the chat input while a turn is in progress and inside the completed response. Only applies to agent sessions.
+    "chat.turnStatusPills": false,
 
     // Controls whether the input of the chat should be restored when an undo request is made. The input will be filled with the text of the request that was restored.
     "chat.undoRequests.restoreInput": true,
@@ -3379,6 +3431,9 @@
     // Override the language model used by built-in small/fast utility flows. A fast and inexpensive model is recommended. Leave empty to use the configured default behavior.
     //  - : Use the default behavior for utility models
     "chat.utilitySmallModel": "",
+
+    // Show request and completion timestamps. Hover over a completion timestamp to show the elapsed response time.
+    "chat.verbose": true,
 
     // Show a progress badge on the chat view when an agent session is in progress that is opened in that view.
     "chat.viewProgressBadge.enabled": false,
@@ -5300,10 +5355,9 @@
     // Defines a default formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
-    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
-    //  - redhat.vscode-xml: XML Language Support by Red Hat
+    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -5331,6 +5385,7 @@
     //  - josee9988.minifyall: Minifier for JSON, CSS, HTML, XML, TWIG, LESS, SASS, SCSS, JavaScript, JSONC, and JavaScriptReact(testing). Compressor of files and folders. You will love its simplicity!
     //  - ms-python.mypy-type-checker: Type checking support for Python files using Mypy.
     //  - vscode.php-language-features: Provides rich language support for PHP files.
+    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - ms-python.pylint: Linting support for Python files using Pylint.
     //  - ms-python.python: Python language support with extension access points for IntelliSense (Pylance), Debugging (Python Debugger), linting, formatting, refactoring, unit tests, and more.
     //  - mechatroner.rainbow-csv: Highlight CSV and TSV files, Run SQL-like queries
@@ -5351,11 +5406,11 @@
     //  - bmewburn.vscode-intelephense-client: PHP code intelligence for Visual Studio Code
     //  - vscjava.vscode-java-debug: A lightweight Java debugger for Visual Studio Code
     //  - vscjava.vscode-java-pack: Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven/Gradle support, project management and more
-    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
+    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
     //  - amazonwebservices.aws-toolkit-vscode: Including CodeCatalyst, Infrastructure Composer, and support for Lambda, S3, CloudWatch Logs, CloudFormation, and many other services.
     //  - ms-vscode.azure-repos: Remotely browse and edit any Azure Repos
@@ -6086,10 +6141,6 @@
     // When enabled IntelliSense filtering requires that the first character matches on a word start. For example, `c` on `Console` or `WebContext` but _not_ on `description`. When disabled IntelliSense will show more results but still sorts them by match quality.
     "editor.suggest.matchOnWordStartOnly": true,
 
-    // This setting is deprecated. The suggest widget can now be resized.
-    //
-    "editor.suggest.maxVisibleSuggestions": 0,
-
     // Controls whether to preview the suggestion outcome in the editor.
     "editor.suggest.preview": false,
 
@@ -6385,6 +6436,15 @@
     // Turns auto fix on save on or off.
     "eslint.autoFixOnSave": false,
 
+    // Show bulk-suppressed violations (from eslint-suppressions.json) as diagnostics. Requires ESLint >= 10.1.
+    "eslint.bulkSuppression.enable": false,
+
+    // Path to the suppressions file relative to the workspace. Defaults to eslint-suppressions.json.
+    "eslint.bulkSuppression.location": "",
+
+    // Diagnostic severity for bulk-suppressed violations.
+    "eslint.bulkSuppression.severity": "info",
+
     // Show disable lint rule in the quick fix menu.
     "eslint.codeAction.disableRuleComment": {
         "commentStyle": "line",
@@ -6475,7 +6535,8 @@
         "css",
         "glimmer-js",
         "glimmer-ts",
-        "svelte"
+        "svelte",
+        "graphql"
     ],
 
     // Shortens the text spans of underlined problems to their first related line.
@@ -11109,6 +11170,7 @@
     //  - Gemini 3 Flash (Preview) (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.3-Codex (copilot): OpenAI Codex model specialized for code generation, debugging, and software development tasks.
     //  - GPT-5.4 (copilot): OpenAI GPT model for coding and general assistance.
@@ -13758,10 +13820,9 @@
     // Defines a default notebook formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
-    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
-    //  - redhat.vscode-xml: XML Language Support by Red Hat
+    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -13789,6 +13850,7 @@
     //  - josee9988.minifyall: Minifier for JSON, CSS, HTML, XML, TWIG, LESS, SASS, SCSS, JavaScript, JSONC, and JavaScriptReact(testing). Compressor of files and folders. You will love its simplicity!
     //  - ms-python.mypy-type-checker: Type checking support for Python files using Mypy.
     //  - vscode.php-language-features: Provides rich language support for PHP files.
+    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - ms-python.pylint: Linting support for Python files using Pylint.
     //  - ms-python.python: Python language support with extension access points for IntelliSense (Pylance), Debugging (Python Debugger), linting, formatting, refactoring, unit tests, and more.
     //  - mechatroner.rainbow-csv: Highlight CSV and TSV files, Run SQL-like queries
@@ -13809,11 +13871,11 @@
     //  - bmewburn.vscode-intelephense-client: PHP code intelligence for Visual Studio Code
     //  - vscjava.vscode-java-debug: A lightweight Java debugger for Visual Studio Code
     //  - vscjava.vscode-java-pack: Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven/Gradle support, project management and more
-    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
+    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
     //  - amazonwebservices.aws-toolkit-vscode: Including CodeCatalyst, Infrastructure Composer, and support for Lambda, S3, CloudWatch Logs, CloudFormation, and many other services.
     //  - ms-vscode.azure-repos: Remotely browse and edit any Azure Repos
@@ -14769,6 +14831,13 @@
     "python.activeStateToolPath": "state",
 
     // Pylance
+    // **Experimental.** When enabled, Pylance will automatically add the source root of every project declared via `python-envs.pythonProjects` to `extraPaths`, so cross-project imports between sub-projects of a monorepo resolve without configuring `extraPaths` manually. The source root is detected per project: a `src` directory if present, otherwise the project's parent directory when the project folder is itself a package (contains `__init__.py`), otherwise the project folder. Any `extraPaths` you configure are preserved.
+    "python.analysis.addExtraPathsForPythonProjects": false,
+
+    // **Deprecated**: Please use `python.analysis.usePerProjectEnvironments` instead. This setting still works for backwards compatibility.
+    // When enabled, Pylance will add a virtual workspace folder for each project declared via `python-envs.pythonProjects`. This ensures that each sub-project uses its own interpreter for type checking. Note: each sub-project may also need its own `extraPaths` configuration so that cross-project imports resolve correctly.
+    "python.analysis.addFoldersForPythonProjects": false,
+
     // Enable/disable AI-assisted code actions. Requires the Copilot Chat extension to be enabled.
     "python.analysis.aiCodeActions": {
         "convertFormatString": true,
@@ -14797,11 +14866,6 @@
     // Automatically translate Python docstrings in hover tooltips to your preferred language using GitHub Copilot. The target language is determined by the `github.copilot.chat.localeOverride` setting. **Note:** Enabling this feature may make hover tooltips display significantly slower due to the time required to call GitHub Copilot for translation.
     "python.analysis.autoTranslateDocstrings": false,
 
-    // Cache LSP data for faster completions.
-    //
-    // [Experimental] may cause Pylance to stop working.
-    "python.analysis.cacheLSPData": false,
-
     // Add parentheses to function completions.
     "python.analysis.completeFunctionParens": false,
 
@@ -14815,9 +14879,10 @@
     // Use the rule name as a key and one of `error`, `warning`, `information`, `none`, `true` (alias for `error`) or `false` (alias for `none`) as value. The default value shown for each diagnostic is the default when #python.analysis.typeCheckingMode# is set to `off`. See [here](https://github.com/microsoft/pyright/blob/main/docs/configuration.md#diagnostic-rule-defaults) for defaults for each type checking mode (`off`, `basic` and `strict`).
     "python.analysis.diagnosticSeverityOverrides": {},
 
-    // Allows specifying a different language server to use for diagnostics. Pylance will combine its results with this other server.
+    // Allows specifying a different type checker to use for diagnostics. Pylance will combine its results with this other server.
     //  - Pylance: Use Pylance for diagnostics. (default)
-    //  - Pyright: Use Pyright for diagnostics. Allows running a different Pyright than the one shipped with the Pylance extension.
+    //  - Pylance + Pyright: Use Pyright for diagnostics. Allows running a different Pyright than the one shipped with the Pylance extension.
+    //  - Pylance + Pyrefly: Use Pyrefly for diagnostics. Pylance will search for a pyrefly installation in your virtual environments or download it automatically. [Learn more](https://aka.ms/pyrefly-help).
     "python.analysis.diagnosticsSource": "Pylance",
 
     // Disable hint diagnostics with special hints for grayed-out or strike-through text.
@@ -14831,6 +14896,9 @@
 
     // Enable/disable color picker in the editor for '#RRGGBB' and '#RRGGBBAA' strings.
     "python.analysis.enableColorPicker": true,
+
+    // Enables Django support in Pylance. When enabled, Pylance detects Django projects and provides IntelliSense for ORM-generated model attributes (e.g. `objects`, reverse relations, and field descriptors) by merging virtual content into your source files via a file overlay. Requires a native binary that is only available on Windows (x64/ARM64), macOS (Apple Silicon), and Linux (x64/ARM64). On unsupported platforms (e.g. macOS x86) this setting is silently ignored. [Experimental].
+    "python.analysis.enableDjangoSupport": false,
 
     // Enable support for editable installs of packages as described in [PEP 660](https://peps.python.org/pep-0660/) when using Python 3.13 and higher.
     //
@@ -14848,6 +14916,9 @@
 
     // Enables internal perf telemetry if telemetry is enabled in VS Code.
     "python.analysis.enablePerfTelemetry": false,
+
+    // Enable/disable showing the notification that lets the user switch to Pyrefly as the diagnostics source.
+    "python.analysis.enablePyreflyNotification": false,
 
     // Enables pytest support in Pylance.
     "python.analysis.enablePytestSupport": true,
@@ -14867,11 +14938,17 @@
     // If no exclude paths are specified, Pylance automatically excludes the following: `**/node_modules`, `**/__pycache__`, `.git` and any virtual environment directories. If the path contains a `${workspaceFolder:<workspaceName>}` variable, the glob pattern will only apply to the corresponding workspace in a multi-root workspace environment.
     "python.analysis.exclude": [],
 
+    // Suppress diagnostics for library files such as standard library, site-packages, and typeshed files while continuing to show diagnostics for user-authored files.
+    "python.analysis.excludeLibraryDiagnostics": false,
+
     // Allow using '.', '(' as commit characters when applicable.
     "python.analysis.extraCommitChars": false,
 
     // Additional import search resolution paths
     "python.analysis.extraPaths": [],
+
+    // **Experimental.** A manual map of folder → `extraPaths`, applied to the per-project workspace folders created for `python-envs.pythonProjects`. Each key is a folder (absolute, or relative to the workspace folder) and each value is a list of paths (absolute, or relative to the workspace folder) added to `extraPaths` for files under that folder. Keys and values may use `${workspaceFolder}`, `${workspaceFolder:Name}`, `${env:HOME}`, `${env:USERNAME}`, `${env:VIRTUAL_ENV}`, and a leading `~`, where `${workspaceFolder}` resolves to the workspace folder that contains the project. Use this as a relief valve when automatic detection (`python.analysis.addExtraPathsForPythonProjects`) cannot infer the right roots — for example monorepos with non-standard layouts. These overrides are applied whether or not automatic detection is enabled.
+    "python.analysis.extraPathsForPythonProjects": {},
 
     // Enable/disable running Find All References on the background thread. For internal use only, may cause Pylance to stop working.
     "python.analysis.findRefsInBackgroundThread": false,
@@ -14884,6 +14961,9 @@
 
     // For string literals that look like module names, enables go to definition to go to the module.
     "python.analysis.gotoDefinitionInStringLiteral": true,
+
+    // Enable/disable a CodeLens on methods that override a base-class member. Clicking it peeks the overridden declaration.
+    "python.analysis.gotoOverrideCodeLens": false,
 
     // Paths of directories or files whose diagnostic output (errors and warnings) should be suppressed even if they are an included file or within the transitive closure of an included file.
     //
@@ -14915,9 +14995,6 @@
 
     // Enable indexing of installed third party libraries and user files for language features such as auto-import, add import, workspace symbols and etc.
     "python.analysis.indexing": true,
-
-    // When enabled, Workspace Symbol indexing will follow files under symlinked folders. Disable this to avoid slow Workspace Symbol indexing in workspaces that contain symlinks into very large directory trees.
-    "python.analysis.indexing.followSymlinkedFolders": true,
 
     // Enable/disable inlay hints for call argument names:
     // ```python
@@ -14953,6 +15030,9 @@
     //
     "python.analysis.inlayHints.variableTypes": false,
 
+    // Enable/disable automatic installation of the Python Dependency Remediation extension. For internal use only.
+    "python.analysis.installPythonDependencyRemediation": false,
+
     // Select a predefined set of values for settings. Please check [this link](https://aka.ms/languageserver-mode) for more details.
     //  - light: Set Pylance to do only essential work to make it light weight. See the link at the description to find out exactly what settings are set to what value.
     //  - default: Leave Pylance with default settings.
@@ -14961,6 +15041,9 @@
 
     // Specifies the level of logging for the Output panel
     "python.analysis.logLevel": "Information",
+
+    // Enable/disable logging of all Type Server Protocol (TSP) messages to the output console. For internal use only.
+    "python.analysis.logTypeServerMessages": false,
 
     // Extra arguments to pass to a Node.js executable to use for running the language server when `python.analysis.nodeExecutable` is set. Default is `--max_old_space_size=8192`.
     "python.analysis.nodeArguments": ["--max-old-space-size=8192"],
@@ -15013,7 +15096,7 @@
             "name": "scipy"
         },
         {
-            "depth": 2,
+            "depth": 4,
             "name": "django"
         },
         {
@@ -15033,6 +15116,14 @@
 
     // Indices for all third party libraries will be persisted to disk.
     "python.analysis.persistAllIndices": true,
+
+    // Specifies the version of Pyrefly to use for diagnostics. Minimum version allowed is 1.1.1. This setting is only used when `python.analysis.diagnosticsSource` is set to `Pylance + Pyrefly`.
+    //
+    // This value can be one of:
+    // - Empty (default) — automatically find or download the latest version
+    // - Version string (e.g. 1.1.1) — download and use that specific version
+    // - Path to a local pyrefly executable
+    "python.analysis.pyreflyVersion": "",
 
     // Specifies the version of Pyright to use for diagnostics. Minimum value allowed is 1.1.397. This setting is only used when `python.analysis.diagnosticsSource` is set to `Pyright`.
     //
@@ -15095,8 +15186,8 @@
     // [PEP 585](https://peps.python.org/pep-0585) indicates that aliases to types in standard collections that were introduced solely to support generics are deprecated as of Python 3.9. This switch controls whether these are treated as deprecated. This applies only when pythonVersion is 3.9 or newer. The default value for this setting is `false` but may be switched to `true` in the future.
     "python.analysis.typeEvaluation.deprecateTypingAliases": false,
 
-    // Disables legacy behavior where `bytearray` and `memoryview` are considered subtypes of `bytes`. [PEP 688](https://peps.python.org/pep-0688/#no-special-meaning-for-bytes) deprecates this behavior, but this switch is provided to restore the older behavior. The default value for this setting is `false`.
-    "python.analysis.typeEvaluation.disableBytesTypePromotions": false,
+    // Disables legacy behavior where `bytearray` and `memoryview` are considered subtypes of `bytes`. [PEP 688](https://peps.python.org/pep-0688/#no-special-meaning-for-bytes) deprecates this behavior, but this switch is provided to restore the older behavior. The default value for this setting is `true`.
+    "python.analysis.typeEvaluation.disableBytesTypePromotions": true,
 
     // Enables a set of experimental (mostly undocumented) features that correspond to proposed or exploratory changes to the Python typing standard. These features will likely change or be removed, so they should not be used except for experimentation purposes. The default value for this setting is `false`.
     "python.analysis.typeEvaluation.enableExperimentalFeatures": false,
@@ -15148,6 +15239,12 @@
 
     // **Experimental.** When enabled, Pylance will search for and use pyrightconfig.json or pyproject.toml files in subdirectories, creating virtual workspaces for each configuration. This allows different type-checking settings for different parts of your codebase.
     "python.analysis.useNearestConfiguration": false,
+
+    // When enabled, Pylance will use a separate Python environment (interpreter) for each project declared via `python-envs.pythonProjects`, so that sub-projects in a single-root workspace are type checked against their own interpreter. Note: each sub-project may also need its own `extraPaths` configuration so that cross-project imports resolve correctly. To have Pylance configure these automatically, enable `python.analysis.addExtraPathsForPythonProjects`.
+    "python.analysis.usePerProjectEnvironments": false,
+
+    // When enabled, user-file indexing will follow files under symlinked folders in the workspace. Disable this to avoid slow workspace indexing in workspaces that contain symlinks into very large directory trees.
+    "python.analysis.userFileIndexFollowSymlinkedFolders": true,
 
     // Maximum number of user files to index in the workspace. Indexing files is a performance-intensive task. Please use this setting to limit the number of files you want us to index. If you enter -1, we will index all files.
     "python.analysis.userFileIndexingLimit": 2000,
@@ -16190,14 +16287,6 @@
     // Controls whether to follow symlinks while searching.
     "search.followSymlinks": true,
 
-    // This setting is deprecated. You can drag the search icon to a new location instead.
-    // Controls whether the search will be shown as a view in the sidebar or as a panel in the panel area for more horizontal space.
-    "search.location": "sidebar",
-
-    // The search cache is kept in the extension host which never shuts down, so this setting is no longer needed.
-    // When enabled, the searchService process will be kept alive instead of being shut down after an hour of inactivity. This will keep the file search cache in memory.
-    "search.maintainFileSearchCache": false,
-
     // Controls the maximum number of search results, this can be set to `null` (empty) to return unlimited results.
     "search.maxResults": 20000,
 
@@ -16286,19 +16375,11 @@
     // Controls whether to use `.gitignore` and `.ignore` files when searching for files.
     "search.useIgnoreFiles": true,
 
-    // Deprecated. PCRE2 will be used automatically when using regex features that are only supported by PCRE2.
-    // Whether to use the PCRE2 regex engine in text search. This enables using some advanced regex features like lookahead and backreferences. However, not all PCRE2 features are supported - only features that are also supported by JavaScript.
-    "search.usePCRE2": false,
-
     // Controls whether to use `.gitignore` and `.ignore` files in parent directories when searching for files. Requires `search.useIgnoreFiles` to be enabled.
     "search.useParentIgnoreFiles": false,
 
     // Controls whether to open Replace Preview when selecting or replacing a match.
     "search.useReplacePreview": true,
-
-    // Deprecated. Consider "search.usePCRE2" for advanced regex feature support.
-    // This setting is deprecated and now falls back on "search.usePCRE2".
-    "search.useRipgrep": true,
 
     // Security
     // A set of UNC host names (without leading or trailing backslash, for example `192.168.0.1` or `my-server`) to allow without user confirmation. If a UNC host is being accessed that is not allowed via this setting or has not been acknowledged via user confirmation, an error will occur and the operation stopped. A restart is required when changing this setting. Find out more about this setting at https://aka.ms/vscode-windows-unc.
@@ -17090,9 +17171,6 @@
     // Controls if the first terminal without input will show a hint about available actions when it is focused. This will only show when `terminal.integrated.sendKeybindingsToShell` is disabled.
     "terminal.integrated.initialHint": true,
 
-    // When enabled, the terminal initial hint will suggest using Copilot CLI by typing `copilot` instead of opening Copilot Chat.
-    "terminal.integrated.initialHintCopilotCli": false,
-
     // Controls the letter spacing of the terminal. This is an integer value which represents the number of additional pixels to add between characters.
     "terminal.integrated.letterSpacing": 0,
 
@@ -17422,7 +17500,7 @@
     // The number of cells in a tab stop.
     "terminal.integrated.tabStopWidth": 8,
 
-    // Controls whether agentic CLIs (such as Claude Code, Codex, GitHub Copilot CLI, and Gemini CLI) are allowed to set the terminal tab title via escape sequences. When disabled, the configured tab title template is used instead.
+    // Controls whether agentic CLIs (such as Claude Code, Codex, Command Code, GitHub Copilot CLI, and Gemini CLI) are allowed to set the terminal tab title via escape sequences. When disabled, the configured tab title template is used instead.
     "terminal.integrated.tabs.allowAgentCliTitle": true,
 
     // A theme color ID to associate with terminal icons by default.
@@ -19686,7 +19764,7 @@
     "workbench.editor.limit.value": 10,
 
     // Controls whether the Markdown editor is used as the default editor for Markdown files in the Agents window.
-    "workbench.editor.markdownDefaultEditorInAgentsWindow": false,
+    "workbench.editor.markdownDefaultEditorInAgentsWindow": true,
 
     // Enables the use of mouse buttons four and five for commands 'Go Back' and 'Go Forward'.
     "workbench.editor.mouseBackForwardToNavigate": true,

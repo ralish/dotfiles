@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code settings
      *
-     * Last reviewed release: v1.129.0
+     * Last reviewed release: v1.130.0
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
@@ -112,6 +112,7 @@
 
     // Chat: Tools
     "chat.tools.terminal.enableAutoApprove": false,
+    "chat.tools.terminal.outputCompaction": true,
 
     // Chat: Miscellaneous
     //"chat.disableAIFeatures": true,
@@ -564,7 +565,6 @@
     "python.analysis.languageServerMode": "default",
     "python.analysis.typeCheckingMode": "standard",
     "python.analysis.typeEvaluation.deprecateTypingAliases": true,
-    "python.analysis.typeEvaluation.disableBytesTypePromotions": true,
     "python.analysis.typeEvaluation.enableReachabilityAnalysis": true,
 
     // Pylint
