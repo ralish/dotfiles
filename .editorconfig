@@ -57,7 +57,6 @@ charset = utf-16le
 # Shell scripts
 [{*.sh,*.bash,.bashrc,.mk-sbuild.rc,.quiltrc,.startxwinrc,user-dirs.dirs}]
 max_line_length = 79
-keep_padding = true             # shfmt: -kp
 space_redirects = true          # shfmt: -sr
 switch_case_indent = true       # shfmt: -ci
 
@@ -69,7 +68,6 @@ shell_variant = posix           # shfmt: -p
 # configuration to handle scripts under `bin` directories.
 [**/bin/*]
 max_line_length = 79
-keep_padding = true             # shfmt: -kp
 space_redirects = true          # shfmt: -sr
 switch_case_indent = true       # shfmt: -ci
 
