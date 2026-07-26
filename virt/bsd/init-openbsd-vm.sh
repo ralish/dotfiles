@@ -54,10 +54,8 @@ function pkg_add_install {
         pkg_regex="$pkg_regex.*-$pkg_flavour$"
     fi
 
-    local pkg_exists
     # shellcheck disable=SC2312
-    pkg_exists="$(pkg_info -Q "$pkg_stem" | grep -E "$pkg_regex")"
-    if [[ -z $pkg_exists ]]; then
+    if ! pkg_info -Q "$pkg_stem" | grep -E "$pkg_regex"; then
         echo "[pkg_add] Unable to find package: $pkg_name_friendly"
         return
     fi
