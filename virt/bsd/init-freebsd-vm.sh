@@ -16,6 +16,13 @@ if [ "$os_name" != 'FreeBSD' ]; then
     exit 1
 fi
 
+# Run before `freebsd-update` as some releases depend on it being present
+if ! pkg -N > /dev/null 2>&1; then
+    echo '[pkg] Bootstraping pkg tool ...'
+    pkg bootstrap -y
+    echo
+fi
+
 echo '[freebsd-update] Configuring ...'
 sed -i '' 's/^# BackupKernel yes$/BackupKernel no/' /etc/freebsd-update.conf
 
@@ -46,12 +53,6 @@ pkg_install() {
     pkg install -y "$pkg_name"
     echo
 }
-
-if ! pkg -N > /dev/null 2>&1; then
-    echo '[pkg] Bootstraping pkg tool ...'
-    pkg bootstrap -y
-    echo
-fi
 
 echo '[pkg] Updating package repository ...'
 pkg update
