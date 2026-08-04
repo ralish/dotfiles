@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code settings
      *
-     * Last reviewed release: v1.130.0
+     * Last reviewed release: v1.131.0
      * Default file path: %APPDATA%\Code\User\settings.json
      */
 
@@ -405,9 +405,11 @@
 
     // GitHub Pull Requests
     "githubIssues.issueBranchTitle": "issue${issueNumber}",
+    "githubIssues.showIssueNumberInTree": true,
     "githubIssues.useBranchForIssues": "prompt",
     "githubPullRequests.defaultCreateOption": "create",
     "githubPullRequests.deleteBranchAfterMerge": true,
+    "githubPullRequests.showCreatePullRequestCancelConfirmation": false,
 
     // GitHub Repositories
     "githubRepositories.autoFetch.enabled": false,

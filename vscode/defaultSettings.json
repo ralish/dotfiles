@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code defaults
      *
-     * Exported from release: v1.130.0
+     * Exported from release: v1.131.0
      *
      * Obtained from "Preferences: Open Default Settings (JSON)" command.
      */
@@ -1971,8 +1971,8 @@
     // Enable the Voice Mode panel in the chat view for voice-driven coding conversations.
     "agents.voice.enabled": false,
 
-    // When enabled, voice mode automatically re-enters listening after the assistant finishes speaking, so you can hold a hands-free back-and-forth conversation. When disabled, you start each turn manually. This controls only the auto-listen loop; how a turn ends is controlled by `agents.voice.turn.silenceMs` and `agents.voice.turn.stopPhrases`.
-    "agents.voice.handsFree": false,
+    // When enabled, voice mode automatically re-enters listening after the assistant finishes speaking, so you can hold a hands-free back-and-forth conversation. When disabled, you start and end each turn manually, and ending the turn sends it. Turns are not ended automatically on trailing silence or a stop phrase unless `agents.voice.turn.silenceMs` or `agents.voice.turn.stopPhrases` is explicitly configured.
+    "agents.voice.handsFree": true,
 
     // The language used for speech recognition and spoken responses. The selectable languages support native voice output. Automatic follows the system or browser locale for speech recognition and uses English voice output when the detected language does not support native voice output. Changing this while voice mode is connected takes effect immediately.
     "agents.voice.language": "auto",
@@ -1986,10 +1986,10 @@
     // When enabled, the assistant reads responses aloud. When disabled, responses are not spoken; enable `agents.voice.showTranscript` to read them as a text transcript instead.
     "agents.voice.speakResponses": true,
 
-    // Trailing silence in milliseconds before the backend ends the turn automatically. Set to `-1` to disable ending the turn on silence, in which case the turn ends only via a stop phrase (`agents.voice.turn.stopPhrases`) or manually. When enabled, the backend clamps this to its supported range (currently 200-5000 ms) and is the source of truth.
+    // Trailing silence in milliseconds before the backend ends the turn automatically. Set to `-1` to disable ending the turn on silence, in which case the turn ends only via a stop phrase (`agents.voice.turn.stopPhrases`) or manually. When enabled, the backend clamps this to its supported range (currently 200-5000 ms) and is the source of truth. When hands-free mode (`agents.voice.handsFree`) is disabled, the turn is not ended on silence by default unless this setting is explicitly configured, so you keep manual control over when a turn is sent.
     "agents.voice.turn.silenceMs": 800,
 
-    // Phrases that end the turn when spoken at the end of an utterance. Leave empty to disable ending the turn on a stop phrase, in which case the turn ends only on trailing silence (`agents.voice.turn.silenceMs`) or manually. The backend strips the matched phrase from the transcript before it reaches the agent.
+    // Phrases that end the turn when spoken at the end of an utterance. Leave empty to disable ending the turn on a stop phrase, in which case the turn ends only on trailing silence (`agents.voice.turn.silenceMs`) or manually. The backend strips the matched phrase from the transcript before it reaches the agent. When hands-free mode (`agents.voice.handsFree`) is disabled, stop phrases do not end the turn by default unless this setting is explicitly configured, so you keep manual control over when a turn is sent.
     "agents.voice.turn.stopPhrases": ["send it"],
 
     // The voice used when the assistant reads responses aloud. Changing this while voice mode is connected takes effect immediately.
@@ -2591,6 +2591,8 @@
     // Specify location(s) of custom agent files (`*.agent.md`). [Learn More](https://aka.ms/vscode-ghcp-custom-chat-modes).
     //
     // Relative paths are resolved from the root folder(s) of your workspace.
+    //
+    // This setting is only used by the Local agent harness.
     "chat.agentFilesLocations": {
         ".claude/agents": true,
         ".github/agents": true,
@@ -2608,13 +2610,16 @@
 
     // Chat Agent Host Starter
     // When enabled, the agent host wires up the BYOK ('bring your own key') language-model bridge so extension-provided BYOK models can run in agent-host sessions. Requires `chat.agentHost.enabled`. The agent host process must be restarted for changes to take effect.
-    "chat.agentHost.byokModels.enabled": true,
+    "chat.agentHost.byokModels.enabled": false,
 
     // When enabled, the agent host registers the Claude provider (subject to the Claude SDK being reachable). Independent of `chat.agents.claude.preferAgentHost` and `chat.editor.claude.preferAgentHost`, which choose which integration surfaces Claude. Requires `chat.agentHost.enabled`. The agent host process must be restarted for changes to take effect.
     "chat.agentHost.claudeAgent.enabled": true,
 
     // When enabled, the agent host registers the Codex provider (subject to the Codex SDK being reachable). Requires `chat.agentHost.enabled`. The agent host process must be restarted for changes to take effect.
     "chat.agentHost.codexAgent.enabled": false,
+
+    // When enabled, Copilot SDK sessions defer MCP and non-core VS Code tools behind a tool-search tool so the model discovers them on demand instead of loading every tool definition up front.
+    "chat.agentHost.copilot.toolSearch.enabled": false,
 
     // Controls the log level for the Copilot SDK runtime used by the local agent host. Changing this setting restarts the Copilot SDK client; active sessions are reloaded when next used.
     //  - info: Log informational messages. Running VS Code with trace logging still enables all Copilot SDK runtime diagnostics.
@@ -2673,6 +2678,8 @@
     // Specify location(s) of agent skills (`SKILL.md`) that can be used in Chat Sessions. [Learn More](https://aka.ms/vscode-agent-skills).
     //
     // Each path should contain skill subfolders with SKILL.md files (e.g., add `my-skills` if you have `my-skills/skillA/SKILL.md`). Relative paths are resolved from the root folder(s) of your workspace.
+    //
+    // This setting is only used by the Local agent harness.
     "chat.agentSkillsLocations": {
         ".agents/skills": true,
         ".claude/skills": true,
@@ -2860,7 +2867,12 @@
     // Controls whether the permissions picker shows an inline "Sandboxing for terminal" toggle on the Default Approvals option. The toggle reflects and updates `chat.agent.sandbox.enabled`.
     "chat.experimental.permissionsSandboxToggle.enabled": false,
 
-    // Controls whether a stronger skill adherence prompt is used that encourages the model to immediately invoke skills when relevant rather than just announcing them.
+    // Controls the wording and icons used by actions that archive and unarchive chat sessions.
+    //  - archive: Use Archive, Archive All, Unarchive, and Unarchive All.
+    //  - done: Use Mark as Done, Mark All as Done, Restore, and Restore All.
+    "chat.experimental.sessionArchiveActionWording": "archive",
+
+    // Controls whether a stronger skill adherence prompt is used that encourages the model to immediately invoke skills when relevant rather than just announcing them. This setting is only used by the Local agent harness.
     "chat.experimental.useSkillAdherencePrompt": false,
 
     // When true, enables sessions-window-specific behavior for extensions.
@@ -2884,6 +2896,7 @@
     //  - GPT-5.4 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.6 Luna (copilot): OpenAI GPT model for coding and general assistance.
     //  - GPT-5.6 Terra (copilot): OpenAI GPT model for coding and general assistance.
+    //  - Grok 4.5 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Kimi K2.7 Code (copilot)
     //  - MAI-Code-1-Flash (copilot)
     //  - Raptor mini (copilot)
@@ -2907,6 +2920,8 @@
     // Specify paths to hook configuration files that define custom shell commands to execute at strategic points in an agent's workflow. [Learn More](https://aka.ms/vscode-chat-hooks).
     //
     // Relative paths are resolved from the root folder(s) of your workspace. Supports Copilot hooks (`*.json`) and Claude Code hooks (`settings.json`, `settings.local.json`).
+    //
+    // This setting is only used by the Local agent harness.
     "chat.hookFilesLocations": {
         ".claude/settings.json": true,
         ".claude/settings.local.json": true,
@@ -2928,10 +2943,10 @@
     // Controls whether the new implicit context flow is shown. In Ask and Edit modes, the context will automatically be included. When using an agent, context will be suggested as an attachment. Selections are always included as context.
     "chat.implicitContext.suggestedContext": true,
 
-    // Controls whether instructions with a matching 'applyTo' attribute are automatically included in chat requests.
+    // Controls whether instructions with a matching 'applyTo' attribute are automatically included in chat requests. This setting is only used by the Local agent harness.
     "chat.includeApplyingInstructions": true,
 
-    // Controls whether referenced instructions are automatically included in chat requests.
+    // Controls whether referenced instructions are automatically included in chat requests. This setting is only used by the Local agent harness.
     "chat.includeReferencedInstructions": false,
 
     // Controls how file and symbol references are displayed in chat messages.
@@ -2942,6 +2957,8 @@
     // Specify location(s) of instructions files (`*.instructions.md`) that can be attached in Chat sessions. [Learn More](https://aka.ms/vscode-ghcp-custom-instructions).
     //
     // Relative paths are resolved from the root folder(s) of your workspace.
+    //
+    // This setting is only used by the Local agent harness.
     "chat.instructionsFilesLocations": {
         ".claude/rules": true,
         ".github/instructions": true,
@@ -2993,6 +3010,8 @@
     // Specify location(s) of custom chat mode files (`*.chatmode.md`). [Learn More](https://aka.ms/vscode-ghcp-custom-chat-modes).
     //
     // Relative paths are resolved from the root folder(s) of your workspace.
+    //
+    // This setting is only used by the Local agent harness.
     "chat.modeFilesLocations": {
         ".github/chatmodes": true
     },
@@ -3018,9 +3037,6 @@
     //  - autopilot: Start new chat sessions in Autopilot mode.
     "chat.permissions.default": "default",
 
-    // Always show progress in chat.
-    "chat.persistentProgress.enabled": false,
-
     // Select the default language model to use for the Plan agent from the available providers.
     //  - : Use the vendor's default model
     //  - Auto (copilot): Auto routes based on your task and real-time system health and model performance. Models routed via auto receive a 10% discount. [Learn More](https://docs.github.com/en/copilot/concepts/models/auto-model-selection)
@@ -3039,6 +3055,7 @@
     //  - GPT-5.4 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.6 Luna (copilot): OpenAI GPT model for coding and general assistance.
     //  - GPT-5.6 Terra (copilot): OpenAI GPT model for coding and general assistance.
+    //  - Grok 4.5 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Kimi K2.7 Code (copilot)
     //  - MAI-Code-1-Flash (copilot)
     //  - Raptor mini (copilot)
@@ -3065,12 +3082,14 @@
     // Enterprise-managed allowlist of plugin marketplace sources. When set, only marketplaces matching one of these entries can be installed; an empty array blocks all marketplaces. This does not retroactively disable already-installed plugins. Each entry is an object with a `source` discriminator (`github`, `git`, `url`, `npm`, `file`, `directory`, `hostPattern`, or `pathPattern`) and the corresponding fields. Typically delivered via enterprise policy.
     "chat.plugins.strictMarketplaces": null,
 
-    // Show an animated gradient border around the chat input while the agent is working or thinking. When enabled and reduced motion is not enabled, this overrides `chat.persistentProgress.enabled` to be off. Has no effect when reduced motion is enabled.
+    // Show an animated gradient border around the chat input while the agent is working or thinking. Has no effect when reduced motion is enabled.
     "chat.progressBorder.enabled": true,
 
     // Specify location(s) of reusable prompt files (`*.prompt.md`) that can be run in Chat sessions. [Learn More](https://aka.ms/vscode-ghcp-prompt-snippets).
     //
     // Relative paths are resolved from the root folder(s) of your workspace.
+    //
+    // This setting is only used by the Local agent harness.
     "chat.promptFilesLocations": {
         ".github/prompts": true
     },
@@ -3091,22 +3110,6 @@
 
     // Repository patterns to exclude from session sync. Use exact `owner/repo` names or glob patterns like `my-org/*`. Sessions from matching repositories will only be stored locally.
     "chat.sessionSync.excludeRepositories": [],
-
-    // Enables dictating into the chat input using on-device speech-to-text. When enabled on a supported platform, a microphone button appears in the chat input; the transcription model is downloaded on first use and runs locally.
-    "chat.speechToText.enabled": false,
-
-    // Controls how the chat dictation shortcut (`Cmd/Ctrl+I`) behaves.
-    //  - auto: Tap the dictation shortcut to start and stop, or press and hold it to dictate only while held (push-to-talk).
-    //  - toggle: Tap the dictation shortcut to start dictating and tap again to stop.
-    //  - pushToTalk: Press and hold the dictation shortcut to dictate; dictation stops as soon as the shortcut is released.
-    "chat.speechToText.mode": "auto",
-
-    // The on-device model used for chat dictation. The model is downloaded on first use and cached on disk. Larger models are more accurate but slower and take longer to download.
-    //  - onnx-community/whisper-tiny: Smallest and fastest; lowest accuracy (~75MB download).
-    //  - onnx-community/whisper-base: Balanced speed and accuracy (~145MB download).
-    //  - onnx-community/whisper-small: Most accurate; slower and larger (~465MB download).
-    //  - onnx-community/nemotron-3.5-asr-streaming-0.6b-onnx-int4: NVIDIA Nemotron RNN-T: multilingual (35+ languages, auto-detected), high accuracy, matches the GitHub Copilot app (~800MB download).
-    "chat.speechToText.model": "onnx-community/nemotron-3.5-asr-streaming-0.6b-onnx-int4",
 
     // Controls whether subagents can invoke other subagents. When enabled, nesting is limited to a maximum depth of 5.
     "chat.subagents.allowInvocationsFromSubagents": false,
@@ -3403,25 +3406,25 @@
     //  - radiantLines: Shows radiant lines emanating from the button.
     "chat.upvoteAnimation": "floatingThumbs",
 
-    // Controls whether skills are provided as specialized capabilities to the chat requests. Skills are loaded from the folders configured in `chat.agentSkillsLocations`. The language model can load these skills on-demand if the `read` tool is available. Learn more about [Agent Skills](https://aka.ms/vscode-agent-skills).
+    // Controls whether skills are provided as specialized capabilities to the chat requests. Skills are loaded from the folders configured in `chat.agentSkillsLocations`. The language model can load these skills on-demand if the `read` tool is available. Learn more about [Agent Skills](https://aka.ms/vscode-agent-skills). This setting is only used by the Local agent harness.
     "chat.useAgentSkills": true,
 
-    // Controls whether instructions from `AGENTS.md` file found in a workspace roots are attached to all chat requests.
+    // Controls whether instructions from `AGENTS.md` file found in a workspace roots are attached to all chat requests. This setting is only used by the Local agent harness.
     "chat.useAgentsMdFile": true,
 
-    // Controls whether hooks from Claude configuration files can execute. When disabled, only Copilot-format hooks are used. Hooks are loaded from the files configured in `chat.hookFilesLocations`.
+    // Controls whether hooks from Claude configuration files can execute. When disabled, only Copilot-format hooks are used. Hooks are loaded from the files configured in `chat.hookFilesLocations`. This setting is only used by the Local agent harness.
     "chat.useClaudeHooks": false,
 
-    // Controls whether instructions from `CLAUDE.md` file found in workspace roots, .claude and ~/.claude folder are attached to all chat requests.
+    // Controls whether instructions from `CLAUDE.md` file found in workspace roots, .claude and ~/.claude folder are attached to all chat requests. This setting is only used by the Local agent harness.
     "chat.useClaudeMdFile": true,
 
-    // Controls whether to use chat customization files in parent repositories.
+    // Controls whether to use chat customization files in parent repositories. This setting is only used by the Local agent harness.
     "chat.useCustomizationsInParentRepositories": false,
 
-    // Controls whether chat hooks are executed at strategic points during an agent's workflow. Hooks are loaded from the files configured in `chat.hookFilesLocations`.
+    // Controls whether chat hooks are executed at strategic points during an agent's workflow. Hooks are loaded from the files configured in `chat.hookFilesLocations`. This setting is only used by the Local agent harness.
     "chat.useHooks": true,
 
-    // Controls whether instructions from nested `AGENTS.md` files found in the workspace are listed in all chat requests. The language model can load these skills on-demand if the `read` tool is available.
+    // Controls whether instructions from nested `AGENTS.md` files found in the workspace are listed in all chat requests. The language model can load these skills on-demand if the `read` tool is available. This setting is only used by the Local agent harness.
     "chat.useNestedAgentsMdFiles": false,
 
     // Override the language model used by built-in utility flows. Leave empty to use the configured default behavior.
@@ -4679,6 +4682,17 @@
     //  - delegated: The container’s view is authoritative.
     "dev.containers.workspaceMountConsistency": "cached",
 
+    // Enables dictation across the product (chat input, editor, and terminal). When enabled on a supported platform, a microphone button appears in the chat input and the dictation shortcut becomes available; the on-device transcription model is downloaded on first use and runs locally.
+    "dictation.enabled": true,
+
+    // Experimental: periodically refine finalized text while dictating, then pass the final transcript through a small language model to restore punctuation, capitalization, paragraphs, and lists. Requires Copilot to be enabled; the transcript is sent to the language model for cleanup. Falls back to the raw transcript when no model is available.
+    "dictation.experimental.llmCleanup": true,
+
+    // The model used for dictation. On-device models download on first use and run locally through Microsoft Foundry Local; the cloud option streams audio to the Microsoft AI voice service.
+    //  - nemotron-speech-streaming-en-0.6b: NVIDIA Nemotron streaming RNN-T (English), run on-device through Microsoft Foundry Local. Works offline; no audio leaves the device. Downloaded on first use and cached on disk.
+    //  - mai: Cloud transcription through the same Microsoft AI voice service used by Voice Mode. Requires a network connection and GitHub sign-in; audio is streamed to the service.
+    "dictation.model": "nemotron-speech-streaming-en-0.6b",
+
     // Editor
     // Controls whether the editor shows CodeLens.
     "diffEditor.codeLens": false,
@@ -5357,7 +5371,6 @@
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
-    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -5406,6 +5419,7 @@
     //  - bmewburn.vscode-intelephense-client: PHP code intelligence for Visual Studio Code
     //  - vscjava.vscode-java-debug: A lightweight Java debugger for Visual Studio Code
     //  - vscjava.vscode-java-pack: Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven/Gradle support, project management and more
+    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
@@ -7677,9 +7691,6 @@
     // Enable the Copilot CLI. When disabled, the Copilot CLI will not be available in 'Continue In' context menus.
     "github.copilot.chat.backgroundAgent.enabled": true,
 
-    // Enables the updated system prompt tuned for the Claude Opus 4.8 model.
-    "github.copilot.chat.claude48OpusPrompt.enabled": false,
-
     // Allow auto permission mode, which uses a model classifier to approve or deny tool operations automatically. [Learn more](https://aka.ms/vscode-claude-auto-mode).
     "github.copilot.chat.claudeAgent.allowAutoPermissions": false,
 
@@ -7695,8 +7706,8 @@
     // Load the Claude Agent SDK from the `ms-vscode.vscode-claude-sdk` extension (installed on demand) instead of the version bundled with Copilot Chat.
     "github.copilot.chat.claudeAgent.useSdkExtension": false,
 
-    // Enables the updated system prompt tuned for the Claude Sonnet 5 model.
-    "github.copilot.chat.claudeSonnet5Prompt.enabled": false,
+    // Enables the updated system prompt tuned for the Claude Opus 5 model.
+    "github.copilot.chat.claudeOpus5Prompt.enabled": false,
 
     // Enable AI-generated branch names in Copilot CLI.
     "github.copilot.chat.cli.aiGenerateBranchNames.enabled": true,
@@ -7791,15 +7802,6 @@
     // Sets the fetcher used for the inline completions.
     "github.copilot.chat.completionsFetcher": "",
 
-    // Override the model used for conversation-history compaction. When `usePrismCompaction` is enabled, defaults to `trajectory-compaction`. When `usePrismCompaction` is disabled, an empty value preserves the main agent model.
-    "github.copilot.chat.conversationCompaction.model": "",
-
-    // Comma-separated list of CAPI model IDs (case-insensitive, substring matched against the agent endpoint's model and family) that opt into prism compaction. Only takes effect when `usePrismCompaction` is enabled. An empty value applies prism to all models.
-    "github.copilot.chat.conversationCompaction.prismModelFilter": "claude-haiku-4.5,claude-sonnet-4.5,claude-sonnet-4.6,gemini-2.5-pro,gemini-3-flash,gemini-3.5-flash",
-
-    // Route conversation-history compaction (both foreground `/compact` and background auto-compaction) to the dedicated `trajectory-compaction` model instead of the main agent model.
-    "github.copilot.chat.conversationCompaction.usePrismCompaction": false,
-
     // Whether the `copilot-debug` command is enabled in the terminal.
     "github.copilot.chat.copilotDebugCommand.enabled": true,
 
@@ -7889,6 +7891,9 @@
 
     // Enables the Read File tool for gpt-5.5 models.
     "github.copilot.chat.gpt55ReadFileTool.enabled": true,
+
+    // Sets the response verbosity to low for gpt-5.6 models.
+    "github.copilot.chat.gpt56Verbosity.enabled": true,
 
     // Enable GPT-5 alternative patch format.
     "github.copilot.chat.gpt5AlternativePatch": false,
@@ -8131,6 +8136,9 @@
     // Use the agentic proxy for the search subagent tool.
     "github.copilot.chat.searchSubagent.useAgenticProxy": false,
 
+    // Disables semantic search in chat: removes the `semantic_search` tool from the agent and hides the `#codebase` chat variable. Enable to experiment with agent behavior without semantic search available.
+    "github.copilot.chat.semanticSearchTool.disabled": false,
+
     // Enables the `/setupTests` intent and prompting in `/tests` generation.
     "github.copilot.chat.setupTests.enabled": true,
 
@@ -8164,8 +8172,8 @@
     // Group default tools in prompts.
     "github.copilot.chat.tools.defaultToolsGrouped": false,
 
-    // The default maximum number of results to return from the grep search tool. The default is 20.
-    "github.copilot.chat.tools.grepSearch.defaultMaxResults": 20,
+    // The default maximum number of results to return from the grep search tool. The default is 100.
+    "github.copilot.chat.tools.grepSearch.defaultMaxResults": 100,
 
     // The maximum number of results that can be returned from the grep search tool. The default is 200.
     "github.copilot.chat.tools.grepSearch.maxResultsCap": 200,
@@ -8317,6 +8325,13 @@
     // - `${sanitizedIssueTitle}` will be replaced with the issue title, with all spaces and unsupported characters (https://git-scm.com/docs/git-check-ref-format) removed. For lowercase, use `${sanitizedLowercaseIssueTitle}`
     "githubIssues.issueBranchTitle": "${user}/issue${issueNumber}",
 
+    // Sets the format of issue completions in the editor.
+    // - `${user}` will be replaced with the currently logged in username
+    // - `${issueNumber}` will be replaced with the current issue number
+    // - `${issueNumberLabel}` will be replaced with a label formatted as #number or owner/repository#number, depending on whether the issue is in the current repository
+    // - `${issueTitle}` will be replaced with the issue title
+    "githubIssues.issueCompletionFormatEditor": "${issueNumberLabel}",
+
     // Sets the format of issue completions in the SCM inputbox.
     // - `${user}` will be replace with the currently logged in username
     // - `${issueNumber}` will be replaced with the current issue number
@@ -8342,6 +8357,9 @@
             "query": "state:open repo:${owner}/${repository} sort:updated-desc"
         }
     ],
+
+    // Shows the issue number in the tree view.
+    "githubIssues.showIssueNumberInTree": false,
 
     // Determines whether a branch should be checked out when working on an issue. To configure the name of the branch, set `githubIssues.issueBranchTitle`.
     //  - on: A branch will always be checked out when you start working on an issue. If the branch doesn't exist, it will be created.
@@ -8557,6 +8575,8 @@
     //  - `${repository}` - repository name, ex. `vscode` in `microsoft/vscode`
     //  - `${today-Nd}` - date N days ago, ex. `${today-7d}` becomes `2025-01-04`
     //
+    // **Matching multiple values:** Queries use GitHub's advanced search, where a space between qualifiers means `AND`. To match any one of several values (for example several authors), combine them with `OR`, ex. `author:name1 OR author:name2 OR author:name3`.
+    //
     // **Example custom queries:**
     // ```json
     // "githubPullRequests.queries": [
@@ -8567,6 +8587,10 @@
     //   {
     //     "label": "Mentioned Me",
     //     "query": "is:open mentions:${user}"
+    //   },
+    //   {
+    //     "label": "Created By My Team",
+    //     "query": "is:open author:name1 OR author:name2 OR author:name3"
     //   },
     //   {
     //     "label": "Recent Activity",
@@ -8606,6 +8630,9 @@
     // Use the setting 'githubPullRequests.defaultCreateOption' instead.
     // Checks the "Auto-merge" checkbox in the "Create Pull Request" view.
     "githubPullRequests.setAutoMerge": false,
+
+    // Show a confirmation dialog when canceling pull request creation if there are unsaved changes (a manually edited title or description, or any selected labels, assignees, reviewers, projects, or milestone).
+    "githubPullRequests.showCreatePullRequestCancelConfirmation": true,
 
     // This setting is deprecated. Views can now be dragged to any location.
     // When true, show GitHub Pull Requests within the SCM viewlet. Otherwise show a separate view container for them.
@@ -11177,6 +11204,7 @@
     //  - GPT-5.4 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.6 Luna (copilot): OpenAI GPT model for coding and general assistance.
     //  - GPT-5.6 Terra (copilot): OpenAI GPT model for coding and general assistance.
+    //  - Grok 4.5 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Kimi K2.7 Code (copilot)
     //  - MAI-Code-1-Flash (copilot)
     //  - Raptor mini (copilot)
@@ -13578,11 +13606,17 @@
     "markdown.validate.unusedLinkDefinitions.enabled": "hint",
 
     // markdownlint
+    // Specifies whether to lint all files, workspace files, "project" files, or no files.
+    "markdownlint.appliesTo": "allFiles",
+
     // markdownlint configuration object.
     "markdownlint.config": {},
 
     // Path to a configuration file that defines the base configuration.
     "markdownlint.configFile": null,
+
+    // JSON Pointer to a configuration object within the "configFile" file.
+    "markdownlint.configPointer": null,
 
     // Array of paths for custom rules to include when linting.
     "markdownlint.customRules": [],
@@ -13822,7 +13856,6 @@
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
-    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -13871,6 +13904,7 @@
     //  - bmewburn.vscode-intelephense-client: PHP code intelligence for Visual Studio Code
     //  - vscjava.vscode-java-debug: A lightweight Java debugger for Visual Studio Code
     //  - vscjava.vscode-java-pack: Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven/Gradle support, project management and more
+    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
@@ -16638,7 +16672,10 @@
     // Focus the terminal accessible view when a command is executed.
     "terminal.integrated.accessibleViewFocusOnCommandExecution": false,
 
-    // Preserve the cursor position on reopen of the terminal's accessible view rather than setting it to the bottom of the buffer.
+    // Controls whether the cursor position is preserved in the terminal's accessible view.
+    //  - false: Always position the cursor at the bottom of the buffer.
+    //  - true: Preserve the cursor position on reopen until new terminal content arrives.
+    //  - always: Always preserve the cursor position, including when new terminal content arrives.
     "terminal.integrated.accessibleViewPreserveCursorPosition": false,
 
     // The terminal profile to use on Linux for agent host terminals, including shells launched by AI agent tools. Accepts either a profile name from `terminal.integrated.profiles.linux` or an inline profile object. When unset, falls back to `terminal.integrated.defaultProfile.linux`. Currently applies to the local agent host. Only the executable `path` is honored today; `args` and `env` from the profile are ignored. Remote agent hosts need remote-side shell configuration because local resolved paths may be invalid on the remote.
@@ -17335,6 +17372,9 @@
 
     // Whether to rescale glyphs horizontally that are a single cell wide but have glyphs that would overlap following cell(s). This typically happens for ambiguous width characters (eg. the roman numeral characters U+2160+) which aren't featured in monospace fonts. Emoji glyphs are never rescaled.
     "terminal.integrated.rescaleOverlappingGlyphs": true,
+
+    // Whether to show a visual overlay with the terminal's columns and rows when it is resized.
+    "terminal.integrated.resizeDimensionsOverlay.enabled": true,
 
     // Controls how terminal reacts to right click.
     //  - default: Show the context menu.
@@ -18226,6 +18266,33 @@
     //  - vscode-outline: $(vscode-outline)
     //  - voice-mode: $(voice-mode)
     //  - voice-mode-compact: $(voice-mode-compact)
+    //  - mic-download: $(mic-download)
+    //  - mic-download-compact: $(mic-download-compact)
+    //  - voice-mode-download: $(voice-mode-download)
+    //  - voice-mode-download-compact: $(voice-mode-download-compact)
+    //  - google-gemini: $(google-gemini)
+    //  - kimi: $(kimi)
+    //  - microsoft: $(microsoft)
+    //  - fish1-happy: $(fish1-happy)
+    //  - fish1-neutral: $(fish1-neutral)
+    //  - fish1-sad: $(fish1-sad)
+    //  - fish1-very-sad: $(fish1-very-sad)
+    //  - fish2-happy: $(fish2-happy)
+    //  - fish2-neutral: $(fish2-neutral)
+    //  - fish2-sad: $(fish2-sad)
+    //  - fish2-very-sad: $(fish2-very-sad)
+    //  - fish3-happy: $(fish3-happy)
+    //  - fish3-neutral: $(fish3-neutral)
+    //  - fish3-sad: $(fish3-sad)
+    //  - fish3-very-sad: $(fish3-very-sad)
+    //  - fish4-happy: $(fish4-happy)
+    //  - fish4-neutral: $(fish4-neutral)
+    //  - fish4-sad: $(fish4-sad)
+    //  - fish4-very-sad: $(fish4-very-sad)
+    //  - person-voice: $(person-voice)
+    //  - person-voice-compact: $(person-voice-compact)
+    //  - person-voice-filled: $(person-voice-filled)
+    //  - person-voice-filled-compact: $(person-voice-filled-compact)
     //  - dialog-error: $(dialog-error)
     //  - dialog-warning: $(dialog-warning)
     //  - dialog-info: $(dialog-info)
