@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code defaults
      *
-     * Exported from release: v1.131.0
+     * Exported from release: v1.132.0
      *
      * Obtained from "Preferences: Open Default Settings (JSON)" command.
      */
@@ -1895,8 +1895,11 @@
     // Controls whether verbose progress announcements should be made when a chat request is in progress, including information like searched text for <search term> with X results, created file <file_name>, or read file <file path>.
     "accessibility.verboseChatProgressUpdates": true,
 
-    // Provide information about how to use the Automations section of the Agent Customizations editor, including keyboard navigation and how to inspect scheduled runs.
+    // Provide information about how to use Automations management views, including keyboard navigation and how to inspect scheduled runs.
     "accessibility.verbosity.automations": true,
+
+    // Provide information about how to access element commenting accessibility help in the Integrated Browser.
+    "accessibility.verbosity.browserElementCommenting": true,
 
     // Provide information about how to navigate and interact with the chat question carousel, including how to focus the terminal when applicable.
     "accessibility.verbosity.chatQuestionCarousel": true,
@@ -1968,13 +1971,16 @@
     "accessibility.windowTitleOptimized": true,
 
     // Voice Mode
+    // Allow Agent mode to speak brief semantic progress updates while it investigates, plans, edits, validates, or recovers from a problem.
+    "agents.voice.agentProgress": false,
+
     // Enable the Voice Mode panel in the chat view for voice-driven coding conversations.
     "agents.voice.enabled": false,
 
     // When enabled, voice mode automatically re-enters listening after the assistant finishes speaking, so you can hold a hands-free back-and-forth conversation. When disabled, you start and end each turn manually, and ending the turn sends it. Turns are not ended automatically on trailing silence or a stop phrase unless `agents.voice.turn.silenceMs` or `agents.voice.turn.stopPhrases` is explicitly configured.
     "agents.voice.handsFree": true,
 
-    // The language used for speech recognition and spoken responses. The selectable languages support native voice output. Automatic follows the system or browser locale for speech recognition and uses English voice output when the detected language does not support native voice output. Changing this while voice mode is connected takes effect immediately.
+    // The language used for speech recognition, dictation, and spoken responses. The selectable languages support native voice output. Automatic follows the system or browser locale for speech recognition and dictation, and uses English voice output when the detected language does not support native voice output. Changing this while voice mode is connected takes effect immediately.
     "agents.voice.language": "auto",
 
     // Show your speech as a live, word-by-word transcript while you are speaking. When disabled, your transcript appears only once you finish speaking. Requires `agents.voice.showTranscript` to be enabled to be visible.
@@ -1992,7 +1998,7 @@
     // Phrases that end the turn when spoken at the end of an utterance. Leave empty to disable ending the turn on a stop phrase, in which case the turn ends only on trailing silence (`agents.voice.turn.silenceMs`) or manually. The backend strips the matched phrase from the transcript before it reaches the agent. When hands-free mode (`agents.voice.handsFree`) is disabled, stop phrases do not end the turn by default unless this setting is explicitly configured, so you keep manual control over when a turn is sent.
     "agents.voice.turn.stopPhrases": ["send it"],
 
-    // The voice used when the assistant reads responses aloud. Changing this while voice mode is connected takes effect immediately.
+    // The voice used when the assistant reads responses aloud. Changing this while voice mode is connected takes effect immediately. Use [Voice Mode instructions](command:workbench.action.chat.configureVoiceInstructions) to customize Voice Mode behavior and terminology.
     //  - victoria_neutral: Victoria.
     //  - kevin_neutral: Kevin.
     //  - maya_neutral: Maya.
@@ -2465,6 +2471,9 @@
     // When applying edits, show a progress animation in the code block pill. If disabled, shows the progress percentage instead.
     "chat.agent.codeBlockProgress": true,
 
+    // Controls whether completed chat responses collapse intermediate work while keeping the final response visible.
+    "chat.agent.collapseCompletedResponses": false,
+
     // Denied domains for network access by agent tools (fetch tool, integrated browser). Applies when `chat.agent.networkFilter` or `chat.agent.sandbox.enabled` is enabled. This does not apply when `chat.agent.sandbox.allowNetwork` is enabled. Takes precedence over `chat.agent.allowedNetworkDomains`. Supports wildcards like `*.example.com`.
     "chat.agent.deniedNetworkDomains": [],
 
@@ -2491,14 +2500,6 @@
 
     // Controls whether agent mode terminal commands can run outside the sandbox after user confirmation when a sandboxed command fails or when sandbox restrictions would block the command. This applies only when `chat.agent.sandbox.enabled` is enabled.
     "chat.agent.sandbox.allowUnsandboxedCommands": true,
-
-    // Use `chat.agent.allowedNetworkDomains` instead
-    //
-    "chat.agent.sandbox.allowedNetworkDomains": [],
-
-    // Use `chat.agent.deniedNetworkDomains` instead
-    //
-    "chat.agent.sandbox.deniedNetworkDomains": [],
 
     // Controls whether agent mode uses sandboxing to restrict what tools can do. When enabled, tools like the terminal are run in a sandboxed environment to limit access to the system. Use `chat.agent.sandbox.allowNetwork` to allow all network domains.
     //  - off: Disable sandboxing for agent mode tools.
@@ -2535,22 +2536,6 @@
 
     // Controls whether agent mode terminal commands can retry in the sandbox with unrestricted network access after user confirmation. This applies only when `chat.agent.sandbox.enabled` is enabled and preserves file system sandboxing while relaxing network restrictions for an approved command.
     "chat.agent.sandbox.retryWithAllowNetworkRequests": true,
-
-    // Use `chat.agent.sandbox.fileSystem.linux` instead
-    //
-    "chat.agent.sandboxFileSystem.linux": {},
-
-    // Use `chat.agent.sandbox.fileSystem.mac` instead
-    //
-    "chat.agent.sandboxFileSystem.mac": {},
-
-    // Use `chat.agent.allowedNetworkDomains` instead
-    //
-    "chat.agent.sandboxNetwork.allowedDomains": [],
-
-    // Use `chat.agent.deniedNetworkDomains` instead
-    //
-    "chat.agent.sandboxNetwork.deniedDomains": [],
 
     // Use `chat.tools.terminal.autoApprove` instead
     //
@@ -2618,8 +2603,11 @@
     // When enabled, the agent host registers the Codex provider (subject to the Codex SDK being reachable). Requires `chat.agentHost.enabled`. The agent host process must be restarted for changes to take effect.
     "chat.agentHost.codexAgent.enabled": false,
 
+    // Minimum number of tools before MCP and external tools are deferred behind tool search. Set to 0 to always defer external tools. Only effective when tool search is enabled.
+    "chat.agentHost.copilot.toolSearch.deferThreshold": 1,
+
     // When enabled, Copilot SDK sessions defer MCP and non-core VS Code tools behind a tool-search tool so the model discovers them on demand instead of loading every tool definition up front.
-    "chat.agentHost.copilot.toolSearch.enabled": false,
+    "chat.agentHost.copilot.toolSearch.enabled": true,
 
     // Controls the log level for the Copilot SDK runtime used by the local agent host. Changing this setting restarts the Copilot SDK client; active sessions are reloaded when next used.
     //  - info: Log informational messages. Running VS Code with trace logging still enables all Copilot SDK runtime diagnostics.
@@ -2629,8 +2617,9 @@
     // When enabled, Copilot SDK sessions use the Agent Host terminal tool override instead of the SDK's default terminal behavior.
     "chat.agentHost.customTerminalTool.enabled": false,
 
+    // Chat Agent Host
     // When enabled, some agents run in a separate agent host process.
-    "chat.agentHost.enabled": false,
+    "chat.agentHost.enabled": true,
 
     // Per-model capability overrides for Copilot SDK agent sessions, keyed by model id, intended for evaluating preview models against an existing model's profile. For each model id, declare an aliased `family` (for example `claude-opus-4-8`) to route the model to that family's tuned system prompt without a code change; the model id sent to the runtime is unaffected. Only affects Copilot CLI agent sessions.
     //
@@ -2663,7 +2652,7 @@
     // **Note**: This is an advanced setting for experimentation.
     "chat.agentHost.reasoningEffortOverride": "",
 
-    // Sandbox mode for the Copilot SDK's built-in shell tool. Only takes effect when `chat.agentHost.customTerminalTool.enabled` is `false`; when the Agent Host's own terminal tool is enabled, the engine sandbox is controlled by `chat.agent.sandbox.enabled`. The sandbox applies only to requests that run with default approvals — not when approvals are bypassed — and is not supported on Windows yet.
+    // Sandbox mode for the Copilot SDK's built-in shell tool. Only takes effect when `chat.agentHost.customTerminalTool.enabled` is `false`; when the Agent Host's own terminal tool is enabled, the engine sandbox is controlled by `chat.agent.sandbox.enabled`. The sandbox applies only to requests that run with default permissions — not when approvals are bypassed — and is not supported on Windows yet.
     //  - off: No sandbox policy is forwarded for the SDK's built-in shell tool — commands run unsandboxed.
     //  - on: The SDK's built-in shell tool runs inside a sandbox using the configured filesystem policy and host-list-restricted network.
     //  - allowNetwork: The SDK's built-in shell tool runs inside a sandbox with unrestricted outbound network access.
@@ -2690,11 +2679,10 @@
     },
 
     // When enabled, Claude sessions opened from the Agents Window run inside the agent host process instead of the GitHub Copilot Chat extension. Only one Claude implementation surfaces per window. Requires `chat.agentHost.enabled`.
-    "chat.agents.claude.preferAgentHost": false,
+    "chat.agents.claude.preferAgentHost": true,
 
-    // Chat Agent Host
     // When enabled, hides the Extension Host Copilot CLI entry from the Agents window picker. Requires `chat.agentHost.enabled`.
-    "chat.agents.copilotCli.hideExtensionHost": false,
+    "chat.agents.copilotCli.hideExtensionHost": true,
 
     // Controls how the 'Agent Status' indicator appears in the title bar command center. When set to `hidden`, the indicator is not shown. Other values show the indicator and automatically enable `window.commandCenter`. The unread and in-progress session indicators require `chat.viewSessions.enabled` to be enabled.
     //  - hidden: The agent status indicator is hidden from the title bar.
@@ -2803,13 +2791,13 @@
     "chat.editing.revealNextChangeOnResolve": true,
 
     // When enabled, Claude sessions opened from the regular workbench (sidebar chat) run inside the agent host process instead of the GitHub Copilot Chat extension. Only one Claude implementation surfaces per window.
-    "chat.editor.claude.preferAgentHost": false,
+    "chat.editor.claude.preferAgentHost": true,
 
     // When enabled, Codex sessions opened from the regular workbench (sidebar chat) run inside the agent host process using the Codex App Server instead of the OpenAI extension. Only one Codex implementation surfaces per window. Requires `chat.agentHost.enabled` and `chat.agentHost.codexAgent.enabled`.
     "chat.editor.codex.preferAgentHost": false,
 
     // When enabled, hides the Extension Host Copilot CLI entry from the editor window chat picker.
-    "chat.editor.copilotCli.hideExtensionHost": false,
+    "chat.editor.copilotCli.hideExtensionHost": true,
 
     // Controls the font family in chat codeblocks.
     "chat.editor.fontFamily": "default",
@@ -2864,10 +2852,10 @@
     // Enables incremental rendering with optional block-level animation when streaming chat responses.
     "chat.experimental.incrementalRendering.enabled": false,
 
-    // Controls whether the permissions picker shows an inline "Sandboxing for terminal" toggle on the Default Approvals option. The toggle reflects and updates `chat.agent.sandbox.enabled`.
+    // Controls whether the permissions picker shows an inline "Sandboxing for terminal" toggle on the Default Permissions option. The toggle reflects and updates `chat.agent.sandbox.enabled`.
     "chat.experimental.permissionsSandboxToggle.enabled": false,
 
-    // Controls the wording and icons used by actions that archive and unarchive chat sessions.
+    // Controls the wording and icons used by actions that archive and unarchive chat sessions, as well as the label of the archived sessions section.
     //  - archive: Use Archive, Archive All, Unarchive, and Unarchive All.
     //  - done: Use Mark as Done, Mark All as Done, Restore, and Restore All.
     "chat.experimental.sessionArchiveActionWording": "archive",
@@ -2885,8 +2873,6 @@
     //  - Claude Sonnet 4.5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 4.6 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 2.5 Pro (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
-    //  - Gemini 3 Flash (Preview) (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
@@ -2971,7 +2957,7 @@
 
     // Controls access to installed Model Context Protocol servers.
     //  - none: No access to MCP servers.
-    //  - registry: Allows access to MCP servers installed from the registry that VS Code is connected to.
+    //  - registry: Allows access to MCP servers listed in the registry that VS Code is connected to.
     //  - all: Allow access to any installed MCP server.
     "chat.mcp.access": "all",
 
@@ -3031,8 +3017,8 @@
     //  - always: Always show OS notifications for responses, even when the window is focused.
     "chat.notifyWindowOnResponseReceived": "windowNotFocused",
 
-    // Controls the default permissions picker mode for new local chat sessions. You can still change the permission mode per session, and each session remembers the permission mode that was used. If enterprise policy disables auto approval, new sessions use Default Approvals.
-    //  - default: Start new chat sessions with Default Approvals.
+    // Controls the default permissions picker mode for new local chat sessions. You can still change the permission mode per session, and each session remembers the permission mode that was used. If enterprise policy disables auto approval, new sessions use Default Permissions.
+    //  - default: Start new chat sessions with Default Permissions.
     //  - autoApprove: Start new chat sessions in Bypass Approvals mode.
     //  - autopilot: Start new chat sessions in Autopilot mode.
     "chat.permissions.default": "default",
@@ -3044,8 +3030,6 @@
     //  - Claude Sonnet 4.5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 4.6 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 2.5 Pro (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
-    //  - Gemini 3 Flash (Preview) (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
@@ -3060,9 +3044,6 @@
     //  - MAI-Code-1-Flash (copilot)
     //  - Raptor mini (copilot)
     "chat.planAgent.defaultModel": "",
-
-    // When enabled, the plan review widget mounts an editor inline, as opposed to in a separate editor tab.
-    "chat.planReview.inlineEditor.enabled": true,
 
     // Plugin directories to discover. Each key is a path that points directly to a plugin folder, and the value enables (`true`) or disables (`false`) it. Paths can be absolute, relative to the workspace root, or start with `~/` for the user's home directory.
     "chat.pluginLocations": {},
@@ -3097,6 +3078,9 @@
     // Configure which prompt files to recommend in the chat welcome view. Each key is a prompt file name, and the value can be `true` to always recommend, `false` to never recommend, or a [when clause](https://aka.ms/vscode-when-clause) expression like `resourceExtname == .js` or `resourceLangId == markdown`.
     "chat.promptFilesRecommendations": {},
 
+    // Controls whether the current prompt is pinned to the top of the chat transcript while scrolling.
+    "chat.promptTimeline.stickyHeader": false,
+
     // Controls which action is the default for the queue button when a request is in progress.
     //  - queue: Queue the message to send after the current request completes.
     //  - steer: Steer the current request by sending the message immediately, signaling the current request to yield.
@@ -3114,6 +3098,9 @@
     // Controls whether subagents can invoke other subagents. When enabled, nesting is limited to a maximum depth of 5.
     "chat.subagents.allowInvocationsFromSubagents": false,
 
+    // Controls whether subagents in chat editors use a rich presentation that opens each subagent in its own editor instead of rendering its full activity inline in the parent chat.
+    "chat.subagents.useRichRendering": true,
+
     // Controls whether tips are shown above user messages in chat. New tips are added frequently, so this is a helpful way to stay up to date with the latest features.
     "chat.tips.enabled": true,
 
@@ -3123,7 +3110,7 @@
     // Controls whether the Copilot Sign In button is shown in the title bar when signed out. When disabled, the Sign In affordance falls back to the status bar.
     "chat.titleBar.signIn.enabled": true,
 
-    // When enabled, tool failures are automatically expanded in the chat UI to show error details.
+    // When enabled, terminal tool failures are automatically expanded in the chat UI to show error details.
     "chat.tools.autoExpandFailures": true,
 
     // Post-process tool output (for example `git diff`, `ls -l`, or `npm install`) to reduce token usage before it is sent to the model.
@@ -3390,7 +3377,7 @@
     },
 
     // Controls whether agent status pills are shown above the chat input while a turn is in progress and inside the completed response. Only applies to agent sessions.
-    "chat.turnStatusPills": false,
+    "chat.turnStatusPills": true,
 
     // Controls whether the input of the chat should be restored when an undo request is made. The input will be filled with the text of the request that was restored.
     "chat.undoRequests.restoreInput": true,
@@ -4685,13 +4672,16 @@
     // Enables dictation across the product (chat input, editor, and terminal). When enabled on a supported platform, a microphone button appears in the chat input and the dictation shortcut becomes available; the on-device transcription model is downloaded on first use and runs locally.
     "dictation.enabled": true,
 
-    // Experimental: periodically refine finalized text while dictating, then pass the final transcript through a small language model to restore punctuation, capitalization, paragraphs, and lists. Requires Copilot to be enabled; the transcript is sent to the language model for cleanup. Falls back to the raw transcript when no model is available.
+    // Experimental: when dictation ends, the final transcript is passed through a small language model to restore punctuation, capitalization, paragraphs, and lists. Requires Copilot to be enabled; the transcript is sent to the language model for cleanup. Falls back to the raw transcript when no model is available. Use [dictation instructions](command:workbench.action.chat.configureDictationInstructions) to customize terminology and formatting.
     "dictation.experimental.llmCleanup": true,
 
     // The model used for dictation. On-device models download on first use and run locally through Microsoft Foundry Local; the cloud option streams audio to the Microsoft AI voice service.
-    //  - nemotron-speech-streaming-en-0.6b: NVIDIA Nemotron streaming RNN-T (English), run on-device through Microsoft Foundry Local. Works offline; no audio leaves the device. Downloaded on first use and cached on disk.
+    //  - nemotron-3.5-asr-streaming-0.6b: NVIDIA Nemotron 3.5 multilingual streaming RNN-T, run on-device through Microsoft Foundry Local. Works offline; no audio leaves the device. Automatic language selection follows the Voice Mode language setting and system or browser locale, with model detection as a fallback. Downloaded on first use and cached on disk.
     //  - mai: Cloud transcription through the same Microsoft AI voice service used by Voice Mode. Requires a network connection and GitHub sign-in; audio is streamed to the service.
-    "dictation.model": "nemotron-speech-streaming-en-0.6b",
+    "dictation.model": "nemotron-3.5-asr-streaming-0.6b",
+
+    // Controls whether the transcript is shown while dictating. The final transcript is inserted when dictation ends.
+    "dictation.showTranscript": true,
 
     // Editor
     // Controls whether the editor shows CodeLens.
@@ -5368,9 +5358,16 @@
 
     // Defines a default formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
+    //  - vscode.css-language-features: Provides rich language support for CSS, LESS and SCSS files.
+    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
+    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
+    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
+    //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
+    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
+    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -5381,7 +5378,6 @@
     //  - ms-vscode.cpptools-extension-pack: Popular extensions for C++ development in Visual Studio Code.
     //  - ms-dotnettools.csdevkit: Official C# extension from Microsoft
     //  - ms-dotnettools.csharp: Base language support for C#
-    //  - vscode.css-language-features: Provides rich language support for CSS, LESS and SCSS files.
     //  - tamasfe.even-better-toml: Fully-featured TOML support
     //  - ms-python.flake8: Linting support for Python files using Flake8.
     //  - golang.go: Rich Go language support for Visual Studio Code
@@ -5390,7 +5386,6 @@
     //  - ms-python.isort: Import organization support for Python files using isort.
     //  - redhat.java: Java Linting, Intellisense, formatting, refactoring, Maven/Gradle support and more...
     //  - samuelcolvin.jinjahtml: Syntax highlighting for jinja(2) including HTML, Markdown, YAML, Ruby and LaTeX templates
-    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - sumneko.lua: Lua Language Server coded by Lua
     //  - ms-vscode.makefile-tools: Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.
     //  - vscode.markdown-language-features: Provides rich language support for Markdown.
@@ -5398,7 +5393,6 @@
     //  - josee9988.minifyall: Minifier for JSON, CSS, HTML, XML, TWIG, LESS, SASS, SCSS, JavaScript, JSONC, and JavaScriptReact(testing). Compressor of files and folders. You will love its simplicity!
     //  - ms-python.mypy-type-checker: Type checking support for Python files using Mypy.
     //  - vscode.php-language-features: Provides rich language support for PHP files.
-    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - ms-python.pylint: Linting support for Python files using Pylint.
     //  - ms-python.python: Python language support with extension access points for IntelliSense (Pylance), Debugging (Python Debugger), linting, formatting, refactoring, unit tests, and more.
     //  - mechatroner.rainbow-csv: Highlight CSV and TSV files, Run SQL-like queries
@@ -5406,9 +5400,7 @@
     //  - ionutvmi.reg: Windows Registry Script (.reg) Language package for VSCode
     //  - ms-vscode-remote.remote-ssh-edit: Edit SSH configuration files
     //  - dnut.rewrap-revived: Hard word wrapping for comments and other text at a given column.
-    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - timonwong.shellcheck: Integrates ShellCheck into VS Code, a linter for Shell scripts.
-    //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
     //  - XadillaX.viml: Vim Script language server protocol and highlighting support for VSCode.
     //  - mark-wiemer.vscode-autohotkey-plus-plus: AutoHotkey v1 and v2 language support for Visual Studio Code: IntelliSense, debugging, formatting, and more!
     //  - kddejong.vscode-cfn-lint: AWS CloudFormation template Linter
@@ -5419,12 +5411,10 @@
     //  - bmewburn.vscode-intelephense-client: PHP code intelligence for Visual Studio Code
     //  - vscjava.vscode-java-debug: A lightweight Java debugger for Visual Studio Code
     //  - vscjava.vscode-java-pack: Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven/Gradle support, project management and more
-    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
-    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
     //  - amazonwebservices.aws-toolkit-vscode: Including CodeCatalyst, Infrastructure Composer, and support for Lambda, S3, CloudWatch Logs, CloudFormation, and many other services.
     //  - ms-vscode.azure-repos: Remotely browse and edit any Azure Repos
@@ -7742,7 +7732,7 @@
     // Enable the /remote command for Copilot CLI sessions, allowing you to view and steer from GitHub.com and the GitHub mobile app.
     "github.copilot.chat.cli.remote.enabled": true,
 
-    // Run Copilot CLI tools (such as the terminal) inside a sandbox to limit what they can access on your system. The sandbox only applies to requests that run with default approvals — it is not used when bypassing approvals — and is not supported on Windows yet.
+    // Run Copilot CLI tools (such as the terminal) inside a sandbox to limit what they can access on your system. The sandbox only applies to requests that run with default permissions — it is not used when bypassing approvals — and is not supported on Windows yet.
     //  - off: Disable sandboxing for Copilot CLI tools.
     //  - on: Enable sandboxing for Copilot CLI tools.
     //  - allowNetwork: Enable sandboxing for Copilot CLI tools and allow all network domains.
@@ -8062,7 +8052,7 @@
     "github.copilot.chat.planAgent.additionalTools": [],
 
     // When enabled, models that offer their full (long) context window at no additional cost will only show the long context option in the model picker and use it by default. When disabled, both the smaller default and larger long context options are shown so you can select a smaller context window.
-    "github.copilot.chat.preferLongContext.enabled": false,
+    "github.copilot.chat.preferLongContext.enabled": true,
 
     // Add project labels in chat requests.
     "github.copilot.chat.projectLabels.chat": false,
@@ -8136,8 +8126,11 @@
     // Use the agentic proxy for the search subagent tool.
     "github.copilot.chat.searchSubagent.useAgenticProxy": false,
 
-    // Disables semantic search in chat: removes the `semantic_search` tool from the agent and hides the `#codebase` chat variable. Enable to experiment with agent behavior without semantic search available.
-    "github.copilot.chat.semanticSearchTool.disabled": false,
+    // Controls how semantic search is offered to the agent in chat. Used to experiment with the impact of semantic search on agent behavior and token usage.
+    //  - enabled: The `semantic_search` tool and the `#codebase` chat variable are available.
+    //  - disabled: Removes the `semantic_search` tool from the agent and hides the `#codebase` chat variable.
+    //  - preferred: Same as `enabled`, plus instructions telling the agent to prefer `semantic_search` over exploratory file reads and text searches.
+    "github.copilot.chat.semanticSearchTool.mode": "enabled",
 
     // Enables the `/setupTests` intent and prompting in `/tests` generation.
     "github.copilot.chat.setupTests.enabled": true,
@@ -11193,8 +11186,6 @@
     //  - Claude Sonnet 4.5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 4.6 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 2.5 Pro (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
-    //  - Gemini 3 Flash (Preview) (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
@@ -13609,6 +13600,7 @@
     // Specifies whether to lint all files, workspace files, "project" files, or no files.
     "markdownlint.appliesTo": "allFiles",
 
+    // This property is deprecated. Please use a configuration file like .markdownlint.json/.markdownlint.yaml instead.
     // markdownlint configuration object.
     "markdownlint.config": {},
 
@@ -13618,6 +13610,7 @@
     // JSON Pointer to a configuration object within the "configFile" file.
     "markdownlint.configPointer": null,
 
+    // This property is deprecated. Please use a configuration file like .markdownlint-cli2.jsonc/.markdownlint-cli2.yaml instead.
     // Array of paths for custom rules to include when linting.
     "markdownlint.customRules": [],
 
@@ -13853,9 +13846,16 @@
 
     // Defines a default notebook formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
+    //  - vscode.css-language-features: Provides rich language support for CSS, LESS and SCSS files.
+    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
+    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
+    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
+    //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
+    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
+    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -13866,7 +13866,6 @@
     //  - ms-vscode.cpptools-extension-pack: Popular extensions for C++ development in Visual Studio Code.
     //  - ms-dotnettools.csdevkit: Official C# extension from Microsoft
     //  - ms-dotnettools.csharp: Base language support for C#
-    //  - vscode.css-language-features: Provides rich language support for CSS, LESS and SCSS files.
     //  - tamasfe.even-better-toml: Fully-featured TOML support
     //  - ms-python.flake8: Linting support for Python files using Flake8.
     //  - golang.go: Rich Go language support for Visual Studio Code
@@ -13875,7 +13874,6 @@
     //  - ms-python.isort: Import organization support for Python files using isort.
     //  - redhat.java: Java Linting, Intellisense, formatting, refactoring, Maven/Gradle support and more...
     //  - samuelcolvin.jinjahtml: Syntax highlighting for jinja(2) including HTML, Markdown, YAML, Ruby and LaTeX templates
-    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - sumneko.lua: Lua Language Server coded by Lua
     //  - ms-vscode.makefile-tools: Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.
     //  - vscode.markdown-language-features: Provides rich language support for Markdown.
@@ -13883,7 +13881,6 @@
     //  - josee9988.minifyall: Minifier for JSON, CSS, HTML, XML, TWIG, LESS, SASS, SCSS, JavaScript, JSONC, and JavaScriptReact(testing). Compressor of files and folders. You will love its simplicity!
     //  - ms-python.mypy-type-checker: Type checking support for Python files using Mypy.
     //  - vscode.php-language-features: Provides rich language support for PHP files.
-    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - ms-python.pylint: Linting support for Python files using Pylint.
     //  - ms-python.python: Python language support with extension access points for IntelliSense (Pylance), Debugging (Python Debugger), linting, formatting, refactoring, unit tests, and more.
     //  - mechatroner.rainbow-csv: Highlight CSV and TSV files, Run SQL-like queries
@@ -13891,9 +13888,7 @@
     //  - ionutvmi.reg: Windows Registry Script (.reg) Language package for VSCode
     //  - ms-vscode-remote.remote-ssh-edit: Edit SSH configuration files
     //  - dnut.rewrap-revived: Hard word wrapping for comments and other text at a given column.
-    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - timonwong.shellcheck: Integrates ShellCheck into VS Code, a linter for Shell scripts.
-    //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
     //  - XadillaX.viml: Vim Script language server protocol and highlighting support for VSCode.
     //  - mark-wiemer.vscode-autohotkey-plus-plus: AutoHotkey v1 and v2 language support for Visual Studio Code: IntelliSense, debugging, formatting, and more!
     //  - kddejong.vscode-cfn-lint: AWS CloudFormation template Linter
@@ -13904,12 +13899,10 @@
     //  - bmewburn.vscode-intelephense-client: PHP code intelligence for Visual Studio Code
     //  - vscjava.vscode-java-debug: A lightweight Java debugger for Visual Studio Code
     //  - vscjava.vscode-java-pack: Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven/Gradle support, project management and more
-    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
-    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
     //  - amazonwebservices.aws-toolkit-vscode: Including CodeCatalyst, Infrastructure Composer, and support for Lambda, S3, CloudWatch Logs, CloudFormation, and many other services.
     //  - ms-vscode.azure-repos: Remotely browse and edit any Azure Repos
@@ -16462,6 +16455,12 @@
     // The priority of the selected lines in status bar. Higher values mean the item should be shown more to the left.
     "selectline.statusbarPriority": 100,
 
+    // Controls whether the prompt timeline is shown next to the chat transcript in the Agents window.
+    //  - off: Do not show the prompt timeline.
+    //  - ruler: Show an overview ruler beside the transcript scrollbar that fans into prompt pills on engagement.
+    //  - dock: Show a minimal handle on the transcript's left edge that opens a list of prompts on hover.
+    "sessions.promptTimeline.rail": "off",
+
     // Settings Sync
     // List of extensions to be ignored while synchronizing. The identifier of an extension is always `${publisher}.${name}`. For example: `vscode.csharp`.
     "settingsSync.ignoredExtensions": [],
@@ -17012,6 +17011,8 @@
     // - extensionIdentifier: ms-azuretools.vscode-azureresourcegroups
     //  - Azure Cloud Shell (PowerShell): $($(azure)) Azure Cloud Shell (PowerShell)
     // - extensionIdentifier: ms-azuretools.vscode-azureresourcegroups
+    //  - Agent Host (Local): $(remote) Agent Host (Local)
+    // - extensionIdentifier: vscode.agent-host-terminal
     "terminal.integrated.defaultProfile.windows": null,
 
     // Controls whether to detect and set the `$LANG` environment variable to a UTF-8 compliant option since VS Code's terminal only supports UTF-8 encoded data coming from the shell.
@@ -18293,6 +18294,11 @@
     //  - person-voice-compact: $(person-voice-compact)
     //  - person-voice-filled: $(person-voice-filled)
     //  - person-voice-filled-compact: $(person-voice-filled-compact)
+    //  - cloud-download-compact: $(cloud-download-compact)
+    //  - cloud-upload-compact: $(cloud-upload-compact)
+    //  - mic-compact: $(mic-compact)
+    //  - arrow-up-compact: $(arrow-up-compact)
+    //  - xai: $(xai)
     //  - dialog-error: $(dialog-error)
     //  - dialog-warning: $(dialog-warning)
     //  - dialog-info: $(dialog-info)
