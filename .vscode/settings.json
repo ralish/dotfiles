@@ -345,7 +345,7 @@
     "[xml]": {
         "editor.rulers": [79],
 
-        // Some programs (e.g. Ghidra) end XML files with two newlines
+        // Some files don't end with a newline or end with two newlines
         "files.trimFinalNewlines": false
     }
 }
