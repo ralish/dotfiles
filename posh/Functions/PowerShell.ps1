@@ -307,7 +307,9 @@ Function Global:Update-PowerShell {
                 Write-Progress @WriteProgressParams -Status 'Updating AWS modules' -PercentComplete $PercentComplete
 
                 try {
-                    Update-AWSToolsModule -CleanUp -Force -ErrorAction 'Stop'
+                    # `-WarningAction` is used to suppress the warning on not
+                    # providing a major version constraint when updating.
+                    Update-AWSToolsModule -Cleanup -Confirm:$false -ErrorAction 'Stop' -WarningAction 'SilentlyContinue'
                 } catch { $PSCmdlet.WriteError($PSItem) }
             }
         }
