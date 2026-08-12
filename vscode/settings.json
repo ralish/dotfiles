@@ -511,6 +511,10 @@
     "markdown.extension.showActionButtons": true,
     "markdown.extension.toc.levels": "1..3",
 
+    // Markdown PDF
+    "markdown-pdf.chromium.autoDownload": false,
+    "markdown-pdf.displayHeaderFooter": false,
+
     // markdownlint
     "markdownlint.severityForError": "Error",
     "markdownlint.severityForWarning": "Warning",
