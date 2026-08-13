@@ -298,6 +298,7 @@ Function Clear-DotFilesLoadData {
         # State
         'AsyncLoadQueue'
         'DotFilesIsAsync'
+        'DotFilesIsWsb'
         'DotFilesProfileStopwatch'
         'DotFilesSection'
         'DotFilesSectionName'
@@ -449,6 +450,8 @@ Function Start-DotFilesSection {
         [ValidateSet('', 'Unix', 'Windows')]
         [String]$Platform,
 
+        [Switch]$SkipIfWsb,
+
         [Version]$PwshMinVersion,
         [String[]]$PwshHostName,
 
@@ -494,6 +497,11 @@ Function Start-DotFilesSection {
                 Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as platform is not Unix-like.'
                 return $false
             }
+        }
+
+        if ($Global:DotFilesIsWsb -and ($SkipIfWsb -or $Command)) {
+            Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as detected running under Windows Sandbox.'
+            return $false
         }
 
         if ($PwshMinVersion -and $PwshMinVersion -gt $PSVersionTable.PSVersion) {

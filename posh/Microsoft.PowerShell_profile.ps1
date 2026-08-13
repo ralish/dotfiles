@@ -62,6 +62,17 @@ $DotFilesTimings = $false
 # Load the helper functions
 . (Join-Path -Path $PoshFunctionsPath -ChildPath '00-Helpers.ps1')
 
+# Indicates if we're running in a Windows Sandbox instance
+#
+# Operations which entail searching the filesystem are outrageously slow under
+# Windows Sandbox. Until that changes, we short-circuit loading of sections and
+# settings which would introduce significant startup delays.
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+$DotFilesIsWsb = $false
+if ((Test-IsWindows) -and $Env:USERNAME -eq 'WDAGUtilityAccount') {
+    $DotFilesIsWsb = $true
+}
+
 # Indicates if we're currently executing in an async context
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesIsAsync = $false

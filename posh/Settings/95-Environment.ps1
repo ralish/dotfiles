@@ -1,4 +1,10 @@
-$null = Start-DotFilesSection -Type 'Settings' -Name 'Environment'
+$DotFilesSection = @{
+    Type      = 'Settings'
+    Name      = 'Environment'
+    SkipIfWsb = $true
+}
+
+if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Miscellaneous environment configuration
 Function Initialize-Environment {
