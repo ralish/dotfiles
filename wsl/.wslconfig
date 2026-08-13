@@ -241,8 +241,8 @@
 # by the Windows release. Only applies when using NAT networking mode.
 #
 # Default differs by WSL version:
-#  < 2.1.0: false
 # >= 2.1.0: true
+#  < 2.1.0: false
 #
 # Support: WSL 1.3.14
 #dnsTunneling =
@@ -453,8 +453,8 @@ telemetry = false
 # - Gradual         Slow release
 #
 # Default differs by WSL version:
-#  < 2.1.3: false (Disabled)
 # >= 2.1.3: DropCache
+#  < 2.1.3: false (Disabled)
 #
 # Boolean prior to WSL 2.0.0.
 #

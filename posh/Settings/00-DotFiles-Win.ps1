@@ -76,7 +76,7 @@ Function Set-DotFilesFinalPath {
         # size including the null terminator.
         if ($Result -gt ($ProfileDirFinalPath.Capacity + 1)) {
             $ExcMsg = "Final path to PowerShell profile directory exceeds string buffer size of $($ProfileDirFinalPath.Capacity): $($Result - 1)"
-            $ErrExc = [ComponentModel.Win32Exception]::new(122, $ExcMsg) # ERROR_INSUFFICIENT_BUFFER
+            $ErrExc = [ComponentModel.Win32Exception]::new(122, $ExcMsg) # `ERROR_INSUFFICIENT_BUFFER`
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeApiFailed', $ErrCat, $Result)
             $PSCmdlet.ThrowTerminatingError($ErrRec)

@@ -33,13 +33,13 @@ Function Initialize-ActiveDirectory {
         'Modified', 'modifyTimeStamp'
 
         # LDAP attributes & PowerShell properties differing only in case
-        'CanonicalName'                 # canonicalName
-        'CN'                            # cn
-        'DistinguishedName'             # distinguishedName
-        'ObjectGUID'                    # objectGUID
+        'CanonicalName'                 # `canonicalName`
+        'CN'                            # `cn`
+        'DistinguishedName'             # `distinguishedName`
+        'ObjectGUID'                    # `objectGUID`
 
         # Interesting but duplicated properties
-        'Deleted'                       # isDeleted
+        'Deleted'                       # `isDeleted`
     )
 
     # Class: `securityPrincipal`
@@ -49,7 +49,7 @@ Function Initialize-ActiveDirectory {
         'SID', 'objectSid'
 
         # LDAP attributes & PowerShell properties differing only in case
-        'MemberOf'                      # memberOf
+        'MemberOf'                      # `memberOf`
     )
 
     # Class: `user`
@@ -69,23 +69,23 @@ Function Initialize-ActiveDirectory {
         'PasswordLastSet', 'pwdLastSet'
 
         # Interesting but duplicated properties: `person`
-        'OfficePhone'                   # telephoneNumber
-        'Surname'                       # sn
+        'OfficePhone'                   # `telephoneNumber`
+        'Surname'                       # `sn`
 
         # Interesting but duplicated properties: `organizationalPerson`
-        'City'                          # l
-        'Country'                       # c
-        'Fax'                           # facsimileTelephoneNumber
-        'Office'                        # physicalDeliveryOfficeName
-        'OtherName'                     # middleName
-        'POBox'                         # postOfficeBox
-        'State'                         # st
+        'City'                          # `l`
+        'Country'                       # `c`
+        'Fax'                           # `facsimileTelephoneNumber`
+        'Office'                        # `physicalDeliveryOfficeName`
+        'OtherName'                     # `middleName`
+        'POBox'                         # `postOfficeBox`
+        'State'                         # `st`
 
         # Interesting but duplicated properties: `user`
-        'AccountExpirationDate'         # accountExpires
-        'EmailAddress'                  # mail
-        'MobilePhone'                   # mobile
-        'Organization'                  # o
+        'AccountExpirationDate'         # `accountExpires`
+        'EmailAddress'                  # `mail`
+        'MobilePhone'                   # `mobile`
+        'Organization'                  # `o`
     )
 }
 

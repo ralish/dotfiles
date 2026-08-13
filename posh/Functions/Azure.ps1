@@ -65,7 +65,7 @@ Function Global:Get-EntraUserLicenseReport {
     [OutputType(ParameterSetName = ('ParsedLicenses', 'ParsedServices'), [Hashtable])]
     Param(
         # Product names and service plan identifiers for licensing
-        # https://learn.microsoft.com/en-us/entra/identity/users/licensing-service-plan-reference
+        # https://learn.microsoft.com/en-au/entra/identity/users/licensing-service-plan-reference
         [Parameter(ParameterSetName = 'LicensingInfo', Mandatory)]
         [Parameter(ParameterSetName = 'ParsedLicenses', Mandatory)]
         [Parameter(ParameterSetName = 'ParsedServices', Mandatory)]

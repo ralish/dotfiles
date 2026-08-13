@@ -24,7 +24,7 @@ mstsc/Template.ini                          working-tree-encoding=UTF-16LE-BOM
 # Windows Registry files should be UTF-16LE
 *.reg                                       working-tree-encoding=UTF-16LE-BOM
 
-# Override Linguist detected language for certain files
+# Language detection overrides for Linguist
 .vscode/*.json                  linguist-language=jsonc
 vscode/*.json                   linguist-language=jsonc
 winget/*.json                   linguist-language=jsonc

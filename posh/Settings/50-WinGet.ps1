@@ -11,7 +11,7 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Tab completion (winget)
+# Tab completion (`winget`)
 # https://learn.microsoft.com/en-au/windows/package-manager/winget/tab-completion
 Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
 Register-ArgumentCompleter -Native -CommandName 'winget' -ScriptBlock {

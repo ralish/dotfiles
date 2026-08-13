@@ -403,7 +403,7 @@ Function Global:Add-FileToEmptyDirectories {
     foreach ($DirPath in $Path) {
         if (!(Test-IsPathFullyQualified -Path $DirPath)) {
             if ($PWD.Provider.Name -ne 'FileSystem') {
-                $ExcMsg = "Skipping relative path as current path is not a file system: ${DirPath}"
+                $ExcMsg = "Skipping relative path as current path is not a filesystem: ${DirPath}"
                 $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $DirPath)

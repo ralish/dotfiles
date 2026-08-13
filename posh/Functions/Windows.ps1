@@ -206,7 +206,7 @@ Function Global:Find-WinEvent {
         }
     }
 
-    # EventLevel Enum
+    # `EventLevel` Enum
     # https://learn.microsoft.com/en-au/dotnet/api/system.diagnostics.tracing.eventlevel
     $EventLevelNameToInt = @{
         Any      = 0
@@ -361,7 +361,7 @@ Function Global:Find-WinEvent {
 
     # User requested event log records be emitted as plain text
 
-    # EventLevel Enum
+    # `EventLevel` Enum
     # https://learn.microsoft.com/en-au/dotnet/api/system.diagnostics.tracing.eventlevel
     $EventLevelIntToName = @(
         'Any'

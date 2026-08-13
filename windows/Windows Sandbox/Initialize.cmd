@@ -1,5 +1,9 @@
 @ECHO OFF
 
+@REM ##########################################################################
+@REM ###            Windows Sandbox instance configuration                  ###
+@REM ##########################################################################
+
 @REM Switch to batch file directory
 CD /D "%~dp0"
 

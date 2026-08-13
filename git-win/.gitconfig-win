@@ -15,7 +15,7 @@
 	# Default: false
 	# Windows only setting
 	#
-	# Enable additional caching of file system data for some operations.
+	# Enable additional caching of filesystem data for some operations.
 	fscache = true
 	# Default: dotGitOnly
 	# Windows only setting
