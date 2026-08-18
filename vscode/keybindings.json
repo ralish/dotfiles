@@ -1,8 +1,12 @@
 [
     /*
      * Visual Studio Code keybindings
+     * https://code.visualstudio.com/docs/configure/keybindings
      *
-     * Default file path: %APPDATA%\Code\User\keybindings.json
+     * File path:
+     * - Linux: `$HOME/.config/Code/User/keybindings.json`
+     * - macOS: `$HOME/Library/Application Support/Code/User/keybindings.json`
+     * - Windows: `%APPDATA%\Code\User\keybindings.json`
      */
 
     // Close the VS Code window if nothing is open

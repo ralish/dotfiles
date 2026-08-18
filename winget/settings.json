@@ -1,9 +1,10 @@
 {
     /*
      * Windows Package Manager (WinGet) settings
+     * https://learn.microsoft.com/en-au/windows/package-manager/winget/
      *
      * Last reviewed release: v1.29.280
-     * Default file path: %LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json
+     * File path: `%LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json`
      */
 
     "$help": "https://aka.ms/winget-settings",

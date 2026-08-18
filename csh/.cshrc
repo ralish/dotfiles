@@ -5,7 +5,7 @@
 #
 # Last reviewed release: v20240808
 # Upstream source: https://cvsweb.openbsd.org/src/bin/csh/
-# Default file path: ~/.cshrc
+# File path: `$HOME/.cshrc`
 #
 # Configuration is performed entirely through shell variables, which has the
 # useful property of providing simple backwards compatibility even with very

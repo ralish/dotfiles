@@ -1,9 +1,10 @@
 {
     /*
      * Windows Terminal settings
+     * https://learn.microsoft.com/en-au/windows/terminal/
      *
      * Last reviewed release: v1.24.11911.0
-     * Default file path: %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
+     * File path: `%LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json`
      *
      * Many Windows Terminal profiles are automatically generated and assigned
      * a unique GUID. The GUID may be taken directly from the underlying source

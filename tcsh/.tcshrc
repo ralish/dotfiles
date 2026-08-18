@@ -4,7 +4,7 @@
 # https://www.tcsh.org/
 #
 # Last reviewed release: v6.24.16
-# Default file path: ~/.tcshrc
+# File path: `$HOME/.tcshrc`
 #
 # Configuration is performed entirely through shell variables, which has the
 # useful property of providing simple backwards compatibility even with very

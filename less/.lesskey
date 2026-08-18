@@ -1,3 +1,19 @@
+# less
+# https://www.greenwoodsoftware.com/less/
+#
+# File paths in preference order (Unix-like):
+# - `$LESSKEYIN`
+# - `$XDG_CONFIG_HOME/lesskey`
+# - `$HOME/.config/lesskey`
+# - `$HOME/.lesskey`
+#
+# File paths in preference order (Windows):
+# - `%LESSKEYIN%`
+# - `%XDG_CONFIG_HOME%\lesskey`
+# - `%HOME%\.config\lesskey`
+# - `%HOME%\_lesskey`
+#   If unset uses `%HOMEDRIVE%%HOMEPATH%`.
+
 #env
 
 # Options to provide to `less` automatically

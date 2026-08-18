@@ -2,10 +2,7 @@
 # https://tiswww.cwru.edu/php/chet/readline/rluserman.html
 #
 # Last reviewed release: v8.3
-# Default file paths in preference order:
-# - $INPUTRC
-# - ~/.inputrc
-# - /etc/inputrc
+# File path: `${INPUTRC:-$HOME/.inputrc}`
 
 # -------------------------------- Encoding -----------------------------------
 
