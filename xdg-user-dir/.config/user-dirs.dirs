@@ -3,7 +3,7 @@
 # xdg-user-dirs
 # https://freedesktop.org/wiki/Software/xdg-user-dirs/
 #
-# Default file path: ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
+# File path: `${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs`
 #
 # Read by `xdg-user-dir(1)` to inform XDG-aware applications of preferred
 # directories for storing various files.

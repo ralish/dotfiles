@@ -2,7 +2,7 @@
 # https://metacpan.org/pod/CPANPLUS::Config
 #
 # Last reviewed release: v0.9916
-# Default file path: ~/.cpanplus/User.pm
+# File path: `${PERL5_CPANPLUS_HOME:-$HOME/.cpanplus}/lib/CPANPLUS/Config/User.pm`
 
 package CPANPLUS::Config::User;
 

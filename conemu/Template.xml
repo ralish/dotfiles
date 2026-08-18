@@ -4,7 +4,10 @@
 	https://conemu.github.io/en/Settings.html
 
 	Last reviewed release: v230724
-	Default file path: %APPDATA%\ConEmu.xml
+	File paths in preference order:
+	- `%ConEmuDir%\ConEmu.xml`
+	- `%ConEmuBaseDir%\ConEmu.xml`
+	- `%APPDATA%\ConEmu.xml`
 
 	ConEmu writes various values which frequently change into its settings file
 	(e.g. modification timestamps). As this causes the file to be marked as

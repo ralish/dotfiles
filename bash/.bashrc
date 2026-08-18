@@ -4,7 +4,7 @@
 # https://www.gnu.org/software/bash/manual/bashref.html
 #
 # Last reviewed release: v5.3
-# Default file path: ~/.bashrc
+# File path: `$HOME/.bashrc`
 #
 # This configuration has been written to be backwards compatible with Bash
 # versions as far back as Bash 2.0. Usage of features added in subsequent

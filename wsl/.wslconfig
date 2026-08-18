@@ -1,8 +1,8 @@
 # Windows Subsystem for Linux 2 (WSL 2) global settings
-# https://learn.microsoft.com/en-au/windows/wsl/wsl-config
+# https://learn.microsoft.com/en-au/windows/wsl/
 #
 # Last reviewed release: v2.7.11
-# Default file path: %USERPROFILE%\.wslconfig
+# File path: `%USERPROFILE%\.wslconfig`
 # Initial support: Windows 10 2004
 
 [general]

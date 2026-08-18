@@ -2,20 +2,39 @@
 # https://metacpan.org/pod/CPAN
 #
 # Last reviewed release: v2.38
-# Default file path: ~/.cpan/CPAN/MyConfig.pm
+#
+# File paths in preference order (Unix-like):
+# - `$HOME/.cpan/CPAN/MyConfig.pm`
+# - `CPAN/MyConfig.pm`
+#   In all directories listed in `@INC`.
+# - `CPAN/Config.pm`
+#   In all directories listed in `@INC`.
+#
+# File paths in preference order (Windows):
+# - If `File::HomeDir` v0.52 or later is present:
+#   - `%LOCALAPPDATA%\.cpan\CPAN\MyConfig.pm`
+#   - `%HOME%\.cpan\CPAN\MyConfig.pm`
+#     If unset uses `%USERPROFILE%` falling back to `%HOMEDRIVE%%HOMEPATH%`.
+# - `%HOME%\.cpan\CPAN\MyConfig.pm`
+# - `%HOMEDRIVE%%HOMEPATH%\.cpan\CPAN\MyConfig.pm`
+# - `%USERPROFILE%\.cpan\CPAN\MyConfig.pm`
+# - `CPAN/MyConfig.pm`
+#   In all directories listed in `@INC`.
+# - `CPAN/Config.pm`
+#   In all directories listed in `@INC`.
 #
 # On Debian (or derived) distributions you may want to install:
-# - libcpan-distnameinfo-perl (CPAN::DistnameInfo)
-# - libcpan-sqlite-perl (CPAN::SQLite) [Warning: Has many deps!]
-# - liblog-log4perl-perl (Log::Log4perl) [Warning: Has many deps!]
-# - libmodule-build-perl (Module::Build) [Warning: Has many deps!]
-# - libmodule-signature-perl (Module::Signature)
-# - libterm-readline-gnu-perl (Term:ReadLine::Gnu)
-# - libyaml-libyaml-perl (YAML::XS)
+# - `libcpan-distnameinfo-perl` (`CPAN::DistnameInfo`)
+# - `libcpan-sqlite-perl` (`CPAN::SQLite`) [Warning: Has many deps!]
+# - `liblog-log4perl-perl` (`Log::Log4perl`) [Warning: Has many deps!]
+# - `libmodule-build-perl` (`Module::Build`) [Warning: Has many deps!]
+# - `libmodule-signature-perl` (`Module::Signature`)
+# - `libterm-readline-gnu-perl` (`Term:ReadLine::Gnu`)
+# - `libyaml-libyaml-perl` (`YAML::XS`)
 #
 # On Windows using Strawberry Perl you may want to install:
-# - Log::Log4perl
-# - Module::Signature (but see the `check_sigs` setting)
+# - `Log::Log4perl`
+# - `Module::Signature` (but see the `check_sigs` setting)
 
 use strict;
 use warnings;

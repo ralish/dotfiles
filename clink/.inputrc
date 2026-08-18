@@ -2,15 +2,16 @@
 # https://chrisant996.github.io/clink/clink.html#configuring-readline
 #
 # Last reviewed release: v1.9.30
-# Default file paths in preference order:
-# - %CLINK_INPUTRC%
+# File paths in preference order:
+# - `%CLINK_INPUTRC%`
 # - Clink profile directory
-#   Default: %LOCALAPPDATA%\clink
-#   Override: %CLINK_PROFILE%
-# - %USERPROFILE%
-# - %LOCALAPPDATA%
-# - %APPDATA%
-# - %HOME% or %HOMEDRIVE%%HOMEPATH%
+#   The default is `%LOCALAPPDATA%\clink` but it can be overridden by either
+#   the `--profile` command-line option to `clink inject` or `%CLINK_PROFILE%`.
+# - `%USERPROFILE%`
+# - `%LOCALAPPDATA%`
+# - `%APPDATA%`
+# - `%HOME%`
+#   If unset uses `%HOMEDRIVE%%HOMEPATH%`.
 #
 # Directories are searched for a `.inputrc` or `_inputrc` file (in that order).
 #
