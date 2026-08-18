@@ -1,3 +1,24 @@
+# Powershell
+# https://learn.microsoft.com/en-au/powershell/
+#
+# Last reviewed release: 7.6
+#
+# File path for PowerShell, current user, all hosts:
+# - Unix-like: `$HOME/.config/powershell/profile.ps1`
+# - Windows: `$HOME\Documents\PowerShell\Profile.ps1`
+#
+# File path for PowerShell, current user, current host:
+# - Unix-like: `$HOME/.config/powershell/Microsoft.PowerShell_profile.ps1`
+# - Windows: `$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1`
+#
+# File path for Windows PowerShell, current user, all hosts:
+# `$HOME\Documents\WindowsPowerShell\Profile.ps1`
+#
+# File path for Windows PowerShell, current user, current host:
+# `$HOME\Documents\WindowsPowerShell\Microsoft.PowerShell_Profile.ps1`
+#
+# Built-in settings are configured in `Settings\01-PowerShell.ps1`.
+
 #region Skip load
 
 # Skip loading profile if PowerShell was launched with `-NonInteractive`
