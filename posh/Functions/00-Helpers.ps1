@@ -292,6 +292,7 @@ Function Clear-DotFilesLoadData {
         # Settings
         'DotFilesFastLoad'
         'DotFilesLoadAsync'
+        'DotFilesPreferredEditors'
         'DotFilesTimings'
         'DotFilesVerbose'
 
