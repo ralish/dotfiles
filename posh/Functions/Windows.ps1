@@ -1181,6 +1181,179 @@ Function Global:Get-WellKnownSID {
 
 #endregion
 
+#region Storage
+
+# Create a new ISO image from one or more directories
+Function New-IsoImage {
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Path,
+
+        [Parameter(Mandatory)]
+        [String[]]$Source,
+
+        [Switch]$AddSourceAsDirectory,
+
+        [ValidateNotNullOrEmpty()]
+        [String]$VolumeName,
+
+        [ValidateSet('ISO9660', 'Joliet', 'UDF')]
+        [String[]]$FileSystem = @('ISO9660', 'Joliet', 'UDF'),
+
+        [Switch]$StrictFileSystemCompliance,
+
+        [ValidateSet('1', '2')]
+        [String]$Iso9660InterchangeLevel = '1',
+
+        [ValidateSet('1.02', '1.50', '2.00', '2.01', '2.50')]
+        [String]$UdfRevision = '1.02'
+    )
+
+    Function Clear-ComObjects {
+        [CmdletBinding()]
+        [OutputType([Void])]
+        Param()
+
+        if ($IsoImageStream) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($IsoImageStream) }
+        if ($IsoImageResult) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($IsoImageResult) }
+        if ($IsoImage) { $null = [Runtime.InteropServices.Marshal]::ReleaseComObject($IsoImage) }
+    }
+
+    if (!(Test-IsPathFullyQualified -Path $Path)) {
+        $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+    }
+
+    $Sources = [Collections.Generic.List[String]]::new()
+    foreach ($SourcePath in $Source) {
+        if (!(Test-IsPathFullyQualified -Path $SourcePath)) {
+            $SourcePath = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $SourcePath
+        }
+
+        $SourceItem = Get-Item -LiteralPath $SourcePath -ErrorAction 'Ignore'
+        if ($SourceItem -isnot [IO.DirectoryInfo]) {
+            $ErrMsg = "Source path is inaccessible or not a directory: ${SourcePath}"
+            $ErrExc = [ArgumentException]::new($ErrMsg, 'Source')
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Source)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
+        $Sources.Add($SourceItem.FullName)
+    }
+
+    # So we don't free existing COM objects in the (extremely unlikely) case
+    # that they're using the same variable names in a parent scope.
+    $IsoImage = $IsoImageResult = $IsoImageStream = $null
+
+    try {
+        # `IFileSystemImage` interface
+        # https://learn.microsoft.com/en-us/windows/win32/api/imapi2fs/nn-imapi2fs-ifilesystemimage
+        $IsoImage = New-Object -ComObject 'IMAPI2FS.MsftFileSystemImage'
+    } catch {
+        $Exc = $PSItem
+        switch -Regex ($Exc.Exception.Message) {
+            # REGDB_E_CLASSNOTREG
+            '\b0x80040154\b' { $ExcMsg = 'Unable to create ISO image as MsftFileSystemImage class is not available.' }
+            default { $ExcMsg = "MsftFileSystemImage COM object failed to activate: $($Exc.Exception.Message)" }
+        }
+
+        $ErrExc = [Exception]::new($ExcMsg, $Exc.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'ComApiFailed', $ErrCat, $null)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    # `FsiFileSystems` enumeration
+    # https://learn.microsoft.com/en-us/windows/win32/api/imapi2fs/ne-imapi2fs-fsifilesystems
+    $FsiFileSystems = @{
+        None    = 0
+        ISO9660 = 1
+        Joliet  = 2
+        UDF     = 4
+        Unknown = 0x40000000
+    }
+
+    try {
+        # Set to zero for an infinite number of blocks (i.e. no size limit)
+        $IsoImage.FreeMediaBlocks = 0
+
+        $FileSystemsToCreate = 0
+        foreach ($FileSystemValue in $FileSystem) {
+            $FileSystemsToCreate += $FsiFileSystems[$FileSystemValue]
+        }
+
+        Write-Verbose -Message "ISO image file system(s): $($FileSystem -join ', ')"
+        $IsoImage.FileSystemsToCreate = $FileSystemsToCreate
+
+        Write-Verbose -Message "Strict file system compliance: ${StrictFileSystemCompliance}"
+        $IsoImage.StrictFileSystemCompliance = $StrictFileSystemCompliance
+
+        if ($FileSystem -contains 'ISO9660') {
+            Write-Verbose -Message "ISO 9660 interchange level: ${Iso9660InterchangeLevel}"
+            $IsoImage.ISO9660InterchangeLevel = [Int]$Iso9660InterchangeLevel
+        }
+
+        if ($FileSystem -contains 'UDF') {
+            Write-Verbose -Message "UDF file system revision: ${UdfRevision}"
+            $UdfRevisionHex = "0x$([Int]($UdfRevision -replace '\.'))"
+            $IsoImage.UDFRevision = [Convert]::ToInt32($UdfRevisionHex, 16)
+        }
+
+        if ($VolumeName) {
+            Write-Verbose -Message "Volume name: ${VolumeName}"
+            $IsoImage.VolumeName = $VolumeName
+        }
+
+        $IsoImageRoot = $IsoImage.Root
+        foreach ($Tree in $Sources) {
+            Write-Verbose -Message "Adding source directory: ${Tree}"
+            $IsoImageRoot.AddTree($Tree, $AddSourceAsDirectory)
+        }
+
+        $IsoImageResult = $IsoImage.CreateResultImage()
+        $IsoImageStream = $IsoImageResult.ImageStream
+
+        # If we got this far the ISO image is ready to write and we have the
+        # resulting `IStream`. Open the destination file and truncate it.
+        $IsoImageFile = [IO.File]::Create($Path)
+
+        # The `IStream` we receive is returned as a COM object and we can't
+        # cast it to an `IStream` due to limitations in PowerShell's handling
+        # of type conversion. We could implement a type to handle it directly
+        # in the CLR's COM interop layer, but then we'd have to embed C# code
+        # and perform type compilation. Instead we'll use .NET reflection.
+        $IStreamType = [Runtime.InteropServices.ComTypes.IStream]
+        $ReadMethod = $IStreamType.GetMethod('Read')
+
+        # Create the buffer for reading the content of the `IStream`
+        $BufferSize = 65536 # 2 ^ 16
+        $Buffer = [Byte[]]::new($BufferSize)
+        $BufferBytesReadPtr = [Runtime.InteropServices.Marshal]::AllocHGlobal(4) # `ULONG`
+
+        try {
+            Write-Verbose -Message "Writing ISO image to: $($IsoImageFile.Name)"
+            while ($true) {
+                $ReadMethod.Invoke($IsoImageStream, @($Buffer, $BufferSize, $BufferBytesReadPtr))
+                $BufferBytesRead = [Runtime.InteropServices.Marshal]::ReadInt32($BufferBytesReadPtr)
+
+                if ($BufferBytesRead -le 0) { break }
+                $IsoImageFile.Write($Buffer, 0, $BufferBytesRead)
+            }
+        } finally {
+            [Runtime.InteropServices.Marshal]::FreeHGlobal($BufferBytesReadPtr)
+            $IsoImageFile.Dispose()
+        }
+    } catch {
+        $PSCmdlet.ThrowTerminatingError($PSItem)
+    } finally {
+        Clear-ComObjects
+    }
+}
+
+#endregion
+
 #region User accounts
 
 # Test if the user has administrator privileges
