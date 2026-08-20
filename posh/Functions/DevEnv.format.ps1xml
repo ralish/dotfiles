@@ -102,6 +102,7 @@
                                             switch -Regex ($Line) {
                                                 'Already up-to-date: v(\S+)' { return "$($Matches[1]) (up-to-date)" }
                                                 'v(\S+) to v(\S+),' { return "$($Matches[2]) (previous: $($Matches[1]))" }
+                                                'go\S+ to go\S+' { return 'Up-to-date' }
                                                 'current: v(\S+), latest: v(\S+)' { return "$($Matches[1]) (available: $($Matches[2]))" }
                                             }
                                         }
@@ -130,7 +131,8 @@
 
                                             switch -Regex ($Line) {
                                                 'Already up-to-date: v\S+' { $Current++ }
-                                                'v\S+ to v\S+' { $Updated++ }
+                                                'v\S+ to v\S+' { $Updated++; break }
+                                                'go\S+ to go\S+' { $Current++ }
                                                 'current: v\S+, latest: v\S+' { $Available++ }
                                             }
                                         }
