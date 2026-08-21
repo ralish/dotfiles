@@ -883,6 +883,50 @@ Function Global:Clear-NpmCache {
     }
 }
 
+# Clear uv cache
+Function Global:Clear-UvCache {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void], [String[]])]
+    Param()
+
+    if (!(Get-Command -Name 'uv' -ErrorAction 'Ignore')) {
+        $ExcMsg = 'Unable to clear uv cache as uv command not found.'
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = 'uv'
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, 'uv')
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    $GetArgs = 'cache', 'dir'
+    $GetCmd = "uv $($GetArgs -join ' ')"
+
+    $ClearArgs = 'cache', 'clean'
+    $ClearCmd = "uv $($ClearArgs -join ' ')"
+
+    Write-Verbose -Message "Retrieving uv cache path: ${GetCmd}"
+    $UvCache = (& uv @GetArgs) -join ''
+    if ($LASTEXITCODE -ne 0) {
+        $ExcMsg = "Failed to retrieve uv cache path (rc: ${LASTEXITCODE})."
+        $ErrExc = [Exception]::new($ExcMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $GetCmd)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    if ($PSCmdlet.ShouldProcess($UvCache, 'Clear')) {
+        Write-Verbose -Message "Clearing uv cache: ${ClearCmd}"
+        & uv @ClearArgs
+        if ($LASTEXITCODE -ne 0) {
+            $ExcMsg = "Failed to clear uv cache (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ClearCmd)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+    }
+}
+
 # Configure environment for Node.js development
 #
 # Environment variables
