@@ -109,8 +109,13 @@ Function Global:Clear-AllDevCaches {
     Param()
 
     DynamicParam {
-        $ValidTasks = [String[]]@('Docker', 'gem', 'Go', 'Gradle', 'Maven', 'npm', 'NuGet', 'pip', 'uv')
-        $TasksVsa = [Management.Automation.ValidateSetAttribute]::new($ValidTasks)
+        $ValidTasks = 'Docker', 'gem', 'Go', 'Gradle', 'Maven', 'npm', 'NuGet', 'pip', 'uv'
+
+        if (Test-IsWindows) {
+            $ValidTasks = ($ValidTasks + 'Symbols') | Sort-Object
+        }
+
+        $TasksVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]$ValidTasks)
 
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
@@ -229,6 +234,16 @@ Function Global:Clear-AllDevCaches {
 
             try {
                 Clear-PipCache
+            } catch { $PSCmdlet.WriteError($PSItem) }
+        }
+
+        if ($Tasks -contains 'Symbols') {
+            $WriteProgressParams['Status'] = 'Clearing symbol data'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            Write-Progress @WriteProgressParams
+
+            try {
+                Clear-SymbolData
             } catch { $PSCmdlet.WriteError($PSItem) }
         }
 
