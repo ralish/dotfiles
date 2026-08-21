@@ -499,6 +499,87 @@ Function Global:Switch-Python {
 
 #region Windows
 
+# Clear debugging symbols data
+Function Global:Clear-SymbolData {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Void])]
+    Param()
+
+    $SymbolPaths = [Collections.Generic.List[String]]::new()
+
+    $DefaultSymbolDirs = @(
+        "${Env:SystemDrive}\Symbols"
+        "${Env:SystemDrive}\SymCache"
+        "${Env:ProgramData}\WindowsPerformanceRecorder\NGenPdbs_Cache"
+        "${Env:LOCALAPPDATA}\RefSrcSymbols"
+        "${Env:LOCALAPPDATA}\SourceServer"
+        "${Env:LOCALAPPDATA}\SymbolSourceSymbols"
+    )
+
+    $SymbolPathEnvVars = '_NT_SYMBOL_PATH', '_NT_ALT_SYMBOL_PATH', '_NT_SYMCACHE_PATH'
+
+    foreach ($SymbolPath in $DefaultSymbolDirs) {
+        if (!(Test-IsPathFullyQualified -Path $SymbolPath)) {
+            Write-Warning -Message "Ignoring relative default symbols path: ${SymbolPath}"
+            continue
+        }
+
+        $PathItem = Get-Item -LiteralPath $SymbolPath -ErrorAction 'Ignore'
+        if ($PathItem -is [IO.DirectoryInfo]) {
+            $SymbolPaths.Add($SymbolPath)
+        } elseif ($null -ne $PathItem) {
+            Write-Warning -Message "Default symbols path is not a directory: ${SymbolPath}"
+        }
+    }
+
+    foreach ($SymbolPathEnvVar in $SymbolPathEnvVars) {
+        $SymbolPathEnvVarPath = "Env:\${SymbolPathEnvVar}"
+        if (!(Test-Path -LiteralPath $SymbolPathEnvVarPath)) { continue }
+
+        $SymbolPathEnvVarValue = (Get-Item -LiteralPath $SymbolPathEnvVarPath).Value
+        if ($SymbolPathEnvVar -eq '_NT_SYMCACHE_PATH') {
+            $SymbolPathEnvVarSeparator = '*'
+        } else {
+            $SymbolPathEnvVarSeparator = [IO.Path]::PathSeparator
+        }
+
+        foreach ($SymbolPath in $SymbolPathEnvVarValue.Split($SymbolPathEnvVarSeparator)) {
+            if ([String]::IsNullOrWhiteSpace($SymbolPath)) { continue }
+
+            if ($SymbolPathEnvVar -ne '_NT_SYMCACHE_PATH') {
+                if ($SymbolPath -match '^srv\*(.+)\*.+' -or $SymbolPath -match '^cache\*(.+)') {
+                    $SymbolPath = $Matches[1]
+                }
+            }
+
+            if (!(Test-IsPathFullyQualified -Path $SymbolPath)) {
+                Write-Warning -Message "Ignoring relative ${SymbolPathEnvVar} path: ${SymbolPath}"
+                continue
+            }
+
+            if ($SymbolPath -match '^\\\\') {
+                Write-Warning -Message "Ignoring UNC ${SymbolPathEnvVar} path: ${SymbolPath}"
+                continue
+            }
+
+            $PathItem = Get-Item -LiteralPath $SymbolPath -ErrorAction 'Ignore'
+            if ($PathItem -is [IO.DirectoryInfo]) {
+                $SymbolPaths.Add($SymbolPath)
+            } elseif ($null -ne $PathItem) {
+                Write-Warning -Message "${SymbolPathEnvVar} path is not a directory: ${SymbolPath}"
+            }
+        }
+    }
+
+    foreach ($SymbolPath in $SymbolPaths) {
+        $SymbolPath = '{0}{1}*' -f [WildcardPattern]::Escape($SymbolPath), [IO.Path]::DirectorySeparatorChar
+
+        if ($PSCmdlet.ShouldProcess($SymbolPath, 'Clear')) {
+            Remove-Item -Path $SymbolPath -Recurse -Force -Verbose:$false
+        }
+    }
+}
+
 # Configure environment for Windows SDK tools
 Function Global:Switch-WindowsSDK {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
