@@ -397,21 +397,12 @@ Function Global:Add-FileToEmptyDirectories {
     )
 
     if (!$Path) {
-        $Path += $PWD.Path
+        $Path += $ExecutionContext.SessionState.Path.CurrentFileSystemLocation
     }
 
     foreach ($DirPath in $Path) {
         if (!(Test-IsPathFullyQualified -Path $DirPath)) {
-            if ($PWD.Provider.Name -ne 'FileSystem') {
-                $ExcMsg = "Skipping relative path as current path is not a filesystem: ${DirPath}"
-                $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
-                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $DirPath)
-                $PSCmdlet.WriteError($ErrRec)
-                continue
-            }
-
-            $DirPath = Join-Path -Path $PWD.Path -ChildPath $DirPath
+            $DirPath = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $DirPath
         }
 
         try {
@@ -477,12 +468,12 @@ Function Global:Get-DirectorySummary {
 
     Process {
         if (!$Path) {
-            $Path = Get-Location -PSProvider 'FileSystem'
+            $Path = $ExecutionContext.SessionState.Path.CurrentFileSystemLocation
         }
 
         $Directory = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
         if ($Directory -isnot [IO.DirectoryInfo]) {
-            $ExcMsg = "Path is not a directory: ${Path}"
+            $ExcMsg = "Path is inaccessible or not a directory: ${Path}"
             $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)

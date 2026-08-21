@@ -432,7 +432,7 @@ Function Global:Invoke-GitRepoCommand {
     )
 
     Begin {
-        $OriginalLocation = Get-Location
+        $OriginalLocation = $ExecutionContext.SessionState.Path.CurrentFileSystemLocation
 
         if (!$Path) {
             $Path += $PWD.Path
@@ -462,15 +462,6 @@ Function Global:Invoke-GitRepoCommand {
     Process {
         foreach ($GitPath in $Path) {
             if (!(Test-IsPathFullyQualified -Path $GitPath)) {
-                if ($OriginalLocation.Provider.Name -ne 'FileSystem') {
-                    $ExcMsg = "Skipping relative path as current path is not a filesystem: ${GitPath}"
-                    $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
-                    $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
-                    $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $GitPath)
-                    $PSCmdlet.WriteError($ErrRec)
-                    continue
-                }
-
                 $GitPath = Join-Path -Path $OriginalLocation -ChildPath $GitPath
             }
 

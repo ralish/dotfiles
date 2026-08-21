@@ -683,7 +683,7 @@ Function Global:Clear-GradleCache {
     if ($PathItem -is [IO.DirectoryInfo]) {
         $GradleCachePath = '{0}{1}*' -f [WildcardPattern]::Escape($GradleCache), [IO.Path]::DirectorySeparatorChar
 
-        if ($PSCmdlet.ShouldProcess($GradleCache, 'Clear')) {
+        if ($PSCmdlet.ShouldProcess($GradleCachePath, 'Clear')) {
             Remove-Item -Path $GradleCachePath -Recurse -Force -Verbose:$false
         }
     } elseif ($null -ne $PathItem) {
@@ -727,7 +727,7 @@ Function Global:Clear-MavenCache {
     if ($PathItem -is [IO.DirectoryInfo]) {
         $MvnCachePath = '{0}{1}*' -f [WildcardPattern]::Escape($MvnCache), [IO.Path]::DirectorySeparatorChar
 
-        if ($PSCmdlet.ShouldProcess($MvnCache, 'Clear')) {
+        if ($PSCmdlet.ShouldProcess($MvnCachePath, 'Clear')) {
             Remove-Item -Path $MvnCachePath -Recurse -Force -Verbose:$false
         }
     } elseif ($null -ne $PathItem) {
