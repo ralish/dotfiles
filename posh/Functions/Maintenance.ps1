@@ -109,7 +109,7 @@ Function Global:Clear-AllDevCaches {
     Param()
 
     DynamicParam {
-        $ValidTasks = [String[]]@('Docker', 'gem', 'Go', 'Gradle', 'Maven', 'npm', 'NuGet', 'pip')
+        $ValidTasks = [String[]]@('Docker', 'gem', 'Go', 'Gradle', 'Maven', 'npm', 'NuGet', 'pip', 'uv')
         $TasksVsa = [Management.Automation.ValidateSetAttribute]::new($ValidTasks)
 
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
@@ -229,6 +229,16 @@ Function Global:Clear-AllDevCaches {
 
             try {
                 Clear-PipCache
+            } catch { $PSCmdlet.WriteError($PSItem) }
+        }
+
+        if ($Tasks -contains 'uv') {
+            $WriteProgressParams['Status'] = 'Clearing uv cache'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            Write-Progress @WriteProgressParams
+
+            try {
+                Clear-UvCache
             } catch { $PSCmdlet.WriteError($PSItem) }
         }
 
