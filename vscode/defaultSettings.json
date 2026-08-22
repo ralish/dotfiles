@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code defaults
      *
-     * Exported from release: v1.133.0
+     * Exported from release: v1.134.0
      *
      * Obtained from "Preferences: Open Default Settings (JSON)" command.
      */
@@ -328,6 +328,7 @@
     // Select the Doxygen section tags that you would like to appear on hover in the tooltip area when the 'Simplify Structured Comments' setting is enabled.
     "C_Cpp.doxygen.sectionTags": [
         "attention",
+        "important",
         "tparam",
         "param",
         "result",
@@ -972,6 +973,11 @@
     //
     "Lua.runtime.builtin": {},
 
+    // Enable LuaJIT extension syntax (requires `Lua.runtime.version` to be set to `LuaJIT`).
+    // Each extension can also be enabled individually via `Lua.runtime.nonstandardSymbol`.
+    //
+    "Lua.runtime.enableLuaJITExtensions": false,
+
     // File encoding. The `ansi` option is only available under the `Windows` platform.
     //  - utf8: TODO: Needs documentation
     //  - ansi: TODO: Needs documentation
@@ -1091,6 +1097,9 @@
     // * Jass
     //
     "Lua.workspace.checkThirdParty": "",
+
+    // In addition to the current workspace, which directories `dofile` will treat as a possible root. The files in these directories will be loaded immediately.
+    "Lua.workspace.dofileRoots": [],
 
     // Ignored files and directories (Use `.gitignore` grammar).
     "Lua.workspace.ignoreDir": [".vscode"],
@@ -2593,13 +2602,38 @@
     // Maximum number of debug events kept in memory per agent host session for the agent debug panel. Older events beyond this limit are dropped from the in-memory buffer, which also lowers the totals (such as token usage) shown in the panel overview.
     "chat.agentHost.agentDebugLog.maxEventsInMemory": 10000,
 
+    // Chat Agent Host Starter
+    // Controls whether enabled Agent Merge sessions address unresolved review threads, changes-requested reviews, and new pull request comments from repository maintainers or the Copilot pull request reviewer.
+    "chat.agentHost.agentMerge.addressReviews": true,
+
+    // Enables the experimental Agent Merge controller and its commands. Agent Merge can monitor an agent session's pull request, ask the agent to address selected blockers, and optionally merge the pull request when it is ready.
+    "chat.agentHost.agentMerge.enabled": false,
+
+    // Controls whether enabled Agent Merge sessions ask the agent to fix failed required CI checks.
+    "chat.agentHost.agentMerge.fixCI": true,
+
+    // Controls the native merge method used by Agent Merge.
+    //  - auto: Uses the first repository-compatible method in this order: squash, merge commit, rebase.
+    //  - squash: Uses squash merge when the repository permits it.
+    //  - merge: Uses a merge commit when the repository permits it.
+    //  - rebase: Uses rebase merge when the repository permits it.
+    "chat.agentHost.agentMerge.mergeMethod": "auto",
+
+    // Controls whether the Agent Host automatically merges or enqueues pull requests for enabled Agent Merge sessions after all selected maintenance work is complete.
+    "chat.agentHost.agentMerge.mergePullRequest": false,
+
+    // Controls whether review-thread replies posted by Agent Merge include an automated-reply attribution note.
+    "chat.agentHost.agentMerge.replyAttribution": true,
+
+    // Controls whether enabled Agent Merge sessions ask the agent to update branches that are behind or resolve merge conflicts.
+    "chat.agentHost.agentMerge.resolveConflicts": true,
+
     // When enabled, logs all AHP transport messages for agent host connections to JSONL files under the window's log directory.
     "chat.agentHost.ahpJsonlLoggingEnabled": false,
 
-    // When enabled, the Agents window opens without forcing GitHub sign-in as long as at least one agent is usable without GitHub (for example Claude in native mode with your own Anthropic credentials). When disabled (the default), GitHub sign-in is required.
+    // When enabled, Agent Host sessions remain available while signed out. The Agents window opens without forcing GitHub sign-in, and editor chat lets you select the Copilot harness. Agents usable without GitHub (for example Codex with ChatGPT authentication or Claude in native mode with your own Anthropic credentials) work while signed out; agents that require GitHub prompt you to add a model or sign in. When disabled (the default), GitHub sign-in is required before the Agents window opens.
     "chat.agentHost.allowSignedOutWhenUsable": false,
 
-    // Chat Agent Host Starter
     // When enabled, the agent host wires up the BYOK ('bring your own key') language-model bridge so extension-provided BYOK models can run in agent-host sessions. The agent host process must be restarted for changes to take effect.
     "chat.agentHost.byokModels.enabled": false,
 
@@ -2609,10 +2643,21 @@
     // When enabled, the agent host registers the Codex provider (subject to the Codex SDK being reachable). Enabling takes effect without restarting the agent host.
     "chat.agentHost.codexAgent.enabled": false,
 
+    // When enabled, maps supported legacy VS Code settings to equivalent Copilot SDK managed settings for local Agent Host sessions. This compatibility bridge is temporary and is not used for new settings.
+    "chat.agentHost.copilot.mapLegacySettingsToManagedSettings": false,
+
+    // Per-model capability overrides for Copilot SDK agent sessions, keyed by model id (`*` matches every model; a specific entry wins field-by-field), intended for evaluating models against an existing model's profile. Declare an aliased `family` (for example `claude-opus-4.8`) to route the model to that family's tuned system prompt and tool profile without changing the model id sent to the runtime — so a preview model can be evaluated against a known prompt while still running on its own endpoint — a `reasoningEffort` to pin its effort level, `availableTools`/`excludedTools` to filter its tool set, or `modelCapabilities` to override individual capability limits (e.g. vision support, context window size) passed through to the SDK. All overrides apply when a session launches or resumes. On a mid-session model change, only the new model's `reasoningEffort` is applied; the session keeps its launch-time family, tool filters, and model capabilities. Only affects Copilot agent sessions.
+    //
+    // **Note**: This is an advanced setting for experimentation.
+    "chat.agentHost.copilot.modelCapabilityOverrides": {},
+
     // Overrides the reasoning effort for Copilot SDK agent sessions regardless of the per-model picker value. Set it to a level the selected model supports (for example `low`, `medium`, `high`, or `xhigh`) — choosing a level the model does not support may be rejected by the model. A value that isn't a recognized effort level is ignored and the session falls back to the picker value. Applied when a session is created and when its model changes. Only affects Copilot CLI agent sessions.
     //
     // **Note**: This is an advanced setting for experimentation.
     "chat.agentHost.copilot.reasoningEffortOverride": "",
+
+    // When enabled, requests concise reasoning summaries for supported Copilot SDK agent sessions.
+    "chat.agentHost.copilot.reasoningSummary.enabled": false,
 
     // Minimum number of tools before MCP and external tools are deferred behind tool search. Set to 0 to always defer external tools. Only effective when tool search is enabled.
     "chat.agentHost.copilot.toolSearch.deferThreshold": 1,
@@ -2628,10 +2673,11 @@
     // When enabled, Copilot SDK sessions use the Agent Host terminal tool override instead of the SDK's default terminal behavior.
     "chat.agentHost.customTerminalTool.enabled": false,
 
-    // Per-model capability overrides for Copilot SDK agent sessions, keyed by model id, intended for evaluating preview models against an existing model's profile. For each model id, declare an aliased `family` (for example `claude-opus-4-8`) to route the model to that family's tuned system prompt without a code change; the model id sent to the runtime is unaffected. Only affects Copilot CLI agent sessions.
-    //
-    // **Note**: This is an advanced setting for experimentation.
-    "chat.agentHost.modelCapabilityOverrides": {},
+    // When enabled, the active agent names new sessions and chats using rename tools. When disabled, a utility model generates titles. Changes apply to sessions and chats created afterward.
+    "chat.agentHost.experimental.activeAgentTitleGeneration": false,
+
+    // When enabled, agents receive guidance for using rich links to issues, pull requests, commits, sessions, and chats, plus running task markers, when creating or editing Markdown plan documents.
+    "chat.agentHost.experimental.markdownPlanRichLinks": false,
 
     // When enabled, Copilot SDK sessions running a Claude Opus 4.8 model apply Opus 4.8-tuned system-prompt section overrides on top of the default system message.
     "chat.agentHost.opus48Prompt.enabled": false,
@@ -2654,11 +2700,15 @@
     // Output path for span JSON lines when exporter type is `file`. Configurable in user settings only. Sets `COPILOT_OTEL_FILE_EXPORTER_PATH`.
     "chat.agentHost.otel.outfile": "",
 
-    // Sandbox mode for the Copilot SDK's built-in shell tool. Only takes effect when `chat.agentHost.customTerminalTool.enabled` is `false`; when the Agent Host's own terminal tool is enabled, the engine sandbox is controlled by `chat.agent.sandbox.enabled`. The sandbox applies only to requests that run with default permissions — not when approvals are bypassed — and is not supported on Windows yet.
+    // Sandbox mode for the Copilot SDK's built-in shell tool on macOS and Linux. Only takes effect when `chat.agentHost.customTerminalTool.enabled` is `false`; when the Agent Host's own terminal tool is enabled, the engine sandbox is controlled by `chat.agent.sandbox.enabled`. The sandbox applies only to requests that run with manual permissions — not when approvals are bypassed. Unrestricted network is controlled by `chat.agent.sandbox.allowNetwork`. Use `chat.agentHost.sdkSandbox.enabledWindows` on Windows.
     //  - off: No sandbox policy is forwarded for the SDK's built-in shell tool — commands run unsandboxed.
-    //  - on: The SDK's built-in shell tool runs inside a sandbox using the configured filesystem policy and host-list-restricted network.
-    //  - allowNetwork: The SDK's built-in shell tool runs inside a sandbox with unrestricted outbound network access.
+    //  - on: The SDK's built-in shell tool runs inside a sandbox using the configured filesystem policy with outbound network blocked.
     "chat.agentHost.sdkSandbox.enabled": "off",
+
+    // Sandbox mode for the Copilot SDK's built-in shell tool on Windows. Only takes effect when `chat.agentHost.customTerminalTool.enabled` is `false`. This setting is independent of `chat.agentHost.sdkSandbox.enabled` so Windows sandbox support can be enabled separately. Unrestricted network is controlled by `chat.agent.sandbox.allowNetwork`.
+    //  - off: No sandbox policy is forwarded for the SDK's built-in shell tool on Windows — commands run unsandboxed.
+    //  - on: The SDK's built-in shell tool runs inside the Windows sandbox using the configured filesystem policy.
+    "chat.agentHost.sdkSandbox.enabledWindows": "off",
 
     // When enabled, Copilot sessions automatically discover and use the operating system's proxy configuration when no proxy environment variable is set.
     "chat.agentHost.systemProxy.enabled": true,
@@ -2668,6 +2718,14 @@
 
     // Controls whether legacy extension host Copilot CLI chat sessions are migrated in place to the Agent host when opened, so their history becomes editable. When disabled, legacy sessions open as before.
     "chat.agentSessions.migrateLegacyCopilotCli": false,
+
+    // Controls which external agent sessions, created outside VS Code's Agent Host, are shown.
+    //  - none: Only shows sessions created by the Agent Host.
+    //  - recent: Shows the 2 most recently updated external sessions from the last 7 days.
+    //  - last24Hours: Shows external sessions updated in the last 24 hours.
+    //  - last7Days: Shows external sessions updated in the last 7 days.
+    //  - all: Shows all sessions discovered from supported external agent applications.
+    "chat.agentSessions.showExternal": "none",
 
     // Specify location(s) of agent skills (`SKILL.md`) that can be used in Chat Sessions. [Learn More](https://aka.ms/vscode-agent-skills).
     //
@@ -2744,15 +2802,18 @@
     // Show the context window usage indicator in the chat input.
     "chat.contextUsage.enabled": true,
 
-    // Controls whether the Chat Customizations editor shows the prompt file migration affordances for agent-host harnesses. When disabled, the migration card and sidebar shortcut are hidden.
+    // Controls whether the Chat Customizations editor offers to convert prompt files into skills for agent-host harnesses, which ignore prompt files. When disabled, the migration card and sidebar shortcut are hidden.
     "chat.customizations.promptMigration.enabled": false,
 
     // Controls whether the Chat Customizations editor shows a structured preview for markdown customization files (agents, skills, instructions, prompts). When disabled, the editor always opens the raw markdown in the embedded code editor.
     "chat.customizations.structuredPreview.enabled": false,
 
-    // Controls the default configuration for new agent sessions (such as Copilot CLI). You can still change the mode and approval behavior per session, and each session remembers what was used.
+    // Controls whether the Chat Customizations editor offers to move agents and instructions stored in user data to the active agent-host harness, which ignores the user data location. When disabled, the migration card and sidebar shortcut are hidden.
+    "chat.customizations.userDataMigration.enabled": false,
+
+    // Controls the default configuration for new agent sessions (such as Copilot). You can still change the mode and approval behavior per session, and each session remembers what was used.
     "chat.defaultConfiguration": {
-        "approvals": "default",
+        "approvals": "manual",
         "mode": "interactive"
     },
 
@@ -2760,7 +2821,7 @@
     "chat.defaultModel": "",
 
     // Chat Agent Host
-    // When enabled, new editor and panel chat sessions default to the Agent Host Copilot CLI instead of the local harness.
+    // When enabled, new editor and panel chat sessions default to the Agent Host Copilot SDK instead of the local harness.
     "chat.defaultToCopilotHarness": false,
 
     // Enables chat participant autodetection for panel chat.
@@ -2808,7 +2869,7 @@
     // When enabled, shows the VS Code local chat harness in the chat picker. This setting is ignored in virtual workspaces, where the local chat harness is always available.
     "chat.editor.localAgent.enabled": true,
 
-    // When enabled, prefers the Agent Host Copilot CLI for new editor chat sessions. If the local harness is selected, it is replaced with Copilot once.
+    // When enabled, uses the Agent Host Copilot SDK whenever the local harness would otherwise be selected for a new editor chat session. Claude and Codex selections are unaffected.
     "chat.editor.preferCopilotHarness": false,
 
     // Controls whether lines should wrap in chat codeblocks.
@@ -2846,8 +2907,11 @@
     // Enables incremental rendering with optional block-level animation when streaming chat responses.
     "chat.experimental.incrementalRendering.enabled": false,
 
-    // Controls whether the permissions picker shows an inline "Sandboxing for terminal" toggle on the Default Permissions option. The toggle reflects and updates `chat.agent.sandbox.enabled`.
+    // Controls whether the permissions picker shows an inline "Sandboxing for terminal" toggle on the Manual permissions option. For Copilot SDK sessions using the built-in shell tool, the toggle reflects and updates `chat.agentHost.sdkSandbox.enabled` or `chat.agentHost.sdkSandbox.enabledWindows`.
     "chat.experimental.permissionsSandboxToggle.enabled": false,
+
+    // Controls whether supported links in chat are rendered as rich links with live metadata. Enabling this may make authenticated requests to services such as GitHub.
+    "chat.experimental.richLinks.enabled": false,
 
     // Controls the wording and icons used by actions that archive and unarchive chat sessions, as well as the label of the archived sessions section.
     //  - archive: Use Archive, Archive All, Unarchive, and Unarchive All.
@@ -2870,6 +2934,7 @@
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.7 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.3-Codex (copilot): OpenAI Codex model specialized for code generation, debugging, and software development tasks.
     //  - GPT-5.4 (copilot): OpenAI GPT model for coding and general assistance.
@@ -2877,6 +2942,7 @@
     //  - GPT-5.6 Luna (copilot): OpenAI GPT model for coding and general assistance.
     //  - GPT-5.6 Terra (copilot): OpenAI GPT model for coding and general assistance.
     //  - Grok 4.5 (copilot): xAI Grok model optimized for fast code generation and development tasks.
+    //  - Grok 4.6 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Kimi K2.7 Code (copilot)
     //  - Kimi K3 (copilot)
     //  - MAI-Code-1-Flash (copilot)
@@ -2919,7 +2985,7 @@
 
     // When enabled, the active editor is automatically forwarded as context, even when it would otherwise only be suggested. Selections and explicitly attached files are always included regardless of this setting.
     //
-    // Note: this setting currently only applies to Agent Host sessions (such as the Copilot CLI).
+    // Note: this setting currently only applies to Agent Host sessions (such as Copilot).
     "chat.implicitContext.includeActiveEditor": true,
 
     // Controls whether the new implicit context flow is shown. In Ask and Edit modes, the context will automatically be included. When using an agent, context will be suggested as an attachment. Selections are always included as context.
@@ -3032,6 +3098,7 @@
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.7 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.3-Codex (copilot): OpenAI Codex model specialized for code generation, debugging, and software development tasks.
     //  - GPT-5.4 (copilot): OpenAI GPT model for coding and general assistance.
@@ -3039,6 +3106,7 @@
     //  - GPT-5.6 Luna (copilot): OpenAI GPT model for coding and general assistance.
     //  - GPT-5.6 Terra (copilot): OpenAI GPT model for coding and general assistance.
     //  - Grok 4.5 (copilot): xAI Grok model optimized for fast code generation and development tasks.
+    //  - Grok 4.6 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Kimi K2.7 Code (copilot)
     //  - Kimi K3 (copilot)
     //  - MAI-Code-1-Flash (copilot)
@@ -3087,6 +3155,9 @@
     // Controls whether the last session is restored in panel after restart.
     "chat.restoreLastPanelSession": false,
 
+    // Controls whether all dirty editors except untitled editors are saved before sending a chat message.
+    "chat.saveBeforeSend": true,
+
     // Enable session sync to GitHub.com. When enabled, Copilot session data is synced to your GitHub account for cross-device access and richer insights. Requires `github.copilot.chat.localIndex.enabled` to also be enabled.
     "chat.sessionSync.enabled": false,
 
@@ -3128,7 +3199,12 @@
         "**/*-lock.{yaml,json}": false,
         "**/*.lock": false,
         "**/*.{code-workspace,csproj,fsproj,vbproj,vcxproj,proj,targets,props,gradle,gradle.kts}": false,
+        "**/.claude/agents/**": false,
+        "**/.claude/settings.json": false,
+        "**/.claude/settings.local.json": false,
         "**/.git/**": false,
+        "**/.github/agents/**": false,
+        "**/.github/hooks/**": false,
         "**/.vscode/*.json": false,
         "**/gradle.properties": false,
         "**/ruby_lsp/*/addon": false,
@@ -4759,6 +4835,20 @@
     //  - inherit: Lines will wrap according to the `editor.wordWrap` setting.
     "diffEditor.wordWrap": "inherit",
 
+    // Docker DX
+    // Be notified when Docker Engine is not available.
+    "docker.extension.dockerEngineAvailabilityPrompt": true,
+
+    // Render a divider line between each build stage of a Dockerfile.
+    "docker.extension.editor.dockerfileBuildStageDecorationLines": true,
+
+    // Enable Compose editing features from the Docker DX extension. Note that changing this value requires a **restart** of Visual Studio Code to take effect.
+    //
+    // If you have [Red Hat's YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml), note that both Docker DX and Red Hat's YAML extension are handling Compose files. This creates duplicate completions, hovers, and syntax errors.
+    //
+    // You can follow the steps [here](https://github.com/docker/vscode-extension/blob/main/FAQ.md) to update your `settings.json` to turn off Compose support in the YAML extension and streamline your experience.
+    "docker.extension.enableComposeLanguageServer": true,
+
     // Controls the diagnostic severity for the deprecated MAINTAINER instruction
     "docker.languageserver.diagnostics.deprecatedMaintainer": "warning",
 
@@ -4788,6 +4878,27 @@
 
     // Controls whether the Dockerfile formatter should ignore instructions that span multiple lines when formatting
     "docker.languageserver.formatter.ignoreMultilineInstructions": false,
+
+    // Enter the port on localhost where the language server is running, used for debugging.
+    "docker.lsp.debugServerPort": null,
+
+    // Determines if `critical_high_vulnerabilities` diagnostics should be shown. If `docker.lsp.experimental.vulnerabilityScanning` is false then this setting will be ignored.
+    "docker.lsp.experimental.scout.criticalHighVulnerabilities": true,
+
+    // Determines if `not_pinned_digest` diagnostics should be shown. If `docker.lsp.experimental.vulnerabilityScanning` is false then this setting will be ignored.
+    "docker.lsp.experimental.scout.notPinnedDigest": false,
+
+    // Determines if `recommended_tag` diagnostics should be shown. If `docker.lsp.experimental.vulnerabilityScanning` is false then this setting will be ignored.
+    "docker.lsp.experimental.scout.recommendedTag": false,
+
+    // Determines if `vulnerabilities` diagnostics should be shown. If `docker.lsp.experimental.vulnerabilityScanning` is false then this setting will be ignored.
+    "docker.lsp.experimental.scout.vulnerabilities": true,
+
+    // Enable image analysis of Dockerfiles (Experimental)
+    "docker.lsp.experimental.vulnerabilityScanning": true,
+
+    // Determines what telemetry is collected by Docker. If vscode.env.isTelemetryEnabled is false, then telemetry collection is disabled regardless of what has been set for this configuration value.
+    "docker.lsp.telemetry": "all",
 
     // The command to run after cloning the dotfiles repository. Defaults to run the first file of `install.sh`, `install`, `bootstrap.sh`, `bootstrap`, `setup.sh` and `setup` found in the dotfiles repository's root folder.
     "dotfiles.installCommand": "",
@@ -5262,6 +5373,7 @@
     //  - ms-dotnettools.csdevkit: Official C# extension from Microsoft
     //  - ms-dotnettools.csharp: Base language support for C#
     //  - vscode.css-language-features: Provides rich language support for CSS, LESS and SCSS files.
+    //  - docker.docker: Edit smarter, ship faster with an enhanced Docker-development experience
     //  - tamasfe.even-better-toml: Fully-featured TOML support
     //  - ms-python.flake8: Linting support for Python files using Flake8.
     //  - golang.go: Rich Go language support for Visual Studio Code
@@ -5370,9 +5482,14 @@
 
     // Defines a default formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
+    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
+    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
+    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
+    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
+    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -5384,6 +5501,7 @@
     //  - ms-dotnettools.csdevkit: Official C# extension from Microsoft
     //  - ms-dotnettools.csharp: Base language support for C#
     //  - vscode.css-language-features: Provides rich language support for CSS, LESS and SCSS files.
+    //  - docker.docker: Edit smarter, ship faster with an enhanced Docker-development experience
     //  - tamasfe.even-better-toml: Fully-featured TOML support
     //  - ms-python.flake8: Linting support for Python files using Flake8.
     //  - golang.go: Rich Go language support for Visual Studio Code
@@ -5392,7 +5510,6 @@
     //  - ms-python.isort: Import organization support for Python files using isort.
     //  - redhat.java: Java Linting, Intellisense, formatting, refactoring, Maven/Gradle support and more...
     //  - samuelcolvin.jinjahtml: Syntax highlighting for jinja(2) including HTML, Markdown, YAML, Ruby and LaTeX templates
-    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - sumneko.lua: Lua Language Server coded by Lua
     //  - ms-vscode.makefile-tools: Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.
     //  - vscode.markdown-language-features: Provides rich language support for Markdown.
@@ -5400,7 +5517,6 @@
     //  - josee9988.minifyall: Minifier for JSON, CSS, HTML, XML, TWIG, LESS, SASS, SCSS, JavaScript, JSONC, and JavaScriptReact(testing). Compressor of files and folders. You will love its simplicity!
     //  - ms-python.mypy-type-checker: Type checking support for Python files using Mypy.
     //  - vscode.php-language-features: Provides rich language support for PHP files.
-    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - ms-python.pylint: Linting support for Python files using Pylint.
     //  - ms-python.python: Python language support with extension access points for IntelliSense (Pylance), Debugging (Python Debugger), linting, formatting, refactoring, unit tests, and more.
     //  - mechatroner.rainbow-csv: Highlight CSV and TSV files, Run SQL-like queries
@@ -5408,7 +5524,6 @@
     //  - ionutvmi.reg: Windows Registry Script (.reg) Language package for VSCode
     //  - ms-vscode-remote.remote-ssh-edit: Edit SSH configuration files
     //  - dnut.rewrap-revived: Hard word wrapping for comments and other text at a given column.
-    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - timonwong.shellcheck: Integrates ShellCheck into VS Code, a linter for Shell scripts.
     //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
     //  - XadillaX.viml: Vim Script language server protocol and highlighting support for VSCode.
@@ -5421,12 +5536,10 @@
     //  - bmewburn.vscode-intelephense-client: PHP code intelligence for Visual Studio Code
     //  - vscjava.vscode-java-debug: A lightweight Java debugger for Visual Studio Code
     //  - vscjava.vscode-java-pack: Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven/Gradle support, project management and more
-    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
-    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
     //  - amazonwebservices.aws-toolkit-vscode: Including CodeCatalyst, Infrastructure Composer, and support for Lambda, S3, CloudWatch Logs, CloudFormation, and many other services.
     //  - ms-vscode.azure-repos: Remotely browse and edit any Azure Repos
@@ -7694,9 +7807,6 @@
     // Choose a routing tier for the Auto model, biasing model selection toward cost, capability, or speed. When disabled, the service picks the routing profile.
     "github.copilot.chat.autoMode.tiers.enabled": false,
 
-    // Use the single-call Auto API to select the best model for each request. When disabled, model selection falls back to the previous two-call flow.
-    "github.copilot.chat.autoMode.v2.enabled": true,
-
     // Overrides the routing tier that the `Auto` model requests, ignoring both the tier picked in the model picker and the tier inline chat defaults to. Accepts `eco`, `balanced`, `max`, or `fast`. Used by evals.
     //
     // **Note**: This is an advanced debugging setting.
@@ -7767,11 +7877,6 @@
 
     // Enable the Cloud Agent. When disabled, the Cloud Agent will not be available in 'Continue In' context menus.
     "github.copilot.chat.cloudAgent.enabled": true,
-
-    // Selects which backend the Cloud Agent uses to create and manage cloud sessions. This setting is experimental and may change. Changes take effect after reloading the window.
-    //  - v1: Use the legacy Jobs API backend.
-    //  - v2: Use the new Mission Control Task API backend.
-    "github.copilot.chat.cloudAgentBackend.version": "v1",
 
     // Use instructions files instead. See https://aka.ms/vscode-ghcp-custom-instructions for more information.
     // A set of instructions that will be added to Copilot requests that generate code.
@@ -8062,9 +8167,6 @@
 
     // Additional tools to enable for the Plan agent, on top of built-in tools. Use fully-qualified tool names (e.g., `github/issue_read`, `mcp_server/tool_name`).
     "github.copilot.chat.planAgent.additionalTools": [],
-
-    // When enabled, models that offer their full (long) context window at no additional cost will only show the long context option in the model picker and use it by default. When disabled, both the smaller default and larger long context options are shown so you can select a smaller context window.
-    "github.copilot.chat.preferLongContext.enabled": true,
 
     // Add project labels in chat requests.
     "github.copilot.chat.projectLabels.chat": false,
@@ -8799,6 +8901,9 @@
     "gitlens.advanced.skipOnboarding": false,
 
     // AI (ᴘʀᴇᴠɪᴇᴡ)
+    // Specifies the minimum AI confidence (0–1) required to automatically apply a conflict resolution during an automatic rebase; below this the rebase pauses and hands off to the conflict resolution panel for your review
+    "gitlens.ai.autoRebase.confidenceThreshold": 0.8,
+
     // Specifies a custom URL to use for access to an Azure OpenAI model. Azure URLs should be in the following format: https://{your-resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version={api-version}
     "gitlens.ai.azure.url": null,
 
@@ -8843,9 +8948,6 @@
     // Specifies custom instructions to provide to the AI provider when generating a cloud patch title and description
     "gitlens.ai.generateCreateCloudPatch.customInstructions": null,
 
-    // Specifies custom instructions to provide to the AI provider when generating a code suggest title and description
-    "gitlens.ai.generateCreateCodeSuggest.customInstructions": null,
-
     // Specifies custom instructions to provide to the AI provider when generating a pull request title and description
     "gitlens.ai.generateCreatePullRequest.customInstructions": null,
 
@@ -8878,6 +8980,9 @@
 
     // Specifies a custom URL to use for access to an OpenAI-compatible model.
     "gitlens.ai.openaicompatible.url": null,
+
+    // Specifies custom instructions to provide to the AI provider when resolving merge or rebase conflicts. Applies to every conflict AI resolves — in the _Commit Graph_'s **Resolve** panel and during an automatic rebase. Guidance given for a single run in the **Resolve** panel takes priority over this.
+    "gitlens.ai.resolveConflicts.customInstructions": null,
 
     // Specifies custom instructions to provide to the AI provider when reviewing a set of changes
     "gitlens.ai.reviewChanges.customInstructions": null,
@@ -9210,6 +9315,16 @@
     //  - agents: Shows only branches associated with active agents (running or idle less than 24 hours)
     "gitlens.graph.branchesVisibility": "all",
 
+    // Specifies whether the _Commit Graph_ computes file and line change statistics for the Changes column. Computing changes can be performance intensive in large repositories. When disabled, the Changes column offers a one-time opt-in
+    "gitlens.graph.changesColumn.enabled": false,
+
+    // Specifies the visualization used by the _Commit Graph_ Changes column
+    //  - numbers: Shows the exact added and deleted line counts
+    //  - squares: Shows a five-cell diffstat of the added / deleted ratio
+    //  - bar: Shows a single bar sized by total churn, split into added and deleted
+    //  - bipolar: Shows a bipolar bar with additions growing right and deletions growing left
+    "gitlens.graph.changesColumn.mode": "bar",
+
     // Specifies the order by which commits will be shown on the _Commit Graph_
     //  - date: Shows commits in reverse chronological order of the commit timestamp
     //  - author-date: Shows commits in reverse chronological order of the author timestamp
@@ -9234,16 +9349,16 @@
     //  - bottom: Show the details panel below the Commit Graph
     "gitlens.graph.details.location": "auto",
 
+    // Specifies whether to automatically maximize the details panel in the _Commit Graph_ when entering a mode (e.g. Compose, Review, Resolve, or Compare), and to restore it when leaving. Only applies when the details panel is docked to the bottom
+    "gitlens.graph.details.maximizeOnMode": true,
+
     // Specifies whether to dim (deemphasize) merge commit rows in the _Commit Graph_
     "gitlens.graph.dimMergeCommits": false,
 
-    // Specifies which editor group editors (files, diffs, etc.) opened from the _Commit Graph_ should appear in when the graph is in an editor tab. Has no effect when the graph is shown as a panel.
+    // Specifies which editor group editors (files, diffs, etc.) opened from the _Commit Graph_ should appear in when the graph is in an editor tab. Has no effect when the graph is shown as a view.
     //  - auto: Opens editors beside the Commit Graph when it is the active editor; otherwise opens in the active editor group
     //  - active: Always opens editors in the active editor group
     "gitlens.graph.editorOpeningBehavior": "auto",
-
-    // (Experimental) Specifies whether to show the home header (account and integrations status) at the top of the _Commit Graph_
-    "gitlens.graph.experimental.homeHeader.enabled": false,
 
     // (Experimental) Specifies whether to enable the Agent Kanban mode on the _Commit Graph_
     "gitlens.graph.experimental.kanban.enabled": true,
@@ -9260,9 +9375,6 @@
     // (Experimental) Specifies whether to enable the Treemap visualization modes (Files, Commits, Agent Activity) alongside the Visual History timeline on the _Commit Graph_. When disabled, only the timeline visualization is available.
     "gitlens.graph.experimental.visualizations.enabled": true,
 
-    // Specifies whether to highlight rows associated with the branch / tag when hovering over it in the _Commit Graph_
-    "gitlens.graph.highlightRowsOnRefHover": true,
-
     // Specifies which row to select by default in the _Commit Graph_
     //  - wip: Selects the "Work in progress" (WIP) row
     //  - head: Selects the HEAD row
@@ -9271,9 +9383,29 @@
     // Specifies whether to show associated issues on branches in the _Commit Graph_. Requires a connection to a supported issue service (e.g. GitHub)
     "gitlens.graph.issues.enabled": true,
 
+    // Specifies the horizontal spacing of lanes in the graph column of the _Commit Graph_
+    //  - expanded: Space lanes airily for easier tracing of branch lines
+    //  - compact: Pack lanes tightly to fit more branches in a narrower graph column
+    "gitlens.graph.lanes.density": "compact",
+
+    // Specifies which lanes are folded by default in the _Commit Graph_. Manual folds during a session override this default per-segment until the webview is reloaded. Requires `gitlens.graph.lanes.folding.enabled`
+    //  - none: Keep every lane expanded on graph load
+    //  - all: Fold every foldable lane segment into a chip on graph load
+    //  - auto: Fold lane segments whose tip is reachable from HEAD via first-parent ("merged & done") on graph load; the segment containing HEAD is never auto-folded
+    "gitlens.graph.lanes.folding.default": "none",
+
+    // Specifies whether lane folding is enabled in the _Commit Graph_. When enabled, collapsible lane segments show expand/collapse chevrons in a fold strip alongside the graph
+    "gitlens.graph.lanes.folding.enabled": true,
+
+    // Specifies the maximum share of the row's width (as a percentage) the inline lanes may take in the _Commit Graph_ when the graph is grouped into another column — wider views show more lanes automatically. `gitlens.graph.lanes.grouped.min` wins when it needs more room than this allows
+    "gitlens.graph.lanes.grouped.max": 40,
+
+    // Specifies the minimum number of lanes the _Commit Graph_ shows inline when the graph is grouped into another column (when the graph has that many). Each row's lanes hug their own branch lines; a row that fans out past the lane cap clips to it, with the extra lanes collapsed to the edge
+    "gitlens.graph.lanes.grouped.min": 10,
+
     // Specifies the preferred layout of the _Commit Graph_
     //  - editor: Prefer showing the Commit Graph in the editor area
-    //  - panel: Prefer showing the Commit Graph in the bottom panel
+    //  - panel: Prefer showing the Commit Graph as a view
     "gitlens.graph.layout": "panel",
 
     // Specifies additional markers to show on the minimap in the _Commit Graph_
@@ -9294,7 +9426,13 @@
     //  - lines: Shows the number of lines changed per day in the minimap
     "gitlens.graph.minimap.dataType": "commits",
 
-    // Specifies whether to show a minimap of commit activity above the _Commit Graph_
+    // Specifies when to show the minimap in the _Commit Graph_, when it is available. Showing or hiding the minimap from the header overrides this for the current workspace. Requires `gitlens.graph.minimap.enabled` to be enabled
+    //  - hidden: Hidden until shown from the Commit Graph header
+    //  - onSearch: Shown while searching
+    //  - always: Always shown
+    "gitlens.graph.minimap.defaultVisibility": "onSearch",
+
+    // Specifies whether the minimap of commit activity is available on the _Commit Graph_. When disabled, the minimap is never shown and its toggle is removed from the header. Use `gitlens.graph.minimap.defaultVisibility` to control when an available minimap is shown
     "gitlens.graph.minimap.enabled": true,
 
     // Specifies whether to reverse the minimap orientation in the _Commit Graph_ so that older commits appear on the left and newer commits on the right
@@ -9309,11 +9447,21 @@
     // Specifies whether to only follow the first parent when showing commits on the _Commit Graph_
     "gitlens.graph.onlyFollowFirstParent": false,
 
+    // Specifies when to show the overview bar above the _Commit Graph_ — the per-worktree _WIP_ pills and the HEAD, upstream, and merge target jumps
+    //  - always: Always shown
+    //  - worktrees: Shown when the repository has more than one worktree
+    //  - dirtyWorktrees: Shown when another worktree has working changes or unpushed commits
+    //  - never: Never shown
+    "gitlens.graph.overviewBar.visibility": "worktrees",
+
     // Specifies the number of additional items to fetch when paginating in the _Commit Graph_. Use 0 to specify no limit
     "gitlens.graph.pageItemLimit": 200,
 
     // Specifies whether to show associated pull requests on remote branches in the _Commit Graph_. Requires a connection to a supported remote service (e.g. GitHub)
     "gitlens.graph.pullRequests.enabled": true,
+
+    // Specifies whether the _Commit Graph_'s Branch / Tag finder closes when it loses focus
+    "gitlens.graph.refFindAutoHide": false,
 
     // Specifies additional markers to show on the scrollbar in the _Commit Graph_
     //  - localBranches: Marks the location of local branches
@@ -9322,11 +9470,7 @@
     //  - stashes: Marks the location of stashes
     //  - tags: Marks the location of tags
     //  - wip: Marks the location of working tree (WIP) rows
-    "gitlens.graph.scrollMarkers.additionalTypes": [
-        "localBranches",
-        "stashes",
-        "wip"
-    ],
+    "gitlens.graph.scrollMarkers.additionalTypes": [],
 
     // Specifies whether to show markers on the scrollbar in the _Commit Graph_
     "gitlens.graph.scrollMarkers.enabled": true,
@@ -9359,13 +9503,22 @@
     "gitlens.graph.sidebar.enabled": true,
 
     // Specifies whether the _Commit Graph_ sidebar is pinned. When pinned, the sidebar shares space with the graph; when unpinned, the sidebar floats over the graph and auto-collapses when it loses focus
-    "gitlens.graph.sidebar.pinned": true,
+    "gitlens.graph.sidebar.pinned": false,
 
     // Specifies whether to show the _Commit Graph_ in the status bar
     "gitlens.graph.statusBar.enabled": true,
 
     // Specifies whether to show a sticky timeline header that remains visible at the top while scrolling in the _Commit Graph_
     "gitlens.graph.stickyTimeline": true,
+
+    // Specifies the style (row layout) of the _Commit Graph_ — `table` (single-line rows with columns) or `list` (stacked two-line rows). `auto` switches to `list` when the view is too narrow for the columns
+    //  - auto: Automatically switch to the list (stacked) style when the graph is too narrow for the table columns
+    //  - table: Table: single-line rows with columns (message, author, date, sha)
+    //  - list: List: stacked two-line rows with no columns
+    "gitlens.graph.style": "auto",
+
+    // Specifies whether to show separator lines between date groups in the _Commit Graph_
+    "gitlens.graph.timelineSeparators": true,
 
     // File Heatmap
     // Specifies the age of the most recent change (in days) after which the file heatmap annotations will be cold rather than hot (i.e. will use `gitlens.heatmap.coldColor` instead of `gitlens.heatmap.hotColor`)
@@ -9647,11 +9800,12 @@
     //  - beside: Always opens the editor beside the active editor, creating a new editor group if needed
     "gitlens.rebaseEditor.openBehavior": "auto",
 
-    // Specifies whether to automatically open the _Interactive Rebase Editor_ when a paused rebase is detected
-    //  - false: Never automatically open the editor
-    //  - interactive: Only automatically open the editor when an interactive rebase is detected
-    //  - true: Automatically open the editor when any paused rebase is detected
-    "gitlens.rebaseEditor.openOnPausedRebase": true,
+    // Specifies whether to automatically open the _Interactive Rebase Editor_ (or the _Commit Graph_ for conflict pauses, when accessible) when a paused rebase is detected
+    //  - false: Never automatically open
+    //  - auto: Only automatically open when the paused rebase was started from GitLens (rebase commands, Commit Graph, automatic rebase, or a pull that rebases) or acted on from GitLens (e.g. continued)
+    //  - interactive: Only automatically open when an interactive rebase is detected
+    //  - true: Automatically open when any paused rebase is detected
+    "gitlens.rebaseEditor.openOnPausedRebase": "auto",
 
     // Specifies how Git commits are displayed in the _Interactive Rebase Editor_
     //  - asc: Shows oldest commit first
@@ -9789,8 +9943,15 @@
     // Specifies whether to enable terminal links &mdash; autolinks in the integrated terminal to quickly jump to more details for commits, branches, tags, and more
     "gitlens.terminalLinks.enabled": true,
 
+    // Deprecated. Use `gitlens.terminalLinks.showIn` instead
     // Specifies whether to show the _Commit Details_ view when clicking on a commit link in the integrated terminal
     "gitlens.terminalLinks.showDetailsView": true,
+
+    // Specifies where to open a commit, branch, tag, or ref when clicking its link in the integrated terminal
+    //  - graph: Reveals the commit, branch, tag, or ref in the Commit Graph (a range opens a comparison)
+    //  - inspect: Shows the commit, branch, tag, or ref (its tip commit) in the Commit Details view (a range opens a comparison)
+    //  - quickpick: Shows the commit, branch, tag, or ref in a quick pick menu (a range opens the commit log)
+    "gitlens.terminalLinks.showIn": "graph",
 
     // Branches View
     // Specifies whether to show avatar images instead of commit (or status) icons in the _Branches_ view
@@ -9838,7 +9999,7 @@
     //  - branch: Compares the branch with a user-selected reference
     "gitlens.views.branches.showBranchComparison": "branch",
 
-    // Specifies whether to show remote branches for the default remote in the _Branches_ view
+    // Specifies whether to show remote branches for the default remote in the _Branches_ view and the _Commit Graph_ side bar
     "gitlens.views.branches.showRemoteBranches": false,
 
     // Specifies whether to show stashes in the _Branches_ view
@@ -11201,6 +11362,7 @@
     //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.7 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.3-Codex (copilot): OpenAI Codex model specialized for code generation, debugging, and software development tasks.
     //  - GPT-5.4 (copilot): OpenAI GPT model for coding and general assistance.
@@ -11208,6 +11370,7 @@
     //  - GPT-5.6 Luna (copilot): OpenAI GPT model for coding and general assistance.
     //  - GPT-5.6 Terra (copilot): OpenAI GPT model for coding and general assistance.
     //  - Grok 4.5 (copilot): xAI Grok model optimized for fast code generation and development tasks.
+    //  - Grok 4.6 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Kimi K2.7 Code (copilot)
     //  - Kimi K3 (copilot)
     //  - MAI-Code-1-Flash (copilot)
@@ -13451,6 +13614,9 @@
     // To use this feature, after pasting text that contains updatable links, just click on the Paste Widget and select `Paste and update pasted links`.
     "markdown.editor.updateLinksOnPaste.enabled": true,
 
+    // Controls whether supported links in the Markdown editor are rendered as rich links with live metadata. Enabling this may make authenticated requests to services such as GitHub.
+    "markdown.experimental.richLinks.enabled": false,
+
     // Markdown All in One
     // Use `**` or `__` to wrap bold text.
     "markdown.extension.bold.indicator": "**",
@@ -13990,9 +14156,14 @@
 
     // Defines a default notebook formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
+    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
+    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
+    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
+    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
+    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -14004,6 +14175,7 @@
     //  - ms-dotnettools.csdevkit: Official C# extension from Microsoft
     //  - ms-dotnettools.csharp: Base language support for C#
     //  - vscode.css-language-features: Provides rich language support for CSS, LESS and SCSS files.
+    //  - docker.docker: Edit smarter, ship faster with an enhanced Docker-development experience
     //  - tamasfe.even-better-toml: Fully-featured TOML support
     //  - ms-python.flake8: Linting support for Python files using Flake8.
     //  - golang.go: Rich Go language support for Visual Studio Code
@@ -14012,7 +14184,6 @@
     //  - ms-python.isort: Import organization support for Python files using isort.
     //  - redhat.java: Java Linting, Intellisense, formatting, refactoring, Maven/Gradle support and more...
     //  - samuelcolvin.jinjahtml: Syntax highlighting for jinja(2) including HTML, Markdown, YAML, Ruby and LaTeX templates
-    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - sumneko.lua: Lua Language Server coded by Lua
     //  - ms-vscode.makefile-tools: Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.
     //  - vscode.markdown-language-features: Provides rich language support for Markdown.
@@ -14020,7 +14191,6 @@
     //  - josee9988.minifyall: Minifier for JSON, CSS, HTML, XML, TWIG, LESS, SASS, SCSS, JavaScript, JSONC, and JavaScriptReact(testing). Compressor of files and folders. You will love its simplicity!
     //  - ms-python.mypy-type-checker: Type checking support for Python files using Mypy.
     //  - vscode.php-language-features: Provides rich language support for PHP files.
-    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - ms-python.pylint: Linting support for Python files using Pylint.
     //  - ms-python.python: Python language support with extension access points for IntelliSense (Pylance), Debugging (Python Debugger), linting, formatting, refactoring, unit tests, and more.
     //  - mechatroner.rainbow-csv: Highlight CSV and TSV files, Run SQL-like queries
@@ -14028,7 +14198,6 @@
     //  - ionutvmi.reg: Windows Registry Script (.reg) Language package for VSCode
     //  - ms-vscode-remote.remote-ssh-edit: Edit SSH configuration files
     //  - dnut.rewrap-revived: Hard word wrapping for comments and other text at a given column.
-    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - timonwong.shellcheck: Integrates ShellCheck into VS Code, a linter for Shell scripts.
     //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
     //  - XadillaX.viml: Vim Script language server protocol and highlighting support for VSCode.
@@ -14041,12 +14210,10 @@
     //  - bmewburn.vscode-intelephense-client: PHP code intelligence for Visual Studio Code
     //  - vscjava.vscode-java-debug: A lightweight Java debugger for Visual Studio Code
     //  - vscjava.vscode-java-pack: Popular extensions for Java development that provides Java IntelliSense, debugging, testing, Maven/Gradle support, project management and more
-    //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
     //  - vscjava.vscode-maven: Manage Maven projects, execute goals, generate project from archetype, improve user experience for Java developers.
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
-    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
     //  - amazonwebservices.aws-toolkit-vscode: Including CodeCatalyst, Infrastructure Composer, and support for Lambda, S3, CloudWatch Logs, CloudFormation, and many other services.
     //  - ms-vscode.azure-repos: Remotely browse and edit any Azure Repos
@@ -16607,7 +16774,7 @@
     //  - off: Do not show the prompt timeline.
     //  - ruler: Show an overview ruler beside the transcript scrollbar that fans into prompt pills on engagement.
     //  - gutter: Show a minimal handle in the transcript's left gutter that opens a list of prompts on hover.
-    "sessions.chatTimeline.display": "off",
+    "sessions.chatTimeline.display": "gutter",
 
     // Settings Sync
     // List of extensions to be ignored while synchronizing. The identifier of an extension is always `${publisher}.${name}`. For example: `vscode.csharp`.
@@ -18448,6 +18615,7 @@
     //  - arrow-up-compact: $(arrow-up-compact)
     //  - xai: $(xai)
     //  - arrow-circle-up-sparkle: $(arrow-circle-up-sparkle)
+    //  - close-small: $(close-small)
     //  - dialog-error: $(dialog-error)
     //  - dialog-warning: $(dialog-warning)
     //  - dialog-info: $(dialog-info)
@@ -19730,6 +19898,9 @@
     // Controls if the 'Zoom In' and 'Zoom Out' commands apply the zoom level to all windows or only the active window. See `window.zoomLevel` for configuring a default zoom level for all windows.
     "window.zoomPerWindow": true,
 
+    // Controls whether signed-in account profile images (avatars) are shown in account-related UI, such as the Accounts item in the Activity Bar.
+    "workbench.accounts.showAvatar": true,
+
     // Controls whether the Activity Bar is automatically hidden when there is only one view container to show. This applies to the Primary and Secondary Side Bars when `workbench.activityBar.location` is set to `top` or `bottom`.
     "workbench.activityBar.autoHide": false,
 
@@ -19954,6 +20125,9 @@
     // Controls whether editors are closed in most recently used order or from left to right.
     "workbench.editor.focusRecentEditorAfterClose": true,
 
+    // Configure editor types that are hidden from the editor type picker. The active editor type remains visible.
+    "workbench.editor.hiddenEditorTypes": [],
+
     // Controls whether a top border is drawn on tabs for editors that have unsaved changes. This value is ignored when `workbench.editor.showTabs` is not set to multiple.
     "workbench.editor.highlightModifiedTabs": false,
 
@@ -20072,6 +20246,9 @@
     // Controls the position of the editor's tabs action buttons (close, unpin). This value is ignored when `workbench.editor.showTabs` is not set to `multiple`.
     "workbench.editor.tabActionLocation": "right",
 
+    // Controls whether Modern UI editor tabs always reserve space for tab action buttons. When disabled, clean tabs stay compact; tabs with persistent dirty or pinned indicators reserve space regardless.
+    "workbench.editor.tabActionReserveSpace": true,
+
     // Controls the visibility of the tab unpin action button.
     "workbench.editor.tabActionUnpinVisibility": true,
 
@@ -20134,8 +20311,11 @@
     // Controls whether to surface cloud changes which partially match the current session.
     "workbench.experimental.cloudChanges.partialMatches.enabled": false,
 
-    // Controls whether the experimental Modern UI Update is enabled. When on, the side bars and bottom panel are shown as floating cards with rounded corners and gaps, and a set of refreshed workbench styles is applied, matching the Agents window design.
+    // Controls whether the Modern UI Update is enabled. When on, the side bars and bottom panel are shown as floating cards with rounded corners and gaps, and a set of refreshed workbench styles is applied, matching the Agents window design.
     "workbench.experimental.modernUI": false,
+
+    // Controls whether view headers, side bar titles, and panel tabs use uppercase text when `workbench.experimental.modernUI` is enabled.
+    "workbench.experimental.modernUIUppercaseViewHeaders": false,
 
     // Controls whether to render the Share action next to the command center when `window.commandCenter` is `true`.
     "workbench.experimental.share.enabled": false,
