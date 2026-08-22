@@ -147,6 +147,21 @@
     // PowerShell script analysis
     "powershell.scriptAnalysis.settingsPath": ".config/PSScriptAnalyzerSettings.psd1",
 
+    // Prettier formatter settings
+    //
+    // Ordinarily these are set via the EditorConfig and Prettier configuration
+    // files, but they only apply to files within the workspace. The VS Code
+    // user settings file is external to the workspace, and although in our
+    // setup it's a symlink to a file in the repository, its real path is not
+    // resolved when opened via the editor command. The settings here mirror
+    // the referenced configuration files to ensure formatting is consistent
+    // when the VS Code user settings file is modified through that entrypoint.
+    "prettier.endOfLine": "auto",
+    "prettier.printWidth": 79,
+    "prettier.singleQuote": true,
+    "prettier.tabWidth": 4,
+    "prettier.trailingComma": "none",
+
     // Excludes for ShellCheck linter
     "shellcheck.ignorePatterns": {
         "**/*.cshrc": true,
