@@ -384,6 +384,20 @@
     // DevSkim: Suppressions
     "MS-CST-E.vscode-devskim.suppressions.suppressionDurationInDays": 0,
 
+    // Docker DX
+    //
+    // The handling of this setting is a bit of a mess:
+    // - If the Red Hat YAML extension is detected, Docker DX automatically
+    //   disables its language service for Compose files to avoid duplicate
+    //   results, provided its support has not been explicitly enabled.
+    // - The Red Hat YAML extension automatically disables schema detection by
+    //   appending Compose file patterns to `yaml.disableSchemaDetection` if
+    //   the effective state for this setting is enabled.
+    // - As the Docker DX support is superior compared to the general YAML
+    //   support provided by the Red Hat extension, explicitly enable support.
+    "docker.extension.enableComposeLanguageServer": true,
+    "docker.lsp.telemetry": "off",
+
     // EditorConfig
     "editorconfig.showMenuEntry": false,
 
@@ -681,14 +695,25 @@
 
     // YAML
     "yaml.disableSchemaDetection": [
+        // Azure Pipelines
+        "azure-pipelines.yml",
+        "azure-pipelines.yaml",
+        // Docker DX
+        "**/compose.yml",
+        "**/compose.yaml",
+        "**/compose.*.yml",
+        "**/compose.*.yaml",
+        "**/docker-compose.yml",
+        "**/docker-compose.yaml",
+        "**/docker-compose.*.yml",
+        "**/docker-compose.*.yaml",
+        // GitHub Actions
         "**/.forgejo/workflows/*.yml",
         "**/.forgejo/workflows/*.yaml",
         "**/.gitea/workflows/*.yml",
         "**/.gitea/workflows/*.yaml",
         "**/.github/workflows/*.yml",
-        "**/.github/workflows/*.yaml",
-        "azure-pipelines.yml",
-        "azure-pipelines.yaml"
+        "**/.github/workflows/*.yaml"
     ],
     "yaml.format.singleQuote": true,
     "yaml.maxItemsComputed": 10000,
