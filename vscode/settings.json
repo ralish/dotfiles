@@ -114,6 +114,9 @@
     "chat.tools.terminal.enableAutoApprove": false,
     "chat.tools.terminal.outputCompaction": true,
 
+    // Chat: MCP
+    "chat.mcp.gallery.enabled": true,
+
     // Chat: Miscellaneous
     //"chat.disableAIFeatures": true,
 
@@ -302,6 +305,7 @@
 
     // C/C++: IntelliSense
     "C_Cpp.autocompleteAddParentheses": true,
+    "C_Cpp.default.compilerPath": "cl.exe",
     "C_Cpp.workspaceParsingPriority": "high",
     // C/C++: Formatting
     "C_Cpp.vcFormat.indent.caseLabels": true,
@@ -437,21 +441,16 @@
     "gitlens.graph.layout": "editor",
     "gitlens.graph.commitOrdering": "author-date",
     "gitlens.graph.dimMergeCommits": true,
+    "gitlens.graph.changesColumn.enabled": true,
     // GitLens: Launchpad
     "gitlens.launchpad.indicator.enabled": false,
     "gitlens.launchpad.indicator.label": "counts",
     // GitLens: Interactive Rebase Editor
     "gitlens.rebaseEditor.density": "compact",
-    "gitlens.rebaseEditor.openOnPausedRebase": false,
     // GitLens: Terminal
     "gitlens.gitkraken.mcp.autoEnabled": false,
     // GitLens: AI
     "gitlens.ai.enabled": false,
-    // Next two settings are present only because GitLens keeps adding them,
-    // resulting in our settings being marked as modified in our `dotfiles`
-    // repository. This is despite disabling AI features for the extension.
-    "gitlens.ai.model": "vscode",
-    "gitlens.ai.vscode.model": "copilot:claude-sonnet-4.6",
     // GitLens: Date & Times
     "gitlens.defaultDateStyle": "absolute",
     // GitLens: Advanced
@@ -722,10 +721,12 @@
     // ###          Language customisations           ###
     // ##################################################
 
-    "[dockercompose]": {
-        "editor.rulers": [79],
-
+    "[azure-pipelines]": {
         "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+
+    "[dockercompose]": {
+        "editor.defaultFormatter": "docker.docker"
     },
 
     "[dynamic csv]": {
