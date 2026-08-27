@@ -55,13 +55,22 @@ insert_final_newline = false
 charset = utf-16le
 
 # Shell scripts
+[*.sh]
+max_line_length = 79
+keep_padding = true             # shfmt: -kp
+space_redirects = true          # shfmt: -sr
+switch_case_indent = true       # shfmt: -ci
+
+# Matching on a pattern with a path separator alongside other patterns with the
+# curly brace syntax doesn't appear to be possible, so we duplicate the earlier
+# configuration to handle scripts under `bin` directories.
 [**/bin/*]
 max_line_length = 79
 keep_padding = true             # shfmt: -kp
 space_redirects = true          # shfmt: -sr
 switch_case_indent = true       # shfmt: -ci
 
-[{*.sh,.bash_logout,.mk-sbuild.rc,.profile,.quiltrc,.startxwinrc,.zlogout,user-dirs.dirs}]
+[{.bash_logout,.mk-sbuild.rc,.profile,.quiltrc,.startxwinrc,.zlogout,user-dirs.dirs}]
 max_line_length = 79
 shell_variant = posix           # shfmt: -p
 space_redirects = true          # shfmt: -sr
