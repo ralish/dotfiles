@@ -78,4 +78,11 @@ ehthumbs_vista.db
 **/obj/Debug/
 **/obj/Release/
 
+#################
+### AI Agents ###
+#################
+
+# Claude
+**/.claude/settings.local.json
+
 # vim: syntax=conf cc=80 tw=79 ts=4 sw=4 sts=4 et sr
