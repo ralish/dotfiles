@@ -271,22 +271,22 @@ Function Global:Update-AllTheThings {
     Param()
 
     DynamicParam {
-        $AllCategories = 'System', 'Apps', 'Devel'
+        $AllCategories = 'Applications', 'Development', 'System'
         $CategoryVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]($AllCategories | Sort-Object))
 
-        $TasksApps = @('PowerShell')
-        $TasksDevel = 'DotNetTools', 'GoBinaries', 'NodejsPackages', 'PythonPipPackages', 'PythonPipxPackages', 'RubyGems', 'RustToolchains'
+        $TasksApplications = @('PowerShell')
+        $TasksDevelopment = 'DotNetTools', 'GoBinaries', 'NodejsPackages', 'PythonPipPackages', 'PythonPipxPackages', 'RubyGems', 'RustToolchains'
         $TasksSystem = @()
 
         if (Test-IsWindows) {
-            $TasksApps = @('Office', 'VisualStudio') + $TasksApps + @('MicrosoftStore', 'Edge', 'Chrome', 'WinGet', 'Scoop')
-            $TasksDevel = ($TasksDevel + @('Cygwin', 'MSYS2', 'Python', 'QtComponents')) | Sort-Object
+            $TasksApplications = @('Office', 'VisualStudio') + $TasksApplications + @('Edge', 'Chrome', 'MicrosoftStore', 'WinGet', 'Scoop')
+            $TasksDevelopment = ($TasksDevelopment + @('Cygwin', 'MSYS2', 'Python', 'QtComponents')) | Sort-Object
             $TasksSystem += 'Windows', 'WSL'
         } else {
-            $TasksApps += 'Homebrew'
+            $TasksApplications += 'Homebrew'
         }
 
-        $ValidTasks = $TasksApps + $TasksDevel + $TasksSystem
+        $ValidTasks = $TasksApplications + $TasksDevelopment + $TasksSystem
         $TasksVsa = [Management.Automation.ValidateSetAttribute]::new([String[]]$ValidTasks)
 
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
@@ -348,26 +348,31 @@ Function Global:Update-AllTheThings {
         }
 
         $Results = [PSCustomObject]@{
-            Windows            = $null
-            WSL                = $null
-            Office             = $null
-            VisualStudio       = $null
+            # System
+            Windows            = $null # Windows
+            WSL                = $null # Windows
+
+            # Applications
+            Office             = $null # Windows
+            VisualStudio       = $null # Windows
             PowerShell         = $null
-            MicrosoftStore     = $null
-            Edge               = $null
-            Chrome             = $null
-            WinGet             = $null
-            Homebrew           = $null
-            Scoop              = $null
-            Cygwin             = $null
+            Edge               = $null # Windows
+            Chrome             = $null # Windows
+            MicrosoftStore     = $null # Windows
+            WinGet             = $null # Windows
+            Scoop              = $null # Windows
+            Homebrew           = $null # Unix-like
+
+            # Development
+            Cygwin             = $null # Windows
             DotNetTools        = $null
             GoBinaries         = $null
-            MSYS2              = $null
+            MSYS2              = $null # Windows
             NodejsPackages     = $null
-            Python             = $null
+            Python             = $null # Windows
             PythonPipPackages  = $null
             PythonPipxPackages = $null
-            QtComponents       = $null
+            QtComponents       = $null # Windows
             RubyGems           = $null
             RustToolchains     = $null
         }
@@ -434,12 +439,6 @@ Function Global:Update-AllTheThings {
             $Results.PowerShell = $true
         }
 
-        if ($Tasks -contains 'MicrosoftStore') {
-            $WriteProgressParams['Status'] = 'Microsoft Store apps'
-            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
-            $Results.MicrosoftStore = Invoke-Task -Progress $WriteProgressParams -Command 'Update-MicrosoftStore'
-        }
-
         if ($Tasks -contains 'Edge') {
             $WriteProgressParams['Status'] = 'Edge'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
@@ -452,22 +451,28 @@ Function Global:Update-AllTheThings {
             $Results.Chrome = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Chrome' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
         }
 
+        if ($Tasks -contains 'MicrosoftStore') {
+            $WriteProgressParams['Status'] = 'Microsoft Store apps'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.MicrosoftStore = Invoke-Task -Progress $WriteProgressParams -Command 'Update-MicrosoftStore'
+        }
+
         if ($Tasks -contains 'WinGet') {
             $WriteProgressParams['Status'] = 'WinGet'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
             $Results.WinGet = Invoke-Task -Progress $WriteProgressParams -Command 'Update-WinGet'
         }
 
-        if ($Tasks -contains 'Homebrew') {
-            $WriteProgressParams['Status'] = 'Homebrew'
-            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
-            $Results.Homebrew = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Homebrew' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
-        }
-
         if ($Tasks -contains 'Scoop') {
             $WriteProgressParams['Status'] = 'Scoop'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
             $Results.Scoop = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Scoop' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+        }
+
+        if ($Tasks -contains 'Homebrew') {
+            $WriteProgressParams['Status'] = 'Homebrew'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.Homebrew = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Homebrew' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
         }
 
         if ($Tasks -contains 'Cygwin') {
