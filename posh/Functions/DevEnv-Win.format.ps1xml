@@ -2,6 +2,29 @@
 <Configuration>
     <ViewDefinitions>
         <View>
+            <Name>DotFiles.MaintenanceWin.UpdateCygwin</Name>
+            <ViewSelectedBy>
+                <TypeName>DotFiles.MaintenanceWin.UpdateCygwin</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Success</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>ExitCode</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>WhatIf</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+        <View>
             <Name>DotFiles.MaintenanceWin.UpdateMSYS2</Name>
             <ViewSelectedBy>
                 <TypeName>DotFiles.MaintenanceWin.UpdateMSYS2</TypeName>

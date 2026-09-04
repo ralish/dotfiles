@@ -123,6 +123,112 @@ Function Global:Switch-Cygwin {
     }
 }
 
+# Update Cygwin runtime & packages
+#
+# Cygwin FAQ: Is there a command-line installer?
+# https://cygwin.com/faq/faq.html#faq.setup.cli
+Function Global:Update-Cygwin {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([PSCustomObject])]
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [String]$SetupFile = "${Env:HOMEDRIVE}\DevEnvs\Cygwin\setup-x86_64.exe",
+
+        [ValidateNotNullOrEmpty()]
+        [String]$InstallDir = "${Env:HOMEDRIVE}\DevEnvs\Cygwin"
+    )
+
+    if (!(Test-IsPathFullyQualified -Path $SetupFile)) {
+        $SetupFile = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $SetupFile
+    }
+
+    $SetupFileItem = Get-Item -LiteralPath $SetupFile -ErrorAction 'Ignore'
+    if ($SetupFileItem -isnot [IO.FileInfo]) {
+        $ExcMsg = "Cygwin setup path is inaccessible or not a file: ${SetupFile}"
+        $ErrExc = [ArgumentException]::new($ExcMsg, 'SetupFile')
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $SetupFile)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    $SetupFile = [IO.Path]::GetFullPath($SetupFile)
+
+    if (!(Test-IsPathFullyQualified -Path $InstallDir)) {
+        $InstallDir = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $InstallDir
+    }
+
+    $InstallDirItem = Get-Item -LiteralPath $InstallDir -ErrorAction 'Ignore'
+    if ($InstallDirItem -isnot [IO.DirectoryInfo]) {
+        $ExcMsg = "Cygwin install path is inaccessible or not a directory: ${InstallDir}"
+        $ErrExc = [IO.DirectoryNotFoundException]::new($ExcMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DirectoryNotFound', $ErrCat, $InstallDir)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
+    $InstallDir = [IO.Path]::GetFullPath($InstallDir).TrimEnd($DirSepChars)
+
+    # Setup performs a new installation when run against a root directory
+    # without an existing installation, so verify the installed packages
+    # database exists as a guard against this.
+    $InstalledDbPath = Join-Path -Path $InstallDir -ChildPath 'etc\setup\installed.db'
+    if (!(Test-Path -LiteralPath $InstalledDbPath -PathType 'Leaf')) {
+        $ExcMsg = "Unable to update Cygwin as installed packages database not found: ${InstalledDbPath}"
+        $ErrExc = [IO.FileNotFoundException]::new($ExcMsg, $InstalledDbPath)
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PathNotFound', $ErrCat, $InstalledDbPath)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    $Result = [PSCustomObject]@{
+        Success  = $false
+        ExitCode = -1
+        WhatIf   = $false
+    }
+
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateCygwin')
+
+    if (!$PSCmdlet.ShouldProcess('Cygwin runtime & packages', 'Update')) {
+        $Result.Success = $true
+        $Result.WhatIf = $true
+        return $Result
+    }
+
+    $SetupArgs = [Collections.Generic.List[String]]::new()
+    $SetupArgs.Add('--quiet-mode')
+    $SetupArgs.Add(('--root "{0}"' -f $InstallDir))
+    $SetupArgs.Add('--upgrade-also')
+    $SetupArgs.Add('--delete-orphans') # Packages no longer in repository
+    $SetupArgs.Add('--no-shortcuts')
+
+    $SetupCmd = "${SetupFile} $($SetupArgs -join ' ')"
+
+    try {
+        Write-Verbose -Message "Updating Cygwin runtime & packages: ${SetupCmd}"
+        $Setup = Start-Process -FilePath $SetupFile -ArgumentList ($SetupArgs -join ' ') -PassThru -Wait -ErrorAction 'Stop'
+    } catch {
+        $ExcMsg = "Failed to start Cygwin setup: $($PSItem.Exception.Message)"
+        $ErrExc = [Exception]::new($ExcMsg, $PSItem.Exception)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $SetupCmd)
+        $PSCmdlet.WriteError($ErrRec)
+        return $Result
+    }
+
+    if ($Setup.ExitCode -ne 0) {
+        $ExcMsg = "Cygwin setup exited with non-zero exit code: $($Result.ExitCode)"
+        $ErrExc = [Exception]::new($ExcMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $SetupCmd)
+        $PSCmdlet.WriteError($ErrRec)
+        return $Result
+    }
+
+    $Result.Success = $true
+    return $Result
+}
+
 #endregion
 
 #region MSYS2
