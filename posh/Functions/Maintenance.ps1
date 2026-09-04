@@ -280,7 +280,7 @@ Function Global:Update-AllTheThings {
 
         if (Test-IsWindows) {
             $TasksApps = @('Office', 'VisualStudio') + $TasksApps + @('MicrosoftStore', 'Edge', 'Chrome', 'WinGet', 'Scoop')
-            $TasksDevel = ($TasksDevel + @('Python', 'QtComponents')) | Sort-Object
+            $TasksDevel = ($TasksDevel + @('MSYS2', 'Python', 'QtComponents')) | Sort-Object
             $TasksSystem += 'Windows', 'WSL'
         } else {
             $TasksApps += 'Homebrew'
@@ -361,6 +361,7 @@ Function Global:Update-AllTheThings {
             Scoop              = $null
             DotNetTools        = $null
             GoBinaries         = $null
+            MSYS2              = $null
             NodejsPackages     = $null
             Python             = $null
             PythonPipPackages  = $null
@@ -478,6 +479,12 @@ Function Global:Update-AllTheThings {
             $WriteProgressParams['Status'] = 'Go binaries'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
             $Results.GoBinaries = Invoke-Task -Progress $WriteProgressParams -Command 'Update-GoBinaries'
+        }
+
+        if ($Tasks -contains 'MSYS2') {
+            $WriteProgressParams['Status'] = 'MSYS2'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.MSYS2 = Invoke-Task -Progress $WriteProgressParams -Command 'Update-MSYS2'
         }
 
         if ($Tasks -contains 'NodejsPackages') {

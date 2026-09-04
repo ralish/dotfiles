@@ -267,6 +267,23 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>MSYS2</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>MSYS2</PropertyName>
+                                </ItemSelectionCondition>
+                                <ScriptBlock>
+                                    $MSYS2 = $PSItem.MSYS2
+
+                                    if ($null -eq $MSYS2) { return }
+                                    if ($MSYS2 -is [Management.Automation.ErrorRecord]) { return $MSYS2.Exception.Message }
+
+                                    if (!$MSYS2.Success) { return 'Error during operation (view property for details)' }
+                                    if ($MSYS2.WhatIf) { return 'Successful dry-run (view property for details)' }
+
+                                    return 'Success (view property for details)'
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
                                 <Label>NodejsPackages</Label>
                                 <ItemSelectionCondition>
                                     <PropertyName>NodejsPackages</PropertyName>
