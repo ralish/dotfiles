@@ -280,7 +280,7 @@ Function Global:Update-AllTheThings {
 
         if (Test-IsWindows) {
             $TasksApps = @('Office', 'VisualStudio') + $TasksApps + @('MicrosoftStore', 'Edge', 'Chrome', 'WinGet', 'Scoop')
-            $TasksDevel = ($TasksDevel + @('MSYS2', 'Python', 'QtComponents')) | Sort-Object
+            $TasksDevel = ($TasksDevel + @('Cygwin', 'MSYS2', 'Python', 'QtComponents')) | Sort-Object
             $TasksSystem += 'Windows', 'WSL'
         } else {
             $TasksApps += 'Homebrew'
@@ -359,6 +359,7 @@ Function Global:Update-AllTheThings {
             WinGet             = $null
             Homebrew           = $null
             Scoop              = $null
+            Cygwin             = $null
             DotNetTools        = $null
             GoBinaries         = $null
             MSYS2              = $null
@@ -467,6 +468,12 @@ Function Global:Update-AllTheThings {
             $WriteProgressParams['Status'] = 'Scoop'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
             $Results.Scoop = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Scoop' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+        }
+
+        if ($Tasks -contains 'Cygwin') {
+            $WriteProgressParams['Status'] = 'Cygwin'
+            $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
+            $Results.Cygwin = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Cygwin'
         }
 
         if ($Tasks -contains 'DotNetTools') {

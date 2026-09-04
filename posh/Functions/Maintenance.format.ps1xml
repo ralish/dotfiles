@@ -233,6 +233,23 @@
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>
+                                <Label>Cygwin</Label>
+                                <ItemSelectionCondition>
+                                    <PropertyName>Cygwin</PropertyName>
+                                </ItemSelectionCondition>
+                                <ScriptBlock>
+                                    $Cygwin = $PSItem.Cygwin
+
+                                    if ($null -eq $Cygwin) { return }
+                                    if ($Cygwin -is [Management.Automation.ErrorRecord]) { return $Cygwin.Exception.Message }
+
+                                    if (!$Cygwin.Success) { return 'Error during operation (view property for details)' }
+                                    if ($Cygwin.WhatIf) { return 'Successful dry-run (view property for details)' }
+
+                                    return 'Updated runtime &amp; packages'
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
                                 <Label>DotNetTools</Label>
                                 <ItemSelectionCondition>
                                     <PropertyName>DotNetTools</PropertyName>
