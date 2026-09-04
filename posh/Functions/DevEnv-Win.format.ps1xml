@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+    <ViewDefinitions>
+        <View>
+            <Name>DotFiles.MaintenanceWin.UpdateMSYS2</Name>
+            <ViewSelectedBy>
+                <TypeName>DotFiles.MaintenanceWin.UpdateMSYS2</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Success</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>BeforeUpdate</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>AfterUpdate</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>CoreUpgrade</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Refresh</Label>
+                                <ScriptBlock>
+                                    $MSYS2 = $PSItem
+
+                                    if ($MSYS2.WhatIf -and $MSYS2.Refresh.Count -eq 0) { return 'Did not run (WhatIf mode)' }
+
+                                    switch ($MSYS2.Refresh.Count) {
+                                        0 { '(no output)' }
+                                        1 { $MSYS2.Refresh }
+                                        default { "$($MSYS2.Refresh.Count) lines (view property for output)" }
+                                    }
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Upgrade</Label>
+                                <ScriptBlock>
+                                    $MSYS2 = $PSItem
+
+                                    if ($MSYS2.WhatIf) {
+                                        if ($MSYS2.Upgrade.Count -eq 0) { return 'No updates available' }
+                                        return "$($MSYS2.Upgrade.Count) updates available (view property for output)"
+                                    }
+
+                                    if ($MSYS2.Upgrade.Count -eq 0) { return '(no output)' }
+
+                                    $Upgraded = 0
+                                    foreach ($Line in $MSYS2.Upgrade) {
+                                        if ($Line -match '^Packages? \(([1-9][0-9]*)\)') { $Upgraded += [Int]$Matches[1] }
+                                    }
+
+                                    if ($Upgraded -gt 0) { return "${Upgraded} packages upgraded (view property for output)" }
+                                    if (@($MSYS2.Upgrade -match '^\s*there is nothing to do$').Count -gt 0) { return 'No updates available' }
+
+                                    return 'Parse error (view property for output)'
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>ExitCode</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>WhatIf</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>

@@ -6,6 +6,9 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
+# Load custom formatting data
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'DevEnv-Win.format.ps1xml'))
+
 #region Cygwin
 
 # Configure environment for Cygwin usage
@@ -118,6 +121,233 @@ Function Global:Switch-Cygwin {
             Remove-EnvironmentVariable -Name 'CYGWIN' -Scope 'User'
         }
     }
+}
+
+#endregion
+
+#region MSYS2
+
+# Update MSYS2 runtime & packages
+Function Global:Update-MSYS2 {
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([PSCustomObject])]
+    Param(
+        [ValidateNotNullOrEmpty()]
+        [String]$Path = "${Env:HOMEDRIVE}\DevEnvs\MSYS2"
+    )
+
+    Function Get-MSYS2Version {
+        [CmdletBinding()]
+        [OutputType([String])]
+        Param(
+            [Parameter(Mandatory)]
+            [String]$Bash,
+
+            [Switch]$Fatal
+        )
+
+        $VersionArgs = '-Q', 'msys2-runtime'
+        $VersionCmd = "pacman $($VersionArgs -join ' ')"
+
+        Write-Verbose -Message "Retrieving MSYS2 runtime version: ${VersionCmd}"
+        $Result = Invoke-Pacman -Bash $Bash -Arguments $VersionArgs
+
+        if ($Result.ExitCode -ne 0) {
+            $ExcMsg = "pacman exited with non-zero exit code querying MSYS2 runtime version: $($Result.ExitCode)"
+            $ErrExc = [Exception]::new($ExcMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $VersionCmd)
+
+            if ($Fatal) {
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            $PSCmdlet.WriteError($ErrRec)
+            return '(unknown)'
+        }
+
+        $ResultOutput = $Result.Output -join ' '
+        if ($ResultOutput -notmatch '\bmsys2-runtime\s+(\S+)\b') {
+            $Msg = "Failed to extract MSYS2 runtime version: ${ResultOutput}"
+
+            if ($Fatal) {
+                $ErrExc = [FormatException]::new($Msg)
+                $ErrCat = [Management.Automation.ErrorCategory]::ParserError
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $ResultOutput)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            Write-Warning -Message $Msg
+            return '(unknown)'
+        }
+
+        return $Matches[1]
+    }
+
+    Function Invoke-Pacman {
+        [CmdletBinding()]
+        [OutputType([PSCustomObject])]
+        Param(
+            [Parameter(Mandatory)]
+            [String]$Bash,
+
+            [Parameter(Mandatory)]
+            [String[]]$Arguments
+        )
+
+        $Result = [PSCustomObject]@{
+            Output   = [String[]]@()
+            ExitCode = -1
+        }
+
+        $Command = "pacman $($Arguments -join ' ')"
+
+        $OriginalMsystemEnv = $Env:MSYSTEM
+        $OriginalOutputEncoding = [Console]::OutputEncoding
+
+        try {
+            # Set the login shell for the MSYS2 environment
+            $Env:MSYSTEM = 'MSYS'
+
+            [Console]::OutputEncoding = [Text.Encoding]::UTF8
+            $Result.Output = [String[]]@(& $Bash -l -c $Command 2>&1)
+            $Result.ExitCode = $LASTEXITCODE
+        } finally {
+            [Console]::OutputEncoding = $OriginalOutputEncoding
+
+            if ($OriginalMsystemEnv) {
+                $Env:MSYSTEM = $OriginalMsystemEnv
+            } else {
+                Remove-Item -LiteralPath 'Env:\MSYSTEM' -WhatIf:$false
+            }
+        }
+
+        return $Result
+    }
+
+    if (!(Test-IsPathFullyQualified -Path $Path)) {
+        $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+    }
+
+    $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+    if ($PathItem -isnot [IO.DirectoryInfo]) {
+        $ExcMsg = "MSYS2 path is inaccessible or not a directory: ${Path}"
+        $ErrExc = [ArgumentException]::new($ExcMsg, 'Path')
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
+    $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
+
+    $BashPath = Join-Path -Path $Path -ChildPath 'usr\bin\bash.exe'
+    $PacmanPath = Join-Path -Path $Path -ChildPath 'usr\bin\pacman.exe'
+
+    foreach ($BinaryPath in $BashPath, $PacmanPath) {
+        if (Test-Path -LiteralPath $BinaryPath -PathType 'Leaf') { continue }
+
+        $BinaryName = [IO.Path]::GetFileName($BinaryPath)
+        $ExcMsg = "Unable to update MSYS2 as ${BinaryName} command not found: ${Path}"
+        $ErrExc = [Management.Automation.CommandNotFoundException]::new($ExcMsg)
+        $ErrExc.CommandName = $BinaryName
+        $ErrCat = [Management.Automation.ErrorCategory]::ObjectNotFound
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandNotFound', $ErrCat, $BinaryName)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    $Result = [PSCustomObject]@{
+        Success      = $false
+        BeforeUpdate = ''
+        AfterUpdate  = ''
+        CoreUpgrade  = $false
+        Refresh      = [String[]]@()
+        Upgrade      = [String[]]@()
+        ExitCode     = -1
+        WhatIf       = $false
+    }
+
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateMSYS2')
+
+    $RefreshArgs = '-Sy', '--noprogressbar'
+    $RefreshCmd = "pacman $($RefreshArgs -join ' ')"
+
+    $UpgradeArgs = '-Su', '--noconfirm', '--noprogressbar'
+    $UpgradeCmd = "pacman $($UpgradeArgs -join ' ')"
+
+    $UpgradeReportOnlyArgs = @('-Qu')
+    $UpgradeReportOnlyCmd = "pacman $($UpgradeReportOnlyArgs -join ' ')"
+
+    $Result.BeforeUpdate = Get-MSYS2Version -Bash $BashPath -Fatal
+
+    if ($PSCmdlet.ShouldProcess('MSYS2 package databases', 'Refresh')) {
+        Write-Verbose -Message "Refreshing MSYS2 package databases: ${RefreshCmd}"
+        $Refresh = Invoke-Pacman -Bash $BashPath -Arguments $RefreshArgs
+        $Result.Refresh = $Refresh.Output
+        $Result.ExitCode = $Refresh.ExitCode
+
+        if ($Result.ExitCode -ne 0) {
+            $ExcMsg = "pacman exited with non-zero exit code refreshing MSYS2 package databases: $($Result.ExitCode)"
+            $ErrExc = [Exception]::new($ExcMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $RefreshCmd)
+            $PSCmdlet.WriteError($ErrRec)
+            return $Result
+        }
+    }
+
+    if (!$PSCmdlet.ShouldProcess('MSYS2 runtime & packages', 'Update')) {
+        $Result.WhatIf = $true
+
+        Write-Verbose -Message "Listing upgradable MSYS2 packages (report only): ${UpgradeReportOnlyCmd}"
+        $Upgrade = Invoke-Pacman -Bash $BashPath -Arguments $UpgradeReportOnlyArgs
+        $Result.Upgrade = $Upgrade.Output
+        $Result.ExitCode = $Upgrade.ExitCode
+
+        # An exit code of 1 with no output indicates no upgradable packages
+        if ($Result.ExitCode -eq 0 -or ($Result.ExitCode -eq 1 -and $Result.Upgrade.Count -eq 0)) {
+            $Result.Success = $true
+        } else {
+            $ExcMsg = "pacman exited with non-zero exit code listing upgradable MSYS2 packages: $($Result.ExitCode)"
+            $ErrExc = [Exception]::new($ExcMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpgradeReportOnlyCmd)
+            $PSCmdlet.WriteError($ErrRec)
+        }
+
+        return $Result
+    }
+
+    Write-Verbose -Message "Upgrading MSYS2 packages: ${UpgradeCmd}"
+    $Upgrade = Invoke-Pacman -Bash $BashPath -Arguments $UpgradeArgs
+    $Result.Upgrade = $Upgrade.Output
+    $Result.ExitCode = $Upgrade.ExitCode
+
+    # A core system upgrade terminates all MSYS2 processes on completion, so
+    # the exit code is not meaningful and the remaining packages are yet to be
+    # upgraded. Run `pacman` again to perform the full system upgrade.
+    $Result.AfterUpdate = Get-MSYS2Version -Bash $BashPath
+    if ($Result.BeforeUpdate -ne $Result.AfterUpdate) {
+        $Result.CoreUpgrade = $true
+
+        Write-Verbose -Message "Upgrading MSYS2 packages after core system upgrade: ${UpgradeCmd}"
+        $Upgrade = Invoke-Pacman -Bash $BashPath -Arguments $UpgradeArgs
+        $Result.Upgrade += $Upgrade.Output
+        $Result.ExitCode = $Upgrade.ExitCode
+        $Result.AfterUpdate = Get-MSYS2Version -Bash $BashPath
+    }
+
+    if ($Result.ExitCode -eq 0) {
+        $Result.Success = $true
+    } else {
+        $ExcMsg = "pacman exited with non-zero exit code upgrading MSYS2 packages: $($Result.ExitCode)"
+        $ErrExc = [Exception]::new($ExcMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpgradeCmd)
+        $PSCmdlet.WriteError($ErrRec)
+    }
+
+    return $Result
 }
 
 #endregion
