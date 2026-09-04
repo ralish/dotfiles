@@ -187,8 +187,8 @@
                                 <ScriptBlock>
                                     $WinGet = $PSItem
 
-                                    if ($WinGet.Available.Count -eq 0) { return 'No available updates' }
-                                    return "$($WinGet.Available.Count) available updates"
+                                    if ($WinGet.Available.Count -eq 0) { return 'No updates available' }
+                                    return "$($WinGet.Available.Count) updates available"
                                 </ScriptBlock>
                             </ListItem>
                             <ListItem>

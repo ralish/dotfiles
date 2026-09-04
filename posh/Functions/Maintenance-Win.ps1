@@ -87,10 +87,6 @@ Function Global:Update-Chrome {
     # that they're using the same variable names in a parent scope.
     $GoogleUpdate = $AppBundle = $AppUpdate = $CurrentVersionWeb = $NextVersionWeb = $null
 
-    # Errors returned from COM objects are surfaced by the .NET runtime as
-    # a generic `RuntimeException` (`0x80131501` / `COR_E_SYSTEM`), which
-    # requires inspection of the exception message to determine the failure.
-
     try {
         try {
             $GoogleUpdate = New-Object -ComObject $ComObjectName
@@ -360,10 +356,6 @@ Function Global:Update-Edge {
     # So we don't free existing COM objects in the (extremely unlikely) case
     # that they're using the same variable names in a parent scope.
     $EdgeUpdate = $AppBundle = $AppUpdate = $CurrentVersionWeb = $NextVersionWeb = $null
-
-    # Errors returned from COM objects are surfaced by the .NET runtime as
-    # a generic `RuntimeException` (`0x80131501` / `COR_E_SYSTEM`), which
-    # requires inspection of the exception message to determine the failure.
 
     try {
         try {
@@ -1444,7 +1436,7 @@ Function Global:Update-WSL {
     [OutputType([PSCustomObject])]
     Param()
 
-    Function Get-WslVersion {
+    Function Get-WSLVersion {
         [CmdletBinding()]
         [OutputType([Void], [PSCustomObject])]
         Param(
@@ -1454,7 +1446,7 @@ Function Global:Update-WSL {
         $StatusArgs = @('--status')
         $VersionArgs = @('--version')
 
-        $DefaultOutputEncoding = [Console]::OutputEncoding
+        $OriginalOutputEncoding = [Console]::OutputEncoding
 
         # We can't immediately launch `wsl --version` as if WSL is available
         # but not installed it will prompt the user to press any key to start
@@ -1464,7 +1456,7 @@ Function Global:Update-WSL {
             [Console]::OutputEncoding = [Text.Encoding]::Unicode
             $null = & wsl @StatusArgs 2>&1
         } finally {
-            [Console]::OutputEncoding = $DefaultOutputEncoding
+            [Console]::OutputEncoding = $OriginalOutputEncoding
         }
 
         switch ($LASTEXITCODE) {
@@ -1497,7 +1489,7 @@ Function Global:Update-WSL {
             [Console]::OutputEncoding = [Text.Encoding]::Unicode
             $WslVersion = [String[]]@(& wsl @VersionArgs 2>&1)
         } finally {
-            [Console]::OutputEncoding = $DefaultOutputEncoding
+            [Console]::OutputEncoding = $OriginalOutputEncoding
         }
 
         if ($LASTEXITCODE -ne 0) {
@@ -1559,7 +1551,7 @@ Function Global:Update-WSL {
     $UpdateArgs = @('--update')
     $UpdateCmd = "wsl $($UpdateArgs -join ' ')"
 
-    $Result.BeforeUpdate = Get-WslVersion -Fatal
+    $Result.BeforeUpdate = Get-WSLVersion -Fatal
 
     if (!$PSCmdlet.ShouldProcess('WSL', 'Update')) {
         $Result.Success = $true
@@ -1567,7 +1559,7 @@ Function Global:Update-WSL {
         return $Result
     }
 
-    $DefaultOutputEncoding = [Console]::OutputEncoding
+    $OriginalOutputEncoding = [Console]::OutputEncoding
 
     try {
         Write-Verbose -Message "Updating WSL: ${UpdateCmd}"
@@ -1575,7 +1567,7 @@ Function Global:Update-WSL {
         $Result.Output = [String[]]@(& wsl @UpdateArgs 2>&1)
         $Result.ExitCode = $LASTEXITCODE
     } finally {
-        [Console]::OutputEncoding = $DefaultOutputEncoding
+        [Console]::OutputEncoding = $OriginalOutputEncoding
     }
 
     if ($Result.ExitCode -eq 0) {
@@ -1588,7 +1580,7 @@ Function Global:Update-WSL {
         $PSCmdlet.WriteError($ErrRec)
     }
 
-    $Result.AfterUpdate = Get-WslVersion
+    $Result.AfterUpdate = Get-WSLVersion
     return $Result
 }
 

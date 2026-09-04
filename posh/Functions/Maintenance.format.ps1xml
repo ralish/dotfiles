@@ -166,7 +166,7 @@
                                     if ($WinGet -is [Management.Automation.ErrorRecord]) { return $WinGet.Exception.Message }
 
                                     if (!$WinGet.Success) { return 'Error during operation (view property for details)' }
-                                    if ($WinGet.WhatIf) { return "$($WinGet.Available.Count) available updates" }
+                                    if ($WinGet.WhatIf) { return "$($WinGet.Available.Count) updates available" }
 
                                     $Updated = ($WinGet.Results | Where-Object Status -EQ 'OK' | Measure-Object).Count
                                     $Failed = $WinGet.Results.Count - $Updated

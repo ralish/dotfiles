@@ -1774,8 +1774,7 @@ Function Global:Switch-Ruby {
 
 # Update Ruby gems
 #
-# TODO: Add dependency cooldown support when available
-# https://github.com/ruby/rubygems/discussions/9113
+# TODO: Add dependency cooldown support (to be released in RubyGems v4.1.0)
 Function Global:Update-RubyGems {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
@@ -1884,6 +1883,9 @@ Function Global:Update-RubyGems {
 #region Rust
 
 # Configure environment for Rust development
+#
+# Environment variables
+# https://doc.rust-lang.org/cargo/reference/environment-variables.html
 Function Global:Switch-Rust {
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]

@@ -331,7 +331,7 @@ Function Global:Update-PowerShell {
 
     if (!$SkipUpdateHelp -and $PSCmdlet.ShouldProcess('PowerShell help', 'Update')) {
         try {
-            Update-Help -Force:$Force -ErrorAction 'Stop'
+            Update-Help -Force:$Force -ErrorAction 'Stop' -Verbose:$false
         } catch {
             Write-Warning -Message 'Some errors were reported while updating PowerShell module help.'
         }

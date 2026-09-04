@@ -245,11 +245,11 @@ Function Global:Get-TextEncoder {
         [Switch]$ThrowOnInvalid
     )
 
-    if ($ByteOrderMark -and $Encoding -in ('ASCII', 'UTF-7')) {
+    if ($ByteOrderMark -and $Encoding -in 'ASCII', 'UTF-7') {
         Write-Warning -Message "Ignoring ByteOrderMark parameter as not applicable for ${Encoding} encoding."
     }
 
-    if ($ThrowOnInvalid -and $Encoding -in ('ASCII', 'UTF-7')) {
+    if ($ThrowOnInvalid -and $Encoding -in 'ASCII', 'UTF-7') {
         Write-Warning -Message "Ignoring ThrowOnInvalid parameter as not supported for ${Encoding} encoding."
     }
 
@@ -657,11 +657,7 @@ Function Global:Sort-XmlElement {
         [Xml.XmlElement[]]$XmlElement,
 
         [Switch]$SortAttributes,
-
-        [ValidateRange(0, [Byte]::MaxValue)]
         [Byte]$Depth = 0,
-
-        [ValidateRange(0, [Byte]::MaxValue)]
         [Byte]$MaxDepth = 25
     )
 
