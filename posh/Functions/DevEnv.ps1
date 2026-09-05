@@ -31,7 +31,7 @@ Function Global:Clear-NuGetCache {
     $GetCmd = "nuget $($GetArgs -join ' ')"
 
     Write-Verbose -Message "Retrieving NuGet caches: ${GetCmd}"
-    $NuGetLocals = & nuget @GetArgs
+    $NuGetLocals = [String[]]@(& nuget @GetArgs 2>&1)
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to retrieve NuGet caches (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -71,7 +71,7 @@ Function Global:Clear-NuGetCache {
             $ClearCmd = "nuget $($ClearArgs -join ' ')"
 
             Write-Verbose -Message "Clearing NuGet ${Cache} cache: ${ClearCmd}"
-            & nuget @ClearArgs
+            [String[]]@(& nuget @ClearArgs 2>&1)
             if ($LASTEXITCODE -ne 0) {
                 $ExcMsg = "Failed to clear NuGet ${Cache} cache (rc: ${LASTEXITCODE})."
                 $ErrExc = [Exception]::new($ExcMsg)
@@ -872,7 +872,7 @@ Function Global:Clear-NpmCache {
 
     if ($PSCmdlet.ShouldProcess($NpmCache, 'Clear')) {
         Write-Verbose -Message "Clearing npm cache: ${ClearCmd}"
-        & npm @ClearArgs
+        [String[]]@(& npm @ClearArgs 2>&1)
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to clear npm cache (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -916,7 +916,7 @@ Function Global:Clear-UvCache {
 
     if ($PSCmdlet.ShouldProcess($UvCache, 'Clear')) {
         Write-Verbose -Message "Clearing uv cache: ${ClearCmd}"
-        & uv @ClearArgs
+        [String[]]@(& uv @ClearArgs 2>&1)
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to clear uv cache (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1085,7 +1085,7 @@ Function Global:Update-NodejsPackages {
 
     if ($PSCmdlet.ShouldProcess('npm', 'Update')) {
         Write-Verbose -Message "Updating npm: ${UpdateNpmCmd}"
-        & npm @UpdateNpmArgs
+        [String[]]@(& npm @UpdateNpmArgs 2>&1)
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update npm (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1097,7 +1097,7 @@ Function Global:Update-NodejsPackages {
 
     if ($PSCmdlet.ShouldProcess('Node.js packages', 'Update')) {
         Write-Verbose -Message "Updating Node.js packages: ${UpdateCmd}"
-        & npm @UpdateArgs
+        [String[]]@(& npm @UpdateArgs 2>&1)
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update Node.js packages (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1250,7 +1250,7 @@ Function Global:Clear-PipCache {
     $PipSupportsCacheIndexV2 = $PipVersion -ge '23.3'
 
     Write-Verbose -Message "Retrieving pip cache path: ${GetCmd}"
-    $PipCacheInfo = & python @GetArgs
+    $PipCacheInfo = [String[]]@(& python @GetArgs 2>&1)
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to retrieve pip cache path (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1303,7 +1303,7 @@ Function Global:Clear-PipCache {
 
     if ($PSCmdlet.ShouldProcess($PipCachePaths -join ', ', 'Clear')) {
         Write-Verbose -Message "Clearing pip cache: ${ClearCmd}"
-        & python @ClearArgs
+        [String[]]@(& python @ClearArgs 2>&1)
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to clear pip cache (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1401,7 +1401,7 @@ Function Global:Update-PythonPipPackages {
         $PipUpdatePipCmd = "python $($PipUpdatePipArgs -join ' ')"
 
         Write-Verbose -Message "Updating pip package: ${PipUpdatePipCmd}"
-        & python @PipUpdatePipArgs
+        [String[]]@(& python @PipUpdatePipArgs 2>&1)
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update pip (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1428,7 +1428,7 @@ Function Global:Update-PythonPipPackages {
         $PipUpdateCmd = "python $($PipUpdateArgs -join ' ')"
 
         Write-Verbose -Message "Updating pip packages: ${PipUpdateCmd} $($Packages -join ' ')"
-        & python @PipUpdateArgs @Packages
+        [String[]]@(& python @PipUpdateArgs @Packages 2>&1)
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update pip packages (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1493,7 +1493,7 @@ Function Global:Update-PythonPipxPackages {
             $Env:USE_EMOJI = 0
 
             Write-Verbose -Message "Updating pipx packages: ${UpdateCmd}"
-            & python @UpdateArgs
+            [String[]]@(& python @UpdateArgs 2>&1)
             if ($LASTEXITCODE -ne 0) {
                 $ExcMsg = "Failed to update pipx packages (rc: ${LASTEXITCODE})."
                 $ErrExc = [Exception]::new($ExcMsg)
@@ -1581,7 +1581,7 @@ Function Global:Update-QtComponents {
         $QtMtCmd = "MaintenanceTool $($QtMtArgs -join ' ')"
 
         Write-Verbose -Message "Updating Qt components: ${QtMtCmd}"
-        & $QtMtPath @QtMtArgs
+        [String[]]@(& $QtMtPath @QtMtArgs 2>&1)
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update Qt components (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1618,7 +1618,7 @@ Function Global:Clear-GemCache {
     $ClearCmd = "gem $($ClearArgs -join ' ')"
 
     Write-Verbose -Message "Retrieving gem environment: ${GetCmd}"
-    $GemEnv = & gem @GetArgs
+    $GemEnv = [String[]]@(& gem @GetArgs 2>&1)
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to retrieve Gem environment (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1645,7 +1645,7 @@ Function Global:Clear-GemCache {
 
     if ($PSCmdlet.ShouldProcess($GemSpecCache, 'Clear')) {
         Write-Verbose -Message "Clearing gem cache: ${ClearCmd}"
-        & gem @ClearArgs
+        [String[]](& gem @ClearArgs 2>&1)
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to clear gem cache (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1817,7 +1817,7 @@ Function Global:Update-RubyGems {
     }
 
     Write-Verbose -Message "Updating RubyGems system${ExplainMsg}: ${UpdateSystemCmd}"
-    & gem @UpdateSystemArgs
+    [String[]]@(& gem @UpdateSystemArgs 2>&1)
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to update RubyGems system${ExplainMsg} (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1829,7 +1829,7 @@ Function Global:Update-RubyGems {
     Write-Verbose -Message "Retrieving Ruby gems: ${ListCmd}"
     $Packages = [Collections.Generic.List[String]]::new()
     $PackageRegex = [Regex]::new('\(default: \S+\)')
-    & gem @ListArgs | ForEach-Object {
+    & gem @ListArgs 2>&1 | ForEach-Object {
         if (!$PackageRegex.Match($PSItem).Success) {
             $Packages.Add($PSItem.Split(' ', [StringSplitOptions]::RemoveEmptyEntries)[0])
         }
@@ -1851,7 +1851,7 @@ Function Global:Update-RubyGems {
     }
 
     Write-Verbose -Message "Updating Ruby gems${ExplainMsg}: ${UpdateCmd} $($Packages -join ' ')"
-    & gem @UpdateArgs @Packages
+    [String[]]@(& gem @UpdateArgs @Packages 2>&1)
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to update Ruby gems${ExplainMsg} (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1868,7 +1868,7 @@ Function Global:Update-RubyGems {
     }
 
     Write-Verbose -Message "Uninstalling obsolete Ruby gems${DryrunMsg}: ${CleanupCmd}"
-    & gem @CleanupArgs
+    [String[]]@(& gem @CleanupArgs 2>&1)
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to uninstall obsolete Ruby gems${DryrunMsg} (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -2012,7 +2012,7 @@ Function Global:Update-RustToolchains {
 
     if ($PSCmdlet.ShouldProcess('Rust toolchains', 'Update')) {
         Write-Verbose -Message 'Updating Rust toolchains: rustup update'
-        & rustup update
+        [String[]]@(& rustup update 2>&1)
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update Rust toolchains (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
