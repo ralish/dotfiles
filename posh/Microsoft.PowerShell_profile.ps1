@@ -58,7 +58,9 @@ $PoshThemesPath = Join-Path -Path $PSScriptRoot -ChildPath 'Themes'
 
 # Preferred text editors ordered by priority (space-separated)
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-$DotFilesPreferredEditors = 'code', 'vim', 'vi', 'nano', 'pico'
+$DotFilesPreferredEditorsNix = 'vim', 'vi', 'nano', 'pico'
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+$DotFilesPreferredEditorsWin = 'code', 'vim', 'edit', 'notepad'
 
 # Load opted-in components asynchronously via the idle event
 $DotFilesLoadAsync = $true
