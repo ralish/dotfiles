@@ -1781,7 +1781,9 @@ Function Global:Switch-Ruby {
 Function Global:Update-RubyGems {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
-    Param()
+    Param(
+        [Switch]$IncludeDocs
+    )
 
     if (!(Test-IsWindows)) {
         $ExcMsg = 'Updating Ruby gems is only supported on Windows.'
@@ -1803,7 +1805,12 @@ Function Global:Update-RubyGems {
     $ListArgs = 'list', '--local', '--no-details'
     $ListCmd = "gem $($ListArgs -join ' ')"
 
-    $UpdateArgs = 'update', '--no-document'
+    $UpdateArgs = @('update')
+
+    if (!$IncludeDocs) {
+        $UpdateArgs += '--no-document'
+    }
+
     $UpdateCmd = "gem $($UpdateArgs -join ' ')"
 
     $UpdateSystemArgs = $UpdateArgs + '--system'
