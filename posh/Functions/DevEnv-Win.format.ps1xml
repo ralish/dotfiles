@@ -93,5 +93,46 @@
                 </ListEntries>
             </ListControl>
         </View>
+        <View>
+            <Name>DotFiles.MaintenanceWin.UpdatePython</Name>
+            <ViewSelectedBy>
+                <TypeName>DotFiles.MaintenanceWin.UpdatePython</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Success</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>BeforeUpdate</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>AfterUpdate</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Output</Label>
+                                <ScriptBlock>
+                                    $Python = $PSItem
+
+                                    switch ($Python.Output.Count) {
+                                        0 { '(no output)' }
+                                        1 { $Python.Output }
+                                        default { "$($Python.Output.Count) lines (view property for output)" }
+                                    }
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>ExitCode</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>WhatIf</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
     </ViewDefinitions>
 </Configuration>
