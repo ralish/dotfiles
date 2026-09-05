@@ -1633,7 +1633,8 @@ Function Global:Clear-GemCache {
     $GemSpecCache = $null
     foreach ($Line in $GemEnv) {
         if ($Line -match 'SPEC CACHE DIRECTORY: (.+)') {
-            $GemSpecCache = $Matches[1]
+            # Normalise the path (e.g. match platform directory separators)
+            $GemSpecCache = [IO.Path]::GetFullPath($Matches[1])
             break
         }
     }
