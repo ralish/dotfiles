@@ -1440,12 +1440,12 @@ Function Global:Update-PythonPipPackages {
 }
 
 # Update Python pipx packages
-#
-# TODO: Add dependency cooldown support when available
 Function Global:Update-PythonPipxPackages {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
-    Param()
+    Param(
+        [Byte]$CooldownDays
+    )
 
     if (!(Get-Command -Name 'python' -ErrorAction 'Ignore')) {
         $ExcMsg = 'Unable to update pipx packages as python command not found.'
@@ -1458,20 +1458,57 @@ Function Global:Update-PythonPipxPackages {
 
     $PipxModuleArgs = '-m', 'pipx'
 
-    $ListArgs = $PipxModuleArgs + 'list'
-    $ListCmd = "python $($ListArgs -join ' ')"
+    $VersionArgs = $PipxModuleArgs + '--version'
+    $VersionCmd = "python $($VersionArgs -join ' ')"
 
     $UpdateArgs = $PipxModuleArgs + 'upgrade-all'
     $UpdateCmd = "python $($UpdateArgs -join ' ')"
 
-    # Use `list` as invoking without a command will return a non-zero exit code
-    $null = & python @ListArgs 2>&1
+    $PipxVersionRaw = (& python @VersionArgs) -join ''
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = 'Unable to update pipx packages as pipx module not found.'
         $ErrExc = [Exception]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $ListCmd)
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $VersionCmd)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    $PipxVersion = $null
+    if (![Version]::TryParse($PipxVersionRaw, [Ref]$PipxVersion)) {
+        $ExcMsg = "Failed to parse pipx version: ${PipxVersionRaw}"
+        $ErrExc = [FormatException]::new($ExcMsg)
+        $ErrCat = [Management.Automation.ErrorCategory]::ParserError
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'VersionParseFailed', $ErrCat, $PipxVersionRaw)
+        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    }
+
+    $CooldownDaysParamSet = $false
+    if ($PSBoundParameters.ContainsKey('CooldownDays')) {
+        $CooldownDaysParamSet = $true
+    }
+
+    $CooldownDaysEnv = $Env:PIPX_COOLDOWN
+    $CooldownDaysEnvSet = $false
+    if (![String]::IsNullOrWhiteSpace($CooldownDaysEnv)) {
+        $CooldownDaysEnvSet = $true
+    }
+
+    if ($CooldownDaysParamSet -or $CooldownDaysEnvSet) {
+        if ($PipxVersionRaw -ge '1.16.0') {
+            if (!$CooldownDaysParamSet) {
+                $CooldownDays = $CooldownDaysEnv
+                Write-Verbose -Message "Using PIPX_COOLDOWN environment variable: ${CooldownDays}"
+            }
+
+            $UpdateArgs += '--cooldown', $CooldownDays
+            $UpdateCmd += ' --cooldown', $CooldownDays
+        } else {
+            if ($CooldownDaysParamSet) {
+                Write-Warning -Message 'Ignoring CooldownDays parameter as pipx is not at least v1.16.0.'
+            } else {
+                Write-Warning -Message 'Ignoring PIPX_COOLDOWN environment variable as pipx is not at least v1.16.0.'
+            }
+        }
     }
 
     if ($PSCmdlet.ShouldProcess('pipx packages', 'Update')) {
