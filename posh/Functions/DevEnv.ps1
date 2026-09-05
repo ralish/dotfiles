@@ -1582,7 +1582,10 @@ Function Global:Update-QtComponents {
 
         Write-Verbose -Message "Updating Qt components: ${QtMtCmd}"
         [String[]]@(& $QtMtPath @QtMtArgs 2>&1)
-        if ($LASTEXITCODE -ne 0) {
+
+        # PackageManagerCore::Status enum
+        # https://doc.qt.io/qtinstallerframework/qinstaller-packagemanagercore.html#Status-enum
+        if ($LASTEXITCODE -notin 0, 3) {
             $ExcMsg = "Failed to update Qt components (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
