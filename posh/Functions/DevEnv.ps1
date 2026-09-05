@@ -2017,14 +2017,31 @@ Function Global:Update-RustToolchains {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
+    $CheckArgs = @('check')
+    $CheckCmd = "rustup $($CheckArgs -join ' ')"
+
+    $UpdateArgs = @('update')
+    $UpdateCmd = "rustup $($UpdateArgs -join ' ')"
+
     if ($PSCmdlet.ShouldProcess('Rust toolchains', 'Update')) {
-        Write-Verbose -Message 'Updating Rust toolchains: rustup update'
-        [String[]]@(& rustup update 2>&1)
+        Write-Verbose -Message "Updating Rust toolchains: ${UpdateCmd}"
+        [String[]]@(& rustup @UpdateArgs 2>&1)
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update Rust toolchains (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, 'rustup update')
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateCmd)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+    } else {
+        Write-Verbose -Message "Checking for Rust toolchain updates: ${CheckCmd}"
+        [String[]]@(& rustup @CheckArgs 2>&1)
+        # 0: Up-to-date, 100: Update available
+        if ($LASTEXITCODE -notin 0, 100) {
+            $ExcMsg = "Failed to check for Rust toolchain updates (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $CheckCmd)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
     }
