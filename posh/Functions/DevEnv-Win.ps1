@@ -719,7 +719,7 @@ Function Global:Switch-Python {
             $VersionCmd = "${PythonExe} $($VersionArgs -join ' ')"
 
             $PythonFailed = $false
-            $PythonVersionRaw = (& $PythonExe @VersionArgs 2>&1) -join ''
+            $PythonVersionRaw = (& $PythonExe @VersionArgs) -join ''
             if ($LASTEXITCODE -ne 0) {
                 $PythonFailed = $true
                 $ExcMsg = "Failed to retrieve Python version (rc: ${LASTEXITCODE})."
@@ -846,7 +846,7 @@ Function Global:Update-Python {
         $ListCmd = "pymanager $($ListArgs -join ' ')"
 
         Write-Verbose -Message "Listing Python runtimes: ${ListCmd}"
-        $VersionsJsonRaw = @(& pymanager @ListArgs 2>&1) -join ''
+        $VersionsJsonRaw = @(& pymanager @ListArgs) -join ''
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Pymanager exited with non-zero exit code listing Python runtimes: ${LASTEXITCODE}"
             $ErrExc = [Exception]::new($ExcMsg)

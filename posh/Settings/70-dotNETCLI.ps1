@@ -58,7 +58,7 @@ Function Get-DotNetCliCompletionsType {
         }
         $Env:DOTNET_NOLOGO = 'true'
 
-        $CliVersionRaw = (& dotnet @VersionArgs 2>&1) -join ''
+        $CliVersionRaw = (& dotnet @VersionArgs) -join ''
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to retrieve .NET version (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)

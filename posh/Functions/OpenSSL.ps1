@@ -630,7 +630,7 @@ Function Global:Get-OpenSSLVersion {
     $VersionArgs = 'version', '-v'
     $VersionCmd = "openssl $($VersionArgs -join ' ')"
 
-    $Version = @(& openssl @VersionArgs 2>&1) -join ''
+    $VersionRaw = @(& openssl @VersionArgs) -join ''
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to retrieve OpenSSL version (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -639,11 +639,11 @@ Function Global:Get-OpenSSLVersion {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    if ($Version -notmatch '^OpenSSL ([0-9]+\.[0-9]+(\.[0-9]+)?)') {
-        $ExcMsg = "Failed to extract OpenSSL version: ${Version}"
+    if ($VersionRaw -notmatch '^OpenSSL ([0-9]+\.[0-9]+(\.[0-9]+)?)') {
+        $ExcMsg = "Failed to extract OpenSSL version: ${VersionRaw}"
         $ErrExc = [FormatException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::ParserError
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $Version)
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $VersionRaw)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 

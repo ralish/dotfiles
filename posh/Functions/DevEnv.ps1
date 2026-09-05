@@ -31,7 +31,7 @@ Function Global:Clear-NuGetCache {
     $GetCmd = "nuget $($GetArgs -join ' ')"
 
     Write-Verbose -Message "Retrieving NuGet caches: ${GetCmd}"
-    $NuGetLocals = [String[]]@(& nuget @GetArgs 2>&1)
+    $NuGetLocals = [String[]]@(& nuget @GetArgs)
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to retrieve NuGet caches (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -142,7 +142,7 @@ Function Global:Update-DotNetTools {
 
         $Env:DOTNET_NOLOGO = 'true'
 
-        $CliVersionRaw = (& dotnet @VersionArgs 2>&1) -join ''
+        $CliVersionRaw = (& dotnet @VersionArgs) -join ''
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to retrieve .NET version (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1229,7 +1229,7 @@ Function Global:Clear-PipCache {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $PipVersionRaw = (& python @VersionArgs 2>&1) -join ''
+    $PipVersionRaw = (& python @VersionArgs) -join ''
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to retrieve pip version (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1250,7 +1250,7 @@ Function Global:Clear-PipCache {
     $PipSupportsCacheIndexV2 = $PipVersion -ge '23.3'
 
     Write-Verbose -Message "Retrieving pip cache path: ${GetCmd}"
-    $PipCacheInfo = [String[]]@(& python @GetArgs 2>&1)
+    $PipCacheInfo = [String[]]@(& python @GetArgs)
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to retrieve pip cache path (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1360,7 +1360,7 @@ Function Global:Update-PythonPipPackages {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $PipdeptreeOutput = [String[]]@(& python @PipdeptreeModuleArgs 2>&1)
+    $PipdeptreeOutput = [String[]]@(& python @PipdeptreeModuleArgs)
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = 'Unable to update pip packages as pipdeptree module not found.'
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1369,7 +1369,7 @@ Function Global:Update-PythonPipPackages {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $PipVersionRaw = (& python @PipVersionArgs 2>&1) -join ''
+    $PipVersionRaw = (& python @PipVersionArgs) -join ''
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to retrieve pip version (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1621,7 +1621,7 @@ Function Global:Clear-GemCache {
     $ClearCmd = "gem $($ClearArgs -join ' ')"
 
     Write-Verbose -Message "Retrieving gem environment: ${GetCmd}"
-    $GemEnv = [String[]]@(& gem @GetArgs 2>&1)
+    $GemEnv = [String[]]@(& gem @GetArgs)
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to retrieve Gem environment (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1836,7 +1836,7 @@ Function Global:Update-RubyGems {
     Write-Verbose -Message "Retrieving Ruby gems: ${ListCmd}"
     $Packages = [Collections.Generic.List[String]]::new()
     $PackageRegex = [Regex]::new('\(default: \S+\)')
-    & gem @ListArgs 2>&1 | ForEach-Object {
+    & gem @ListArgs | ForEach-Object {
         if (!$PackageRegex.Match($PSItem).Success) {
             $Packages.Add($PSItem.Split(' ', [StringSplitOptions]::RemoveEmptyEntries)[0])
         }

@@ -1397,7 +1397,7 @@ Function Global:Update-WSL {
 
         try {
             [Console]::OutputEncoding = [Text.Encoding]::Unicode
-            $WslVersion = [String[]]@(& wsl @VersionArgs 2>&1)
+            $WslVersionRaw = [String[]]@(& wsl @VersionArgs)
         } finally {
             [Console]::OutputEncoding = $OriginalOutputEncoding
         }
@@ -1407,7 +1407,7 @@ Function Global:Update-WSL {
         }
 
         $Result = [PSCustomObject]@{}
-        foreach ($Line in $WslVersion) {
+        foreach ($Line in $WslVersionRaw) {
             if ([String]::IsNullOrWhiteSpace($Line)) { continue }
 
             if ($Line -notmatch '^([A-Za-z0-9]+) version: (.+)') {
