@@ -917,7 +917,10 @@ Function Global:Update-Python {
         $PSCmdlet.WriteError($ErrRec)
     }
 
-    $Result.AfterUpdate = Get-PythonRuntimes
+    if (!$WhatIfPreference) {
+        $Result.AfterUpdate = Get-PythonRuntimes
+    }
+
     return $Result
 }
 
