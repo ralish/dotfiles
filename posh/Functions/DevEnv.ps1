@@ -265,6 +265,107 @@ Function Global:Update-DotNetTools {
 
 #endregion
 
+#region DJGPP
+
+# Configure environment for DJGPP development
+Function Global:Switch-DJGPP {
+    [CmdletBinding(DefaultParameterSetName = 'Enable')]
+    [OutputType([Void])]
+    Param(
+        [Parameter(Mandatory)]
+        [String]$Path,
+
+        [Parameter(ParameterSetName = 'Disable', Mandatory)]
+        [Switch]$Disable,
+
+        [Parameter(ParameterSetName = 'Disable')]
+        [Switch]$IncludeNonPathVars,
+
+        [Switch]$Force
+    )
+
+    DynamicParam {
+        $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
+
+        if (Test-IsWindows) {
+            $PersistParamAttr = [Management.Automation.ParameterAttribute]@{}
+            $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $PersistParamAttr)
+            $RuntimeParams.Add('Persist', $PersistParam)
+        }
+
+        return $RuntimeParams
+    }
+
+    End {
+        if (!(Test-IsPathFullyQualified -Path $Path)) {
+            $Path = Join-Path -Path $ExecutionContext.SessionState.Path.CurrentFileSystemLocation -ChildPath $Path
+        }
+
+        $PathItem = Get-Item -LiteralPath $Path -ErrorAction 'Ignore'
+        if ($PathItem -isnot [IO.DirectoryInfo]) {
+            $Msg = "DJGPP path is inaccessible or not a directory: ${Path}"
+
+            if (!$Force) {
+                $ErrExc = [ArgumentException]::new($Msg, 'Path')
+                $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
+                $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Path)
+                $PSCmdlet.ThrowTerminatingError($ErrRec)
+            }
+
+            Write-Warning -Message $Msg
+        }
+
+        $Enable = !$Disable
+        $PathParams = @{}
+        $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
+
+        if ($Enable) {
+            $PathFunc = 'Add-PathStringElement'
+            $PathParams['Action'] = 'Prepend'
+            $PathChangesDesc = 'Prepended to PATH: '
+        } else {
+            $PathFunc = 'Remove-PathStringElement'
+            $PathChangesDesc = 'Removed from PATH: '
+        }
+
+        $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
+        $BinPath = Join-Path -Path $Path -ChildPath ('i586-pc-msdosdjgpp', 'bin' -join [IO.Path]::DirectorySeparatorChar)
+        $GccPath = Join-Path -Path $Path -ChildPath ('lib', 'gcc' -join [IO.Path]::DirectorySeparatorChar)
+
+        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
+        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host $BinPath
+
+        if ($Enable) {
+            $Env:GCC_EXEC_PREFIX = $GccPath
+            Write-Host -ForegroundColor 'Green' -NoNewline 'Set GCC_EXEC_PREFIX to: '
+            Write-Host $Env:GCC_EXEC_PREFIX
+        } elseif ($Disable -and $IncludeNonPathVars) {
+            $Env:GCC_EXEC_PREFIX = $null
+            Write-Host -ForegroundColor 'Green' 'Unset GCC_EXEC_PREFIX.'
+        }
+
+        if ($PSBoundParameters['Persist']) {
+            Write-Host -ForegroundColor 'Green' 'Persisting changes to user environment ...'
+            if ($Enable) {
+                $PathParams['Action'] = 'Append'
+            }
+
+            Get-EnvironmentVariable -Name 'Path' -Scope 'User' |
+                & $PathFunc @PathParams -Element $BinPath |
+                Set-EnvironmentVariable -Name 'Path' -Scope 'User'
+
+            if ($Enable) {
+                Set-EnvironmentVariable -Name 'GCC_EXEC_PREFIX' -Value $Env:GCC_EXEC_PREFIX -Scope 'User'
+            } elseif ($Disable -and $IncludeNonPathVars) {
+                Remove-EnvironmentVariable -Name 'GCC_EXEC_PREFIX' -Scope 'User'
+            }
+        }
+    }
+}
+
+#endregion
+
 #region Go
 
 # Clear Go cache
