@@ -1812,21 +1812,17 @@ Function Global:Update-RubyGems {
     $CleanupArgs = @('cleanup')
     $CleanupCmd = "gem $($CleanupArgs -join ' ')"
 
-    $ExplainMsg = ''
-    if (!$PSCmdlet.ShouldProcess('RubyGems system', 'Update')) {
-        $ExplainMsg += ' (explain only)'
-        $UpdateSystemArgs += '--explain'
-        $UpdateSystemCmd += ' --explain'
-    }
-
-    Write-Verbose -Message "Updating RubyGems system${ExplainMsg}: ${UpdateSystemCmd}"
-    [String[]]@(& gem @UpdateSystemArgs 2>&1)
-    if ($LASTEXITCODE -ne 0) {
-        $ExcMsg = "Failed to update RubyGems system${ExplainMsg} (rc: ${LASTEXITCODE})."
-        $ErrExc = [Exception]::new($ExcMsg)
-        $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateSystemCmd)
-        $PSCmdlet.ThrowTerminatingError($ErrRec)
+    # It's not possible to simulate a RubyGems system update
+    if ($PSCmdlet.ShouldProcess('RubyGems system', 'Update')) {
+        Write-Verbose -Message "Updating RubyGems system: ${UpdateSystemCmd}"
+        [String[]]@(& gem @UpdateSystemArgs 2>&1)
+        if ($LASTEXITCODE -ne 0) {
+            $ExcMsg = "Failed to update RubyGems system (rc: ${LASTEXITCODE})."
+            $ErrExc = [Exception]::new($ExcMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpdateSystemCmd)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
     }
 
     Write-Verbose -Message "Retrieving Ruby gems: ${ListCmd}"
