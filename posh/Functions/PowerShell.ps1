@@ -409,7 +409,10 @@ Function Global:Compare-Hashtable {
 }
 
 # Compare the properties of two objects
-# Via: https://learn.microsoft.com/en-au/archive/blogs/janesays/compare-all-properties-of-two-objects-in-windows-powershell
+#
+# Multi-valued properties are compared by content irrespective of element order
+# unless `-OrderSensitive` is specified, and an empty collection is treated as
+# equal to a missing value.
 Function Global:Compare-ObjectProperties {
     [CmdletBinding()]
     [OutputType([PSCustomObject[]])]
@@ -420,8 +423,40 @@ Function Global:Compare-ObjectProperties {
         [Parameter(Mandatory)]
         [PSObject]$DifferenceObject,
 
-        [String[]]$IgnoredProperties
+        [String[]]$IgnoredProperties,
+        [Switch]$OrderSensitive
     )
+
+    # Normalise a value for comparison. Collections are reduced to their string
+    # elements, sorted unless order is significant, and an empty collection
+    # becomes `$null` so it compares equal to a missing value.
+    Function ConvertTo-ComparableValue {
+        [CmdletBinding()]
+        [OutputType([Object], [String])]
+        Param(
+            [Object]$Value,
+            [Switch]$OrderSensitive
+        )
+
+        if ($null -eq $Value -or $Value -is [String]) {
+            return $Value
+        }
+
+        if ($Value -isnot [Collections.IEnumerable]) {
+            return $Value
+        }
+
+        $Items = [String[]]@($Value | ForEach-Object { [String]$PSItem })
+        if ($Items.Count -eq 0) {
+            return $null
+        }
+
+        if (!$OrderSensitive) {
+            $Items = [String[]]@($Items | Sort-Object)
+        }
+
+        return [String]::Join("`n", $Items)
+    }
 
     $RefPropNames = @($ReferenceObject |
             Get-Member -MemberType 'Property', 'NoteProperty' |
@@ -440,17 +475,43 @@ Function Global:Compare-ObjectProperties {
     $DifferentProperties = [Collections.Generic.List[PSCustomObject]]::new()
 
     foreach ($PropertyName in $AllPropNames) {
-        $CompareObject = Compare-Object -ReferenceObject $ReferenceObject -DifferenceObject $DifferenceObject -Property $PropertyName
-
-        if ($CompareObject) {
-            $DifferentProperty = [PSCustomObject]@{
-                PropertyName   = $PropertyName
-                ReferenceValue = $CompareObject | Where-Object SideIndicator -EQ '<=' | Select-Object -ExpandProperty $PropertyName
-                DifferentValue = $CompareObject | Where-Object SideIndicator -EQ '=>' | Select-Object -ExpandProperty $PropertyName
-            }
-
-            $DifferentProperties.Add($DifferentProperty)
+        # A property may be present on only one of the objects
+        $RefValue = $null
+        $RefProperty = $ReferenceObject.PSObject.Properties[$PropertyName]
+        if ($null -ne $RefProperty) {
+            $RefValue = $RefProperty.Value
         }
+
+        $DiffValue = $null
+        $DiffProperty = $DifferenceObject.PSObject.Properties[$PropertyName]
+        if ($null -ne $DiffProperty) {
+            $DiffValue = $DiffProperty.Value
+        }
+
+        $RefComparable = ConvertTo-ComparableValue -Value $RefValue -OrderSensitive:$OrderSensitive
+        $DiffComparable = ConvertTo-ComparableValue -Value $DiffValue -OrderSensitive:$OrderSensitive
+
+        $Equal = $false
+        if ($null -eq $RefComparable -and $null -eq $DiffComparable) {
+            $Equal = $true
+        } elseif ($null -ne $RefComparable -and $null -ne $DiffComparable) {
+            try {
+                $Equal = $RefComparable -eq $DiffComparable
+            } catch {
+                # Values which can't be converted for comparison are different
+                Write-Debug -Message "Treating incomparable values of property as different: ${PropertyName}"
+            }
+        }
+
+        if ($Equal) { continue }
+
+        $DifferentProperty = [PSCustomObject]@{
+            PropertyName   = $PropertyName
+            ReferenceValue = $RefValue
+            DifferentValue = $DiffValue
+        }
+
+        $DifferentProperties.Add($DifferentProperty)
     }
 
     return $DifferentProperties.ToArray()
