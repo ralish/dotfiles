@@ -321,7 +321,7 @@ Function Global:Update-PowerShell {
         $UninstallParams = @{ ErrorAction = 'Stop' }
 
         if ($PSBoundParameters.ContainsKey('ProgressParentId')) {
-            $UninstallParams['ProgressParentId'] = $WriteProgressParams['Id']
+            $UninstallParams['ProgressParentId'] = $WriteProgressParams.Id
         }
 
         try {

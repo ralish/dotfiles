@@ -1233,8 +1233,8 @@ Function Global:New-IsoImage {
 
         $SourceItem = Get-Item -LiteralPath $SourcePath -ErrorAction 'Ignore'
         if ($SourceItem -isnot [IO.DirectoryInfo]) {
-            $ErrMsg = "Source path is inaccessible or not a directory: ${SourcePath}"
-            $ErrExc = [ArgumentException]::new($ErrMsg, 'Source')
+            $ExcMsg = "Source path is inaccessible or not a directory: ${SourcePath}"
+            $ErrExc = [ArgumentException]::new($ExcMsg, 'Source')
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidArgument
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidArgument', $ErrCat, $Source)
             $PSCmdlet.ThrowTerminatingError($ErrRec)

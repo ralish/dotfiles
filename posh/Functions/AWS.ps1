@@ -488,9 +488,9 @@ Function Global:Get-S3BucketSize {
     }
 
     foreach ($Bucket in $Buckets) {
-        $Bucket.PSObject.TypeNames.Insert(0, 'Amazon.S3.Model.S3Bucket.Size')
         $Bucket | Add-Member -MemberType 'NoteProperty' -Name 'BucketSizeBytes' -Value 0
         $Bucket | Add-Member -MemberType 'ScriptProperty' -Name 'BucketSize' -Value { $this.BucketSizeBytes | Format-SizeDigital }
+        $Bucket.PSObject.TypeNames.Insert(0, 'Amazon.S3.Model.S3Bucket.Size')
     }
 
     Write-Verbose -Message 'Retrieving BucketSizeBytes metrics for enabled regions ...'

@@ -423,32 +423,32 @@ Function Global:Update-AllTheThings {
         if ($Tasks -contains 'Office') {
             $WriteProgressParams['Status'] = 'Office'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
-            $Results.Office = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Office' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+            $Results.Office = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Office' -Parameters @{ ProgressParentId = $WriteProgressParams.Id }
         }
 
         if ($Tasks -contains 'VisualStudio') {
             $WriteProgressParams['Status'] = 'Visual Studio'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
-            $Results.VisualStudio = Invoke-Task -Progress $WriteProgressParams -Command 'Update-VisualStudio' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+            $Results.VisualStudio = Invoke-Task -Progress $WriteProgressParams -Command 'Update-VisualStudio' -Parameters @{ ProgressParentId = $WriteProgressParams.Id }
         }
 
         if ($Tasks -contains 'PowerShell') {
             $WriteProgressParams['Status'] = 'PowerShell'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
-            $null = Invoke-Task -Progress $WriteProgressParams -Command 'Update-PowerShell' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+            $null = Invoke-Task -Progress $WriteProgressParams -Command 'Update-PowerShell' -Parameters @{ ProgressParentId = $WriteProgressParams.Id }
             $Results.PowerShell = $true
         }
 
         if ($Tasks -contains 'Edge') {
             $WriteProgressParams['Status'] = 'Edge'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
-            $Results.Edge = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Edge' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+            $Results.Edge = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Edge' -Parameters @{ ProgressParentId = $WriteProgressParams.Id }
         }
 
         if ($Tasks -contains 'Chrome') {
             $WriteProgressParams['Status'] = 'Chrome'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
-            $Results.Chrome = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Chrome' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+            $Results.Chrome = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Chrome' -Parameters @{ ProgressParentId = $WriteProgressParams.Id }
         }
 
         if ($Tasks -contains 'MicrosoftStore') {
@@ -466,13 +466,13 @@ Function Global:Update-AllTheThings {
         if ($Tasks -contains 'Scoop') {
             $WriteProgressParams['Status'] = 'Scoop'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
-            $Results.Scoop = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Scoop' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+            $Results.Scoop = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Scoop' -Parameters @{ ProgressParentId = $WriteProgressParams.Id }
         }
 
         if ($Tasks -contains 'Homebrew') {
             $WriteProgressParams['Status'] = 'Homebrew'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
-            $Results.Homebrew = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Homebrew' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+            $Results.Homebrew = Invoke-Task -Progress $WriteProgressParams -Command 'Update-Homebrew' -Parameters @{ ProgressParentId = $WriteProgressParams.Id }
         }
 
         if ($Tasks -contains 'Cygwin') {
@@ -484,7 +484,7 @@ Function Global:Update-AllTheThings {
         if ($Tasks -contains 'DotNetTools') {
             $WriteProgressParams['Status'] = '.NET tools'
             $WriteProgressParams['PercentComplete'] = $TasksDone++ / $TasksTotal * 100
-            $Results.DotNetTools = Invoke-Task -Progress $WriteProgressParams -Command 'Update-DotNetTools' -Parameters @{ ProgressParentId = $WriteProgressParams['Id'] }
+            $Results.DotNetTools = Invoke-Task -Progress $WriteProgressParams -Command 'Update-DotNetTools' -Parameters @{ ProgressParentId = $WriteProgressParams.Id }
         }
 
         if ($Tasks -contains 'GoBinaries') {
