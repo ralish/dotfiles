@@ -521,6 +521,7 @@
     ],
     // Language Support for Java(TM) by Red Hat: Code Navigation
     "java.referencesCodeLens.enabled": true,
+    "java.referencesCodeLens.includeFields": true,
     "java.implementationCodeLens": "all",
 
     // Markdown All in One
