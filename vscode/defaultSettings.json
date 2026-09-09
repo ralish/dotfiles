@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code defaults
      *
-     * Exported from release: v1.134.0
+     * Exported from release: v1.137.0
      *
      * Obtained from "Preferences: Open Default Settings (JSON)" command.
      */
@@ -1910,6 +1910,9 @@
     // Provide information about how to access element commenting accessibility help in the Integrated Browser.
     "accessibility.verbosity.browserElementCommenting": true,
 
+    // Provide information about how to access chat pet achievements accessibility help when the Achievements modal is focused.
+    "accessibility.verbosity.chatPetAchievements": true,
+
     // Provide information about how to navigate and interact with the chat question carousel, including how to focus the terminal when applicable.
     "accessibility.verbosity.chatQuestionCarousel": true,
 
@@ -2478,15 +2481,19 @@
 
     // Chat
     // Allowed domains for network access by agent tools (fetch tool, integrated browser). Applies when `chat.agent.networkFilter` or `chat.agent.sandbox.enabled` is enabled. When `chat.agent.sandbox.allowNetwork` is enabled, all domains are allowed. Supports wildcards like `*.example.com`. When both allowed and denied lists are empty, all domains are blocked. Denied domains (see `chat.agent.deniedNetworkDomains`) take precedence.
+    //
+    // Changes may not take full effect until VS Code is restarted.
     "chat.agent.allowedNetworkDomains": [],
 
     // When applying edits, show a progress animation in the code block pill. If disabled, shows the progress percentage instead.
     "chat.agent.codeBlockProgress": true,
 
     // Controls whether completed chat responses collapse intermediate work while keeping the final response visible.
-    "chat.agent.collapseCompletedResponses": false,
+    "chat.agent.collapseCompletedResponses": true,
 
     // Denied domains for network access by agent tools (fetch tool, integrated browser). Applies when `chat.agent.networkFilter` or `chat.agent.sandbox.enabled` is enabled. This does not apply when `chat.agent.sandbox.allowNetwork` is enabled. Takes precedence over `chat.agent.allowedNetworkDomains`. Supports wildcards like `*.example.com`.
+    //
+    // Changes may not take full effect until VS Code is restarted.
     "chat.agent.deniedNetworkDomains": [],
 
     // When enabled, agent mode can be activated from chat and tools in agentic contexts with side effects can be used.
@@ -2496,6 +2503,8 @@
     "chat.agent.maxRequests": 50,
 
     // When enabled, network access by agent tools (fetch tool, integrated browser) is restricted according to `chat.agent.allowedNetworkDomains` and `chat.agent.deniedNetworkDomains`. Domain filtering is also applied to those tools when `chat.agent.sandbox.enabled` is enabled.
+    //
+    // Changes may not take full effect until VS Code is restarted.
     "chat.agent.networkFilter": false,
 
     // Integrated Terminal
@@ -2508,7 +2517,7 @@
     "chat.agent.sandbox.allowAutoApprove": true,
 
     // When `chat.agent.sandbox.enabled` is enabled, controls whether to allow all network domains in the sandbox. When enabled, the sandbox preserves file system restrictions while relaxing all network restrictions.
-    "chat.agent.sandbox.allowNetwork": false,
+    "chat.agent.sandbox.allowNetwork": true,
 
     // Controls whether agent mode terminal commands can run outside the sandbox after user confirmation when a sandboxed command fails or when sandbox restrictions would block the command. This applies only when `chat.agent.sandbox.enabled` is enabled.
     "chat.agent.sandbox.allowUnsandboxedCommands": true,
@@ -2585,6 +2594,7 @@
     //  - fixedScrolling: Show thinking in a fixed-height streaming panel that auto-scrolls; click header to expand to full height.
     "chat.agent.thinkingStyle": "fixedScrolling",
 
+    // This setting and the Local agent harness will be removed in a future release. Use [Migrate Location Settings](command:aiCustomization.openManagementEditor?%255B%257B%2522migration%2522%253Atrue%252C%2522migrationCategory%2522%253A%2522configuredLocations%2522%257D%255D "Open Migrate Location Settings") in the Agent Customizations editor to move agents into supported locations.
     // Specify location(s) of custom agent files (`*.agent.md`). [Learn More](https://aka.ms/vscode-ghcp-custom-chat-modes).
     //
     // Relative paths are resolved from the root folder(s) of your workspace.
@@ -2602,39 +2612,14 @@
     // Maximum number of debug events kept in memory per agent host session for the agent debug panel. Older events beyond this limit are dropped from the in-memory buffer, which also lowers the totals (such as token usage) shown in the panel overview.
     "chat.agentHost.agentDebugLog.maxEventsInMemory": 10000,
 
-    // Chat Agent Host Starter
-    // Controls whether enabled Agent Merge sessions address unresolved review threads, changes-requested reviews, and new pull request comments from repository maintainers or the Copilot pull request reviewer.
-    "chat.agentHost.agentMerge.addressReviews": true,
-
-    // Enables the experimental Agent Merge controller and its commands. Agent Merge can monitor an agent session's pull request, ask the agent to address selected blockers, and optionally merge the pull request when it is ready.
-    "chat.agentHost.agentMerge.enabled": false,
-
-    // Controls whether enabled Agent Merge sessions ask the agent to fix failed required CI checks.
-    "chat.agentHost.agentMerge.fixCI": true,
-
-    // Controls the native merge method used by Agent Merge.
-    //  - auto: Uses the first repository-compatible method in this order: squash, merge commit, rebase.
-    //  - squash: Uses squash merge when the repository permits it.
-    //  - merge: Uses a merge commit when the repository permits it.
-    //  - rebase: Uses rebase merge when the repository permits it.
-    "chat.agentHost.agentMerge.mergeMethod": "auto",
-
-    // Controls whether the Agent Host automatically merges or enqueues pull requests for enabled Agent Merge sessions after all selected maintenance work is complete.
-    "chat.agentHost.agentMerge.mergePullRequest": false,
-
-    // Controls whether review-thread replies posted by Agent Merge include an automated-reply attribution note.
-    "chat.agentHost.agentMerge.replyAttribution": true,
-
-    // Controls whether enabled Agent Merge sessions ask the agent to update branches that are behind or resolve merge conflicts.
-    "chat.agentHost.agentMerge.resolveConflicts": true,
-
     // When enabled, logs all AHP transport messages for agent host connections to JSONL files under the window's log directory.
     "chat.agentHost.ahpJsonlLoggingEnabled": false,
 
     // When enabled, Agent Host sessions remain available while signed out. The Agents window opens without forcing GitHub sign-in, and editor chat lets you select the Copilot harness. Agents usable without GitHub (for example Codex with ChatGPT authentication or Claude in native mode with your own Anthropic credentials) work while signed out; agents that require GitHub prompt you to add a model or sign in. When disabled (the default), GitHub sign-in is required before the Agents window opens.
     "chat.agentHost.allowSignedOutWhenUsable": false,
 
-    // When enabled, the agent host wires up the BYOK ('bring your own key') language-model bridge so extension-provided BYOK models can run in agent-host sessions. The agent host process must be restarted for changes to take effect.
+    // Chat Agent Host Starter
+    // When enabled, extension-provided BYOK ('bring your own key') models can run in agent-host sessions. Changes are synchronized to the running agent host and do not require a restart.
     "chat.agentHost.byokModels.enabled": false,
 
     // When enabled, the agent host registers the Claude provider, subject to the Claude SDK being reachable. The agent host process must be restarted for changes to take effect.
@@ -2643,13 +2628,17 @@
     // When enabled, the agent host registers the Codex provider (subject to the Codex SDK being reachable). Enabling takes effect without restarting the agent host.
     "chat.agentHost.codexAgent.enabled": false,
 
-    // When enabled, maps supported legacy VS Code settings to equivalent Copilot SDK managed settings for local Agent Host sessions. This compatibility bridge is temporary and is not used for new settings.
+    // When enabled, the Auto model in Copilot SDK agent sessions offers an "Optimize for" picker that biases routing toward efficiency, balance, or intelligence. The profile applies when a session is created and stays fixed for that session.
+    "chat.agentHost.copilot.autoModeTiers.enabled": false,
+
+    // When enabled, maps supported legacy VS Code settings to equivalent Copilot SDK managed settings for local Agent Host sessions. Only restrictions are mapped, and only from globally-scoped values — workspace and folder values are ignored. Applies to local sessions using the Copilot agent; remote hosts and other agents are unaffected. This compatibility bridge is temporary and is not used for new settings.
     "chat.agentHost.copilot.mapLegacySettingsToManagedSettings": false,
 
-    // Per-model capability overrides for Copilot SDK agent sessions, keyed by model id (`*` matches every model; a specific entry wins field-by-field), intended for evaluating models against an existing model's profile. Declare an aliased `family` (for example `claude-opus-4.8`) to route the model to that family's tuned system prompt and tool profile without changing the model id sent to the runtime — so a preview model can be evaluated against a known prompt while still running on its own endpoint — a `reasoningEffort` to pin its effort level, `availableTools`/`excludedTools` to filter its tool set, or `modelCapabilities` to override individual capability limits (e.g. vision support, context window size) passed through to the SDK. All overrides apply when a session launches or resumes. On a mid-session model change, only the new model's `reasoningEffort` is applied; the session keeps its launch-time family, tool filters, and model capabilities. Only affects Copilot agent sessions.
-    //
-    // **Note**: This is an advanced setting for experimentation.
+    // Per-model overrides for Copilot Agent Host sessions. Use `*` to match every model. Supports model family, reasoning effort, tool filters, model capabilities, and YAML prompt overrides.
     "chat.agentHost.copilot.modelCapabilityOverrides": {},
+
+    // When enabled, Auto model selection in Copilot SDK agent sessions routes on the conversation so far, sending prior user messages to the router instead of scoring the latest message alone.
+    "chat.agentHost.copilot.multiTurnContextRouting.enabled": false,
 
     // Overrides the reasoning effort for Copilot SDK agent sessions regardless of the per-model picker value. Set it to a level the selected model supports (for example `low`, `medium`, `high`, or `xhigh`) — choosing a level the model does not support may be rejected by the model. A value that isn't a recognized effort level is ignored and the session falls back to the picker value. Applied when a session is created and when its model changes. Only affects Copilot CLI agent sessions.
     //
@@ -2679,6 +2668,9 @@
     // When enabled, agents receive guidance for using rich links to issues, pull requests, commits, sessions, and chats, plus running task markers, when creating or editing Markdown plan documents.
     "chat.agentHost.experimental.markdownPlanRichLinks": false,
 
+    // When enabled, agent-host sessions include the GitHub MCP server.
+    "chat.agentHost.githubMcpServer.enabled": true,
+
     // When enabled, Copilot SDK sessions running a Claude Opus 4.8 model apply Opus 4.8-tuned system-prompt section overrides on top of the default system message.
     "chat.agentHost.opus48Prompt.enabled": false,
 
@@ -2700,7 +2692,7 @@
     // Output path for span JSON lines when exporter type is `file`. Configurable in user settings only. Sets `COPILOT_OTEL_FILE_EXPORTER_PATH`.
     "chat.agentHost.otel.outfile": "",
 
-    // Sandbox mode for the Copilot SDK's built-in shell tool on macOS and Linux. Only takes effect when `chat.agentHost.customTerminalTool.enabled` is `false`; when the Agent Host's own terminal tool is enabled, the engine sandbox is controlled by `chat.agent.sandbox.enabled`. The sandbox applies only to requests that run with manual permissions — not when approvals are bypassed. Unrestricted network is controlled by `chat.agent.sandbox.allowNetwork`. Use `chat.agentHost.sdkSandbox.enabledWindows` on Windows.
+    // Sandbox mode for the Copilot SDK's built-in shell tool on macOS and Linux. Only takes effect when `chat.agentHost.customTerminalTool.enabled` is `false`; when the Agent Host's own terminal tool is enabled, the engine sandbox is controlled by `chat.agent.sandbox.enabled`. The sandbox applies to every permission mode. Unrestricted network is controlled by `chat.agent.sandbox.allowNetwork`. Use `chat.agentHost.sdkSandbox.enabledWindows` on Windows.
     //  - off: No sandbox policy is forwarded for the SDK's built-in shell tool — commands run unsandboxed.
     //  - on: The SDK's built-in shell tool runs inside a sandbox using the configured filesystem policy with outbound network blocked.
     "chat.agentHost.sdkSandbox.enabled": "off",
@@ -2710,23 +2702,60 @@
     //  - on: The SDK's built-in shell tool runs inside the Windows sandbox using the configured filesystem policy.
     "chat.agentHost.sdkSandbox.enabledWindows": "off",
 
+    // When enabled, Copilot SDK sessions load your shell profile (`~/.bashrc` on macOS and Linux, PowerShell profiles on Windows) and activate the Python environment selected for the workspace before each shell command. Python activation requires the Python Environments extension with `python-envs.terminal.autoActivationType` set to `shellStartup`. Local windows only.
+    "chat.agentHost.shellTool.initScript.enabled": false,
+
     // When enabled, Copilot sessions automatically discover and use the operating system's proxy configuration when no proxy environment variable is set.
     "chat.agentHost.systemProxy.enabled": true,
+
+    // Controls whether enabled Agent Merge sessions address unresolved review threads, changes-requested reviews, and new pull request comments from repository maintainers or the Copilot pull request reviewer.
+    "chat.agentMerge.addressReviews": true,
+
+    // Enables the experimental Agent Merge controller and its commands. Agent Merge can monitor an agent session's pull request, ask the agent to address selected blockers, and optionally merge the pull request when it is ready.
+    "chat.agentMerge.enabled": false,
+
+    // Controls whether enabled Agent Merge sessions ask the agent to fix failed required CI checks.
+    "chat.agentMerge.fixCI": true,
+
+    // Controls the native merge method used by Agent Merge.
+    //  - auto: Uses the first repository-compatible method in this order: squash, merge commit, rebase.
+    //  - squash: Uses squash merge when the repository permits it.
+    //  - merge: Uses a merge commit when the repository permits it.
+    //  - rebase: Uses rebase merge when the repository permits it.
+    "chat.agentMerge.mergeMethod": "auto",
+
+    // Controls whether the Agent Host automatically merges or enqueues pull requests for enabled Agent Merge sessions after all selected maintenance work is complete.
+    //  - always: Merges the pull request whenever it is ready, including after Agent Merge has fixed CI failures or addressed review feedback.
+    //  - ifUnchanged: Merges the pull request only while Agent Merge has not changed it. Once a repair turn lands a commit, automatic merging turns itself off for that session so the changes can be reviewed.
+    //  - never: Never merges the pull request automatically.
+    "chat.agentMerge.mergePullRequest": "never",
+
+    // Controls whether review-thread replies posted by Agent Merge include an automated-reply attribution note.
+    "chat.agentMerge.replyAttribution": true,
+
+    // Controls whether enabled Agent Merge sessions ask the agent to update branches that are behind or resolve merge conflicts.
+    "chat.agentMerge.resolveConflicts": true,
 
     // Controls whether Agent Session Projection mode is enabled for reviewing agent sessions in a focused workspace.
     "chat.agentSessionProjection.enabled": false,
 
+    // Controls whether GitHub and remote workspaces are combined under Remote in the Agents Window workspace picker, with search always available and, when supported, a No workspace option.
+    "chat.agentSessions.consolidatedRemoteWorkspaces": false,
+
     // Controls whether legacy extension host Copilot CLI chat sessions are migrated in place to the Agent host when opened, so their history becomes editable. When disabled, legacy sessions open as before.
+    //
+    // Changing this setting requires a restart to take effect.
     "chat.agentSessions.migrateLegacyCopilotCli": false,
 
     // Controls which external agent sessions, created outside VS Code's Agent Host, are shown.
-    //  - none: Only shows sessions created by the Agent Host.
-    //  - recent: Shows the 2 most recently updated external sessions from the last 7 days.
-    //  - last24Hours: Shows external sessions updated in the last 24 hours.
-    //  - last7Days: Shows external sessions updated in the last 7 days.
-    //  - all: Shows all sessions discovered from supported external agent applications.
-    "chat.agentSessions.showExternal": "none",
+    //  - none: Do not show external sessions.
+    //  - recent: Show up to the 2 most recent external sessions updated in the last 7 days. At startup, external sessions older than the second-most-recently updated local session are hidden.
+    //  - last24Hours: Show external sessions updated in the last 24 hours.
+    //  - last7Days: Show external sessions updated in the last 7 days.
+    //  - last30Days: Show external sessions updated in the last 30 days.
+    "chat.agentSessions.showExternal": "recent",
 
+    // This setting and the Local agent harness will be removed in a future release. Use [Migrate Location Settings](command:aiCustomization.openManagementEditor?%255B%257B%2522migration%2522%253Atrue%252C%2522migrationCategory%2522%253A%2522configuredLocations%2522%257D%255D "Open Migrate Location Settings") in the Agent Customizations editor to move skills into supported locations.
     // Specify location(s) of agent skills (`SKILL.md`) that can be used in Chat Sessions. [Learn More](https://aka.ms/vscode-agent-skills).
     //
     // Each path should contain skill subfolders with SKILL.md files (e.g., add `my-skills` if you have `my-skills/skillA/SKILL.md`). Relative paths are resolved from the root folder(s) of your workspace.
@@ -2752,6 +2781,9 @@
     //  - default: Show the handoff tip with the default description.
     //  - custom: Show the handoff tip with an alternate description.
     "chat.agentsHandoffTip.mode": "hidden",
+
+    // When enabled, agents can record artifacts — pull requests, issues, commits, websites, files and other resources — which are surfaced above the chat input.
+    "chat.artifactTools.enabled": false,
 
     // Controls whether the artifacts view is available in chat.
     "chat.artifacts.enabled": false,
@@ -2802,8 +2834,23 @@
     // Show the context window usage indicator in the chat input.
     "chat.contextUsage.enabled": true,
 
+    // Controls whether Copilot Agent Host sessions can use VS Code's semantic workspace search. When disabled, semantic search is unavailable.
+    "chat.copilot.semanticSearch.enabled": false,
+
+    // When enabled, Copilot SDK agent sessions instruct the model to keep subagents on their default model, setting the task tool's `model` parameter only when you explicitly name the model a subagent should run on. Applied when a session launches or resumes.
+    "chat.copilot.subagentModelGuidance.enabled": false,
+
+    // Controls whether the Chat Customizations editor offers to move agents, instructions, and skills from configured locations that are not supported by the active agent-host harness. When disabled, the migration card and sidebar shortcut are hidden.
+    "chat.customizations.locationsMigration.enabled": false,
+
+    // Controls whether chat shows information about customizations that are not used by the active Agent Host harness.
+    //  - never: Never show customization migration hints in chat.
+    //  - once: Show a customization migration hint once per chat session.
+    //  - always: Show a customization migration hint for every chat request.
+    "chat.customizations.migrationHint": "never",
+
     // Controls whether the Chat Customizations editor offers to convert prompt files into skills for agent-host harnesses, which ignore prompt files. When disabled, the migration card and sidebar shortcut are hidden.
-    "chat.customizations.promptMigration.enabled": false,
+    "chat.customizations.promptMigration.enabled": true,
 
     // Controls whether the Chat Customizations editor shows a structured preview for markdown customization files (agents, skills, instructions, prompts). When disabled, the editor always opens the raw markdown in the embedded code editor.
     "chat.customizations.structuredPreview.enabled": false,
@@ -2907,8 +2954,11 @@
     // Enables incremental rendering with optional block-level animation when streaming chat responses.
     "chat.experimental.incrementalRendering.enabled": false,
 
-    // Controls whether the permissions picker shows an inline "Sandboxing for terminal" toggle on the Manual permissions option. For Copilot SDK sessions using the built-in shell tool, the toggle reflects and updates `chat.agentHost.sdkSandbox.enabled` or `chat.agentHost.sdkSandbox.enabledWindows`.
-    "chat.experimental.permissionsSandboxToggle.enabled": false,
+    // Controls whether Open in Agents Window reveals the current local Agent Host session instead of opening a new session.
+    "chat.experimental.openInAgentsWindow.revealCurrentSession": false,
+
+    // Controls whether the permissions picker shows a "Sandboxing for terminal" toggle. Local sessions show it on the Default permissions option; Copilot Agent Host sessions show it as a separate setting that applies to every permission mode. For Copilot SDK sessions using the built-in shell tool, the toggle reflects and updates `chat.agentHost.sdkSandbox.enabled` or `chat.agentHost.sdkSandbox.enabledWindows`.
+    "chat.experimental.permissionsSandboxToggle.enabled": true,
 
     // Controls whether supported links in chat are rendered as rich links with live metadata. Enabling this may make authenticated requests to services such as GitHub.
     "chat.experimental.richLinks.enabled": false,
@@ -2918,8 +2968,17 @@
     //  - done: Use Mark as Done, Mark All as Done, Restore, and Restore All.
     "chat.experimental.sessionArchiveActionWording": "archive",
 
+    // Enable state indicators around chat editor sessions.
+    "chat.experimental.sessionStateIndicator.enabled": false,
+
+    // Controls whether chat requests use experimental tree-based sticky scroll instead of the sticky prompt header.
+    "chat.experimental.stickyScroll.enabled": true,
+
     // Controls whether a stronger skill adherence prompt is used that encourages the model to immediately invoke skills when relevant rather than just announcing them. This setting is only used by the Local agent harness.
     "chat.experimental.useSkillAdherencePrompt": false,
+
+    // When enabled, the model picker uses a tab per model provider and configures thinking effort and context from a detail card next to each model, instead of a separate configuration button.
+    "chat.experimentalModelPicker": false,
 
     // When true, enables sessions-window-specific behavior for extensions.
     "chat.experimentalSessionsWindowOverride": false,
@@ -2928,13 +2987,11 @@
     //  - : Use the vendor's default model
     //  - Auto (copilot): Auto routes based on your task and real-time system health and model performance. Models routed via auto receive a 10% to 100% discount. [Learn More](https://docs.github.com/en/copilot/concepts/models/auto-model-selection)
     //  - Claude Haiku 4.5 (copilot): Fastest and most compact Claude model. Ideal for quick responses and simple tasks.
-    //  - Claude Sonnet 4.5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Claude Sonnet 4.6 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.7 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.8 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.3-Codex (copilot): OpenAI Codex model specialized for code generation, debugging, and software development tasks.
     //  - GPT-5.4 (copilot): OpenAI GPT model for coding and general assistance.
@@ -2945,9 +3002,8 @@
     //  - Grok 4.6 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Kimi K2.7 Code (copilot)
     //  - Kimi K3 (copilot)
-    //  - MAI-Code-1-Flash (copilot)
+    //  - MAI-Code-1-Flash (copilot): MAI-Code-1-Flash has a planned deprecation date of 2026-09-10.
     //  - MAI-Code-1.1-Flash (copilot)
-    //  - Raptor mini (copilot)
     "chat.exploreAgent.defaultModel": "",
 
     // Enable using tools contributed by third-party extensions.
@@ -2997,11 +3053,15 @@
     // Controls whether referenced instructions are automatically included in chat requests. This setting is only used by the Local agent harness.
     "chat.includeReferencedInstructions": false,
 
+    // Controls whether editor inline chat is backed by the Agent Host instead of the extension host. Applied on startup.
+    "chat.inlineChat.agentHost.enabled": false,
+
     // Controls how file and symbol references are displayed in chat messages.
     //  - box: Display file and symbol references as boxed widgets with icons.
     //  - link: Display file and symbol references as simple blue links without icons.
     "chat.inlineReferences.style": "box",
 
+    // This setting and the Local agent harness will be removed in a future release. Use [Migrate Location Settings](command:aiCustomization.openManagementEditor?%255B%257B%2522migration%2522%253Atrue%252C%2522migrationCategory%2522%253A%2522configuredLocations%2522%257D%255D "Open Migrate Location Settings") in the Agent Customizations editor to move instructions into supported locations.
     // Specify location(s) of instructions files (`*.instructions.md`) that can be attached in Chat sessions. [Learn More](https://aka.ms/vscode-ghcp-custom-instructions).
     //
     // Relative paths are resolved from the root folder(s) of your workspace.
@@ -3043,6 +3103,7 @@
     // Configures discovery of Model Context Protocol servers from configuration from various other applications.
     "chat.mcp.discovery.enabled": {
         "claude-desktop": false,
+        "copilot": false,
         "cursor-global": false,
         "cursor-workspace": false,
         "windsurf": false
@@ -3054,7 +3115,10 @@
     // Configures which models are exposed to MCP servers for sampling (making model requests in the background). This setting can be edited in a graphical way under the `MCP: List Servers` command.
     "chat.mcp.serverSampling": {},
 
-    // This setting is deprecated and will be removed in future releases. Chat modes are now called custom agents and are located in `.github/agents`
+    // When enabled, sign-in dialogs offer "Continue with Microsoft". Signing in with Microsoft exchanges your Microsoft account for the GitHub access your organization has linked to it. The resulting GitHub sign-in lasts for the current window session only and is not saved.
+    "chat.microsoftAuthentication.enabled": false,
+
+    // This setting and the Local agent harness will be removed in a future release. Chat modes are now called custom agents and are located in `.github/agents`. Use [Migrate Location Settings](command:aiCustomization.openManagementEditor?%255B%257B%2522migration%2522%253Atrue%252C%2522migrationCategory%2522%253A%2522configuredLocations%2522%257D%255D "Open Migrate Location Settings") in the Agent Customizations editor to move them into supported locations.
     // Specify location(s) of custom chat mode files (`*.chatmode.md`). [Learn More](https://aka.ms/vscode-ghcp-custom-chat-modes).
     //
     // Relative paths are resolved from the root folder(s) of your workspace.
@@ -3079,8 +3143,8 @@
     //  - always: Always show OS notifications for responses, even when the window is focused.
     "chat.notifyWindowOnResponseReceived": "windowNotFocused",
 
-    // Enables the floating chat input window and its entry points. Requests submitted from the window are scored against existing agent sessions and routed with an advisory badge.
-    "chat.omni.enabled": false,
+    // The number of characters a paste must exceed before it is added to the chat input as an attachment instead of being inserted inline. A paste must also span several lines, so a long single-line paste is always inserted inline. Set this to a very large number to always paste inline.
+    "chat.pasteAsAttachmentThreshold": 10000,
 
     // Controls the default permissions picker mode for new local chat sessions. You can still change the permission mode per session, and each session remembers the permission mode that was used. If enterprise policy disables auto approval, new sessions use Default Permissions.
     //  - default: Start new chat sessions with Default Permissions.
@@ -3092,13 +3156,11 @@
     //  - : Use the vendor's default model
     //  - Auto (copilot): Auto routes based on your task and real-time system health and model performance. Models routed via auto receive a 10% to 100% discount. [Learn More](https://docs.github.com/en/copilot/concepts/models/auto-model-selection)
     //  - Claude Haiku 4.5 (copilot): Fastest and most compact Claude model. Ideal for quick responses and simple tasks.
-    //  - Claude Sonnet 4.5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Claude Sonnet 4.6 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.7 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.8 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.3-Codex (copilot): OpenAI Codex model specialized for code generation, debugging, and software development tasks.
     //  - GPT-5.4 (copilot): OpenAI GPT model for coding and general assistance.
@@ -3109,9 +3171,8 @@
     //  - Grok 4.6 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Kimi K2.7 Code (copilot)
     //  - Kimi K3 (copilot)
-    //  - MAI-Code-1-Flash (copilot)
+    //  - MAI-Code-1-Flash (copilot): MAI-Code-1-Flash has a planned deprecation date of 2026-09-10.
     //  - MAI-Code-1.1-Flash (copilot)
-    //  - Raptor mini (copilot)
     "chat.planAgent.defaultModel": "",
 
     // Plugin directories to discover. Each key is a path that points directly to a plugin folder, and the value enables (`true`) or disables (`false`) it. Paths can be absolute, relative to the workspace root, or start with `~/` for the user's home directory.
@@ -3135,6 +3196,7 @@
     // Show an animated gradient border around the chat input while the agent is working or thinking. Has no effect when reduced motion is enabled.
     "chat.progressBorder.enabled": true,
 
+    // This setting and the Local agent harness will be removed in a future release. Use [Migrate Prompt Files](command:aiCustomization.openManagementEditor?%255B%257B%2522migration%2522%253Atrue%252C%2522migrationCategory%2522%253A%2522promptFiles%2522%257D%255D "Open Migrate Prompt Files") in the Agent Customizations editor to convert prompt files into skills.
     // Specify location(s) of reusable prompt files (`*.prompt.md`) that can be run in Chat sessions. [Learn More](https://aka.ms/vscode-ghcp-prompt-snippets).
     //
     // Relative paths are resolved from the root folder(s) of your workspace.
@@ -3170,8 +3232,17 @@
     // Controls whether subagents can invoke other subagents. When enabled, nesting is limited to a maximum depth of 5.
     "chat.subagents.allowInvocationsFromSubagents": false,
 
+    // Controls whether local subagents use the Auto model when neither the tool call nor the selected agent specifies a model. Explicit tool and agent model selections take precedence. Subagents of a BYOK main model continue to use that model. Auto routing is not constrained by the main model's fixed cost tier.
+    "chat.subagents.defaultToAuto": false,
+
+    // Controls whether AI credit usage is shown next to the duration for subagents.
+    "chat.subagents.showCreditUsage": false,
+
     // Controls whether subagents in chat editors use a rich presentation that opens each subagent in its own editor instead of rendering its full activity inline in the parent chat.
     "chat.subagents.useRichRendering": true,
+
+    // Controls whether Terminal Chat is backed by the Agent Host instead of the extension host. Applied on startup.
+    "chat.terminal.agentHost.enabled": false,
 
     // Controls whether tips are shown above user messages in chat. New tips are added frequently, so this is a helpful way to stay up to date with the latest features.
     "chat.tips.enabled": true,
@@ -3205,6 +3276,8 @@
         "**/.git/**": false,
         "**/.github/agents/**": false,
         "**/.github/hooks/**": false,
+        "**/.mcp.json": false,
+        "**/.npmrc": false,
         "**/.vscode/*.json": false,
         "**/gradle.properties": false,
         "**/ruby_lsp/*/addon": false,
@@ -3460,7 +3533,7 @@
         "https://github.com/microsoft/vscode/wiki/*": true
     },
 
-    // Controls whether agent status pills are shown above the chat input while a turn is in progress and inside the completed response. Only applies to agent sessions.
+    // Controls whether agent status pills are shown above the chat input and inside completed responses. Only applies to agent sessions.
     "chat.turnStatusPills": true,
 
     // Controls whether the input of the chat should be restored when an undo request is made. The input will be filled with the text of the request that was restored.
@@ -4019,6 +4092,14 @@
         }
     ],
 
+    // Command templates for compose logs commands.
+    "containers.commands.composeLogs": [
+        {
+            "label": "Compose Logs",
+            "template": "${composeCommand} ${configurationFile} ${projectName} ${environmentFile} logs --tail 1000 -f"
+        }
+    ],
+
     // Command templates for compose up commands.
     "containers.commands.composeUp": [
         {
@@ -4158,6 +4239,9 @@
 
     // Enable C++ code editing tools.
     "cpp-devtools.enableCppCodeEditingTools": true,
+
+    // Stop showing the prompt to install the Microsoft C++ Language Server for Agency GitHub Copilot CLI.
+    "cpp-devtools.suppressMscpplsPromotion": false,
 
     // Maximum number of symbol references to return per individual request.
     "cpp-devtools.symbolReferencesLimit": 25,
@@ -4759,6 +4843,9 @@
     // Experimental: when dictation ends, the final transcript is passed through a small language model to restore punctuation, capitalization, paragraphs, and lists. Requires Copilot to be enabled; the transcript is sent to the language model for cleanup. Falls back to the raw transcript when no model is available. Use [dictation instructions](command:workbench.action.chat.configureDictationInstructions) to customize terminology and formatting.
     "dictation.experimental.llmCleanup": true,
 
+    // Controls the language model used for experimental dictation cleanup. `auto` follows the experiment-provided default.
+    "dictation.experimental.llmCleanupModel": "auto",
+
     // The model used for dictation. On-device models download on first use and run locally through Microsoft Foundry Local; the cloud option streams audio to the Microsoft AI voice service.
     //  - nemotron-3.5-asr-streaming-0.6b: NVIDIA Nemotron 3.5 multilingual streaming RNN-T, run on-device through Microsoft Foundry Local. Works offline; no audio leaves the device. Automatic language selection follows the Voice Mode language setting; when that setting is Automatic, dictation uses the configured display language when supported, then the system or browser locale, with model detection as a fallback. Downloaded on first use and cached on disk.
     //  - mai: Cloud transcription through the same Microsoft AI voice service used by Voice Mode. Requires a network connection and GitHub sign-in; audio is streamed to the service.
@@ -5091,7 +5178,7 @@
     "dotnet.testWindow.discoveryTimeoutInSec": 900,
 
     // Enable the lightweight test experience for C# tests. (experimental)
-    "dotnet.testWindow.enableNextTest": false,
+    "dotnet.testWindow.enableNextTest": true,
 
     // Enables the Test Explorer to show the diff of the test results.
     "dotnet.testWindow.enableTestExplorerDiff": false,
@@ -5482,14 +5569,11 @@
 
     // Defines a default formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
-    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
     //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
-    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
-    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -5510,6 +5594,7 @@
     //  - ms-python.isort: Import organization support for Python files using isort.
     //  - redhat.java: Java Linting, Intellisense, formatting, refactoring, Maven/Gradle support and more...
     //  - samuelcolvin.jinjahtml: Syntax highlighting for jinja(2) including HTML, Markdown, YAML, Ruby and LaTeX templates
+    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - sumneko.lua: Lua Language Server coded by Lua
     //  - ms-vscode.makefile-tools: Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.
     //  - vscode.markdown-language-features: Provides rich language support for Markdown.
@@ -5524,6 +5609,7 @@
     //  - ionutvmi.reg: Windows Registry Script (.reg) Language package for VSCode
     //  - ms-vscode-remote.remote-ssh-edit: Edit SSH configuration files
     //  - dnut.rewrap-revived: Hard word wrapping for comments and other text at a given column.
+    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - timonwong.shellcheck: Integrates ShellCheck into VS Code, a linter for Shell scripts.
     //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
     //  - XadillaX.viml: Vim Script language server protocol and highlighting support for VSCode.
@@ -5540,6 +5626,7 @@
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
+    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
     //  - amazonwebservices.aws-toolkit-vscode: Including CodeCatalyst, Infrastructure Composer, and support for Lambda, S3, CloudWatch Logs, CloudFormation, and many other services.
     //  - ms-vscode.azure-repos: Remotely browse and edit any Azure Repos
@@ -6189,7 +6276,7 @@
     // Controls whether the editor should highlight matches similar to the selection.
     "editor.selectionHighlight": true,
 
-    // Controls how many characters can be in the selection before similiar matches are not highlighted. Set to zero for unlimited.
+    // Controls how many characters can be in the selection before similar matches are not highlighted. Set to zero for unlimited.
     "editor.selectionHighlightMaxLength": 200,
 
     // Controls whether the editor should highlight selection matches that span multiple lines.
@@ -6980,7 +7067,7 @@
     "extensions.autoUpdate": "on",
 
     // Controls the delay in hours after an extension update is published before it is automatically installed. Only applies when `extensions.autoUpdate` is set to `on`. This delay helps avoid installing potentially problematic updates immediately after release.
-    "extensions.autoUpdateDelay": 2,
+    "extensions.autoUpdateDelay": 12,
 
     // When enabled, editors with extension details will be automatically closed upon navigating away from the Extensions View.
     "extensions.closeExtensionDetailsOnViewChange": false,
@@ -7733,10 +7820,6 @@
     //
     "github.copilot.chat.agent.terminal.denyList": null,
 
-    // This setting has been merged into `github.copilot.chat.agentDebugLog.fileLogging.enabled`. Please use this setting instead.
-    // Deprecated: use `github.copilot.chat.agentDebugLog.fileLogging.enabled` instead.
-    "github.copilot.chat.agentDebugLog.enabled": false,
-
     // Enable agent debug logging: write chat debug events (tool calls, LLM requests, token usage, errors) to JSONL files for the debug panel and troubleshoot skill. Requires window reload to take effect.
     "github.copilot.chat.agentDebugLog.fileLogging.enabled": false,
 
@@ -7807,7 +7890,7 @@
     // Choose a routing tier for the Auto model, biasing model selection toward cost, capability, or speed. When disabled, the service picks the routing profile.
     "github.copilot.chat.autoMode.tiers.enabled": false,
 
-    // Overrides the routing tier that the `Auto` model requests, ignoring both the tier picked in the model picker and the tier inline chat defaults to. Accepts `eco`, `balanced`, `max`, or `fast`. Used by evals.
+    // Overrides the routing tier that the `Auto` model requests, ignoring both the tier picked in the model picker and the tier inline chat defaults to. Accepts `efficiency`, `balance`, `intelligence`, or `fast`. Used by evals.
     //
     // **Note**: This is an advanced debugging setting.
     "github.copilot.chat.autoModeTierOverride": null,
@@ -7815,8 +7898,16 @@
     // Enable the Copilot CLI. When disabled, the Copilot CLI will not be available in 'Continue In' context menus.
     "github.copilot.chat.backgroundAgent.enabled": true,
 
+    // Controls the output token limit parameter sent to custom Chat Completions APIs. Use `max_completion_tokens` for endpoints that do not support `max_tokens`.
+    //  - max_completion_tokens: Send `max_completion_tokens`.
+    //  - max_tokens: Send the legacy `max_tokens` parameter for compatibility.
+    "github.copilot.chat.chatCompletionsTokenParameter": "max_tokens",
+
     // Enables the updated system prompt tuned for the Claude Opus 5 model.
     "github.copilot.chat.claudeOpus5Prompt.enabled": false,
+
+    // Overrides the default thinking effort shown in the model picker for Claude Opus models. Leave empty to use the built-in default. Ignored if the model does not support the chosen level.
+    "github.copilot.chat.claudeOpusDefaultReasoningEffort": "",
 
     // Enables the updated system prompt tuned for the Claude Sonnet 5 model.
     "github.copilot.chat.claudeSonnet5Prompt.enabled": false,
@@ -7865,9 +7956,6 @@
 
     // Enable the new session controller API for Sessions App. Requires VS Code reload.
     "github.copilot.chat.cli.sessionControllerForSessionsApp.enabled": false,
-
-    // Show sessions created by other applications.
-    "github.copilot.chat.cli.showExternalSessions": true,
 
     // Enable advanced clickable file links in Copilot CLI terminals. Resolves relative paths against session state directories. Requires VS Code reload.
     "github.copilot.chat.cli.terminalLinks.enabled": true,
@@ -7973,6 +8061,9 @@
     // Sets the reasoning effort to low for gemini-3 models.
     "github.copilot.chat.gemini3LowReasoningEffort.enabled": false,
 
+    // Enables experimental additional prompt guidance for Gemini Flash 3.6 and 3.7 models.
+    "github.copilot.chat.geminiFlashPromptAdditions.enabled": false,
+
     // Enable the Get Changed Files tool in Copilot Chat. When enabled, the agent can retrieve git diffs of current changes via a dedicated tool.
     "github.copilot.chat.getChangedFilesTool.enabled": false,
 
@@ -8026,9 +8117,6 @@
     // Maximum tokens for current file in next cursor prediction.
     "github.copilot.chat.inlineEdits.nextCursorPrediction.currentFileMaxTokens": 3000,
 
-    // Display predicted cursor line for next edit suggestions.
-    "github.copilot.chat.inlineEdits.nextCursorPrediction.displayLine": true,
-
     // Enable rename symbol suggestions in inline edits.
     "github.copilot.chat.inlineEdits.renameSymbolSuggestions": true,
 
@@ -8066,6 +8154,9 @@
 
     // Controls which kind of items are included in the TypeScript language context provider.
     "github.copilot.chat.languageContext.typescript.items": "double",
+
+    // Enables the TypeScript language context provider for inline suggestions when using TS7 language services
+    "github.copilot.chat.languageContext.typescript7.enabled": false,
 
     // Enable local session tracking. When enabled, session data is tracked locally for /chronicle commands.
     "github.copilot.chat.localIndex.enabled": true,
@@ -8231,6 +8322,9 @@
     // Model to use for the search subagent. When useAgenticProxy is enabled, defaults to 'vscode-agentic-search-router-a'. Otherwise defaults to the main agent model.
     "github.copilot.chat.searchSubagent.model": "",
 
+    // Enable the semantic search tool for the search subagent.
+    "github.copilot.chat.searchSubagent.subagentSemanticSearchEnabled": true,
+
     // Enable the thoroughness parameter on the search subagent tool. When enabled, the caller can pass 'normal' or 'deep' to adjust the number of allowed tool-call turns (1× or 2× the base toolCallLimit respectively).
     "github.copilot.chat.searchSubagent.thoroughnessEnabled": false,
 
@@ -8239,12 +8333,6 @@
 
     // Use the agentic proxy for the search subagent tool.
     "github.copilot.chat.searchSubagent.useAgenticProxy": false,
-
-    // Controls how semantic search is offered to the agent in chat. Used to experiment with the impact of semantic search on agent behavior and token usage.
-    //  - enabled: The `semantic_search` tool and the `#codebase` chat variable are available.
-    //  - disabled: Removes the `semantic_search` tool from the agent and hides the `#codebase` chat variable.
-    //  - preferred: Same as `enabled`, plus instructions telling the agent to prefer `semantic_search` over exploratory file reads and text searches.
-    "github.copilot.chat.semanticSearchTool.mode": "enabled",
 
     // Enables the `/setupTests` intent and prompting in `/tests` generation.
     "github.copilot.chat.setupTests.enabled": true,
@@ -8316,9 +8404,6 @@
 
     // Preferred embeddings model for semantic search.
     "github.copilot.chat.workspace.preferredEmbeddingsModel": "",
-
-    // Override endpoint for Azure DevOps code search prototype.
-    "github.copilot.chat.workspace.prototypeAdoCodeSearchEndpointOverride": "",
 
     // Whether to enable inline completions in chat.
     "github.copilot.completions.chat.enabled": false,
@@ -9273,6 +9358,8 @@
     //  - switch:menu: Skips switch confirmations when run from the Git Command Palette
     //  - tag-create:command: Skips tag create confirmations when run from a command, e.g. a view action
     //  - tag-create:menu: Skips tag create confirmations when run from the Git Command Palette
+    //  - tag-push:command: Skips tag push confirmations when run from a command, e.g. a view action
+    //  - tag-push:menu: Skips tag push confirmations when run from the Git Command Palette
     "gitlens.gitCommands.skipConfirmations": [
         "fetch:command",
         "stash-push:command"
@@ -9282,6 +9369,9 @@
     //  - name: Sorts commands by name
     //  - usage: Sorts commands by last used date
     "gitlens.gitCommands.sortBy": "usage",
+
+    // Specifies whether GitLens will automatically apply safe, repo-local Git performance optimizations in the background (loose-object packing, incremental repack, and commit-graph) while VS Code is open. This is the same routine work Git performs during `git gc`/`git maintenance`: packing and repacking reorganize objects the repository already contains without altering history, while the commit-graph is a pure acceleration cache that can be deleted at any time. More invasive optimizations (untracked cache, FSMonitor, system-scheduled maintenance, `feature.manyFiles`) are never applied automatically
+    "gitlens.gitOptimizations.enabled": true,
 
     // GitKraken
     // Specifies the ID of the user's active GitKraken organization in GitLens
@@ -9331,7 +9421,7 @@
     //  - topo: Shows commits in reverse chronological order of the commit timestamp, but avoids intermixing multiple lines of history
     "gitlens.graph.commitOrdering": "date",
 
-    // Specifies how absolute dates will be formatted in the _Commit Graph_, when not specified `gitlens.defaultDateFormat` is used. Use `full`, `long`, `medium`, `short`, or a custom format, e.g. `MMMM Do, YYYY h:mma`, similar to [Moment.js formats](https://momentjs.com/docs/#/displaying/format/). Only applies when `gitlens.graph.dateFormat` is set to `absolute`
+    // Specifies how absolute dates will be formatted in the _Commit Graph_, when not specified `gitlens.defaultDateFormat` is used. Use `full`, `long`, `medium`, `short`, or a custom format, e.g. `MMMM Do, YYYY h:mma`, similar to [Moment.js formats](https://momentjs.com/docs/#/displaying/format/). Only applies when `gitlens.graph.dateStyle` is set to `absolute`
     "gitlens.graph.dateFormat": null,
 
     // Specifies how dates will be displayed in the _Commit Graph_, when not specified `gitlens.defaultDateStyle` is used
@@ -9372,8 +9462,14 @@
     //  - 30m: 30 minutes
     "gitlens.graph.experimental.visualizations.activityDecay": "5m",
 
-    // (Experimental) Specifies whether to enable the Treemap visualization modes (Files, Commits, Agent Activity) alongside the Visual History timeline on the _Commit Graph_. When disabled, only the timeline visualization is available.
+    // (Experimental) Specifies whether to enable Repository Health and the Treemap visualization modes (Files, Commits, Agent Activity) alongside the Visual History timeline on the _Commit Graph_. When disabled, only the timeline visualization is available.
     "gitlens.graph.experimental.visualizations.enabled": true,
+
+    // Specifies whether following the active terminal or Claude Code conversation tab can switch the Commit Graph to a different repository; when disabled, terminals in other repositories are ignored
+    "gitlens.graph.followTerminal.allowRepositorySwitching": false,
+
+    // Specifies whether a visible Commit Graph follows the active terminal or Claude Code conversation tab, selecting the working changes row of the repository or worktree it is in
+    "gitlens.graph.followTerminal.enabled": true,
 
     // Specifies which row to select by default in the _Commit Graph_
     //  - wip: Selects the "Work in progress" (WIP) row
@@ -9447,12 +9543,12 @@
     // Specifies whether to only follow the first parent when showing commits on the _Commit Graph_
     "gitlens.graph.onlyFollowFirstParent": false,
 
-    // Specifies when to show the overview bar above the _Commit Graph_ — the per-worktree _WIP_ pills and the HEAD, upstream, and merge target jumps
+    // Specifies when to show the overview bar above the _Commit Graph_ — the per-worktree _WIP_ pills and the HEAD, upstream, and merge target jumps. When shown, the primary worktree is always included. `always` and `worktrees` include every secondary worktree; `dirtyWorktrees` includes secondary worktrees only when they have working changes or unpushed commits
     //  - always: Always shown
     //  - worktrees: Shown when the repository has more than one worktree
     //  - dirtyWorktrees: Shown when another worktree has working changes or unpushed commits
     //  - never: Never shown
-    "gitlens.graph.overviewBar.visibility": "worktrees",
+    "gitlens.graph.overviewBar.visibility": "dirtyWorktrees",
 
     // Specifies the number of additional items to fetch when paginating in the _Commit Graph_. Use 0 to specify no limit
     "gitlens.graph.pageItemLimit": 200,
@@ -9462,6 +9558,17 @@
 
     // Specifies whether the _Commit Graph_'s Branch / Tag finder closes when it loses focus
     "gitlens.graph.refFindAutoHide": false,
+
+    // Specifies how branch and tag pills are laid out on each row of the _Commit Graph_
+    //  - inline: Shows branch and tag pills inline with the commit row
+    //  - stacked: Shows branch and tag pills on their own line above the commit, growing the row
+    "gitlens.graph.refs.layout": "inline",
+
+    // Specifies the maximum number of branch and tag pills to show on each row of the _Commit Graph_, as space allows. Additional refs are collapsed behind a +N counter on the last pill. Use `"auto"` to fit as many pills as the row area allows
+    "gitlens.graph.refs.maxInline": 1,
+
+    // Specifies the maximum number of branch and tag pills to show on the stacked pill line of the _Commit Graph_ (used when `gitlens.graph.refs.layout` is `"stacked"`), as space allows. Additional refs are collapsed behind a +N counter on the last pill. Use `"auto"` to fit as many pills as the line allows
+    "gitlens.graph.refs.maxStacked": "auto",
 
     // Specifies additional markers to show on the scrollbar in the _Commit Graph_
     //  - localBranches: Marks the location of local branches
@@ -9778,6 +9885,11 @@
             "statusBarItemName": "Zen"
         }
     },
+
+    // Specifies where GitLens opens the terminals it creates
+    //  - panel: Open in the terminal panel
+    //  - editor: Open as an editor tab
+    "gitlens.openInTerminalLocation": "panel",
 
     // This setting is deprecated. Use the **GitLens: Enable Debug Logging** and **GitLens: Disable Debug Logging** commands, or the **Developer: Set Log Level...** command to control logging.
     //
@@ -10764,13 +10876,13 @@
     // Specifies the default path in which new worktrees will be created
     "gitlens.worktrees.defaultLocation": null,
 
-    // Specifies how and when to open a worktree after it is created
-    //  - always: Always open the new worktree in the current window
-    //  - alwaysNewWindow: Always open the new worktree in a new window
-    //  - onlyWhenEmpty: Only open the new worktree in the current window when no folder is opened
-    //  - never: Never open the new worktree
-    //  - prompt: Always prompt to open the new worktree
-    "gitlens.worktrees.openAfterCreate": "prompt",
+    // Specifies how and when to open a worktree after it is created. Choosing an _After Creating_ option in the Create Worktree dialog updates this setting.
+    //  - newWindow: Always open the new worktree in a new window
+    //  - currentWindow: Always open the new worktree in the current window
+    //  - addToWorkspace: Always add the new worktree to the current workspace
+    //  - none: Never open the new worktree
+    //  - onlyWhenEmpty: Open the new worktree in the current window only when no folder is opened, otherwise in a new window. Choosing an After Creating option in the Create Worktree dialog replaces this with that direct choice.
+    "gitlens.worktrees.openAfterCreate": "newWindow",
 
     // Specifies whether to prompt for a path when creating new worktrees
     "gitlens.worktrees.promptForLocation": true,
@@ -10858,6 +10970,7 @@
         "generateTestForFile": false,
         "generateTestForFunction": true,
         "generateTestForPackage": false,
+        "implCursor": true,
         "playground": true,
         "removeTags": false,
         "testAtCursor": true,
@@ -11270,10 +11383,6 @@
     // Show references to MDN in hover.
     "html.hover.references": true,
 
-    // Deprecated in favor of `editor.linkedEditing`
-    // Enable/disable mirroring cursor on matching HTML tag.
-    "html.mirrorCursorOnMatchingTag": false,
-
     // Controls whether the built-in HTML language support suggests closing tags. When disabled, end tag completions like `</div>` will not be shown.
     "html.suggest.hideEndTagSuggestions": false,
 
@@ -11328,7 +11437,7 @@
     "http.systemCertificates": true,
 
     // Controls whether system certificates should be loaded using Node.js built-in support. Reload the window after changing this setting. When during [remote development](https://aka.ms/vscode-remote) the `http.useLocalProxyConfiguration` setting is disabled this setting can be configured in the local and the remote settings separately.
-    "http.systemCertificatesNode": false,
+    "http.systemCertificatesNode": true,
 
     // Controls whether in the remote extension host the local proxy configuration should be used. This setting only applies as a remote setting during [remote development](https://aka.ms/vscode-remote).
     "http.useLocalProxyConfiguration": true,
@@ -11356,13 +11465,11 @@
     //  - : Use the vendor's default model
     //  - Auto (copilot): Auto routes based on your task and real-time system health and model performance. Models routed via auto receive a 10% to 100% discount. [Learn More](https://docs.github.com/en/copilot/concepts/models/auto-model-selection)
     //  - Claude Haiku 4.5 (copilot): Fastest and most compact Claude model. Ideal for quick responses and simple tasks.
-    //  - Claude Sonnet 4.5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Claude Sonnet 4.6 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 3.1 Pro (Preview) (copilot): Google's advanced Gemini Pro model with strong reasoning and coding capabilities.
     //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.7 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.8 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
     //  - GPT-5.3-Codex (copilot): OpenAI Codex model specialized for code generation, debugging, and software development tasks.
     //  - GPT-5.4 (copilot): OpenAI GPT model for coding and general assistance.
@@ -11373,9 +11480,8 @@
     //  - Grok 4.6 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Kimi K2.7 Code (copilot)
     //  - Kimi K3 (copilot)
-    //  - MAI-Code-1-Flash (copilot)
+    //  - MAI-Code-1-Flash (copilot): MAI-Code-1-Flash has a planned deprecation date of 2026-09-10.
     //  - MAI-Code-1.1-Flash (copilot)
-    //  - Raptor mini (copilot)
     "inlineChat.defaultModel": "",
 
     // Controls whether the Fix action is shown for diagnostics in the editor.
@@ -11806,6 +11912,10 @@
     // Enable/disable the 'auto build'
     "java.autobuild.enabled": true,
 
+    // Code Generation
+    // Set of classpath variable strings of the form: "name=path" that are used to resolve classpath entries.
+    "java.classpath.variables": [],
+
     // Code Action
     // The list of clean ups to be run on the current document when it's saved or when the cleanup command is issued. Clean ups can automatically fix code style or programming mistakes. Click [HERE](command:_java.learnMoreAboutCleanUps) to learn more about what each clean up does.
     "java.cleanup.actions": ["renameFileToType"],
@@ -11817,7 +11927,6 @@
     // Reordering of fields, enum constants, and initializers can result in semantic and runtime changes due to different initialization and persistence order. This setting prevents this from occurring.
     "java.codeAction.sortMembers.avoidVolatileChanges": true,
 
-    // Code Generation
     // Whether to generate the 'final' modifer for code actions that create new declarations.
     //  - none: Do not generate final modifier.
     //  - fields: Generate 'final' modifier only for new field declarations.
@@ -11827,6 +11936,9 @@
 
     // Generate method comments when generating the methods.
     "java.codeGeneration.generateComments": false,
+
+    // Generate Javadoc comments in Markdown style (requires source compliance >= 23).
+    "java.codeGeneration.generateCommentsInMarkdown": false,
 
     // Use 'instanceof' to compare types when generating the hashCode and equals methods.
     "java.codeGeneration.hashCodeEquals.useInstanceof": false,
@@ -12304,6 +12416,9 @@
     // Whether to load lombok processors from project classpath
     "java.jdt.ls.lombokSupport.enabled": true,
 
+    // Specifies the size of the in-memory Maven project cache to use. Increasing the project cache size will help load multi-module projects and monorepos faster, but will result in a significant increase in memory usage.
+    "java.jdt.ls.mavenProjectCacheSize": 50,
+
     // Specify whether to automatically add Protobuf output source directories to the classpath.
     //
     // **Note:** Only works for Gradle `com.google.protobuf` plugin `0.8.4` or higher.
@@ -12373,6 +12488,9 @@
     // Enable/disable the references code lens.
     "java.referencesCodeLens.enabled": false,
 
+    // Enable/disable the references code lens for fields.
+    "java.referencesCodeLens.includeFields": false,
+
     // Enable/disable cleanup actions on save.
     "java.saveActions.cleanup": true,
 
@@ -12386,6 +12504,7 @@
     //  - Workspace Symbols
     //  - all: Search on all classpath entries including reference libraries and projects.
     //  - main: All classpath entries excluding test classpath entries.
+    //  - projectOnly: Only search sources, tests, and referenced projects, excluding the JDK and referenced libraries from the search.
     "java.search.scope": "all",
 
     // Enable/disable Smart Selection support for Java. Disabling this option will not affect the VS Code built-in word-based and bracket-based smart selection.
@@ -12436,11 +12555,32 @@
     // Include method declarations from source files in symbol search.
     "java.symbols.includeSourceMethodDeclarations": false,
 
+    // Specifies the catch block body snippet (e.g. generated by "Surround with try/catch"). Supports configuring multi-line content with an array of strings, and using ${variable} to reference the [predefined variables](command:_java.templateVariables).
+    "java.templates.catchBody": [
+        "// ${todo} Auto-generated catch block",
+        "${exception_var}.printStackTrace();"
+    ],
+
     // Specifies the file header comment for new Java file. Supports configuring multi-line comments with an array of strings, and using ${variable} to reference the [predefined variables](command:_java.templateVariables).
     "java.templates.fileHeader": [],
 
+    // Specifies the method body snippet for unimplemented methods (e.g. generated by "Add unimplemented methods"). Supports configuring multi-line content with an array of strings, and using ${variable} to reference the [predefined variables](command:_java.templateVariables).
+    "java.templates.methodBody": [
+        "// ${todo} Auto-generated method stub",
+        "throw new UnsupportedOperationException(\"Unimplemented method '${enclosing_method}'\");"
+    ],
+
+    // Specifies the method body snippet for overridden methods that call `super` (e.g. generated by "Override/Implement Methods"). Supports configuring multi-line content with an array of strings, and using ${variable} to reference the [predefined variables](command:_java.templateVariables).
+    "java.templates.methodBodySuper": [
+        "// ${todo} Auto-generated method stub",
+        "${body_statement}"
+    ],
+
     // Enable/disable automatic generation of class body and package declaration when creating a new Java file. Set to `false` to create empty Java files. Defaults to `true`.
     "java.templates.newFile.enabled": true,
+
+    // Specifies whether newly created top-level types (class/interface/record) should be package-private instead of public.
+    "java.templates.preferPackagePrivateVisibility": false,
 
     // Specifies the type comment for new Java type. Supports configuring multi-line comments with an array of strings, and using ${variable} to reference the [predefined variables](command:_java.templateVariables).
     "java.templates.typeComment": [],
@@ -13615,7 +13755,7 @@
     "markdown.editor.updateLinksOnPaste.enabled": true,
 
     // Controls whether supported links in the Markdown editor are rendered as rich links with live metadata. Enabling this may make authenticated requests to services such as GitHub.
-    "markdown.experimental.richLinks.enabled": false,
+    "markdown.experimental.richLinks.enabled": true,
 
     // Markdown All in One
     // Use `**` or `__` to wrap bold text.
@@ -14156,14 +14296,11 @@
 
     // Defines a default notebook formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
-    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
     //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
-    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
-    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - ms-python.autopep8: Formatting support for Python files using the autopep8 formatter.
     //  - ms-azure-devops.azure-pipelines: Syntax highlighting, IntelliSense, and more for Azure Pipelines YAML
     //  - aaron-bond.better-comments: Improve your code commenting by annotating with alert, informational, TODOs, and more!
@@ -14184,6 +14321,7 @@
     //  - ms-python.isort: Import organization support for Python files using isort.
     //  - redhat.java: Java Linting, Intellisense, formatting, refactoring, Maven/Gradle support and more...
     //  - samuelcolvin.jinjahtml: Syntax highlighting for jinja(2) including HTML, Markdown, YAML, Ruby and LaTeX templates
+    //  - vscode.json-language-features: Provides rich language support for JSON files.
     //  - sumneko.lua: Lua Language Server coded by Lua
     //  - ms-vscode.makefile-tools: Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.
     //  - vscode.markdown-language-features: Provides rich language support for Markdown.
@@ -14198,6 +14336,7 @@
     //  - ionutvmi.reg: Windows Registry Script (.reg) Language package for VSCode
     //  - ms-vscode-remote.remote-ssh-edit: Edit SSH configuration files
     //  - dnut.rewrap-revived: Hard word wrapping for comments and other text at a given column.
+    //  - foxundermoon.shell-format: A formatter for shell scripts, Dockerfile, gitignore, dotenv, /etc/hosts, jvmoptions, and other file types
     //  - timonwong.shellcheck: Integrates ShellCheck into VS Code, a linter for Shell scripts.
     //  - vscode.typescript-language-features: Provides rich language support for JavaScript and TypeScript.
     //  - XadillaX.viml: Vim Script language server protocol and highlighting support for VSCode.
@@ -14214,6 +14353,7 @@
     //  - ms-python.vscode-pylance: A performant, feature-rich language server for Python in VS Code
     //  - serkonda7.vscode-vba: VBA and VB6 tooling, syntax highlighting and snippets.
     //  - pflannery.vscode-versionlens: Shows the latest version for each package using code lens
+    //  - redhat.vscode-xml: XML Language Support by Red Hat
     //  - redhat.vscode-yaml: YAML Language Support by Red Hat, with built-in Kubernetes syntax support
     //  - amazonwebservices.aws-toolkit-vscode: Including CodeCatalyst, Infrastructure Composer, and support for Lambda, S3, CloudWatch Logs, CloudFormation, and many other services.
     //  - ms-vscode.azure-repos: Remotely browse and edit any Azure Repos
@@ -14434,10 +14574,6 @@
 
     // Enable running npm scripts contained in a folder from the Explorer context menu.
     "npm.enableRunFromFolder": false,
-
-    // The NPM Script Explorer is now available in 'Views' menu in the Explorer in all folders.
-    // Enable an explorer view for npm scripts when there is no top-level `package.json` file.
-    "npm.enableScriptExplorer": false,
 
     // Configure glob patterns for folders that should be excluded from automatic script detection.
     "npm.exclude": "",
@@ -16093,9 +16229,6 @@
 
     // Local folder for downloading and caching VS Code server archives. The archives will be stored as `{downloadFolder}/{commit}/vscode-server-{platform}[-{quality}].tar.gz`. Platforms include `linux-x64`, `linux-armhf`, `linux-arm64`, `linux-alpine`, and `alpine-arm64`. Quality is `stable` or `insider`. The `-{quality}` suffix is omitted for `stable`. The default is in the system's temp folder.
     "remote.serverDownloadFolder": "",
-
-    // Enable Microsoft account authentication for agent host tunnels. When disabled, only GitHub authentication is used.
-    "remote.tunnels.access.enableMicrosoftAuth": false,
 
     // The name under which the remote tunnel access is registered. If not set, the host name is used.
     "remote.tunnels.access.hostNameOverride": "",
@@ -18616,6 +18749,13 @@
     //  - xai: $(xai)
     //  - arrow-circle-up-sparkle: $(arrow-circle-up-sparkle)
     //  - close-small: $(close-small)
+    //  - book-compact: $(book-compact)
+    //  - mic-off: $(mic-off)
+    //  - mic-off-compact: $(mic-off-compact)
+    //  - copilot-dot: $(copilot-dot)
+    //  - copilot-dot-compact: $(copilot-dot-compact)
+    //  - layout-density-compact: $(layout-density-compact)
+    //  - layout-density-default: $(layout-density-default)
     //  - dialog-error: $(dialog-error)
     //  - dialog-warning: $(dialog-warning)
     //  - dialog-info: $(dialog-info)
@@ -19788,6 +19928,11 @@
     // Controls the height of editor tabs. Also applies to the title control bar when `workbench.editor.showTabs` is not set to `multiple`.
     "window.density.editorTabHeight": "default",
 
+    // Controls the spacing density of the workbench layout. Only applies when `workbench.experimental.modernUI` is enabled.
+    //  - default: Uses the standard spacing between workbench parts.
+    //  - compact: Removes the gaps between workbench parts and reduces their internal spacing to provide more room for content.
+    "window.density.layout": "default",
+
     // Adjust the appearance of dialogs to be native by the OS or custom.
     "window.dialogStyle": "native",
 
@@ -19929,6 +20074,7 @@
     //  - global: All browser views share a single persistent session across all workspaces. Incompatible with remote sessions.
     //  - workspace: Browser views within the same workspace share a persistent session. If no workspace is opened, `ephemeral` storage is used.
     //  - ephemeral: Each browser view has its own session that is cleaned up when closed.
+    //  - agent: Browser views share one in-memory session that is cleaned up when the application is closed. This session is shared with agent-opened browser pages, so **all data including local storage and cookies will be accessible by agents.** When agent network filtering is enabled, requests from this session are restricted by the configured network domain policy.
     "workbench.browser.dataStorage": "default",
 
     // When enabled, chat agents can use browser tools to open and interact with pages in the Integrated Browser.
