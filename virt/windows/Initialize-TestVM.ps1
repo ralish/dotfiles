@@ -3,7 +3,6 @@
 #>
 
 #Requires -Version 3.0
-#Requires -RunAsAdministrator
 
 [CmdletBinding(DefaultParameterSetName = 'OptOut', SupportsShouldProcess)]
 [OutputType([Void])]
@@ -1009,6 +1008,17 @@ Function Test-DotNetPresent {
     }
 }
 
+# The `-RunAsAdministrator` parameter to `#Requires` is available since
+# Windows PowerShell 4.0 but this script targets as far back as 3.0.
+Function Test-IsAdministrator {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    Param()
+
+    $User = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+    return $User.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
 #endregion
 
 if ($PSVersionTable.PSVersion.Major -ge 6) {
@@ -1019,6 +1029,7 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
     $PSCmdlet.ThrowTerminatingError($ErrRec)
 }
 
+Test-IsAdministrator
 Get-WindowsInfo
 Test-DotNetPresent
 
