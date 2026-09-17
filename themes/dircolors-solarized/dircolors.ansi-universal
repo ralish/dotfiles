@@ -63,6 +63,8 @@ TERM cygwin
 TERM dtterm
 TERM dvtm
 TERM dvtm-256color
+TERM eat-256color
+TERM eat-truecolor
 TERM Eterm
 TERM eterm-color
 TERM fbterm
