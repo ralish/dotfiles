@@ -25,11 +25,15 @@ Function Global:Get-DotFilesLastUpdated {
         # Exclude `.git` directory
         $RgGlobExcludeGit = '!.git/'
 
+        # Markdown files aren't relevant
+        $RgGlobExcludeMd = '!*.md'
+
         $RgArgs = @(
             '--hidden'
             '--no-ignore-dot'
             '-g', $RgGlobExcludeGit
             '-g', $RgGlobExcludeThis
+            '-g', $RgGlobExcludeMd
             'Last reviewed release: '
         )
 
