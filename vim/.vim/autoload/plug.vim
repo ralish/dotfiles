@@ -68,6 +68,7 @@ let s:mac_gui = has('gui_macvim') && has('gui_running')
 let s:is_win = has('win32')
 let s:nvim = has('nvim-0.2') || (has('nvim') && exists('*jobwait') && !s:is_win)
 let s:vim8 = has('patch-8.0.0039') && exists('*job_start')
+let s:shell_error = 0
 if s:is_win && &shellslash
   set noshellslash
   let s:me = resolve(expand('<sfile>:p'))
@@ -170,7 +171,7 @@ function! s:git_origin_branch(spec)
 
   " The command may not return the name of a branch in detached HEAD state
   let result = s:lines(s:system('git symbolic-ref --short HEAD', a:spec.dir))
-  return v:shell_error ? '' : result[-1]
+  return s:shell_error ? '' : result[-1]
 endfunction
 
 if s:is_win
@@ -996,7 +997,7 @@ function! s:bang(cmd, ...)
     let [sh, shellcmdflag, shrd] = s:chsh(a:0)
     " FIXME: Escaping is incomplete. We could use shellescape with eval,
     "        but it won't work on Windows.
-    let cmd = a:0 ? s:with_cd(a:cmd, a:1) : a:cmd
+    let cmd = a:0 ? s:with_cd(a:cmd, a:1, {'shell': s:is_win ? 'cmd.exe' : &shell}) : a:cmd
     if s:is_win
       let [batchfile, cmd] = s:batchfile(cmd)
     endif
@@ -1097,7 +1098,7 @@ function! s:checkout(spec)
     let credential_helper = s:disable_credential_helper() ? '-c credential.helper= ' : ''
     let output = s:system(
           \ 'git '.credential_helper.'fetch --depth 999999 && git checkout '.plug#shellescape(sha).' --', a:spec.dir)
-    let error = v:shell_error
+    let error = s:shell_error
   endif
   return [output, error]
 endfunction
@@ -1303,7 +1304,7 @@ function! s:update_finish()
         let tag = spec.tag
         if tag =~ '\*'
           let tags = s:lines(s:system('git tag --list '.plug#shellescape(tag).' --sort -version:refname 2>&1', spec.dir))
-          if !v:shell_error && !empty(tags)
+          if !s:shell_error && !empty(tags)
             let tag = tags[0]
             call s:log4(name, printf('Latest tag for %s -> %s', spec.tag, tag))
             call append(3, '')
@@ -1311,7 +1312,7 @@ function! s:update_finish()
         endif
         call s:log4(name, 'Checking out '.tag)
         let out = s:system('git checkout -q '.plug#shellescape(tag).' -- 2>&1', spec.dir)
-        let error = v:shell_error
+        let error = s:shell_error
       endif
       if !error && filereadable(spec.dir.'/.gitmodules') &&
             \ (s:update.force || has_key(s:update.new, name) || s:is_updated(spec.dir))
@@ -1319,7 +1320,7 @@ function! s:update_finish()
         let out .= s:bang('git submodule update --init --recursive'.s:submodule_opt.' 2>&1', spec.dir)
         let error = v:shell_error
       endif
-      let msg = s:format_message(v:shell_error ? 'x': '-', name, out)
+      let msg = s:format_message(error ? 'x': '-', name, out)
       if error
         call add(s:update.errors, name)
         call s:regress_bar()
@@ -1461,7 +1462,7 @@ function! s:spawn(name, spec, queue, opts)
   elseif s:vim8
     let cmd = join(map(copy(argv), 'plug#shellescape(v:val, {"script": 0})'))
     if has_key(a:opts, 'dir')
-      let cmd = s:with_cd(cmd, a:opts.dir, 0)
+      let cmd = s:with_cd(cmd, a:opts.dir, {'shell': s:is_win ? 'cmd.exe' : 'sh', 'script': 0})
     endif
     let argv = s:is_win ? ['cmd', '/s', '/c', '"'.cmd.'"'] : ['sh', '-c', cmd]
     let jid = job_start(s:is_win ? join(argv, ' ') : argv, {
@@ -1480,7 +1481,7 @@ function! s:spawn(name, spec, queue, opts)
     endif
   else
     let job.lines = s:lines(call('s:system', has_key(a:opts, 'dir') ? [argv, a:opts.dir] : [argv]))
-    let job.error = v:shell_error != 0
+    let job.error = s:shell_error != 0
     let job.running = 0
   endif
 endfunction
@@ -2327,11 +2328,34 @@ function! s:format_message(bullet, name, message)
 endfunction
 
 function! s:with_cd(cmd, dir, ...)
-  let script = a:0 > 0 ? a:1 : 1
-  let pwsh = s:is_powershell(&shell)
+  let opts = a:0 > 0 && type(a:1) == s:TYPE.dict ? a:1 : {}
+  let opts.shell = get(opts, 'shell', &shell)
+  let opts.script = get(opts, 'script', 1)
+
+  let pwsh = s:is_powershell(opts.shell)
   let cd = s:is_win && !pwsh ? 'cd /d' : 'cd'
   let sep = pwsh ? ';' : '&&'
-  return printf('%s %s %s %s', cd, plug#shellescape(a:dir, {'script': script, 'shell': &shell}), sep, a:cmd)
+  let pwsh_block_required = pwsh && !has('patch-9.2.6')
+  let start = pwsh_block_required ? '& { ' : ''
+  let end = pwsh_block_required ? ' }' : ''
+
+  return printf('%s%s %s %s %s%s', start, cd, plug#shellescape(a:dir, opts), sep, a:cmd, end)
+endfunction
+
+function! s:system_job(cmd) abort
+  let tmp = tempname()
+  let job = job_start(['/bin/sh', '-c', a:cmd], {
+  \ 'out_io': 'file',
+  \ 'out_name': tmp,
+  \ 'err_io': 'out',
+  \})
+  while job_status(job) ==# 'run'
+    sleep 1m
+  endwhile
+  let s:shell_error = job_info(job).exitval
+  let result = filereadable(tmp) ? join(readfile(tmp, 'b'), "\n") : ''
+  silent! call delete(tmp)
+  return result
 endfunction
 
 function! s:system(cmd, ...)
@@ -2343,7 +2367,9 @@ function! s:system(cmd, ...)
       " but it cannot set the working directory for the command.
       " Assume that the command does not rely on the shell.
       if has('nvim') && a:0 == 0
-        return system(a:cmd)
+        let ret = system(a:cmd)
+        let s:shell_error = v:shell_error
+        return ret
       endif
       let cmd = join(map(copy(a:cmd), 'plug#shellescape(v:val, {"shell": &shell, "script": 0})'))
       if s:is_powershell(&shell)
@@ -2353,12 +2379,17 @@ function! s:system(cmd, ...)
       let cmd = a:cmd
     endif
     if a:0 > 0
-      let cmd = s:with_cd(cmd, a:1, type(a:cmd) != s:TYPE.list)
+      let cmd = s:with_cd(cmd, a:1, {'script': type(a:cmd) != s:TYPE.list})
     endif
-    if s:is_win && type(a:cmd) != s:TYPE.list
+    if s:is_win && type(a:cmd) != s:TYPE.list && !s:is_powershell(&shell)
       let [batchfile, cmd] = s:batchfile(cmd)
     endif
-    return system(cmd)
+    if s:vim8 && has('gui_running') && !s:is_win
+      return s:system_job(cmd)
+    endif
+    let ret = system(cmd)
+    let s:shell_error = v:shell_error
+    return ret
   finally
     let [&shell, &shellcmdflag, &shellredir] = [sh, shellcmdflag, shrd]
     if s:is_win && filereadable(batchfile)
@@ -2369,7 +2400,7 @@ endfunction
 
 function! s:system_chomp(...)
   let ret = call('s:system', a:000)
-  return v:shell_error ? '' : substitute(ret, '\n$', '', '')
+  return s:shell_error ? '' : substitute(ret, '\n$', '', '')
 endfunction
 
 function! s:git_validate(spec, check_branch)
@@ -2383,7 +2414,9 @@ function! s:git_validate(spec, check_branch)
       let err = join(['Invalid URI: '.remote,
                     \ 'Expected:    '.a:spec.uri,
                     \ 'PlugClean required.'], "\n")
-    elseif a:check_branch && has_key(a:spec, 'commit')
+    elseif !a:check_branch
+      return ['', 0]
+    elseif has_key(a:spec, 'commit')
       let sha = s:git_revision(a:spec.dir)
       if empty(sha)
         let err = join(add(result, 'PlugClean required.'), "\n")
@@ -2392,18 +2425,16 @@ function! s:git_validate(spec, check_branch)
                               \ a:spec.commit[:6], sha[:6]),
                       \ 'PlugUpdate required.'], "\n")
       endif
+    elseif has_key(a:spec, 'tag')
+      let tag = s:system_chomp('git describe --exact-match --tags HEAD 2>&1', a:spec.dir)
+      if a:spec.tag !=# tag && a:spec.tag !~ '\*'
+        let err = printf('Invalid tag: %s (expected: %s). Try PlugUpdate.',
+              \ (empty(tag) ? 'N/A' : tag), a:spec.tag)
+      endif
     elseif a:check_branch
       let current_branch = result[0]
-      " Check tag
       let origin_branch = s:git_origin_branch(a:spec)
-      if has_key(a:spec, 'tag')
-        let tag = s:system_chomp('git describe --exact-match --tags HEAD 2>&1', a:spec.dir)
-        if a:spec.tag !=# tag && a:spec.tag !~ '\*'
-          let err = printf('Invalid tag: %s (expected: %s). Try PlugUpdate.',
-                \ (empty(tag) ? 'N/A' : tag), a:spec.tag)
-        endif
-      " Check branch
-      elseif origin_branch !=# current_branch
+      if origin_branch !=# current_branch
         let err = printf('Invalid branch: %s (expected: %s). Try PlugUpdate.',
               \ current_branch, origin_branch)
       endif
@@ -2412,7 +2443,7 @@ function! s:git_validate(spec, check_branch)
           \ 'git', 'rev-list', '--count', '--left-right',
           \ printf('HEAD...origin/%s', origin_branch)
           \ ], a:spec.dir)), '\t')
-        if v:shell_error || len(ahead_behind) != 2
+        if s:shell_error || len(ahead_behind) != 2
           let err = "Failed to compare with the origin. The default branch might have changed.\nPlugClean required."
         else
           let [ahead, behind] = ahead_behind
@@ -2438,9 +2469,11 @@ endfunction
 
 function! s:rm_rf(dir)
   if isdirectory(a:dir)
-    return s:system(s:is_win
-    \ ? 'rmdir /S /Q '.plug#shellescape(a:dir)
-    \ : ['rm', '-rf', a:dir])
+    return s:system(!s:is_win
+    \ ? ['rm', '-rf', a:dir]
+    \ : s:is_powershell(&shell)
+    \ ? ['Remove-Item', '-Recurse', '-Force', a:dir]
+    \ : 'rmdir /S /Q '.plug#shellescape(a:dir))
   endif
 endfunction
 
@@ -2562,7 +2595,7 @@ function! s:upgrade()
 
   try
     let out = s:system(['git', 'clone', '--depth', '1', s:plug_src, tmp])
-    if v:shell_error
+    if s:shell_error
       return s:err('Error upgrading vim-plug: '. out)
     endif
 
