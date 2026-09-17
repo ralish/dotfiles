@@ -2,7 +2,7 @@
     /*
      * Visual Studio Code defaults
      *
-     * Exported from release: v1.137.0
+     * Exported from release: v1.138.0
      *
      * Obtained from "Preferences: Open Default Settings (JSON)" command.
      */
@@ -1335,6 +1335,15 @@
         "diffEditor.ignoreTrimWhitespace": false
     },
 
+    // Configure settings to be overridden for cmake.
+    "[cmake]": {
+        "editor.quickSuggestions": {
+            "comments": "off",
+            "other": "on",
+            "strings": "on"
+        }
+    },
+
     // Configure settings to be overridden for coffeescript.
     "[coffeescript]": {
         "diffEditor.ignoreTrimWhitespace": false,
@@ -1918,6 +1927,9 @@
 
     // Provide information about actions that can be taken in the comment widget or in a file which contains comments.
     "accessibility.verbosity.comments": true,
+
+    // Provide information about how to access accessibility help for the customization migration checklist.
+    "accessibility.verbosity.customizationMigrations": true,
 
     // Provide information about how to access the debug console accessibility help dialog when the debug console or run and debug viewlet is focused. Note that a reload of the window is required for this to take effect.
     "accessibility.verbosity.debug": true,
@@ -2588,7 +2600,7 @@
     // When enabled, terminal tool calls are displayed inside the thinking dropdown with a simplified view.
     "chat.agent.thinking.terminalTools": true,
 
-    // Controls how thinking is rendered.
+    // Controls how thinking is rendered. Read-only chats always use the collapsed preview style.
     //  - collapsed: Thinking parts will be collapsed by default.
     //  - collapsedPreview: Thinking parts will be expanded first, then collapse once we reach a part that is not thinking.
     //  - fixedScrolling: Show thinking in a fixed-height streaming panel that auto-scrolls; click header to expand to full height.
@@ -2628,17 +2640,11 @@
     // When enabled, the agent host registers the Codex provider (subject to the Codex SDK being reachable). Enabling takes effect without restarting the agent host.
     "chat.agentHost.codexAgent.enabled": false,
 
-    // When enabled, the Auto model in Copilot SDK agent sessions offers an "Optimize for" picker that biases routing toward efficiency, balance, or intelligence. The profile applies when a session is created and stays fixed for that session.
-    "chat.agentHost.copilot.autoModeTiers.enabled": false,
-
     // When enabled, maps supported legacy VS Code settings to equivalent Copilot SDK managed settings for local Agent Host sessions. Only restrictions are mapped, and only from globally-scoped values — workspace and folder values are ignored. Applies to local sessions using the Copilot agent; remote hosts and other agents are unaffected. This compatibility bridge is temporary and is not used for new settings.
     "chat.agentHost.copilot.mapLegacySettingsToManagedSettings": false,
 
     // Per-model overrides for Copilot Agent Host sessions. Use `*` to match every model. Supports model family, reasoning effort, tool filters, model capabilities, and YAML prompt overrides.
     "chat.agentHost.copilot.modelCapabilityOverrides": {},
-
-    // When enabled, Auto model selection in Copilot SDK agent sessions routes on the conversation so far, sending prior user messages to the router instead of scoring the latest message alone.
-    "chat.agentHost.copilot.multiTurnContextRouting.enabled": false,
 
     // Overrides the reasoning effort for Copilot SDK agent sessions regardless of the per-model picker value. Set it to a level the selected model supports (for example `low`, `medium`, `high`, or `xhigh`) — choosing a level the model does not support may be rejected by the model. A value that isn't a recognized effort level is ignored and the session falls back to the picker value. Applied when a session is created and when its model changes. Only affects Copilot CLI agent sessions.
     //
@@ -2664,6 +2670,9 @@
 
     // When enabled, the active agent names new sessions and chats using rename tools. When disabled, a utility model generates titles. Changes apply to sessions and chats created afterward.
     "chat.agentHost.experimental.activeAgentTitleGeneration": false,
+
+    // Controls whether the Agent Host automatically discovers and associates a pull request for the currently checked-out branch. When disabled, only pull requests recorded by the agent as artifacts or explicitly selected or created through session actions are considered.
+    "chat.agentHost.experimental.autoAttachPullRequests": true,
 
     // When enabled, agents receive guidance for using rich links to issues, pull requests, commits, sessions, and chats, plus running task markers, when creating or editing Markdown plan documents.
     "chat.agentHost.experimental.markdownPlanRichLinks": false,
@@ -2739,8 +2748,11 @@
     // Controls whether Agent Session Projection mode is enabled for reviewing agent sessions in a focused workspace.
     "chat.agentSessionProjection.enabled": false,
 
-    // Controls whether GitHub and remote workspaces are combined under Remote in the Agents Window workspace picker, with search always available and, when supported, a No workspace option.
-    "chat.agentSessions.consolidatedRemoteWorkspaces": false,
+    // Controls the number of inactive days before agent sessions with a merged pull request are automatically archived. Archiving safely removes eligible worktrees. Permanent deletion is controlled separately by `chat.agentSessions.autoDeleteArchivedMergedSessionsAfterDays`. Set to 0 to disable automatic archival. The recommended value is 15.
+    "chat.agentSessions.autoArchiveMergedSessionsAfterDays": 0,
+
+    // Controls the number of days after automatic archival before agent sessions with a merged pull request are permanently deleted. Retained eligible worktrees are safely removed before deletion. Automatic archival is controlled separately by `chat.agentSessions.autoArchiveMergedSessionsAfterDays`. Set to 0 to disable permanent deletion. The recommended value is 15.
+    "chat.agentSessions.autoDeleteArchivedMergedSessionsAfterDays": 0,
 
     // Controls whether legacy extension host Copilot CLI chat sessions are migrated in place to the Agent host when opened, so their history becomes editable. When disabled, legacy sessions open as before.
     //
@@ -2834,6 +2846,9 @@
     // Show the context window usage indicator in the chat input.
     "chat.contextUsage.enabled": true,
 
+    // When enabled, Copilot Agent Host sessions using a supported Claude model can call the provider-native Advisor tool. Changing this setting restarts the Copilot SDK client after active turns finish.
+    "chat.copilot.claudeAdvisor.enabled": false,
+
     // Controls whether Copilot Agent Host sessions can use VS Code's semantic workspace search. When disabled, semantic search is unavailable.
     "chat.copilot.semanticSearch.enabled": false,
 
@@ -2842,6 +2857,9 @@
 
     // Controls whether the Chat Customizations editor offers to move agents, instructions, and skills from configured locations that are not supported by the active agent-host harness. When disabled, the migration card and sidebar shortcut are hidden.
     "chat.customizations.locationsMigration.enabled": false,
+
+    // Controls whether the Chat Customizations editor offers to move supported workspace MCP servers out of .vscode/mcp.json and into a .mcp.json file at the workspace root, where the active agent-host harness discovers them directly. When disabled, the migration card and sidebar shortcut are hidden.
+    "chat.customizations.mcpServerMigration.enabled": false,
 
     // Controls whether chat shows information about customizations that are not used by the active Agent Host harness.
     //  - never: Never show customization migration hints in chat.
@@ -2957,7 +2975,7 @@
     // Controls whether Open in Agents Window reveals the current local Agent Host session instead of opening a new session.
     "chat.experimental.openInAgentsWindow.revealCurrentSession": false,
 
-    // Controls whether the permissions picker shows a "Sandboxing for terminal" toggle. Local sessions show it on the Default permissions option; Copilot Agent Host sessions show it as a separate setting that applies to every permission mode. For Copilot SDK sessions using the built-in shell tool, the toggle reflects and updates `chat.agentHost.sdkSandbox.enabled` or `chat.agentHost.sdkSandbox.enabledWindows`.
+    // Controls whether the permissions picker shows a "Sandboxing for terminal" toggle. Local sessions show it on the Default permissions option. Copilot Agent Host sessions show it as a session-specific setting that applies to every permission mode; changing it saves the choice only for that session. New Copilot Agent Host sessions initially follow `chat.agentHost.sdkSandbox.enabled` or `chat.agentHost.sdkSandbox.enabledWindows` when using the SDK's built-in shell tool, and `chat.agent.sandbox.enabled` or `chat.agent.sandbox.enabledWindows` when using the Agent Host terminal tool.
     "chat.experimental.permissionsSandboxToggle.enabled": true,
 
     // Controls whether supported links in chat are rendered as rich links with live metadata. Enabling this may make authenticated requests to services such as GitHub.
@@ -2966,9 +2984,9 @@
     // Controls the wording and icons used by actions that archive and unarchive chat sessions, as well as the label of the archived sessions section.
     //  - archive: Use Archive, Archive All, Unarchive, and Unarchive All.
     //  - done: Use Mark as Done, Mark All as Done, Restore, and Restore All.
-    "chat.experimental.sessionArchiveActionWording": "archive",
+    "chat.experimental.sessionArchiveActionWording": "done",
 
-    // Enable state indicators around chat editor sessions.
+    // Enable state indicators around chat editor sessions that are in progress, need input, or have an unvisited completion. Customize the borders with `chat.sessionStateIndicator.inProgressBorder`, `chat.sessionStateIndicator.needsInputBorder`, and `chat.sessionStateIndicator.unvisitedBorder` in `workbench.colorCustomizations`.
     "chat.experimental.sessionStateIndicator.enabled": false,
 
     // Controls whether chat requests use experimental tree-based sticky scroll instead of the sticky prompt header.
@@ -2976,6 +2994,9 @@
 
     // Controls whether a stronger skill adherence prompt is used that encourages the model to immediately invoke skills when relevant rather than just announcing them. This setting is only used by the Local agent harness.
     "chat.experimental.useSkillAdherencePrompt": false,
+
+    // Shows mode and permissions in a combined picker with expandable permission choices for Copilot Agent Host sessions.
+    "chat.experimentalModePermissionsPicker": false,
 
     // When enabled, the model picker uses a tab per model provider and configures thinking effort and context from a detail card next to each model, instead of a separate configuration button.
     "chat.experimentalModelPicker": false,
@@ -2988,8 +3009,8 @@
     //  - Auto (copilot): Auto routes based on your task and real-time system health and model performance. Models routed via auto receive a 10% to 100% discount. [Learn More](https://docs.github.com/en/copilot/concepts/models/auto-model-selection)
     //  - Claude Haiku 4.5 (copilot): Fastest and most compact Claude model. Ideal for quick responses and simple tasks.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
-    //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.5 Flash (copilot): Gemini 3.5 Flash has a planned deprecation date of 2026-10-02.
+    //  - Gemini 3.6 Flash (copilot): Gemini 3.6 Flash has a planned deprecation date of 2026-10-02.
     //  - Gemini 3.7 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.8 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
@@ -3000,9 +3021,8 @@
     //  - GPT-5.6 Terra (copilot): OpenAI GPT model for coding and general assistance.
     //  - Grok 4.5 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Grok 4.6 (copilot): xAI Grok model optimized for fast code generation and development tasks.
-    //  - Kimi K2.7 Code (copilot)
+    //  - Kimi K2.7 Code (copilot): Kimi K2.7 Code has a planned deprecation date of 2026-10-02.
     //  - Kimi K3 (copilot)
-    //  - MAI-Code-1-Flash (copilot): MAI-Code-1-Flash has a planned deprecation date of 2026-09-10.
     //  - MAI-Code-1.1-Flash (copilot)
     "chat.exploreAgent.defaultModel": "",
 
@@ -3143,7 +3163,7 @@
     //  - always: Always show OS notifications for responses, even when the window is focused.
     "chat.notifyWindowOnResponseReceived": "windowNotFocused",
 
-    // The number of characters a paste must exceed before it is added to the chat input as an attachment instead of being inserted inline. A paste must also span several lines, so a long single-line paste is always inserted inline. Set this to a very large number to always paste inline.
+    // The number of characters a paste must exceed before it is added to the chat input as an attachment instead of being inserted inline. Set this to a very large number to always paste inline.
     "chat.pasteAsAttachmentThreshold": 10000,
 
     // Controls the default permissions picker mode for new local chat sessions. You can still change the permission mode per session, and each session remembers the permission mode that was used. If enterprise policy disables auto approval, new sessions use Default Permissions.
@@ -3157,8 +3177,8 @@
     //  - Auto (copilot): Auto routes based on your task and real-time system health and model performance. Models routed via auto receive a 10% to 100% discount. [Learn More](https://docs.github.com/en/copilot/concepts/models/auto-model-selection)
     //  - Claude Haiku 4.5 (copilot): Fastest and most compact Claude model. Ideal for quick responses and simple tasks.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
-    //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.5 Flash (copilot): Gemini 3.5 Flash has a planned deprecation date of 2026-10-02.
+    //  - Gemini 3.6 Flash (copilot): Gemini 3.6 Flash has a planned deprecation date of 2026-10-02.
     //  - Gemini 3.7 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.8 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
@@ -3169,9 +3189,8 @@
     //  - GPT-5.6 Terra (copilot): OpenAI GPT model for coding and general assistance.
     //  - Grok 4.5 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Grok 4.6 (copilot): xAI Grok model optimized for fast code generation and development tasks.
-    //  - Kimi K2.7 Code (copilot)
+    //  - Kimi K2.7 Code (copilot): Kimi K2.7 Code has a planned deprecation date of 2026-10-02.
     //  - Kimi K3 (copilot)
-    //  - MAI-Code-1-Flash (copilot): MAI-Code-1-Flash has a planned deprecation date of 2026-09-10.
     //  - MAI-Code-1.1-Flash (copilot)
     "chat.planAgent.defaultModel": "",
 
@@ -3273,6 +3292,9 @@
         "**/.claude/agents/**": false,
         "**/.claude/settings.json": false,
         "**/.claude/settings.local.json": false,
+        "**/.codex/agents/**": false,
+        "**/.codex/config.toml": false,
+        "**/.codex/hooks.json": false,
         "**/.git/**": false,
         "**/.github/agents/**": false,
         "**/.github/hooks/**": false,
@@ -3533,9 +3555,6 @@
         "https://github.com/microsoft/vscode/wiki/*": true
     },
 
-    // Controls whether agent status pills are shown above the chat input and inside completed responses. Only applies to agent sessions.
-    "chat.turnStatusPills": true,
-
     // Controls whether the input of the chat should be restored when an undo request is made. The input will be filled with the text of the request that was restored.
     "chat.undoRequests.restoreInput": true,
 
@@ -3628,6 +3647,9 @@
 
     // Enables the use of presets files that are using features from the versions that CMake Tools extension doesn't currently support. Unknown properties and macros will be ignored.
     "cmake.allowUnsupportedPresetsVersions": false,
+
+    // When no `CMakeLists.txt` exists at the workspace root (`cmake.sourceDirectory`), automatically detect a single `CMakeLists.txt` in a subdirectory and use its folder as the source directory so CMake Tools activates instead of staying hidden. When several candidates are found, you are prompted to choose. Has no effect when `cmake.sourceDirectory` is set explicitly.
+    "cmake.autoDetectSourceDirectory": true,
 
     // Select active folder automatically.
     "cmake.autoSelectActiveFolder": true,
@@ -3750,10 +3772,10 @@
     // Maximum number of times the delimiter may be used to split the name of the test. `0` means no limit.
     "cmake.ctest.testSuiteDelimiterMaxOccurrence": 0,
 
-    // Additional arguments to pass to CTest. When using CMake Presets, these arguments are temporarily added to the arguments provided by the active test preset.
+    // Additional arguments to pass to CTest. When using CMake Presets, these arguments are temporarily added to the arguments provided by the active test preset. Use ${testName} to reference the current test name (only expanded when running a single test).
     "cmake.ctestArgs": [],
 
-    // Arguments passed by default to CTest.
+    // Arguments passed by default to CTest. Use ${testName} to reference the current test name (only expanded when running a single test).
     "cmake.ctestDefaultArgs": ["-T", "test", "--output-on-failure"],
 
     // Path to CTest executable. If null, will be inferred from cmake.cmakePath (recommended to leave null).
@@ -3974,6 +3996,9 @@
     // Target to build after running tests with coverage using the test explorer
     "cmake.postRunCoverageTarget": null,
 
+    // If set, this named task will be executed before CMake configure. Note that chaining the pre-configure task with other tasks in tasks.json may lead to multiple executions of the pre-configure task.
+    "cmake.preConfigureTask": null,
+
     // Target to build before running tests with coverage using the test explorer
     "cmake.preRunCoverageTarget": null,
 
@@ -3989,6 +4014,9 @@
     //  - never: The log neither appears nor takes the focus.
     //  - error: The log appears only when the build or the configuration fails.
     "cmake.revealLog": "always",
+
+    // When `true`, automatic and programmatic CMake operations - such as configure-on-open, automatic reconfigure, and builds or tests invoked by other extensions through the CMake Tools API (for example the C/C++ DevTools companion acting on behalf of Copilot) - reveal the CMake output channel. When `false` (the default), these operations log silently so they don't switch the panel away from a terminal you are working in. The `cmake.revealLog` setting still controls how operations you start yourself reveal the log. Build, test, and configure failures are always shown, regardless of this setting.
+    "cmake.revealLogOnAutomaticTrigger": false,
 
     // Save open files before building.
     "cmake.saveBeforeBuild": true,
@@ -4010,6 +4038,9 @@
 
     // Include system kits in kit selection.
     "cmake.showSystemKits": true,
+
+    // Show timestamps and log levels in the CMake output channel. Useful for tracking build durations.
+    "cmake.showTimestampsInOutput": false,
 
     // Skip over the configure process if cache is present.
     "cmake.skipConfigureIfCachePresent": null,
@@ -4074,7 +4105,7 @@
     "containers.commands.attach": "${containerCommand} exec -it ${containerId} ${shellCommand}",
 
     // Command template(s) for container build commands.
-    "containers.commands.build": "${containerCommand} build --pull --rm -f \"${dockerfile}\" -t ${tag} \"${context}\"",
+    "containers.commands.build": "${containerCommand} build --pull ${rm} -f \"${dockerfile}\" -t ${tag} \"${context}\"",
 
     // Command templates for compose down commands.
     "containers.commands.composeDown": [
@@ -4837,7 +4868,7 @@
     //  - delegated: The container’s view is authoritative.
     "dev.containers.workspaceMountConsistency": "cached",
 
-    // Enables dictation across the product (chat input, editor, and terminal). When enabled on a supported platform, a microphone button appears in the chat input and the dictation shortcut becomes available; the on-device transcription model is downloaded on first use and runs locally.
+    // Enables dictation across the product (chat input, editor, and terminal). When enabled, a microphone button appears in the chat input and the dictation shortcut becomes available. Desktop uses the selected transcription model; web uses cloud transcription.
     "dictation.enabled": true,
 
     // Experimental: when dictation ends, the final transcript is passed through a small language model to restore punctuation, capitalization, paragraphs, and lists. Requires Copilot to be enabled; the transcript is sent to the language model for cleanup. Falls back to the raw transcript when no model is available. Use [dictation instructions](command:workbench.action.chat.configureDictationInstructions) to customize terminology and formatting.
@@ -4846,7 +4877,7 @@
     // Controls the language model used for experimental dictation cleanup. `auto` follows the experiment-provided default.
     "dictation.experimental.llmCleanupModel": "auto",
 
-    // The model used for dictation. On-device models download on first use and run locally through Microsoft Foundry Local; the cloud option streams audio to the Microsoft AI voice service.
+    // The model used for dictation. On-device models download on first use and run locally through Microsoft Foundry Local; the cloud option streams audio to the Microsoft AI voice service. On the web, user and default on-device selections use cloud transcription because local transcription is unsupported. If policy requires on-device transcription, dictation is unavailable on the web.
     //  - nemotron-3.5-asr-streaming-0.6b: NVIDIA Nemotron 3.5 multilingual streaming RNN-T, run on-device through Microsoft Foundry Local. Works offline; no audio leaves the device. Automatic language selection follows the Voice Mode language setting; when that setting is Automatic, dictation uses the configured display language when supported, then the system or browser locale, with model detection as a fallback. Downloaded on first use and cached on disk.
     //  - mai: Cloud transcription through the same Microsoft AI voice service used by Voice Mode. Requires a network connection and GitHub sign-in; audio is streamed to the service.
     "dictation.model": "nemotron-3.5-asr-streaming-0.6b",
@@ -5570,7 +5601,6 @@
     // Defines a default formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
-    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
     //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
@@ -5602,6 +5632,7 @@
     //  - josee9988.minifyall: Minifier for JSON, CSS, HTML, XML, TWIG, LESS, SASS, SCSS, JavaScript, JSONC, and JavaScriptReact(testing). Compressor of files and folders. You will love its simplicity!
     //  - ms-python.mypy-type-checker: Type checking support for Python files using Mypy.
     //  - vscode.php-language-features: Provides rich language support for PHP files.
+    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - ms-python.pylint: Linting support for Python files using Pylint.
     //  - ms-python.python: Python language support with extension access points for IntelliSense (Pylance), Debugging (Python Debugger), linting, formatting, refactoring, unit tests, and more.
     //  - mechatroner.rainbow-csv: Highlight CSV and TSV files, Run SQL-like queries
@@ -5838,6 +5869,11 @@
 
     // Controls whether the editor should automatically format the line after typing.
     "editor.formatOnType": false,
+
+    // Controls the width used to render full-width characters.
+    //  - font: Render full-width characters using the width defined by the font.
+    //  - twoCells: Render full-width characters centered in exactly two character cells. Only applies to monospace fonts. Does not apply to multi codepoint full-width characters or to GPU rendering. This has a performance impact on line rendering.
+    "editor.fullwidthCharacterWidth": "font",
 
     // Controls whether the editor should render the vertical glyph margin. Glyph margin is mostly used for debugging.
     "editor.glyphMargin": true,
@@ -7887,12 +7923,10 @@
     // Override the language model used by the Ask agent. Leave empty to use the default model.
     "github.copilot.chat.askAgent.model": "",
 
-    // Choose a routing tier for the Auto model, biasing model selection toward cost, capability, or speed. When disabled, the service picks the routing profile.
+    // Show the Auto model's "Optimize for" picker with Efficiency, Balance, and Intelligence options in Copilot Chat and Copilot SDK sessions. When disabled, the service chooses how to route unless an override is configured.
     "github.copilot.chat.autoMode.tiers.enabled": false,
 
-    // Overrides the routing tier that the `Auto` model requests, ignoring both the tier picked in the model picker and the tier inline chat defaults to. Accepts `efficiency`, `balance`, `intelligence`, or `fast`. Used by evals.
-    //
-    // **Note**: This is an advanced debugging setting.
+    // Override Auto's "Optimize for" preference for evals and debugging, even when the picker is disabled. Accepts `efficiency`, `balance`, or `intelligence` in both Copilot Chat and Copilot SDK sessions; `fast` is extension-only. Set to `null` to clear.
     "github.copilot.chat.autoModeTierOverride": null,
 
     // Enable the Copilot CLI. When disabled, the Copilot CLI will not be available in 'Continue In' context menus.
@@ -8700,6 +8734,9 @@
 
     // If GitHub notifications should be shown to the user.
     "githubPullRequests.notifications": "off",
+
+    // Controls whether GitHub issue and pull request links open in VS Code.
+    "githubPullRequests.openPullLinks": false,
 
     // The default branch for a repository is set on github.com. With this setting, you can override that default with another branch.
     "githubPullRequests.overrideDefaultBranch": "",
@@ -11466,8 +11503,8 @@
     //  - Auto (copilot): Auto routes based on your task and real-time system health and model performance. Models routed via auto receive a 10% to 100% discount. [Learn More](https://docs.github.com/en/copilot/concepts/models/auto-model-selection)
     //  - Claude Haiku 4.5 (copilot): Fastest and most compact Claude model. Ideal for quick responses and simple tasks.
     //  - Claude Sonnet 5 (copilot): Balanced Claude model offering strong performance for everyday coding and chat tasks at faster speeds.
-    //  - Gemini 3.5 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
-    //  - Gemini 3.6 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
+    //  - Gemini 3.5 Flash (copilot): Gemini 3.5 Flash has a planned deprecation date of 2026-10-02.
+    //  - Gemini 3.6 Flash (copilot): Gemini 3.6 Flash has a planned deprecation date of 2026-10-02.
     //  - Gemini 3.7 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - Gemini 3.8 Flash (copilot): Fast and efficient Gemini model optimized for quick responses and high throughput.
     //  - GPT-5 mini (copilot): Lightweight GPT model for quick responses and simple tasks with low latency.
@@ -11478,9 +11515,8 @@
     //  - GPT-5.6 Terra (copilot): OpenAI GPT model for coding and general assistance.
     //  - Grok 4.5 (copilot): xAI Grok model optimized for fast code generation and development tasks.
     //  - Grok 4.6 (copilot): xAI Grok model optimized for fast code generation and development tasks.
-    //  - Kimi K2.7 Code (copilot)
+    //  - Kimi K2.7 Code (copilot): Kimi K2.7 Code has a planned deprecation date of 2026-10-02.
     //  - Kimi K3 (copilot)
-    //  - MAI-Code-1-Flash (copilot): MAI-Code-1-Flash has a planned deprecation date of 2026-09-10.
     //  - MAI-Code-1.1-Flash (copilot)
     "inlineChat.defaultModel": "",
 
@@ -14297,7 +14333,6 @@
     // Defines a default notebook formatter which takes precedence over all other formatter settings. Must be the identifier of an extension contributing a formatter.
     //  - null: None
     //  - yzhang.markdown-all-in-one: All you need to write Markdown (keyboard shortcuts, table of contents, auto preview and more)
-    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - esbenp.prettier-vscode: Code formatter using prettier
     //  - charliermarsh.ruff: A Visual Studio Code extension with support for the Ruff linter and formatter for Python.
     //  - DavidAnson.vscode-markdownlint: Markdown linting and style checking for Visual Studio Code
@@ -14329,6 +14364,7 @@
     //  - josee9988.minifyall: Minifier for JSON, CSS, HTML, XML, TWIG, LESS, SASS, SCSS, JavaScript, JSONC, and JavaScriptReact(testing). Compressor of files and folders. You will love its simplicity!
     //  - ms-python.mypy-type-checker: Type checking support for Python files using Mypy.
     //  - vscode.php-language-features: Provides rich language support for PHP files.
+    //  - ms-vscode.powershell: Develop PowerShell modules, commands and scripts in Visual Studio Code!
     //  - ms-python.pylint: Linting support for Python files using Pylint.
     //  - ms-python.python: Python language support with extension access points for IntelliSense (Pylance), Debugging (Python Debugger), linting, formatting, refactoring, unit tests, and more.
     //  - mechatroner.rainbow-csv: Highlight CSV and TSV files, Run SQL-like queries
@@ -16902,6 +16938,9 @@
 
     // The priority of the selected lines in status bar. Higher values mean the item should be shown more to the left.
     "selectline.statusbarPriority": 100,
+
+    // Controls whether the Agents Window uses the unified workspace picker, which combines GitHub and remote workspaces, provides search, and, when supported, allows creating sessions with no workspace.
+    "sessions.chat.unifiedWorkspacePicker.enabled": false,
 
     // Controls how the prompt timeline is displayed next to the chat transcript in the Agents window.
     //  - off: Do not show the prompt timeline.
