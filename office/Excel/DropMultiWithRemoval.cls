@@ -42,13 +42,16 @@ Private Sub Worksheet_Change(ByVal Destination As Range)
             Destination.Value = strOldVal
         ElseIf InStr(1, strOldVal, strDelimVal & strNewVal) Or InStr(1, strOldVal, strNewVal & strDelimVal) Or InStr(1, strOldVal, strDelimVal & strNewVal & strDelimVal) Then
             strArray = Split(strOldVal, strDelimVal)
+
             If IsError(Application.Match(strNewVal, strArray, 0)) = 0 Then
                 Destination.Value = ""
+
                 For idx = 0 To UBound(strArray)
                     If strArray(idx) <> strNewVal Then
                         Destination.Value = Destination.Value & strArray(idx) & strDelimVal
                     End If
                 Next idx
+
                 Destination.Value = Left(Destination.Value, Len(Destination.Value) - Len(strDelimVal))
             Else
                 Destination.Value = strOldVal & strDelimVal & strNewVal
