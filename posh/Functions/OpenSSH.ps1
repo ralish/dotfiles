@@ -180,7 +180,7 @@ Function Global:Update-OpenSSHConfig {
                         }
 
                         # Matched a line to be excluded; walk backwards to
-                        # remove comments and new lines which pertain to the
+                        # remove comments and newlines which pertain to the
                         # directive.
                         for ($LastValidLine = $Config.Count - 1; $LastValidLine -ge 0; $LastValidLine--) {
                             if ($Config[$LastValidLine] -notmatch '^\s*(#.*)?$') { break }

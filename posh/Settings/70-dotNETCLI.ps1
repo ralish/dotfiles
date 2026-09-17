@@ -21,9 +21,9 @@ Function Initialize-DotNetCli {
     [OutputType([Void])]
     Param()
 
-    # Assume if there's an existing native completions script we can use it. This
-    # avoids a potentially expensive process launch of `dotnet` to retrieve the
-    # version, which tells us whether to use dynamic or native completions.
+    # Assume if there's an existing native completions script we can use it.
+    # This avoids launching a `dotnet` process to retrieve the version and
+    # determine if we should use dynamic or native completions.
     $CompletionsFile = Join-Path -Path $Global:PoshCompletionsPath -ChildPath 'dotnet.ps1'
     if (!$Env:DOTFILES_REBUILD_COMPLETIONS -and (Test-Path -LiteralPath $CompletionsFile -PathType 'Leaf')) {
         $CompletionsType = 'Native'
@@ -56,6 +56,7 @@ Function Get-DotNetCliCompletionsType {
         } else {
             $OriginalNoLogo = $null
         }
+
         $Env:DOTNET_NOLOGO = 'true'
 
         $CliVersionRaw = (& dotnet @VersionArgs) -join ''

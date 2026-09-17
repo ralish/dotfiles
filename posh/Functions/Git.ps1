@@ -20,7 +20,7 @@ Function Global:Get-GitRepoSummary {
 
     Begin {
         if (!$Path) {
-            $Path += $PWD.Path
+            $Path += $ExecutionContext.SessionState.Path.CurrentFileSystemLocation.Path
         }
     }
 
@@ -435,7 +435,7 @@ Function Global:Invoke-GitRepoCommand {
         $OriginalLocation = $ExecutionContext.SessionState.Path.CurrentFileSystemLocation
 
         if (!$Path) {
-            $Path += $PWD.Path
+            $Path += $OriginalLocation.Path
         }
 
         $GitCmds = [Collections.Generic.List[String[]]]::new()

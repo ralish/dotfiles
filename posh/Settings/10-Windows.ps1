@@ -85,6 +85,7 @@ Function Repair-ConHostVT100Bug {
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'Win32ApiFailed', $ErrCat, $null)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
+
         Write-DotFilesMessage -Type 'Debug' -Message "Current console output mode: $([DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode)"
 
         $ConStdVT100 = [DotFiles.Console+ConsoleModeOutputFlags]$ConStdMode -band [DotFiles.Console+ConsoleModeOutputFlags]::ENABLE_VIRTUAL_TERMINAL_PROCESSING

@@ -1,6 +1,6 @@
 $null = Start-DotFilesSection -Type 'Functions' -Name 'VMware'
 
-# Optimizes VMware virtual machines
+# Optimize VMware virtual machines
 Function Global:Optimize-VMwareVirtualMachine {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]

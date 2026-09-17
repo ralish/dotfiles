@@ -3,9 +3,9 @@ $null = Start-DotFilesSection -Type 'Functions' -Name 'Maintenance'
 # Load custom formatting data
 $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Maintenance.format.ps1xml'))
 
-# Retrieves a report containing:
-# - Name and version for all vendored components
-# - Path and last reviewed version for all configuration files
+# Retrieve a report containing:
+# - Name and version of all vendored components
+# - Path and last reviewed version of all configuration files
 Function Global:Get-DotFilesLastUpdated {
     [CmdletBinding()]
     [OutputType([PSCustomObject[]])]
@@ -128,14 +128,14 @@ Function Global:Clear-AllDevCaches {
         $OptInAttrs.Add($OptInParamAttr)
         $OptInAttrs.Add($TasksVsa)
         $OptInParam = [Management.Automation.RuntimeDefinedParameter]::new('IncludeTasks', [String[]], $OptInAttrs)
-        $RuntimeParams.Add('IncludeTasks', $OptInParam)
+        $RuntimeParams['IncludeTasks'] = $OptInParam
 
         $OptOutAttrs = [Collections.ObjectModel.Collection[Attribute]]::new()
         $OptOutParamAttr = [Management.Automation.ParameterAttribute]@{ ParameterSetName = 'OptOut' }
         $OptOutAttrs.Add($OptOutParamAttr)
         $OptOutAttrs.Add($TasksVsa)
         $OptOutParam = [Management.Automation.RuntimeDefinedParameter]::new('ExcludeTasks', [String[]], $OptOutAttrs)
-        $RuntimeParams.Add('ExcludeTasks', $OptOutParam)
+        $RuntimeParams['ExcludeTasks'] = $OptOutParam
 
         return $RuntimeParams
     }
@@ -283,7 +283,7 @@ Function Global:Update-AllTheThings {
         $TasksSystem = @()
 
         if (Test-IsWindows) {
-            $TasksApplications = @('Office', 'VisualStudio') + $TasksApplications + @('Edge', 'Chrome', 'MicrosoftStore', 'WinGet', 'Scoop')
+            $TasksApplications = 'Office', 'VisualStudio', $TasksApplications, 'Edge', 'Chrome', 'MicrosoftStore', 'WinGet', 'Scoop'
             $TasksDevelopment = ($TasksDevelopment + @('Cygwin', 'MSYS2', 'Python', 'QtComponents')) | Sort-Object
             $TasksSystem += 'Windows', 'WSL'
         } else {
@@ -300,21 +300,21 @@ Function Global:Update-AllTheThings {
         $CategoryAttrs.Add($CategoryParamAttr)
         $CategoryAttrs.Add($CategoryVsa)
         $CategoryParam = [Management.Automation.RuntimeDefinedParameter]::new('Category', [String[]], $CategoryAttrs)
-        $RuntimeParams.Add('Category', $CategoryParam)
+        $RuntimeParams['Category'] = $CategoryParam
 
         $OptInAttrs = [Collections.ObjectModel.Collection[Attribute]]::new()
         $OptInParamAttr = [Management.Automation.ParameterAttribute]@{ ParameterSetName = 'OptIn'; Mandatory = $true }
         $OptInAttrs.Add($OptInParamAttr)
         $OptInAttrs.Add($TasksVsa)
         $OptInParam = [Management.Automation.RuntimeDefinedParameter]::new('IncludeTasks', [String[]], $OptInAttrs)
-        $RuntimeParams.Add('IncludeTasks', $OptInParam)
+        $RuntimeParams['IncludeTasks'] = $OptInParam
 
         $OptOutAttrs = [Collections.ObjectModel.Collection[Attribute]]::new()
         $OptOutParamAttr = [Management.Automation.ParameterAttribute]@{ ParameterSetName = 'OptOut' }
         $OptOutAttrs.Add($OptOutParamAttr)
         $OptOutAttrs.Add($TasksVsa)
         $OptOutParam = [Management.Automation.RuntimeDefinedParameter]::new('ExcludeTasks', [String[]], $OptOutAttrs)
-        $RuntimeParams.Add('ExcludeTasks', $OptOutParam)
+        $RuntimeParams['ExcludeTasks'] = $OptOutParam
 
         return $RuntimeParams
     }

@@ -31,7 +31,7 @@ Function Set-WindowsTerminalGlobalVariables {
 # Must run before the new `Prompt` function to preserve the original prompt
 Set-WindowsTerminalGlobalVariables
 
-# Returns the last exit code for usage by the shell integration
+# Return the last exit code for usage by the shell integration
 Function Global:__Get-LastExitCodeForWinTerm {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
     [OutputType([Int])]

@@ -217,10 +217,10 @@ Function Global:Get-OpenSSLCertificate {
 
     $Params = [Collections.Generic.List[String]]::new(
         [String[]]@(
-            'x509',
-            '-in', $Certificate,
+            'x509'
+            '-in', $Certificate
             # Suppress default certificate output
-            '-noout',
+            '-noout'
             # Print the certificate in text form
             '-text'
         )
@@ -251,12 +251,12 @@ Function Global:Get-OpenSSLCsr {
 
     $Params = [Collections.Generic.List[String]]::new(
         [String[]]@(
-            'req',
-            '-in', $Csr,
+            'req'
+            '-in', $Csr
             # Verify the signature on the request
-            '-verify',
+            '-verify'
             # Suppress default certificate request output
-            '-noout',
+            '-noout'
             # Print the certificate request in text form
             '-text'
         )
@@ -299,8 +299,8 @@ Function Global:Get-OpenSSLPkcs12 {
 
     $Params = [Collections.Generic.List[String]]::new(
         [String[]]@(
-            'pkcs12',
-            '-in', $Pkcs12File,
+            'pkcs12'
+            '-in', $Pkcs12File
             # Print additional information about the PKCS #12 file
             '-info'
         )
@@ -357,7 +357,7 @@ Function Global:Get-OpenSSLServerCertificate {
 
     $Params = [Collections.Generic.List[String]]::new(
         [String[]]@(
-            's_client',
+            's_client'
             '-connect', "${Hostname}:${Port}"
         )
     )
@@ -413,9 +413,9 @@ Function Global:Convert-OpenSSLDerToPem {
     $Params = [Collections.Generic.List[String]]::new(
         [String[]]@(
             'x509',
-            '-in', $DerFile,
-            '-inform', 'DER',
-            '-out', $PemFile,
+            '-in', $DerFile
+            '-inform', 'DER'
+            '-out', $PemFile
             '-outform', 'PEM'
         )
     )
@@ -441,9 +441,9 @@ Function Global:Convert-OpenSSLPemToDer {
     $Params = [Collections.Generic.List[String]]::new(
         [String[]]@(
             'x509',
-            '-in', $PemFile,
-            '-inform', 'PEM',
-            '-out', $DerFile,
+            '-in', $PemFile
+            '-inform', 'PEM'
+            '-out', $DerFile
             '-outform', 'DER'
         )
     )
@@ -497,9 +497,9 @@ Function Global:Convert-OpenSSLPemToPkcs12 {
 
     $Params = [Collections.Generic.List[String]]::new(
         [String[]]@(
-            'pkcs12',
-            '-export',
-            '-out', $Pkcs12File,
+            'pkcs12'
+            '-export'
+            '-out', $Pkcs12File
             '-in', $PemFile
         )
     )
@@ -564,8 +564,8 @@ Function Global:Convert-OpenSSLPkcs12ToPem {
 
     $Params = [Collections.Generic.List[String]]::new(
         [String[]]@(
-            'pkcs12',
-            '-in', $Pkcs12File,
+            'pkcs12'
+            '-in', $Pkcs12File
             '-out', $PemFile
         )
     )
@@ -606,7 +606,7 @@ Function Global:Get-OpenSSLEccCurves {
 
     $Params = [Collections.Generic.List[String]]::new(
         [String[]]@(
-            'ecparam',
+            'ecparam'
             '-list_curves'
         )
     )

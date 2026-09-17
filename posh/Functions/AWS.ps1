@@ -14,7 +14,6 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'AWS.format.ps1xm
 
 # Set AWS credential environment variables
 Function Global:Set-AWSCredentialEnvironment {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUsePSCredentialType', '')]
     [CmdletBinding()]
     [OutputType([Void])]
@@ -49,7 +48,7 @@ Function Global:Set-AWSCredentialEnvironment {
             $Env:AWS_ACCESS_KEY_ID = $AccessKey
             $Env:AWS_SECRET_ACCESS_KEY = $SecretKey
 
-            if ($PSBoundParameters.ContainsKey('SessionToken')) {
+            if ($SessionToken) {
                 $Env:AWS_SESSION_TOKEN = $SessionToken
             } else {
                 $Env:AWS_SESSION_TOKEN = $null
@@ -177,6 +176,9 @@ Function Global:Set-R53HostedZoneParkedRecords {
     } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
 
     $Changes = [Collections.Generic.List[Amazon.Route53.Model.ChangeInfo]]::new()
+
+    # Hosted zone ID for CloudFront distribution alias records
+    $CloudFrontHostedZoneId = 'Z2FDTNDATAQYW2'
 
     # Construct the DMARC record
     if ($Records -contains 'DMARC') {
@@ -352,9 +354,6 @@ Function Global:Set-R53HostedZoneParkedRecords {
         }
 
         if ($Records -contains 'Redirect') {
-            # Hosted zone ID for CloudFront distribution alias records
-            $CloudFrontHostedZoneId = 'Z2FDTNDATAQYW2'
-
             foreach ($RecordName in @($ZoneName, "*.${ZoneName}")) {
                 foreach ($RecordType in $RedirectCloudFrontRecordTypes) {
                     $Record = [Amazon.Route53.Model.Change]::new()
@@ -461,16 +460,16 @@ Function Global:Get-S3BucketSize {
         }
     }
 
-    $ModuleVersionMajor = @($Modules.Version.Major | Sort-Object -Unique)
-    if ($ModuleVersionMajor.Count -ne 1) {
-        $ExcMsg = "AWS modules span multiple major versions: $($ModuleVersionMajor -join ', ')"
+    $ModuleVersionsMajor = @($Modules.Version.Major | Sort-Object -Unique)
+    if ($ModuleVersionsMajor.Count -ne 1) {
+        $ExcMsg = "AWS modules span multiple major versions: $($ModuleVersionsMajor -join ', ')"
         $ErrExc = [InvalidOperationException]::new($ExcMsg)
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
         $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSModuleMismatch', $ErrCat, $Modules)
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
-    $ModuleVersionMajor = $ModuleVersionMajor[0]
+    $ModuleVersionMajor = $ModuleVersionsMajor[0]
 
     try {
         $Modules | Import-Module -ErrorAction 'Stop' -Verbose:$false
@@ -583,7 +582,7 @@ Function Global:Get-S3BucketSize {
                 continue
             }
 
-            $Bucket.BucketSizeBytes += ($Statistic.Datapoints | Sort-Object -Property 'Timestamp' -Descending)[0].Average
+            $Bucket.BucketSizeBytes += @($Statistic.Datapoints | Sort-Object -Property 'Timestamp' -Descending)[0].Average
         }
     }
 

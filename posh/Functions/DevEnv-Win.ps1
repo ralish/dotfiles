@@ -78,7 +78,7 @@ Function Global:Switch-Cygwin {
 
     foreach ($PathChange in $PathChanges) {
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $PathChange
     }
 
@@ -97,7 +97,7 @@ Function Global:Switch-Cygwin {
         $CygwinCfg.Sort()
 
         $Env:CYGWIN = $CygwinCfg -join ' '
-        Write-Host -ForegroundColor 'Green' -NoNewline 'Set CYGWIN to: '
+        Write-Host -NoNewline -ForegroundColor 'Green' 'Set CYGWIN to: '
         Write-Host $Env:CYGWIN
     } elseif ($Disable -and $IncludeNonPathVars) {
         $Env:CYGWIN = $null
@@ -324,7 +324,7 @@ Function Global:Update-MSYS2 {
             if ($OriginalMsystemEnv) {
                 $Env:MSYSTEM = $OriginalMsystemEnv
             } else {
-                Remove-Item -LiteralPath 'Env:\MSYSTEM' -WhatIf:$false
+                $Env:MSYSTEM = $null
             }
         }
 
@@ -531,9 +531,6 @@ Function Global:Switch-Perl {
             $LibPaths = [Collections.Generic.List[String]]::new()
         }
 
-        # Forward or backward slashes (or a mix) are valid for `PERL5LIB`
-        $DirSepChars = [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
-
         foreach ($LibPath in $Env:PERL5LIB.Split([IO.Path]::PathSeparator)) {
             if ([String]::IsNullOrWhiteSpace($LibPath)) { continue }
 
@@ -545,6 +542,7 @@ Function Global:Switch-Perl {
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
+            # Forward or backward slashes (or a mix) are valid for `PERL5LIB`
             $LibBasePathElements = $LibPath.Split($DirSepChars)
             if ($LibBasePathElements.Count -lt 3) {
                 $ExcMsg = "Found path with less than expected minimum of 3 path components while parsing PERL5LIB: ${LibPath}"
@@ -571,19 +569,19 @@ Function Global:Switch-Perl {
 
     foreach ($PathChange in $PathChanges) {
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $PathChange
     }
 
     if ($Enable -and $Env:PERL5LIB -and $LibPaths.Count -ne 0) {
         # `Module::Build` options
-        $Env:PERL_MB_OPT = "--install_base `"$($LibPaths[0])`""
-        Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MB_OPT to: '
+        $Env:PERL_MB_OPT = '--install_base "{0}"' -f $LibPaths[0]
+        Write-Host -NoNewline -ForegroundColor 'Green' 'Set PERL_MB_OPT to: '
         Write-Host $Env:PERL_MB_OPT
 
         # `ExtUtils::MakeMaker` options
-        $Env:PERL_MM_OPT = "INSTALL_BASE=`"$($LibPaths[0])`""
-        Write-Host -ForegroundColor 'Green' -NoNewline 'Set PERL_MM_OPT to: '
+        $Env:PERL_MM_OPT = 'INSTALL_BASE="{0}"' -f $LibPaths[0]
+        Write-Host -NoNewline -ForegroundColor 'Green' 'Set PERL_MM_OPT to: '
         Write-Host $Env:PERL_MM_OPT
     } elseif ($Disable -and $IncludeNonPathVars) {
         $Env:PERL_MB_OPT = $null
@@ -755,7 +753,7 @@ Function Global:Switch-Python {
 
     foreach ($PathChange in $PathChanges) {
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $PathChange
     }
 
@@ -772,7 +770,7 @@ Function Global:Switch-Python {
 
         if ($DevMode) {
             $Env:PYTHONDEVMODE = 1
-            Write-Host -ForegroundColor 'Green' -NoNewline 'Set PYTHONDEVMODE to: '
+            Write-Host -NoNewline -ForegroundColor 'Green' 'Set PYTHONDEVMODE to: '
             Write-Host $Env:PYTHONDEVMODE
         } elseif ($IncludeNonPathVars) {
             $Env:PYTHONDEVMODE = $null
@@ -795,7 +793,7 @@ Function Global:Switch-Python {
 
         if ($Utf8Mode) {
             $Env:PYTHONUTF8 = 1
-            Write-Host -ForegroundColor 'Green' -NoNewline 'Set PYTHONUTF8 to: '
+            Write-Host -NoNewline -ForegroundColor 'Green' 'Set PYTHONUTF8 to: '
             Write-Host $Env:PYTHONUTF8
         } elseif ($IncludeNonPathVars) {
             $Env:PYTHONUTF8 = $null
@@ -1004,7 +1002,9 @@ Function Global:Clear-SymbolData {
         $SymbolPath = '{0}{1}*' -f [WildcardPattern]::Escape($SymbolPath), [IO.Path]::DirectorySeparatorChar
 
         if ($PSCmdlet.ShouldProcess($SymbolPath, 'Clear')) {
-            Remove-Item -Path $SymbolPath -Recurse -Force -Verbose:$false
+            try {
+                Remove-Item -Path $SymbolPath -Recurse -Force -ErrorAction 'Stop' -Verbose:$false
+            } catch { $PSCmdlet.WriteError($PSItem) }
         }
     }
 }
@@ -1075,7 +1075,7 @@ Function Global:Switch-WindowsSDK {
 
     if (!$Version) {
         $Version = [Environment]::OSVersion.Version
-        Write-Host -ForegroundColor 'Green' -NoNewline 'Defaulting to Windows version as SDK version: '
+        Write-Host -NoNewline -ForegroundColor 'Green' 'Defaulting to Windows version as SDK version: '
         Write-Host $Version
     }
 
@@ -1110,7 +1110,7 @@ Function Global:Switch-WindowsSDK {
             }
         }
 
-        Write-Host -ForegroundColor 'Green' -NoNewline 'Defaulting to Windows processor architecture: '
+        Write-Host -NoNewline -ForegroundColor 'Green' 'Defaulting to Windows processor architecture: '
         Write-Host $Architecture
     }
 
@@ -1135,7 +1135,7 @@ Function Global:Switch-WindowsSDK {
     }
 
     $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $SdkVerPath
-    Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+    Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
     Write-Host $SdkVerPath
 
     if ($Persist) {

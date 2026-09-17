@@ -288,9 +288,9 @@ Function Global:Switch-DJGPP {
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
         if (Test-IsWindows) {
-            $PersistParamAttr = [Management.Automation.ParameterAttribute]@{}
+            $PersistParamAttr = [Management.Automation.ParameterAttribute]::new()
             $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $PersistParamAttr)
-            $RuntimeParams.Add('Persist', $PersistParam)
+            $RuntimeParams['Persist'] = $PersistParam
         }
 
         return $RuntimeParams
@@ -333,12 +333,12 @@ Function Global:Switch-DJGPP {
         $GccPath = Join-Path -Path $Path -ChildPath ('lib', 'gcc' -join [IO.Path]::DirectorySeparatorChar)
 
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $BinPath
 
         if ($Enable) {
             $Env:GCC_EXEC_PREFIX = $GccPath
-            Write-Host -ForegroundColor 'Green' -NoNewline 'Set GCC_EXEC_PREFIX to: '
+            Write-Host -NoNewline -ForegroundColor 'Green' 'Set GCC_EXEC_PREFIX to: '
             Write-Host $Env:GCC_EXEC_PREFIX
         } elseif ($Disable -and $IncludeNonPathVars) {
             $Env:GCC_EXEC_PREFIX = $null
@@ -464,9 +464,9 @@ Function Global:Switch-Go {
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
         if (Test-IsWindows) {
-            $PersistParamAttr = [Management.Automation.ParameterAttribute]@{}
+            $PersistParamAttr = [Management.Automation.ParameterAttribute]::new()
             $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $PersistParamAttr)
-            $RuntimeParams.Add('Persist', $PersistParam)
+            $RuntimeParams['Persist'] = $PersistParam
         }
 
         return $RuntimeParams
@@ -529,7 +529,7 @@ Function Global:Switch-Go {
 
         foreach ($PathChange in $PathChanges) {
             $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
-            Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+            Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
             Write-Host $PathChange
         }
 
@@ -677,9 +677,9 @@ Function Global:Switch-GoogleDepotTools {
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
         if (Test-IsWindows) {
-            $PersistParamAttr = [Management.Automation.ParameterAttribute]@{}
+            $PersistParamAttr = [Management.Automation.ParameterAttribute]::new()
             $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $PersistParamAttr)
-            $RuntimeParams.Add('Persist', $PersistParam)
+            $RuntimeParams['Persist'] = $PersistParam
         }
 
         return $RuntimeParams
@@ -721,13 +721,13 @@ Function Global:Switch-GoogleDepotTools {
         $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
 
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $Path
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $Path
 
         if (Test-IsWindows) {
             if ($Enable) {
                 $Env:DEPOT_TOOLS_WIN_TOOLCHAIN = $DepotToolsWinToolchain
-                Write-Host -ForegroundColor 'Green' -NoNewline 'Set DEPOT_TOOLS_WIN_TOOLCHAIN to: '
+                Write-Host -NoNewline -ForegroundColor 'Green' 'Set DEPOT_TOOLS_WIN_TOOLCHAIN to: '
                 Write-Host $Env:DEPOT_TOOLS_WIN_TOOLCHAIN
             } elseif ($Disable -and $IncludeNonPathVars) {
                 $Env:DEPOT_TOOLS_WIN_TOOLCHAIN = $null
@@ -861,9 +861,9 @@ Function Global:Switch-Java {
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
         if (Test-IsWindows) {
-            $PersistParamAttr = [Management.Automation.ParameterAttribute]@{}
+            $PersistParamAttr = [Management.Automation.ParameterAttribute]::new()
             $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $PersistParamAttr)
-            $RuntimeParams.Add('Persist', $PersistParam)
+            $RuntimeParams['Persist'] = $PersistParam
         }
 
         return $RuntimeParams
@@ -905,12 +905,12 @@ Function Global:Switch-Java {
         $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $BinPath
 
         if ($Enable) {
             $Env:JAVA_HOME = $Path
-            Write-Host -ForegroundColor 'Green' -NoNewline 'Set JAVA_HOME to: '
+            Write-Host -NoNewline -ForegroundColor 'Green' 'Set JAVA_HOME to: '
             Write-Host $Env:JAVA_HOME
         } elseif ($Disable -and $IncludeNonPathVars) {
             $Env:JAVA_HOME = $null
@@ -1008,9 +1008,9 @@ Function Global:Switch-Nodejs {
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
         if (Test-IsWindows) {
-            $PersistParamAttr = [Management.Automation.ParameterAttribute]@{}
+            $PersistParamAttr = [Management.Automation.ParameterAttribute]::new()
             $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $PersistParamAttr)
-            $RuntimeParams.Add('Persist', $PersistParam)
+            $RuntimeParams['Persist'] = $PersistParam
         }
 
         return $RuntimeParams
@@ -1087,7 +1087,7 @@ Function Global:Switch-Nodejs {
 
         foreach ($PathChange in $PathChanges) {
             $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
-            Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+            Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
             Write-Host $PathChange
         }
 
@@ -1187,9 +1187,9 @@ Function Global:Switch-PHP {
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
         if (Test-IsWindows) {
-            $PersistParamAttr = [Management.Automation.ParameterAttribute]@{}
+            $PersistParamAttr = [Management.Automation.ParameterAttribute]::new()
             $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $PersistParamAttr)
-            $RuntimeParams.Add('Persist', $PersistParam)
+            $RuntimeParams['Persist'] = $PersistParam
         }
 
         return $RuntimeParams
@@ -1230,7 +1230,7 @@ Function Global:Switch-PHP {
         $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
 
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $Path
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $Path
 
         if ($PSBoundParameters['Persist']) {
@@ -1328,7 +1328,9 @@ Function Global:Clear-PipCache {
             $PipCacheWheels = $true
         } elseif ($PipSupportsCacheIndexV2 -and $Line -match '^Package index page cache location \(pip v23\.3\+\): (.*)') {
             $PipCacheIndexV2 = $true
-        } else { continue }
+        } else {
+            continue
+        }
 
         $PipCachePaths.Add($Matches[1])
         if ($PipCacheIndex -and $PipCacheWheels -and $PipCacheIndexV2) { break }
@@ -1595,7 +1597,7 @@ Function Global:Update-PythonPipxPackages {
     }
 
     if ($CooldownDaysParamSet -or $CooldownDaysEnvSet) {
-        if ($PipxVersionRaw -ge '1.16.0') {
+        if ($PipxVersion -ge '1.16.0') {
             if (!$CooldownDaysParamSet) {
                 $CooldownDays = $CooldownDaysEnv
                 Write-Verbose -Message "Using PIPX_COOLDOWN environment variable: ${CooldownDays}"
@@ -1676,7 +1678,7 @@ Function Global:Update-QtComponents {
         }
 
         $PathParam = [Management.Automation.RuntimeDefinedParameter]::new('Path', [String], $PathAttrCollection)
-        $RuntimeParams.Add('Path', $PathParam)
+        $RuntimeParams['Path'] = $PathParam
 
         return $RuntimeParams
     }
@@ -1825,9 +1827,9 @@ Function Global:Switch-Ruby {
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
         if (Test-IsWindows) {
-            $PersistParamAttr = [Management.Automation.ParameterAttribute]@{}
+            $PersistParamAttr = [Management.Automation.ParameterAttribute]::new()
             $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $PersistParamAttr)
-            $RuntimeParams.Add('Persist', $PersistParam)
+            $RuntimeParams['Persist'] = $PersistParam
         }
 
         return $RuntimeParams
@@ -1870,7 +1872,7 @@ Function Global:Switch-Ruby {
         $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $BinPath
 
         if ($Enable -and $Options) {
@@ -1887,7 +1889,7 @@ Function Global:Switch-Ruby {
 
             if ($SetOptions) {
                 $Env:RUBYOPT = $Options
-                Write-Host -ForegroundColor 'Green' -NoNewline 'Set RUBYOPT to: '
+                Write-Host -NoNewline -ForegroundColor 'Green' 'Set RUBYOPT to: '
                 Write-Host $Env:RUBYOPT
             }
         } elseif ($Disable -and $IncludeNonPathVars) {
@@ -2051,9 +2053,9 @@ Function Global:Switch-Rust {
         $RuntimeParams = [Management.Automation.RuntimeDefinedParameterDictionary]::new()
 
         if (Test-IsWindows) {
-            $PersistParamAttr = [Management.Automation.ParameterAttribute]@{}
+            $PersistParamAttr = [Management.Automation.ParameterAttribute]::new()
             $PersistParam = [Management.Automation.RuntimeDefinedParameter]::new('Persist', [Switch], $PersistParamAttr)
-            $RuntimeParams.Add('Persist', $PersistParam)
+            $RuntimeParams['Persist'] = $PersistParam
         }
 
         return $RuntimeParams
@@ -2113,7 +2115,7 @@ Function Global:Switch-Rust {
         $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
         $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
-        Write-Host -ForegroundColor 'Green' -NoNewline $PathChangesDesc
+        Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $BinPath
 
         if ($Disable -and $IncludeNonPathVars) {

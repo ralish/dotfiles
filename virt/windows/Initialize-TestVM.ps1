@@ -57,7 +57,7 @@ Function Invoke-ComponentStoreCleanup {
 
     # Windows 8 / Server 2012 or later
     if ($Script:WindowsBuildNumber -ge 9200) {
-        Write-Host -ForegroundColor 'Green' -NoNewline '[Component Store] Running clean-up via DISM ...'
+        Write-Host -NoNewline -ForegroundColor 'Green' '[Component Store] Running clean-up via DISM ...'
         $DismExe = 'dism.exe'
         $DismArgs = '/Online', '/Cleanup-Image', '/StartComponentCleanup', '/ResetBase'
         & $DismExe @DismArgs
@@ -1034,18 +1034,18 @@ Get-WindowsInfo
 Test-DotNetPresent
 
 $Tasks = New-Object -TypeName 'Collections.Specialized.OrderedDictionary'
-$Tasks.Add('ComponentStore', @('Invoke-ComponentStoreCleanup'))
-$Tasks.Add('DiskCleanup', @('Invoke-DiskCleanup'))
-$Tasks.Add('DotNetFramework', @('Optimize-DotNetFramework2x', 'Optimize-DotNetFramework4x'))
-$Tasks.Add('Microsoft365', @('Optimize-Microsoft365'))
-$Tasks.Add('PowerShell', @('Optimize-PowerShell'))
-$Tasks.Add('ShutdownCleanup', @('Invoke-ShutdownCleanup'))
-$Tasks.Add('SystemRestore', @('Optimize-SystemRestore'))
-$Tasks.Add('WindowsDefender', @('Optimize-WindowsDefender'))
-$Tasks.Add('WindowsPower', @('Optimize-WindowsPower'))
-$Tasks.Add('WindowsSecurity', @('Optimize-WindowsSecurity'))
-$Tasks.Add('WindowsSettings', @('Optimize-WindowsSettingsComputer', 'Optimize-WindowsSettingsUser'))
-$Tasks.Add('WindowsUpdate', @('Optimize-WindowsUpdate'))
+$Tasks['ComponentStore'] = @('Invoke-ComponentStoreCleanup')
+$Tasks['DiskCleanup'] = @('Invoke-DiskCleanup')
+$Tasks['DotNetFramework'] = @('Optimize-DotNetFramework2x', 'Optimize-DotNetFramework4x')
+$Tasks['Microsoft365'] = @('Optimize-Microsoft365')
+$Tasks['PowerShell'] = @('Optimize-PowerShell')
+$Tasks['ShutdownCleanup'] = @('Invoke-ShutdownCleanup')
+$Tasks['SystemRestore'] = @('Optimize-SystemRestore')
+$Tasks['WindowsDefender'] = @('Optimize-WindowsDefender')
+$Tasks['WindowsPower'] = @('Optimize-WindowsPower')
+$Tasks['WindowsSecurity'] = @('Optimize-WindowsSecurity')
+$Tasks['WindowsSettings'] = @('Optimize-WindowsSettingsComputer', 'Optimize-WindowsSettingsUser')
+$Tasks['WindowsUpdate'] = @('Optimize-WindowsUpdate')
 
 foreach ($Task in $Tasks.Keys) {
     if ($PSCmdlet.ParameterSetName -eq 'OptOut') {

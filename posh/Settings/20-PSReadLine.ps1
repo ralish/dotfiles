@@ -102,6 +102,7 @@ Function Set-PSReadLineKeyHandlerCommandHelpWindow {
             $Node.Extent.StartOffset -le $Cursor -and
             $Node.Extent.EndOffset -ge $Cursor
         }
+
         $CommandAst = $Ast.FindAll($CommandAstFind, $true) | Select-Object -Last 1
         if (!$CommandAst) { return }
 

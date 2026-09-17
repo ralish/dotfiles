@@ -19,7 +19,7 @@ Function Global:Prompt {
     }
 
     # Default
-    if (-not $Prompt) {
+    if (!$Prompt) {
         $CurLoc = $ExecutionContext.SessionState.Path.CurrentLocation
         $Prompt = "PS ${CurLoc}$('>' * ($NestedPromptLevel + 1))"
     }

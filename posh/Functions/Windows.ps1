@@ -332,7 +332,7 @@ Function Global:Find-WinEvent {
                 Oldest          = $false
             }
 
-            # Analytical & Debug logs must be read in forward chronological order
+            # Analytical & Debug logs require forward chronological order
             if ($EventLog.LogType -in 'Analytical', 'Debug') {
                 $EventParams['Oldest'] = $true
             }
@@ -353,7 +353,6 @@ Function Global:Find-WinEvent {
     } finally {
         Write-Progress @WriteProgressParams -Completed
     }
-
 
     if ($OutputFormat -eq 'EventLogRecord') {
         return [Diagnostics.Eventing.Reader.EventLogRecord[]]@($SortedEvents)
@@ -538,7 +537,7 @@ Function Global:Edit-Hosts {
     }
 
     if (!(Test-IsAdministrator)) {
-        $Params.Add('Verb', 'RunAs')
+        $Params['Verb'] = 'RunAs'
     }
 
     Start-Process @Params
@@ -680,7 +679,7 @@ Function Global:Search-Registry {
                 return
             }
 
-            $WriteProgressParams.Status = $RegistryKey.Name
+            $WriteProgressParams['Status'] = $RegistryKey.Name
             Write-Progress @WriteProgressParams
         }
     }
@@ -718,7 +717,7 @@ Function Global:Search-Registry {
             }
 
             if ($Recurse) {
-                $SearchParams.SubKeyName = $SubKeyName
+                $SearchParams['SubKeyName'] = $SubKeyName
                 Search-Registry @SearchParams
             }
         }
@@ -1249,7 +1248,7 @@ Function Global:New-IsoImage {
 
     try {
         # `IFileSystemImage` interface
-        # https://learn.microsoft.com/en-us/windows/win32/api/imapi2fs/nn-imapi2fs-ifilesystemimage
+        # https://learn.microsoft.com/en-au/windows/win32/api/imapi2fs/nn-imapi2fs-ifilesystemimage
         $IsoImage = New-Object -ComObject 'IMAPI2FS.MsftFileSystemImage'
     } catch {
         $Exc = $PSItem
@@ -1266,7 +1265,7 @@ Function Global:New-IsoImage {
     }
 
     # `FsiFileSystems` enumeration
-    # https://learn.microsoft.com/en-us/windows/win32/api/imapi2fs/ne-imapi2fs-fsifilesystems
+    # https://learn.microsoft.com/en-au/windows/win32/api/imapi2fs/ne-imapi2fs-fsifilesystems
     $FsiFileSystems = @{
         None    = 0
         ISO9660 = 1

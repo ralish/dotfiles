@@ -16,9 +16,9 @@ Function Global:Get-AzureAuthHeader {
     [CmdletBinding()]
     [OutputType([Hashtable])]
     Param(
-        # Either:
-        # - `Microsoft.Azure.Commands.Profile.Models.PSSecureAccessToken` (>= 14.0.0)
-        # - `Microsoft.Azure.Commands.Profile.Models.PSAccessToken` (< 14.0.0)
+        # Depends on the `Az.Accounts` module version:
+        # - `Microsoft.Azure.Commands.Profile.Models.PSSecureAccessToken` (>= 5.0.0)
+        # - `Microsoft.Azure.Commands.Profile.Models.PSAccessToken` (< 5.0.0)
         [Parameter(Mandatory)]
         [PSObject]$AccessToken
     )
@@ -46,6 +46,7 @@ Function Global:Get-AzureAuthHeader {
         }
     }
 
+    # Necessarily in plaintext as it's being embedded in an HTTP header
     $AuthHeader = @{
         Authorization  = "Bearer ${BearerToken}"
         'Content-Type' = 'application/json'
@@ -523,7 +524,7 @@ Function Global:Get-EntraUserLicenseReport {
             DisabledServices  = [String[]]@($DisabledServices | Sort-Object -Unique)
         }
 
-        $Result.PSObject.TypeNames.Insert(0, 'Microsoft.Entra.User.LicenseReport')
+        $Result.PSObject.TypeNames.Insert(0, 'DotFiles.Azure.EntraUserLicenseReport')
         $Results.Add($Result)
     }
 

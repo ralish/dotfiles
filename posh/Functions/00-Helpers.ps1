@@ -343,7 +343,7 @@ Function Complete-DotFilesSection {
             $ExcMsg = 'No stopwatch found for section timing.'
             $ErrExc = [InvalidOperationException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesInvalidState', $ErrCat, $null)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesMissingStopwatch', $ErrCat, $null)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
@@ -394,6 +394,14 @@ Function Invoke-DotFilesAsyncTask {
     }
 
     if ($Global:DotFilesTimings) {
+        if ($Global:DotFilesSectionStopwatch -isnot [Diagnostics.Stopwatch]) {
+            $ExcMsg = 'No stopwatch found for section timing.'
+            $ErrExc = [InvalidOperationException]::new($ExcMsg)
+            $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesMissingStopwatch', $ErrCat, $null)
+            $PSCmdlet.ThrowTerminatingError($ErrRec)
+        }
+
         $Global:DotFilesSectionStopwatch.Restart()
     }
 
@@ -613,27 +621,31 @@ Function Write-DotFilesMessage {
     )
 
     if (!$SectionType) {
-        if (!$Global:DotFilesSectionType) {
+        $GlobalSectionType = Get-Variable -Name 'DotFilesSectionType' -Scope 'Global' -ValueOnly -ErrorAction 'Ignore'
+
+        if (!$GlobalSectionType) {
             $ExcMsg = 'SectionType parameter was not provided and no global value is defined.'
             $ErrExc = [InvalidOperationException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesInvalidState', $ErrCat, $null)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesMissingSectionType', $ErrCat, $null)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $SectionType = $Global:DotFilesSectionType
+        $SectionType = $GlobalSectionType
     }
 
     if (!$SectionName) {
-        if (!$Global:DotFilesSectionName) {
+        $GlobalSectionName = Get-Variable -Name 'DotFilesSectionName' -Scope 'Global' -ValueOnly -ErrorAction 'Ignore'
+
+        if (!$GlobalSectionName) {
             $ExcMsg = 'SectionName parameter was not provided and no global value is defined.'
             $ErrExc = [InvalidOperationException]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidOperation
-            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesInvalidState', $ErrCat, $null)
+            $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesMissingSectionName', $ErrCat, $null)
             $PSCmdlet.ThrowTerminatingError($ErrRec)
         }
 
-        $SectionName = $Global:DotFilesSectionName
+        $SectionName = $GlobalSectionName
     }
 
     if ($Global:DotFilesLoadAsync) {

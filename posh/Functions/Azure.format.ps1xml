@@ -2,9 +2,9 @@
 <Configuration>
     <ViewDefinitions>
         <View>
-            <Name>Microsoft.Entra.User.LicenseReport</Name>
+            <Name>DotFiles.Azure.EntraUserLicenseReport</Name>
             <ViewSelectedBy>
-                <TypeName>Microsoft.Entra.User.LicenseReport</TypeName>
+                <TypeName>DotFiles.Azure.EntraUserLicenseReport</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableHeaders>

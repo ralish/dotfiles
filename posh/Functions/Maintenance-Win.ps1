@@ -1192,16 +1192,16 @@ Function Global:Update-Windows {
     $UpdateParams = @{ ErrorAction = 'Stop' }
 
     switch ($PSCmdlet.ParameterSetName) {
-        'Exclude' { $UpdateParams.Add('NotCategory', $ExcludeCategories) }
-        'Include' { $UpdateParams.Add('Category', $IncludeCategories) }
+        'Exclude' { $UpdateParams['NotCategory'] = $ExcludeCategories }
+        'Include' { $UpdateParams['Category'] = $IncludeCategories }
     }
 
     # `Get-WindowsUpdate` doesn't correctly support `-WhatIf`; it will install
     # Windows updates when `-Install` is provided even if `-WhatIf` is set.
     if ($PSCmdlet.ShouldProcess('Windows', 'Update')) {
-        $UpdateParams.Add('Install', $true)
-        $UpdateParams.Add('AcceptAll', $true)
-        $UpdateParams.Add('IgnoreReboot', $true)
+        $UpdateParams['Install'] = $true
+        $UpdateParams['AcceptAll'] = $true
+        $UpdateParams['IgnoreReboot'] = $true
     } else {
         $Result.WhatIf = $true
     }

@@ -36,7 +36,7 @@ try {
         $ContextMenuPath = "HKCR:\SystemFileAssociations\.${Extension}\Shell\3D Edit"
 
         try {
-            # Incredibly slow as it enumerates every key as it traverses the path
+            # Absurdly slow as it enumerates every key it traverses on the path
             $ContextMenuKey = Get-Item -LiteralPath $ContextMenuPath -ErrorAction 'Stop'
         } catch {
             Write-Warning -Message "Skipping extension due to missing registry key: ${Extension}"

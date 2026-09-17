@@ -190,7 +190,7 @@ Function Global:Get-KerberosTokenSize {
 
         # The user's primary group will only be included if they were added as
         # a member (directly or transitively). If not, add it separately.
-        if ($ADUserPrimaryGroup.SID -notin $ADGroups.SID) {
+        if ($ADGroups.Count -ne 0 -and $ADUserPrimaryGroup.SID -notin $ADGroups.SID) {
             $ADGroups += $ADUserPrimaryGroup
         }
     } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
@@ -214,7 +214,7 @@ Function Global:Get-KerberosTokenSize {
     }
 
     # Setting T4D apparently doubles the token size, inclusive of the overhead.
-    # This intuitively sounds wrong, but it is what the documentation state.
+    # This intuitively sounds wrong, but it is what the documentation states.
     if ($ADUser.TrustedForDelegation) {
         $TokenSizeBytes = $TokenSizeBytes * 2
     }
@@ -348,7 +348,7 @@ Function Global:Get-ADShadowPrincipalContainer {
 # Create a shadow principal
 Function Global:New-ADShadowPrincipal {
     [CmdletBinding(SupportsShouldProcess)]
-    [OutputType('Microsoft.ActiveDirectory.Management.ADObject')]
+    [OutputType('Void', 'Microsoft.ActiveDirectory.Management.ADObject')]
     Param(
         [Parameter(Mandatory)]
         [String]$Name,

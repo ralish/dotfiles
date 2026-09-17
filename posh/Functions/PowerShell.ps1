@@ -342,7 +342,7 @@ Function Global:Update-PowerShell {
 
 #region Object handling
 
-# Compare two hashtables
+# Compare two hash tables
 Function Global:Compare-Hashtable {
     [CmdletBinding()]
     [OutputType([PSCustomObject[]])]
@@ -548,11 +548,11 @@ Function Global:Update-Profile {
         $ProfileTypes = 'AllUsersAllHosts', 'AllUsersCurrentHost', 'CurrentUserAllHosts', 'CurrentUserCurrentHost'
         foreach ($ProfileType in $ProfileTypes) {
             if (Get-Variable -Name $ProfileType -ValueOnly) {
-                if (Test-Path -LiteralPath $profile.$ProfileType -PathType 'Leaf') {
-                    Write-Verbose -Message "Sourcing ${ProfileType} from: $($profile.$ProfileType)"
-                    . $profile.$ProfileType
+                if (Test-Path -LiteralPath $PROFILE.$ProfileType -PathType 'Leaf') {
+                    Write-Verbose -Message "Sourcing ${ProfileType} from: $($PROFILE.$ProfileType)"
+                    . $PROFILE.$ProfileType
                 } else {
-                    Write-Warning -Message "Skipping ${ProfileType} as it doesn't exist: $($profile.$ProfileType)"
+                    Write-Warning -Message "Skipping ${ProfileType} as it doesn't exist: $($PROFILE.$ProfileType)"
                 }
             }
         }
