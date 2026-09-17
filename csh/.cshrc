@@ -3,7 +3,7 @@
 # C shell
 # https://man.netbsd.org/csh.1
 #
-# Last reviewed release: v20240808
+# Last reviewed release: v20240808 (Debian package)
 # Upstream source: https://cvsweb.openbsd.org/src/bin/csh/
 # File path: `$HOME/.cshrc`
 #

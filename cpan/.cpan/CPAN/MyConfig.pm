@@ -1,7 +1,7 @@
 # CPAN configuration
 # https://metacpan.org/pod/CPAN
 #
-# Last reviewed release: v2.38
+# Last reviewed release: v2.41
 #
 # File paths in preference order (Unix-like):
 # - `$HOME/.cpan/CPAN/MyConfig.pm`
@@ -218,7 +218,7 @@ $CPAN::Config = {
     # we won't even get that far as CPAN hardcodes the temporary directory it
     # uses during signature checks to `/tmp`. This path resolves to `C:\tmp`
     # and if it doesn't exist (which it typically won't) then creating the
-    # temporary file will fail. Verified to still be broken as of CPAN v2.38.
+    # temporary file will fail. Verified to still be broken as of CPAN v2.41.
     'check_sigs' => $IsWin ? q[0] :
                     defined $exe_gpg && $mod_signature ? q[0] : q[0],
 

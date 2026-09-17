@@ -3,7 +3,7 @@
     XLaunch configuration for Cygwin/X
     https://x.cygwin.com/docs/xlaunch/
 
-    Last reviewed release: v20160530-1
+    Last reviewed release: v20160530
 
     There's no XML schema seemingly available so the supported settings have
     been determined from the documentation and inspecting the source. Note as

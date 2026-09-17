@@ -1,7 +1,7 @@
 # Editline configuration
 # https://man.netbsd.org/editrc.5
 #
-# Last reviewed release: v20250104
+# Last reviewed release: v20250104 (Debian package)
 # Upstream source: https://cvsweb.netbsd.org/bsdweb.cgi/src/lib/libedit/
 # File path: `${EDITRC:-$HOME/.editrc}`
 
