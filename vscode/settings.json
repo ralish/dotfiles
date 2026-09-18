@@ -783,6 +783,11 @@
         "editor.defaultFormatter": "foxundermoon.shell-format"
     },
 
+    "[skill]": {
+        // Skills are Markdown where trailing whitespace has special meaning
+        "files.trimTrailingWhitespace": false
+    },
+
     "[toml]": {
         "editor.defaultFormatter": "tamasfe.even-better-toml"
     },
