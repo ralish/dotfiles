@@ -268,7 +268,7 @@ Function Global:Update-PowerShell {
             }
 
             # The modular AWS Tools for PowerShell is handled separately
-            if ($ModuleName -match '^AWS\.Tools\.' -and $Module.Repository -notmatch 'PSGallery') { continue }
+            if ($ModuleName -match '^AWS\.Tools\.') { continue }
 
             $UpdateParams = @{
                 Name          = $ModuleName
@@ -309,7 +309,7 @@ Function Global:Update-PowerShell {
                 try {
                     # `-WarningAction` is used to suppress the warning on not
                     # providing a major version constraint when updating.
-                    Update-AWSToolsModule -Cleanup -Confirm:$false -ErrorAction 'Stop' -WarningAction 'SilentlyContinue'
+                    Update-AWSToolsModule -Cleanup -Confirm:$false -ErrorAction 'Stop' -Verbose:$false -WarningAction 'SilentlyContinue'
                 } catch { $PSCmdlet.WriteError($PSItem) }
             }
         }
