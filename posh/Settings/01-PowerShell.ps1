@@ -73,20 +73,36 @@ switch ($PSVersionTable.PSEdition) {
 
 #region Object pipeline
 
-# Save the output of the last command in a global variable
-#
-# This function is automatically invoked by PowerShell internally appending it
-# to the end of every top-level interactive pipeline. The `Out-Default` cmdlet
-# would normally be invoked, but functions have higher precedence, so we can
-# override the default behaviour by defining a function of the same name.
-Function Global:Out-Default {
+# Setup custom `Out-Default` function
+Function Set-OutDefault {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
     [OutputType([Void])]
     Param()
 
-    $Input | Tee-Object -Variable 'LastObject' | Microsoft.PowerShell.Core\Out-Default
-    $Global:LastObject = $LastObject
+    # Ensure the variable `Out-Default` stores the last object is initialised
+    #
+    # Handles the edge case where we've loaded our PowerShell profile with
+    # strict mode enabled but have yet to run a command. Don't assign `$null`
+    # as that will remove any existing stored object when sourcing the profile.
+    $Global:LastObject = Get-Variable -Name 'LastObject' -Scope 'Global' -ValueOnly -ErrorAction 'Ignore'
+
+    # Save the output of the last command in a global variable
+    #
+    # Automatically invoked by PowerShell internally by appending it to the end
+    # of every top-level interactive pipeline. The `Out-Default` cmdlet would
+    # normally be invoked, but functions have higher precedence, so we can
+    # override the default behaviour by defining a function of the same name.
+    Function Global:Out-Default {
+        [OutputType([Void])]
+        Param()
+
+        $Input | Tee-Object -Variable 'LastObject' | Microsoft.PowerShell.Core\Out-Default
+        $Global:LastObject = $LastObject
+    }
 }
+
+Set-OutDefault
 
 #endregion
 
@@ -359,4 +375,5 @@ if ($PSVersionTable.PSVersion.Major -lt 6) {
 
 #endregion
 
+Remove-Item -LiteralPath 'Function:\Set-OutDefault'
 Complete-DotFilesSection
