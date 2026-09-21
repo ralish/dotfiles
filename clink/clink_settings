@@ -1,7 +1,7 @@
 # Clink configuration
 # https://chrisant996.github.io/clink/clink.html#configuring-clink
 #
-# Last reviewed release: v1.9.33
+# Last reviewed release: v1.9.34
 # File paths in preference order:
 # - `%CLINK_SETTINGS%\clink_settings`
 # - `%LOCALAPPDATA%\clink\clink_settings`
@@ -410,6 +410,9 @@ exec.dirs = True
 exec.files = False
 # Executables in directories specified in the `%PATH%` environment variable
 exec.path = True
+
+# Match executables in the current directory first, followed by other matches
+exec.cwd_first = False
 
 # Bypass executable matching (`exec.path`) if the line begins with whitespace
 exec.space_prefix = True
