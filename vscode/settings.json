@@ -3,7 +3,7 @@
      * Visual Studio Code settings
      * https://code.visualstudio.com/docs/configure/settings
      *
-     * Last reviewed release: v1.138.0
+     * Last reviewed release: v1.139.0
      * File path:
      * - Linux: `$HOME/.config/Code/User/settings.json`
      * - macOS: `$HOME/Library/Application Support/Code/User/settings.json`
@@ -26,6 +26,7 @@
     "editor.trimWhitespaceOnDelete": true,
     "editor.unicodeHighlight.includeComments": true,
     "editor.unicodeHighlight.nonBasicASCII": true,
+    "editor.wordWrapIndicator": true,
     "editor.wrappingIndent": "indent",
 
     // Text Editor: Cursor
