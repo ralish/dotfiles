@@ -2,9 +2,9 @@
 <Configuration>
     <ViewDefinitions>
         <View>
-            <Name>DotFiles.MaintenanceWin.UpdateCygwin</Name>
+            <Name>DotFiles.DevEnvWin.UpdateCygwin</Name>
             <ViewSelectedBy>
-                <TypeName>DotFiles.MaintenanceWin.UpdateCygwin</TypeName>
+                <TypeName>DotFiles.DevEnvWin.UpdateCygwin</TypeName>
             </ViewSelectedBy>
             <ListControl>
                 <ListEntries>
@@ -25,9 +25,9 @@
             </ListControl>
         </View>
         <View>
-            <Name>DotFiles.MaintenanceWin.UpdateMSYS2</Name>
+            <Name>DotFiles.DevEnvWin.UpdateMSYS2</Name>
             <ViewSelectedBy>
-                <TypeName>DotFiles.MaintenanceWin.UpdateMSYS2</TypeName>
+                <TypeName>DotFiles.DevEnvWin.UpdateMSYS2</TypeName>
             </ViewSelectedBy>
             <ListControl>
                 <ListEntries>
@@ -94,9 +94,9 @@
             </ListControl>
         </View>
         <View>
-            <Name>DotFiles.MaintenanceWin.UpdatePython</Name>
+            <Name>DotFiles.DevEnvWin.UpdatePython</Name>
             <ViewSelectedBy>
-                <TypeName>DotFiles.MaintenanceWin.UpdatePython</TypeName>
+                <TypeName>DotFiles.DevEnvWin.UpdatePython</TypeName>
             </ViewSelectedBy>
             <ListControl>
                 <ListEntries>

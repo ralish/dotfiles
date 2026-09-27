@@ -187,7 +187,7 @@ Function Global:Update-Cygwin {
         WhatIf   = $false
     }
 
-    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateCygwin')
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.DevEnvWin.UpdateCygwin')
 
     if (!$PSCmdlet.ShouldProcess('Cygwin runtime & packages', 'Update')) {
         $Result.Success = $true
@@ -373,7 +373,7 @@ Function Global:Update-MSYS2 {
         WhatIf       = $false
     }
 
-    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdateMSYS2')
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.DevEnvWin.UpdateMSYS2')
 
     $RefreshArgs = '-Sy', '--noprogressbar'
     $RefreshCmd = "pacman $($RefreshArgs -join ' ')"
@@ -888,7 +888,7 @@ Function Global:Update-Python {
         WhatIf       = $false
     }
 
-    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.MaintenanceWin.UpdatePython')
+    $Result.PSObject.TypeNames.Insert(0, 'DotFiles.DevEnvWin.UpdatePython')
 
     $UpdateArgs = 'install', '--update'
     $UpdateCmd = "pymanager $($UpdateArgs -join ' ')"
