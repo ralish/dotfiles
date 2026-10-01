@@ -1,7 +1,7 @@
 # Windows Subsystem for Linux 2 (WSL 2) global settings
 # https://learn.microsoft.com/en-au/windows/wsl/
 #
-# Last reviewed release: v2.7.14
+# Last reviewed release: v3.0.1
 # File path: `%USERPROFILE%\.wslconfig`
 # Initial support: Windows 10 2004
 
@@ -167,7 +167,9 @@
 # - Bridged         Bridge to host network (WSL 0.51.2)
 # - Mirrored        Mirror all host network interfaces (WSL 0.51.2?)
 #                   Allegedly requires Windows 11 22H2 (OS Build 22621.2359)
-# - VirtioProxy     VirtIO proxy networking (WSL 1.3.10)
+# - Consomme        Consomme proxy networking (WSL 1.3.10)
+#                   `VirtioProxy` prior to WSL 2.9.0 and accepted as an alias
+#                   Requires `virtio`, otherwise falling back to NAT
 #
 # Experimental prior to WSL 2.0.5.
 #
@@ -238,7 +240,8 @@
 # Tunnel DNS requests to Windows
 #
 # If enabled by default, will automatically be disabled if it's not supported
-# by the Windows release. Only applies when using NAT networking mode.
+# by the Windows release. Only applies when using NAT, mirrored, or Consomme
+# (since WSL 2.8.5) networking modes.
 #
 # Default differs by WSL version:
 # >= 2.1.0: true
@@ -367,6 +370,14 @@
 ###               Miscellaneous                ###
 ##################################################
 
+# Place all distro and plugin processes in a `wsl-user` cgroup
+#
+# If enabled, cgroups support will be automatically upgraded to v2.
+#
+# Default: true
+# Support: WSL 2.9.5
+#isolateDistroCgroup =
+
 # Enable VirtIO support [UNDOCUMENTED]
 #
 # VirtIO support is required for numerous features.
@@ -471,6 +482,15 @@ telemetry = false
 # Support: WSL 1.3.10
 #sparseVhd =
 
+# Expose DrvFs shares through one aggregate `virtiofs` device [UNDOCUMENTED]
+#
+# One aggregate device is created per privilege level (admin or non-admin),
+# with each share as a child. Only applies when `virtiofs` is enabled.
+#
+# Default: true
+# Support: WSL 2.9.5
+#virtioFsAggregateShares =
+
 ##################################################
 ###                  Network                   ###
 ##################################################
@@ -528,3 +548,17 @@ telemetry = false
 # Default: 1000
 # Support: WSL 1.3.14
 #initialAutoProxyTimeout =
+
+##################################################
+###               Miscellaneous                ###
+##################################################
+
+# Size of SWIOTLB reserved bounce-buffer pool for VirtIO devices [UNDOCUMENTED]
+#
+# Using size suffixes (e.g. MB, GB) is supported. If set to `0`, a 64MB pool is
+# used if `virtiofs` or Consomme networking is in use, and the VM has at least
+# 1,088 MB of memory. Otherwise, no pool is reserved.
+#
+# Default: 0
+# Support: WSL 2.8.9
+#swiotlb =
