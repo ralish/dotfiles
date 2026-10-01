@@ -6,7 +6,7 @@
 # Initial support: Windows 10 2004
 
 [general]
-# Absolute path to directory to install distributions [UNDOCUMENTED]
+# Absolute path to directory to install distributions
 #
 # An empty string defaults to `%LOCALAPPDATA%\\wsl`.
 #
@@ -37,7 +37,10 @@
 
 # Nested virtualisation support (AMD64 only)
 #
-# Default: true
+# Default differs by Windows version:
+# - 11: true
+# - 10: false
+#
 # Support: Windows 11 21H2
 #nestedVirtualization =
 
@@ -54,9 +57,10 @@
 # Amount of memory to assign to the VM (bytes)
 #
 # Using size suffixes (e.g. MB, GB) is supported. If set to `0`, a percentage
-# of memory is assigned which differs by Windows build:
-#  < 20175: 80% of total memory
+# of memory is assigned. For Microsoft Store releases, the default is 50% of
+# total memory. For inbox releases, the default differs by Windows build:
 # >= 20175: 50% of total memory
+#  < 20175: 80% of total memory
 #
 # Default: 0
 # Support: Windows 10 2004
@@ -65,8 +69,8 @@
 # Amount of swap space to add to the VM (bytes)
 #
 # Using size suffixes (e.g. MB, GB) is supported. If set to `0`, a swap file
-# will not be created. The default adds swap space equal to 25% of the total
-# memory, rounded-up to the nearest GB.
+# will not be created. The default adds swap space equal to 25% of the VM's
+# assigned memory, rounded-up to the nearest GB.
 #
 # Default: 18446744073709551615 (UINT64_MAX)
 # Support: Windows 10 2004
@@ -74,9 +78,9 @@
 
 # Absolute path to swap VHDX file
 #
-# An empty string defaults to `%LOCALAPPDATA%\\temp\\swap.vhdx`. If a path is
-# explicitly provided and doesn't end with `.vhdx`, the `.vhdx` file extension
-# will automatically be appended.
+# An empty string defaults to `%LOCALAPPDATA%\\temp\\<VM GUID>\\swap.vhdx`. If
+# a path is explicitly provided and doesn't end with `.vhdx`, the `.vhdx` file
+# extension will automatically be appended.
 #
 # Default: (empty)
 # Support: Windows 10 2004
@@ -108,7 +112,7 @@
 # Support: Windows 11 21H2
 #guiApplications =
 
-# GPU acceleration support [UNDOCUMENTED]
+# GPU acceleration support
 #
 # Default: true
 # Support: Windows 11 21H2
@@ -135,13 +139,15 @@
 
 # Enable 9P protocol over VirtIO for exposing host storage [UNDOCUMENTED]
 #
-# Automatically disabled if VirtIO is disabled.
+# Automatically disabled if VirtIO is disabled. Default differs by WSL version:
+# >= 2.0.11: false
+#  < 2.0.11: true
 #
-# Default: false
 # Support: Unknown (Inbox release)
+# Ignored: WSL 2.3.11
 #virtio9p =
 
-# Enable VirtIO shared filesystem for exposing host storage [UNDOCUMENTED]
+# Enable VirtIO shared filesystem for exposing host storage
 #
 # Automatically disabled if VirtIO is disabled.
 #
@@ -149,7 +155,7 @@
 # Support: WSL 0.68.2
 #virtiofs =
 
-# Timeout for attaching a disk to the VM (ms) [UNDOCUMENTED]
+# Timeout for attaching or detaching a disk to the VM (ms)
 #
 # Default: 5000
 # Support: WSL 0.50.2
@@ -161,17 +167,30 @@
 
 # Networking mode
 #
-# Valid values (case-insensitive):
-# - None            Disconnect WSL network (WSL 0.66.2)
-# - Nat             Network Address Translation (WSL 0.51.2)
-# - Bridged         Bridge to host network (WSL 0.51.2)
-# - Mirrored        Mirror all host network interfaces (WSL 0.51.2?)
-#                   Allegedly requires Windows 11 22H2 (OS Build 22621.2359)
-# - Consomme        Consomme proxy networking (WSL 1.3.10)
-#                   `VirtioProxy` prior to WSL 2.9.0 and accepted as an alias
-#                   Requires `virtio`, otherwise falling back to NAT
+# The supported values have changed considerably through WSL releases, with
+# some values only supported when under the `wsl2` or `experimental` section.
 #
-# Experimental prior to WSL 2.0.5.
+# MODE          WSL2 SUPPORT            EXPERIMENTAL SUPPORT
+# None          0.66.2+                 2.0.5+
+# Nat           0.51.2+                 2.0.5+
+# Bridged       0.51.2+                 2.0.5+
+# Mirrored      0.51.2 - 1.0.0, 2.0.5+  1.3.14+
+# MirroredNoFs  0.51.2 - 0.65.1         N/A
+# VirtioProxy   2.0.5+                  2.0.0+
+# Consomme      2.9.0+                  2.9.0+
+#
+# The networking modes have the following behaviours:
+# - None            Disconnect WSL network
+# - Nat             Network Address Translation
+#                   Falls back to Consomme on failure (since WSL 2.3.25)
+# - Bridged         Bridge to host network
+# - Mirrored        Mirror all host network interfaces
+#                   Requires Windows 11 22H2 (OS Build 22621.2359)
+# - MirroredNoFs    As per the mirrored mode, with no flow steering
+# - Consomme        Consomme proxy networking
+#                   Originally `VirtioProxy` (prior to WSL 2.9.0)
+#                   `VirtioProxy` is now an alias (since WSL 2.9.0)
+#                   Requires `virtio`, otherwise falling back to NAT
 #
 # Default: Nat
 # Support: WSL 0.51.2
@@ -179,7 +198,7 @@
 
 # Name of the Hyper-V virtual switch to connect [UNDOCUMENTED]
 #
-# Only applies when using bridged networking mode.
+# Only applies when using bridged networking mode and must be set.
 #
 # Default: (empty)
 # Support: WSL 0.51.2
@@ -189,7 +208,8 @@
 #
 # If unset and using bridged networking mode, a random MAC address is generated
 # to avoid MAC address conflicts on the bridged network if multiple systems are
-# connected using WSL in bridged networking mode.
+# connected using WSL in bridged networking mode. The MAC address must be dash
+# or colon separated (e.g. XX-XX-XX-XX-XX-XX).
 #
 # Default: (unset)
 # Support: WSL 0.51.2
@@ -205,10 +225,9 @@
 
 # Permit access from the host to listening ports in the VM
 #
-# Defaults to `true` for all networking modes except mirrored networking mode,
-# in which it is unsupported.
+# Applies to all networking modes except mirrored.
 #
-# Default: (unset)
+# Default: true
 # Support: Windows 10 2004
 #localhostForwarding =
 
@@ -231,7 +250,9 @@
 # Use the NAT interface for DNS requests
 #
 # If disabled, the DNS servers configured on the host are mirrored into the
-# distribution. Only applies when using NAT networking mode.
+# distribution.
+#
+# Only applies when using NAT networking mode and DNS tunneling is disabled.
 #
 # Default: true
 # Support: WSL 0.64.0
@@ -240,12 +261,18 @@
 # Tunnel DNS requests to Windows
 #
 # If enabled by default, will automatically be disabled if it's not supported
-# by the Windows release. Only applies when using NAT, mirrored, or Consomme
-# (since WSL 2.8.5) networking modes.
+# by the Windows release.
+#
+# Only applies when using NAT, mirrored, or Consomme (since WSL 2.8.2)
+# networking modes.
 #
 # Default differs by WSL version:
-# >= 2.1.0: true
+# >= 2.2.1: true
+#  > 2.1.0: false
+#  = 2.1.0: true
 #  < 2.1.0: false
+#
+# Experimental prior to WSL 2.0.5.
 #
 # Support: WSL 1.3.14
 #dnsTunneling =
@@ -291,14 +318,13 @@
 
 # Absolute path to kernel modules VHD
 #
-# An empty string defaults to `%ProgramFiles%\\WSL\\tools\\modules.vhd` only if
-# the default kernel image is used.
+# A custom kernel must be set when providing this setting.
 #
 # Default: (empty)
 # Support: WSL 2.1.0
 #kernelModules =
 
-# Loads the default kernel modules [UNDOCUMENTED]
+# Loads the default kernel modules
 #
 # Default set: `br_netfilter`, `ip_tables`, `tun`
 #
@@ -306,7 +332,7 @@
 # Support: WSL 2.6.0
 #loadDefaultKernelModules =
 
-# Kernel modules to load (comma-separated) [UNDOCUMENTED]
+# Kernel modules to load (comma-separated)
 #
 # Default: (empty)
 # Support: WSL 2.6.0
@@ -332,7 +358,8 @@
 
 # Absolute path to system distribution VHD
 #
-# An empty string defaults to `%ProgramFiles%\\WSL\\system.vhd`.
+# An empty string defaults to `%ProgramFiles%\\WSL\\system.vhd`. The file
+# extension must be either `img` or `vhd`.
 #
 # Default: (empty)
 # Support: Unknown (Inbox release)
@@ -358,7 +385,7 @@
 # Support: WSL 2.0.5
 #defaultVhdSize =
 
-# Timeout for starting a distribution (ms) [UNDOCUMENTED]
+# Timeout for starting a distribution (ms)
 #
 # If set to `-1`, no timeout is applied to distribution startup.
 #
@@ -386,7 +413,7 @@
 # Support: Unknown (Inbox release)
 #virtio =
 
-# Telemetry [UNDOCUMENTED]
+# Telemetry
 #
 # Default: true
 # Support: Unknown (Inbox release)
@@ -418,7 +445,7 @@ telemetry = false
 # Support: Windows 11 21H2
 #debugConsole =
 
-# Absolute path to kernel output log file [UNDOCUMENTED]
+# Absolute path to kernel output log file
 #
 # When configured the debug console will always be enabled.
 #
@@ -435,7 +462,7 @@ telemetry = false
 # Support: WSL 0.60.0
 #earlyBootLogging =
 
-# Absolute path to directory to store crash dumps [UNDOCUMENTED]
+# Absolute path to directory to store crash dumps
 #
 # An empty string defaults to `%LOCALAPPDATA%\\temp\\wsl-crashes`.
 #
@@ -445,7 +472,11 @@ telemetry = false
 
 # Maximum number of crash dump files to retain
 #
-# When the maximum is exceeded, the oldest crash dump is deleted.
+# Valid values:
+# - > 0: Number of crash dumps to retain
+#        When the maximum is exceeded the oldest crash dump is deleted.
+# - = 0: No limit to number of crash dumps
+# - < 0: Disable crash dump collection
 #
 # Default: 10
 # Support: WSL 2.3.14
@@ -480,12 +511,15 @@ telemetry = false
 #
 # Default: false
 # Support: WSL 1.3.10
+# Ignored: WSL 2.5.6
 #sparseVhd =
 
 # Expose DrvFs shares through one aggregate `virtiofs` device [UNDOCUMENTED]
 #
 # One aggregate device is created per privilege level (admin or non-admin),
-# with each share as a child. Only applies when `virtiofs` is enabled.
+# with each share as a child.
+#
+# Only applies when `virtiofs` is enabled.
 #
 # Default: true
 # Support: WSL 2.9.5
@@ -495,19 +529,22 @@ telemetry = false
 ###                  Network                   ###
 ##################################################
 
-# Assign an IP address to the host for access to/from WSL
+# Permit access to/from WSL on the host's IPv4 address
 #
-# Analogous to the `localhostForwarding` setting. Only applies when using
-# mirrored networking mode.
+# Analogous to the `localhostForwarding` setting.
+#
+# Only applies when using mirrored networking mode.
 #
 # Default: false
 # Support: WSL 2.0.0 & Windows 11 22H2 (OS Build 22621.2359)
 #hostAddressLoopback =
 
-# Ports to permit binding to when in-use by a Windows process (comma-separated)
+# Ports to permit binding to when in use by a Windows process (comma-separated)
 #
-# When binding to a port which is already in-use, the port is only accessible
-# from within WSL. Only applies when using mirrored networking mode.
+# When binding to a port which is already in use, the port is only accessible
+# from within WSL.
+#
+# Only applies when using mirrored networking mode.
 #
 # Default: (empty)
 # Support: WSL 2.0.0 & Windows 11 22H2 (OS Build 22621.2359)
@@ -517,7 +554,7 @@ telemetry = false
 #
 # Only applies when DNS tunneling is enabled.
 #
-# Default: 10.255.255.255
+# Default: 10.255.255.254
 # Support: WSL 2.2.1
 #dnsTunnelingIpAddress =
 
@@ -526,7 +563,9 @@ telemetry = false
 # Determines how Windows handles requests for record types which the DNS client
 # does not know how to parse. If enabled, the DNS query is extracted from the
 # request and resolution attempted, ignoring unknown records. If disabled, the
-# request will immediately fail. Only applies when DNS tunneling is enabled.
+# request will immediately fail.
+#
+# Only applies when DNS tunneling is enabled.
 #
 # Default: false
 # Support: WSL 1.3.15
@@ -541,7 +580,7 @@ telemetry = false
 # Removed: WSL 2.3.22
 #useWindowsDnsCache =
 
-# Timeout for retrieval of HTTP proxy settings startup (ms)
+# Timeout for retrieval of HTTP proxy settings (ms)
 #
 # Only applies when automatic configuration of proxy settings is enabled.
 #
