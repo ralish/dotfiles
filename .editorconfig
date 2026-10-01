@@ -21,6 +21,10 @@ indent_size = 2
 indent_size = 2
 trim_trailing_whitespace = false
 
+# YAML
+[*.yaml]
+indent_size = 2
+
 # Windows Registry
 [*.reg]
 charset = utf-16le

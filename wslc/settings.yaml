@@ -1,0 +1,140 @@
+# WSL containers settings
+# https://aka.ms/wslc-settings
+#
+# Last reviewed release: v3.0.1
+# File path: `%LOCALAPPDATA%\wslc\settings.yaml`
+#
+# Settings file handling:
+# - Enumerated values are case-sensitive.
+# - Invalid values print a warning and fall back to the default.
+# - Since WSL 2.8.3, the value `default` uses the built-in default.
+
+session:
+  # Number of vCPUs in the session VM
+  #
+  # Default differs by WSL version:
+  # >= 2.8.3: All logical processors
+  #  < 2.8.3: 4 processors
+  #
+  # Support: WSL 2.8.0
+  #cpuCount:
+
+  # Memory limit for the session VM
+  #
+  # Using size suffixes (e.g. MB, GB) is supported.
+  #
+  # Default differs by WSL version:
+  # >= 2.8.3: 50% of total memory
+  #  < 2.8.3: 2GB
+  #
+  # Support: WSL 2.8.0
+  #memorySize:
+
+  # Maximum session VM disk image size at creation time
+  #
+  # Using size suffixes (e.g. MB, GB) is supported.
+  #
+  # Default differs by WSL version:
+  # >= 2.8.3: 1TB
+  #  < 2.8.3: 100GB
+  #
+  # Support: WSL 2.8.0
+  #maxStorageSize:
+
+  # Absolute path to the base directory for the default session VM storage
+  #
+  # Session VHDs are created under:
+  # `<storagePath>\wslc\sessions\<session>\storage.vhdx`.
+  #
+  # Default: %LOCALAPPDATA%
+  # Support: WSL 2.9.4
+  #storagePath:
+
+  # Absolute path to the base directory for the default session VM storage
+  #
+  # Session VHDs are created under:
+  # `<defaultStoragePath>\<session>\storage.vhdx`.
+  #
+  # Default: %LOCALAPPDATA%\wslc\sessions
+  # Support: WSL 2.8.0
+  # Removed: WSL 2.8.3
+  #defaultStoragePath:
+
+  # Default host IPv4 address to bind published ports
+  #
+  # Default: 127.0.0.1
+  # Support: WSL 2.9.1
+  #defaultBindingAddress:
+
+  # DNS name used for resolving the host's loopback address
+  #
+  # A value of `none` disables the entry.
+  #
+  # Only applies when using Consomme networking mode.
+  #
+  # Default: host.wslc.internal
+  # Support: WSL 2.9.5
+  #hostLoopback:
+
+  # Idle timeout for a session VM before being torn-down (secs)
+  #
+  # Default: 30
+  # Support: WSL 2.9.5
+  #idleTimeout:
+
+  # Networking mode for the session VM
+  #
+  # Valid values:
+  # - none          None
+  # - nat           Network Address Translation
+  # - consomme      Consomme proxy networking
+  #                 Originally `virtioproxy` (prior to WSL 2.9.0)
+  #
+  # Default: consomme
+  # Support: WSL 2.8.0
+  #networkingMode:
+
+  # File sharing mode for the session VM
+  #
+  # Valid values:
+  # - plan9
+  # - virtiofs
+  #
+  # Default: virtiofs
+  # Support: WSL 2.8.0
+  #hostFileShareMode:
+
+  # Tunnel DNS requests to Windows
+  #
+  # Default: true
+  # Support: WSL 2.8.2
+  #dnsTunneling:
+
+# Credential storage backend
+#
+# Valid values:
+# - file
+#   Stored in `%LOCALAPPDATA%\wslc\registry-credentials.json` using the DPAPI.
+# - wincred
+#   Stored using Windows Credential Manager under a `wslc-credential/` prefix.
+#
+# Default: wincred
+# Support: WSL 2.8.3
+#credentialStore:
+
+experimental:
+  # Backend for publishing container ports into the session VM
+  #
+  # Valid values:
+  # - virtionet
+  #   Use Consomme port mapper on the `virtio-net` device. Both TCP and UDP
+  #   ports can be forwarded, and they can be on any host address.
+  # - wslrelay
+  #   Use the user-mode `wslrelay.exe` relay service. Only TCP ports can be
+  #   forwarded, and only on the loopback address.
+  #
+  # Only applies when using Consomme networking mode.
+  #
+  # Default: virtionet
+  # Support: WSL 2.9.0
+  #portRelay:
