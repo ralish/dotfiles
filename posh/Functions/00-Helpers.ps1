@@ -285,6 +285,7 @@ Function Clear-DotFilesLoadData {
         'Get-DotFilesTiming'
         'Invoke-DotFilesAsyncTask'
         'Start-DotFilesSection'
+        'Update-DotFilesFormatData'
         'Write-DotFilesMessage'
     )
 
@@ -598,6 +599,25 @@ Function Start-DotFilesSection {
 
     Write-DotFilesMessage -Type 'Verbose' -Message 'All prerequisites met.'
     return $true
+}
+
+# Update formatting data from `dotfiles`
+Function Update-DotFilesFormatData {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
+
+    $null = Start-DotFilesSection -Type 'Profile' -Name 'Formatting'
+
+    if ($Global:FormatDataPaths.Count -ne 0) {
+        Write-DotFilesMessage -Type 'Verbose' -Message "Updating formatting data from $($Global:FormatDataPaths.Count) files ..."
+        Update-FormatData -PrependPath $Global:FormatDataPaths
+    } else {
+        Write-DotFilesMessage -Type 'Verbose' -Message 'Skipping as no formatting files provided.'
+    }
+
+    Complete-DotFilesSection
 }
 
 # Write a formatted `dotfiles` message

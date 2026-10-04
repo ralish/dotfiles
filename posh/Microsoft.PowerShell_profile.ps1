@@ -155,12 +155,13 @@ if ($DotFilesLoadAsync) {
     }
 }
 
-# Array of paths containing additional formatting data
+# List of paths containing additional formatting data
 #
-# Calling `Update-FormatData` is *very* expensive. To improve profile load
-# performance, functions and settings files should append the path(s) of
-# any formatting data files to this array. After sourcing all functions
-# and settings we'll call `Update-FormatData` with all specified paths.
+# Calling `Update-FormatData` can be very expensive. To improve profile load
+# performance, functions and settings sections should append the path of any
+# formatting data files to this list. After processing of all functions and
+# settings, `Update-FormatData` is called with all specified paths.
+[Diagnostics.CodeAnalysis.SuppressMessage('PSUseDeclaredVarsMoreThanAssignments', '')]
 $FormatDataPaths = [Collections.Generic.List[String]]::new()
 
 #endregion
@@ -194,10 +195,14 @@ foreach ($PoshPath in $PoshFunctionsPath, $PoshSettingsPath) {
 }
 
 # Update formatting data
-if ($FormatDataPaths) {
-    $null = Start-DotFilesSection -Type 'Profile' -Name 'Formatting'
-    Update-FormatData -PrependPath $FormatDataPaths
-    Complete-DotFilesSection
+if ($DotFilesLoadAsync) {
+    $AsyncLoadQueue.Enqueue({ Update-DotFilesFormatData })
+} else {
+    if ($DotFilesTimings) {
+        $DotFilesSectionStopwatch.Restart()
+    }
+
+    Update-DotFilesFormatData
 }
 
 # Amend the search path to include scripts directory
