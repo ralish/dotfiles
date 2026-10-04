@@ -12,7 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `PSDotFiles` configuration
 Function Initialize-PSDotFiles {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

@@ -14,7 +14,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'AWS.format.ps1xm
 
 # Set AWS credential environment variables
 Function Global:Set-AWSCredentialEnvironment {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUsePSCredentialType', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUsePSCredentialType', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param(

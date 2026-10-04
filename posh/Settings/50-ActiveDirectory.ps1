@@ -12,7 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `ActiveDirectory` configuration
 Function Initialize-ActiveDirectory {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

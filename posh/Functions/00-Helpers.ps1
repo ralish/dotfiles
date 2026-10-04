@@ -274,7 +274,7 @@ Function Test-IsPathFullyQualified {
 
 # Clean-up `dotfiles` profile loading data
 Function Clear-DotFilesLoadData {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -327,7 +327,7 @@ Function Clear-DotFilesLoadData {
 
 # Complete a `dotfiles` section and conditionally output timings
 Function Complete-DotFilesSection {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -379,7 +379,7 @@ Function Get-DotFilesTiming {
 
 # Dequeue a `dotfiles` task from the asynchronous loading queue
 Function Invoke-DotFilesAsyncTask {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Boolean])]
     Param()
@@ -447,7 +447,7 @@ Function Invoke-DotFilesAsyncTask {
 # closure for the asynchronous scriptblock if any function parameters fail
 # validation, even if they weren't provided for the function invocation.
 Function Start-DotFilesSection {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Boolean])]
     Param(
@@ -602,7 +602,7 @@ Function Start-DotFilesSection {
 
 # Write a formatted `dotfiles` message
 Function Write-DotFilesMessage {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param(

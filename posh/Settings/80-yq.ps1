@@ -11,7 +11,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `yq` configuration
 Function Initialize-Yq {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

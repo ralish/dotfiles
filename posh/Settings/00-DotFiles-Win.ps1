@@ -8,7 +8,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Validate and set `dotfiles` path from `DOTFILES` environment variable
 Function Set-DotFilesEnvPath {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -36,7 +36,7 @@ Function Set-DotFilesEnvPath {
 
 # Find and set `dotfiles` path while resolving all symlinks and junctions
 Function Set-DotFilesFinalPath {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

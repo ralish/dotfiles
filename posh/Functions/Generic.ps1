@@ -234,7 +234,7 @@ Function Global:ConvertTo-URLEncoded {
 
 # Retrieve a text encoding class
 Function Global:Get-TextEncoder {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseOutputTypeCorrectly', '')]
     [CmdletBinding()]
     [OutputType([Text.Encoding])]
     Param(
@@ -649,7 +649,7 @@ Function Global:Format-Xml {
 # Sort XML elements
 # Via: https://danielsmon.com/2017/03/10/diff-xml-via-sorting-xml-elements-and-attributes/
 Function Global:Sort-XmlElement {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseApprovedVerbs', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param(

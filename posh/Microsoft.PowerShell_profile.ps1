@@ -48,18 +48,18 @@ foreach ($SkipEnvVar in $DotFilesSkipEnvVars) {
 #region Configuration
 
 # Paths to directories used during profile load
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[Diagnostics.CodeAnalysis.SuppressMessage('PSUseDeclaredVarsMoreThanAssignments', '')]
 $PoshCompletionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Completions'
 $PoshFunctionsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Functions'
 $PoshScriptsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Scripts'
 $PoshSettingsPath = Join-Path -Path $PSScriptRoot -ChildPath 'Settings'
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[Diagnostics.CodeAnalysis.SuppressMessage('PSUseDeclaredVarsMoreThanAssignments', '')]
 $PoshThemesPath = Join-Path -Path $PSScriptRoot -ChildPath 'Themes'
 
 # Preferred text editors ordered by priority (space-separated)
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[Diagnostics.CodeAnalysis.SuppressMessage('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesPreferredEditorsNix = 'vim', 'vi', 'nano', 'pico'
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[Diagnostics.CodeAnalysis.SuppressMessage('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesPreferredEditorsWin = 'code', 'vim', 'edit', 'notepad'
 
 # Load opted-in components asynchronously via the idle event
@@ -69,7 +69,7 @@ $DotFilesLoadAsync = $true
 #
 # - `Get-Module -ListAvailable`
 #   Assume the module exists instead of checking.
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[Diagnostics.CodeAnalysis.SuppressMessage('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesFastLoad = $true
 
 # Display verbose messages during profile load
@@ -90,14 +90,14 @@ $DotFilesTimings = $false
 # Operations which entail searching the filesystem are outrageously slow under
 # Windows Sandbox. Until that changes, we short-circuit loading of sections and
 # settings which would introduce significant startup delays.
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[Diagnostics.CodeAnalysis.SuppressMessage('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesIsWsb = $false
 if ((Test-IsWindows) -and $Env:USERNAME -eq 'WDAGUtilityAccount') {
     $DotFilesIsWsb = $true
 }
 
 # Indicates if we're currently executing in an async context
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+[Diagnostics.CodeAnalysis.SuppressMessage('PSUseDeclaredVarsMoreThanAssignments', '')]
 $DotFilesIsAsync = $false
 
 # Enable verbose profile loading

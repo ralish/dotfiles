@@ -55,7 +55,7 @@ Function Initialize-OhMyPosh {
 
 # Attempt to retrieve the path to a theme given its name
 Function Get-OhMyPoshThemePath {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void], [String])]
     Param(

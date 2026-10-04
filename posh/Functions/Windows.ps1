@@ -896,7 +896,7 @@ Function Global:Convert-SecurityDescriptor {
 
 # Retrieve well-known security identifiers
 Function Global:Get-WellKnownSID {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
     [CmdletBinding()]
     [OutputType([Security.Principal.SecurityIdentifier])]
     Param(

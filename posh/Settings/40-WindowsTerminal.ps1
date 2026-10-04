@@ -16,7 +16,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 # This is only a function because we can't suppress the `PSScriptAnalyzer`
 # warning on the usage of global variables outside of one.
 Function Set-WindowsTerminalGlobalVariables {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -33,7 +33,7 @@ Set-WindowsTerminalGlobalVariables
 
 # Return the last exit code for usage by the shell integration
 Function Global:__Get-LastExitCodeForWinTerm {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseApprovedVerbs', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseApprovedVerbs', '')]
     [OutputType([Int])]
     Param(
         [Boolean]$LastCmdStatus
@@ -56,7 +56,7 @@ Function Global:__Get-LastExitCodeForWinTerm {
 # Shell Integration
 # https://learn.microsoft.com/en-au/windows/terminal/tutorials/shell-integration
 Function Global:Prompt {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [OutputType([String])]
     Param()
 

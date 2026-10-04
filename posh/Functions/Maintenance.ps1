@@ -107,7 +107,7 @@ Function Global:Get-DotFilesLastUpdated {
 
 # Clear caches used by development environments and tooling
 Function Global:Clear-AllDevCaches {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSShouldProcess', '')]
     [CmdletBinding(DefaultParameterSetName = 'OptOut', SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()
@@ -269,7 +269,7 @@ Function Global:Clear-AllDevCaches {
 
 # Update everything!
 Function Global:Update-AllTheThings {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSShouldProcess', '')]
     [CmdletBinding(DefaultParameterSetName = 'OptOut', SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param()

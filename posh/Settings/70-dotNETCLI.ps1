@@ -16,7 +16,7 @@ $Env:DOTNET_CLI_TELEMETRY_OPTOUT = 'true'
 
 # Setup .NET CLI configuration
 Function Initialize-DotNetCli {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
