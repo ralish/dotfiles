@@ -73,6 +73,18 @@ Function Global:New-OpenSSLCertificate {
         [String]$Config
     )
 
+    Function Get-EscapedRdn {
+        [CmdletBinding()]
+        [OutputType([String])]
+        Param(
+            [Parameter(Mandatory)]
+            [String]$Rdn
+        )
+
+        # Escape "=" and "/" as they are treated as separators
+        return $Rdn -replace '=', '\=' -replace '/', '\/'
+    }
+
     $OpenSSLVersion = Get-OpenSSLVersion
 
     $Params = [Collections.Generic.List[String]]::new()
@@ -116,11 +128,11 @@ Function Global:New-OpenSSLCertificate {
     $SANs = [Collections.Generic.List[String]]::new()
 
     if ($EmailAddress) {
-        $Subjects.Add("emailAddress=${EmailAddress}")
+        $Subjects.Add("emailAddress=$(Get-EscapedRdn -Rdn $EmailAddress)")
     }
 
     if ($CommonName) {
-        $Subjects.Add("commonName=${CommonName}")
+        $Subjects.Add("commonName=$(Get-EscapedRdn -Rdn $CommonName)")
         if (!$NoMatchingSAN) {
             $SANs.Add("DNS:${CommonName}")
         }
@@ -129,23 +141,23 @@ Function Global:New-OpenSSLCertificate {
     }
 
     if ($OrganisationalUnit) {
-        $Subjects.Add("organizationalUnitName=${OrganisationalUnit}")
+        $Subjects.Add("organizationalUnitName=$(Get-EscapedRdn -Rdn $OrganisationalUnit)")
     }
 
     if ($Organisation) {
-        $Subjects.Add("organizationName=${Organisation}")
+        $Subjects.Add("organizationName=$(Get-EscapedRdn -Rdn $Organisation)")
     }
 
     if ($City) {
-        $Subjects.Add("localityName=${City}")
+        $Subjects.Add("localityName=$(Get-EscapedRdn -Rdn $City)")
     }
 
     if ($State) {
-        $Subjects.Add("stateOrProvinceName=${State}")
+        $Subjects.Add("stateOrProvinceName=$(Get-EscapedRdn -Rdn $State)")
     }
 
     if ($Country) {
-        $Subjects.Add("countryName=${Country}")
+        $Subjects.Add("countryName=$(Get-EscapedRdn -Rdn $Country)")
     }
 
     if ($AdditionalDomains -and $AdditionalDomains.Count -ne 0) {
@@ -170,8 +182,7 @@ Function Global:New-OpenSSLCertificate {
     }
 
     if ($Subjects.Count -ne 0) {
-        # Escape "=" and "/" as they are treated as RDN separators
-        $Subject = "/$($Subjects -replace '=', '\=' -replace '/', '\/' -join '/')"
+        $Subject = "/$($Subjects -join '/')"
         $Params.Add('-subj')
         $Params.Add($Subject)
     }
