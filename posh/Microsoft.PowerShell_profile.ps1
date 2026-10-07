@@ -83,7 +83,7 @@ $DotFilesTimings = $false
 #region Setup
 
 # Load the helper functions
-. (Join-Path -Path $PoshFunctionsPath -ChildPath '00-Helpers.ps1')
+. (Join-Path -Path $PoshFunctionsPath -ChildPath 'Helpers.ps1')
 
 # Indicates if we're running in a Windows Sandbox instance
 #
@@ -181,7 +181,7 @@ foreach ($PoshPath in $PoshFunctionsPath, $PoshSettingsPath) {
     $PoshFiles = @(Get-ChildItem -Path $PoshPath -File -Recurse -Include '*.ps1' | Sort-Object -Property 'Name')
 
     foreach ($PoshFile in $PoshFiles) {
-        if ($PoshFile.Name -eq '00-Helpers.ps1') { continue }
+        if ($PoshFile.Name -eq 'Helpers.ps1') { continue }
 
         # Originally was handled in `Start-DotFilesSection` but then the
         # filesystem level operations (opening and reading the file) and
