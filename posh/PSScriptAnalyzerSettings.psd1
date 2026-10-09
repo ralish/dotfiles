@@ -3,6 +3,33 @@
 # Last reviewed release: v1.25.0
 
 @{
+    # A wildcard does not enable rules derived from `ConfigurableRule` which
+    # are disabled by default. These rules must still be explicitly enabled.
+    #
+    # Configurable rules which default to enabled:
+    # - PSAvoidOverwritingBuiltInCmdlets
+    # - PSAvoidPositionalParameters
+    # - PSProvideCommentHelp
+    # - PSUseSingularNouns
+    #
+    # Configurable rules which default to disabled:
+    # - PSAlignAssignmentStatement
+    # - PSAvoidExclaimOperator
+    # - PSAvoidLongLines
+    # - PSAvoidSemicolonsAsLineTerminators
+    # - PSAvoidUsingDoubleQuotesForConstantString
+    # - PSPlaceCloseBrace
+    # - PSPlaceOpenBrace
+    # - PSUseCompatibleCommands
+    # - PSUseCompatibleSyntax
+    # - PSUseCompatibleTypes
+    # - PSUseConsistentIndentation
+    # - PSUseConsistentParameterSetName
+    # - PSUseConsistentParametersKind
+    # - PSUseConsistentWhitespace
+    # - PSUseConstrainedLanguageMode
+    # - PSUseCorrectCasing
+    # - PSUseSingleValueFromPipelineParameter
     IncludeRules = @('*')
 
     ExcludeRules = @()
@@ -49,9 +76,13 @@
             Enable                                  = $true
             CheckHashtable                          = $true
             AlignHashtableKvpWithInterveningComment = $true
-            CheckEnum                               = $true
+            CheckEnums                              = $true
             AlignEnumMemberWithInterveningComment   = $true
             IncludeValuelessEnumMembers             = $true
+        }
+
+        PSAvoidExclaimOperator = @{
+            Enable = $false
         }
 
         PSAvoidLongLines = @{
@@ -59,8 +90,16 @@
             MaximumLineLength = 119
         }
 
+        PSAvoidSemicolonsAsLineTerminators = @{
+            Enable = $true
+        }
+
         PSAvoidUsingCmdletAliases = @{
             allowlist = @()
+        }
+
+        PSAvoidUsingDoubleQuotesForConstantString = @{
+            Enable = $true
         }
 
         PSAvoidUsingPositionalParameters = @{
@@ -95,7 +134,6 @@
         }
 
         PSReviewUnusedParameter = @{
-            Enable             = $true
             # ForEach-Object and Where-Object are always included
             CommandsToTraverse = @()
         }
@@ -115,6 +153,18 @@
             PipelineIndentation = 'IncreaseIndentationForFirstPipeline'
         }
 
+        PSUseConsistentParameterSetName = @{
+            Enable = $true
+        }
+
+        PSUseConsistentParametersKind = @{
+            Enable         = $true
+            # Valid values:
+            # - Inline
+            # - ParamBlock
+            ParametersKind = 'ParamBlock'
+        }
+
         PSUseConsistentWhitespace = @{
             Enable                                  = $true
             CheckInnerBrace                         = $true
@@ -129,8 +179,8 @@
         }
 
         PSUseConstrainedLanguageMode = @{
-            Enable          = $false
-            IgnoreSignature = $true
+            Enable           = $false
+            IgnoreSignatures = $true
         }
 
         PSUseCorrectCasing = @{
@@ -138,6 +188,10 @@
             CheckCommands = $true
             CheckKeyword  = $false
             CheckOperator = $true
+        }
+
+        PSUseSingleValueFromPipelineParameter = @{
+            Enable = $true
         }
 
         PSUseSingularNouns = @{

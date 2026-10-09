@@ -5,15 +5,7 @@
 @{
     IncludeRules = @('*')
 
-    ExcludeRules = @(
-        'PSAvoidLongLines',
-        'PSAvoidUsingInvokeExpression',
-        'PSAvoidUsingWriteHost',
-        'PSReviewUnusedParameter',
-        'PSUseConstrainedLanguageMode',
-        'PSUseShouldProcessForStateChangingFunctions',
-        'PSUseSingularNouns'
-    )
+    ExcludeRules = @('PSAvoidUsingWriteHost')
 
     Rules = @{
         # Compatibility rules
@@ -44,18 +36,21 @@
             Enable                                  = $true
             CheckHashtable                          = $true
             AlignHashtableKvpWithInterveningComment = $true
-            CheckEnum                               = $true
+            CheckEnums                              = $true
             AlignEnumMemberWithInterveningComment   = $true
             IncludeValuelessEnumMembers             = $true
+        }
+
+        PSAvoidSemicolonsAsLineTerminators = @{
+            Enable = $true
         }
 
         PSAvoidUsingCmdletAliases = @{
             allowlist = @()
         }
 
-        PSAvoidUsingPositionalParameters = @{
-            Enable           = $true
-            CommandAllowList = @()
+        PSAvoidUsingDoubleQuotesForConstantString = @{
+            Enable = $true
         }
 
         PSPlaceCloseBrace = @{
@@ -87,6 +82,15 @@
             PipelineIndentation = 'IncreaseIndentationForFirstPipeline'
         }
 
+        PSUseConsistentParameterSetName = @{
+            Enable = $true
+        }
+
+        PSUseConsistentParametersKind = @{
+            Enable         = $true
+            ParametersKind = 'ParamBlock'
+        }
+
         PSUseConsistentWhitespace = @{
             Enable                                  = $true
             CheckInnerBrace                         = $true
@@ -105,6 +109,10 @@
             CheckCommands = $true
             CheckKeyword  = $false
             CheckOperator = $true
+        }
+
+        PSUseSingleValueFromPipelineParameter = @{
+            Enable = $true
         }
     }
 }
