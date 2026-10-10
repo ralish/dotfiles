@@ -32,7 +32,7 @@ Function Global:Convert-BytesToHex {
 
 # Convert a hex string to a byte array
 # Via: https://www.reddit.com/r/PowerShell/comments/5rhjsy/hex_to_byte_array_and_back/
-Function Global:Convert-HexToBytes {
+Function Global:Convert-HexToByte {
     [CmdletBinding()]
     [OutputType([Byte[]])]
     Param(
@@ -234,9 +234,8 @@ Function Global:ConvertTo-URLEncoded {
 
 # Retrieve a text encoding class
 Function Global:Get-TextEncoder {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseOutputTypeCorrectly', '')]
     [CmdletBinding()]
-    [OutputType([Text.Encoding])]
+    [OutputType([Text.ASCIIEncoding], [Text.UTF7Encoding], [Text.UTF8Encoding], [Text.UnicodeEncoding], [Text.UTF32Encoding])]
     Param(
         [ValidateSet('ASCII', 'UTF-7', 'UTF-8', 'UTF-16', 'UTF-16BE', 'UTF-32', 'UTF-32BE')]
         [String]$Encoding = 'UTF-8',
@@ -380,7 +379,7 @@ Function Global:Get-TextEncoding {
 #region Filesystem
 
 # Create a file in each empty directory under a path
-Function Global:Add-FileToEmptyDirectories {
+Function Global:Add-FileToEmptyDirectory {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void])]
     Param(

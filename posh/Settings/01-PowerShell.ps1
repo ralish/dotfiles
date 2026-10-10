@@ -75,7 +75,8 @@ switch ($PSVersionTable.PSEdition) {
 
 # Setup custom `Out-Default` function
 Function Set-OutDefault {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', 'Global:LastObject')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

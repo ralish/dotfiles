@@ -10,32 +10,43 @@ $DotFilesSection = @{
 
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
-# Default output format
-$Env:AWS_DEFAULT_OUTPUT = 'table'
+# Setup AWS CLI configuration
+Function Initialize-AwsCli {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'wordToComplete')]
+    [CmdletBinding()]
+    [OutputType([Void])]
+    Param()
 
-# Configuring command completion in the AWS CLI
-# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html
-Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
-Register-ArgumentCompleter -Native -CommandName 'aws' -ScriptBlock {
-    Param($wordToComplete, $commandAst, $cursorPosition)
+    # Default output format
+    $Env:AWS_DEFAULT_OUTPUT = 'table'
 
-    $Env:COMP_LINE = $commandAst.ToString()
-    $Env:COMP_POINT = $cursorPosition
+    # Configuring command completion in the AWS CLI
+    # https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html
+    Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
+    Register-ArgumentCompleter -Native -CommandName 'aws' -ScriptBlock {
+        Param($wordToComplete, $commandAst, $cursorPosition)
 
-    # `ToString()` in `System.Management.Automation.Language.CommandAst` trims
-    # any trailing whitespace from the command which will break our emulated
-    # `bash`-style command completion. Append a single whitespace character if
-    # the cursor position is beyond the length of the entered command as a
-    # simple workaround.
-    if ($cursorPosition -gt $Env:COMP_LINE.Length) {
-        $Env:COMP_LINE = "${Env:COMP_LINE} "
+        $Env:COMP_LINE = $commandAst.ToString()
+        $Env:COMP_POINT = $cursorPosition
+
+        # `ToString()` in `System.Management.Automation.Language.CommandAst` trims
+        # any trailing whitespace from the command which will break our emulated
+        # `bash`-style command completion. Append a single whitespace character if
+        # the cursor position is beyond the length of the entered command as a
+        # simple workaround.
+        if ($cursorPosition -gt $Env:COMP_LINE.Length) {
+            $Env:COMP_LINE = "${Env:COMP_LINE} "
+        }
+
+        & aws_completer | ForEach-Object {
+            [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
+        }
+
+        $Env:COMP_LINE = $Env:COMP_POINT = $null
     }
-
-    & aws_completer | ForEach-Object {
-        [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
-    }
-
-    $Env:COMP_LINE = $Env:COMP_POINT = $null
 }
 
+Initialize-AwsCli
+
+Remove-Item -LiteralPath 'Function:\Initialize-AwsCli'
 Complete-DotFilesSection

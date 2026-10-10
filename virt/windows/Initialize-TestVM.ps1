@@ -216,12 +216,12 @@ Function Optimize-DotNetFramework2x {
     }
 
     if ([Environment]::Is64BitOperatingSystem) {
-        Invoke-NgenTasks -Version '2.x' -Bitness '64-bit'
+        Invoke-NgenTask -Version '2.x' -Bitness '64-bit'
         if ($Script:Wow64Present) {
-            Invoke-NgenTasks -Version '2.x' -Bitness '32-bit'
+            Invoke-NgenTask -Version '2.x' -Bitness '32-bit'
         }
     } else {
-        Invoke-NgenTasks -Version '2.x' -Bitness '32-bit'
+        Invoke-NgenTask -Version '2.x' -Bitness '32-bit'
     }
 }
 
@@ -252,12 +252,12 @@ Function Optimize-DotNetFramework4x {
     }
 
     if ([Environment]::Is64BitOperatingSystem) {
-        Invoke-NgenTasks -Version '4.x' -Bitness '64-bit'
+        Invoke-NgenTask -Version '4.x' -Bitness '64-bit'
         if ($Script:Wow64Present) {
-            Invoke-NgenTasks -Version '4.x' -Bitness '32-bit'
+            Invoke-NgenTask -Version '4.x' -Bitness '32-bit'
         }
     } else {
-        Invoke-NgenTasks -Version '4.x' -Bitness '32-bit'
+        Invoke-NgenTask -Version '4.x' -Bitness '32-bit'
     }
 }
 
@@ -786,7 +786,7 @@ Function Get-WindowsInfo {
     }
 }
 
-Function Invoke-NgenTasks {
+Function Invoke-NgenTask {
     [CmdletBinding()]
     [OutputType([Void], [String[]])]
     Param(
@@ -828,6 +828,7 @@ Function Invoke-NgenTasks {
 }
 
 Function Remove-DiskCleanupProfile {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param(
@@ -898,6 +899,7 @@ Function Set-DiskCleanupProfile {
         - Windows Server 2012 R2 through 2025
     #>
 
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
     [CmdletBinding(DefaultParameterSetName = 'OptOut')]
     [OutputType([Void])]
     Param(
@@ -956,6 +958,7 @@ Function Set-DiskCleanupProfile {
 }
 
 Function Set-RegistryValue {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
     [CmdletBinding(DefaultParameterSetName = 'KeyOnly')]
     [OutputType([Void])]
     Param(

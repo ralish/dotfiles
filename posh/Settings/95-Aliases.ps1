@@ -2,6 +2,7 @@ $null = Start-DotFilesSection -Type 'Settings' -Name 'Aliases'
 
 # Configure our custom aliases
 Function Initialize-Aliases {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

@@ -11,7 +11,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `ExchangeOnlineManagement` configuration
 Function Initialize-ExchangeOnlineManagement {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', 'Global:ExoMailboxIgnoredProperties')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

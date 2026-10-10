@@ -37,6 +37,11 @@ Function Global:Get-GitRepoSummary {
 
 # Invoke a linter on matching repository files
 Function Global:Invoke-GitLinter {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseConsistentParameterSetName', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'DevSkim')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'Markdownlint')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'PSScriptAnalyzer')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'ShellCheck')]
     [CmdletBinding()]
     [OutputType(ParameterSetName = ('DevSkim', 'Markdownlint', 'ShellCheck'), [Void], [String[]])]
     [OutputType(ParameterSetName = 'PSScriptAnalyzer', 'Void', 'Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.DiagnosticRecord[]')]
@@ -267,6 +272,7 @@ Function Global:Invoke-GitLinter {
 
 # Fast-forward all branches to match a branch
 Function Global:Invoke-GitMergeAllBranches {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param(

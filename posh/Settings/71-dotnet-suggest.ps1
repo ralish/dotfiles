@@ -12,6 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `dotnet-suggest` configuration
 Function Initialize-DotNetSuggest {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'wordToComplete')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

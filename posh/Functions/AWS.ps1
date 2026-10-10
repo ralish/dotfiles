@@ -14,6 +14,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'AWS.format.ps1xm
 
 # Set AWS credential environment variables
 Function Global:Set-AWSCredentialEnvironment {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseConsistentParameterSetName', '')]
     [Diagnostics.CodeAnalysis.SuppressMessage('PSUsePSCredentialType', '')]
     [CmdletBinding()]
     [OutputType([Void])]
@@ -119,7 +120,7 @@ Function Global:Set-R53HostedZoneNameTag {
 }
 
 # Set records on a Route 53 hosted zone suitable for a parked domain
-Function Global:Set-R53HostedZoneParkedRecords {
+Function Global:Set-R53HostedZoneParkedRecord {
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType('Amazon.Route53.Model.ChangeInfo[]')]
     Param(

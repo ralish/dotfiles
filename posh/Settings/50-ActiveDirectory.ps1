@@ -12,7 +12,9 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `ActiveDirectory` configuration
 Function Initialize-ActiveDirectory {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', 'Global:ADClassIgnoredPropertiesTop')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', 'Global:ADClassIgnoredPropertiesSecurityPrincipal')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', 'Global:ADClassIgnoredPropertiesUser')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
