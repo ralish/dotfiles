@@ -109,8 +109,8 @@ End Sub
 ' Matches against:
 ' - Space
 ' - Tab
-' - Non-breaking space (NBSP)
-' - Vertical tabulation (VT)
+' - Non-breaking space (`NBSP`)
+' - Vertical tabulation (`VT`)
 Private Function IsTrimChar(ByVal ch As String) As Boolean
     Select Case ch
         Case " ", vbTab, Chr$(160), Chr$(11)
