@@ -8,7 +8,7 @@ $DotFilesSection = @{
 if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; return }
 
 # Load custom formatting data
-$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory.format.ps1xml'))
+$FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'ActiveDirectory.format.ps1xml'))
 
 #region Directory schema
 
