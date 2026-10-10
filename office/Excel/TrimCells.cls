@@ -69,9 +69,9 @@ End Function
 ' Matches against:
 ' - Space
 ' - Tab
-' - Carriage return (CR)
-' - Line feed (LF)
-' - Non-breaking space (NBSP)
+' - Carriage return (`CR`)
+' - Line feed (`LF`)
+' - Non-breaking space (`NBSP`)
 Private Function IsTrimChar(ByVal ch As String) As Boolean
     Select Case ch
         Case " ", vbTab, vbCr, vbLf, Chr$(160)

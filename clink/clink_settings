@@ -51,7 +51,7 @@ clink.logo = none
 # If set to `0`, the limit is the terminal height.
 clink.max_input_rows = 0
 
-# Handling of CR and LF characters on paste
+# Handling of `CR` and `LF` characters on paste
 #
 # Valid values:
 # - ampersand

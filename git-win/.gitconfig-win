@@ -1,8 +1,8 @@
 [core]
 	# Default: false
 	#
-	# Checkout Windows-style (CRLF) line endings in the working directory and
-	# commit Unix-style (LF) line endings. Equivalent to setting the `text`
+	# Checkout Windows-style (`CRLF`) line endings in the working directory and
+	# commit Unix-style (`LF`) line endings. Equivalent to setting the `text`
 	# attribute to `auto` on all files and the `core.eol` setting to `crlf`.
 	autocrlf = true
 	# Default: unset
