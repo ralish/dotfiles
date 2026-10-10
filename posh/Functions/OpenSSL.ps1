@@ -87,41 +87,41 @@ Function Global:New-OpenSSLCertificate {
 
     $OpenSSLVersion = Get-OpenSSLVersion
 
-    $Params = [Collections.Generic.List[String]]::new()
-    $Params.Add('req')
+    $NewCertArgs = [Collections.Generic.List[String]]::new()
+    $NewCertArgs.Add('req')
 
     if ($PSCmdlet.ParameterSetName -match '^Csr') {
-        $Params.Add('-new')
+        $NewCertArgs.Add('-new')
         $Out = "${Name}.csr"
     } else {
-        $Params.Add('-x509')
+        $NewCertArgs.Add('-x509')
         $Out = "${Name}.cer"
     }
 
-    $Params.Add('-out')
-    $Params.Add($Out)
+    $NewCertArgs.Add('-out')
+    $NewCertArgs.Add($Out)
 
     if ($PSCmdlet.ParameterSetName -match 'GenerateKey$') {
-        $Params.Add('-keyout')
-        $Params.Add("${Name}.key")
+        $NewCertArgs.Add('-keyout')
+        $NewCertArgs.Add("${Name}.key")
 
-        $Params.Add('-newkey')
+        $NewCertArgs.Add('-newkey')
         if ($KeySize) {
-            $Params.Add("rsa:${KeySize}")
+            $NewCertArgs.Add("rsa:${KeySize}")
         } else {
-            $Params.Add('rsa')
+            $NewCertArgs.Add('rsa')
         }
 
         if (!$EncryptKey) {
             if ($OpenSSLVersion -ge '3.0') {
-                $Params.Add('-noenc')
+                $NewCertArgs.Add('-noenc')
             } else {
-                $Params.Add('-nodes')
+                $NewCertArgs.Add('-nodes')
             }
         }
     } else {
-        $Params.Add('-key')
-        $Params.Add($ExistingKeyPath)
+        $NewCertArgs.Add('-key')
+        $NewCertArgs.Add($ExistingKeyPath)
     }
 
     $Subjects = [Collections.Generic.List[String]]::new()
@@ -183,30 +183,30 @@ Function Global:New-OpenSSLCertificate {
 
     if ($Subjects.Count -ne 0) {
         $Subject = "/$($Subjects -join '/')"
-        $Params.Add('-subj')
-        $Params.Add($Subject)
+        $NewCertArgs.Add('-subj')
+        $NewCertArgs.Add($Subject)
     }
 
     if ($SANs.Count -ne 0) {
         $SAN = "subjectAltName = $($SANs -join ', ')"
-        $Params.Add('-addext')
-        $Params.Add($SAN)
+        $NewCertArgs.Add('-addext')
+        $NewCertArgs.Add($SAN)
     }
 
     if ($PSCmdlet.ParameterSetName -match '^SelfSigned') {
-        $Params.Add('-sha256')
-        $Params.Add('-days')
-        $Params.Add([String]$ValidDays)
+        $NewCertArgs.Add('-sha256')
+        $NewCertArgs.Add('-days')
+        $NewCertArgs.Add([String]$ValidDays)
     }
 
     if ($Config) {
-        $Params.Add('-config')
-        $Params.Add($Config)
+        $NewCertArgs.Add('-config')
+        $NewCertArgs.Add($Config)
     }
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
-    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
-    & openssl @Params
+    Write-Host "openssl $(($NewCertArgs | Add-QuotesToStringWithSpace) -join ' ')"
+    & openssl @NewCertArgs
 }
 
 #endregion
@@ -226,7 +226,7 @@ Function Global:Get-OpenSSLCertificate {
         [String[]]$NameOptions = 'oneline'
     )
 
-    $Params = [Collections.Generic.List[String]]::new(
+    $GetCertArgs = [Collections.Generic.List[String]]::new(
         [String[]]@(
             'x509'
             '-in', $Certificate
@@ -238,13 +238,13 @@ Function Global:Get-OpenSSLCertificate {
     )
 
     if ($NameOptions) {
-        $Params.Add('-nameopt')
-        $Params.Add($NameOptions -join ',')
+        $GetCertArgs.Add('-nameopt')
+        $GetCertArgs.Add($NameOptions -join ',')
     }
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
-    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
-    & openssl @Params
+    Write-Host "openssl $(($GetCertArgs | Add-QuotesToStringWithSpace) -join ' ')"
+    & openssl @GetCertArgs
 }
 
 # Retrieve the details of a certificate signing request
@@ -260,7 +260,7 @@ Function Global:Get-OpenSSLCsr {
         [String[]]$NameOptions = 'oneline'
     )
 
-    $Params = [Collections.Generic.List[String]]::new(
+    $GetCsrArgs = [Collections.Generic.List[String]]::new(
         [String[]]@(
             'req'
             '-in', $Csr
@@ -274,13 +274,13 @@ Function Global:Get-OpenSSLCsr {
     )
 
     if ($NameOptions) {
-        $Params.Add('-nameopt')
-        $Params.Add($NameOptions -join ',')
+        $GetCsrArgs.Add('-nameopt')
+        $GetCsrArgs.Add($NameOptions -join ',')
     }
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
-    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
-    & openssl @Params
+    Write-Host "openssl $(($GetCsrArgs | Add-QuotesToStringWithSpace) -join ' ')"
+    & openssl @GetCsrArgs
 }
 
 # Retrieve the details of a PKCS #12 certificate
@@ -308,7 +308,7 @@ Function Global:Get-OpenSSLPkcs12 {
 
     $OpenSSLVersion = Get-OpenSSLVersion
 
-    $Params = [Collections.Generic.List[String]]::new(
+    $GetPkcs12Args = [Collections.Generic.List[String]]::new(
         [String[]]@(
             'pkcs12'
             '-in', $Pkcs12File
@@ -319,21 +319,21 @@ Function Global:Get-OpenSSLPkcs12 {
 
     if (!$VerifyOnly) {
         if ($PrivateKeyEncryption) {
-            $Params.Add("-$($PrivateKeyEncryption.ToLower())")
+            $GetPkcs12Args.Add("-$($PrivateKeyEncryption.ToLower())")
         } else {
             if ($OpenSSLVersion -ge '3.0') {
-                $Params.Add('-noenc')
+                $GetPkcs12Args.Add('-noenc')
             } else {
-                $Params.Add('-nodes')
+                $GetPkcs12Args.Add('-nodes')
             }
         }
     } else {
-        $Params.Add('-noout')
+        $GetPkcs12Args.Add('-noout')
     }
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
-    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
-    & openssl @Params
+    Write-Host "openssl $(($GetPkcs12Args | Add-QuotesToStringWithSpace) -join ' ')"
+    & openssl @GetPkcs12Args
 }
 
 #endregion
@@ -366,7 +366,7 @@ Function Global:Get-OpenSSLServerCertificate {
         [Switch]$KeepStdinOpen
     )
 
-    $Params = [Collections.Generic.List[String]]::new(
+    $GetSvrCertArgs = [Collections.Generic.List[String]]::new(
         [String[]]@(
             's_client'
             '-connect', "${Hostname}:${Port}"
@@ -375,32 +375,32 @@ Function Global:Get-OpenSSLServerCertificate {
 
     if ($IpVersion) {
         if ($IpVersion -eq 'IPv4Only') {
-            $Params.Add('-4')
+            $GetSvrCertArgs.Add('-4')
         } else {
-            $Params.Add('-6')
+            $GetSvrCertArgs.Add('-6')
         }
     }
 
     if ($ServerName) {
-        $Params.Add('-servername')
-        $Params.Add($ServerName)
+        $GetSvrCertArgs.Add('-servername')
+        $GetSvrCertArgs.Add($ServerName)
     }
 
     if ($StartTls) {
-        $Params.Add('-starttls')
-        $Params.Add($StartTls.ToLower())
+        $GetSvrCertArgs.Add('-starttls')
+        $GetSvrCertArgs.Add($StartTls.ToLower())
     }
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
-    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
+    Write-Host "openssl $(($GetSvrCertArgs | Add-QuotesToStringWithSpace) -join ' ')"
 
     # The `s_client` command keeps the connection open for further commands.
     # Piping `$null` will effectively close standard input, gracefully closing
     # the connection after it's established.
     if ($KeepStdinOpen) {
-        & openssl @Params
+        & openssl @GetSvrCertArgs
     } else {
-        $null | & openssl @Params
+        $null | & openssl @GetSvrCertArgs
     }
 }
 
@@ -421,7 +421,7 @@ Function Global:Convert-OpenSSLDerToPem {
         [String]$PemFile
     )
 
-    $Params = [Collections.Generic.List[String]]::new(
+    $GetDerToPemArgs = [Collections.Generic.List[String]]::new(
         [String[]]@(
             'x509',
             '-in', $DerFile
@@ -432,8 +432,8 @@ Function Global:Convert-OpenSSLDerToPem {
     )
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
-    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
-    & openssl @Params
+    Write-Host "openssl $(($GetDerToPemArgs | Add-QuotesToStringWithSpace) -join ' ')"
+    & openssl @GetDerToPemArgs
 }
 
 # Convert a certificate in PEM format to DER format
@@ -449,7 +449,7 @@ Function Global:Convert-OpenSSLPemToDer {
         [String]$DerFile
     )
 
-    $Params = [Collections.Generic.List[String]]::new(
+    $GetPemToDerArgs = [Collections.Generic.List[String]]::new(
         [String[]]@(
             'x509',
             '-in', $PemFile
@@ -460,8 +460,8 @@ Function Global:Convert-OpenSSLPemToDer {
     )
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
-    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
-    & openssl @Params
+    Write-Host "openssl $(($GetPemToDerArgs | Add-QuotesToStringWithSpace) -join ' ')"
+    & openssl @GetPemToDerArgs
 }
 
 # Convert a certificate in PEM format to PKCS #12 format
@@ -506,7 +506,7 @@ Function Global:Convert-OpenSSLPemToPkcs12 {
         [Switch]$LegacyEncryption
     )
 
-    $Params = [Collections.Generic.List[String]]::new(
+    $GetPemToPkcs12Args = [Collections.Generic.List[String]]::new(
         [String[]]@(
             'pkcs12'
             '-export'
@@ -516,29 +516,29 @@ Function Global:Convert-OpenSSLPemToPkcs12 {
     )
 
     if ($PrivateKeyFile) {
-        $Params.Add('-inkey')
-        $Params.Add($PrivateKeyFile)
+        $GetPemToPkcs12Args.Add('-inkey')
+        $GetPemToPkcs12Args.Add($PrivateKeyFile)
     }
 
     if ($CertsFile) {
-        $Params.Add('-certfile')
-        $Params.Add($CertsFile)
+        $GetPemToPkcs12Args.Add('-certfile')
+        $GetPemToPkcs12Args.Add($CertsFile)
     }
 
     if ($FriendlyName) {
-        $Params.Add('-name')
-        $Params.Add($FriendlyName)
+        $GetPemToPkcs12Args.Add('-name')
+        $GetPemToPkcs12Args.Add($FriendlyName)
     }
 
     if ($CertificateDesEncryption) {
-        $Params.Add('-descert')
+        $GetPemToPkcs12Args.Add('-descert')
     } elseif ($LegacyEncryption) {
-        $Params.Add('-legacy')
+        $GetPemToPkcs12Args.Add('-legacy')
     }
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
-    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
-    & openssl @Params
+    Write-Host "openssl $(($GetPemToPkcs12Args | Add-QuotesToStringWithSpace) -join ' ')"
+    & openssl @GetPemToPkcs12Args
 }
 
 # Convert a certificate in PKCS #12 format to PEM format
@@ -573,7 +573,7 @@ Function Global:Convert-OpenSSLPkcs12ToPem {
 
     $OpenSSLVersion = Get-OpenSSLVersion
 
-    $Params = [Collections.Generic.List[String]]::new(
+    $GetPkcs12ToPemArgs = [Collections.Generic.List[String]]::new(
         [String[]]@(
             'pkcs12'
             '-in', $Pkcs12File
@@ -582,26 +582,26 @@ Function Global:Convert-OpenSSLPkcs12ToPem {
     )
 
     if ($PSCmdlet.ParameterSetName -eq 'CertificatesOnly') {
-        $Params.Add('-nokeys')
+        $GetPkcs12ToPemArgs.Add('-nokeys')
     } elseif ($PSCmdlet.ParameterSetName -eq 'PrivateKeyOnly') {
-        $Params.Add('-nocerts')
+        $GetPkcs12ToPemArgs.Add('-nocerts')
     }
 
     if ($PSCmdlet.ParameterSetName -ne 'CertificatesOnly') {
         if ($PrivateKeyEncryption) {
-            $Params.Add("-$($PrivateKeyEncryption.ToLower())")
+            $GetPkcs12ToPemArgs.Add("-$($PrivateKeyEncryption.ToLower())")
         } else {
             if ($OpenSSLVersion -ge '3.0') {
-                $Params.Add('-noenc')
+                $GetPkcs12ToPemArgs.Add('-noenc')
             } else {
-                $Params.Add('-nodes')
+                $GetPkcs12ToPemArgs.Add('-nodes')
             }
         }
     }
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
-    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
-    & openssl @Params
+    Write-Host "openssl $(($GetPkcs12ToPemArgs | Add-QuotesToStringWithSpace) -join ' ')"
+    & openssl @GetPkcs12ToPemArgs
 }
 
 #endregion
@@ -615,7 +615,7 @@ Function Global:Get-OpenSSLEccCurves {
     [OutputType([Void], [String[]])]
     Param()
 
-    $Params = [Collections.Generic.List[String]]::new(
+    $GetEccCurvesArgs = [Collections.Generic.List[String]]::new(
         [String[]]@(
             'ecparam'
             '-list_curves'
@@ -623,8 +623,8 @@ Function Global:Get-OpenSSLEccCurves {
     )
 
     Write-Host -NoNewline -ForegroundColor 'Green' 'Invoking: '
-    Write-Host "openssl $(($Params | Add-QuotesToStringWithSpace) -join ' ')"
-    & openssl @Params
+    Write-Host "openssl $(($GetEccCurvesArgs | Add-QuotesToStringWithSpace) -join ' ')"
+    & openssl @GetEccCurvesArgs
 }
 
 #endregion
