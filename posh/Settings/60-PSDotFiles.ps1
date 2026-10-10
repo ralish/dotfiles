@@ -12,7 +12,10 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `PSDotFiles` configuration
 Function Initialize-PSDotFiles {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', 'Global:DotFilesPath')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', 'Global:DotFilesAutodetect')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', 'Global:DotFilesAllowNestedSymlinks')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

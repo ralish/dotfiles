@@ -414,6 +414,7 @@ Function Global:Compare-Hashtable {
 # unless `-OrderSensitive` is specified, and an empty collection is treated as
 # equal to a missing value.
 Function Global:Compare-ObjectProperties {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding()]
     [OutputType([PSCustomObject[]])]
     Param(

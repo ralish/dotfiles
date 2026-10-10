@@ -88,6 +88,7 @@ Function Global:Clear-NuGetCache {
 # TODO: Add support for local tools
 # TODO: Add dependency cooldown support when available
 Function Global:Update-DotNetTools {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param(
@@ -572,6 +573,7 @@ Function Global:Switch-Go {
 # TODO: Add dependency cooldown support when available
 # TODO: Handle the case where `gup` wasn't installed by Go
 Function Global:Update-GoBinaries {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     Param()
@@ -658,6 +660,7 @@ Function Global:Update-GoBinaries {
 
 # Configure environment for Google `depot_tools` usage
 Function Global:Switch-GoogleDepotTools {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -989,6 +992,7 @@ Function Global:Clear-NpmCache {
 # Environment variables
 # https://nodejs.org/api/cli.html#cli_environment_variables
 Function Global:Switch-Nodejs {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding(DefaultParameterSetName = 'Enable')]
     [OutputType([Void])]
     Param(
@@ -1121,6 +1125,7 @@ Function Global:Switch-Nodejs {
 # TODO: Add dependency cooldown support
 # https://docs.npmjs.com/cli/v11/using-npm/config#min-release-age
 Function Global:Update-NodejsPackages {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()
@@ -1422,6 +1427,7 @@ Function Global:Clear-UvCache {
 # TODO: Add dependency cooldown support
 # https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-uploaded-prior-to
 Function Global:Update-PythonPipPackages {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()
@@ -1544,6 +1550,7 @@ Function Global:Update-PythonPipPackages {
 
 # Update Python pipx packages
 Function Global:Update-PythonPipxPackages {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param(
@@ -1657,6 +1664,7 @@ Function Global:Update-PythonPipxPackages {
 
 # Update Qt components
 Function Global:Update-QtComponents {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param(
@@ -1920,6 +1928,7 @@ Function Global:Switch-Ruby {
 #
 # TODO: Add dependency cooldown support (to be released in RubyGems v4.1.0)
 Function Global:Update-RubyGems {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param(
@@ -2144,6 +2153,7 @@ Function Global:Switch-Rust {
 
 # Update Rust toolchains
 Function Global:Update-RustToolchains {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
     Param()

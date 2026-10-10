@@ -11,6 +11,9 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 # Create a certificate signing request or self-signed certificate
 # https://docs.openssl.org/master/man1/openssl-req/
 Function Global:New-OpenSSLCertificate {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseConsistentParameterSetName', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'Csr')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'SelfSigned')]
     [CmdletBinding()]
     [OutputType([Void], [String[]])]
     Param(
@@ -544,6 +547,8 @@ Function Global:Convert-OpenSSLPemToPkcs12 {
 # Convert a certificate in PKCS #12 format to PEM format
 # https://docs.openssl.org/master/man1/openssl-pkcs12/
 Function Global:Convert-OpenSSLPkcs12ToPem {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'CertificatesOnly')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'PrivateKeyOnly')]
     [CmdletBinding(DefaultParameterSetName = 'Both')]
     [OutputType([Void], [String[]])]
     Param(
@@ -611,6 +616,7 @@ Function Global:Convert-OpenSSLPkcs12ToPem {
 # Retrieve the list of supported ECC curves
 # https://docs.openssl.org/master/man1/openssl-ecparam/
 Function Global:Get-OpenSSLEccCurves {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding()]
     [OutputType([Void], [String[]])]
     Param()

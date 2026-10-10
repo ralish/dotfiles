@@ -448,6 +448,7 @@ Function Global:Watch-EventLog {
 
 # Retrieve files with a minimum number of hard links
 Function Global:Get-MultipleHardLinks {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding()]
     [OutputType([IO.FileInfo[]])]
     Param(
@@ -527,6 +528,7 @@ Function Global:mklink {
 
 # Open the hosts file for editing
 Function Global:Edit-Hosts {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -545,6 +547,7 @@ Function Global:Edit-Hosts {
 
 # Restore connections to mapped network drives
 Function Global:Restore-MappedNetworkDrives {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -831,6 +834,7 @@ Function Global:Update-RdcDefaultConfig {
 
 # Convert security descriptors between different formats
 Function Global:Convert-SecurityDescriptor {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseConsistentParameterSetName', '')]
     [CmdletBinding()]
     [OutputType(ParameterSetName = 'Binary', [String], [Management.ManagementBaseObject])]
     [OutputType(ParameterSetName = 'SDDL', [Byte[]], [Management.ManagementBaseObject])]
@@ -896,7 +900,8 @@ Function Global:Convert-SecurityDescriptor {
 
 # Retrieve well-known security identifiers
 Function Global:Get-WellKnownSID {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseConsistentWhitespace', '')] # PSScriptAnalyzer bug
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseConsistentParameterSetName', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseConsistentWhitespace', '')]
     [CmdletBinding()]
     [OutputType([Security.Principal.SecurityIdentifier])]
     Param(
@@ -1211,6 +1216,7 @@ Function Global:New-IsoImage {
     )
 
     Function Clear-ComObjects {
+        [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
         [CmdletBinding()]
         [OutputType([Void])]
         Param()

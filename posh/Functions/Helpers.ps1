@@ -448,6 +448,7 @@ Function Invoke-DotFilesAsyncTask {
 # closure for the asynchronous scriptblock if any function parameters fail
 # validation, even if they weren't provided for the function invocation.
 Function Start-DotFilesSection {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
     [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Boolean])]
@@ -603,6 +604,7 @@ Function Start-DotFilesSection {
 
 # Update formatting data from `dotfiles`
 Function Update-DotFilesFormatData {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
     [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]

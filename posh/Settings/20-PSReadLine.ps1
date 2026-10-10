@@ -86,6 +86,9 @@ Function Initialize-PSReadLine {
 # From the PSReadLine sample profile with minor clean-up:
 # https://github.com/PowerShell/PSReadLine/blob/master/PSReadLine/SamplePSReadLineProfile.ps1
 Function Set-PSReadLineKeyHandlerCommandHelpWindow {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'Key')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'Arg')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -134,6 +137,10 @@ Function Set-PSReadLineKeyHandlerCommandHelpWindow {
 # From the PSReadLine sample profile with minor clean-up:
 # https://github.com/PowerShell/PSReadLine/blob/master/PSReadLine/SamplePSReadLineProfile.ps1
 Function Set-PSReadLineKeyHandlerExpandAliases {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'Key')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'Arg')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -182,6 +189,9 @@ Function Set-PSReadLineKeyHandlerExpandAliases {
 # From the PSReadLine sample profile with minor clean-up:
 # https://github.com/PowerShell/PSReadLine/blob/master/PSReadLine/SamplePSReadLineProfile.ps1
 Function Set-PSReadLineKeyHandlerInsertPairedBraces {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'Arg')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -228,6 +238,10 @@ Function Set-PSReadLineKeyHandlerInsertPairedBraces {
 # From the PSReadLine sample profile with minor clean-up:
 # https://github.com/PowerShell/PSReadLine/blob/master/PSReadLine/SamplePSReadLineProfile.ps1
 Function Set-PSReadLineKeyHandlerInsertPairedParenthesis {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'Key')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'Arg')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -266,6 +280,9 @@ Function Set-PSReadLineKeyHandlerInsertPairedParenthesis {
 # From the PSReadLine sample profile with minor clean-up:
 # https://github.com/PowerShell/PSReadLine/blob/master/PSReadLine/SamplePSReadLineProfile.ps1
 Function Set-PSReadLineKeyHandlerSmartCloseBraces {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'Arg')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

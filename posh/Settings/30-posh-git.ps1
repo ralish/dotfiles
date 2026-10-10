@@ -13,7 +13,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `posh-git` configuration
 Function Initialize-PoshGit {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', 'Global:GitPromptSettings')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

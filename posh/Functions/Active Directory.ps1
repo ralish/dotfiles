@@ -14,6 +14,8 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Active Directory
 
 # Resolve AD GUIDs corresponding to extended rights or schema objects
 Function Global:Resolve-ADGuid {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseConsistentParameterSetName', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'All')]
     [CmdletBinding()]
     [OutputType('Void', 'Microsoft.ActiveDirectory.Management.ADObject[]')]
     Param(

@@ -12,6 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup Oh My Posh configuration
 Function Initialize-OhMyPosh {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidUsingInvokeExpression', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -55,7 +56,7 @@ Function Initialize-OhMyPosh {
 
 # Attempt to retrieve the path to a theme given its name
 Function Get-OhMyPoshThemePath {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', 'Global:PoshThemesPath')]
     [CmdletBinding()]
     [OutputType([Void], [String])]
     Param(

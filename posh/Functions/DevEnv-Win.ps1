@@ -835,7 +835,7 @@ Function Global:Update-Python {
     [OutputType([PSCustomObject])]
     Param()
 
-    Function Get-PythonRuntimes {
+    Function Get-PythonRuntime {
         [CmdletBinding()]
         [OutputType([String[]])]
         Param()
@@ -891,7 +891,7 @@ Function Global:Update-Python {
     $UpdateArgs = 'install', '--update'
     $UpdateCmd = "pymanager $($UpdateArgs -join ' ')"
 
-    $Result.BeforeUpdate = Get-PythonRuntimes
+    $Result.BeforeUpdate = Get-PythonRuntime
 
     $DryrunMsg = ''
     if (!$PSCmdlet.ShouldProcess('Python runtimes', 'Update')) {
@@ -916,7 +916,7 @@ Function Global:Update-Python {
     }
 
     if (!$WhatIfPreference) {
-        $Result.AfterUpdate = Get-PythonRuntimes
+        $Result.AfterUpdate = Get-PythonRuntime
     }
 
     return $Result

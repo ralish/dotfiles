@@ -12,6 +12,8 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup PuTTY configuration
 Function Initialize-PuTTY {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'commandAst')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'cursorPosition')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()

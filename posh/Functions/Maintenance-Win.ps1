@@ -26,6 +26,7 @@ Function Global:Update-Chrome {
     )
 
     Function Clear-ComObjects {
+        [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
         [CmdletBinding()]
         [OutputType([Void])]
         Param()
@@ -298,6 +299,7 @@ Function Global:Update-Edge {
     )
 
     Function Clear-ComObjects {
+        [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
         [CmdletBinding()]
         [OutputType([Void])]
         Param()

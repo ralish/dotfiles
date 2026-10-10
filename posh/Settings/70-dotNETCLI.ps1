@@ -16,7 +16,7 @@ $Env:DOTNET_CLI_TELEMETRY_OPTOUT = 'true'
 
 # Setup .NET CLI configuration
 Function Initialize-DotNetCli {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidGlobalVars', 'Global:PoshCompletionsPath')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -96,6 +96,9 @@ Function Get-DotNetCliCompletionsType {
 # How to enable tab completion for the .NET CLI
 # https://learn.microsoft.com/en-au/dotnet/core/tools/enable-tab-autocomplete
 Function Import-DotNetCliCompletions {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'wordToComplete')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidUsingInvokeExpression', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param(

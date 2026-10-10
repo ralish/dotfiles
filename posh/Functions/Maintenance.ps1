@@ -7,6 +7,7 @@ $FormatDataPaths.Add((Join-Path -Path $PSScriptRoot -ChildPath 'Maintenance.form
 # - Name and version of all vendored components
 # - Path and last reviewed version of all configuration files
 Function Global:Get-DotFilesLastUpdated {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseCmdletCorrectly', '')]
     [CmdletBinding()]
     [OutputType([PSCustomObject[]])]
     Param()
@@ -107,6 +108,7 @@ Function Global:Get-DotFilesLastUpdated {
 
 # Clear caches used by development environments and tooling
 Function Global:Clear-AllDevCaches {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [Diagnostics.CodeAnalysis.SuppressMessage('PSShouldProcess', '')]
     [CmdletBinding(DefaultParameterSetName = 'OptOut', SupportsShouldProcess)]
     [OutputType([Void], [String[]])]
@@ -269,6 +271,7 @@ Function Global:Clear-AllDevCaches {
 
 # Update everything!
 Function Global:Update-AllTheThings {
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
     [Diagnostics.CodeAnalysis.SuppressMessage('PSShouldProcess', '')]
     [CmdletBinding(DefaultParameterSetName = 'OptOut', SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
