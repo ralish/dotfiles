@@ -1360,14 +1360,22 @@ Function Global:Update-WSL {
 
         $OriginalOutputEncoding = [Console]::OutputEncoding
 
+        # Workaround for engine behaviour on PowerShell releases prior to 7.2.
+        # On earlier releases, `$ErrorActionPreference` applies to redirected
+        # `stderr` output from native commands, resulting in termination if set
+        # to `Stop`.
+        $OriginalErrorActionPreference = $ErrorActionPreference
+
         # We can't immediately launch `wsl --version` as if WSL is available
         # but not installed it will prompt the user to press any key to start
         # the install with a 60 second time-out. Instead we can first use `wsl
         # --status` which seems to exit with code 50 when WSL is not installed.
         try {
+            $ErrorActionPreference = 'Continue'
             [Console]::OutputEncoding = [Text.Encoding]::Unicode
             $null = & wsl @StatusArgs 2>&1
         } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
             [Console]::OutputEncoding = $OriginalOutputEncoding
         }
 
@@ -1473,12 +1481,19 @@ Function Global:Update-WSL {
 
     $OriginalOutputEncoding = [Console]::OutputEncoding
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
+    Write-Verbose -Message "Updating WSL: ${UpdateCmd}"
     try {
-        Write-Verbose -Message "Updating WSL: ${UpdateCmd}"
+        $ErrorActionPreference = 'Continue'
         [Console]::OutputEncoding = [Text.Encoding]::Unicode
         $Result.Output = [String[]]@(& wsl @UpdateArgs 2>&1)
         $Result.ExitCode = $LASTEXITCODE
     } finally {
+        $ErrorActionPreference = $OriginalErrorActionPreference
         [Console]::OutputEncoding = $OriginalOutputEncoding
     }
 

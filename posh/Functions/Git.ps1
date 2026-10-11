@@ -289,12 +289,29 @@ Function Global:Invoke-GitMergeAllBranches {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     if (!$SourceBranch) {
-        $null = & git rev-parse -q --verify main 2>&1
+        try {
+            $ErrorActionPreference = 'Continue'
+            $null = & git rev-parse -q --verify main 2>&1
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -eq 0) {
             $SourceBranch = 'main'
         } else {
-            $null = & git rev-parse -q --verify master 2>&1
+            try {
+                $ErrorActionPreference = 'Continue'
+                $null = & git rev-parse -q --verify master 2>&1
+            } finally {
+                $ErrorActionPreference = $OriginalErrorActionPreference
+            }
+
             if ($LASTEXITCODE -ne 0) {
                 $ExcMsg = 'Unable to guess source branch to merge (not main or master).'
                 $ErrExc = [InvalidOperationException]::new($ExcMsg)

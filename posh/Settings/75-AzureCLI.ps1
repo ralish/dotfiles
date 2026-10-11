@@ -37,7 +37,19 @@ Function Initialize-AzureCli {
         $Env:_ARGCOMPLETE_STDOUT_FILENAME = $AzCompletionFile
         $Env:_ARGCOMPLETE_SUPPRESS_SPACE = 0
 
-        $null = & az 2>&1
+        # Workaround for engine behaviour on PowerShell releases prior to
+        # 7.2. On earlier releases, `$ErrorActionPreference` applies to
+        # redirected `stderr` output from native commands, resulting in
+        # termination if set to `Stop`.
+        $OriginalErrorActionPreference = $ErrorActionPreference
+
+        try {
+            $ErrorActionPreference = 'Continue'
+            $null = & az 2>&1
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         Get-Content -LiteralPath $AzCompletionFile | Sort-Object | ForEach-Object {
             [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
         }

@@ -18,6 +18,11 @@ Function Global:Update-OpenSSHConfig {
         '9.1' = @('RequiredRSASize')
     }
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     # OpenSSH outputs its version string on `stderr`. When redirecting to
     # `stdout`, Windows PowerShell creates an `ErrorRecord` for each line of
     # "error" output. While it's not a terminating error, custom prompts often
@@ -27,11 +32,13 @@ Function Global:Update-OpenSSHConfig {
     # with such prompts we clear the most recent error record if the error
     # count increased after retrieving the OpenSSH client version.
     try {
+        $ErrorActionPreference = 'Continue'
         $ErrorCount = $Error.Count
         $VersionArgs = @('-V')
         $VersionCmd = "ssh $($VersionArgs -join ' ')"
         $VersionRaw = @(& ssh @VersionArgs 2>&1) -join ''
     } finally {
+        $ErrorActionPreference = $OriginalErrorActionPreference
         if ($Error.Count -eq ($ErrorCount + 1)) {
             $Error.RemoveAt(0)
         }

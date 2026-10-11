@@ -54,11 +54,22 @@ Function Global:Update-Homebrew {
     $CleanupArgs = 'cleanup', '-s'
     $CleanupCmd = "brew $($CleanupArgs -join ' ')"
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     try {
         if ($PSCmdlet.ShouldProcess('Homebrew', 'Update')) {
             Write-Progress @WriteProgressParams -Status 'Updating Homebrew to latest version' -PercentComplete 1
             Write-Verbose -Message "Updating Homebrew: ${UpdateBrewCmd}"
-            $Result.Brew = [String[]]@(& brew @UpdateBrewArgs 2>&1)
+            try {
+                $ErrorActionPreference = 'Continue'
+                $Result.Brew = [String[]]@(& brew @UpdateBrewArgs 2>&1)
+            } finally {
+                $ErrorActionPreference = $OriginalErrorActionPreference
+            }
+
             if ($LASTEXITCODE -ne 0) {
                 $ExcMsg = "Homebrew update exited with non-zero exit code: ${LASTEXITCODE}"
                 $ErrExc = [Exception]::new($ExcMsg)
@@ -79,7 +90,13 @@ Function Global:Update-Homebrew {
 
         Write-Progress @WriteProgressParams -Status 'Updating casks & formulae' -PercentComplete 10
         Write-Verbose -Message "Updating Homebrew casks & formulae${DryrunMsg}: ${UpgradeAppsCmd}"
-        $Result.Apps = [String[]]@(& brew @UpgradeAppsArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            $Result.Apps = [String[]]@(& brew @UpgradeAppsArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Homebrew upgrade${DryrunMsg} exited with non-zero exit code: ${LASTEXITCODE}"
             $ErrExc = [Exception]::new($ExcMsg)
@@ -99,7 +116,13 @@ Function Global:Update-Homebrew {
 
         Write-Progress @WriteProgressParams -Status 'Cleaning-up outdated data' -PercentComplete 90
         Write-Verbose -Message "Cleaning-up outdated Homebrew data${DryrunMsg}: ${CleanupCmd}"
-        $Result.Cleanup = [String[]]@(& brew @CleanupArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            $Result.Cleanup = [String[]]@(& brew @CleanupArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Homebrew clean-up${DryrunMsg} exited with non-zero exit code: ${LASTEXITCODE}"
             $ErrExc = [Exception]::new($ExcMsg)

@@ -63,6 +63,11 @@ Function Global:Clear-NuGetCache {
         }
     }
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     foreach ($Cache in $Caches.Keys) {
         if ([String]::IsNullOrWhiteSpace($Caches[$Cache])) { continue }
 
@@ -71,7 +76,13 @@ Function Global:Clear-NuGetCache {
             $ClearCmd = "nuget $($ClearArgs -join ' ')"
 
             Write-Verbose -Message "Clearing NuGet ${Cache} cache: ${ClearCmd}"
-            [String[]]@(& nuget @ClearArgs 2>&1)
+            try {
+                $ErrorActionPreference = 'Continue'
+                [String[]]@(& nuget @ClearArgs 2>&1)
+            } finally {
+                $ErrorActionPreference = $OriginalErrorActionPreference
+            }
+
             if ($LASTEXITCODE -ne 0) {
                 $ExcMsg = "Failed to clear NuGet ${Cache} cache (rc: ${LASTEXITCODE})."
                 $ErrExc = [Exception]::new($ExcMsg)
@@ -132,6 +143,11 @@ Function Global:Update-DotNetTools {
     $UpdateArgs = 'tool', 'update', '--global'
     $UpdateCmd = "dotnet $($UpdateArgs -join ' ')"
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     try {
         # If we're running this version of `dotnet` for the first time the
         # welcome banner will display which may cause output parsing issues.
@@ -166,7 +182,13 @@ Function Global:Update-DotNetTools {
 
         Write-Progress @WriteProgressParams -Status 'Retrieving global tools' -PercentComplete 1
         Write-Verbose -Message "Retrieving .NET global tools: ${ListCmd}"
-        $Result.BeforeUpdate = [String[]]@(& dotnet @ListArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            $Result.BeforeUpdate = [String[]]@(& dotnet @ListArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to retrieve .NET global tools (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -191,8 +213,13 @@ Function Global:Update-DotNetTools {
 
             Write-Progress @WriteProgressParams -Status 'Updating global tools' -PercentComplete 10
             Write-Verbose -Message "Updating .NET global tools: ${UpdateCmd}"
-            $Result.Output = [String[]]@(& dotnet @UpdateArgs 2>&1)
-            $Result.ExitCode = $LASTEXITCODE
+            try {
+                $ErrorActionPreference = 'Continue'
+                $Result.Output = [String[]]@(& dotnet @UpdateArgs 2>&1)
+                $Result.ExitCode = $LASTEXITCODE
+            } finally {
+                $ErrorActionPreference = $OriginalErrorActionPreference
+            }
         } else {
             # Fallback approach for .NET versions prior to 8.0.403 (see above).
             # Enumerate all the installed tools and update each individually.
@@ -210,7 +237,12 @@ Function Global:Update-DotNetTools {
                 foreach ($Tool in $Tools) {
                     Write-Progress @WriteProgressParams -Status "Updating global tool: ${Tool}" -PercentComplete ($ToolsUpdated / $Tools.Count * 90 + 10)
                     Write-Verbose -Message "Updating .NET ${Tool} global tool: ${UpdateCmd} ${Tool}"
-                    $DotnetOutput.AddRange([String[]]@(& dotnet @UpdateArgs $Tool 2>&1))
+                    try {
+                        $ErrorActionPreference = 'Continue'
+                        $DotnetOutput.AddRange([String[]]@(& dotnet @UpdateArgs $Tool 2>&1))
+                    } finally {
+                        $ErrorActionPreference = $OriginalErrorActionPreference
+                    }
 
                     # Only the first non-zero exit code is retained
                     if ($null -eq $Result.ExitCode -or $Result.ExitCode -eq 0) {
@@ -243,7 +275,13 @@ Function Global:Update-DotNetTools {
 
         Write-Progress @WriteProgressParams -Status 'Retrieving global tools' -PercentComplete 90
         Write-Verbose -Message "Retrieving .NET global tools: ${ListCmd}"
-        $Result.AfterUpdate = [String[]]@(& dotnet @ListArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            $Result.AfterUpdate = [String[]]@(& dotnet @ListArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to retrieve .NET global tools (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -618,8 +656,19 @@ Function Global:Update-GoBinaries {
 
     $GupCmd = "gup $($GupArgs -join ' ')"
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     Write-Verbose -Message "Updating gup${CheckMsg}: ${GupCmd}"
-    $Result.Gup = [String[]]@(& gup @GupArgs 2>&1)
+    try {
+        $ErrorActionPreference = 'Continue'
+        $Result.Gup = [String[]]@(& gup @GupArgs 2>&1)
+    } finally {
+        $ErrorActionPreference = $OriginalErrorActionPreference
+    }
+
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to update gup${CheckMsg} (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -639,8 +688,14 @@ Function Global:Update-GoBinaries {
     $GupCmd = "gup $($GupArgs -join ' ')"
 
     Write-Verbose -Message "Updating Go binaries${CheckMsg}: ${GupCmd}"
-    $Result.Binaries = [String[]]@(& gup @GupArgs 2>&1)
-    $Result.ExitCode = $LASTEXITCODE
+    try {
+        $ErrorActionPreference = 'Continue'
+        $Result.Binaries = [String[]]@(& gup @GupArgs 2>&1)
+        $Result.ExitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $OriginalErrorActionPreference
+    }
+
     if ($Result.ExitCode -eq 0) {
         $Result.Success = $true
     } else {
@@ -974,9 +1029,20 @@ Function Global:Clear-NpmCache {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     if ($PSCmdlet.ShouldProcess($NpmCache, 'Clear')) {
         Write-Verbose -Message "Clearing npm cache: ${ClearCmd}"
-        [String[]]@(& npm @ClearArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]]@(& npm @ClearArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to clear npm cache (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1145,9 +1211,20 @@ Function Global:Update-NodejsPackages {
     $UpdateNpmArgs = $UpdateArgs + 'npm'
     $UpdateNpmCmd = "${UpdateCmd} npm"
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     if ($PSCmdlet.ShouldProcess('npm', 'Update')) {
         Write-Verbose -Message "Updating npm: ${UpdateNpmCmd}"
-        [String[]]@(& npm @UpdateNpmArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]]@(& npm @UpdateNpmArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update npm (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1159,7 +1236,13 @@ Function Global:Update-NodejsPackages {
 
     if ($PSCmdlet.ShouldProcess('Node.js packages', 'Update')) {
         Write-Verbose -Message "Updating Node.js packages: ${UpdateCmd}"
-        [String[]]@(& npm @UpdateArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]]@(& npm @UpdateArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update Node.js packages (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1282,7 +1365,18 @@ Function Global:Clear-PipCache {
     $ClearArgs = $PipModuleArgs + 'cache', 'purge', '-qqq'
     $ClearCmd = "python $($ClearArgs -join ' ')"
 
-    $null = & python @PipModuleArgs 2>&1
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
+    try {
+        $ErrorActionPreference = 'Continue'
+        $null = & python @PipModuleArgs 2>&1
+    } finally {
+        $ErrorActionPreference = $OriginalErrorActionPreference
+    }
+
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = 'Unable to clear pip cache as pip module not found.'
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1367,7 +1461,13 @@ Function Global:Clear-PipCache {
 
     if ($PSCmdlet.ShouldProcess($PipCachePaths -join ', ', 'Clear')) {
         Write-Verbose -Message "Clearing pip cache: ${ClearCmd}"
-        [String[]]@(& python @ClearArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]]@(& python @ClearArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to clear pip cache (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1409,9 +1509,20 @@ Function Global:Clear-UvCache {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     if ($PSCmdlet.ShouldProcess($UvCache, 'Clear')) {
         Write-Verbose -Message "Clearing uv cache: ${ClearCmd}"
-        [String[]]@(& uv @ClearArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]]@(& uv @ClearArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to clear uv cache (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1460,7 +1571,18 @@ Function Global:Update-PythonPipPackages {
 
     $PipUpdateBaseArgs = $PipModuleArgs + @('install', '--upgrade')
 
-    $null = & python @PipModuleArgs 2>&1
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
+    try {
+        $ErrorActionPreference = 'Continue'
+        $null = & python @PipModuleArgs 2>&1
+    } finally {
+        $ErrorActionPreference = $OriginalErrorActionPreference
+    }
+
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = 'Unable to update pip packages as pip module not found.'
         $ErrExc = [Exception]::new($ExcMsg)
@@ -1510,7 +1632,13 @@ Function Global:Update-PythonPipPackages {
         $PipUpdatePipCmd = "python $($PipUpdatePipArgs -join ' ')"
 
         Write-Verbose -Message "Updating pip package: ${PipUpdatePipCmd}"
-        [String[]]@(& python @PipUpdatePipArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]]@(& python @PipUpdatePipArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update pip (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1537,7 +1665,13 @@ Function Global:Update-PythonPipPackages {
         $PipUpdateCmd = "python $($PipUpdateArgs -join ' ')"
 
         Write-Verbose -Message "Updating pip packages: ${PipUpdateCmd} $($Packages -join ' ')"
-        [String[]]@(& python @PipUpdateArgs @Packages 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]]@(& python @PipUpdateArgs @Packages 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update pip packages (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1621,8 +1755,15 @@ Function Global:Update-PythonPipxPackages {
         }
     }
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     if ($PSCmdlet.ShouldProcess('pipx packages', 'Update')) {
         try {
+            $ErrorActionPreference = 'Continue'
+
             # Outputting emojis can be problematic on Windows. This isn't as
             # big an issue as it used to be but there's still some edge cases.
             # In particular, Python will default to MBCS encoding on Windows
@@ -1649,6 +1790,8 @@ Function Global:Update-PythonPipxPackages {
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
         } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+
             if ($OriginalUseEmoji) {
                 $Env:USE_EMOJI = $OriginalUseEmoji
             } else {
@@ -1728,8 +1871,19 @@ Function Global:Update-QtComponents {
 
         $QtMtCmd = "MaintenanceTool $($QtMtArgs -join ' ')"
 
+        # Workaround for engine behaviour on PowerShell releases prior to 7.2.
+        # On earlier releases, `$ErrorActionPreference` applies to redirected
+        # `stderr` output from native commands, resulting in termination if set
+        # to `Stop`.
+        $OriginalErrorActionPreference = $ErrorActionPreference
+
         Write-Verbose -Message "Updating Qt components: ${QtMtCmd}"
-        [String[]]@(& $QtMtPath @QtMtArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]]@(& $QtMtPath @QtMtArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
 
         # PackageManagerCore::Status enum
         # https://doc.qt.io/qtinstallerframework/qinstaller-packagemanagercore.html#Status-enum
@@ -1795,9 +1949,20 @@ Function Global:Clear-GemCache {
         $PSCmdlet.ThrowTerminatingError($ErrRec)
     }
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     if ($PSCmdlet.ShouldProcess($GemSpecCache, 'Clear')) {
         Write-Verbose -Message "Clearing gem cache: ${ClearCmd}"
-        [String[]](& gem @ClearArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]](& gem @ClearArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to clear gem cache (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -1969,10 +2134,21 @@ Function Global:Update-RubyGems {
     $CleanupArgs = @('cleanup')
     $CleanupCmd = "gem $($CleanupArgs -join ' ')"
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     # It's not possible to simulate a RubyGems system update
     if ($PSCmdlet.ShouldProcess('RubyGems system', 'Update')) {
         Write-Verbose -Message "Updating RubyGems system: ${UpdateSystemCmd}"
-        [String[]]@(& gem @UpdateSystemArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]]@(& gem @UpdateSystemArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update RubyGems system (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -2007,7 +2183,13 @@ Function Global:Update-RubyGems {
     }
 
     Write-Verbose -Message "Updating Ruby gems${ExplainMsg}: ${UpdateCmd} $($Packages -join ' ')"
-    [String[]]@(& gem @UpdateArgs @Packages 2>&1)
+    try {
+        $ErrorActionPreference = 'Continue'
+        [String[]]@(& gem @UpdateArgs @Packages 2>&1)
+    } finally {
+        $ErrorActionPreference = $OriginalErrorActionPreference
+    }
+
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to update Ruby gems${ExplainMsg} (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -2024,7 +2206,13 @@ Function Global:Update-RubyGems {
     }
 
     Write-Verbose -Message "Uninstalling obsolete Ruby gems${DryrunMsg}: ${CleanupCmd}"
-    [String[]]@(& gem @CleanupArgs 2>&1)
+    try {
+        $ErrorActionPreference = 'Continue'
+        [String[]]@(& gem @CleanupArgs 2>&1)
+    } finally {
+        $ErrorActionPreference = $OriginalErrorActionPreference
+    }
+
     if ($LASTEXITCODE -ne 0) {
         $ExcMsg = "Failed to uninstall obsolete Ruby gems${DryrunMsg} (rc: ${LASTEXITCODE})."
         $ErrExc = [Exception]::new($ExcMsg)
@@ -2173,9 +2361,20 @@ Function Global:Update-RustToolchains {
     $UpdateArgs = @('update')
     $UpdateCmd = "rustup $($UpdateArgs -join ' ')"
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     if ($PSCmdlet.ShouldProcess('Rust toolchains', 'Update')) {
         Write-Verbose -Message "Updating Rust toolchains: ${UpdateCmd}"
-        [String[]]@(& rustup @UpdateArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]]@(& rustup @UpdateArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         if ($LASTEXITCODE -ne 0) {
             $ExcMsg = "Failed to update Rust toolchains (rc: ${LASTEXITCODE})."
             $ErrExc = [Exception]::new($ExcMsg)
@@ -2185,7 +2384,13 @@ Function Global:Update-RustToolchains {
         }
     } else {
         Write-Verbose -Message "Checking for Rust toolchain updates: ${CheckCmd}"
-        [String[]]@(& rustup @CheckArgs 2>&1)
+        try {
+            $ErrorActionPreference = 'Continue'
+            [String[]]@(& rustup @CheckArgs 2>&1)
+        } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
+        }
+
         # 0: Up-to-date, 100: Update available
         if ($LASTEXITCODE -notin 0, 100) {
             $ExcMsg = "Failed to check for Rust toolchain updates (rc: ${LASTEXITCODE})."
