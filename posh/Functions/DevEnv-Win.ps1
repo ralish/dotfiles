@@ -311,14 +311,23 @@ Function Global:Update-MSYS2 {
         $OriginalMsystemEnv = $Env:MSYSTEM
         $OriginalOutputEncoding = [Console]::OutputEncoding
 
+        # Workaround for engine behaviour on PowerShell releases prior to 7.2.
+        # On earlier releases, `$ErrorActionPreference` applies to redirected
+        # `stderr` output from native commands, resulting in termination if set
+        # to `Stop`.
+        $OriginalErrorActionPreference = $ErrorActionPreference
+
         try {
+            $ErrorActionPreference = 'Continue'
+            [Console]::OutputEncoding = [Text.Encoding]::UTF8
+
             # Set the login shell for the MSYS2 environment
             $Env:MSYSTEM = 'MSYS'
 
-            [Console]::OutputEncoding = [Text.Encoding]::UTF8
             $Result.Output = [String[]]@(& $Bash -l -c $Command 2>&1)
             $Result.ExitCode = $LASTEXITCODE
         } finally {
+            $ErrorActionPreference = $OriginalErrorActionPreference
             [Console]::OutputEncoding = $OriginalOutputEncoding
 
             if ($OriginalMsystemEnv) {
@@ -901,9 +910,19 @@ Function Global:Update-Python {
         $Result.WhatIf = $true
     }
 
+    # Workaround for engine behaviour on PowerShell releases prior to 7.2. On
+    # earlier releases, `$ErrorActionPreference` applies to redirected `stderr`
+    # output from native commands, resulting in termination if set to `Stop`.
+    $OriginalErrorActionPreference = $ErrorActionPreference
+
     Write-Verbose -Message "Updating Python runtimes${DryrunMsg}: ${UpdateCmd}"
-    $Result.Output = [String[]]@(& pymanager @UpdateArgs 2>&1)
-    $Result.ExitCode = $LASTEXITCODE
+    try {
+        $ErrorActionPreference = 'Continue'
+        $Result.Output = [String[]]@(& pymanager @UpdateArgs 2>&1)
+        $Result.ExitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $OriginalErrorActionPreference
+    }
 
     if ($Result.ExitCode -eq 0) {
         $Result.Success = $true
