@@ -18,14 +18,23 @@ openssh/bin/*                   text        eol=lf
 scripts/bin/*                   text        eol=lf
 
 # Remote Desktop Connection files should be UTF-16LE
-*.rdp                                       working-tree-encoding=UTF-16LE-BOM
-mstsc/Template.ini                          working-tree-encoding=UTF-16LE-BOM
+*.rdp                           working-tree-encoding=UTF-16LE-BOM
+mstsc/Template.ini              working-tree-encoding=UTF-16LE-BOM
 
 # Windows Registry files should be UTF-16LE
-*.reg                                       working-tree-encoding=UTF-16LE-BOM
+*.reg                           working-tree-encoding=UTF-16LE-BOM
 
 # Language detection overrides for Linguist
+*.inf                           linguist-language=ini
+*.vsconfig                      linguist-language=json
+*.wsb                           linguist-language=xml
+.psqlrc                         linguist-language=plpgsql
+.stow-local-ignore              linguist-language=ignore
+.wslconfig                      linguist-language=ini
 .vscode/*.json                  linguist-language=jsonc
+office/**/*.cls                 linguist-language=vba
+themes/**/dircolors.*           linguist-language=dircolors
+tmux/**/*.conf                  linguist-language=shell
 vscode/*.json                   linguist-language=jsonc
 winget/*.json                   linguist-language=jsonc
 winterm/*.json                  linguist-language=jsonc
