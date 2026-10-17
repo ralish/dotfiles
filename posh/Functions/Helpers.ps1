@@ -409,6 +409,7 @@ Function Invoke-DotFilesAsyncTask {
     if ($Global:AsyncLoadQueue.Count -ne 0) {
         try {
             $Global:DotFilesIsAsync = $true
+            $MoreAsyncTasks = $true
 
             # `$null` assignment should be unnecessary but is a precaution
             # against accidental pipeline pollution from uncaptured output.
@@ -420,14 +421,13 @@ Function Invoke-DotFilesAsyncTask {
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'DotFilesAsyncTaskFailure', $ErrCat, $null)
             $PSCmdlet.WriteError($ErrRec)
         } finally {
+            if ($Global:AsyncLoadQueue.Count -eq 0) {
+                $MoreAsyncTasks = $false
+                Write-DotFilesMessage -Type 'Verbose' -SectionType 'Profile' -SectionName 'End' -Message 'Finished asynchronous processing.'
+            }
+
             $Global:DotFilesIsAsync = $false
         }
-    }
-
-    $MoreAsyncTasks = $true
-    if ($Global:AsyncLoadQueue.Count -eq 0) {
-        $MoreAsyncTasks = $false
-        Write-DotFilesMessage -Type 'Verbose' -SectionType 'Profile' -SectionName 'End' -Message 'Finished asynchronous processing.'
     }
 
     return $MoreAsyncTasks
