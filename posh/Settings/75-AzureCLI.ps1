@@ -12,7 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup Azure CLI configuration
 Function Initialize-AzureCli {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'wordToComplete')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'WordToComplete')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -24,10 +24,10 @@ Function Initialize-AzureCli {
     # https://learn.microsoft.com/en-au/cli/azure/install-azure-cli-windows
     Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
     Register-ArgumentCompleter -Native -CommandName 'az' -ScriptBlock {
-        Param($wordToComplete, $commandAst, $cursorPosition)
+        Param($WordToComplete, $CommandAst, $CursorPosition)
 
-        $Env:COMP_LINE = $commandAst
-        $Env:COMP_POINT = $cursorPosition
+        $Env:COMP_LINE = $CommandAst
+        $Env:COMP_POINT = $CursorPosition
 
         $AzCompletionFile = New-TemporaryFile
         $Env:ARGCOMPLETE_USE_TEMPFILES = 1

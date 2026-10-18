@@ -97,7 +97,7 @@ Function Get-DotNetCliCompletionsType {
 # https://learn.microsoft.com/en-au/dotnet/core/tools/enable-tab-autocomplete
 Function Import-DotNetCliCompletions {
     [Diagnostics.CodeAnalysis.SuppressMessage('PSUseSingularNouns', '')]
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'wordToComplete')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'WordToComplete')]
     [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidUsingInvokeExpression', '')]
     [CmdletBinding()]
     [OutputType([Void])]
@@ -110,9 +110,9 @@ Function Import-DotNetCliCompletions {
         'Dynamic' {
             Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
             Register-ArgumentCompleter -Native -CommandName 'dotnet' -ScriptBlock {
-                Param($wordToComplete, $commandAst, $cursorPosition)
+                Param($WordToComplete, $CommandAst, $CursorPosition)
 
-                & dotnet complete --position $cursorPosition $commandAst.ToString() | ForEach-Object {
+                & dotnet complete --position $CursorPosition $CommandAst.ToString() | ForEach-Object {
                     [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
                 }
             }

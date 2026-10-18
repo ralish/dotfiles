@@ -12,8 +12,8 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup PuTTY configuration
 Function Initialize-PuTTY {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'commandAst')]
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'cursorPosition')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'CommandAst')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'CursorPosition')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -24,7 +24,7 @@ Function Initialize-PuTTY {
     Write-DotFilesMessage -Type 'Verbose' -Message 'Registering native argument completer ...'
     $PuttyCmds = 'plink', 'pscp', 'psftp', 'putty'
     Register-ArgumentCompleter -Native -CommandName $PuttyCmds -ScriptBlock {
-        Param($wordToComplete, $commandAst, $cursorPosition)
+        Param($WordToComplete, $CommandAst, $CursorPosition)
 
         # Registry key for saved sessions
         $SessionsPath = 'HKCU:\Software\SimonTatham\PuTTY\Sessions'
@@ -53,7 +53,7 @@ Function Initialize-PuTTY {
             $Result.ToString()
         }
 
-        $SessionName = $wordToComplete.Trim('"', "'")
+        $SessionName = $WordToComplete.Trim('"', "'")
         $Sessions | Where-Object {
             $PSItem.StartsWith($SessionName, [StringComparison]::CurrentCultureIgnoreCase)
         } | ForEach-Object {

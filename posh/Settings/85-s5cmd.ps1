@@ -11,8 +11,8 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Initialize s5cmd configuration
 Function Initialize-S5Cmd {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'commandAst')]
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'cursorPosition')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'CommandAst')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'CursorPosition')]
     [Diagnostics.CodeAnalysis.SuppressMessage('PSAvoidUsingInvokeExpression', '')]
     [CmdletBinding()]
     [OutputType([Void])]
@@ -20,9 +20,9 @@ Function Initialize-S5Cmd {
 
     Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
     Register-ArgumentCompleter -Native -CommandName 's5cmd' -ScriptBlock {
-        Param($wordToComplete, $commandAst, $cursorPosition)
+        Param($WordToComplete, $CommandAst, $CursorPosition)
 
-        $Completion = "$wordToComplete --generate-bash-completion"
+        $Completion = "$WordToComplete --generate-bash-completion"
         Invoke-Expression -Command $Completion | ForEach-Object { # DevSkim: ignore DS104456
             [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
         }

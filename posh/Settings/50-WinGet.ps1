@@ -15,12 +15,12 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 # https://learn.microsoft.com/en-au/windows/package-manager/winget/tab-completion
 Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
 Register-ArgumentCompleter -Native -CommandName 'winget' -ScriptBlock {
-    Param($wordToComplete, $commandAst, $cursorPosition)
+    Param($WordToComplete, $CommandAst, $CursorPosition)
 
     [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [Text.UTF8Encoding]::new()
-    $Word = $wordToComplete.Replace('"', '""')
-    $Ast = $commandAst.ToString().Replace('"', '""')
-    & winget complete --word=$Word --commandline $Ast --position $cursorPosition | ForEach-Object {
+    $Word = $WordToComplete.Replace('"', '""')
+    $Ast = $CommandAst.ToString().Replace('"', '""')
+    & winget complete --word=$Word --commandline $Ast --position $CursorPosition | ForEach-Object {
         [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
     }
 }

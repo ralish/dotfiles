@@ -12,7 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `dotnet-suggest` configuration
 Function Initialize-DotNetSuggest {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'wordToComplete')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'WordToComplete')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -40,11 +40,11 @@ Function Initialize-DotNetSuggest {
 
     Write-DotFilesMessage -Type 'Verbose' -Message "Registering dynamic argument completer for $($RegisteredApps.Count) command(s)."
     Register-ArgumentCompleter -Native -CommandName $RegisteredApps -ScriptBlock {
-        Param($wordToComplete, $commandAst, $cursorPosition)
+        Param($WordToComplete, $CommandAst, $CursorPosition)
 
-        $CommandPath = (Get-Command -Name $commandAst.CommandElements[0]).Source
+        $CommandPath = (Get-Command -Name $CommandAst.CommandElements[0]).Source
         $CommandArgs = $CommandAst.Extent.ToString().Replace('"', '\"')
-        & dotnet-suggest get -e $CommandPath --position $cursorPosition -- $CommandArgs | ForEach-Object {
+        & dotnet-suggest get -e $CommandPath --position $CursorPosition -- $CommandArgs | ForEach-Object {
             [Management.Automation.CompletionResult]::new($PSItem, $PSItem, 'ParameterValue', $PSItem)
         }
     }

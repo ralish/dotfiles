@@ -12,7 +12,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup AWS CLI configuration
 Function Initialize-AwsCli {
-    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'wordToComplete')]
+    [Diagnostics.CodeAnalysis.SuppressMessage('PSReviewUnusedParameter', 'WordToComplete')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -24,17 +24,17 @@ Function Initialize-AwsCli {
     # https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html
     Write-DotFilesMessage -Type 'Verbose' -Message 'Registering dynamic argument completer ...'
     Register-ArgumentCompleter -Native -CommandName 'aws' -ScriptBlock {
-        Param($wordToComplete, $commandAst, $cursorPosition)
+        Param($WordToComplete, $CommandAst, $CursorPosition)
 
-        $Env:COMP_LINE = $commandAst.ToString()
-        $Env:COMP_POINT = $cursorPosition
+        $Env:COMP_LINE = $CommandAst.ToString()
+        $Env:COMP_POINT = $CursorPosition
 
         # `ToString()` in `System.Management.Automation.Language.CommandAst` trims
         # any trailing whitespace from the command which will break our emulated
         # `bash`-style command completion. Append a single whitespace character if
         # the cursor position is beyond the length of the entered command as a
         # simple workaround.
-        if ($cursorPosition -gt $Env:COMP_LINE.Length) {
+        if ($CursorPosition -gt $Env:COMP_LINE.Length) {
             $Env:COMP_LINE = "${Env:COMP_LINE} "
         }
 
