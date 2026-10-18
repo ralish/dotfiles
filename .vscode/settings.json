@@ -141,7 +141,7 @@
   },
 
   // Markdown table of contents generation
-  "markdown.extension.toc.levels": "2..2",
+  "markdown.extension.toc.levels": "2..3",
   "markdown.extension.toc.slugifyMode": "github",
 
   // PowerShell script analysis

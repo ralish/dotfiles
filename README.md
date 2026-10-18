@@ -4,6 +4,8 @@ dotfiles
 [![license](https://img.shields.io/github/license/ralish/dotfiles)](https://choosealicense.com/licenses/unlicense/)
 
 - [Usage](#usage)
+  - [Unix-like](#unix-like)
+  - [Windows](#windows)
 - [Objectives](#objectives)
 - [Management](#management)
 - [Tested environments](#tested-environments)
