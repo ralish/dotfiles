@@ -249,7 +249,7 @@ Function Global:Update-MSYS2 {
             [Parameter(Mandatory)]
             [String]$Bash,
 
-            [Switch]$Fatal
+            [Switch]$ThrowOnError
         )
 
         $VersionArgs = '-Q', 'msys2-runtime'
@@ -264,7 +264,7 @@ Function Global:Update-MSYS2 {
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $VersionCmd)
 
-            if ($Fatal) {
+            if ($ThrowOnError) {
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
@@ -276,7 +276,7 @@ Function Global:Update-MSYS2 {
         if ($ResultOutput -notmatch '\bmsys2-runtime\s+(\S+)\b') {
             $Msg = "Failed to extract MSYS2 runtime version: ${ResultOutput}"
 
-            if ($Fatal) {
+            if ($ThrowOnError) {
                 $ErrExc = [FormatException]::new($Msg)
                 $ErrCat = [Management.Automation.ErrorCategory]::ParserError
                 $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'RegexMatchFailed', $ErrCat, $ResultOutput)
@@ -393,7 +393,7 @@ Function Global:Update-MSYS2 {
     $UpgradeReportOnlyArgs = @('-Qu')
     $UpgradeReportOnlyCmd = "pacman $($UpgradeReportOnlyArgs -join ' ')"
 
-    $Result.BeforeUpdate = Get-MSYS2Version -Bash $BashPath -Fatal
+    $Result.BeforeUpdate = Get-MSYS2Version -Bash $BashPath -ThrowOnError
 
     if ($PSCmdlet.ShouldProcess('MSYS2 package databases', 'Refresh')) {
         Write-Verbose -Message "Refreshing MSYS2 package databases: ${RefreshCmd}"

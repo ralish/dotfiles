@@ -1352,7 +1352,7 @@ Function Global:Update-WSL {
         [CmdletBinding()]
         [OutputType([Void], [PSCustomObject])]
         Param(
-            [Switch]$Fatal
+            [Switch]$ThrowOnError
         )
 
         $StatusArgs = @('--status')
@@ -1397,7 +1397,7 @@ Function Global:Update-WSL {
             $ErrExc = [Exception]::new($ExcMsg)
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $null)
 
-            if ($Fatal) {
+            if ($ThrowOnError) {
                 $PSCmdlet.ThrowTerminatingError($ErrRec)
             }
 
@@ -1471,7 +1471,7 @@ Function Global:Update-WSL {
     $UpdateArgs = @('--update')
     $UpdateCmd = "wsl $($UpdateArgs -join ' ')"
 
-    $Result.BeforeUpdate = Get-WSLVersion -Fatal
+    $Result.BeforeUpdate = Get-WSLVersion -ThrowOnError
 
     if (!$PSCmdlet.ShouldProcess('WSL', 'Update')) {
         $Result.Success = $true
