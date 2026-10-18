@@ -1,68 +1,68 @@
 {
-    /*
-     * Windows Package Manager (WinGet) settings
-     * https://learn.microsoft.com/en-au/windows/package-manager/winget/
-     *
-     * Last reviewed release: v1.29.380
-     * File path: `%LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json`
-     */
+  /*
+   * Windows Package Manager (WinGet) settings
+   * https://learn.microsoft.com/en-au/windows/package-manager/winget/
+   *
+   * Last reviewed release: v1.29.380
+   * File path: `%LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\settings.json`
+   */
 
-    "$help": "https://aka.ms/winget-settings",
-    "$schema": "https://aka.ms/winget-settings.schema.json",
+  "$help": "https://aka.ms/winget-settings",
+  "$schema": "https://aka.ms/winget-settings.schema.json",
 
-    "interactivity": {
-        "disable": false
-    },
+  "interactivity": {
+    "disable": false
+  },
 
-    "logging": {
-        "level": "info",
-        "channels": ["default"],
-        "fileNameStrategy": "manifest",
-        "file": {
-            "countLimit": 0,
-            "ageLimitInDays": 7,
-            "individualSizeLimitInMB": 16,
-            "totalSizeLimitInMB": 128
-        }
-    },
-
-    "network": {
-        "downloader": "default",
-        "doProgressTimeoutInSeconds": 60
-    },
-
-    "output": {
-        "sortOrder": ["name"],
-        "sortDirection": "ascending"
-    },
-
-    "source": {
-        "autoUpdateIntervalInMinutes": 15
-    },
-
-    "telemetry": {
-        "disable": true
-    },
-
-    "visual": {
-        "anonymizeDisplayedPaths": true,
-        "enableSixels": true,
-        "progressBar": "accent"
-    },
-
-    "installBehavior": {
-        "archiveExtractionMethod": "shellApi",
-        "disableInstallNotes": false,
-        "maxResumes": 3,
-        "skipDependencies": false,
-
-        "preferences": {
-            "locale": ["en-AU", "en-GB", "en-US"],
-            "scope": "user"
-        }
-    },
-
-    "uninstallBehavior": {
-        "purgePortablePackage": false
+  "logging": {
+    "level": "info",
+    "channels": ["default"],
+    "fileNameStrategy": "manifest",
+    "file": {
+      "countLimit": 0,
+      "ageLimitInDays": 7,
+      "individualSizeLimitInMB": 16,
+      "totalSizeLimitInMB": 128
     }
+  },
+
+  "network": {
+    "downloader": "default",
+    "doProgressTimeoutInSeconds": 60
+  },
+
+  "output": {
+    "sortOrder": ["name"],
+    "sortDirection": "ascending"
+  },
+
+  "source": {
+    "autoUpdateIntervalInMinutes": 15
+  },
+
+  "telemetry": {
+    "disable": true
+  },
+
+  "visual": {
+    "anonymizeDisplayedPaths": true,
+    "enableSixels": true,
+    "progressBar": "accent"
+  },
+
+  "installBehavior": {
+    "archiveExtractionMethod": "shellApi",
+    "disableInstallNotes": false,
+    "maxResumes": 3,
+    "skipDependencies": false,
+
+    "preferences": {
+      "locale": ["en-AU", "en-GB", "en-US"],
+      "scope": "user"
+    }
+  },
+
+  "uninstallBehavior": {
+    "purgePortablePackage": false
+  }
 }

@@ -16,6 +16,10 @@ insert_final_newline = true
 [*.js]
 indent_size = 2
 
+# JSON
+[*.{json,jsonc}]
+indent_size = 2
+
 # Markdown
 [*.md]
 indent_size = 2
@@ -54,6 +58,10 @@ insert_final_newline = false
 # PowerShell
 [*.ps1xml]
 insert_final_newline = false
+
+# Prettier
+[.prettierrc]
+indent_size = 2
 
 # Remote Desktop Connection
 [{**.rdp,mstsc/Template.ini}]

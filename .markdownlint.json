@@ -1,8 +1,8 @@
 {
-    "default": true,
-    "heading-style": { "style": "setext_with_atx" },
-    "line-length": false,
-    "descriptive-link-text": false
+  "default": true,
+  "heading-style": { "style": "setext_with_atx" },
+  "line-length": false,
+  "descriptive-link-text": false
 }
 
-// vim: syntax=jsonc ts=4 sw=4 sts=4 et sr
+// vim: syntax=jsonc ts=2 sw=2 sts=2 et sr

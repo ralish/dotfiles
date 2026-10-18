@@ -1,366 +1,366 @@
 {
-    // File paths to language mappings
-    //
-    // Associations to the "plaintext" type are generally for hinting the
-    // vscode-icons extension as to the preferred icon.
-    "files.associations": {
-        // generic
-        "VERSION": "plaintext",
-        // root
-        ".ignore": "ignore",
-        "dot-manage": "shellscript",
-        "dot-update": "shellscript",
-        // bash
-        ".bash_logout": "shellscript",
-        ".bashrc": "shellscript",
-        ".profile": "shellscript",
-        // bazaar
-        "**/.bazaar/*.conf": "ini",
-        // clink
-        "clink_history*": "plaintext",
-        "clink_settings": "properties",
-        // csh
-        ".cshrc": "properties", // csh is not compatible with `shellscript`
-        // curl
-        ".curlrc": "properties",
-        // cygwin
-        ".startxwinrc": "shellscript",
-        // dig
-        ".digrc": "properties",
-        // editline
-        ".editrc": "properties",
-        // git
-        ".gitattributes": "properties",
-        ".gitconfig": "ini",
-        ".gitconfig-*": "ini",
-        ".gitignore": "ignore",
-        ".gitmodules": "ini",
-        "**/git/bin/*": "shellscript",
-        "**/git/hooks/*": "shellscript",
-        // git-win
-        ".git-for-windows-updater": "ini",
-        // htop
-        "htoprc": "properties",
-        // irssi
-        "**/irssi/.irssi/*": "plaintext",
-        // jetbrains
-        "*.DotSettings": "xml",
-        // kpcli
-        "**/kpcli/bin/*": "perl",
-        // less
-        ".lesskey": "properties",
-        // markdownlint
-        ".markdownlint.json": "jsonc",
-        // mstsc
-        "*.rdp": "ini",
-        // mysql
-        ".my.cnf": "ini",
-        // npm
-        ".npmrc": "properties",
-        // openssh
-        "**/.ssh/config": "ssh_config",
-        "**/.ssh/known_hosts": "plaintext",
-        "**/.ssh/known_hosts.old": "plaintext",
-        "**/.ssh/hosts/*": "plaintext",
-        "**/.ssh/includes/*": "ssh_config",
-        "**/.ssh/templates/*": "ssh_config",
-        "**/openssh/bin/*": "shellscript",
-        // openssl
-        "**/openssl/*.cnf": "ini",
-        // pgsql
-        ".psqlrc": "sql",
-        // pip
-        "pip.conf": "ini",
-        // prettier
-        ".prettierignore": "ignore",
-        ".prettierrc": "json",
-        // quilt
-        ".quiltrc": "shellscript",
-        // readline
-        ".inputrc": "properties",
-        // ripgrep
-        ".ripgreprc": "properties",
-        // sbuild
-        ".mk-sbuild.rc": "shellscript",
-        // screen
-        ".screenrc": "properties",
-        // scripts
-        "**/scripts/bin/*": "shellscript",
-        // shellcheck
-        ".shellcheckrc": "properties",
-        // stow
-        ".stow-local-ignore": "plaintext",
-        "**/stow/bin/*": "perl",
-        // subversion
-        "**/.subversion/config": "ini",
-        "**/.subversion/servers": "ini",
-        // tcsh
-        ".tcshrc": "properties", // tcsh is not compatible with `shellscript`
-        // vscode
-        "**/vscode/*.json": "jsonc",
-        // wget
-        ".wgetrc": "properties",
-        // windows/Windows Sandbox
-        "*.wsb": "xml",
-        // winget
-        "**/winget/*.json": "jsonc",
-        // winterm
-        "**/winterm/*.json": "jsonc",
-        // wsl
-        ".wslconfig": "ini",
-        "wsl.conf": "ini",
-        // xdg-user-dir
-        "user-dirs.dirs": "shellscript",
-        "user-dirs.locale": "plaintext",
-        // xlaunch
-        "*.xlaunch": "xml",
-        // zsh
-        ".zlogout": "shellscript",
-        ".zshrc": "shellscript"
+  // File paths to language mappings
+  //
+  // Associations to the "plaintext" type are generally for hinting the
+  // vscode-icons extension as to the preferred icon.
+  "files.associations": {
+    // generic
+    "VERSION": "plaintext",
+    // root
+    ".ignore": "ignore",
+    "dot-manage": "shellscript",
+    "dot-update": "shellscript",
+    // bash
+    ".bash_logout": "shellscript",
+    ".bashrc": "shellscript",
+    ".profile": "shellscript",
+    // bazaar
+    "**/.bazaar/*.conf": "ini",
+    // clink
+    "clink_history*": "plaintext",
+    "clink_settings": "properties",
+    // csh
+    ".cshrc": "properties", // csh is not compatible with `shellscript`
+    // curl
+    ".curlrc": "properties",
+    // cygwin
+    ".startxwinrc": "shellscript",
+    // dig
+    ".digrc": "properties",
+    // editline
+    ".editrc": "properties",
+    // git
+    ".gitattributes": "properties",
+    ".gitconfig": "ini",
+    ".gitconfig-*": "ini",
+    ".gitignore": "ignore",
+    ".gitmodules": "ini",
+    "**/git/bin/*": "shellscript",
+    "**/git/hooks/*": "shellscript",
+    // git-win
+    ".git-for-windows-updater": "ini",
+    // htop
+    "htoprc": "properties",
+    // irssi
+    "**/irssi/.irssi/*": "plaintext",
+    // jetbrains
+    "*.DotSettings": "xml",
+    // kpcli
+    "**/kpcli/bin/*": "perl",
+    // less
+    ".lesskey": "properties",
+    // markdownlint
+    ".markdownlint.json": "jsonc",
+    // mstsc
+    "*.rdp": "ini",
+    // mysql
+    ".my.cnf": "ini",
+    // npm
+    ".npmrc": "properties",
+    // openssh
+    "**/.ssh/config": "ssh_config",
+    "**/.ssh/known_hosts": "plaintext",
+    "**/.ssh/known_hosts.old": "plaintext",
+    "**/.ssh/hosts/*": "plaintext",
+    "**/.ssh/includes/*": "ssh_config",
+    "**/.ssh/templates/*": "ssh_config",
+    "**/openssh/bin/*": "shellscript",
+    // openssl
+    "**/openssl/*.cnf": "ini",
+    // pgsql
+    ".psqlrc": "sql",
+    // pip
+    "pip.conf": "ini",
+    // prettier
+    ".prettierignore": "ignore",
+    ".prettierrc": "json",
+    // quilt
+    ".quiltrc": "shellscript",
+    // readline
+    ".inputrc": "properties",
+    // ripgrep
+    ".ripgreprc": "properties",
+    // sbuild
+    ".mk-sbuild.rc": "shellscript",
+    // screen
+    ".screenrc": "properties",
+    // scripts
+    "**/scripts/bin/*": "shellscript",
+    // shellcheck
+    ".shellcheckrc": "properties",
+    // stow
+    ".stow-local-ignore": "plaintext",
+    "**/stow/bin/*": "perl",
+    // subversion
+    "**/.subversion/config": "ini",
+    "**/.subversion/servers": "ini",
+    // tcsh
+    ".tcshrc": "properties", // tcsh is not compatible with `shellscript`
+    // vscode
+    "**/vscode/*.json": "jsonc",
+    // wget
+    ".wgetrc": "properties",
+    // windows/Windows Sandbox
+    "*.wsb": "xml",
+    // winget
+    "**/winget/*.json": "jsonc",
+    // winterm
+    "**/winterm/*.json": "jsonc",
+    // wsl
+    ".wslconfig": "ini",
+    "wsl.conf": "ini",
+    // xdg-user-dir
+    "user-dirs.dirs": "shellscript",
+    "user-dirs.locale": "plaintext",
+    // xlaunch
+    "*.xlaunch": "xml",
+    // zsh
+    ".zlogout": "shellscript",
+    ".zshrc": "shellscript"
+  },
+
+  // Files to hide in Explorer tree
+  "files.exclude": {
+    "**/.venv": true,
+    "**/~$*.doc*": true,
+    "**/~$*.ppt*": true,
+    "**/~$*.xls*": true,
+    "**/clink_errorlevel_*.txt": true,
+    "**/desktop.ini": true
+  },
+
+  // Excludes for search & quick open
+  "search.exclude": {
+    "**/modules/": true,
+    "**/posh/Help/": true,
+    "**/posh/Modules/": true,
+    "**/pwsh/": true,
+    "**/vim/.vim/": true,
+    "**/zsh/.oh-my-zsh/": true,
+    "**/zsh/oh-my-zsh/": true
+  },
+
+  // Markdown table of contents generation
+  "markdown.extension.toc.levels": "2..2",
+  "markdown.extension.toc.slugifyMode": "github",
+
+  // PowerShell script analysis
+  "powershell.scriptAnalysis.settingsPath": ".config/PSScriptAnalyzerSettings.psd1",
+
+  // Prettier formatter settings
+  //
+  // Ordinarily these are set via the EditorConfig and Prettier configuration
+  // files, but they only apply to files within the workspace. The VS Code
+  // user settings file is external to the workspace, and although in our
+  // setup it's a symlink to a file in the repository, its real path is not
+  // resolved when opened via the editor command. The settings here mirror
+  // the referenced configuration files to ensure formatting is consistent
+  // when the VS Code user settings file is modified through that entrypoint.
+  "prettier.endOfLine": "auto",
+  "prettier.printWidth": 79,
+  "prettier.singleQuote": true,
+  "prettier.tabWidth": 4,
+  "prettier.trailingComma": "none",
+
+  // Excludes for ShellCheck linter
+  "shellcheck.ignorePatterns": {
+    "**/*.cshrc": true,
+    "**/*.tcshrc": true,
+    "**/*.zsh": true,
+    "**/.zshrc": true
+  },
+
+  // VS Code explorer icons
+  "vsicons.presets.foldersAllDefaultIcon": true,
+  "vsicons.associations.files": [
+    {
+      "icon": "binary",
+      "extensions": ["ocb", "pmf"],
+      "format": "svg"
     },
-
-    // Files to hide in Explorer tree
-    "files.exclude": {
-        "**/.venv": true,
-        "**/~$*.doc*": true,
-        "**/~$*.ppt*": true,
-        "**/~$*.xls*": true,
-        "**/clink_errorlevel_*.txt": true,
-        "**/desktop.ini": true
+    {
+      "icon": "binary",
+      "extensions": [".less"],
+      "filename": true,
+      "format": "svg"
     },
-
-    // Excludes for search & quick open
-    "search.exclude": {
-        "**/modules/": true,
-        "**/posh/Help/": true,
-        "**/posh/Modules/": true,
-        "**/pwsh/": true,
-        "**/vim/.vim/": true,
-        "**/zsh/.oh-my-zsh/": true,
-        "**/zsh/oh-my-zsh/": true
+    {
+      "icon": "config",
+      "extensions": ["prf"],
+      "format": "svg"
     },
-
-    // Markdown table of contents generation
-    "markdown.extension.toc.levels": "2..2",
-    "markdown.extension.toc.slugifyMode": "github",
-
-    // PowerShell script analysis
-    "powershell.scriptAnalysis.settingsPath": ".config/PSScriptAnalyzerSettings.psd1",
-
-    // Prettier formatter settings
-    //
-    // Ordinarily these are set via the EditorConfig and Prettier configuration
-    // files, but they only apply to files within the workspace. The VS Code
-    // user settings file is external to the workspace, and although in our
-    // setup it's a symlink to a file in the repository, its real path is not
-    // resolved when opened via the editor command. The settings here mirror
-    // the referenced configuration files to ensure formatting is consistent
-    // when the VS Code user settings file is modified through that entrypoint.
-    "prettier.endOfLine": "auto",
-    "prettier.printWidth": 79,
-    "prettier.singleQuote": true,
-    "prettier.tabWidth": 4,
-    "prettier.trailingComma": "none",
-
-    // Excludes for ShellCheck linter
-    "shellcheck.ignorePatterns": {
-        "**/*.cshrc": true,
-        "**/*.tcshrc": true,
-        "**/*.zsh": true,
-        "**/.zshrc": true
+    {
+      "icon": "config",
+      "extensions": [".dircolors", ".rdp"],
+      "filename": true,
+      "format": "svg"
     },
-
-    // VS Code explorer icons
-    "vsicons.presets.foldersAllDefaultIcon": true,
-    "vsicons.associations.files": [
-        {
-            "icon": "binary",
-            "extensions": ["ocb", "pmf"],
-            "format": "svg"
-        },
-        {
-            "icon": "binary",
-            "extensions": [".less"],
-            "filename": true,
-            "format": "svg"
-        },
-        {
-            "icon": "config",
-            "extensions": ["prf"],
-            "format": "svg"
-        },
-        {
-            "icon": "config",
-            "extensions": [".dircolors", ".rdp"],
-            "filename": true,
-            "format": "svg"
-        },
-        {
-            "icon": "git",
-            "extensions": [
-                ".git-for-windows-updater",
-                ".gitconfig-delta",
-                ".gitconfig-priv",
-                ".gitconfig-win"
-            ],
-            "filename": true,
-            "format": "svg"
-        },
-        {
-            "icon": "java",
-            "extensions": ["java_home.save"],
-            "filename": true,
-            "format": "svg"
-        },
-        {
-            "icon": "key",
-            "extensions": ["pub"],
-            "format": "svg"
-        },
-        {
-            "icon": "log",
-            "extensions": [".bash_history", "clink_history"],
-            "filename": true,
-            "format": "svg"
-        },
-        {
-            "icon": "mysql",
-            "extensions": [".my.cnf"],
-            "filename": true,
-            "format": "svg"
-        },
-        {
-            "icon": "onenote",
-            "extensions": ["onetastic"],
-            "format": "svg"
-        },
-        {
-            "icon": "pgsql",
-            "extensions": [".psqlrc"],
-            "filename": true,
-            "format": "svg"
-        },
-        {
-            "icon": "pip",
-            "extensions": ["pip.conf"],
-            "filename": true,
-            "format": "svg"
-        },
-        {
-            "icon": "text",
-            "extensions": [".ignore", ".keepme"],
-            "filename": true,
-            "format": "svg"
-        },
-        {
-            "icon": "vim",
-            "extensions": [".viminfo"],
-            "filename": true,
-            "format": "svg"
-        }
-    ],
-
-    // XML schema file associations
-    "xml.fileAssociations": [
-        // Windows PowerShell doesn't permit attributes in `<Configuration>`
-        {
-            "pattern": "**/*.format.ps1xml",
-            "systemId": "https://raw.githubusercontent.com/PowerShell/PowerShell/refs/heads/master/src/Schemas/Format.xsd"
-        },
-        {
-            "pattern": "**/windows/Event Viewer/**.xml",
-            "systemId": "windows/Event Viewer/Schemas/Viewer.xsd"
-        }
-    ],
-
-    "[ahk]": {
-        "editor.rulers": [79]
+    {
+      "icon": "git",
+      "extensions": [
+        ".git-for-windows-updater",
+        ".gitconfig-delta",
+        ".gitconfig-priv",
+        ".gitconfig-win"
+      ],
+      "filename": true,
+      "format": "svg"
     },
-
-    "[bat]": {
-        "editor.rulers": [79]
+    {
+      "icon": "java",
+      "extensions": ["java_home.save"],
+      "filename": true,
+      "format": "svg"
     },
-
-    "[csharp]": {
-        "editor.rulers": [79]
+    {
+      "icon": "key",
+      "extensions": ["pub"],
+      "format": "svg"
     },
-
-    "[ini]": {
-        "editor.rulers": [79]
+    {
+      "icon": "log",
+      "extensions": [".bash_history", "clink_history"],
+      "filename": true,
+      "format": "svg"
     },
-
-    "[javascript]": {
-        "editor.rulers": [79],
-
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": true
+    {
+      "icon": "mysql",
+      "extensions": [".my.cnf"],
+      "filename": true,
+      "format": "svg"
     },
-
-    "[json][jsonc]": {
-        "editor.rulers": [79],
-
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "editor.formatOnSave": true
+    {
+      "icon": "onenote",
+      "extensions": ["onetastic"],
+      "format": "svg"
     },
-
-    "[markdown]": {
-        "editor.defaultFormatter": "yzhang.markdown-all-in-one",
-        "editor.formatOnSave": true,
-
-        "editor.codeActionsOnSave": {
-            "source.fixAll.markdownlint": "explicit"
-        },
-
-        // Trailing whitespace has special meaning
-        "files.trimTrailingWhitespace": false
+    {
+      "icon": "pgsql",
+      "extensions": [".psqlrc"],
+      "filename": true,
+      "format": "svg"
     },
-
-    "[perl]": {
-        "editor.rulers": [79]
+    {
+      "icon": "pip",
+      "extensions": ["pip.conf"],
+      "filename": true,
+      "format": "svg"
     },
-
-    "[powershell]": {
-        "editor.rulers": [79],
-
-        "editor.defaultFormatter": "ms-vscode.powershell",
-        "editor.formatOnSave": true
+    {
+      "icon": "text",
+      "extensions": [".ignore", ".keepme"],
+      "filename": true,
+      "format": "svg"
     },
-
-    "[properties]": {
-        "editor.rulers": [79]
-    },
-
-    "[shellscript]": {
-        "editor.rulers": [79],
-
-        "editor.defaultFormatter": "foxundermoon.shell-format",
-        "editor.formatOnSave": true,
-
-        "editor.codeActionsOnSave": {
-            "source.fixAll.shellcheck": "explicit"
-        }
-    },
-
-    "[sql]": {
-        "editor.rulers": [79]
-    },
-
-    "[ssh_config]": {
-        "editor.rulers": [79]
-    },
-
-    "[vba]": {
-        "editor.rulers": [79]
-    },
-
-    "[viml]": {
-        "editor.rulers": [79]
-    },
-
-    "[xml]": {
-        "editor.rulers": [79],
-
-        // Some files don't end with a newline or end with two newlines
-        "files.trimFinalNewlines": false
+    {
+      "icon": "vim",
+      "extensions": [".viminfo"],
+      "filename": true,
+      "format": "svg"
     }
+  ],
+
+  // XML schema file associations
+  "xml.fileAssociations": [
+    // Windows PowerShell doesn't permit attributes in `<Configuration>`
+    {
+      "pattern": "**/*.format.ps1xml",
+      "systemId": "https://raw.githubusercontent.com/PowerShell/PowerShell/refs/heads/master/src/Schemas/Format.xsd"
+    },
+    {
+      "pattern": "**/windows/Event Viewer/**.xml",
+      "systemId": "windows/Event Viewer/Schemas/Viewer.xsd"
+    }
+  ],
+
+  "[ahk]": {
+    "editor.rulers": [79]
+  },
+
+  "[bat]": {
+    "editor.rulers": [79]
+  },
+
+  "[csharp]": {
+    "editor.rulers": [79]
+  },
+
+  "[ini]": {
+    "editor.rulers": [79]
+  },
+
+  "[javascript]": {
+    "editor.rulers": [79],
+
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+
+  "[json][jsonc]": {
+    "editor.rulers": [79],
+
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one",
+    "editor.formatOnSave": true,
+
+    "editor.codeActionsOnSave": {
+      "source.fixAll.markdownlint": "explicit"
+    },
+
+    // Trailing whitespace has special meaning
+    "files.trimTrailingWhitespace": false
+  },
+
+  "[perl]": {
+    "editor.rulers": [79]
+  },
+
+  "[powershell]": {
+    "editor.rulers": [79],
+
+    "editor.defaultFormatter": "ms-vscode.powershell",
+    "editor.formatOnSave": true
+  },
+
+  "[properties]": {
+    "editor.rulers": [79]
+  },
+
+  "[shellscript]": {
+    "editor.rulers": [79],
+
+    "editor.defaultFormatter": "foxundermoon.shell-format",
+    "editor.formatOnSave": true,
+
+    "editor.codeActionsOnSave": {
+      "source.fixAll.shellcheck": "explicit"
+    }
+  },
+
+  "[sql]": {
+    "editor.rulers": [79]
+  },
+
+  "[ssh_config]": {
+    "editor.rulers": [79]
+  },
+
+  "[vba]": {
+    "editor.rulers": [79]
+  },
+
+  "[viml]": {
+    "editor.rulers": [79]
+  },
+
+  "[xml]": {
+    "editor.rulers": [79],
+
+    // Some files don't end with a newline or end with two newlines
+    "files.trimFinalNewlines": false
+  }
 }

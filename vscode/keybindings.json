@@ -1,34 +1,34 @@
 [
-    /*
-     * Visual Studio Code keybindings
-     * https://code.visualstudio.com/docs/configure/keybindings
-     *
-     * File path:
-     * - Linux: `$HOME/.config/Code/User/keybindings.json`
-     * - macOS: `$HOME/Library/Application Support/Code/User/keybindings.json`
-     * - Windows: `%APPDATA%\Code\User\keybindings.json`
-     */
+  /*
+   * Visual Studio Code keybindings
+   * https://code.visualstudio.com/docs/configure/keybindings
+   *
+   * File path:
+   * - Linux: `$HOME/.config/Code/User/keybindings.json`
+   * - macOS: `$HOME/Library/Application Support/Code/User/keybindings.json`
+   * - Windows: `%APPDATA%\Code\User\keybindings.json`
+   */
 
-    // Close the VS Code window if nothing is open
-    {
-        "key": "ctrl+w",
-        "command": "workbench.action.closeWindow",
-        "when": "!editorIsOpen && !multipleEditorGroups"
-    },
-    // Repurpose shortcut for "Sort Lines Ascending"
-    {
-        "key": "alt+a",
-        "command": "-editor.action.accessibilityHelpConfigureAssignedKeybindings",
-        "when": "accessibilityHelpIsShown && accessibleViewHasAssignedKeybindings"
-    },
-    {
-        "key": "alt+a",
-        "command": "editor.action.sortLinesAscending"
-    },
-    // Disable "Open New External Terminal" shortcut
-    {
-        "key": "ctrl+shift+c",
-        "command": "-workbench.action.terminal.openNativeConsole",
-        "when": "!terminalFocus"
-    }
+  // Close the VS Code window if nothing is open
+  {
+    "key": "ctrl+w",
+    "command": "workbench.action.closeWindow",
+    "when": "!editorIsOpen && !multipleEditorGroups"
+  },
+  // Repurpose shortcut for "Sort Lines Ascending"
+  {
+    "key": "alt+a",
+    "command": "-editor.action.accessibilityHelpConfigureAssignedKeybindings",
+    "when": "accessibilityHelpIsShown && accessibleViewHasAssignedKeybindings"
+  },
+  {
+    "key": "alt+a",
+    "command": "editor.action.sortLinesAscending"
+  },
+  // Disable "Open New External Terminal" shortcut
+  {
+    "key": "ctrl+shift+c",
+    "command": "-workbench.action.terminal.openNativeConsole",
+    "when": "!terminalFocus"
+  }
 ]
