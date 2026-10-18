@@ -423,7 +423,7 @@ Function Global:Update-MSYS2 {
         if ($Result.ExitCode -eq 0 -or ($Result.ExitCode -eq 1 -and $Result.Upgrade.Count -eq 0)) {
             $Result.Success = $true
         } else {
-            $ExcMsg = "pacman exited with non-zero exit code listing upgradable MSYS2 packages: $($Result.ExitCode)"
+            $ExcMsg = "pacman exited with unexpected exit code listing upgradable MSYS2 packages: $($Result.ExitCode)"
             $ErrExc = [Exception]::new($ExcMsg)
             $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'NativeCommandFailed', $ErrCat, $UpgradeReportOnlyCmd)

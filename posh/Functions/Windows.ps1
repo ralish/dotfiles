@@ -893,7 +893,7 @@ Function Global:Convert-SecurityDescriptor {
         $ExcMsg = 'Unable to convert security descriptor to same type as input.'
         $ErrExc = [ArgumentException]::new($ExcMsg, 'TargetType')
         $ErrCat = [Management.Automation.ErrorCategory]::InvalidType
-        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $null)
+        $ErrRec = [Management.Automation.ErrorRecord]::new($ErrExc, 'PSInvalidType', $ErrCat, $TargetType)
         $PSCmdlet.WriteError($ErrRec)
     }
 }

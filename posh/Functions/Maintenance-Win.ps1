@@ -1388,7 +1388,7 @@ Function Global:Update-WSL {
             }
 
             default {
-                $ExcMsg = "Unknown exit code return by WSL: ${LASTEXITCODE}"
+                $ExcMsg = "WSL exited with unexpected exit code: ${LASTEXITCODE}"
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidResult
             }
         }
