@@ -101,7 +101,7 @@ Function Global:Get-EntraUserLicenseReport {
 
         $ColumnNames = 'Product_Display_Name', 'String_Id', 'Guid', 'Service_Plan_Name', 'Service_Plan_Id', 'Service_Plans_Included_Friendly_Names'
         foreach ($ColumnName in $ColumnNames) {
-            if (!($LicensingInfo[0].PSObject.Properties.Name -contains $ColumnName)) {
+            if ($null -eq $LicensingInfo[0].PSObject.Properties[$ColumnName]) {
                 $ExcMsg = "Imported CSV is missing expected column: ${ColumnName}"
                 $ErrExc = [IO.InvalidDataException]::new($ExcMsg)
                 $ErrCat = [Management.Automation.ErrorCategory]::InvalidData
@@ -125,7 +125,7 @@ Function Global:Get-EntraUserLicenseReport {
             }
 
             # Populate the mapping of license SKU IDs to display names
-            $ConflictingNames = 0
+            $ConflictingLicenses = [Collections.Generic.HashSet[String]]::new()
             foreach ($Entry in $LicensingInfo) {
                 try {
                     # Validate format and normalise
@@ -160,21 +160,55 @@ Function Global:Get-EntraUserLicenseReport {
                 $LicenseCurrentName = $LicenseSkuIdLookup[$LicenseSkuId]
                 if ($LicenseCurrentName -ceq $LicenseCandidateName) { continue }
 
-                # Prefer name which doesn't reference an outdated license name:
+                # Skip candidate names which are ruled out so that they are
+                # never stored by a later preference.
+
+                # Skip a candidate name which is entirely upper-case
+                if ($LicenseCandidateName -ceq $LicenseCandidateName.ToUpper()) { continue }
+
+                # Skip a candidate name referencing an outdated license:
                 # - Power Virtual Agent(s) -> Copilot Studio
-                $TestRegex = '\b(Power Virtual Agents?)\b'
-                if ($LicenseCandidateName -match $TestRegex) { continue }
-                if ($LicenseCurrentName -match $TestRegex) {
+                $OutdatedNamesRegex = '\b(Power Virtual Agents?)\b'
+                if ($LicenseCandidateName -match $OutdatedNamesRegex) { continue }
+
+                # Replace the current name with the candidate name on the first
+                # preference which applies, in priority order.
+
+                # Prefer a name which is not upper-case
+                if ($LicenseCurrentName -ceq $LicenseCurrentName.ToUpper()) {
                     $LicenseSkuIdLookup[$LicenseSkuId] = $LicenseCandidateName
                     continue
                 }
 
-                $ConflictingNames++
+                # Prefer a name which does not reference an outdated license
+                if ($LicenseCurrentName -match $OutdatedNamesRegex) {
+                    $LicenseSkuIdLookup[$LicenseSkuId] = $LicenseCandidateName
+                    continue
+                }
+
+                $null = $ConflictingLicenses.Add($LicenseSkuId)
                 Write-Debug -Message ('Display name for license "{0}" differs from existing entry: {1} != {2}' -f $LicenseSkuId, $LicenseCurrentName, $LicenseCandidateName)
             }
 
-            if ($ConflictingNames) {
-                Write-Warning -Message "${ConflictingNames} licenses had conflicting names which were not reconciled."
+            if ($ConflictingLicenses.Count -ne 0) {
+                Write-Warning -Message "$($ConflictingLicenses.Count) licenses had conflicting names which were not reconciled."
+            }
+
+            # Convert remaining entirely upper-case names to title-case
+            $TitleCaseNames = 0
+            $CultureTextInfo = (Get-Culture).TextInfo
+            foreach ($LicenseSkuId in @($LicenseSkuIdLookup.Keys)) {
+                $LicenseName = $LicenseSkuIdLookup[$LicenseSkuId]
+                if ($LicenseName -cne $LicenseName.ToUpper()) { continue }
+
+                # Convert to lower-case first as `ToTitleCase()` treats
+                # upper-case words as acronyms and skips processing them.
+                $LicenseSkuIdLookup[$LicenseSkuId] = $CultureTextInfo.ToTitleCase($LicenseName.ToLower())
+                $TitleCaseNames++
+            }
+
+            if ($TitleCaseNames) {
+                Write-Warning -Message "${TitleCaseNames} licenses had display names converted to title-case."
             }
 
             if ($ReturnParsedLicenses) {
@@ -189,8 +223,31 @@ Function Global:Get-EntraUserLicenseReport {
             '\bDOD\b'               = 'DoD'
         }
 
+        # Regular expressions which if the candidate name does not match but
+        # the current name does triggers replacement of the current name with
+        # the candidate name.
+        $CandidateNoMatchRegexes = @(
+            # Grammar/spelling mistakes
+            '\b(Microsoft Microsoft|PowerApps)\b'
+            # Deprecated services
+            '\b(Do Not Use|Retired)\b'
+            # Outdated service names:
+            # - Azure      -> Entra
+            # - Flow       -> Power Automate
+            # - Office 365 -> Microsoft 365
+            '\b(Azure|Flow|O(ffice )?365)\b'
+        )
+
+        # Regular expressions which if the current name does not match but the
+        # candidate name does triggers replacement of the current name with the
+        # candidate name.
+        $CandidateMatchRegexes = @(
+            # References a plan (e.g. `Plan 2`)
+            '\bPlan\b'
+        )
+
         # Populate the mapping of service plan IDs to display names
-        $ConflictingNames = 0
+        $ConflictingServices = [Collections.Generic.HashSet[String]]::new()
         foreach ($Entry in $LicensingInfo) {
             try {
                 # Validate format and normalise
@@ -225,41 +282,18 @@ Function Global:Get-EntraUserLicenseReport {
             $ServicePlanCurrentName = $ServicePlanIdLookup[$ServicePlanId]
             if ($ServicePlanCurrentName -ceq $ServicePlanCandidateName) { continue }
 
-            $UpdatedCurrentName = $false
-            $IgnoredCandidateName = $false
+            # Skip candidate names which are ruled out so that they are never
+            # stored by a later preference.
 
-            # Prefer name which is not upper-case
+            # Skip a candidate name which is entirely upper-case
             if ($ServicePlanCandidateName -ceq $ServicePlanCandidateName.ToUpper()) { continue }
-            if ($ServicePlanCurrentName -ceq $ServicePlanCurrentName.ToUpper()) {
-                $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
-                $UpdatedCurrentName = $true
-            }
 
-            # Prefer name which does not contain specific capitalised words
-            $TestRegex = '\b(EDU|RIGHTS)\b'
-            if ($ServicePlanCandidateName -cmatch $TestRegex) { continue }
-            if ($ServicePlanCurrentName -cmatch $TestRegex) {
-                $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
-                $UpdatedCurrentName = $true
-            }
+            # Skip a candidate name which contains specific capitalised words
+            $CapitalisedWordsRegex = '\b(EDU|RIGHTS)\b'
+            if ($ServicePlanCandidateName -cmatch $CapitalisedWordsRegex) { continue }
 
-            # Regular expressions which if the candidate name does not match
-            # but the current name does triggers replacement of the current
-            # name with the candidate name.
-            $CandidateNoMatchRegexes = @(
-                # Grammar/spelling mistakes
-                '\b(Microsoft Microsoft|PowerApps)\b'
-                # Deprecated services
-                '\b(Do Not Use|Retired)\b'
-                # Outdated service names:
-                # - Azure      -> Entra
-                # - Flow       -> Power Automate
-                # - Office 365 -> Microsoft 365
-                '\b(Azure|Flow|O(ffice )?365)\b'
-            )
-
-            # Check if the candidate name matches any of the regexes and bail
-            # out early if so as it's clearly not suitable.
+            # Skip a candidate name which matches any of the regexes
+            $IgnoredCandidateName = $false
             foreach ($TestRegex in $CandidateNoMatchRegexes) {
                 if ($ServicePlanCandidateName -match $TestRegex) {
                     $IgnoredCandidateName = $true
@@ -269,8 +303,23 @@ Function Global:Get-EntraUserLicenseReport {
 
             if ($IgnoredCandidateName) { continue }
 
-            # The candidate name may be preferred. Check if the current name
-            # matches any of the regexes, and if so, perform the replacement.
+            # Replace the current name with the candidate name on the first
+            # preference which applies, in priority order.
+
+            # Prefer a name which is not upper-case
+            if ($ServicePlanCurrentName -ceq $ServicePlanCurrentName.ToUpper()) {
+                $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
+                continue
+            }
+
+            # Prefer a name which does not contain specific capitalised words
+            if ($ServicePlanCurrentName -cmatch $CapitalisedWordsRegex) {
+                $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
+                continue
+            }
+
+            # Prefer a name which does not match any of the regexes
+            $UpdatedCurrentName = $false
             foreach ($TestRegex in $CandidateNoMatchRegexes) {
                 if ($ServicePlanCurrentName -match $TestRegex) {
                     $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
@@ -279,16 +328,9 @@ Function Global:Get-EntraUserLicenseReport {
                 }
             }
 
-            # Regular expressions which if the current name does not match but
-            # the candidate name does triggers replacement of the current name
-            # with the candidate name.
-            $CandidateMatchRegexes = @(
-                # References a plan (e.g. `Plan 2`)
-                '\bPlan\b'
-            )
+            if ($UpdatedCurrentName) { continue }
 
-            # Check if the current name matches any of the regexes and bail out
-            # early if so as it's clearly already suitable.
+            # Skip candidate name if the current name matches any regexes
             foreach ($TestRegex in $CandidateMatchRegexes) {
                 if ($ServicePlanCurrentName -match $TestRegex) {
                     $IgnoredCandidateName = $true
@@ -298,8 +340,7 @@ Function Global:Get-EntraUserLicenseReport {
 
             if ($IgnoredCandidateName) { continue }
 
-            # The candidate name may be preferred. Check if candidate name
-            # matches any of the regexes, and if so, perform the replacement.
+            # Prefer a name which matches any of the regexes
             foreach ($TestRegex in $CandidateMatchRegexes) {
                 if ($ServicePlanCandidateName -match $TestRegex) {
                     $ServicePlanIdLookup[$ServicePlanId] = $ServicePlanCandidateName
@@ -310,18 +351,18 @@ Function Global:Get-EntraUserLicenseReport {
 
             if ($UpdatedCurrentName) { continue }
 
-            $ConflictingNames++
+            $null = $ConflictingServices.Add($ServicePlanId)
             Write-Debug -Message ('Display name for service "{0}" differs from existing entry: {1} != {2}' -f $ServicePlanId, $ServicePlanCurrentName, $ServicePlanCandidateName)
         }
 
-        if ($ConflictingNames) {
-            Write-Warning -Message "${ConflictingNames} services had conflicting names which were not reconciled."
+        if ($ConflictingServices.Count -ne 0) {
+            Write-Warning -Message "$($ConflictingServices.Count) services had conflicting names which were not reconciled."
         }
 
-        # Convert remaining names which are entirely upper-case to title-case
+        # Convert remaining entirely upper-case names to title-case
         $TitleCaseNames = 0
         $CultureTextInfo = (Get-Culture).TextInfo
-        foreach ($ServicePlanId in $($ServicePlanIdLookup.Keys)) {
+        foreach ($ServicePlanId in @($ServicePlanIdLookup.Keys)) {
             $ServicePlanName = $ServicePlanIdLookup[$ServicePlanId]
             if ($ServicePlanName -cne $ServicePlanName.ToUpper()) { continue }
 
@@ -397,11 +438,11 @@ Function Global:Get-EntraUserLicenseReport {
 
     if (!$LicensingInfoCsv) {
         # Populate the mapping of license SKU IDs to names
-        foreach ($SubscribedSKU in $SubscribedSKUs) {
-            $LicenseSkuIdLookup[$SubscribedSKU.SkuId] = $SubscribedSKU.SkuPartNumber
+        foreach ($SubscribedSku in $SubscribedSKUs) {
+            $LicenseSkuIdLookup[$SubscribedSku.SkuId] = $SubscribedSku.SkuPartNumber
 
             # Populate the mapping of service plan IDs to names
-            foreach ($ServicePlan in $SubscribedSKU.ServicePlans) {
+            foreach ($ServicePlan in $SubscribedSku.ServicePlans) {
                 $ServicePlanIdLookup[$ServicePlan.ServicePlanId] = $ServicePlan.ServicePlanName
             }
         }
@@ -419,8 +460,8 @@ Function Global:Get-EntraUserLicenseReport {
         # Start by collecting licenses and disabled services
         foreach ($AssignedLicense in $User.AssignedLicenses) {
             $SkuId = $AssignedLicense.SkuId
-            $SubscribedSKU = $SubscribedSKUs | Where-Object SkuId -EQ $SkuId
-            if (!$SubscribedSKU) {
+            $SubscribedSku = $SubscribedSKUs | Where-Object SkuId -EQ $SkuId
+            if (!$SubscribedSku) {
                 Write-Warning -Message ('Skipping unknown license SKU "{0}" assigned to user: {1}' -f $SkuId, $User.UserPrincipalName)
                 continue
             }
@@ -456,15 +497,15 @@ Function Global:Get-EntraUserLicenseReport {
         # Enabled services are those which aren't listed in disabled services
         foreach ($AssignedLicense in $User.AssignedLicenses) {
             $SkuId = $AssignedLicense.SkuId
-            $SubscribedSKU = $SubscribedSKUs | Where-Object SkuId -EQ $SkuId
-            if (!$SubscribedSKU) { continue }
+            $SubscribedSku = $SubscribedSKUs | Where-Object SkuId -EQ $SkuId
+            if (!$SubscribedSku) { continue }
 
             $LicenseName = $LicenseSkuIdLookup[$SkuId]
             if (!$LicenseName) {
                 $LicenseName = $SkuId
             }
 
-            $ServicePlans = $SubscribedSKU.ServicePlans | Where-Object AppliesTo -EQ 'User'
+            $ServicePlans = $SubscribedSku.ServicePlans | Where-Object AppliesTo -EQ 'User'
             foreach ($ServicePlan in $ServicePlans) {
                 $PlanId = $ServicePlan.ServicePlanId
                 $PlanName = $ServicePlanIdLookup[$PlanId]
