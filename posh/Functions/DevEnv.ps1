@@ -371,7 +371,10 @@ Function Global:Switch-DJGPP {
         $BinPath = Join-Path -Path $Path -ChildPath ('i586-pc-msdosdjgpp', 'bin' -join [IO.Path]::DirectorySeparatorChar)
         $GccPath = Join-Path -Path $Path -ChildPath ('lib', 'gcc' -join [IO.Path]::DirectorySeparatorChar)
 
-        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
+        # On Unix-like platforms environment variable names are case-sensitive
+        # and the correct casing is `PATH`. The canonical casing is `Path` on
+        # Windows, but as it is case-insensitive using `PATH` still works.
+        $Env:PATH = $Env:PATH | & $PathFunc @PathParams -Element $BinPath
         Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $BinPath
 
@@ -567,7 +570,11 @@ Function Global:Switch-Go {
         }
 
         foreach ($PathChange in $PathChanges) {
-            $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
+            # On Unix-like platforms environment variable names are
+            # case-sensitive and the correct casing is `PATH`. The canonical
+            # casing is `Path` on Windows, but as it is case-insensitive using
+            # `PATH` still works.
+            $Env:PATH = $Env:PATH | & $PathFunc @PathParams -Element $PathChange
             Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
             Write-Host $PathChange
         }
@@ -778,7 +785,10 @@ Function Global:Switch-GoogleDepotTools {
 
         $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
 
-        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $Path
+        # On Unix-like platforms environment variable names are case-sensitive
+        # and the correct casing is `PATH`. The canonical casing is `Path` on
+        # Windows, but as it is case-insensitive using `PATH` still works.
+        $Env:PATH = $Env:PATH | & $PathFunc @PathParams -Element $Path
         Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $Path
 
@@ -962,7 +972,10 @@ Function Global:Switch-Java {
         $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
         $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
-        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
+        # On Unix-like platforms environment variable names are case-sensitive
+        # and the correct casing is `PATH`. The canonical casing is `Path` on
+        # Windows, but as it is case-insensitive using `PATH` still works.
+        $Env:PATH = $Env:PATH | & $PathFunc @PathParams -Element $BinPath
         Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $BinPath
 
@@ -1156,7 +1169,11 @@ Function Global:Switch-Nodejs {
         $PathChanges.Add($GlobalPrefixPath)
 
         foreach ($PathChange in $PathChanges) {
-            $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $PathChange
+            # On Unix-like platforms environment variable names are
+            # case-sensitive and the correct casing is `PATH`. The canonical
+            # casing is `Path` on Windows, but as it is case-insensitive using
+            # `PATH` still works.
+            $Env:PATH = $Env:PATH | & $PathFunc @PathParams -Element $PathChange
             Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
             Write-Host $PathChange
         }
@@ -1317,7 +1334,10 @@ Function Global:Switch-PHP {
 
         $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
 
-        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $Path
+        # On Unix-like platforms environment variable names are case-sensitive
+        # and the correct casing is `PATH`. The canonical casing is `Path` on
+        # Windows, but as it is case-insensitive using `PATH` still works.
+        $Env:PATH = $Env:PATH | & $PathFunc @PathParams -Element $Path
         Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $Path
 
@@ -2044,7 +2064,10 @@ Function Global:Switch-Ruby {
         $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
         $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
-        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
+        # On Unix-like platforms environment variable names are case-sensitive
+        # and the correct casing is `PATH`. The canonical casing is `Path` on
+        # Windows, but as it is case-insensitive using `PATH` still works.
+        $Env:PATH = $Env:PATH | & $PathFunc @PathParams -Element $BinPath
         Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $BinPath
 
@@ -2311,7 +2334,10 @@ Function Global:Switch-Rust {
         $Path = [IO.Path]::GetFullPath($Path).TrimEnd($DirSepChars)
         $BinPath = Join-Path -Path $Path -ChildPath 'bin'
 
-        $Env:Path = $Env:Path | & $PathFunc @PathParams -Element $BinPath
+        # On Unix-like platforms environment variable names are case-sensitive
+        # and the correct casing is `PATH`. The canonical casing is `Path` on
+        # Windows, but as it is case-insensitive using `PATH` still works.
+        $Env:PATH = $Env:PATH | & $PathFunc @PathParams -Element $BinPath
         Write-Host -NoNewline -ForegroundColor 'Green' $PathChangesDesc
         Write-Host $BinPath
 

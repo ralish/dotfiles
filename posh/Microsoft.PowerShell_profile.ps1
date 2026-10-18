@@ -205,9 +205,13 @@ if ($DotFilesLoadAsync) {
     Update-DotFilesFormatData
 }
 
-# Amend the search path to include scripts directory
+# Amend the search path to include the scripts directory
+#
+# On Unix-like platforms environment variable names are case-sensitive and the
+# correct casing is `PATH`. The canonical casing is `Path` on Windows, but as
+# it is case-insensitive using `PATH` still works.
 if (Test-Path -LiteralPath $PoshScriptsPath -PathType 'Container') {
-    $Env:Path = Add-PathStringElement -Path $Env:Path -Element $PoshScriptsPath -Action 'Prepend'
+    $Env:PATH = Add-PathStringElement -Path $Env:PATH -Element $PoshScriptsPath -Action 'Prepend'
 }
 
 # Output final count of queued async tasks
