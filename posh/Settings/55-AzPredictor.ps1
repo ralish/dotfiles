@@ -30,16 +30,17 @@ Function Import-AzPredictor {
         return
     }
 
+    $OriginalVerbosePreference = $Global:VerbosePreference
+
     try {
         # Suppress verbose output on import (global scope to catch everything)
-        $VerboseOriginal = $Global:VerbosePreference
         $Global:VerbosePreference = 'SilentlyContinue'
 
         Import-Module -Name 'Az.Tools.Predictor' -Scope 'Global' -ErrorAction 'Stop' -Verbose:$false
     } catch {
         Write-DotFilesMessage -Type 'Warning' -Message 'Failed to import Az.Tools.Predictor module.'
     } finally {
-        $Global:VerbosePreference = $VerboseOriginal
+        $Global:VerbosePreference = $OriginalVerbosePreference
     }
 }
 

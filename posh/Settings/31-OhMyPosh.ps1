@@ -38,9 +38,10 @@ Function Initialize-OhMyPosh {
         Write-DotFilesMessage -Type 'Verbose' -Message "Theme path: ${ThemePath}"
     }
 
+    $OriginalVerbosePreference = $Global:VerbosePreference
+
     try {
         # Suppress verbose output on import (global scope to catch everything)
-        $VerboseOriginal = $Global:VerbosePreference
         $Global:VerbosePreference = 'SilentlyContinue'
 
         # Load Oh My Posh
@@ -50,7 +51,7 @@ Function Initialize-OhMyPosh {
             & oh-my-posh init pwsh | Invoke-Expression # DevSkim: ignore DS104456
         }
     } finally {
-        $Global:VerbosePreference = $VerboseOriginal
+        $Global:VerbosePreference = $OriginalVerbosePreference
     }
 }
 

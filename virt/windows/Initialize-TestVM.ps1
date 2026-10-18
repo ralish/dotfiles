@@ -311,15 +311,16 @@ Function Optimize-PowerShell {
                 } catch { $PSCmdlet.ThrowTerminatingError($PSItem) }
             }
 
-            # Disabling progress output substantially improves performance
-            $ProgressPreferenceOriginal = $ProgressPreference
-            $ProgressPreference = 'SilentlyContinue'
+            $OriginalProgressPreference = $ProgressPreference
+
             try {
+                # Disabling progress output substantially improves performance
+                $ProgressPreference = 'SilentlyContinue'
                 $null = Invoke-WebRequest -Uri $NuGetUrl -OutFile $NuGetPath -UseBasicParsing -ErrorAction 'Stop'
             } catch {
                 $PSCmdlet.ThrowTerminatingError($PSItem)
             } finally {
-                $ProgressPreference = $ProgressPreferenceOriginal
+                $ProgressPreference = $OriginalProgressPreference
             }
 
             # There's some caching of package providers and I've yet to find a
@@ -754,19 +755,20 @@ Function Get-WindowsInfo {
     [OutputType([Void])]
     Param()
 
-    # The implicit import of the `CimCmdlets` module that may occur below
-    # triggers several "What if" outputs under Windows PowerShell, even though
-    # `Get-CimInstance` doesn't support `-WhatIf`. As this cmdlet doesn't
-    # modify any state we temporarily disable `WhatIf` mode.
+    $OriginalWhatIfPreference = $WhatIfPreference
+
     try {
-        $WhatIfOriginal = $WhatIfPreference
+        # The implicit import of the `CimCmdlets` module that may occur
+        # triggers several "What if" outputs under Windows PowerShell. As
+        # `Get-CimInstance` doesn't support `-WhatIf` and no state will be
+        # modified we temporarily disable `WhatIf` mode.
         $WhatIfPreference = $false
 
         $Win32OpSys = Get-CimInstance -Class 'Win32_OperatingSystem' -ErrorAction 'Stop' -Verbose:$false
     } catch {
         $PSCmdlet.ThrowTerminatingError($PSItem)
     } finally {
-        $WhatIfPreference = $WhatIfOriginal
+        $WhatIfPreference = $OriginalWhatIfPreference
     }
 
     $Script:WindowsBuildNumber = [UInt32]$Win32OpSys.BuildNumber

@@ -1099,19 +1099,20 @@ Function Global:Switch-WindowsSDK {
     }
 
     if (!$Architecture) {
-        # The implicit import of the `CimCmdlets` module that may occur below
-        # triggers several "What if" outputs under Windows PowerShell, even
-        # though `Get-CimInstance` doesn't support `-WhatIf`. As this cmdlet
-        # doesn't modify any state we temporarily disable `WhatIf` mode.
+        $OriginalWhatIfPreference = $WhatIfPreference
+
         try {
-            $WhatIfOriginal = $WhatIfPreference
+            # The implicit import of the `CimCmdlets` module that may occur
+            # triggers several "What if" outputs under Windows PowerShell. As
+            # `Get-CimInstance` doesn't support `-WhatIf` and no state will be
+            # modified we temporarily disable `WhatIf` mode.
             $WhatIfPreference = $false
 
             $Processor = Get-CimInstance -ClassName 'Win32_Processor' -ErrorAction 'Stop' -Verbose:$false | Select-Object -First 1
         } catch {
             $PSCmdlet.ThrowTerminatingError($PSItem)
         } finally {
-            $WhatIfPreference = $WhatIfOriginal
+            $WhatIfPreference = $OriginalWhatIfPreference
         }
 
         switch ($Processor.Architecture) {

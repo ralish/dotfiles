@@ -846,15 +846,15 @@ Function Global:Update-Scoop {
         if ($PSCmdlet.ShouldProcess('Scoop', 'Update')) {
             Write-Progress @WriteProgressParams -Status 'Updating Scoop to latest version' -PercentComplete 1
             Write-Verbose -Message "Updating Scoop: ${UpdateScoopCmd}"
+            $OriginalVerbosePreference = $VerbosePreference
 
             try {
                 # Suppress useless verbose output from Scoop
-                $VerboseOriginal = $VerbosePreference
                 $VerbosePreference = 'SilentlyContinue'
 
                 $Result.Scoop = [String[]]@(& scoop @UpdateScoopArgs 6>&1)
             } finally {
-                $VerbosePreference = $VerboseOriginal
+                $VerbosePreference = $OriginalVerbosePreference
             }
 
             $Result.ExitCode = $LASTEXITCODE
@@ -878,21 +878,21 @@ Function Global:Update-Scoop {
 
         Write-Progress @WriteProgressParams -Status 'Updating apps' -PercentComplete 20
         Write-Verbose -Message "Updating Scoop apps${ReportOnlyMsg}: ${UpdateAppsCmd}"
+        $OriginalVerbosePreference = $VerbosePreference
+        $OriginalWhatIfPreference = $WhatIfPreference
 
         try {
             # Suppress useless verbose output from Scoop
-            $VerboseOriginal = $VerbosePreference
             $VerbosePreference = 'SilentlyContinue'
 
             # Scoop may emit a "What if" output for updating formatting data.
             # This action is harmless so temporarily disable `WhatIf` mode.
-            $WhatIfOriginal = $WhatIfPreference
             $WhatIfPreference = $false
 
             $Result.Apps = [String[]]@(& scoop @UpdateAppsArgs 6>&1 | Where-Object { $PSItem -notmatch $ProgressBarRegex })
         } finally {
-            $VerbosePreference = $VerboseOriginal
-            $WhatIfPreference = $WhatIfOriginal
+            $VerbosePreference = $OriginalVerbosePreference
+            $WhatIfPreference = $OriginalWhatIfPreference
         }
 
         $Result.ExitCode = $LASTEXITCODE
@@ -908,15 +908,15 @@ Function Global:Update-Scoop {
         if ($PSCmdlet.ShouldProcess('Scoop outdated data', 'Remove')) {
             Write-Progress @WriteProgressParams -Status 'Cleaning-up outdated data' -PercentComplete 80
             Write-Verbose -Message "Cleaning-up outdated Scoop data: ${CleanupCmd}"
+            $OriginalVerbosePreference = $VerbosePreference
 
             try {
                 # Suppress useless verbose output from Scoop
-                $VerboseOriginal = $VerbosePreference
                 $VerbosePreference = 'SilentlyContinue'
 
                 $Result.Cleanup = [String[]]@(& scoop @CleanupArgs 6>&1)
             } finally {
-                $VerbosePreference = $VerboseOriginal
+                $VerbosePreference = $OriginalVerbosePreference
             }
 
             $Result.ExitCode = $LASTEXITCODE

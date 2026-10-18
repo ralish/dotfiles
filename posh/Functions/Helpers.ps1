@@ -167,9 +167,10 @@ Function Test-ModuleAvailable {
         if ($Operation -eq 'Get') {
             $ModuleAvailable = @(Get-Module -Name $Module -ListAvailable -Verbose:$false)
         } else {
+            $OriginalVerbosePreference = $Global:VerbosePreference
+
             try {
                 # Suppress verbose output on import
-                $VerboseOriginal = $Global:VerbosePreference
                 $Global:VerbosePreference = 'SilentlyContinue'
 
                 # Ensure we always load into the global scope. When running
@@ -184,7 +185,7 @@ Function Test-ModuleAvailable {
                     default { $PSCmdlet.ThrowTerminatingError($ErrRec) }
                 }
             } finally {
-                $Global:VerbosePreference = $VerboseOriginal
+                $Global:VerbosePreference = $OriginalVerbosePreference
             }
         }
 

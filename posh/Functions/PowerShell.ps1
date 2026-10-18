@@ -155,15 +155,15 @@ Function Global:Update-PowerShell {
     }
 
     Write-Verbose -Message "Using $($PSGetModule.Name) v$($PSGetModule.Version)"
+    $OriginalWhatIfPreference = $WhatIfPreference
 
     # Newer PowerShell versions no longer ship with DSC support built-in. It's
     # instead provided as a separate module which may not have been installed.
     try {
         # The implicit import of the `PSDesiredStateConfiguration` module that
-        # may occur below triggers several "What if" outputs, even though
-        # `Get-Command` doesn't support `-WhatIf`. As this cmdlet doesn't
-        # modify any state we temporarily disable `WhatIf` mode.
-        $WhatIfOriginal = $WhatIfPreference
+        # may occur triggers several "What if" outputs. As `Get-Command`
+        # doesn't support `-WhatIf` and no state will be modified we
+        # temporarily disable `WhatIf` mode.
         $WhatIfPreference = $false
 
         $DscSupport = Get-Command -Name 'Get-DscResource' -ErrorAction 'Stop'
@@ -183,7 +183,7 @@ Function Global:Update-PowerShell {
         Write-Warning -Message $Msg
         Write-Warning -Message 'DSC resources will be updated as they cannot be separately enumerated.'
     } finally {
-        $WhatIfPreference = $WhatIfOriginal
+        $WhatIfPreference = $OriginalWhatIfPreference
     }
 
     $WriteProgressParams = @{ Activity = 'Updating PowerShell modules' }
@@ -197,14 +197,15 @@ Function Global:Update-PowerShell {
         if ($PSResourceGet) {
             $InstalledModules = Get-InstalledPSResource -Verbose:$false
         } else {
+            $OriginalVerbosePreference = $VerbosePreference
+
             try {
                 # Suppress verbose output on implicit import
-                $VerboseOriginal = $VerbosePreference
                 $VerbosePreference = 'SilentlyContinue'
 
                 $InstalledModules = Get-InstalledModule -Verbose:$false
             } finally {
-                $VerbosePreference = $VerboseOriginal
+                $VerbosePreference = $OriginalVerbosePreference
             }
         }
 
@@ -223,13 +224,13 @@ Function Global:Update-PowerShell {
 
         if (!$IncludeDscModules -and $DscSupport) {
             Write-Progress @WriteProgressParams -Status 'Enumerating DSC modules for exclusion' -PercentComplete 5
+            $OriginalProgressPreference = $Global:ProgressPreference
 
             try {
                 # `Get-DscResource` likes to output multiple progress bars but
                 # doesn't have the good manners to clean them up when it's
                 # done. The result is a visual mess when we have our own
                 # progress bars.
-                $ProgressOriginal = $Global:ProgressPreference
                 $Global:ProgressPreference = 'SilentlyContinue'
 
                 # `Get-DscResource` may output various errors, most often due
@@ -238,7 +239,7 @@ Function Global:Update-PowerShell {
                 # multiple locations.
                 $DscModules = @(Get-DscResource -Module * -ErrorAction 'Ignore' -Verbose:$false | Select-Object -ExpandProperty 'ModuleName' -Unique)
             } finally {
-                $Global:ProgressPreference = $ProgressOriginal
+                $Global:ProgressPreference = $OriginalProgressPreference
             }
         }
 
