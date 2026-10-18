@@ -28,7 +28,9 @@ Function Initialize-Yq {
     Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
 }
 
-Initialize-Yq
-
-Remove-Item -LiteralPath 'Function:\Initialize-Yq'
-Complete-DotFilesSection
+try {
+    Initialize-Yq
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-Yq'
+    Complete-DotFilesSection
+}

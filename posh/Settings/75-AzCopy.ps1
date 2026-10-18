@@ -32,7 +32,9 @@ Function Initialize-AzCopy {
     Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
 }
 
-Initialize-AzCopy
-
-Remove-Item -LiteralPath 'Function:\Initialize-AzCopy'
-Complete-DotFilesSection
+try {
+    Initialize-AzCopy
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-AzCopy'
+    Complete-DotFilesSection
+}

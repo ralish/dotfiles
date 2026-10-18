@@ -46,7 +46,9 @@ Function Initialize-AwsCli {
     }
 }
 
-Initialize-AwsCli
-
-Remove-Item -LiteralPath 'Function:\Initialize-AwsCli'
-Complete-DotFilesSection
+try {
+    Initialize-AwsCli
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-AwsCli'
+    Complete-DotFilesSection
+}

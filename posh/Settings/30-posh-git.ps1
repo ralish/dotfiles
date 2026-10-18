@@ -32,7 +32,9 @@ Function Initialize-PoshGit {
     $Global:GitPromptSettings.DefaultPromptPrefix.Text = "${Env:USERNAME}@${Env:COMPUTERNAME}"
 }
 
-Initialize-PoshGit
-
-Remove-Item -LiteralPath 'Function:\Initialize-PoshGit'
-Complete-DotFilesSection
+try {
+    Initialize-PoshGit
+} catch {
+    Remove-Item -LiteralPath 'Function:\Initialize-PoshGit'
+    Complete-DotFilesSection
+}

@@ -32,7 +32,9 @@ Function Initialize-Ripgrep {
     Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
 }
 
-Initialize-Ripgrep
-
-Remove-Item -LiteralPath 'Function:\Initialize-Ripgrep'
-Complete-DotFilesSection
+try {
+    Initialize-Ripgrep
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-Ripgrep'
+    Complete-DotFilesSection
+}

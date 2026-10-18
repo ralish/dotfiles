@@ -71,7 +71,9 @@ Function Initialize-ExchangeOnlineManagement {
     )
 }
 
-Initialize-ExchangeOnlineManagement
-
-Remove-Item -LiteralPath 'Function:\Initialize-ExchangeOnlineManagement'
-Complete-DotFilesSection
+try {
+    Initialize-ExchangeOnlineManagement
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-ExchangeOnlineManagement'
+    Complete-DotFilesSection
+}

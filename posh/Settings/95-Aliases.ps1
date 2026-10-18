@@ -34,7 +34,9 @@ Function Initialize-Aliases {
     }
 }
 
-Initialize-Aliases
-
-Remove-Item -LiteralPath 'Function:\Initialize-Aliases'
-Complete-DotFilesSection
+try {
+    Initialize-Aliases
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-Aliases'
+    Complete-DotFilesSection
+}

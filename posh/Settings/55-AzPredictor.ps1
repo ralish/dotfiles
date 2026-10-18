@@ -44,7 +44,9 @@ Function Import-AzPredictor {
     }
 }
 
-Import-AzPredictor
-
-Remove-Item -LiteralPath 'Function:\Import-AzPredictor'
-Complete-DotFilesSection
+try {
+    Import-AzPredictor
+} finally {
+    Remove-Item -LiteralPath 'Function:\Import-AzPredictor'
+    Complete-DotFilesSection
+}

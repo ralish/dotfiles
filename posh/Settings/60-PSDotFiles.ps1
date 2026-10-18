@@ -30,7 +30,9 @@ Function Initialize-PSDotFiles {
     $Global:DotFilesAllowNestedSymlinks = $true
 }
 
-Initialize-PSDotFiles
-
-Remove-Item -LiteralPath 'Function:\Initialize-PSDotFiles'
-Complete-DotFilesSection
+try {
+    Initialize-PSDotFiles
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-PSDotFiles'
+    Complete-DotFilesSection
+}

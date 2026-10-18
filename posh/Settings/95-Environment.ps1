@@ -29,7 +29,9 @@ Function Initialize-Environment {
     }
 }
 
-Initialize-Environment
-
-Remove-Item -LiteralPath 'Function:\Initialize-Environment'
-Complete-DotFilesSection
+try {
+    Initialize-Environment
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-Environment'
+    Complete-DotFilesSection
+}

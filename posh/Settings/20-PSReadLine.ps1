@@ -70,15 +70,6 @@ Function Initialize-PSReadLine {
     Set-PSReadLineKeyHandlerInsertPairedBraces
     Set-PSReadLineKeyHandlerInsertPairedParenthesis
     Set-PSReadLineKeyHandlerSmartCloseBraces
-
-    # Clean-up the key handler setup functions
-    Remove-Item -LiteralPath @(
-        'Function:\Set-PSReadLineKeyHandlerCommandHelpWindow'
-        'Function:\Set-PSReadLineKeyHandlerExpandAliases'
-        'Function:\Set-PSReadLineKeyHandlerInsertPairedBraces'
-        'Function:\Set-PSReadLineKeyHandlerInsertPairedParenthesis'
-        'Function:\Set-PSReadLineKeyHandlerSmartCloseBraces'
-    )
 }
 
 # Show help for the command at the cursor in a new window
@@ -310,7 +301,17 @@ Function Set-PSReadLineKeyHandlerSmartCloseBraces {
     Set-PSReadLineKeyHandler @KeyHandlerParams
 }
 
-Initialize-PSReadLine
+try {
+    Initialize-PSReadLine
+} finally {
+    Remove-Item -LiteralPath @(
+        'Function:\Initialize-PSReadLine'
+        'Function:\Set-PSReadLineKeyHandlerCommandHelpWindow'
+        'Function:\Set-PSReadLineKeyHandlerExpandAliases'
+        'Function:\Set-PSReadLineKeyHandlerInsertPairedBraces'
+        'Function:\Set-PSReadLineKeyHandlerInsertPairedParenthesis'
+        'Function:\Set-PSReadLineKeyHandlerSmartCloseBraces'
+    )
 
-Remove-Item -LiteralPath 'Function:\Initialize-PSReadLine'
-Complete-DotFilesSection
+    Complete-DotFilesSection
+}

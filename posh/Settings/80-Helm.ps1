@@ -29,7 +29,9 @@ Function Initialize-Helm {
     Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
 }
 
-Initialize-Helm
-
-Remove-Item -LiteralPath 'Function:\Initialize-Helm'
-Complete-DotFilesSection
+try {
+    Initialize-Helm
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-Helm'
+    Complete-DotFilesSection
+}

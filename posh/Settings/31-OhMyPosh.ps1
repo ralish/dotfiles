@@ -121,7 +121,13 @@ Function Get-OhMyPoshThemePath {
     return $ThemePath
 }
 
-Initialize-OhMyPosh
+try {
+    Initialize-OhMyPosh
+} finally {
+    Remove-Item -LiteralPath @(
+        'Function:\Get-OhMyPoshThemePath'
+        'Function:\Initialize-OhMyPosh'
+    )
 
-Remove-Item -LiteralPath 'Function:\Get-OhMyPoshThemePath', 'Function:\Initialize-OhMyPosh'
-Complete-DotFilesSection
+    Complete-DotFilesSection
+}

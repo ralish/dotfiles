@@ -26,7 +26,9 @@ Function Test-Microsoft365DSCTelemetry {
     }
 }
 
-Test-Microsoft365DSCTelemetry
-
-Remove-Item -LiteralPath 'Function:\Test-Microsoft365DSCTelemetry'
-Complete-DotFilesSection
+try {
+    Test-Microsoft365DSCTelemetry
+} finally {
+    Remove-Item -LiteralPath 'Function:\Test-Microsoft365DSCTelemetry'
+    Complete-DotFilesSection
+}

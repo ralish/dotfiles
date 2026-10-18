@@ -29,7 +29,9 @@ Function Initialize-Trivy {
     Get-Content -LiteralPath $CompletionsFile | Out-String | Invoke-Expression # DevSkim: ignore DS104456
 }
 
-Initialize-Trivy
-
-Remove-Item -LiteralPath 'Function:\Initialize-Trivy'
-Complete-DotFilesSection
+try {
+    Initialize-Trivy
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-Trivy'
+    Complete-DotFilesSection
+}

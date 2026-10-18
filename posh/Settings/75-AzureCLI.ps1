@@ -58,7 +58,9 @@ Function Initialize-AzureCli {
     }
 }
 
-Initialize-AzureCli
-
-Remove-Item -LiteralPath 'Function:\Initialize-AzureCli'
-Complete-DotFilesSection
+try {
+    Initialize-AzureCli
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-AzureCli'
+    Complete-DotFilesSection
+}

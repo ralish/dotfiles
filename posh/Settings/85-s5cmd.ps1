@@ -29,7 +29,9 @@ Function Initialize-S5Cmd {
     }
 }
 
-Initialize-S5Cmd
-
-Remove-Item -LiteralPath 'Function:\Initialize-S5Cmd'
-Complete-DotFilesSection
+try {
+    Initialize-S5Cmd
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-S5Cmd'
+    Complete-DotFilesSection
+}

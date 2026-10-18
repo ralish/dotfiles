@@ -91,7 +91,9 @@ Function Initialize-ActiveDirectory {
     )
 }
 
-Initialize-ActiveDirectory
-
-Remove-Item -LiteralPath 'Function:\Initialize-ActiveDirectory'
-Complete-DotFilesSection
+try {
+    Initialize-ActiveDirectory
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-ActiveDirectory'
+    Complete-DotFilesSection
+}

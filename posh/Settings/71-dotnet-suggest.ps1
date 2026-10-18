@@ -50,7 +50,9 @@ Function Initialize-DotNetSuggest {
     }
 }
 
-Initialize-DotNetSuggest
-
-Remove-Item -LiteralPath 'Function:\Initialize-DotNetSuggest'
-Complete-DotFilesSection
+try {
+    Initialize-DotNetSuggest
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-DotNetSuggest'
+    Complete-DotFilesSection
+}

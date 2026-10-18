@@ -33,9 +33,6 @@ Function Initialize-DotNetCli {
 
     # Import the appropriate type of completions
     Import-DotNetCliCompletions -Type $CompletionsType
-
-    # Clean-up the completions setup functions
-    Remove-Item -LiteralPath 'Function:\Get-DotNetCliCompletionsType', 'Function:\Import-DotNetCliCompletions'
 }
 
 # Determine the type of argument completions to use
@@ -130,7 +127,14 @@ Function Import-DotNetCliCompletions {
     }
 }
 
-Initialize-DotNetCli
+try {
+    Initialize-DotNetCli
+} finally {
+    Remove-Item -LiteralPath @(
+        'Function:\Get-DotNetCliCompletionsType'
+        'Function:\Import-DotNetCliCompletions'
+        'Function:\Initialize-DotNetCli'
+    )
 
-Remove-Item -LiteralPath 'Function:\Initialize-DotNetCli'
-Complete-DotFilesSection
+    Complete-DotFilesSection
+}

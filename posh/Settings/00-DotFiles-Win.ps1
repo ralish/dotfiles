@@ -104,6 +104,10 @@ try {
         Set-DotFilesFinalPath
     }
 } finally {
-    Remove-Item -LiteralPath 'Function:\Set-DotFilesEnvPath', 'Function:\Set-DotFilesFinalPath'
+    Remove-Item -LiteralPath @(
+        'Function:\Set-DotFilesEnvPath'
+        'Function:\Set-DotFilesFinalPath'
+    )
+
     Complete-DotFilesSection
 }

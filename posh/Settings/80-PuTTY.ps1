@@ -67,7 +67,9 @@ Function Initialize-PuTTY {
     }
 }
 
-Initialize-PuTTY
-
-Remove-Item -LiteralPath 'Function:\Initialize-PuTTY'
-Complete-DotFilesSection
+try {
+    Initialize-PuTTY
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-PuTTY'
+    Complete-DotFilesSection
+}

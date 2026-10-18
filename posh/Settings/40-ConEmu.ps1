@@ -36,7 +36,9 @@ Function Initialize-ConEmu {
     }
 }
 
-Initialize-ConEmu
-
-Remove-Item -LiteralPath 'Function:\Initialize-ConEmu'
-Complete-DotFilesSection
+try {
+    Initialize-ConEmu
+} finally {
+    Remove-Item -LiteralPath 'Function:\Initialize-ConEmu'
+    Complete-DotFilesSection
+}
