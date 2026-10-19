@@ -175,11 +175,6 @@
   "vsicons.associations.files": [
     {
       "icon": "binary",
-      "extensions": ["ocb", "pmf"],
-      "format": "svg"
-    },
-    {
-      "icon": "binary",
       "extensions": [".less"],
       "filename": true,
       "format": "svg"
