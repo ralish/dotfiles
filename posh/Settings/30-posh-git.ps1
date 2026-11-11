@@ -34,7 +34,7 @@ Function Initialize-PoshGit {
 
 try {
     Initialize-PoshGit
-} catch {
+} finally {
     Remove-Item -LiteralPath 'Function:\Initialize-PoshGit'
     Complete-DotFilesSection
 }
