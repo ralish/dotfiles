@@ -15,6 +15,13 @@ Function Initialize-Environment {
     [OutputType([Void])]
     Param()
 
+    # Preferred editors for the current platform
+    if (Test-IsWindows) {
+        $DotFilesPreferredEditors = $Global:DotFilesPreferredEditorsWin
+    } else {
+        $DotFilesPreferredEditors = $Global:DotFilesPreferredEditorsNix
+    }
+
     # Set the `EDITOR` environment variable to an available preferred editor
     foreach ($Editor in $DotFilesPreferredEditors) {
         if (Get-Command -Name $Editor -ErrorAction 'Ignore') {
