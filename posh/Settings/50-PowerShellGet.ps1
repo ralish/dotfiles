@@ -13,6 +13,7 @@ if (!(Start-DotFilesSection @DotFilesSection)) { Complete-DotFilesSection; retur
 
 # Setup `PowerShellGet` configuration
 Function Initialize-PowerShellGet {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
     [CmdletBinding()]
     [OutputType([Void])]
     Param()
@@ -27,10 +28,10 @@ Function Initialize-PowerShellGet {
     )
 
     # `Install-Module`: Default to `CurrentUser` scope
-    $PSDefaultParameterValues['Install-Module:Scope'] = 'CurrentUser'
+    $Global:PSDefaultParameterValues['Install-Module:Scope'] = 'CurrentUser'
 
     # `Publish-Module`: Exclude development files
-    $PSDefaultParameterValues['Publish-Module:Exclude'] = $ExcludePaths
+    $Global:PSDefaultParameterValues['Publish-Module:Exclude'] = $ExcludePaths
 
     # Retrieve latest installed module version
     $PowerShellGet = Test-ModuleAvailable -Name 'PowerShellGet' -PassThru
@@ -38,10 +39,10 @@ Function Initialize-PowerShellGet {
     # v3 includes major changes to commands and parameters
     if ($PowerShellGet.Version.Major -ge 3) {
         # `Install-PSResource`: Default to `CurrentUser` scope
-        $PSDefaultParameterValues['Install-PSResource:Scope'] = 'CurrentUser'
+        $Global:PSDefaultParameterValues['Install-PSResource:Scope'] = 'CurrentUser'
 
         # `Publish-Module`: Exclude development files
-        $PSDefaultParameterValues['Publish-PSResource:Exclude'] = $ExcludePaths
+        $Global:PSDefaultParameterValues['Publish-PSResource:Exclude'] = $ExcludePaths
     }
 }
 
